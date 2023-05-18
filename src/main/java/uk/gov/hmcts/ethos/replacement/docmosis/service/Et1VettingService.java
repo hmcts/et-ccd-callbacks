@@ -50,6 +50,8 @@ public class Et1VettingService {
     private final TornadoService tornadoService;
 
     private static final String ET1_DOC_TYPE = "ET1";
+    private static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
+
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";
     private static final String BEFORE_LABEL_ET1 =
@@ -189,12 +191,12 @@ public class Et1VettingService {
                     .map(d -> String.format(
                             BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount.incrementAndReturnValue()))
                     .collect(Collectors.joining());
-        }
-        if (claimantRequestType != null && claimantRequestType.getClaimDescriptionDocument() != null) {
-            String documentBinaryUrl = claimantRequestType.getClaimDescriptionDocument().getDocumentBinaryUrl();
-            et1Attachment = String.format(BEFORE_LABEL_ET1_ATTACHMENT,
-                    documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/")),
-                    claimantRequestType.getClaimDescriptionDocument().getDocumentFilename());
+            et1Attachment = documentCollection
+                    .stream()
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_ATTACHMENT_DOC_TYPE))
+                    .map(d -> String.format(BEFORE_LABEL_ET1_ATTACHMENT,
+                            createDocLinkBinary(d), d.getValue().getUploadedDocument().getDocumentFilename()))
+                    .collect(Collectors.joining());
         }
 
         if (acasCount.getValue() > FIVE_ACAS_DOC_TYPE_ITEMS_COUNT) {

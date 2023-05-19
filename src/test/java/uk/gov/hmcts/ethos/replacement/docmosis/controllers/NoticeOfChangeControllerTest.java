@@ -63,6 +63,7 @@ class NoticeOfChangeControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
 
     private static final String ABOUT_TO_SUBMIT_URL = "/noc-decision/about-to-submit";
+    private static final String UPDATE_RESPONDENTS_URL = "/noc-decision/update-respondents";
     private static final String SUBMITTED_URL = "/noc-decision/submitted";
     private static final String AUTHORIZATION = "Authorization";
 
@@ -101,10 +102,28 @@ class NoticeOfChangeControllerTest {
     }
 
     @Test
+    void updateNocRespondents() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
+            .data(caseData)
+            .build());
+
+        mvc.perform(post(UPDATE_RESPONDENTS_URL)
+                .content(requestContent.toString())
+                .header(AUTHORIZATION, AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
     void nocSubmitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
-            any(), any());
+            any());
 
         mvc.perform(post(SUBMITTED_URL)
                 .content(requestContent.toString())

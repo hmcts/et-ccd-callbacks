@@ -1,14 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
@@ -45,9 +42,80 @@ class Et3ResponseHelperTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseData = caseDetails.getCaseData();
+    }
 
+    @Test
+    void givenClaimant_shouldFormatToTable() {
+        caseData.setClaimant("Test Person");
+
+        String expected = "<pre> ET1 claimant name&#09&#09&#09&#09 Test Person</pre><hr>";
+        assertThat(Et3ResponseHelper.formatClaimantNameForHtml(caseData), is(expected));
+    }
+
+    @Test
+    void givenValidStartDateAndEndDate_shouldReturnNoErrors() {
+        caseData.setEt3ResponseEmploymentStartDate("2022-02-02");
+        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
+
+        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
+    }
+
+    @Test
+    void givenNoStartDateAndEndDate_shouldNotValidateDates() {
+        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
+
+        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
+    }
+
+    @Test
+    void givenStartDateAndNoEndDate_shouldNotValidateDates() {
+        caseData.setEt3ResponseEmploymentStartDate("2022-02-02");
+
+        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
+    }
+
+    @Test
+    void givenNoStartDateAndNoEndDate_shouldNotValidateDates() {
+        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
+    }
+
+    @Test
+    void givenInvalidStartDateAndEndDate_shouldReturnAnError() {
+        caseData.setEt3ResponseEmploymentStartDate("2022-02-03");
+        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
+
+        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
+
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
+    }
+
+    @Test
+    void givenStartDateInTheFuture_shouldReturnAnError() {
+        caseData.setEt3ResponseEmploymentStartDate("2099-02-02");
+
+        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
+
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
+    }
+
+    @Test
+    void givenStartDateInTheFutureAndEndDateBeforeStartDate_shouldReturnErrors() {
+        caseData.setEt3ResponseEmploymentStartDate("2099-02-02");
+        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
+
+        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
+
+        assertThat(errors.size(), is(2));
+        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
+        assertThat(errors.get(1), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
+    }
+
+    @Test
+    void getDocumentRequest_buildsCorrectData() throws IOException, URISyntaxException {
         Address et3Address = CaseDataBuilder.builder().createAddress("line1", "line2", "line3", "town", "county",
-                "postcode", "country");
+            "postcode", "country");
 
         caseData.setEt3RespondentAddress(et3Address);
         caseData.setClaimant("claimant name");
@@ -87,121 +155,12 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponseContactPreference("Post");
         caseData.setEt3ResponsePayFrequency("Weekly");
 
-        Address repAddress = CaseDataBuilder.builder().createAddress(
-                "r1", "r2", "r3", "rTown", "rCounty",
-                "rPostcode", "rCountry"
-        );
-
-        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId("id");
-        representedTypeRItem.setValue(RepresentedTypeR.builder()
-                .respRepName("test")
-                .representativeAddress(repAddress)
-                .representativePhoneNumber("phone")
-                .build());
-        caseData.setRepCollection(List.of(representedTypeRItem));
-    }
-
-    @Test
-    void givenClaimant_shouldFormatToTable() {
-        caseData.setClaimant("Test Person");
-
-        String expected = "<pre> ET1 claimant name&#09&#09&#09&#09 Test Person</pre><hr>";
-        assertThat(Et3ResponseHelper.formatClaimantNameForHtml(caseData), is(expected));
-    }
-
-    @Test
-    void givenValidStartDateAndEndDate_shouldReturnNoErrors() {
-        caseData.setEt3ResponseEmploymentStartDate("2022-02-02");
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenNoStartDateAndEndDate_shouldNotValidateDates() {
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenStartDateAndNoEndDate_shouldNotValidateDates() {
-        caseData.setEt3ResponseEmploymentStartDate("2022-02-02");
-        caseData.setEt3ResponseEmploymentEndDate(null);
-
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenNoStartDateAndNoEndDate_shouldNotValidateDates() {
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenInvalidStartDateAndEndDate_shouldReturnAnError() {
-        caseData.setEt3ResponseEmploymentStartDate("2022-02-03");
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
-
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
-    }
-
-    @Test
-    void givenStartDateInTheFuture_shouldReturnAnError() {
-        caseData.setEt3ResponseEmploymentStartDate("2099-02-02");
-        caseData.setEt3ResponseEmploymentEndDate(null);
-
-        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
-
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
-    }
-
-    @Test
-    void givenStartDateInTheFutureAndEndDateBeforeStartDate_shouldReturnErrors() {
-        caseData.setEt3ResponseEmploymentStartDate("2099-02-02");
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
-
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
-        assertThat(errors.get(1), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
-    }
-
-    @Test
-    void getDocumentRequest_buildsCorrectData() throws IOException, URISyntaxException {
         // UTF-8 is required here for special characters to resolve on Windows correctly
         String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void getDocumentRequest_buildsCorrectData_withoutRespondentRepAddress() throws IOException, URISyntaxException {
-        caseData.getRepCollection().get(0).getValue().setRepresentativeAddress(null);
-
-        // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
-
-        JSONObject json = new JSONObject(expected);
-        JSONObject data = (JSONObject)json.get("data");
-
-        data.remove("repAddressLine1");
-        data.remove("repAddressLine2");
-        data.remove("repTown");
-        data.remove("repCounty");
-        data.remove("repPostcode");
-
-        String test = json.toString();
-        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
-        JSONAssert.assertEquals(test, actual, false);
     }
 
     @Test
@@ -236,10 +195,20 @@ class Et3ResponseHelperTest {
     }
 
     @Test
-    void createDynamicListSelection_noRespondents() {
-        caseData.setRespondentCollection(null);
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(errors, hasSize(1));
-        assertThat(errors.get(0)).isEqualTo("No respondents found");
+    void reloadEt3Data() {
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .et3ResponseAcasAgree(YES)
+                .et3ResponseSiteEmploymentCount("120")
+                .responseRespondentName("Test Test")
+                .respondentName("test")
+                .build();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
+
+        Et3ResponseHelper.reloadDataOntoEt3(caseData);
+        assertThat(caseData.getEt3ResponseAcasAgree()).isEqualTo(YES);
+        assertThat(caseData.getEt3ResponseSiteEmploymentCount()).isEqualTo("120");
+        assertThat(caseData.getEt3ResponseRespondentLegalName()).isEqualTo("Test Test");
     }
 }

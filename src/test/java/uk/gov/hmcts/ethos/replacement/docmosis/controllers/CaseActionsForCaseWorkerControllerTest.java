@@ -428,10 +428,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @Test
     public void amendRespondentRepresentative() throws Exception {
+
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(), anyString()))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
 
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
@@ -1215,7 +1214,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenThrow(
                 new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateReceiptDate(isA(CaseDetails.class))).thenThrow(
+        when(eventValidationService.validateReceiptDate(isA(CaseData.class))).thenThrow(
                 new InternalException(ERROR_MESSAGE));
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())

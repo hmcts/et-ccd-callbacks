@@ -74,8 +74,8 @@ module.exports = async function () {
     I.click('#respondentCollection_0_responseReceived_Yes');
     I.see('Response received date');
     I.seeInField('#responseReceivedDate-day', '05');
-    I.seeInField('#responseReceivedDate-month', '05');
-    I.seeInField('#responseReceivedDate-year', '2021');
+    I.seeInField('#responseReceivedDate-month', '11');
+    I.seeInField('#responseReceivedDate-year', '2022');
     I.see('Response Struck Out (Optional)');
 
     I.click(commonConfig.continue);

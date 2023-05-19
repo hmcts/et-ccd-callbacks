@@ -8,20 +8,17 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 
 @SuppressWarnings({"PMD.ExcessiveClassLength", "PMD.LawOfDemeter", "PMD.UseProperClassLoader",
     "PMD.LinguisticNaming", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveMethodLength", "PMD.TooManyMethods",
-    "PMD.TooManyFields", "PMD.ExcessiveImports"})
+    "PMD.TooManyFields"})
 public class DocumentHelperTest {
 
     private static final String DUMMY_CASE_TYPE_ID = "dummy case type id";
@@ -2182,23 +2179,4 @@ public class DocumentHelperTest {
                         UtilHelper.formatCurrentDate(currentLocalDatePlus28Days));
     }
 
-    @Test
-    public void setLegalRepVisibleDocuments_hidesDocuments() {
-        CaseData caseData = new CaseData();
-        DocumentTypeItem et1Doc = DocumentFixtures.getDocumentTypeItem("Visible", "ET1");
-        DocumentTypeItem caseFileDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Tribunal case file");
-        DocumentTypeItem otherDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Other");
-        DocumentTypeItem referralsDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Referral/Judicial direction");
-        DocumentTypeItem nullDoc = DocumentFixtures.getDocumentTypeItem("Visible", null);
-
-        caseData.setDocumentCollection(List.of(et1Doc, caseFileDoc, otherDoc, referralsDoc, nullDoc));
-
-        DocumentHelper.setLegalRepVisibleDocuments(caseData);
-
-        List<DocumentTypeItem> legalRepDocuments = caseData.getLegalrepDocumentCollection();
-
-        assertEquals(legalRepDocuments.size(), 2);
-        assertEquals(legalRepDocuments.get(0).getValue().getUploadedDocument().getDocumentFilename(), "Visible");
-        assertEquals(legalRepDocuments.get(1).getValue().getUploadedDocument().getDocumentFilename(), "Visible");
-    }
 }

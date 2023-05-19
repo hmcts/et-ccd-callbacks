@@ -58,19 +58,6 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')
 
-  afterAlways('test') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/integration/index.html'
-
-    publishHTML target: [
-            allowMissing : true,
-            alwaysLinkToLastBuild: true,
-            keepAll : true,
-            reportDir : "integration",
-            reportFiles : "index.html",
-            reportName : "Integration test report"
-    ]
-  }
-
   afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
 

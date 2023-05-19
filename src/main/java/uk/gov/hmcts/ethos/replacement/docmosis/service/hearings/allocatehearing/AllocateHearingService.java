@@ -37,7 +37,7 @@ public class AllocateHearingService {
 
     public void initialiseAllocateHearing(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelectionAllocateHearing(caseData));
+        dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelection(caseData));
         caseData.setAllocateHearingHearing(dynamicFixedListType);
     }
 
@@ -83,11 +83,11 @@ public class AllocateHearingService {
     }
 
     private HearingType getSelectedHearing(CaseData caseData) {
-        return hearingSelectionService.getSelectedHearingAllocateHearing(caseData);
+        return hearingSelectionService.getSelectedHearing(caseData, caseData.getAllocateHearingHearing());
     }
 
     private DateListedType getSelectedListing(CaseData caseData) {
-        return hearingSelectionService.getSelectedListing(caseData);
+        return hearingSelectionService.getSelectedListing(caseData, caseData.getAllocateHearingHearing());
     }
 
     private boolean isVenueChanged(DynamicFixedListType currentVenue, DynamicFixedListType newVenue) {

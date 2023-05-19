@@ -8,14 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -25,42 +21,32 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.ExcessiveMethodLength"})
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class NocRespondentRepresentativeServiceTest {
-    private static final String CASE_ID_ONE = "723";
+    public static final String CASE_ID_ONE = "723";
     private static final String RESPONDENT_NAME = "Harry Johnson";
     private static final String RESPONDENT_NAME_TWO = "Jane Green";
     private static final String RESPONDENT_NAME_THREE = "Bad Company Inc";
@@ -83,7 +69,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final String ORGANISATION_ID_TWO = "ORG2";
     private static final String ORGANISATION_ID_THREE = "ORG3";
     private static final String ORGANISATION_ID_NEW = "ORG_NEW";
-    private static final String ET_ORG_1 = "ET Org 1";
+    public static final String ET_ORG_1 = "ET Org 1";
     private static final String ET_ORG_2 = "ET Org 2";
     private static final String ET_ORG_3 = "ET Org 3";
     private static final String ET_ORG_NEW = "ET Org New";
@@ -98,30 +84,17 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_REP_NAME_NEW = "New Dawn Solicitors";
     private static final String RESPONDENT_REP_ID_NEW = "1111-5555-8888-1113";
     private static final String AUTH_TOKEN = "someToken";
-    private static final String USER_ID_ONE = "891-456";
-    private static final String USER_ID_TWO = "123-456";
-
+    public static final String USER_ID_ONE = "891-456";
+    public static final String USER_ID_TWO = "123-456";
     @Autowired
     private ObjectMapper objectMapper;
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
-
     @MockBean
     private NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
     @MockBean
     private AdminUserService adminUserService;
     @MockBean
     private NocCcdService nocCcdService;
-    @MockBean
-    private NocNotificationService nocNotificationService;
-    @MockBean
-    private CcdClient ccdClient;
-    @MockBean
-    private CcdCaseAssignment ccdCaseAssignment;
-    @MockBean
-    private OrganisationClient organisationClient;
-    @MockBean
-    private AuthTokenGenerator authTokenGenerator;
-
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
 
@@ -130,18 +103,15 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentHelper = new NocRespondentHelper();
         caseData = new CaseData();
         CaseConverter converter = new CaseConverter(objectMapper);
-
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
-                    adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, ccdCaseAssignment,
-                    organisationClient, authTokenGenerator);
-                    
+                adminUserService, nocRespondentHelper);
+
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(RespondentSumType.builder()
-            .respondentName(RESPONDENT_NAME)
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME)
             .respondentEmail(RESPONDENT_EMAIL)
             .responseReference(RESPONDENT_REF)
             .build());
@@ -188,8 +158,7 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME)
                 .respRepName(RESPONDENT_NAME)
-                .respondentOrganisation(org1)
-                .myHmctsYesNo(YES).build();
+                .respondentOrganisation(org1).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID);
         representedTypeRItem.setValue(representedType);
@@ -200,8 +169,7 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_TWO)
                 .respRepName(RESPONDENT_NAME_TWO)
-                .respondentOrganisation(org2)
-                .myHmctsYesNo(NO).build();
+                .respondentOrganisation(org2).build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_TWO);
         representedTypeRItem.setValue(representedType);
@@ -212,22 +180,12 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_THREE)
                 .respRepName(RESPONDENT_NAME_THREE)
-                .respondentOrganisation(org3)
-                .myHmctsYesNo(YES).build();
+                .respondentOrganisation(org3).build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_THREE);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseData.getRepCollection().add(representedTypeRItem);
-
-        caseData.setChangeOrganisationRequestField(ChangeOrganisationRequest.builder()
-                .organisationToAdd(org1)
-                .organisationToRemove(org2)
-                .caseRoleId(null)
-                .requestTimestamp(null)
-                .approvalStatus(null)
-                .build());
-        when(authTokenGenerator.generate()).thenReturn("s2sToken");
     }
 
     @Test
@@ -321,26 +279,15 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     void updateRepresentativesAccess() throws IOException {
-        CCDRequest ccdRequest = getCCDRequest();
+        CallbackRequest callbackRequest = getCallBackCallbackRequest();
 
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(nocCcdService.updateCaseRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
-        when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
-                mockCaseAssignmentData());
-        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
-                .data(caseData)
-                .build());
+        doNothing().when(nocCcdService).updateCaseRepresentation(any(), any(), any(), any(), any());
 
-        nocRespondentRepresentativeService.updateRepresentativesAccess(getCallBackCallbackRequest());
+        nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
 
         verify(nocCcdService, times(2))
-            .updateCaseRepresentation(any(), any(), any(), any());
-
-        verify(nocNotificationService, times(2))
-                .sendNotificationOfChangeEmails(any(), any(), any());
-
-        verify(ccdClient, times(2))
-                .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
+            .updateCaseRepresentation(any(), any(), any(), any(), any());
     }
 
     private CallbackRequest getCallBackCallbackRequest() {
@@ -352,14 +299,6 @@ class NocRespondentRepresentativeServiceTest {
         caseDetailsAfter.setCaseData(getCaseDataAfter());
         callbackRequest.setCaseDetails(caseDetailsAfter);
         return callbackRequest;
-    }
-
-    private CCDRequest getCCDRequest() {
-        CCDRequest ccdRequest = new CCDRequest();
-        CaseDetails caseDetailsAfter = new CaseDetails();
-        caseDetailsAfter.setCaseData(getCaseDataAfter());
-        ccdRequest.setCaseDetails(caseDetailsAfter);
-        return ccdRequest;
     }
 
     @Test
@@ -425,8 +364,6 @@ class NocRespondentRepresentativeServiceTest {
         CaseData caseDataBefore = new CaseData();
 
         caseDataBefore.setRespondentCollection(new ArrayList<>());
-        caseDataBefore.setClaimant("claimant");
-        caseDataBefore.setEthosCaseReference("caseRef");
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME)
@@ -481,8 +418,7 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_TWO)
                 .respRepName(RESPONDENT_NAME_TWO)
-                .respondentOrganisation(org2)
-                .representativeEmailAddress("oldRep1@test.com").build();
+                .respondentOrganisation(org2).build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_TWO);
         representedTypeRItem.setValue(representedType);
@@ -493,8 +429,7 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_THREE)
                 .respRepName(RESPONDENT_NAME_THREE)
-                .respondentOrganisation(org3)
-                .representativeEmailAddress("oldRep2@test.com").build();
+                .respondentOrganisation(org3).build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_THREE);
         representedTypeRItem.setValue(representedType);
@@ -606,184 +541,6 @@ class NocRespondentRepresentativeServiceTest {
 
         verify(nocCcdService, times(1))
             .revokeCaseAssignments(any(), any());
-    }
-
-    @Test
-    void prepopulateOrgAddressAndName() {
-        OrganisationsResponse resOrg1 = createOrganisationsResponse(ORGANISATION_ID, ET_ORG_1);
-        OrganisationsResponse resOrg2 = createOrganisationsResponse(ORGANISATION_ID_TWO, ET_ORG_2);
-        OrganisationsResponse resOrg3 = createOrganisationsResponse(ORGANISATION_ID_THREE, ET_ORG_3);
-
-        List<OrganisationsResponse> orgDetails = new ArrayList<>();
-        orgDetails.add(resOrg1);
-        orgDetails.add(resOrg2);
-        orgDetails.add(resOrg3);
-
-        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
-
-        CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-
-        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
-
-        List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
-
-        RepresentedTypeR rep1 = repCollection.get(0).getValue();
-        assertThat(rep1.getRepresentativeAddress().getAddressLine1())
-                .isEqualTo(resOrg1.getContactInformation().get(0).getAddressLine1());
-        assertThat(rep1.getNameOfOrganisation()).isEqualTo(resOrg1.getName());
-
-        RepresentedTypeR rep2 = repCollection.get(1).getValue();
-        assertNull(rep2.getRepresentativeAddress());
-        assertNull(rep2.getNameOfOrganisation());
-
-        RepresentedTypeR rep3 = repCollection.get(2).getValue();
-        assertThat(rep3.getRepresentativeAddress().getAddressLine1())
-                .isEqualTo(resOrg3.getContactInformation().get(0).getAddressLine1());
-        assertThat(rep3.getNameOfOrganisation()).isEqualTo(resOrg3.getName());
-    }
-
-    @Test
-    void prepopulateOrgAddress_RepCollection_Null() {
-        caseData.setRepCollection(null);
-        nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
-    }
-
-    @Test
-    void prepopulateOrgAddress_RepCollection_Empty() {
-        caseData.setRepCollection(new ArrayList<>());
-        nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
-    }
-
-    @Test
-    void prepopulateOrgAddress_NoOrganisationAccounts() {
-        for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-            representative.getValue().setMyHmctsYesNo(NO);
-        }
-        nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
-    }
-
-    @Test
-    void prepopulateOrgAddress_NoActiveOrganisations() {
-        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(new ArrayList<>());
-
-        CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-
-        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
-
-        List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
-
-        assertNull(repCollection.get(0).getValue().getRepresentativeAddress());
-        assertNull(repCollection.get(1).getValue().getRepresentativeAddress());
-        assertNull(repCollection.get(2).getValue().getRepresentativeAddress());
-    }
-
-    @Test
-    void prepopulateOrgAddress_OrgNotFound() {
-        OrganisationsResponse resOrg1 = createOrganisationsResponse("SomeOrgId", ET_ORG_1);
-
-        List<OrganisationsResponse> orgDetails = new ArrayList<>();
-        orgDetails.add(resOrg1);
-
-        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
-
-        CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-
-        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
-
-        List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
-
-        assertNull(repCollection.get(0).getValue().getRepresentativeAddress());
-        assertNull(repCollection.get(1).getValue().getRepresentativeAddress());
-        assertNull(repCollection.get(2).getValue().getRepresentativeAddress());
-    }
-
-    @Test
-    void prepopulateOrgAddress_AddressNotPopulated() {
-        OrganisationsResponse resOrg1 = createOrganisationsResponse(ORGANISATION_ID, ET_ORG_1);
-        resOrg1.setContactInformation(null);
-        OrganisationsResponse resOrg2 = createOrganisationsResponse(ORGANISATION_ID_TWO, ET_ORG_2);
-        resOrg2.setContactInformation(new ArrayList<>());
-        OrganisationsResponse resOrg3 = createOrganisationsResponse(ORGANISATION_ID_THREE, ET_ORG_3);
-        resOrg3.getContactInformation().get(0).setAddressLine1(null);
-        resOrg3.getContactInformation().get(0).setTownCity(null);
-        resOrg3.getContactInformation().get(0).setCountry(null);
-
-        List<OrganisationsResponse> orgDetails = new ArrayList<>();
-        orgDetails.add(resOrg1);
-        orgDetails.add(resOrg2);
-        orgDetails.add(resOrg3);
-
-        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
-
-        CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-
-        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
-
-        List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
-
-        assertNull(repCollection.get(0).getValue().getRepresentativeAddress());
-        assertNull(repCollection.get(1).getValue().getRepresentativeAddress());
-        assertNull(repCollection.get(2).getValue().getRepresentativeAddress().getAddressLine1());
-    }
-
-    @Test
-    void prepopulateOrgAddress_OverwriteExistingAddress() {
-        OrganisationsResponse resOrg1 = createOrganisationsResponse(ORGANISATION_ID, ET_ORG_1);
-        OrganisationsResponse resOrg2 = createOrganisationsResponse(ORGANISATION_ID_TWO, ET_ORG_2);
-        OrganisationsResponse resOrg3 = createOrganisationsResponse(ORGANISATION_ID_THREE, ET_ORG_3);
-
-        List<OrganisationsResponse> orgDetails = new ArrayList<>();
-        orgDetails.add(resOrg1);
-        orgDetails.add(resOrg2);
-        orgDetails.add(resOrg3);
-
-        List<RepresentedTypeRItem> existingRepCollection = caseData.getRepCollection();
-        Address rep1Address = new Address();
-        rep1Address.setAddressLine1("Rep 1 - Address 1");
-        existingRepCollection.get(0).getValue().setRepresentativeAddress(rep1Address);
-        Address rep2Address = new Address();
-        rep2Address.setAddressLine1("Rep 2 - Address 1");
-        existingRepCollection.get(1).getValue().setRepresentativeAddress(rep2Address);
-        Address rep3Address = new Address();
-        rep3Address.setAddressLine1("Rep 3 - Address 1");
-        existingRepCollection.get(2).getValue().setRepresentativeAddress(rep3Address);
-
-        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
-
-        CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-
-        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
-
-        List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
-
-        Address representative1Org = repCollection.get(0).getValue().getRepresentativeAddress();
-        assertThat(representative1Org.getAddressLine1())
-                .isEqualTo(resOrg1.getContactInformation().get(0).getAddressLine1());
-
-        Address representative2Org = repCollection.get(1).getValue().getRepresentativeAddress();
-        assertThat(representative2Org.getAddressLine1())
-                .isEqualTo(rep2Address.getAddressLine1());
-
-        Address representative3Org = repCollection.get(2).getValue().getRepresentativeAddress();
-        assertThat(representative3Org.getAddressLine1())
-                .isEqualTo(resOrg3.getContactInformation().get(0).getAddressLine1());
-    }
-
-    private OrganisationsResponse createOrganisationsResponse(String orgId, String orgName) {
-        OrganisationAddress orgAddress =
-                OrganisationAddress.builder()
-                        .addressLine1(orgName + " Address 1")
-                        .townCity(orgName + " TownCity 2")
-                        .country(orgName + " Country 3")
-                        .build();
-
-        return  OrganisationsResponse.builder()
-                        .organisationIdentifier(orgId)
-                        .name(orgName)
-                        .contactInformation(Collections.singletonList(orgAddress)).build();
     }
 
     private CaseUserAssignmentData mockCaseAssignmentData() {

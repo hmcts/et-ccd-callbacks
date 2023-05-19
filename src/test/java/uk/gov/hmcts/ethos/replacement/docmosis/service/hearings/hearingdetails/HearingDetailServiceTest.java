@@ -7,16 +7,12 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
+
 import java.util.List;
-import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -79,23 +75,22 @@ public class HearingDetailServiceTest {
         selectedListing.setHearingNotes2(notes);
         CaseData caseData = createCaseData();
         hearingDetailsService.handleListingSelected(caseData);
-        HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().get(0).getValue();
-        assertEquals(hearingStatus, hearingDetailType.getHearingDetailsStatus());
-        assertEquals(postponedBy, hearingDetailType.getHearingDetailsPostponedBy());
-        assertEquals(caseDisposed, hearingDetailType.getHearingDetailsCaseDisposed());
-        assertEquals(partHeard, hearingDetailType.getHearingDetailsPartHeard());
-        assertEquals(reservedJudgment, hearingDetailType.getHearingDetailsReservedJudgment());
-        assertEquals(attendeeClaimant, hearingDetailType.getHearingDetailsAttendeeClaimant());
-        assertEquals(attendeeNonAttendees, hearingDetailType.getHearingDetailsAttendeeNonAttendees());
-        assertEquals(attendeeRespNoRep, hearingDetailType.getHearingDetailsAttendeeRespNoRep());
-        assertEquals(attendeeRespAndRep, hearingDetailType.getHearingDetailsAttendeeRespAndRep());
-        assertEquals(attendeeRepOnly, hearingDetailType.getHearingDetailsAttendeeRepOnly());
-        assertEquals(hearingTimeStart, hearingDetailType.getHearingDetailsTimingStart());
-        assertEquals(hearingTimeBreak, hearingDetailType.getHearingDetailsTimingBreak());
-        assertEquals(hearingTimeResume, hearingDetailType.getHearingDetailsTimingResume());
-        assertEquals(hearingTimeFinish, hearingDetailType.getHearingDetailsTimingFinish());
-        assertEquals(duration, hearingDetailType.getHearingDetailsTimingDuration());
-        assertEquals(notes, hearingDetailType.getHearingDetailsHearingNotes2());
+        assertEquals(hearingStatus, caseData.getHearingDetailsStatus());
+        assertEquals(postponedBy, caseData.getHearingDetailsPostponedBy());
+        assertEquals(caseDisposed, caseData.getHearingDetailsCaseDisposed());
+        assertEquals(partHeard, caseData.getHearingDetailsPartHeard());
+        assertEquals(reservedJudgment, caseData.getHearingDetailsReservedJudgment());
+        assertEquals(attendeeClaimant, caseData.getHearingDetailsAttendeeClaimant());
+        assertEquals(attendeeNonAttendees, caseData.getHearingDetailsAttendeeNonAttendees());
+        assertEquals(attendeeRespNoRep, caseData.getHearingDetailsAttendeeRespNoRep());
+        assertEquals(attendeeRespAndRep, caseData.getHearingDetailsAttendeeRespAndRep());
+        assertEquals(attendeeRepOnly, caseData.getHearingDetailsAttendeeRepOnly());
+        assertEquals(hearingTimeStart, caseData.getHearingDetailsTimingStart());
+        assertEquals(hearingTimeBreak, caseData.getHearingDetailsTimingBreak());
+        assertEquals(hearingTimeResume, caseData.getHearingDetailsTimingResume());
+        assertEquals(hearingTimeFinish, caseData.getHearingDetailsTimingFinish());
+        assertEquals(duration, caseData.getHearingDetailsTimingDuration());
+        assertEquals(notes, caseData.getHearingDetailsHearingNotes2());
     }
 
     @Test
@@ -114,67 +109,60 @@ public class HearingDetailServiceTest {
         selectedListing.setHearingTimingFinish(null);
         selectedListing.setHearingTimingDuration(null);
         selectedListing.setHearingNotes2(null);
-        selectedListing.setListedDate("2022-11-11 11:00:00");
         CaseData caseData = createCaseData();
         hearingDetailsService.handleListingSelected(caseData);
-        HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().get(0).getValue();
-        assertEquals(" ", hearingDetailType.getHearingDetailsStatus());
-        assertEquals(" ", hearingDetailType.getHearingDetailsPostponedBy());
-        assertEquals(" ", hearingDetailType.getHearingDetailsCaseDisposed());
-        assertEquals(" ", hearingDetailType.getHearingDetailsPartHeard());
-        assertEquals(" ", hearingDetailType.getHearingDetailsReservedJudgment());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeClaimant());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeNonAttendees());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeRespNoRep());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeRespAndRep());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeRepOnly());
-        assertEquals(" ", hearingDetailType.getHearingDetailsTimingStart());
-        assertEquals(" ", hearingDetailType.getHearingDetailsTimingFinish());
-        assertEquals(" ", hearingDetailType.getHearingDetailsTimingDuration());
-        assertEquals(" ", hearingDetailType.getHearingDetailsHearingNotes2());
+
+        assertEquals(" ", caseData.getHearingDetailsStatus());
+        assertEquals(" ", caseData.getHearingDetailsPostponedBy());
+        assertEquals(" ", caseData.getHearingDetailsCaseDisposed());
+        assertEquals(" ", caseData.getHearingDetailsPartHeard());
+        assertEquals(" ", caseData.getHearingDetailsReservedJudgment());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeClaimant());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeNonAttendees());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeRespNoRep());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeRespAndRep());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeRepOnly());
+        assertEquals(" ", caseData.getHearingDetailsTimingStart());
+        assertEquals(" ", caseData.getHearingDetailsTimingFinish());
+        assertEquals(" ", caseData.getHearingDetailsTimingDuration());
+        assertEquals(" ", caseData.getHearingDetailsHearingNotes2());
     }
 
     @Test
     public void testUpdateCase() {
-        HearingDetailType hearingDetailType = new HearingDetailType();
-        selectedListing.setListedDate("2022-11-11 11:00:00");
-        hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
-        String hearingStatus = Constants.HEARING_STATUS_HEARD;
-        hearingDetailType.setHearingDetailsStatus(hearingStatus);
-        String postponedBy = "Arthur";
-        hearingDetailType.setHearingDetailsPostponedBy(postponedBy);
-        String caseDisposed = String.valueOf(Boolean.TRUE);
-        hearingDetailType.setHearingDetailsCaseDisposed(caseDisposed);
-        String partHeard = String.valueOf(Boolean.TRUE);
-        hearingDetailType.setHearingDetailsPartHeard(partHeard);
-        String reservedJudgment = String.valueOf(Boolean.TRUE);
-        hearingDetailType.setHearingDetailsReservedJudgment(reservedJudgment);
-        String attendeeClaimant = "1";
-        hearingDetailType.setHearingDetailsAttendeeClaimant(attendeeClaimant);
-        String attendeeNonAttendees = "2";
-        hearingDetailType.setHearingDetailsAttendeeNonAttendees(attendeeNonAttendees);
-        String attendeeRespNoRep = "3";
-        hearingDetailType.setHearingDetailsAttendeeRespNoRep(attendeeRespNoRep);
-        String attendeeRespAndRep = "4";
-        hearingDetailType.setHearingDetailsAttendeeRespAndRep(attendeeRespAndRep);
-        String attendeeRepOnly = "5";
-        hearingDetailType.setHearingDetailsAttendeeRepOnly(attendeeRepOnly);
-        String hearingTimeStart = "09:00";
-        hearingDetailType.setHearingDetailsTimingStart(hearingTimeStart);
-        String hearingTimeBreak = "10:00";
-        hearingDetailType.setHearingDetailsTimingBreak(hearingTimeBreak);
-        String hearingTimeResume = "11:00";
-        hearingDetailType.setHearingDetailsTimingResume(hearingTimeResume);
-        String hearingTimeFinish = "12:00";
-        hearingDetailType.setHearingDetailsTimingFinish(hearingTimeFinish);
-        String duration = "6";
-        hearingDetailType.setHearingDetailsTimingDuration(duration);
-        String notes = "Some notes";
-        hearingDetailType.setHearingDetailsHearingNotes2(notes);
-        HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
-        hearingDetailTypeItem.setValue(hearingDetailType);
         CaseData caseData = createCaseData();
-        caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
+        String hearingStatus = Constants.HEARING_STATUS_HEARD;
+        caseData.setHearingDetailsStatus(hearingStatus);
+        String postponedBy = "Arthur";
+        caseData.setHearingDetailsPostponedBy(postponedBy);
+        String caseDisposed = String.valueOf(Boolean.TRUE);
+        caseData.setHearingDetailsCaseDisposed(caseDisposed);
+        String partHeard = String.valueOf(Boolean.TRUE);
+        caseData.setHearingDetailsPartHeard(partHeard);
+        String reservedJudgment = String.valueOf(Boolean.TRUE);
+        caseData.setHearingDetailsReservedJudgment(reservedJudgment);
+        String attendeeClaimant = "1";
+        caseData.setHearingDetailsAttendeeClaimant(attendeeClaimant);
+        String attendeeNonAttendees = "2";
+        caseData.setHearingDetailsAttendeeNonAttendees(attendeeNonAttendees);
+        String attendeeRespNoRep = "3";
+        caseData.setHearingDetailsAttendeeRespNoRep(attendeeRespNoRep);
+        String attendeeRespAndRep = "4";
+        caseData.setHearingDetailsAttendeeRespAndRep(attendeeRespAndRep);
+        String attendeeRepOnly = "5";
+        caseData.setHearingDetailsAttendeeRepOnly(attendeeRepOnly);
+        String hearingTimeStart = "09:00";
+        caseData.setHearingDetailsTimingStart(hearingTimeStart);
+        String hearingTimeBreak = "10:00";
+        caseData.setHearingDetailsTimingBreak(hearingTimeBreak);
+        String hearingTimeResume = "11:00";
+        caseData.setHearingDetailsTimingResume(hearingTimeResume);
+        String hearingTimeFinish = "12:00";
+        caseData.setHearingDetailsTimingFinish(hearingTimeFinish);
+        String duration = "6";
+        caseData.setHearingDetailsTimingDuration(duration);
+        String notes = "Some notes";
+        caseData.setHearingDetailsHearingNotes2(notes);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
 
@@ -202,32 +190,16 @@ public class HearingDetailServiceTest {
         HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing", "Hearing ");
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
-        dateListedTypeItem.setId(UUID.randomUUID().toString());
-        dateListedTypeItem.setValue(selectedListing);
-        HearingType hearingType = new HearingType();
-        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
-        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
-                .thenReturn(hearingType);
+
+        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
+                isA(DynamicFixedListType.class))).thenReturn(selectedListing);
 
         return hearingSelectionService;
     }
 
     private CaseData createCaseData() {
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        hearingTypeItem.setId("id1");
-        HearingType hearingType = new HearingType();
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
-        dateListedTypeItem.setValue(selectedListing);
-        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
-        hearingTypeItem.setValue(hearingType);
-        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("id1");
-        dynamicFixedListType.setValue(dynamicValueType);
         CaseData caseData = new CaseData();
-        caseData.setHearingDetailsHearing(dynamicFixedListType);
-        caseData.setHearingCollection(List.of(hearingTypeItem));
+        caseData.setHearingDetailsHearing(new DynamicFixedListType());
         return caseData;
     }
 }

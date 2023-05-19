@@ -69,8 +69,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_BEFORE_RECEIPT_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE;
 
 @SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.TooManyFields",
     "PMD.ExcessiveImports"})
@@ -151,39 +149,18 @@ class EventValidationServiceTest {
     @Test
     void shouldValidatePastReceiptDate() {
         caseData.setReceiptDate(PAST_RECEIPT_DATE.toString());
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
+
+        List<String> errors = eventValidationService.validateReceiptDate(caseData);
 
         assertEquals(0, errors.size());
         assertEquals(caseData.getTargetHearingDate(), PAST_TARGET_HEARING_DATE.toString());
     }
 
-    @ParameterizedTest
-    @CsvSource({"2023-01-01", "2019-01-01"})
-    void shouldValidateRejectedDate(String rejectedDate) {
-        caseData.setReceiptDate("2022-01-01");
-        CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
-        casePreAcceptType.setDateRejected(rejectedDate);
-        caseData.setPreAcceptCase(casePreAcceptType);
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setState(REJECTED_STATE);
-        caseDetails.setCaseData(caseData);
-        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
-        if ("2023-01-01".equals(rejectedDate)) {
-            assertEquals(0, errors.size());
-        }
-        if ("2019-01-01".equals(rejectedDate)) {
-            assertEquals(RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE, errors.get(0));
-        }
-    }
-
     @Test
     void shouldValidateCurrentReceiptDate() {
         caseData.setReceiptDate(CURRENT_RECEIPT_DATE.toString());
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
+
+        List<String> errors = eventValidationService.validateReceiptDate(caseData);
 
         assertEquals(0, errors.size());
         assertEquals(caseData.getTargetHearingDate(), CURRENT_TARGET_HEARING_DATE.toString());
@@ -192,9 +169,8 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateFutureReceiptDate() {
         caseData.setReceiptDate(FUTURE_RECEIPT_DATE.toString());
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
+
+        List<String> errors = eventValidationService.validateReceiptDate(caseData);
 
         assertEquals(1, errors.size());
         assertEquals(FUTURE_RECEIPT_DATE_ERROR_MESSAGE, errors.get(0));
@@ -226,10 +202,8 @@ class EventValidationServiceTest {
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setDateAccepted(PAST_ACCEPTED_DATE.toString());
         caseData.setPreAcceptCase(casePreAcceptType);
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setState(ACCEPTED_STATE);
-        caseDetails.setCaseData(caseData);
-        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
+
+        List<String> errors = eventValidationService.validateReceiptDate(caseData);
 
         assertEquals(1, errors.size());
         assertEquals(RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE, errors.get(0));
@@ -465,7 +439,6 @@ class EventValidationServiceTest {
         CaseData caseData = new CaseData();
         HearingTypeItem hearingTypeItem1 = setHearing(HEARING_DATE2, disposed);
         HearingTypeItem hearingTypeItem2 = setHearing(HEARING_DATE, disposed);
-        caseData.setReceiptDate("2019-01-01");
         caseData.setHearingCollection(Arrays.asList(hearingTypeItem1, hearingTypeItem2));
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId(UUID.randomUUID().toString());
@@ -504,26 +477,6 @@ class EventValidationServiceTest {
                 JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
             errors);
         assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void disposalDateAfterReceiptDate() {
-        List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE, YES,
-                        JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
-                errors);
-        assertThat(errors).isEmpty();
-
-    }
-
-    @Test
-    void disposalDateBeforeReceiptDate() {
-        List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2018-02-02", YES,
-                        JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
-                errors);
-        assertThat(errors.get(0))
-                .isEqualTo(String.format(DISPOSAL_DATE_BEFORE_RECEIPT_DATE, "blah blah"));
     }
 
     @Test

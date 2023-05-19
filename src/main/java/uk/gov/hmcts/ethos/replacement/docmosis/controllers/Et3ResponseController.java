@@ -51,7 +51,7 @@ public class Et3ResponseController {
     private final Et3ResponseService et3ResponseService;
 
     /**
-     * Called at the start of the ET3 Response journey.
+     * Called at the start of the ET3 Response journey. 
      * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
      *
      * @param ccdRequest holds the request and case data
@@ -82,9 +82,9 @@ public class Et3ResponseController {
         caseData.setEt3ResponseShowInset(YES);
         caseData.setEt3ResponseNameShowInset(YES);
         caseData.setEt3ResponseClaimantName(Et3ResponseHelper.formatClaimantNameForHtml(caseData));
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        Et3ResponseHelper.createDynamicListSelection(caseData);
 
-        return getCallbackRespEntityErrors(errors, caseData);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/validateRespondent", consumes = APPLICATION_JSON_VALUE)
@@ -109,6 +109,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
+        Et3ResponseHelper.reloadDataOntoEt3(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -177,10 +178,8 @@ public class Et3ResponseController {
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
             ccdRequest.getCaseDetails().getCaseTypeId());
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
-        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         Et3ResponseHelper.addEt3DataToRespondent(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
-        et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());
         Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

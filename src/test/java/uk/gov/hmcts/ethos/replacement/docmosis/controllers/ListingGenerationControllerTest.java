@@ -263,7 +263,7 @@ public class ListingGenerationControllerTest {
     public void listingHearings() throws Exception {
         when(listingService.processListingHearingsRequest(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingDetails.getCaseData());
-        when(defaultValuesReaderService.getListingDefaultValues(isA(ListingDetails.class)))
+        when(defaultValuesReaderService.getDefaultValues(isA(String.class)))
                 .thenReturn(defaultValues);
         when(defaultValuesReaderService.getListingData(isA(ListingData.class), isA(DefaultValues.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());

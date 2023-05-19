@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -199,22 +198,17 @@ public class ReplyToReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
-        String referralCode = caseData.getSelectReferral().getValue().getCode();
+
         emailService.sendEmail(
             referralTemplateId,
             caseData.getReplyToEmailAddress(),
             ReferralHelper.buildPersonalisation(
                 ccdRequest.getCaseDetails(),
-                referralCode,
+                caseData.getSelectReferral().getValue().getCode(),
                 false,
                 userDetails.getName()
             )
         );
-
-        log.info("Event: Referral Reply Email sent. "
-            + ". EventId: " + ccdRequest.getEventId()
-            + ". Referral code: " + referralCode
-            + ". Emailed at: " + DateTime.now());
 
         ReferralHelper.createReferralReply(
             caseData,

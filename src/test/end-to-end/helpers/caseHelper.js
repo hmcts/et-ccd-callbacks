@@ -255,6 +255,17 @@ async function verifyApplicationTabs(I) {
     await I.caseApplicationTabs();
 }
 
+//async function noticeOfChange(I, eventName, myHMCTSFlag) {
+//    await I.chooseNextStep(eventName, 3);
+//    await I.executeUploadDocument();
+//    await I.createNOC();
+//}
+
+async function noticeOfChange(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.executeUploadDocument();
+}
+
 module.exports = {
     acceptCaseEvent,
     rejectCaseEvent,
@@ -293,5 +304,6 @@ module.exports = {
     enterDisposalDateJurisdiction,
     createAdminReferral,
     createJudgeReferral,
-    createLegalRepReferral
+    createLegalRepReferral,
+    noticeOfChange
 };

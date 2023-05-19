@@ -1,12 +1,11 @@
-ARG APP_INSIGHTS_AGENT_VERSION=3.4.11
-FROM hmctspublic.azurecr.io/base/java:17-distroless as base
+ARG APP_INSIGHTS_AGENT_VERSION=2.5.1
+FROM hmctspublic.azurecr.io/base/java:openjdk-11-distroless-1.4 as base
 LABEL maintainer="https://github.com/hmcts/et-ccd-callbacks"
 
-COPY lib/applicationinsights.json /opt/app/
+COPY lib/AI-Agent.xml /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
 
-
-FROM debian:11 AS builder
+FROM debian:10 AS builder
 
 USER root
 RUN apt update

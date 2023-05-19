@@ -341,9 +341,7 @@ public class CaseTransferControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.managingOffice",
-                    hasToString(TribunalOffice.GLASGOW.getOfficeName())))
-                .andExpect(jsonPath("$.data.allocatedOffice",
-                    hasToString(TribunalOffice.GLASGOW.getOfficeName())));
+                        hasToString(TribunalOffice.GLASGOW.getOfficeName())));
     }
 
     @Test

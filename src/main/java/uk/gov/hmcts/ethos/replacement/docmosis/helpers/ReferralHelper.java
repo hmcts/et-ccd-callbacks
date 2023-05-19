@@ -387,7 +387,7 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @return Returns next hearing date in "dd MMM yyyy" format or "None"
      */
-    public static String getNearestHearingToReferral(CaseData caseData, String defaultValue) {
+    private static String getNearestHearingToReferral(CaseData caseData, String defaultValue) {
         String earliestFutureHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
         if (earliestFutureHearingDate == null) {
@@ -506,7 +506,6 @@ public final class ReferralHelper {
     public static void setReferralStatusToClosed(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         referral.setReferralStatus(ReferralStatus.CLOSED);
-        referral.setCloseReferralGeneralNotes(caseData.getCloseReferralGeneralNotes());
     }
 
     /**

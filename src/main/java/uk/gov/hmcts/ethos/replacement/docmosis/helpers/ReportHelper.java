@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -12,7 +11,6 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
     "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
     "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
+    "PMD.LawOfDemeter"})
 public class ReportHelper {
 
     public static final String CASES_SEARCHED = "Cases searched: ";
@@ -283,50 +281,4 @@ public class ReportHelper {
             throw new IllegalArgumentException("Unexpected case type id " + listingCaseTypeId);
         }
     }
-
-    public static String getReportListingDate(ListingData reportData,
-                                              String listingDateFrom, String listingDateTo, String hearingDateType) {
-        if (Constants.SINGLE_HEARING_DATE_TYPE.equals(hearingDateType)) {
-            reportData.setListingDate(ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setListingDateFrom(null);
-            reportData.setListingDateTo(null);
-            reportData.setHearingDateType(hearingDateType);
-            String reportedOn = "On " + UtilHelper.listingFormatLocalDate(
-                    ReportHelper.getFormattedLocalDate(listingDateFrom));
-            return getReportTitle(reportedOn, reportData.getManagingOffice());
-        } else {
-            reportData.setListingDate(null);
-            reportData.setListingDateFrom(ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setListingDateTo(ReportHelper.getFormattedLocalDate(listingDateTo));
-            reportData.setHearingDateType(hearingDateType);
-            String reportedBetween = "Between " + UtilHelper.listingFormatLocalDate(reportData.getListingDateFrom())
-                    + " and " + UtilHelper.listingFormatLocalDate(reportData.getListingDateTo());
-            return getReportTitle(reportedBetween, reportData.getManagingOffice());
-        }
-    }
-
-    private static String getReportTitle(String reportPeriod, String officeName) {
-        return "   Period: " + reportPeriod + "       Office: " + officeName;
-    }
-
-    public static ReportParams getListingDateRangeForSearch(ListingDetails listingDetails) {
-        ListingData listingData = listingDetails.getCaseData();
-        boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        String listingDateFrom;
-        String listingDateTo;
-        if (!isRangeHearingDateType) {
-            listingDateFrom = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().format(OLD_DATE_TIME_PATTERN);
-            listingDateTo = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().plusDays(1).minusSeconds(1).format(OLD_DATE_TIME_PATTERN);
-        } else {
-            listingDateFrom = LocalDate.parse(listingData.getListingDateFrom(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().format(OLD_DATE_TIME_PATTERN);
-            listingDateTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().plusDays(1).minusSeconds(1).format(OLD_DATE_TIME_PATTERN);
-        }
-        return new ReportParams(listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice(),
-                listingDateFrom, listingDateTo);
-    }
-
 }

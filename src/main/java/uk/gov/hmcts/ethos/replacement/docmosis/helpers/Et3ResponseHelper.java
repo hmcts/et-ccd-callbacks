@@ -292,7 +292,7 @@ public class Et3ResponseHelper {
         }
         Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
                 rep -> rep.getValue().getRespRepName().equals(
-                        caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
+                        caseData.getSubmitEt3Respondent().getSelectedLabel()
                 )
         ).findFirst();
 

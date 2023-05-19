@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantRequestType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
@@ -50,6 +49,8 @@ public class Et1VettingService {
     private final TornadoService tornadoService;
 
     private static final String ET1_DOC_TYPE = "ET1";
+    private static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
+
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";
     private static final String BEFORE_LABEL_ET1 =
@@ -176,7 +177,6 @@ public class Et1VettingService {
         IntWrapper acasCount = new IntWrapper(0);
 
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
-        ClaimantRequestType claimantRequestType = caseDetails.getCaseData().getClaimantRequests();
         if (documentCollection != null) {
             et1Display = documentCollection
                     .stream()
@@ -189,11 +189,12 @@ public class Et1VettingService {
                     .map(d -> String.format(
                             BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount.incrementAndReturnValue()))
                     .collect(Collectors.joining());
-        }
-        if (claimantRequestType != null && claimantRequestType.getClaimDescriptionDocument() != null) {
-            et1Attachment = String.format(BEFORE_LABEL_ET1_ATTACHMENT,
-                    claimantRequestType.getClaimDescriptionDocument().getDocumentBinaryUrl(),
-                    claimantRequestType.getClaimDescriptionDocument().getDocumentFilename());
+            et1Attachment = documentCollection
+                    .stream()
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_ATTACHMENT_DOC_TYPE))
+                    .map(d -> String.format(BEFORE_LABEL_ET1_ATTACHMENT,
+                            createDocLinkBinary(d), d.getValue().getUploadedDocument().getDocumentFilename()))
+                    .collect(Collectors.joining());
         }
 
         if (acasCount.getValue() > FIVE_ACAS_DOC_TYPE_ITEMS_COUNT) {

@@ -541,7 +541,7 @@ class Et1VettingServiceTest {
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setUploadedDocument(new UploadedDocumentType());
-        if (typeOfDocument.equals(ET1_ATTACHMENT_DOC_TYPE)) {
+        if (ET1_ATTACHMENT_DOC_TYPE.equals(typeOfDocument)) {
             documentType.getUploadedDocument().setDocumentFilename(ET1_ATTACHMENT_NAME);
         }
         documentType.getUploadedDocument().setDocumentBinaryUrl("http://dm-store:8080" + binaryLink);

@@ -200,7 +200,7 @@ public class EventValidationService {
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 if (set.contains(respondentSumType.getRespondentAcas())) {
                     duplicates.add(respondentSumType.getRespondentAcas());
-                } else if (respondentSumType.getRespondentAcas() != null){
+                } else if (respondentSumType.getRespondentAcas() != null) {
                     set.add(respondentSumType.getRespondentAcas());
                 }
             }

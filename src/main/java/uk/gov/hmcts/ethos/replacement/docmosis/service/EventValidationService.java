@@ -192,6 +192,24 @@ public class EventValidationService {
         return errors;
     }
 
+    public void validateACAS(CaseData caseData, List<String> errors) {
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            List<String> duplicates = new ArrayList<>();
+            Set<String> set = new HashSet<>();
+            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+                if (set.contains(respondentSumType.getRespondentAcas())) {
+                    duplicates.add(respondentSumType.getRespondentAcas());
+                } else if (respondentSumType.getRespondentAcas() != null){
+                    set.add(respondentSumType.getRespondentAcas());
+                }
+            }
+            if (!duplicates.isEmpty()) {
+                errors.add("ACAS number should be unique for each respondent.");
+            }
+        }
+    }
+
     public List<String> validateAndSetRespRepNames(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())

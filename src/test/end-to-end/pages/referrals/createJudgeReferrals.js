@@ -5,7 +5,7 @@ const testConfig = require("../../../config");
 
 module.exports = async function() {
     const I = this;
-    I.wait(15);
+    I.waitForVisible('.govuk-cookie-banner__heading', 10);
     I.waitForText('Referral', testConfig.TestTimeToWaitForText);
     I.see('Refer to admin, legal officer or judge');
     I.see('Case Number:');
@@ -22,7 +22,6 @@ module.exports = async function() {
     I.fillField('#referralDetails', 'Test Referral Details');
     I.click(commonConfig.continueButton);
     
-    I.wait(15);
     I.waitForText('Referral');
     I.see('Case Number:');
     I.see('Check your answers');
@@ -39,14 +38,12 @@ module.exports = async function() {
     I.see('Test Referral Details');
     I.click(commonConfig.submit);
 
-    I.wait(15);
     I.waitForText('Referral');
     I.see('Case Number:');
     I.see('What happens next');
     I.see('Your referral has been sent. Replies and instructions will appear in the Referrals tab (opens in new tab).');
     I.click('Close and Return to case details');
 
-    I.wait(15);
     I.waitForText('has been updated with event: Referral', testConfig.TestTimeToWaitForText);
     I.click("//div[text()='Referrals']");
     I.see('Referrals');

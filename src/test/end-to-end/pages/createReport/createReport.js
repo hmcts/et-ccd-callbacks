@@ -7,7 +7,7 @@ const {eventNames} = require('../common/constants.js');
 module.exports = async function (jurisdiction, caseType, eventName) {
     const I = this;
 
-    I.click('[href="cases"]');
+    I.click('[href="/cases"]');
     I.waitForText('Manage Cases', testConfig.TestTimeToWaitForText);
     I.see('Case list');
     I.see('Filters');

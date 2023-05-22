@@ -10,4 +10,5 @@ module.exports = async function (userName, password) {
     I.click('[name="save"]');
     I.waitForText('Case list', 60);
     I.waitForClickable('.hmcts-button--secondary');
+    I.click('[value="accept"]');
 };

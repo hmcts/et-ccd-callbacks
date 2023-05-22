@@ -5,7 +5,6 @@ const testConfig = require("../../../config");
 
 module.exports = async function() {
     const I = this;
-    I.waitForVisible('.govuk-cookie-banner__heading', 10);
     I.waitForText('Referral', testConfig.TestTimeToWaitForText);
     I.see('Refer to admin, legal officer or judge');
     I.see('Case Number:');

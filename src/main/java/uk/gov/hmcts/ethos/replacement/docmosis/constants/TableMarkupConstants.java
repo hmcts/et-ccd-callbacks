@@ -7,8 +7,10 @@ public final class TableMarkupConstants {
     public static final String RESPONSE_TABLE_HEADER = "|Response %s | |\r\n";
     public static final String SUPPORTING_MATERIAL_TABLE_HEADER = "|Supporting material | %s|\r\n";
     public static final String ORDER_APP_HEARING_MARKUP = "|Hearing | %s|\r\n";
-    public static final String ORDER_APP_DOC_MARKUP = "|Description | %s|\r\n"
+    public static final String ORDER_APP_DOC_MARKUP = "|Description  %s|\r\n"
             + "|Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>|\r\n";
+    public static final String DOC_MARKUP_DOCUMENT =
+        "<a href=\"/documents/%s\" target=\"_blank\">%s</a>";
     public static final String PARTY_OR_PARTIES_TO_RESPOND = "|Party or parties to respond | %s|\r\n";
     public static final String RESPONSE_DUE = "|Is a response required?| %s|\r\n";
     public static final String NAME_MARKUP = "|Name | %s|\r\n";

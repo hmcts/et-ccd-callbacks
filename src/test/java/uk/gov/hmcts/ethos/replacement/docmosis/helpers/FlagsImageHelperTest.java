@@ -7,10 +7,14 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+
 import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @SuppressWarnings({"PMD.ExcessiveClassLength", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class FlagsImageHelperTest {
@@ -117,6 +121,19 @@ public class FlagsImageHelperTest {
             //assertEquals("EMP-TRIB-00000000000.jpg", caseData.getFlagsImageFileName());
             assertEquals("EMP-TRIB-00000000000.jpg", caseData.getFlagsImageFileName());
         }
+    }
+
+    @Test
+    public void addReasonableAdjustmentFlagForRespondent() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withRespondent("Test", NO, null, false)
+                .build();
+        caseData.getRespondentCollection().get(0).getValue().setEt3ResponseRespondentSupportNeeded(YES);
+        FlagsImageHelper.buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertEquals("EMP-TRIB-00000000010.jpg", caseData.getFlagsImageFileName());
+        assertEquals("<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>",
+                caseData.getFlagsImageAltText());
+
     }
 
     private CaseDetails createCaseDetails(String caseTypeId, CaseData caseData) {

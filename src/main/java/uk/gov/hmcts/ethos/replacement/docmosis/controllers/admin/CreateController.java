@@ -53,7 +53,6 @@ public class CreateController {
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         adminData.setName(ADMIN_CASE_NAME);
         List<String> errors = createService.initCreateAdmin(userToken);
-
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getAdminData());
     }
 }

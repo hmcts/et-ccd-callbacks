@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {claimantRespondentDetails} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Create A Leeds Singles Case & Execute Claimant Respondent Details...');
+Feature('Create Singles Case & Execute Claimant Respondent Details...');
 
 Scenario('Verify Respondent Details', async ({I}) => {
 
@@ -12,7 +12,4 @@ Scenario('Verify Respondent Details', async ({I}) => {
 
     await claimantRespondentDetails(I, eventNames.CLAIMANT_RESPONDENT_DETAILS);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@RET-BAT')
-    .retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

@@ -222,10 +222,12 @@ public class ListingService {
             dateFrom = listingData.getListingDate();
             dateTo = listingData.getListingDate();
         }
+
         if (ALL_VENUES.equals(venueToSearch)) {
             venueToSearch = listingData.getManagingOffice();
             venueToSearchMapping = getFieldNameForVenueToSearch(listingDetails.getCaseTypeId());
         }
+
         return ccdClient.buildAndGetElasticSearchRequest(authToken,
                 UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
                 getESQuery(dateFrom, dateTo, venueToSearchMapping, venueToSearch));

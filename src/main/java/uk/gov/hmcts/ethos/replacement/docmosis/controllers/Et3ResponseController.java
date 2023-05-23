@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -50,7 +51,7 @@ public class Et3ResponseController {
     private final Et3ResponseService et3ResponseService;
 
     /**
-     * Called at the start of the ET3 Response journey. 
+     * Called at the start of the ET3 Response journey.
      * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
      *
      * @param ccdRequest holds the request and case data
@@ -81,9 +82,37 @@ public class Et3ResponseController {
         caseData.setEt3ResponseShowInset(YES);
         caseData.setEt3ResponseNameShowInset(YES);
         caseData.setEt3ResponseClaimantName(Et3ResponseHelper.formatClaimantNameForHtml(caseData));
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityErrors(errors, caseData);
     }
+
+    @PostMapping(value = "/validateRespondent", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "validate dates are correct for employment")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateRespondent(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
+
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
 
     /**
      * Called when trying to submit on the ET3 Employment Dates page.
@@ -120,7 +149,7 @@ public class Et3ResponseController {
     }
 
     /**
-     * Generates ET3 Response document.
+     * Generates ET3 Response document and add the ET3 Fields to each respondent.
      * @param ccdRequest generic request from CCD
      * @param userToken authentication token to verify the user
      * @return Callback response entity with case data attached.
@@ -148,7 +177,11 @@ public class Et3ResponseController {
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
             ccdRequest.getCaseDetails().getCaseTypeId());
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
-
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
+        Et3ResponseHelper.addEt3DataToRespondent(caseData);
+        FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+        et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());
+        Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

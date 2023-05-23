@@ -11,23 +11,29 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -342,10 +348,20 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
+    public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
+                                          String respondentEmail, boolean extension) {
+        withRespondent(respondentName, responseReceived, receivedDate, extension);
+        RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection()
+            .get(caseData.getRespondentCollection().size() - 1);
+        respondentSumTypeItem.getValue().setRespondentEmail(respondentEmail);
+        return this;
+
+    }
+
+    public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
                                           boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName(respondent);
+        respondentSumType.setRespondentName(respondentName);
         respondentSumType.setResponseReceived(responseReceived);
         respondentSumType.setResponseReceivedDate(receivedDate);
         if (extension) {
@@ -431,6 +447,34 @@ public class CaseDataBuilder {
     }
 
     /**
+     * Add two respondent representatives with org ids and an emails.
+     */
+    public CaseDataBuilder withTwoRespondentRepresentative(String org1Id, String org2Id,
+                                                           String rep1Email, String rep2Email) {
+
+        RepresentedTypeR rep1 = RepresentedTypeR.builder()
+                .respondentOrganisation(Organisation.builder().organisationID(org1Id).build())
+                .respRepName("res1 name")
+                .nameOfRepresentative("rep1 name")
+                .representativeEmailAddress(rep1Email).build();
+        RepresentedTypeR rep2 = RepresentedTypeR.builder()
+                .respondentOrganisation(Organisation.builder().organisationID(org2Id).build())
+                .respRepName("res2 name")
+                .nameOfRepresentative("rep2 name")
+                .representativeEmailAddress(rep2Email).build();
+        RepresentedTypeRItem itemType1 = new RepresentedTypeRItem();
+        itemType1.setValue(rep1);
+        RepresentedTypeRItem itemType2 = new RepresentedTypeRItem();
+        itemType2.setValue(rep2);
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            caseData.setRepCollection(new ArrayList<>());
+        }
+        caseData.getRepCollection().add(itemType1);
+        caseData.getRepCollection().add(itemType2);
+        return this;
+    }
+
+    /**
      * Creates an Address object from its properties.
      */
     public Address createAddress(String addressLine1, String addressLine2, String addressLine3,
@@ -462,6 +506,29 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withChangeOrganisationRequestField(Organisation organisationToAdd,
+                                                              Organisation organisationToRemove,
+                                                              DynamicFixedListType caseRoleID,
+                                                              LocalDateTime requestTimestamp,
+                                                              ChangeOrganisationApprovalStatus approvalStatus) {
+        DynamicValueType caseRoleIDValue = DynamicValueType.create("[SOLICITORA]", "Respondent Solicitor");
+
+        DynamicFixedListType caseRoleIDList = new DynamicFixedListType();
+        caseRoleIDList.setValue(caseRoleIDValue);
+        caseRoleIDList.setListItems(List.of(caseRoleIDValue));
+
+        ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
+            .organisationToAdd(organisationToAdd)
+            .organisationToRemove(organisationToRemove)
+            .caseRoleId(caseRoleIDList)
+            .requestTimestamp(requestTimestamp)
+            .approvalStatus(approvalStatus)
+            .build();
+
+        caseData.setChangeOrganisationRequestField(cor);
+        return this;
+    }
+        
     public CaseDataBuilder withAssignOffice(String selectedOffice) {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->
@@ -469,6 +536,18 @@ public class CaseDataBuilder {
                 .collect(Collectors.toList());
         caseData.setAssignOffice(DynamicFixedListType.from(tribunalOffices));
         caseData.getAssignOffice().setValue(DynamicValueType.create(selectedOffice, selectedOffice));
+        return this;
+    }
+
+    public CaseDataBuilder withEt3RepresentingRespondent(String respondentName) {
+        DynamicValueType respondent = DynamicValueType.create(respondentName, respondentName);
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType.from(List.of(respondent));
+        dynamicFixedListType.setValue(respondent);
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(dynamicFixedListType);
+        DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
+        dynamicListTypeItem.setValue(dynamicListType);
+        caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
         return this;
     }
 }

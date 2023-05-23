@@ -13,7 +13,6 @@ public class DocmosisApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DocmosisApplication.class, args);
-        // Hello world
     }
 
 }

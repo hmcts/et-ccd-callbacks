@@ -13,11 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOC_MARKUP_DOCUMENT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
@@ -77,25 +76,26 @@ public final class PseHelper {
      * @return Hearing, case management order or request Markup
      */
     public static String formatOrdReqDetails(SendNotificationType sendNotificationType) {
-        List<String[]> rows = new ArrayList<> (List.of(
+        List<String[]> rows = new ArrayList<>(List.of(
             new String[]{"Notification", sendNotificationType.getSendNotificationTitle()},
             new String[]{"Hearing", getSendNotificationSelectHearing(sendNotificationType)},
             new String[]{"Date sent", sendNotificationType.getDate()},
             new String[]{"Sent by", TRIBUNAL},
             new String[]{"Case management order or request?",
-                defaultString(sendNotificationType.getSendNotificationCaseManagement())},
+                sendNotificationType.getSendNotificationCaseManagement()},
             new String[]{"Is a response required?",
-                defaultString(sendNotificationType.getSendNotificationResponseTribunal())},
+                sendNotificationType.getSendNotificationResponseTribunal()},
             new String[]{"Party or parties to respond",
-                defaultString(sendNotificationType.getSendNotificationSelectParties())},
+                sendNotificationType.getSendNotificationSelectParties()},
             new String[]{"Additional information", sendNotificationType.getSendNotificationAdditionalInfo()}
         ));
-            rows.addAll(getSendNotificationUploadDocumentList(sendNotificationType));
+        rows.addAll(getSendNotificationUploadDocumentList(sendNotificationType));
+        String requestMadeBy = CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
+            ? sendNotificationType.getSendNotificationWhoCaseOrder()
+            : sendNotificationType.getSendNotificationRequestMadeBy();
         rows.addAll(List.of(
-                new String[] {"Case management order",
-                    defaultString(sendNotificationType.getSendNotificationCaseManagement())},
-                new String[] {"Case management order made by",
-                    defaultString(sendNotificationType.getSendNotificationCaseManagement())},
+                new String[] {"Request made by", requestMadeBy},
+                new String[] {"Name", sendNotificationType.getSendNotificationFullName()},
                 new String[] {"Who made the judgment?", sendNotificationType.getSendNotificationWhoMadeJudgement()},
                 new String[] {"Full name", sendNotificationType.getSendNotificationFullName2()},
                 new String[] {"Decision", sendNotificationType.getSendNotificationDecision()},
@@ -104,17 +104,16 @@ public final class PseHelper {
                 new String[] {"Sent to", sendNotificationType.getSendNotificationNotify()}
             )
         );
-        return MarkdownHelper.createTwoColumnTable(new String[
-            ]{"View Application",""}, rows);
+        return MarkdownHelper.createTwoColumnTable(new String[]{"View Application", ""}, rows);
     }
 
     public static List<String[]> getSendNotificationUploadDocumentList(SendNotificationType sendNotificationType) {
         List<String []> documents = new ArrayList<>();
-        if(sendNotificationType.getSendNotificationUploadDocument() == null) {
-            documents.add(new String[]{"",""});
+        if (sendNotificationType.getSendNotificationUploadDocument() == null) {
+            documents.add(new String[]{"", ""});
             return documents;
         }
-        for(DocumentTypeItem documentTypeItem : sendNotificationType.getSendNotificationUploadDocument()) {
+        for (DocumentTypeItem documentTypeItem : sendNotificationType.getSendNotificationUploadDocument()) {
             documents.add(new String[]{"Description", documentTypeItem.getValue().getShortDescription()});
             documents.add(new String[]{"Document", String.format(DOC_MARKUP_DOCUMENT,
                 Helper.getDocumentMatcher(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())

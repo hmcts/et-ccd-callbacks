@@ -130,23 +130,21 @@ class PseRespondentViewServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        String expected = "### Hearing, case management order or request \r\n "
-            + "| | |\r\n"
+        String expected = "|View Application||\r\n"
             + "|--|--|\r\n"
-            + "|Notification | View notice of hearing|\r\n"
-            + "|Hearing | 3: Hearing - Leeds - 14 Aug 2022|\r\n"
-            + "|Date sent | 5 Aug 2022|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | Case management order|\r\n"
-            + "|Is a response required?| Yes - view document for details|\r\n"
-            + "|Party or parties to respond | Both parties|\r\n"
-            + "|Additional information | Additional Info|\r\n"
-            + "|Description | Notice of Hearing and Submit Hearing Agenda document|\r\n"
-            + "|Document | <a href=\"/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary\" target=\"_blank\">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r\n"
-            + "|Case management order made by | Legal Officer|\r\n"
-            + "|Name | Mr Lee Gal Officer|\r\n"
-            + "|Sent to | Both parties|\r\n"
-            + "\r\n"
+            + "|Notification|View notice of hearing|\r\n"
+            + "|Hearing|3: Hearing - Leeds - 14 Aug 2022|\r\n"
+            + "|Date sent|5 Aug 2022|\r\n"
+            + "|Sent by|Tribunal|\r\n"
+            + "|Case management order or request?|Case management order|\r\n"
+            + "|Is a response required?|Yes - view document for details|\r\n"
+            + "|Party or parties to respond|Both parties|\r\n"
+            + "|Additional information|Additional Info|\r\n"
+            + "|Description|Notice of Hearing and Submit Hearing Agenda document|\r\n"
+            + "|Document|<a href=\"/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary\" target=\"_blank\">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r\n"
+            + "|Request made by|Legal Officer|\r\n"
+            + "|Name|Mr Lee Gal Officer|\r\n"
+            + "|Sent to|Both parties|\r\n"
             + "|Response 1 | |\r\n"
             + "|--|--|\r\n"
             + "|Response from | Claimant|\r\n"
@@ -196,19 +194,16 @@ class PseRespondentViewServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        String expected = "### Hearing, case management order or request \r\n "
-            + "| | |\r\n"
+        String expected = "|View Application||\r\n"
             + "|--|--|\r\n"
-            + "|Notification | View notice of hearing|\r\n"
-            + "|Date sent | 5 Aug 2022|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | Request|\r\n"
-            + "|Is a response required?| No|\r\n"
-            + "|Party or parties to respond | |\r\n"
-            + "|Request made by | Judge|\r\n"
-            + "|Name | Mr Lee Gal Officer|\r\n"
-            + "|Sent to | Both parties|\r\n"
-            + "\r\n";
+            + "|Notification|View notice of hearing|\r\n"
+            + "|Date sent|5 Aug 2022|\r\n"
+            + "|Sent by|Tribunal|\r\n"
+            + "|Case management order or request?|Request|\r\n"
+            + "|Is a response required?|No|\r\n"
+            + "|Request made by|Judge|\r\n"
+            + "|Name|Mr Lee Gal Officer|\r\n"
+            + "|Sent to|Both parties|\r\n";
 
         assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
             is(expected));

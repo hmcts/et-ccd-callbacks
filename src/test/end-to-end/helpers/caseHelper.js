@@ -1,3 +1,5 @@
+const caseTransferScotland = require("../pages/caseTransfer/caseTransferScotland");
+
 async function acceptCaseEvent(I, caseId, eventName) {
     await I.wait(5);
     await I.chooseNextStep(eventName, 3);
@@ -5,8 +7,6 @@ async function acceptCaseEvent(I, caseId, eventName) {
 }
 
 async function rejectCaseEvent(I, caseId, eventName) {
-    await I.authenticateWithIdam(username, password);
-    await I.amOnPage('/case-details/' + caseId);
     await I.chooseNextStep(eventName, 3);
     await I.rejectTheCase();
 }
@@ -16,10 +16,10 @@ async function submittedState(I, caseId) {
     await I.amOnPage('/case-details/' + caseId);
 }
 
-async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, conciliationTrack) {
+async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, suggestedHearingVenue) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.amendTheCaseDetails(clerkResponsible, physicalLocation, conciliationTrack);
+    await I.amendTheCaseDetails(clerkResponsible, physicalLocation, suggestedHearingVenue);
 }
 
 async function caseDetailsEvent(I, caseId, eventName, clerkResponsible, currentPosition, physicalLocation, conciliationTrack) {
@@ -46,16 +46,21 @@ async function claimantRespondentDetails(I, eventName) {
     await I.executeRespondentDetails();
 }
 
-async function respondentRepresentative(I, eventName) {
+async function respondentRepresentative(I, eventName, myHMCTSFlag) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.executeRespondentRepresentative();
+    await I.executeRespondentRepresentative(myHMCTSFlag);
 }
 
-async function jurisdiction(I, eventName) {
+async function jurisdiction(I, eventName, jurisdictionOutcome) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeAddAmendJurisdiction();
+    await I.executeAddAmendJurisdiction(jurisdictionOutcome);
+}
+
+async function enterDisposalDateJurisdiction(I, hearingDisposalDate) {
+    await I.wait(2);
+    await I.enterDisposalDate(hearingDisposalDate);
 }
 
 async function closeCase(I, eventName, clerkResponsible, physicalLocation) {
@@ -95,20 +100,20 @@ async function bfActionsOutstanding(I, eventName) {
 
 async function listHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeAddAmendHearing(jurisdiction);
+    await I.wait(5);
+    await I.executeListHearing(jurisdiction);
 }
 
 async function allocateHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
+    await I.wait(5);
     await I.executeAllocateHearing(jurisdiction);
 }
 
-async function hearingDetails(I, eventName) {
+async function hearingDetails(I, eventName, caseDisposed) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeHearingDetails();
+    await I.wait(5);
+    await I.executeHearingDetails(caseDisposed);
 }
 
 async function updateHearingDetails(I, eventName) {
@@ -126,18 +131,33 @@ async function printHearingLists(I, eventName, jurisdiction) {
 async function caseTransfer(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeCaseTransfer();
+    switch (eventName){
+        case "Case Transfer (Eng/Wales)":
+            await I.executeCaseTransferEngWales();
+            break;
+        case "Case Transfer (Scotland)":
+            await I.executeCaseTransferScotland();
+            break;
+        case "Case Transfer to ECM":
+            await I.executeCaseTransferECM();
+            break;
+        default:
+            throw new Error("Control arrived at default block");
+    }
 }
 
-async function judgment(I, eventName) {
+async function judgment(I, eventName , hearingRequired) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeJudgment();
+    await I.wait(3);
+    if (hearingRequired) {
+        await I.executeJudgmentForHearingCases();
+    } else {
+        await I.executeJudgmentForNonHearingCases();
+    }
 }
 
-async function generateReport(I, jurisdiction, caseType, eventName) {
-    await I.authenticateWithIdam(username, password);
-    await I.wait(2);
+async function generateReport(I, jurisdiction, caseType, eventName, userName, password) {
+    I.wait(2);
     await I.executeCreateReport(jurisdiction, caseType, eventName);
 }
 
@@ -186,20 +206,7 @@ async function et3Response(I, eventName) {
 async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.startet1Vetting();
-    await I.minReqInfoET1Vetting();
-    await I.minReqInfo2ET1Vetting();
-    await I.et1CaseVettingOptions1();
-    await I.caseDetails1ET1Vetting();
-    await I.caseDetails2ET1Vetting();
-    await I.caseDetails3ET1Vetting();
-    await I.caseDetails4ET1Vetting();
-    await I.furtherQET1Vetting();
-    await I.possibleReferal1ET1Vetting();
-    await I.possibleReferal2ET1Vetting();
-    await I.otherFactorsET1Vetting();
-    await I.finalNotesET1Vetting();
-    await I.checkYourAnswersET1Vetting();
+    await I.et1VettingJourney();
 }
 
 async function createAdminReferral(emailAddress, details) {
@@ -279,5 +286,6 @@ module.exports = {
     et3Notification,
     et3Response,
     clickCreateCase,
-    verifyApplicationTabs
+    verifyApplicationTabs,
+    enterDisposalDateJurisdiction
 };

@@ -3,23 +3,42 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseDocument;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 /**
  * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
  */
 @Slf4j
 @SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming",
-    "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration"})
+    "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration", "PMD.GodClass",
+    "PMD.CyclomaticComplexity"})
 public class Et3ResponseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -45,7 +64,7 @@ public class Et3ResponseHelper {
     }
 
     /**
-     * Validates that the employment start date is in the past and not after 
+     * Validates that the employment start date is in the past and not after
      * the employment end date if both dates are provided.
      * @param caseData data for the current case
      * @return List of validation errors encountered
@@ -167,11 +186,14 @@ public class Et3ResponseHelper {
             .et3ResponsePensionCorrectDetails(caseData.getEt3ResponsePensionCorrectDetails())
             .hearingPhone(caseData.getEt3ResponseHearingRespondent().contains("Phone hearings") ? CHECKED : UNCHECKED)
             .hearingVideo(caseData.getEt3ResponseHearingRespondent().contains("Video hearings") ? CHECKED : UNCHECKED)
+            .repReference(caseData.getEt3ResponseReference())
             .repHearingPhone(caseData.getEt3ResponseHearingRepresentative().contains("Phone hearings") ? CHECKED :
                 UNCHECKED)
             .repHearingVideo(caseData.getEt3ResponseHearingRepresentative().contains("Video hearings") ? CHECKED :
                 UNCHECKED)
             .build();
+
+        addRepDetails(caseData, data);
 
         setTitle(data, caseData.getEt3ResponseRespondentPreferredTitle());
         setCheck(caseData.getEt3ResponseMultipleSites(), data::setSiteYes, data::setSiteNo, null);
@@ -200,15 +222,18 @@ public class Et3ResponseHelper {
         data.setBeforeAnnually(UNCHECKED);
         data.setTakehomeAnnually(UNCHECKED);
 
-        if ("Weekly".equals(caseData.getEt3ResponsePayFrequency())) {
-            data.setBeforeWeekly(CHECKED);
-            data.setTakehomeWeekly(CHECKED);
-        } else if ("Monthly".equals(caseData.getEt3ResponsePayFrequency())) {
-            data.setBeforeMonthly(CHECKED);
-            data.setTakehomeMonthly(CHECKED);
-        } else {
-            data.setBeforeAnnually(CHECKED);
-            data.setTakehomeAnnually(CHECKED);
+        if (NO.equals(caseData.getEt3ResponseEarningDetailsCorrect())
+                && caseData.getEt3ResponsePayFrequency() != null) {
+            if ("Weekly".equals(caseData.getEt3ResponsePayFrequency())) {
+                data.setBeforeWeekly(CHECKED);
+                data.setTakehomeWeekly(CHECKED);
+            } else if ("Monthly".equals(caseData.getEt3ResponsePayFrequency())) {
+                data.setBeforeMonthly(CHECKED);
+                data.setTakehomeMonthly(CHECKED);
+            } else {
+                data.setBeforeAnnually(CHECKED);
+                data.setTakehomeAnnually(CHECKED);
+            }
         }
 
         Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
@@ -220,4 +245,237 @@ public class Et3ResponseHelper {
 
         return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
     }
+
+    private static void addRepDetails(CaseData caseData, Et3ResponseData data) {
+        Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
+            rep -> rep.getValue().getRespRepName().equals(
+                caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
+            )
+        ).findFirst();
+
+        if (representative.isPresent()) {
+            RepresentedTypeR rep = representative.get().getValue();
+            data.setRepName(rep.getNameOfRepresentative());
+            data.setRepOrgName(rep.getNameOfOrganisation());
+
+            Address address = rep.getRepresentativeAddress();
+
+            if (address != null) {
+                data.setRepAddressLine1(address.getAddressLine1());
+                data.setRepAddressLine2(address.getAddressLine2());
+                data.setRepTown(address.getPostTown());
+                data.setRepCounty(address.getCounty());
+                data.setRepPostcode(address.getPostCode());
+            }
+
+            data.setRepPhoneNumber(rep.getRepresentativePhoneNumber());
+            data.setRepEmailAddress(rep.getRepresentativeEmailAddress());
+        }
+    }
+
+    /**
+     * Create a collection of DynamicLists of respondent names.
+     * @param caseData data for the case
+     */
+    public static List<String> createDynamicListSelection(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return List.of("No respondents found");
+        }
+
+        DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
+                caseData.getRespondentCollection().stream()
+                        .filter(r -> NO.equals(r.getValue().getResponseReceived()))
+                        .collect(Collectors.toList())));
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(dynamicList);
+        DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
+        dynamicListTypeItem.setValue(dynamicListType);
+        caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
+        return new ArrayList<>();
+    }
+
+    /**
+     * Validate the selection of respondents.
+     * @param caseData data for the case
+     * @return an error is the user has selected the same respondent multiple times
+     */
+    public static List<String> validateRespondents(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
+            return List.of("No respondents found");
+        }
+
+        Set<String> respondentSet = new HashSet<>();
+        for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
+            respondentSet.add(String.valueOf(DynamicFixedListType.getSelectedLabel(
+                    dynamicListTypeItem.getValue().getDynamicList())));
+        }
+
+        if (respondentSet.size() != caseData.getEt3RepresentingRespondent().size()) {
+            return List.of("Please do not choose the same respondent multiple times");
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Saves the data from the ET3 Form event to the respondent.
+     * @param caseData data for the case
+     */
+    public static void addEt3DataToRespondent(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+
+        Set<String> respondentSet = new HashSet<>();
+        for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
+            respondentSet.add(dynamicListTypeItem.getValue().getDynamicList().getSelectedLabel());
+        }
+
+        for (String respondentSelected : respondentSet) {
+            Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
+                    .filter(r -> respondentSelected.equals(r.getValue().getRespondentName()))
+                    .findFirst();
+            if (respondent.isPresent()) {
+                RespondentSumType respondentSumType = addEt3Data(caseData, respondent.get().getValue());
+                for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                    if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
+                        respondentSumTypeItem.setValue(respondentSumType);
+                    }
+                }
+            }
+        }
+    }
+
+    private static RespondentSumType addEt3Data(CaseData caseData, RespondentSumType respondent) {
+        respondent.setResponseReceived(YES);
+        respondent.setResponseReceivedDate(LocalDate.now().toString());
+        respondent.setEt3ResponseIsClaimantNameCorrect(caseData.getEt3ResponseIsClaimantNameCorrect());
+        respondent.setEt3ResponseClaimantNameCorrection(caseData.getEt3ResponseClaimantNameCorrection());
+        respondent.setResponseRespondentName(caseData.getEt3ResponseRespondentLegalName());
+        respondent.setResponseRespondentAddress(caseData.getEt3RespondentAddress());
+        respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone());
+        respondent.setResponseReference(caseData.getEt3ResponseReference());
+        respondent.setResponseRespondentContactPreference(caseData.getEt3ResponseContactPreference());
+        respondent.setEt3ResponseContactReason(caseData.getEt3ResponseContactReason());
+        respondent.setEt3ResponseRespondentCompanyNumber(caseData.getEt3ResponseRespondentCompanyNumber());
+        respondent.setEt3ResponseRespondentEmployerType(caseData.getEt3ResponseRespondentEmployerType());
+        respondent.setEt3ResponseRespondentPreferredTitle(caseData.getEt3ResponseRespondentPreferredTitle());
+        respondent.setEt3ResponseRespondentContactName(caseData.getEt3ResponseRespondentContactName());
+        respondent.setEt3ResponseDXAddress(caseData.getEt3ResponseDXAddress());
+        respondent.setEt3ResponseHearingRepresentative(caseData.getEt3ResponseHearingRepresentative());
+        respondent.setEt3ResponseHearingRespondent(caseData.getEt3ResponseHearingRespondent());
+        respondent.setEt3ResponseEmploymentCount(caseData.getEt3ResponseEmploymentCount());
+        respondent.setEt3ResponseMultipleSites(caseData.getEt3ResponseMultipleSites());
+        respondent.setEt3ResponseSiteEmploymentCount(caseData.getEt3ResponseSiteEmploymentCount());
+        respondent.setEt3ResponseAcasAgree(caseData.getEt3ResponseAcasAgree());
+        respondent.setEt3ResponseAcasAgreeReason(caseData.getEt3ResponseAcasAgreeReason());
+        respondent.setEt3ResponseAreDatesCorrect(caseData.getEt3ResponseAreDatesCorrect());
+        respondent.setEt3ResponseEmploymentStartDate(caseData.getEt3ResponseEmploymentStartDate());
+        respondent.setEt3ResponseEmploymentEndDate(caseData.getEt3ResponseEmploymentEndDate());
+        respondent.setEt3ResponseEmploymentInformation(caseData.getEt3ResponseEmploymentInformation());
+        respondent.setEt3ResponseContinuingEmployment(caseData.getEt3ResponseContinuingEmployment());
+        respondent.setEt3ResponseIsJobTitleCorrect(caseData.getEt3ResponseIsJobTitleCorrect());
+        respondent.setEt3ResponseCorrectJobTitle(caseData.getEt3ResponseCorrectJobTitle());
+        respondent.setEt3ResponseClaimantWeeklyHours(caseData.getEt3ResponseClaimantWeeklyHours());
+        respondent.setEt3ResponseClaimantCorrectHours(caseData.getEt3ResponseClaimantCorrectHours());
+        respondent.setEt3ResponseEarningDetailsCorrect(caseData.getEt3ResponseEarningDetailsCorrect());
+        respondent.setEt3ResponsePayFrequency(caseData.getEt3ResponsePayFrequency());
+        respondent.setEt3ResponsePayBeforeTax(caseData.getEt3ResponsePayBeforeTax());
+        respondent.setEt3ResponsePayTakehome(caseData.getEt3ResponsePayTakehome());
+        respondent.setEt3ResponseIsNoticeCorrect(caseData.getEt3ResponseIsNoticeCorrect());
+        respondent.setEt3ResponseCorrectNoticeDetails(caseData.getEt3ResponseCorrectNoticeDetails());
+        respondent.setEt3ResponseIsPensionCorrect(caseData.getEt3ResponseIsPensionCorrect());
+        respondent.setEt3ResponsePensionCorrectDetails(caseData.getEt3ResponsePensionCorrectDetails());
+        respondent.setEt3ResponseRespondentContestClaim(caseData.getEt3ResponseRespondentContestClaim());
+        respondent.setEt3ResponseContestClaimDocument(caseData.getEt3ResponseContestClaimDocument());
+        respondent.setEt3ResponseContestClaimDetails(caseData.getEt3ResponseContestClaimDetails());
+        respondent.setEt3ResponseEmployerClaim(caseData.getEt3ResponseEmployerClaim());
+        respondent.setEt3ResponseEmployerClaimDetails(caseData.getEt3ResponseEmployerClaimDetails());
+        respondent.setEt3ResponseEmployerClaimDocument(caseData.getEt3ResponseEmployerClaimDocument());
+        respondent.setEt3ResponseRespondentSupportNeeded(caseData.getEt3ResponseRespondentSupportNeeded());
+        respondent.setEt3ResponseRespondentSupportDetails(caseData.getEt3ResponseRespondentSupportDetails());
+        respondent.setEt3ResponseRespondentSupportDocument(caseData.getEt3ResponseRespondentSupportDocument());
+
+        return respondent;
+    }
+
+    /**
+     * Sends notification emails to Tribunal.
+     * @param caseDetails Contains details about the case.
+     * @return Map of Personalisation
+     */
+    public static Map<String, String> buildPersonalisation(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("case_number", caseData.getEthosCaseReference());
+        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put("list_of_respondents", getRespondentNames(caseData));
+        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put("ccdId", caseDetails.getCaseId());
+        return personalisation;
+    }
+
+    private static String getRespondentNames(CaseData caseData) {
+        return caseData.getRespondentCollection().stream()
+            .map(o -> o.getValue().getRespondentName())
+            .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Reset the fields in the ET3 Response form event.
+     * @param caseData data for the case
+     */
+    public static void resetEt3FormFields(CaseData caseData) {
+        caseData.setEt3RepresentingRespondent(null);
+        caseData.setEt3ResponseShowInset(null);
+        caseData.setEt3ResponseClaimantName(null);
+        caseData.setEt3ResponseIsClaimantNameCorrect(null);
+        caseData.setEt3ResponseClaimantNameCorrection(null);
+        caseData.setEt3ResponseNameShowInset(null);
+        caseData.setEt3ResponseRespondentLegalName(null);
+        caseData.setEt3ResponseRespondentCompanyNumber(null);
+        caseData.setEt3ResponseRespondentEmployerType(null);
+        caseData.setEt3ResponseRespondentPreferredTitle(null);
+        caseData.setEt3ResponseRespondentContactName(null);
+        caseData.setEt3RespondentAddress(null);
+        caseData.setEt3ResponseDXAddress(null);
+        caseData.setEt3ResponsePhone(null);
+        caseData.setEt3ResponseReference(null);
+        caseData.setEt3ResponseContactPreference(null);
+        caseData.setEt3ResponseContactReason(null);
+        caseData.setEt3ResponseHearingRepresentative(null);
+        caseData.setEt3ResponseHearingRespondent(null);
+        caseData.setEt3ResponseEmploymentCount(null);
+        caseData.setEt3ResponseMultipleSites(null);
+        caseData.setEt3ResponseSiteEmploymentCount(null);
+        caseData.setEt3ResponseAcasAgree(null);
+        caseData.setEt3ResponseAcasAgreeReason(null);
+        caseData.setEt3ResponseAreDatesCorrect(null);
+        caseData.setEt3ResponseEmploymentStartDate(null);
+        caseData.setEt3ResponseEmploymentEndDate(null);
+        caseData.setEt3ResponseEmploymentInformation(null);
+        caseData.setEt3ResponseContinuingEmployment(null);
+        caseData.setEt3ResponseIsJobTitleCorrect(null);
+        caseData.setEt3ResponseCorrectJobTitle(null);
+        caseData.setEt3ResponseClaimantWeeklyHours(null);
+        caseData.setEt3ResponseClaimantCorrectHours(null);
+        caseData.setEt3ResponseEarningDetailsCorrect(null);
+        caseData.setEt3ResponsePayFrequency(null);
+        caseData.setEt3ResponsePayBeforeTax(null);
+        caseData.setEt3ResponsePayTakehome(null);
+        caseData.setEt3ResponseIsNoticeCorrect(null);
+        caseData.setEt3ResponseCorrectNoticeDetails(null);
+        caseData.setEt3ResponseIsPensionCorrect(null);
+        caseData.setEt3ResponsePensionCorrectDetails(null);
+        caseData.setEt3ResponseRespondentContestClaim(null);
+        caseData.setEt3ResponseContestClaimDocument(null);
+        caseData.setEt3ResponseContestClaimDetails(null);
+        caseData.setEt3ResponseEmployerClaim(null);
+        caseData.setEt3ResponseEmployerClaimDetails(null);
+        caseData.setEt3ResponseEmployerClaimDocument(null);
+        caseData.setEt3ResponseRespondentSupportNeeded(null);
+        caseData.setEt3ResponseRespondentSupportDetails(null);
+        caseData.setEt3ResponseRespondentSupportDocument(null);
+    }
+
 }

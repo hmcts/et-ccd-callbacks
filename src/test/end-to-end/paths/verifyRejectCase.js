@@ -10,4 +10,4 @@ Scenario('Verify Reject Case', async ({I}) => {
     caseNumber = await processCaseToET1VettedState();
     await rejectCaseEvent(I, caseNumber, eventNames.REJECT_CASE);
 
-}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT-DISABLED').retry(testConfig.TestRetryScenarios);

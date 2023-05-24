@@ -12,4 +12,4 @@ Scenario('Verify Claimant Representative', async ({I}) => {
     console.log("... case id =>" +caseId);
     await claimantRepresentative(I, eventNames.CLAIMANT_REPRESENTATIVE);
 
-}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT-DISABLED').retry(testConfig.TestRetryScenarios);

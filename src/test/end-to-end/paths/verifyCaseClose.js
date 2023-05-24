@@ -11,4 +11,4 @@ Scenario('Verify Case Close', async ({I}) => {
     console.log("... case id =>" +caseId);
     await closeCase(I, eventNames.CLOSE_CASE, commonConfig.clerkResponsible, commonConfig.physicalLocation)
 
-}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT-DISABLED').retry(testConfig.TestRetryScenarios);

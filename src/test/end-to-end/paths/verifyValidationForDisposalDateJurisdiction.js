@@ -12,7 +12,7 @@ Scenario('Ensure disposal date is not present for jurisdiction outcomes allocate
     await jurisdiction(I, eventNames.JURISDICTION, "Not allocated");
 
 }).tag('@nightly')
-    .tag('@RET-BAT')
+    .tag('@RET-BAT-DISABLED')
     .retry(testConfig.TestRetryScenarios);
 
 Scenario('Ensure disposal date is present for jurisdiction outcomes successful hearings', async ({I}) => {
@@ -21,7 +21,7 @@ Scenario('Ensure disposal date is present for jurisdiction outcomes successful h
     console.log("... case id =>" +caseId);
     await jurisdiction(I, eventNames.JURISDICTION, "Successful at hearing");
 
-}).tag('@RET-BAT')
+}).tag('@RET-BAT-DISABLED')
     .tag('@nightly')
     .retry(testConfig.TestRetryScenarios);
 
@@ -32,7 +32,7 @@ Scenario('Ensure date notified field is not present for "withdrawn or private se
     console.log("... case id =>" +caseId);
     await jurisdiction(I, eventNames.JURISDICTION, "Withdrawn or private settlement");
 
-}).tag('@RET-BAT')
+}).tag('@RET-BAT-DISABLED')
     .tag('@nightly')
 .retry(testConfig.TestRetryScenarios);
 

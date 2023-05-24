@@ -11,4 +11,4 @@ Scenario('Verify Case Details ', async ({I}) => {
     console.log("... case id =>" +caseNumber);
     await caseDetails(I, caseNumber, eventNames.CASE_DETAILS, 'A Clerk', 'Casework Table', 'Leeds');
 
-}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT-DISABLED').retry(testConfig.TestRetryScenarios);

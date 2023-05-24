@@ -10,18 +10,18 @@ Scenario('Verify a Case Transfer for England and Wales', async ({I}) => {
     console.log("... case id =>" +caseId);
     await caseTransfer(I, eventNames.CASE_TRANSFER_ENGWAL);
 
-}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT-DISABLED').tag('@nightly').retry(testConfig.TestRetryScenarios);
 
 Scenario('Verify a Case Transfer for Scotland', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
     console.log("... case id =>" +caseId);
     await caseTransfer(I, eventNames.CASE_TRANSFER_SCOTLAND);
 
-}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT-DISABLED').tag('@nightly').retry(testConfig.TestRetryScenarios);
 
 Scenario('Verify a Case Transfer for an ECM Case', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
     console.log("... case id =>" +caseId);
     await caseTransfer(I, eventNames.CASE_TRANSFER_ECM);
 
-}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT-DISABLED').tag('@nightly').retry(testConfig.TestRetryScenarios);

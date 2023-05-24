@@ -11,4 +11,4 @@ Scenario('Verify Respondent Representative for a Representative without a myHMCT
     console.log("... case id =>" +caseId);
     await respondentRepresentative(I, eventNames.RESPONDENT_REPRESENTATIVE, false);
 
-}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT-DISABLED').tag('@nightly').retry(testConfig.TestRetryScenarios);

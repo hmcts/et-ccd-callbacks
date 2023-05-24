@@ -11,4 +11,4 @@ Scenario('Verify Claimant Details', async ({I}) => {
     console.log("... case id =>" + caseNumber);
     await claimantDetails(I, eventNames.CLAIMANT_DETAILS);
 
-}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT-DISABLED').tag('@nightly').retry(testConfig.TestRetryScenarios);

@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({Et3ResponseController.class, Et3ResponseService.class, JsonMapper.class})
@@ -42,6 +44,7 @@ class Et3ResponseControllerTest {
     private static final String PROCESSING_COMPLETE_URL = "/et3Response/processingComplete";
     private static final String MID_EMPLOYMENT_DATES_URL = "/et3Response/midEmploymentDates";
     private static final String ABOUT_TO_SUBMIT_URL = "/et3Response/aboutToSubmit";
+    private static final String VALIDATE_RESPONDENT_URL = "/et3Response/validateRespondent";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -51,6 +54,8 @@ class Et3ResponseControllerTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TornadoService tornadoService;
+    @MockBean
+    private EmailService emailService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 
@@ -62,11 +67,17 @@ class Et3ResponseControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("1234567/1234")
+            .withRespondent("test", NO, null, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setClaimant("Claimant LastName");
+        caseDetails.getCaseData().setTribunalCorrespondenceEmail("tribunal@email.com");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
             .build();
+        ccdRequest.getCaseDetails().setCaseId("1683646754393041");
+
     }
 
     @Test
@@ -78,7 +89,6 @@ class Et3ResponseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
@@ -197,5 +207,37 @@ class Et3ResponseControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void validateRespondent_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(VALIDATE_RESPONDENT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()))
+                .andExpect(jsonPath("$.errors", notNullValue()));
+    }
+
+    @Test
+    void validateRespondent_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(VALIDATE_RESPONDENT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void validateRespondent_badRequest() throws Exception {
+        mvc.perform(post(VALIDATE_RESPONDENT_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

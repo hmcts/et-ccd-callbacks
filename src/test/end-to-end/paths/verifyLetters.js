@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {letters} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Create a Leeds Single Case & Execute Letters');
+Feature('Create Single Case & Execute Letters');
 
 Scenario('Verify Letters', async ({I}) => {
 
@@ -12,7 +12,4 @@ Scenario('Verify Letters', async ({I}) => {
 
     await letters(I, eventNames.LETTERS);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@wip');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').retry(testConfig.TestRetryScenarios);

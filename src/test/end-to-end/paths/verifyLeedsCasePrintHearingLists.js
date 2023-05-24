@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {listHearing, allocateHearing, printHearingLists} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Create a Leeds Single Case & Execute Print Hearing Lists');
+Feature('Create Single Case & Execute Print Hearing Lists');
 
 Scenario('Verify Print Hearing Lists', async ({I}) => {
 
@@ -14,6 +14,5 @@ Scenario('Verify Print Hearing Lists', async ({I}) => {
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
     await printHearingLists(I, eventNames.PRINT_HEARING_LISTS, 'Leeds');
 
-}).tag('@printHearing')
-    .tag('@wip');
+}).tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios);

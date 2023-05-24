@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -232,6 +233,12 @@ public class FlagsImageHelper {
         }
         if (!flag && caseData.getClaimantHearingPreference() != null) {
             flag = YES.equals(caseData.getClaimantHearingPreference().getReasonableAdjustments());
+        }
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            flag = caseData.getRespondentCollection()
+                    .stream()
+                    .anyMatch(r -> YES.equals(
+                            defaultIfEmpty(r.getValue().getEt3ResponseRespondentSupportNeeded(), "")));
         }
         return flag;
     }

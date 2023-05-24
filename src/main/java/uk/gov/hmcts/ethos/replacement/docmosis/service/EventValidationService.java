@@ -193,6 +193,11 @@ public class EventValidationService {
         return errors;
     }
 
+      public Optional<String> validateMaximumSize(CaseData caseData) {
+         if (caseData.getRespondentCollection().size() > MAX_RESPONDENTS) {
+             return Optional.of(String.format("Maximum number of respondents is %s", MAX_RESPONDENTS));
+         }
+      }
     public void validateACAS(CaseData caseData, List<String> errors) {
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
             List<String> duplicates = new ArrayList<>();

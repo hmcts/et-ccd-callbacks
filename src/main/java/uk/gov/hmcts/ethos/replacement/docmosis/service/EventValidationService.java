@@ -217,7 +217,7 @@ public class EventValidationService {
         }
     }
 
-    public List<String> validateAndSetRespRepNames(CaseData caseData) {
+    public List<String> validateRespRepNames(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
             && CollectionUtils.isNotEmpty(caseData.getRepCollection())) {

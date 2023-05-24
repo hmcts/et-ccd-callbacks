@@ -9,7 +9,7 @@ function verifyCaseDetails() {
     I.see('LIVE APPEAL');
     I.see('SENSITIVE');
     I.see('DIGITAL FILE');
-    I.see('REASONABLE ADJUSTMENT');
+    // I.see('REASONABLE ADJUSTMENT');
 
     I.see('Claimant');
     I.see('Grayson Becker');

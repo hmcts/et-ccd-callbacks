@@ -242,4 +242,41 @@ class Et3ResponseHelperTest {
         assertThat(errors, hasSize(1));
         assertThat(errors.get(0)).isEqualTo("No respondents found");
     }
+
+    @Test
+    void createDynamicListSelection_noExtensionGranted() {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        respondentSumType.setResponseReceived(YES);
+        respondentSumType.setExtensionRequested(NO);
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        assertThat(errors, hasSize(0));
+        assertThat(caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getListItems(),
+            hasSize(0));
+    }
+
+    @Test
+    void createDynamicListSelection_extensionDateBefore() {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        respondentSumType.setResponseReceived(YES);
+        respondentSumType.setExtensionRequested(YES);
+        respondentSumType.setExtensionGranted(YES);
+        respondentSumType.setExtensionDate("2000-12-31");
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        assertThat(errors, hasSize(0));
+        assertThat(caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getListItems(),
+            hasSize(0));
+    }
+
+    @Test
+    void createDynamicListSelection_extensionDateAfter() {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        respondentSumType.setResponseReceived(YES);
+        respondentSumType.setExtensionRequested(YES);
+        respondentSumType.setExtensionGranted(YES);
+        respondentSumType.setExtensionDate("2999-12-31");
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        assertThat(errors, hasSize(0));
+        assertThat(caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getListItems(),
+            hasSize(1));
+    }
 }

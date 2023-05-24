@@ -284,14 +284,27 @@ public class Et3ResponseHelper {
 
         DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
                 caseData.getRespondentCollection().stream()
-                        .filter(r -> NO.equals(r.getValue().getResponseReceived()))
-                        .collect(Collectors.toList())));
+                        .filter(Et3ResponseHelper::isAllowSubmit)
+                        .toList()));
         DynamicListType dynamicListType = new DynamicListType();
         dynamicListType.setDynamicList(dynamicList);
         DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
         dynamicListTypeItem.setValue(dynamicListType);
         caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
         return new ArrayList<>();
+    }
+
+    private static boolean isAllowSubmit(RespondentSumTypeItem respondentSumTypeItem) {
+        if (NO.equals(respondentSumTypeItem.getValue().getResponseReceived())) {
+            return true;
+        }
+        if (respondentSumTypeItem.getValue().getExtensionDate() != null) {
+            LocalDate extensionDate = LocalDate.parse(respondentSumTypeItem.getValue().getExtensionDate());
+            return YES.equals(respondentSumTypeItem.getValue().getExtensionRequested())
+                && YES.equals(respondentSumTypeItem.getValue().getExtensionGranted())
+                && extensionDate.isAfter(LocalDate.now());
+        }
+        return false;
     }
 
     /**

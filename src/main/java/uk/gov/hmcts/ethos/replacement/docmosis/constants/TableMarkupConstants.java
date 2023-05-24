@@ -2,11 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
 public final class TableMarkupConstants {
 
-    public static final String TABLE_START_WITHOUT_HEADER = "| | |\r\n";
     public static final String TABLE_STRING = "|--|--|\r\n";
     public static final String RESPONSE_TABLE_HEADER = "|Response %s | |\r\n";
     public static final String SUPPORTING_MATERIAL_TABLE_HEADER = "|Supporting material | %s|\r\n";
-    public static final String DOC_MARKUP_DOCUMENT =
+    public static final String DOCUMENT_LINK_MARKDOWN =
         "<a href=\"/documents/%s\" target=\"_blank\">%s</a>";
     public static final String PARTY_OR_PARTIES_TO_RESPOND = "|Party or parties to respond | %s|\r\n";
     public static final String RESPONSE_DUE = "|Is a response required?| %s|\r\n";

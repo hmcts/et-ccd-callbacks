@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOC_MARKUP_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
@@ -106,18 +104,14 @@ public final class PseHelper {
     }
 
     public static List<String[]> getSendNotificationUploadDocumentList(SendNotificationType sendNotificationType) {
-        List<String []> documents = new ArrayList<>();
+
         if (sendNotificationType.getSendNotificationUploadDocument() == null) {
-            return documents;
+            return new ArrayList<>();
         }
-        for (DocumentTypeItem documentTypeItem : sendNotificationType.getSendNotificationUploadDocument()) {
-            documents.add(new String[]{"Description", documentTypeItem.getValue().getShortDescription()});
-            documents.add(new String[]{"Document", String.format(DOC_MARKUP_DOCUMENT,
-                Helper.getDocumentMatcher(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())
-                    .replaceFirst(""),
-                documentTypeItem.getValue().getUploadedDocument().getDocumentFilename())});
-        }
-        return documents;
+        return sendNotificationType.getSendNotificationUploadDocument()
+            .stream()
+            .flatMap(documentTypeItem -> MarkdownHelper.addDocumentRow(documentTypeItem.getValue()).stream())
+            .collect(Collectors.toList());
     }
 
     private static String getSendNotificationSelectHearing(SendNotificationType sendNotificationType) {

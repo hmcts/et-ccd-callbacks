@@ -1,8 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT_LINK_MARKDOWN;
 
 /**
  * Helper class for formatting strings into markdown.
@@ -43,5 +46,30 @@ public final class MarkdownHelper {
         }
 
         return stringBuilder.toString();
+    }
+
+    /**
+     * Returns two rows of two columns for a document representing its name and description.
+     * @param document Document data
+     * @return A list of String arrays representing the two columned rows
+     */
+    public static List<String[]> addDocumentRow(DocumentType document) {
+        UploadedDocumentType uploadedDocument = document.getUploadedDocument();
+        String documentLink = String.format(DOCUMENT_LINK_MARKDOWN,
+            Helper.extractUUID(uploadedDocument.getDocumentBinaryUrl()), uploadedDocument.getDocumentFilename());
+        return addDocumentRow(document, documentLink);
+    }
+
+    /**
+     * Returns two rows of two columns for a document representing its name and description.
+     * @param document Document data
+     * @param documentString String to show for the document in the table
+     * @return A list of String arrays representing the two columned rows
+     */
+    public static List<String[]> addDocumentRow(DocumentType document, String documentString) {
+        return List.of(
+            new String[]{"Document", documentString},
+            new String[]{"Description", document.getShortDescription()}
+        );
     }
 }

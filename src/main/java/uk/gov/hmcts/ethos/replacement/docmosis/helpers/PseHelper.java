@@ -11,6 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
@@ -81,12 +82,9 @@ public final class PseHelper {
             new String[]{"Hearing", getSendNotificationSelectHearing(sendNotificationType)},
             new String[]{"Date sent", sendNotificationType.getDate()},
             new String[]{"Sent by", TRIBUNAL},
-            new String[]{"Case management order or request?",
-                sendNotificationType.getSendNotificationCaseManagement()},
-            new String[]{"Is a response required?",
-                sendNotificationType.getSendNotificationResponseTribunal()},
-            new String[]{"Party or parties to respond",
-                sendNotificationType.getSendNotificationSelectParties()},
+            new String[]{"Case management order or request?", sendNotificationType.getSendNotificationCaseManagement()},
+            new String[]{"Is a response required?", sendNotificationType.getSendNotificationResponseTribunal()},
+            new String[]{"Party or parties to respond", sendNotificationType.getSendNotificationSelectParties()},
             new String[]{"Additional information", sendNotificationType.getSendNotificationAdditionalInfo()}
         ));
         rows.addAll(getSendNotificationUploadDocumentList(sendNotificationType));
@@ -110,7 +108,6 @@ public final class PseHelper {
     public static List<String[]> getSendNotificationUploadDocumentList(SendNotificationType sendNotificationType) {
         List<String []> documents = new ArrayList<>();
         if (sendNotificationType.getSendNotificationUploadDocument() == null) {
-            documents.add(new String[]{"", ""});
             return documents;
         }
         for (DocumentTypeItem documentTypeItem : sendNotificationType.getSendNotificationUploadDocument()) {
@@ -125,7 +122,7 @@ public final class PseHelper {
 
     private static String getSendNotificationSelectHearing(SendNotificationType sendNotificationType) {
         return Optional.ofNullable(sendNotificationType.getSendNotificationSelectHearing())
-            .map(SendNotificationSelectHearing::getSelectedLabel)
+            .map(hearing -> hearing.getSelectedLabel())
             .orElse("");
     }
 

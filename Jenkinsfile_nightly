@@ -59,21 +59,24 @@ withNightlyPipeline(type, product, component) {
     env.RUNNING_ENV = params.ENVIRONMENT
 
     loadVaultSecrets(secrets)
-    enableFullFunctionalTest()
     enableCrossBrowserTest()
     enableFortifyScan()
 
-    afterAlways('fullFunctionalTest') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+    afterAlways('crossBrowserTest') {
+        try {
+            sh "./gradlew :nightlyFunctional"
+        } finally {
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
 
-        publishHTML target: [
-                allowMissing : true,
-                alwaysLinkToLastBuild: true,
-                keepAll : true,
-                reportDir : "functional-output",
-                reportFiles : "ET-CCD-Callbacks-tests.html",
-                reportName : "ET E2E functional tests result"
-        ]
+            publishHTML target: [
+                    allowMissing : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll : true,
+                    reportDir : "functional-output",
+                    reportFiles : "ET-CCD-Callbacks-tests.html",
+                    reportName : "ET E2E functional tests result"
+            ]
+        }
     }
 
     afterAlways('fortify-scan') {

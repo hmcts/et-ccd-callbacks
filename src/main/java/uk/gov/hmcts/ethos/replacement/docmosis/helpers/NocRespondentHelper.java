@@ -26,6 +26,7 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 @Component
+@SuppressWarnings({"PMD.ConfusingTernary"})
 public class NocRespondentHelper {
     public Map<String, Organisation> getRespondentOrganisations(CaseData caseData) {
         List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();

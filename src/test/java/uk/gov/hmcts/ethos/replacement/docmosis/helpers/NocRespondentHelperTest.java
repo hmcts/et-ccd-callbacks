@@ -179,7 +179,8 @@ class NocRespondentHelperTest {
 
     @Test
     void shouldReturnOrganisationOfRep() {
-        Organisation orgFromRep = nocRespondentHelper.getOrgFromRep(RESPONDENT_ID_THREE, caseData.getRepCollection());
+        Organisation orgFromRep = nocRespondentHelper.getOrgFromRep(respondentSumTypeItem3,
+                caseData.getRepCollection());
         assertThat(orgFromRep).isEqualTo(org1);
     }
 

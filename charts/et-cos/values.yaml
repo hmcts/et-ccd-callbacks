@@ -80,6 +80,6 @@ java:
     PSE_RESPONDENT_NOTIFICATION_ADMIN_TEMPLATE_ID: 296d3c6e-00d7-4f43-a8bd-260d52b171a7
     EXUI_CASE_DETAILS_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net/cases/case-details/"
     CITIZEN_CASE_DETAILS_URL: "https://et-sya.{{ .Values.global.environment }}.platform.hmcts.net/citizen-hub/"
-    SEND_NOTIFICATION_TEMPLATE_ID: 1b8299d7-5051-4b78-a870-726b6384d8a8
     TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID: bd7addc3-d1ea-47cf-9249-208a7033d454
+    SEND_NOTIFICATION_TEMPLATE_ID: 1b8299d7-5051-4b78-a870-726b6384d8a8
     RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID: d2caad87-2bab-4bc0-b598-01f1a7341f9e

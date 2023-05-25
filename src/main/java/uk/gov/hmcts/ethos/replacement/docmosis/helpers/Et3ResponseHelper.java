@@ -284,7 +284,7 @@ public class Et3ResponseHelper {
 
         DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
                 caseData.getRespondentCollection().stream()
-                        .filter(Et3ResponseHelper::isAllowSubmit)
+                        .filter(r -> isAllowSubmit(r.getValue()))
                         .toList()));
         DynamicListType dynamicListType = new DynamicListType();
         dynamicListType.setDynamicList(dynamicList);
@@ -294,15 +294,16 @@ public class Et3ResponseHelper {
         return new ArrayList<>();
     }
 
-    private static boolean isAllowSubmit(RespondentSumTypeItem respondentSumTypeItem) {
-        if (NO.equals(respondentSumTypeItem.getValue().getResponseReceived())) {
+    private static boolean isAllowSubmit(RespondentSumType respondent) {
+        if (NO.equals(respondent.getResponseReceived())) {
             return true;
         }
-        if (respondentSumTypeItem.getValue().getExtensionDate() != null) {
-            LocalDate extensionDate = LocalDate.parse(respondentSumTypeItem.getValue().getExtensionDate());
-            return YES.equals(respondentSumTypeItem.getValue().getExtensionRequested())
-                && YES.equals(respondentSumTypeItem.getValue().getExtensionGranted())
-                && extensionDate.isAfter(LocalDate.now());
+        if (respondent.getExtensionDate() != null) {
+            LocalDate extensionDate = LocalDate.parse(respondent.getExtensionDate());
+            return YES.equals(respondent.getExtensionRequested())
+                && YES.equals(respondent.getExtensionGranted())
+                && extensionDate.isAfter(LocalDate.now())
+                && !YES.equals(respondent.getExtensionResubmitted());
         }
         return false;
     }
@@ -360,6 +361,11 @@ public class Et3ResponseHelper {
     }
 
     private static RespondentSumType addEt3Data(CaseData caseData, RespondentSumType respondent) {
+        if (YES.equals(respondent.getResponseReceived())
+            && YES.equals(respondent.getExtensionRequested())
+            && YES.equals(respondent.getExtensionGranted())) {
+            respondent.setExtensionResubmitted(YES);
+        }
         respondent.setResponseReceived(YES);
         respondent.setResponseReceivedDate(LocalDate.now().toString());
         respondent.setEt3ResponseIsClaimantNameCorrect(caseData.getEt3ResponseIsClaimantNameCorrect());

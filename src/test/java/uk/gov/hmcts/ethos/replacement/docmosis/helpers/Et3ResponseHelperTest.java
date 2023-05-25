@@ -3,6 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -30,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class Et3ResponseHelperTest {
 
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
@@ -243,40 +247,30 @@ class Et3ResponseHelperTest {
         assertThat(errors.get(0)).isEqualTo("No respondents found");
     }
 
-    @Test
-    void createDynamicListSelection_noExtensionGranted() {
+    @ParameterizedTest
+    @MethodSource("createDynamicListSelectionExtension")
+    void createDynamicListSelection_extensionRequested(String responseReceived, String extensionRequested,
+                                             String extensionGranted, String extensionDate,
+                                             String extensionResubmitted, int count) {
         RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-        respondentSumType.setResponseReceived(YES);
-        respondentSumType.setExtensionRequested(NO);
+        respondentSumType.setResponseReceived(responseReceived);
+        respondentSumType.setExtensionRequested(extensionRequested);
+        respondentSumType.setExtensionGranted(extensionGranted);
+        respondentSumType.setExtensionDate(extensionDate);
+        respondentSumType.setExtensionResubmitted(extensionResubmitted);
         List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
         assertThat(errors, hasSize(0));
         assertThat(caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getListItems(),
-            hasSize(0));
+            hasSize(count));
     }
 
-    @Test
-    void createDynamicListSelection_extensionDateBefore() {
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-        respondentSumType.setResponseReceived(YES);
-        respondentSumType.setExtensionRequested(YES);
-        respondentSumType.setExtensionGranted(YES);
-        respondentSumType.setExtensionDate("2000-12-31");
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(errors, hasSize(0));
-        assertThat(caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getListItems(),
-            hasSize(0));
+    private static Stream<Arguments> createDynamicListSelectionExtension() {
+        return Stream.of(
+            Arguments.of(YES, null, null, null, null, 0),
+            Arguments.of(YES, YES, YES, "2000-12-31", null, 0),
+            Arguments.of(YES, YES, YES, "2999-12-31", null, 1),
+            Arguments.of(YES, YES, YES, "2999-12-31", YES, 0)
+        );
     }
 
-    @Test
-    void createDynamicListSelection_extensionDateAfter() {
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-        respondentSumType.setResponseReceived(YES);
-        respondentSumType.setExtensionRequested(YES);
-        respondentSumType.setExtensionGranted(YES);
-        respondentSumType.setExtensionDate("2999-12-31");
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(errors, hasSize(0));
-        assertThat(caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getListItems(),
-            hasSize(1));
-    }
 }

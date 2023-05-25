@@ -314,8 +314,8 @@ public final class Helper {
         return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
     }
 
-    public static String extractUUID(String input) {
-        Pattern pattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+    public static String extractLink(String input) {
+        Pattern pattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/binary");
         Matcher matcher = pattern.matcher(input);
         if (matcher.find()) {
             return matcher.group();

@@ -56,7 +56,7 @@ public final class MarkdownHelper {
     public static List<String[]> addDocumentRow(DocumentType document) {
         UploadedDocumentType uploadedDocument = document.getUploadedDocument();
         String documentLink = String.format(DOCUMENT_LINK_MARKDOWN,
-            Helper.extractUUID(uploadedDocument.getDocumentBinaryUrl()), uploadedDocument.getDocumentFilename());
+            Helper.extractLink(uploadedDocument.getDocumentBinaryUrl()), uploadedDocument.getDocumentFilename());
         return addDocumentRow(document, documentLink);
     }
 

@@ -34,19 +34,28 @@ public class NocRespondentHelper {
         return respondentCollection.stream().collect(
                 HashMap::new,
                 (container, respondent) ->
-                        container.put(respondent.getId(), getOrgFromRep(respondent.getId(), repCollection)),
+                        container.put(respondent.getId(), getOrgFromRep(respondent, repCollection)),
                 HashMap::putAll
         );
     }
 
-    public Organisation getOrgFromRep(String respId, List<RepresentedTypeRItem> repCollection) {
+    public Organisation getOrgFromRep(RespondentSumTypeItem respondent, List<RepresentedTypeRItem> repCollection) {
         return emptyIfNull(repCollection).stream()
-                .filter(rep -> rep.getValue().getRespondentId().equals(respId))
+                .filter(rep -> validateRespondent(respondent, rep.getValue()))
                 .filter(rep -> rep.getValue().getRespondentOrganisation() != null)
                 .filter(rep -> isNotEmpty(rep.getValue().getRespondentOrganisation().getOrganisationID()))
                 .map(rep -> rep.getValue().getRespondentOrganisation())
                 .findFirst()
                 .orElse(null);
+    }
+    
+    public static boolean validateRespondent(RespondentSumTypeItem respondentSumTypeItem,
+                                             RepresentedTypeR representedTypeR) {
+        if (representedTypeR.getRespondentId() != null) {
+            return respondentSumTypeItem.getId().equals(representedTypeR.getRespondentId());
+        } else {
+            return respondentSumTypeItem.getValue().getRespondentName().equals(representedTypeR.getRespRepName());
+        }
     }
 
     public int getIndexOfRep(RespondentSumTypeItem respondent,

@@ -353,11 +353,7 @@ public class TseService {
     public List<String[]> addDocumentRow(DocumentType document, String authToken) {
         UploadedDocumentType uploadedDocument = document.getUploadedDocument();
         String nameTypeSizeLink = documentManagementService.displayDocNameTypeSizeLink(uploadedDocument, authToken);
-
-        return List.of(
-                new String[]{"Document", nameTypeSizeLink},
-                new String[]{"Description", document.getShortDescription()}
-        );
+        return MarkdownHelper.addDocumentRow(document, nameTypeSizeLink);
     }
 
     /**

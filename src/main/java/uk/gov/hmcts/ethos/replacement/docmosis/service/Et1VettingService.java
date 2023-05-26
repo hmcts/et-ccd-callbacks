@@ -63,9 +63,9 @@ public class Et1VettingService {
             "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
     private static final String CLAIMANT_DETAILS_PERSON = "<hr><h3>Claimant</h3>"
-            + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre>";
+        + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre>";
     private static final String CLAIMANT_DETAILS_COMPANY = "<hr><h3>Claimant</h3>"
         + "<pre>Company name &#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Contact address &#09&#09 %s</pre>";

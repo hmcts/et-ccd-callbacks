@@ -3,16 +3,12 @@ const {eventNames} = require('../pages/common/constants.js');
 const {respondentRepresentative} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Leeds Office Individual Case & Execute Respondent Representative');
+Feature('Individual Case & Execute Respondent Representative');
 
-Scenario('Verify Respondent Representative', async ({I}) => {
+Scenario('Verify Respondent Representative for a Representative without a myHMCTS account', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
     console.log("... case id =>" +caseId);
+    await respondentRepresentative(I, eventNames.RESPONDENT_REPRESENTATIVE, false);
 
-    await respondentRepresentative(I, eventNames.RESPONDENT_REPRESENTATIVE);
-
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('RET-BAT')
-    .retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

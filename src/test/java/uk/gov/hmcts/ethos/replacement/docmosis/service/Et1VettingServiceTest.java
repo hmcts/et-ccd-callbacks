@@ -71,10 +71,14 @@ class Et1VettingServiceTest {
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
             "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
-    private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
+    private static final String CLAIMANT_DETAILS_PERSON = "<hr><h3>Claimant</h3>"
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre>";
+    private static final String CLAIMANT_DETAILS_COMPANY = "<hr><h3>Claimant</h3>"
+        + "<pre>Company name &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre>";
+
     private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
@@ -275,12 +279,25 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_ClaimantDetails_shouldReturnMarkUp() {
+    void initialBeforeYouStart_ClaimantPersonDetails_shouldReturnMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expected = String.format(CLAIMANT_DETAILS, "Doris", "Johnson",
+        String expected = String.format(CLAIMANT_DETAILS_PERSON, "Doris", "Johnson",
                 "232 Petticoat Square" + BR_WITH_TAB + "3 House" + BR_WITH_TAB + "London" + BR_WITH_TAB + "W10 4AG");
         assertThat(caseDetails.getCaseData().getEt1VettingClaimantDetailsMarkUp())
                 .isEqualTo(expected);
+    }
+
+    @Test
+    void initialBeforeYouStart_ClaimantCompanyDetails_shouldReturnMarkUp() {
+        caseDetails.getCaseData().getClaimantIndType().setClaimantLastName(null);
+        caseDetails.getCaseData().getClaimantIndType().setClaimantFirstNames(null);
+        caseDetails.getCaseData().setClaimantTypeOfClaimant("Company");
+        caseDetails.getCaseData().setClaimantCompany("Johnson's Company");
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(CLAIMANT_DETAILS_COMPANY, "Johnson's Company",
+            "232 Petticoat Square" + BR_WITH_TAB + "3 House" + BR_WITH_TAB + "London" + BR_WITH_TAB + "W10 4AG");
+        assertThat(caseDetails.getCaseData().getEt1VettingClaimantDetailsMarkUp())
+            .isEqualTo(expected);
     }
 
     @Test

@@ -79,7 +79,7 @@ public class NoticeOfChangeFieldPopulator {
                                                       RespondentSumTypeItem respondent) {
         return emptyIfNull(repCollection).stream()
             .filter(representedTypeRItem ->
-                representedTypeRItem.getValue().getRespondentId().equals(respondent.getId()))
+                    NocRespondentHelper.validateRespondent(respondent, representedTypeRItem.getValue()))
             .findFirst();
     }
 

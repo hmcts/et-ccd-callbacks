@@ -234,7 +234,7 @@ public class FlagsImageHelper {
         if (!flag && caseData.getClaimantHearingPreference() != null) {
             flag = YES.equals(caseData.getClaimantHearingPreference().getReasonableAdjustments());
         }
-        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+        if (!flag && CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
             flag = caseData.getRespondentCollection()
                     .stream()
                     .anyMatch(r -> YES.equals(

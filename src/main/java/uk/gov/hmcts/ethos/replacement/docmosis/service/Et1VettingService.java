@@ -219,17 +219,22 @@ public class Et1VettingService {
     private String getInitialClaimantDetailsMarkUp(CaseData caseData) {
         if (COMPANY.equals(caseData.getClaimantTypeOfClaimant())) {
             return String.format(CLAIMANT_DETAILS_COMPANY,
-                caseData.getClaimantIndType() != null
+                caseData.getClaimantCompany() != null
                     ? caseData.getClaimantCompany()
                     : "Company name not specified.",
                 toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
         }
 
+        if (caseData.getClaimantIndType() == null) {
+            return String.format(CLAIMANT_DETAILS_PERSON, "Name not specified.", "Name not specified.",
+                toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
+        }
+
         return String.format(CLAIMANT_DETAILS_PERSON,
-            caseData.getClaimantIndType() != null
+            caseData.getClaimantIndType().getClaimantFirstNames() != null
                 ? caseData.getClaimantIndType().getClaimantFirstNames()
                 : "First name not specified.",
-            caseData.getClaimantIndType() != null
+            caseData.getClaimantIndType().getClaimantLastName() != null
                 ? caseData.getClaimantIndType().getClaimantLastName()
                 : "Last name not specified.",
             toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));

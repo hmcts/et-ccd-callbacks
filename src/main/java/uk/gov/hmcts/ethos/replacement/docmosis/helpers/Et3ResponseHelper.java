@@ -284,14 +284,28 @@ public class Et3ResponseHelper {
 
         DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
                 caseData.getRespondentCollection().stream()
-                        .filter(r -> NO.equals(r.getValue().getResponseReceived()))
-                        .collect(Collectors.toList())));
+                        .filter(r -> isAllowSubmit(r.getValue()))
+                        .toList()));
         DynamicListType dynamicListType = new DynamicListType();
         dynamicListType.setDynamicList(dynamicList);
         DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
         dynamicListTypeItem.setValue(dynamicListType);
         caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
         return new ArrayList<>();
+    }
+
+    private static boolean isAllowSubmit(RespondentSumType respondent) {
+        if (NO.equals(respondent.getResponseReceived())) {
+            return true;
+        }
+        if (respondent.getExtensionDate() != null) {
+            LocalDate extensionDate = LocalDate.parse(respondent.getExtensionDate());
+            return YES.equals(respondent.getExtensionRequested())
+                && YES.equals(respondent.getExtensionGranted())
+                && extensionDate.isAfter(LocalDate.now())
+                && !YES.equals(respondent.getExtensionResubmitted());
+        }
+        return false;
     }
 
     /**
@@ -347,6 +361,11 @@ public class Et3ResponseHelper {
     }
 
     private static RespondentSumType addEt3Data(CaseData caseData, RespondentSumType respondent) {
+        if (YES.equals(respondent.getResponseReceived())
+            && YES.equals(respondent.getExtensionRequested())
+            && YES.equals(respondent.getExtensionGranted())) {
+            respondent.setExtensionResubmitted(YES);
+        }
         respondent.setResponseReceived(YES);
         respondent.setResponseReceivedDate(LocalDate.now().toString());
         respondent.setEt3ResponseIsClaimantNameCorrect(caseData.getEt3ResponseIsClaimantNameCorrect());

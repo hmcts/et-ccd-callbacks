@@ -298,9 +298,7 @@ public class Et3ResponseHelper {
         if (NO.equals(respondent.getResponseReceived())) {
             return true;
         }
-        if (respondent.getExtensionRequested() != null
-            && respondent.getExtensionGranted() != null
-            && respondent.getExtensionDate() != null) {
+        if (respondent.getExtensionDate() != null) {
             LocalDate extensionDate = LocalDate.parse(respondent.getExtensionDate());
             return YES.equals(respondent.getExtensionRequested())
                 && YES.equals(respondent.getExtensionGranted())

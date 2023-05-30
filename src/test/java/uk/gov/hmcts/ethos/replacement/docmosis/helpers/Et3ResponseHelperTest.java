@@ -239,6 +239,26 @@ class Et3ResponseHelperTest {
         assertThat(respondentSumType.getResponseReceivedDate()).isEqualTo(LocalDate.now().toString());
     }
 
+    @ParameterizedTest
+    @MethodSource("addEt3DataToRespondentExtensionResubmitted")
+    void addEt3DataToRespondent_setExtensionResubmitted(String responseReceived, String extensionRequested,
+                                                        String extensionGranted, String result) {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        respondentSumType.setResponseReceived(responseReceived);
+        respondentSumType.setExtensionRequested(extensionRequested);
+        respondentSumType.setExtensionGranted(extensionGranted);
+        Et3ResponseHelper.addEt3DataToRespondent(caseData);
+        assertThat(respondentSumType.getExtensionResubmitted()).isEqualTo(result);
+    }
+
+    private static Stream<Arguments> addEt3DataToRespondentExtensionResubmitted() {
+        return Stream.of(
+            Arguments.of(YES, YES, YES, YES),
+            Arguments.of(NO, null, null, null),
+            Arguments.of(null, null, null, null)
+        );
+    }
+
     @Test
     void createDynamicListSelection_noRespondents() {
         caseData.setRespondentCollection(null);
@@ -249,11 +269,10 @@ class Et3ResponseHelperTest {
 
     @ParameterizedTest
     @MethodSource("createDynamicListSelectionExtension")
-    void createDynamicListSelection_extensionRequested(String responseReceived, String extensionRequested,
-                                             String extensionGranted, String extensionDate,
-                                             String extensionResubmitted, int count) {
+    void createDynamicListSelection_extensionRequested(String extensionRequested, String extensionGranted,
+                                                       String extensionDate, String extensionResubmitted, int count) {
         RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-        respondentSumType.setResponseReceived(responseReceived);
+        respondentSumType.setResponseReceived(YES);
         respondentSumType.setExtensionRequested(extensionRequested);
         respondentSumType.setExtensionGranted(extensionGranted);
         respondentSumType.setExtensionDate(extensionDate);
@@ -266,10 +285,10 @@ class Et3ResponseHelperTest {
 
     private static Stream<Arguments> createDynamicListSelectionExtension() {
         return Stream.of(
-            Arguments.of(YES, null, null, null, null, 0),
-            Arguments.of(YES, YES, YES, "2000-12-31", null, 0),
-            Arguments.of(YES, YES, YES, "2999-12-31", null, 1),
-            Arguments.of(YES, YES, YES, "2999-12-31", YES, 0)
+            Arguments.of(null, null, null, null, 0),
+            Arguments.of(YES, YES, "2000-12-31", null, 0),
+            Arguments.of(YES, YES, "2999-12-31", null, 1),
+            Arguments.of(YES, YES, "2999-12-31", YES, 0)
         );
     }
 

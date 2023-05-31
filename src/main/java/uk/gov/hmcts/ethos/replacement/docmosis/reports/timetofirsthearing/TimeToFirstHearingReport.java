@@ -294,40 +294,36 @@ public class TimeToFirstHearingReport {
     }
 
     private void setPercent(AdhocReportType adhocReportType) {
-        double conNone26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConNoneTotal()) != 0)
-                ? (Double.parseDouble(adhocReportType.getConNone26wkTotal())
-                / Integer.parseInt(adhocReportType.getConNoneTotal())) * 100 : 0;
-        double conStd26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConStdTotal()) != 0)
-                ? (Double.parseDouble(adhocReportType.getConStd26wkTotal())
-                / Integer.parseInt(adhocReportType.getConStdTotal())) * 100 : 0;
-        double conFast26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConFastTotal()) != 0)
-                ? (Double.parseDouble(adhocReportType.getConFast26wkTotal())
-                / Integer.parseInt(adhocReportType.getConFastTotal())) * 100 : 0;
-        double conOpen26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConOpenTotal()) != 0)
-                ? (Double.parseDouble(adhocReportType.getConOpen26wkTotal())
-                / Integer.parseInt(adhocReportType.getConOpenTotal())) * 100 : 0;
+        int conNonTotal = Integer.parseInt(adhocReportType.getConNoneTotal());
+        int conStdTotal = Integer.parseInt(adhocReportType.getConStdTotal());
+        int conFastTotal = Integer.parseInt(adhocReportType.getConFastTotal());
+        int conOpenTotal = Integer.parseInt(adhocReportType.getConOpenTotal());
 
-        double notConNone26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConNoneTotal()) != 0)
-                ? (Double.parseDouble(adhocReportType.getNotConNone26wkTotal())
-                / Integer.parseInt(adhocReportType.getConNoneTotal())) * 100 : 0;
-        double notConStd26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConStdTotal()) != 0)
-                ? (Double.parseDouble(adhocReportType.getNotConStd26wkTotal())
-                / Integer.parseInt(adhocReportType.getConStdTotal())) * 100 : 0;
-        double notConFast26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConFastTotal()) != 0)
-                ? (Double.parseDouble(adhocReportType.getNotConFast26wkTotal())
-                / Integer.parseInt(adhocReportType.getConFastTotal())) * 100 : 0;
-        float notConOpen26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConOpenTotal()) != 0)
-                ? ((float)Double.parseDouble(adhocReportType.getNotConOpen26wkTotal())
-                / Integer.parseInt(adhocReportType.getConOpenTotal())) * 100 : 0;
+        adhocReportType.setConNone26wkTotalPerCent
+                (calculatePercent(adhocReportType.getConNone26wkTotal(), conNonTotal));
+        adhocReportType.setConStd26wkTotalPerCent
+                (calculatePercent(adhocReportType.getConStd26wkTotal(), conStdTotal));
+        adhocReportType.setConFast26wkTotalPerCent
+                (calculatePercent(adhocReportType.getConFast26wkTotal(), conFastTotal));
+        adhocReportType.setConOpen26wkTotalPerCent
+                (calculatePercent(adhocReportType.getConOpen26wkTotal(), conOpenTotal));
+        adhocReportType.setNotConNone26wkTotalPerCent
+                (calculatePercent(adhocReportType.getNotConNone26wkTotal(), conNonTotal));
+        adhocReportType.setNotConStd26wkTotalPerCent
+                (calculatePercent(adhocReportType.getNotConStd26wkTotal(), conStdTotal));
+        adhocReportType.setNotConFast26wkTotalPerCent
+                (calculatePercent(adhocReportType.getNotConFast26wkTotal(), conFastTotal));
+        adhocReportType.setNotConOpen26wkTotalPerCent
+                (calculatePercent(adhocReportType.getNotConOpen26wkTotal(), conOpenTotal));
+    }
 
-        adhocReportType.setConNone26wkTotalPerCent(String.format("%.2f", conNone26wkTotalPerCent));
-        adhocReportType.setConStd26wkTotalPerCent(String.format("%.2f", conStd26wkTotalPerCent));
-        adhocReportType.setConFast26wkTotalPerCent(String.format("%.2f", conFast26wkTotalPerCent));
-        adhocReportType.setConOpen26wkTotalPerCent(String.format("%.2f", conOpen26wkTotalPerCent));
-        adhocReportType.setNotConNone26wkTotalPerCent(String.format("%.2f", notConNone26wkTotalPerCent));
-        adhocReportType.setNotConStd26wkTotalPerCent(String.format("%.2f", notConStd26wkTotalPerCent));
-        adhocReportType.setNotConFast26wkTotalPerCent(String.format("%.2f", notConFast26wkTotalPerCent));
-        adhocReportType.setNotConOpen26wkTotalPerCent(String.format("%.2f", notConOpen26wkTotalPerCent));
+    private String calculatePercent(String value, int total) {
+        if (total == 0) {
+            return "0.00";
+        } else {
+            double percentage = (Double.parseDouble(value) / total) * 100;
+            return String.format("%.2f", percentage);
+        }
     }
 
     private String getConciliationTrack(CaseData caseData) {

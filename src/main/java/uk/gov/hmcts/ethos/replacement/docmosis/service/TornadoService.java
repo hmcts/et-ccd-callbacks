@@ -212,8 +212,9 @@ public class TornadoService {
     }
 
     private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
+       String pdfFileName = documentName.endsWith(".pdf") && documentName.contains("ET3") ? documentName : OUTPUT_FILE_NAME_PDF;
         if (documentName.endsWith(".pdf")) {
-            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME_PDF,
+            return documentManagementService.uploadDocument(authToken, bytes, pdfFileName,
                     APPLICATION_PDF_VALUE, caseTypeId);
         } else {
             return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,

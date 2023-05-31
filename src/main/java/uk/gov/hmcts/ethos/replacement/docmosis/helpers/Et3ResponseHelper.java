@@ -327,7 +327,7 @@ public class Et3ResponseHelper {
         }
 
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection().stream()
-                .filter(r -> NO.equals(r.getValue().getResponseReceived()))
+                .filter(r -> isAllowSubmit(r.getValue()))
                 .toList();
 
         if (CollectionUtils.isEmpty(respondents)) {

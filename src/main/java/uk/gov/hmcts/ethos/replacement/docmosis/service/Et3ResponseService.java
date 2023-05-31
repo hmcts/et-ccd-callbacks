@@ -64,13 +64,13 @@ public class Et3ResponseService {
      * Saves the generated ET3 Response form document in the document collection and the respondent.
      * @param caseData where the data is stored
      */
-    public void saveEt3ResponseDocument(CaseData caseData, DocumentInfo documentInfo) {
+    public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
         addDocumentToDocCollection(caseData, DocumentHelper.createDocumenTypeItem(uploadedDocument, "ET3"));
-        addDocumentToRespondent(caseData, uploadedDocument);
+        saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }
 
-    private void addDocumentToRespondent(CaseData caseData, UploadedDocumentType uploadedDocument) {
+    private void saveEt3DetailsToRespondent(CaseData caseData, UploadedDocumentType uploadedDocument) {
         String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel();
 
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
@@ -80,6 +80,10 @@ public class Et3ResponseService {
             respondent.get().getValue().setEt3Form(uploadedDocument);
             respondent.get().getValue().setResponseReceived(YES);
             respondent.get().getValue().setResponseReceivedDate(LocalDate.now().toString());
+            if (YES.equals(respondent.get().getValue().getExtensionRequested())
+                    && YES.equals(respondent.get().getValue().getExtensionGranted())) {
+                respondent.get().getValue().setExtensionResubmitted(YES);
+            }
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
                     respondentSumTypeItem.setValue(respondent.get().getValue());

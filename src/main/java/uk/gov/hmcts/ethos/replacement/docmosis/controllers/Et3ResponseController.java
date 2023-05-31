@@ -237,7 +237,7 @@ public class Et3ResponseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
-        et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
+        et3ResponseService.saveEt3Response(caseData, documentInfo);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());

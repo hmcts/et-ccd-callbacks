@@ -67,7 +67,7 @@ public class Et1VettingService {
         + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Contact address &#09&#09 %s</pre>";
     private static final String CLAIMANT_DETAILS_COMPANY = "<hr><h3>Claimant</h3>"
-        + "<pre>Company name &#09&#09&#09&#09&nbsp; %s"
+        + "<pre>Company name &#09&#09&nbsp; %s"
         + "<br><br>Contact address &#09&#09 %s</pre>";
     private static final String CLAIMANT_AND_RESPONDENT_ADDRESSES = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
         + "<pre>Contact address &#09&#09 %s</pre>"

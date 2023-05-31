@@ -564,9 +564,10 @@ public class ReportDocHelper {
     private static void addEntriesByServingDay(int dayNumber, String listBlockOpener,
                                                StringBuilder reportContent, ListingData listingData) {
         AdhocReportTypeItem itemsList = listingData.getLocalReportsDetail().get(0);
-        List<ClaimServedTypeItem> claimServedTypeItems = itemsList.getValue().getClaimServedItems()
+        List<ClaimServedTypeItem> claimServedTypeItems =
+                new java.util.ArrayList<>(itemsList.getValue().getClaimServedItems()
                 .stream().filter(item -> Integer.parseInt(item.getValue().getReportedNumberOfDays()) == dayNumber)
-                .collect(Collectors.toList());
+                .toList());
         int claimServedTypeItemsCount = claimServedTypeItems.size();
         String claimServedTypeItemsListSize = String.valueOf(claimServedTypeItems.size());
 

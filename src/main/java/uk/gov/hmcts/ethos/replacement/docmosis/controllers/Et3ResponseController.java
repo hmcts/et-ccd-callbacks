@@ -42,11 +42,20 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class Et3ResponseController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String PROCESSING_COMPLETE_HEADER = "<h1>ET3 application complete</h1>";
-    private static final String PROCESSING_COMPLETE_BODY =
-        "<h3>What happens next</h3>\r\n\r\nYou should receive confirmation from the tribunal office process your"
-            + " application within 5 working days. If you have not heard from them within 5 days, "
-            + "contact the office directly.";
+    private static final String ET3_COMPLETE_HEADER = "<h1>ET3 Response submitted</h1>";
+    private static final String ET3_COMPLETE_BODY =
+            """
+                    <h3>What happens next</h3>\r
+                    \r
+                    You should receive confirmation from the tribunal office to process your application within 5
+                     working days. If you have not heard from them within 5 days, contact the office directly.""";
+    private static final String SECTION_COMPLETE_BODY =
+            "You may want to complete the rest of the ET3 Form using the links below"
+                    + "<br><a href=\"/cases/case-details/%s/trigger/et3Response/et3Response1\">ET3 - Respondent Details</a>"
+                    + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseEmploymentDetails/et3ResponseEmploymentDetails1"
+                    + "\">ET3 - Employment Details</a>"
+                    + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseDetails/et3ResponseDetails1\">ET3 - "
+                    + "Response Details</a>";
     private final VerifyTokenService verifyTokenService;
     private final Et3ResponseService et3ResponseService;
 
@@ -63,15 +72,14 @@ public class Et3ResponseController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initEt3Response(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -91,10 +99,9 @@ public class Et3ResponseController {
     @Operation(summary = "validate dates are correct for employment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -108,7 +115,8 @@ public class Et3ResponseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ccdRequest.getEventId());
+        Et3ResponseHelper.reloadDataOntoEt3(caseData, ccdRequest.getEventId());
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -127,15 +135,14 @@ public class Et3ResponseController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEmploymentDates(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -148,10 +155,64 @@ public class Et3ResponseController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    @PostMapping(value = "/submitSection", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Save answers to the given specific respondent")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> submitSection(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
+        Et3ResponseHelper.resetEt3FormFields(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/sectionComplete", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "display the next steps after ET3 response section")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> sectionComplete(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        String ccdId = ccdRequest.getCaseDetails().getCaseId();
+        String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId);
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_body(body)
+                .build());
+    }
+
+
     /**
      * Generates ET3 Response document and add the ET3 Fields to each respondent.
+     *
      * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * @param userToken  authentication token to verify the user
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -165,8 +226,8 @@ public class Et3ResponseController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -175,10 +236,9 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
-            ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId());
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
-        Et3ResponseHelper.addEt3DataToRespondent(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());
         Et3ResponseHelper.resetEt3FormFields(caseData);
@@ -187,12 +247,13 @@ public class Et3ResponseController {
 
     /**
      * Generates the confirmation page for the ET3 response journey, with instructions on what to do next.
+     *
      * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * @param userToken  authentication token to verify the user
      * @return this will return and display a message to the user on the next steps.
      */
     @PostMapping(value = "/processingComplete", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "display the next steps after ET3 response")
+    @Operation(summary = "display the next steps after ET3 response submission")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -202,8 +263,8 @@ public class Et3ResponseController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> processingComplete(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -211,9 +272,59 @@ public class Et3ResponseController {
         }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_header(PROCESSING_COMPLETE_HEADER)
-            .confirmation_body(PROCESSING_COMPLETE_BODY)
-            .build());
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_header(ET3_COMPLETE_HEADER)
+                .confirmation_body(ET3_COMPLETE_BODY)
+                .build());
+    }
+
+    @PostMapping(value = "/startSubmitEt3", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "start et3 submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> startSubmitEt3(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
+
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/reloadSubmitData", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "reloads the data onto the case for submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> reloadSubmitData(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3ResponseHelper.reloadSubmitOntoEt3(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 }

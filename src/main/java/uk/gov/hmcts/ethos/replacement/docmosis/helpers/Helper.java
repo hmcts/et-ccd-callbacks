@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_PAPERS;
@@ -130,7 +130,7 @@ public final class Helper {
                     .stream()
                     .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
                             || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (caseData.getRespondentCollection().size() == 1
                     && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseStruckOut())
@@ -152,7 +152,7 @@ public final class Helper {
                     .stream()
                     .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
                             || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO))
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return activeRespondents;
@@ -264,7 +264,7 @@ public final class Helper {
         return jurCodesCollection != null
                 ? jurCodesCollection.stream()
                 .map(jurCodesTypeItem -> jurCodesTypeItem.getValue().getJuridictionCodesList())
-                .collect(Collectors.toList())
+                .toList()
                 : new ArrayList<>();
     }
 

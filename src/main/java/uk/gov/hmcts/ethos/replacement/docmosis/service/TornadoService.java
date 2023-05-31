@@ -265,7 +265,7 @@ public class TornadoService {
             String et3DocName = String.format("%s - ET3 Response.pdf",
                     caseData.getEt3ResponseRespondentLegalName());
             connection = createConnection();
-            if("ET3 Response.pdf".equals(documentName)) {
+            if ("ET3 Response.pdf".equals(documentName)) {
                 buildDocumentInstruction(connection, caseData, et3DocName, caseTypeId);
                 return checkResponseStatus(userToken, connection, et3DocName, caseTypeId);
             }

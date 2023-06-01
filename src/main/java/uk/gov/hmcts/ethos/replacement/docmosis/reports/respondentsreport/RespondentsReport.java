@@ -95,6 +95,7 @@ public class RespondentsReport {
                 }
             }
         }
+
         return count > 1;
     }
 

@@ -51,6 +51,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
+    private static final String ET3_RESPONSE_PDF = "ET3 Response.pdf";
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -60,8 +61,6 @@ public class TornadoService {
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
-
-    private String dmStoreDocumentName = OUTPUT_FILE_NAME_PDF;
 
     public DocumentInfo documentGeneration(String authToken, CaseData caseData, String caseTypeId,
                                            CorrespondenceType correspondenceType,
@@ -143,7 +142,7 @@ public class TornadoService {
                     documentName, userDetails, caseType);
         }
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-            conn.getOutputStream(), StandardCharsets.UTF_8)) {
+                conn.getOutputStream(), StandardCharsets.UTF_8)) {
             writeOutputStream(outputStreamWriter, sb);
         }
     }
@@ -168,7 +167,7 @@ public class TornadoService {
         StringBuilder sb = BulkHelper.buildScheduleDocumentContent(bulkData, tornadoConnection.getAccessKey());
 
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-            conn.getOutputStream(), StandardCharsets.UTF_8)) {
+                conn.getOutputStream(), StandardCharsets.UTF_8)) {
             writeOutputStream(outputStreamWriter, sb);
         }
     }
@@ -213,7 +212,8 @@ public class TornadoService {
 
     private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
         if (documentName.endsWith(".pdf")) {
-            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME_PDF,
+            String pdfFileName = documentName.contains("ET3") ? documentName : OUTPUT_FILE_NAME_PDF;
+            return documentManagementService.uploadDocument(authToken, bytes, pdfFileName,
                     APPLICATION_PDF_VALUE, caseTypeId);
         } else {
             return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
@@ -256,14 +256,18 @@ public class TornadoService {
      timeout or maybe a bad gateway.
      */
     public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
-                                              String documentName)
-        throws IOException {
+                                              String documentName) throws IOException {
         HttpURLConnection connection = null;
         try {
-            dmStoreDocumentName = documentName;
             connection = createConnection();
+            if (ET3_RESPONSE_PDF.equals(documentName)) {
+                String et3DocName = String.format("%s - " + ET3_RESPONSE_PDF,
+                        caseData.getEt3ResponseRespondentLegalName());
+                buildDocumentInstruction(connection, caseData, et3DocName, caseTypeId);
+                return checkResponseStatus(userToken, connection, et3DocName, caseTypeId);
+            }
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
-            return checkResponseStatus(userToken, connection, dmStoreDocumentName, caseTypeId);
+            return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
@@ -298,7 +302,7 @@ public class TornadoService {
                 dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
                     caseData.getSubmitEt3Respondent().getSelectedLabel());
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "Initial Consideration.pdf" :
+            case "Initial Consideration.pdf":
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             case "Referral Summary.pdf":

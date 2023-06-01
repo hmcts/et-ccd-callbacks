@@ -81,14 +81,16 @@ public class RespondentsReport {
     }
 
     private boolean isRepresentativeRepresentingMoreThanOneRespondent(String rep, RespondentsReportCaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return false;
+        }
+
         int count = 0;
-        if (CollectionUtils.isNotEmpty(caseData.getRepCollection())) {
-            for (RepresentedTypeRItem repItem : caseData.getRepCollection()) {
-                if (repItem.getValue().getNameOfRepresentative().equals(rep)) {
-                    for (RespondentSumTypeItem respItem : caseData.getRespondentCollection()) {
-                        if (respItem.getValue().getRespondentName().equals(repItem.getValue().getRespRepName())) {
-                            count++;
-                        }
+        for (RepresentedTypeRItem repItem : caseData.getRepCollection()) {
+            if (repItem.getValue().getNameOfRepresentative().equals(rep)) {
+                for (RespondentSumTypeItem respItem : caseData.getRespondentCollection()) {
+                    if (respItem.getValue().getRespondentName().equals(repItem.getValue().getRespRepName())) {
+                        count++;
                     }
                 }
             }

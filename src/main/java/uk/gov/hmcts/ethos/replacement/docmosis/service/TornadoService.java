@@ -47,7 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @RequiredArgsConstructor
 @Service("tornadoService")
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LawOfDemeter", "PMD.AvoidThrowingNullPointerException",
-    "PMD.ExcessiveImports"})
+    "PMD.ExcessiveImports", "PMD.SwitchStmtsShouldHaveDefault"})
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
@@ -294,19 +294,24 @@ public class TornadoService {
             throw new NullPointerException("Document name cannot be null or empty");
         }
         switch (documentName) {
-            case "ET1 Vetting.pdf":
+            case "ET1 Vetting.pdf" -> {
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "ET3 Processing.pdf":
+            }
+            case "ET3 Processing.pdf" -> {
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case ET3_RESPONSE_PDF:
+            }
+            case ET3_RESPONSE_PDF -> {
+                caseData.getSubmitEt3Respondent().getSelectedLabel();
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "Initial Consideration.pdf":
+            }
+            case "Initial Consideration.pdf" -> {
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
-            case "Referral Summary.pdf":
+            }
+            case "Referral Summary.pdf" -> {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            default:
-                throw new IllegalArgumentException("Unexpected document name " + documentName);
+            }
+            default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }
     }
 }

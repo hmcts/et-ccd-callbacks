@@ -262,7 +262,7 @@ public class TornadoService {
             connection = createConnection();
             if (ET3_RESPONSE_PDF.equals(documentName)) {
                 String et3DocName = String.format("%s - " + ET3_RESPONSE_PDF,
-                        caseData.getEt3ResponseRespondentLegalName());
+                        caseData.getSubmitEt3Respondent().getSelectedLabel());
                 buildDocumentInstruction(connection, caseData, et3DocName, caseTypeId);
                 return checkResponseStatus(userToken, connection, et3DocName, caseTypeId);
             }
@@ -301,7 +301,6 @@ public class TornadoService {
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case ET3_RESPONSE_PDF -> {
-                caseData.getSubmitEt3Respondent().getSelectedLabel();
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case "Initial Consideration.pdf" -> {

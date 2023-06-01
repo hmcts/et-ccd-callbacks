@@ -58,6 +58,7 @@
         <exclude name="DataClass"/>
         <exclude name="AvoidThrowingRawExceptionTypes"/>
         <exclude name="ExcessiveImports"/>
+        <exclude name="TooManyMethods"/>
     </rule>
     <rule ref="category/java/design.xml/LawOfDemeter">
         <properties>

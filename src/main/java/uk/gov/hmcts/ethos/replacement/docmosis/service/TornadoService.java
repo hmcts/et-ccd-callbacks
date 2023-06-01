@@ -246,18 +246,16 @@ public class TornadoService {
     /**
      * This method calls the helper method to create the data to be passed through to Tornado and then checks whether
      * it can reach the service.
-     *
-     * @param caseData     contains the data needed to generate the PDF
-     * @param userToken    contains the user authentication token
-     * @param caseTypeId   reference for which casetype the document is being uploaded to
+     * @param caseData contains the data needed to generate the PDF
+     * @param userToken contains the user authentication token
+     * @param caseTypeId reference for which casetype the document is being uploaded to
      * @param documentName name of the document
      * @return DocumentInfo which contains the URL and markup of the uploaded document
      * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
-     *                     timeout or maybe a bad gateway.
+     timeout or maybe a bad gateway.
      */
     public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
-                                              String documentName)
-            throws IOException {
+                                              String documentName) throws IOException {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();

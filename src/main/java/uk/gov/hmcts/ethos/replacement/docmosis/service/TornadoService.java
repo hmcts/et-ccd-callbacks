@@ -51,6 +51,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
+    private static final String ET3_RESPONSE_PDF = "ET3 Response.pdf";
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -259,8 +260,8 @@ public class TornadoService {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
-            if ("ET3 Response.pdf".equals(documentName)) {
-                String et3DocName = String.format("%s - ET3 Response.pdf",
+            if (ET3_RESPONSE_PDF.equals(documentName)) {
+                String et3DocName = String.format("%s - " + ET3_RESPONSE_PDF,
                         caseData.getEt3ResponseRespondentLegalName());
                 buildDocumentInstruction(connection, caseData, et3DocName, caseTypeId);
                 return checkResponseStatus(userToken, connection, et3DocName, caseTypeId);
@@ -297,7 +298,7 @@ public class TornadoService {
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "ET3 Processing.pdf":
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "ET3 Response.pdf":
+            case ET3_RESPONSE_PDF:
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "Initial Consideration.pdf":
                 return InitialConsiderationHelper.getDocumentRequest(

@@ -40,7 +40,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods"})
 public final class TseHelper {
     public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any "
         + "objections or responses to their application you must send them to the tribunal as soon as possible and by "

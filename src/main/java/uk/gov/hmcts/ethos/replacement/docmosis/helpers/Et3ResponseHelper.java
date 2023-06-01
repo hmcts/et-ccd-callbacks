@@ -680,7 +680,7 @@ public class Et3ResponseHelper {
         return YES.equals(respondent.getPersonalDetailsSection())
                 && YES.equals(respondent.getEmploymentDetailsSection())
                 && YES.equals(respondent.getClaimDetailsSection())
-                && NO.equals(respondent.getResponseReceived());
+                && isAllowSubmit(respondent);
     }
 
     /**

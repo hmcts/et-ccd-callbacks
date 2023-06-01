@@ -259,10 +259,10 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
-            String et3DocName = String.format("%s - ET3 Response.pdf",
-                    caseData.getEt3ResponseRespondentLegalName());
             connection = createConnection();
             if ("ET3 Response.pdf".equals(documentName)) {
+                String et3DocName = String.format("%s - ET3 Response.pdf",
+                        caseData.getEt3ResponseRespondentLegalName());
                 buildDocumentInstruction(connection, caseData, et3DocName, caseTypeId);
                 return checkResponseStatus(userToken, connection, et3DocName, caseTypeId);
             }
@@ -294,23 +294,19 @@ public class TornadoService {
             throw new NullPointerException("Document name cannot be null or empty");
         }
         switch (documentName) {
-            case "ET1 Vetting.pdf" -> {
+            case "ET1 Vetting.pdf":
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            }
-            case "ET3 Processing.pdf" -> {
+            case "ET3 Processing.pdf":
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            }
-            case "ET3 Response.pdf" -> {
+            case "ET3 Response.pdf":
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            }
-            case "Initial Consideration.pdf" -> {
+            case "Initial Consideration.pdf":
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
-            }
-            case "Referral Summary.pdf" -> {
+            case "Referral Summary.pdf":
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            default:
+                throw new IllegalArgumentException("Unexpected document name " + documentName);
             }
-            default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }
     }
-}

@@ -51,6 +51,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem.fromUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
@@ -1014,5 +1015,18 @@ public class DocumentHelper {
         }
 
         return types.contains(typeOfDocument);
+    }
+
+    /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param typeOfDocument String to update TypeOfDocument
+     * @return DocumentTypeItem
+     */
+    public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
+                                                          String typeOfDocument) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        documentTypeItem.getValue().setTypeOfDocument(typeOfDocument);
+        return documentTypeItem;
     }
 }

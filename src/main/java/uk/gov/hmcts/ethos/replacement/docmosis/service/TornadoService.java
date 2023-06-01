@@ -260,13 +260,12 @@ public class TornadoService {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
+            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             if (ET3_RESPONSE_PDF.equals(documentName)) {
                 String et3DocName = String.format("%s - " + ET3_RESPONSE_PDF,
                         caseData.getSubmitEt3Respondent().getSelectedLabel());
-                buildDocumentInstruction(connection, caseData, et3DocName, caseTypeId);
                 return checkResponseStatus(userToken, connection, et3DocName, caseTypeId);
             }
-            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);

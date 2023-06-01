@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
@@ -41,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
+@SuppressWarnings({"PMD.TooManyMethods"})
 public final class TseHelper {
     public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any "
         + "objections or responses to their application you must send them to the tribunal as soon as possible and by "
@@ -83,7 +83,7 @@ public final class TseHelper {
                         && isNoRespondentReply(o.getValue().getRespondCollection())
                         && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo()))
                 .map(TseHelper::formatDropdownOption)
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
@@ -156,6 +156,7 @@ public final class TseHelper {
         }
 
         GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
+        ensureSelectedApplicationExists(genericTseApplicationType);
 
         if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
             genericTseApplicationType.setRespondCollection(new ArrayList<>());
@@ -254,6 +255,8 @@ public final class TseHelper {
      */
     public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        ensureSelectedApplicationExists(selectedApplication);
+
         TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
@@ -276,6 +279,8 @@ public final class TseHelper {
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        ensureSelectedApplicationExists(selectedApplication);
+
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
@@ -292,6 +297,7 @@ public final class TseHelper {
     public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl) {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        ensureSelectedApplicationExists(selectedApplication);
 
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
@@ -332,5 +338,11 @@ public final class TseHelper {
                 )
                         : ""
         );
+    }
+
+    private static void ensureSelectedApplicationExists(GenericTseApplicationType genericTseApplicationType) {
+        if (genericTseApplicationType == null) {
+            throw new IllegalStateException("Selected application is null");
+        }
     }
 }

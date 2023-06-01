@@ -191,10 +191,6 @@ public class TseService {
     public String formatViewApplication(CaseData caseData, String authToken) {
         GenericTseApplicationType application = TseHelper.getSelectedApplication(caseData);
 
-        if (application == null) {
-            return "";
-        }
-
         String applicationTable = formatApplicationDetails(application, authToken, true);
         String responses = formatApplicationResponses(application, authToken);
         String decisions = formatApplicationDecisions(application, authToken);
@@ -284,7 +280,7 @@ public class TseService {
             .sorted(Comparator.comparing((TseAdminRecordDecisionTypeItem d) -> d.getValue().getDate()).reversed())
             .limit(2)
             .map(d -> getSingleDecisionMarkdown(d.getValue(), authToken))
-            .collect(Collectors.toList());
+            .toList();
 
         return String.join("\r\n", decisionsMarkdown);
     }
@@ -369,6 +365,6 @@ public class TseService {
 
         return documents.stream()
                 .flatMap(o -> addDocumentRow(o.getValue(), authToken).stream())
-                .collect(Collectors.toList());
+                .toList();
     }
 }

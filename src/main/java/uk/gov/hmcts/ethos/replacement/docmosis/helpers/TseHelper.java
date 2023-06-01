@@ -101,16 +101,11 @@ public final class TseHelper {
      * @param caseData contains all the case data
      */
     public static void setDataForRespondingToApplication(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications)) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
         GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
-
-        if (genericTseApplicationType == null) {
-            return;
-        }
 
         LocalDate date = LocalDate.parse(genericTseApplicationType.getDate(), NEW_DATE_PATTERN);
 
@@ -155,7 +150,6 @@ public final class TseHelper {
         }
 
         GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
-        ensureSelectedApplicationExists(genericTseApplicationType);
 
         if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
             genericTseApplicationType.setRespondCollection(new ArrayList<>());
@@ -206,7 +200,7 @@ public final class TseHelper {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
 
         if (CollectionUtils.isEmpty(applications)) {
-            return null;
+            throw new IllegalStateException("Selected application is null");
         }
 
         DynamicFixedListType respondSelectApplication = caseData.getTseRespondSelectApplication();
@@ -227,7 +221,7 @@ public final class TseHelper {
             return applications.get(Integer.parseInt(tseViewSelectApplication.getValue().getCode()) - 1).getValue();
         }
 
-        return null;
+        throw new IllegalStateException("Selected application is null");
     }
 
     /**
@@ -254,7 +248,6 @@ public final class TseHelper {
      */
     public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
-        ensureSelectedApplicationExists(selectedApplication);
 
         TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
@@ -278,7 +271,6 @@ public final class TseHelper {
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
-        ensureSelectedApplicationExists(selectedApplication);
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
@@ -296,7 +288,6 @@ public final class TseHelper {
     public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl) {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
-        ensureSelectedApplicationExists(selectedApplication);
 
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
@@ -337,11 +328,5 @@ public final class TseHelper {
                 )
                         : ""
         );
-    }
-
-    private static void ensureSelectedApplicationExists(GenericTseApplicationType genericTseApplicationType) {
-        if (genericTseApplicationType == null) {
-            throw new IllegalStateException("Selected application is null");
-        }
     }
 }

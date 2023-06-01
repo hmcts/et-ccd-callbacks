@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
@@ -49,7 +50,7 @@ class TseServiceTest {
         document.setShortDescription("Description");
         List<String[]> actual = tseService.addDocumentRow(document, AUTH_TOKEN);
 
-        assertThat(actual.size()).isEqualTo(2);
+        assertThat(actual).hasSize(2);
         assertThat(actual.get(0)).isEqualTo(new String[] {"Document", "Document (txt, 1MB)"});
         assertThat(actual.get(1)).isEqualTo(new String[] {"Description", "Description"});
     }
@@ -58,7 +59,7 @@ class TseServiceTest {
     void addDocumentRows_withNoDocuments_returnsEmptyList() {
         List<String[]> actual = tseService.addDocumentRows(null, AUTH_TOKEN);
 
-        assertThat(actual.size()).isEqualTo(0);
+        assertThat(actual).isEmpty();
     }
 
     @Test
@@ -77,7 +78,7 @@ class TseServiceTest {
         var documents = List.of(GenericTypeItem.from(document), GenericTypeItem.from(documentTwo));
         List<String[]> actual = tseService.addDocumentRows(documents, AUTH_TOKEN);
 
-        assertThat(actual.size()).isEqualTo(4);
+        assertThat(actual).hasSize(4);
         assertThat(actual.get(0)).isEqualTo(new String[] {"Document", "File1 (txt, 1MB)"});
         assertThat(actual.get(1)).isEqualTo(new String[] {"Description", "Description1"});
         assertThat(actual.get(2)).isEqualTo(new String[] {"Document", "File2 (txt, 1MB)"});
@@ -223,13 +224,16 @@ class TseServiceTest {
 
     @Test
     void formatViewApplication_withNoApplications() {
-        assertThat(tseService.formatViewApplication(new CaseData(), AUTH_TOKEN)).isEqualTo("");
+        CaseData caseData = new CaseData();
+        assertThatThrownBy(() -> tseService.formatViewApplication(caseData, AUTH_TOKEN))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void formatViewApplication_withNoSelectedApplication() {
         CaseData caseData = setupCaseDataWithAnApplication();
-        assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN)).isEqualTo("");
+        assertThatThrownBy(() -> tseService.formatViewApplication(caseData, AUTH_TOKEN))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @Test

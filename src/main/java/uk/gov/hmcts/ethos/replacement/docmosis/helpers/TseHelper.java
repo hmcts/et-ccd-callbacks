@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
@@ -83,7 +82,7 @@ public final class TseHelper {
                         && isNoRespondentReply(o.getValue().getRespondCollection())
                         && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo()))
                 .map(TseHelper::formatDropdownOption)
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
@@ -102,16 +101,11 @@ public final class TseHelper {
      * @param caseData contains all the case data
      */
     public static void setDataForRespondingToApplication(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications)) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
         GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
-
-        if (genericTseApplicationType == null) {
-            return;
-        }
 
         LocalDate date = LocalDate.parse(genericTseApplicationType.getDate(), NEW_DATE_PATTERN);
 
@@ -206,7 +200,7 @@ public final class TseHelper {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
 
         if (CollectionUtils.isEmpty(applications)) {
-            return null;
+            throw new IllegalStateException("Selected application is null");
         }
 
         DynamicFixedListType respondSelectApplication = caseData.getTseRespondSelectApplication();
@@ -227,7 +221,7 @@ public final class TseHelper {
             return applications.get(Integer.parseInt(tseViewSelectApplication.getValue().getCode()) - 1).getValue();
         }
 
-        return null;
+        throw new IllegalStateException("Selected application is null");
     }
 
     /**
@@ -254,6 +248,7 @@ public final class TseHelper {
      */
     public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+
         TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
@@ -276,6 +271,7 @@ public final class TseHelper {
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(

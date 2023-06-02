@@ -26,7 +26,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PDM.FieldNamingConventions"})
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PDM.FieldNamingConventions",
+    "PMD.SignatureDeclareThrowsException"})
 public class ET1ServingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

@@ -111,7 +111,7 @@ class SendNotificationServiceTest {
         assertEquals("Other", sendNotificationType.getSendNotificationDecision());
         assertEquals("details", sendNotificationType.getSendNotificationDetails());
         assertEquals("Judge", sendNotificationType.getSendNotificationRequestMadeBy());
-        assertEquals("notStartedYet", sendNotificationType.getNotificationState());
+        assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
         assertEquals(YES, sendNotificationType.getSendNotificationResponseTribunalTable());
         assertEquals("Hearing, Judgment", sendNotificationType.getSendNotificationSubjectString());
         assertEquals("0", sendNotificationType.getSendNotificationResponsesCount());

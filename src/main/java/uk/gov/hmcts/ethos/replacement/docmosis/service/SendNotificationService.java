@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
@@ -103,11 +102,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
-        if (RESPONDENT_ONLY.equals(sendNotificationType.getSendNotificationSelectParties())) {
-            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
-        } else {
-            sendNotificationType.setNotificationState(NOT_STARTED_YET);
-        }
+        sendNotificationType.setNotificationState(NOT_VIEWED_YET);
 
         sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
         sendNotificationType.setSendNotificationSubjectString(

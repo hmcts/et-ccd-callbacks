@@ -40,20 +40,20 @@ public class ServingService {
     private static final String ET1_SERVING = "ET1%20serving";
     private static final String ET3_RELEVANT_PARTIES = "relevant%20parties";
     private static final String ET1_RESPONDENT = "respondent";
-    public static final String EMAIL_ADDRESS = "emailAddress";
+    private static final String EMAIL_ADDRESS = "emailAddress";
 
-    public static final String DOC_TYPE_ACK_OF_CLAIM = "Acknowledgement of claim";
-    public static final String DOC_TYPE_NOTICE_OF_CLAIM = "Notice of a claim";
-    public static final String DOC_TYPE_NOTICE_OF_HEARING = "Notice of Hearing";
-    public static final String DOC_TYPE_OTHER = "Other ";
+    private static final String DOC_TYPE_ACK_OF_CLAIM = "Acknowledgement of claim";
+    private static final String DOC_TYPE_NOTICE_OF_CLAIM = "Notice of a claim";
+    private static final String DOC_TYPE_NOTICE_OF_HEARING = "Notice of Hearing";
+    private static final String DOC_TYPE_OTHER = "Other ";
 
-    public static final String SERVING_DOC_1_1 = "1.1";
-    public static final String SERVING_DOC_2_6 = "2.6";
-    public static final String SERVING_DOC_2_7 = "2.7";
-    public static final String SERVING_DOC_2_8 = "2.8";
-    public static final String SERVING_DOC_7_7 = "7.7";
-    public static final String SERVING_DOC_7_8 = "7.8";
-    public static final String SERVING_DOC_7_8A = "7.8a";
+    private static final String SERVING_DOC_1_1 = "1.1";
+    private static final String SERVING_DOC_2_6 = "2.6";
+    private static final String SERVING_DOC_2_7 = "2.7";
+    private static final String SERVING_DOC_2_8 = "2.8";
+    private static final String SERVING_DOC_7_7 = "7.7";
+    private static final String SERVING_DOC_7_8 = "7.8";
+    private static final String SERVING_DOC_7_8A = "7.8a";
 
     @Value("${et1Serving.template.id}")
     private String templateId;

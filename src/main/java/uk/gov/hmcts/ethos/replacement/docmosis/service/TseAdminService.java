@@ -37,6 +37,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Service
 @RequiredArgsConstructor
 public class TseAdminService {
+    public static final String NOT_VIEWED_YET = "notViewedYet";
+
     private final EmailService emailService;
     private final TseService tseService;
     private final NotificationProperties notificationProperties;
@@ -55,7 +57,7 @@ public class TseAdminService {
             return;
         }
 
-        caseData.setTseAdminTableMarkUp(String.format("%s\r\n%s",
+        caseData.setTseAdminTableMarkUp(String.format("%s\r%n%s",
                 tseService.formatApplicationDetails(applicationTypeItem.getValue(), authToken, false),
                 tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken)
         ));
@@ -63,6 +65,7 @@ public class TseAdminService {
 
     /**
      * Save Tse Admin Record a Decision data to the application object.
+     * This includes the new application state.
      * @param caseData in which the case details are extracted from
      */
     public void saveTseAdminDataFromCaseData(CaseData caseData) {
@@ -71,33 +74,38 @@ public class TseAdminService {
         }
 
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem != null) {
-
-            GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
-            if (CollectionUtils.isEmpty(genericTseApplicationType.getAdminDecision())) {
-                genericTseApplicationType.setAdminDecision(new ArrayList<>());
-            }
-
-            genericTseApplicationType.getAdminDecision().add(
-                TseAdminRecordDecisionTypeItem.builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(
-                        TseAdminRecordDecisionType.builder()
-                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                            .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
-                            .decision(caseData.getTseAdminDecision())
-                            .decisionDetails(caseData.getTseAdminDecisionDetails())
-                            .typeOfDecision(caseData.getTseAdminTypeOfDecision())
-                            .isResponseRequired(caseData.getTseAdminIsResponseRequired())
-                            .selectPartyRespond(caseData.getTseAdminSelectPartyRespond())
-                            .additionalInformation(caseData.getTseAdminAdditionalInformation())
-                            .responseRequiredDoc(getResponseRequiredDocYesOrNo(caseData))
-                            .decisionMadeBy(caseData.getTseAdminDecisionMadeBy())
-                            .decisionMadeByFullName(caseData.getTseAdminDecisionMadeByFullName())
-                            .selectPartyNotify(caseData.getTseAdminSelectPartyNotify())
-                            .build()
-                    ).build());
+        if (applicationTypeItem == null) {
+            return;
         }
+
+        applicationTypeItem.getValue().setApplicationState(NOT_VIEWED_YET);
+
+        GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
+        if (CollectionUtils.isEmpty(genericTseApplicationType.getAdminDecision())) {
+            genericTseApplicationType.setAdminDecision(new ArrayList<>());
+        }
+
+        TseAdminRecordDecisionType decision = TseAdminRecordDecisionType.builder()
+            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+            .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
+            .decision(caseData.getTseAdminDecision())
+            .decisionDetails(caseData.getTseAdminDecisionDetails())
+            .typeOfDecision(caseData.getTseAdminTypeOfDecision())
+            .isResponseRequired(caseData.getTseAdminIsResponseRequired())
+            .selectPartyRespond(caseData.getTseAdminSelectPartyRespond())
+            .additionalInformation(caseData.getTseAdminAdditionalInformation())
+            .responseRequiredDoc(getResponseRequiredDocYesOrNo(caseData))
+            .decisionMadeBy(caseData.getTseAdminDecisionMadeBy())
+            .decisionMadeByFullName(caseData.getTseAdminDecisionMadeByFullName())
+            .selectPartyNotify(caseData.getTseAdminSelectPartyNotify())
+            .build();
+
+        genericTseApplicationType.getAdminDecision().add(
+            TseAdminRecordDecisionTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(decision)
+                .build()
+        );
     }
 
     private List<GenericTypeItem<DocumentType>> getResponseRequiredDocYesOrNo(CaseData caseData) {

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 
 import java.nio.file.Files;
@@ -121,5 +123,24 @@ public class HelperTest {
         String expected = "<a href=\"/documents/1234/binary\" target=\"_blank\">testFileName</a>";
         String actual = Helper.createLinkForUploadedDocument(uploadedDocumentType);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void isClaimantNonSystemUser() {
+        CaseData caseData = new CaseData();
+        caseData.setEt1OnlineSubmission(null);
+        caseData.setHubLinksStatuses(null);
+        boolean actual = Helper.isClaimantNonSystemUser(caseData);
+        assertEquals(true, actual);
+
+        caseData.setEt1OnlineSubmission("Yes");
+        caseData.setHubLinksStatuses(null);
+        boolean actual2 = Helper.isClaimantNonSystemUser(caseData);
+        assertEquals(false, actual2);
+
+        caseData.setEt1OnlineSubmission(null);
+        caseData.setHubLinksStatuses(new HubLinksStatuses());
+        boolean actual3 = Helper.isClaimantNonSystemUser(caseData);
+        assertEquals(false, actual3);
     }
 }

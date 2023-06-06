@@ -322,4 +322,18 @@ public final class Helper {
         }
         return null; // No UUID found
     }
+
+    /**
+     * Validate if the other party (Claimant/Citizen) is a system user.
+     * Non system user Claimant refers to the cases that have been transferred from legacy ECM or a paper based claim
+     * which a caseworker would manually create in ExUI.
+     * @param caseData in which the case details are extracted from
+     * @return errors Error message
+     */
+    public static boolean isClaimantNonSystemUser(CaseData caseData) {
+        if (caseData != null) {
+            return caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null;
+        }
+        return true;
+    }
 }

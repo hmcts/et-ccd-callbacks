@@ -52,9 +52,9 @@ public class NocNotificationService {
             log.warn("missing claimantEmail");
         } else {
             emailService.sendEmail(
-                claimantTemplateId,
-                claimantEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsPrevious, partyName)
+                    claimantTemplateId,
+                    claimantEmail,
+                    NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsPrevious, partyName)
             );
         }
 
@@ -71,9 +71,9 @@ public class NocNotificationService {
             log.warn("missing tribunalEmail");
         } else {
             emailService.sendEmail(
-                tribunalTemplateId,
-                caseDataPrevious.getTribunalCorrespondenceEmail(),
-                NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious)
+                    tribunalTemplateId,
+                    caseDataPrevious.getTribunalCorrespondenceEmail(),
+                    NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious)
             );
         }
 
@@ -95,7 +95,7 @@ public class NocNotificationService {
         if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
             Object resBody = getOrgResponse.getBody();
             if (resBody != null) {
-                String oldOrgAdminEmail = ((RetrieveOrgByIdResponse)resBody).getSuperUser().getEmail();
+                String oldOrgAdminEmail = ((RetrieveOrgByIdResponse) resBody).getSuperUser().getEmail();
                 if (isNullOrEmpty(oldOrgAdminEmail)) {
                     log.warn("Previous Org " + orgId + " is missing org admin email");
                 } else {
@@ -118,7 +118,7 @@ public class NocNotificationService {
         if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
             Object resBody = getOrgResponse.getBody();
             if (resBody != null) {
-                String newOrgAdminEmail = ((RetrieveOrgByIdResponse)resBody).getSuperUser().getEmail();
+                String newOrgAdminEmail = ((RetrieveOrgByIdResponse) resBody).getSuperUser().getEmail();
                 if (isNullOrEmpty(newOrgAdminEmail)) {
                     log.warn("New Org " + orgId + " is missing org admin email");
                 } else {

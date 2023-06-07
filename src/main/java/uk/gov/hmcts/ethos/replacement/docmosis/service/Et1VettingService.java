@@ -49,22 +49,26 @@ public class Et1VettingService {
     private final TornadoService tornadoService;
 
     private static final String ET1_DOC_TYPE = "ET1";
+    private static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
+    private static final String COMPANY = "Company";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
-    private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
-            + "<br>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+    private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";
     private static final String BEFORE_LABEL_ET1 =
             "<br><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
     private static final String BEFORE_LABEL_ACAS =
             "<br><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
+    private static final String BEFORE_LABEL_ET1_ATTACHMENT =
+            "<br><a target=\"_blank\" href=\"%s\">%s (opens in new tab)</a>";
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
             "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
-
-    private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
-            + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre>";
-
+    private static final String CLAIMANT_DETAILS_PERSON = "<hr><h3>Claimant</h3>"
+        + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre>";
+    private static final String CLAIMANT_DETAILS_COMPANY = "<hr><h3>Claimant</h3>"
+        + "<pre>Company name &#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre>";
     private static final String CLAIMANT_AND_RESPONDENT_ADDRESSES = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
         + "<pre>Contact address &#09&#09 %s</pre>"
         + "<br><pre>Work address &#09&#09&#09 %s</pre><hr>"
@@ -113,7 +117,7 @@ public class Et1VettingService {
     public void initialiseEt1Vetting(CaseDetails caseDetails) {
         caseDetails.getCaseData().setEt1VettingBeforeYouStart(initialBeforeYouStart(caseDetails));
         caseDetails.getCaseData().setEt1VettingClaimantDetailsMarkUp(
-                initialClaimantDetailsMarkUp(caseDetails.getCaseData()));
+            getInitialClaimantDetailsMarkUp(caseDetails.getCaseData()));
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
             initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
         populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
@@ -170,6 +174,7 @@ public class Et1VettingService {
 
         String et1Display = "";
         String acasDisplay = "";
+        String et1Attachment = "";
         IntWrapper acasCount = new IntWrapper(0);
 
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
@@ -185,13 +190,19 @@ public class Et1VettingService {
                     .map(d -> String.format(
                             BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount.incrementAndReturnValue()))
                     .collect(Collectors.joining());
+            et1Attachment = documentCollection
+                    .stream()
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_ATTACHMENT_DOC_TYPE))
+                    .map(d -> String.format(BEFORE_LABEL_ET1_ATTACHMENT,
+                            createDocLinkBinary(d), d.getValue().getUploadedDocument().getDocumentFilename()))
+                    .collect(Collectors.joining());
         }
 
         if (acasCount.getValue() > FIVE_ACAS_DOC_TYPE_ITEMS_COUNT) {
             acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseDetails.getCaseId());
         }
 
-        return String.format(BEFORE_LABEL_TEMPLATE, et1Display, acasDisplay);
+        return String.format(BEFORE_LABEL_TEMPLATE, et1Display, acasDisplay, et1Attachment);
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
@@ -200,15 +211,33 @@ public class Et1VettingService {
     }
 
     /**
-     * Prepare wordings to be displayed in et1VettingClaimantDetailsMarkUp.
+     * Prepare wordings to be displayed in et1VettingClaimantDetailsMarkUp
+     * for the type of current claimant, i.e. Person or Company.
      * @param caseData Get ClaimantIndType and ClaimantType
      * @return et1VettingClaimantDetailsMarkUp
      */
-    private String initialClaimantDetailsMarkUp(CaseData caseData) {
-        return String.format(CLAIMANT_DETAILS,
-                caseData.getClaimantIndType().getClaimantFirstNames(),
-                caseData.getClaimantIndType().getClaimantLastName(),
+    private String getInitialClaimantDetailsMarkUp(CaseData caseData) {
+        if (COMPANY.equals(caseData.getClaimantTypeOfClaimant())) {
+            return String.format(CLAIMANT_DETAILS_COMPANY,
+                caseData.getClaimantCompany() != null
+                    ? caseData.getClaimantCompany()
+                    : "Company name not specified.",
                 toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
+        }
+
+        if (caseData.getClaimantIndType() == null) {
+            return String.format(CLAIMANT_DETAILS_PERSON, "Name not specified.", "Name not specified.",
+                toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
+        }
+
+        return String.format(CLAIMANT_DETAILS_PERSON,
+            caseData.getClaimantIndType().getClaimantFirstNames() != null
+                ? caseData.getClaimantIndType().getClaimantFirstNames()
+                : "First name not specified.",
+            caseData.getClaimantIndType().getClaimantLastName() != null
+                ? caseData.getClaimantIndType().getClaimantLastName()
+                : "Last name not specified.",
+            toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
     }
 
     /**

@@ -11,31 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_CONFIG_FILE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_CCA;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_API;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_ENGLANDWALES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_SCOTLAND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_ROLES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CCD_DOCKER_DEFAULT_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CCD_IMPORT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANDWALES_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANGWALES_CONFIG_FILE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.IDAM_SYSTEM_USER_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_CAA;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_CASE_MANAGER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_ORGANISATION_MANAGER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_USER_MANAGER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_CONFIG_FILE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SOLICITOR_1_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SUPERUSER_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.*;
 
 /**
  * Configures the cftlib plugin so that the environment is ready for use with this et-ccd-callbacks service. To start
@@ -179,12 +155,24 @@ public class CftlibConfig implements CFTLibConfigurer {
             PUI_CAA);
 
         lib.createIdamUser(SOLICITOR_1_EMAIL,
-            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
+            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
+                CASEWORKER_DIVORCE_SOLICITOR,
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_CCA,
+                PUI_CASE_MANAGER,
+                PUI_CAA,
+                PUI_ORGANISATION_MANAGER);
 
         lib.createIdamUser(CITIZEN_EMAIL, CITIZEN);
 
         // Required by ccd-data-store-api
         lib.createIdamUser(IDAM_SYSTEM_USER_EMAIL, CASEWORKER);
+
+        // Required for Share a Case
+        lib.createIdamUser(MCA_NOC_APPROVER_EMAIL, CASEWORKER, CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN);
+        lib.createIdamUser(MCA_SYSTEM_IDAM_ACC_EMAIL, CASEWORKER, CASEWORKER_CCA);
+        lib.createIdamUser(ET_SYSTEM_EMAIL, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API);
     }
 
     private void importCcdDefinitions(CFTLib lib) {

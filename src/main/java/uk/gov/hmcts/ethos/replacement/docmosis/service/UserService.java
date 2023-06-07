@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -8,7 +9,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
+import java.io.Console;
+
 @Component
+@Slf4j
 public class UserService implements uk.gov.hmcts.ecm.common.service.UserService {
     private final IdamApi idamApi;
     private final OAuth2Configuration oauth2Configuration;
@@ -32,6 +36,7 @@ public class UserService implements uk.gov.hmcts.ecm.common.service.UserService 
     }
 
     public TokenResponse getAccessTokenResponse(String username, String password) {
+        log.info(username + password);
         return idamApi.generateOpenIdToken(
             new TokenRequest(
                 oauth2Configuration.getClientId(),

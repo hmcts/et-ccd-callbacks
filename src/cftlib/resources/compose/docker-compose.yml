@@ -58,6 +58,37 @@ services:
     command:
       - -global-response-templating
 
+  manage-case-assignment:
+    image: "hmctspublic.azurecr.io/aac/manage-case-assignment:${MANAGE_CASE_ASSIGNMENT_TAG:-latest}"
+    container_name: manage-case-assignment
+    environment:
+      SERVER_PORT: 4454
+      IDAM_API_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
+      IDAM_OIDC_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
+      S2S_URL: http://service-auth-provider-api:8489
+      MANAGE_CASE_S2S_KEY: "AAAAAAAAAAAAAAAA"
+      CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api:4452
+      CCD_DEFINITION_STORE_API_BASE_URL: http://ccd-definition-store-api:4451
+      PRD_HOST: http://host.docker.internal:4507
+      NOTIFY_MCA_API_KEY: "notify-test-api-key"
+      MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,ccd_gw,xui_mo_webapp,et_cos
+      ROOT_LOGGING_LEVEL: info
+      CCD_DATA_STORE_ALLOWED_SERVICE: xui_webapp
+      MCA_DS_PROXY_URLS_ALLOWED_LIST: /searchCases.*,/internal/searchCases.*,/internal/cases.*
+      MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST: /api/display/challenge-questions.*
+      MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED: "true"
+      ROLE_ASSIGNMENT_URL: "${ROLE_ASSIGNMENT_URL:-http://am-role-assignment-service:4096}"
+      IDAM_CAA_USERNAME: "mca.system.idam.acc@gmail.com"
+      IDAM_CAA_PASSWORD: "password"
+      IDAM_NOC_APPROVER_USERNAME: "mca.noc.approver@gmail.com"
+      IDAM_NOC_APPROVER_PASSWORD: "password"
+      IDAM_CLIENT_SECRET: "${BEFTA_S2S_CLIENT_SECRET_OF_AAC_MANAGE_CASE_ASSIGNMENT}"
+      IDAM_CLIENT_ID: aac_manage_case_assignment
+      IDAM_URL: "${IDAM_STUB_SERVICE_NAME:-http://idam-api:5000}"
+      CCD_DEFINITION_STORE_ALLOWED_SERVICE: xui_webapp
+    ports:
+      - "4454:4454"
+
 volumes:
   ccd-docker-azure-blob-data:
 

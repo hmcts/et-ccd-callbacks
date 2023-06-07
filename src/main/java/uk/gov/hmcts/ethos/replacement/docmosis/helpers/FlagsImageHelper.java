@@ -177,11 +177,13 @@ public final class FlagsImageHelper {
 
         for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
             HearingType hearingType = hearingTypeItem.getValue();
-            if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
+            if (hearingType != null && CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
                 for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
-                    String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
-                    if (YES.equals(hearingReservedJudgement)) {
-                        return true;
+                    if (dateListedTypeItem != null && dateListedTypeItem.getValue() != null) {
+                        String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
+                        if (YES.equals(hearingReservedJudgement)) {
+                            return true;
+                        }
                     }
                 }
             }

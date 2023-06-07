@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
@@ -10,6 +14,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -17,6 +23,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -32,6 +39,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -59,6 +67,7 @@ class Et3ResponseServiceTest {
                 "Manchester", "M12 42R", "United Kingdom",
                 "1234/5678/90")
             .withEt3RepresentingRespondent("Antonio Vazquez")
+            .withSubmitEt3Respondent("Antonio Vazquez")
             .build();
         caseData.setEt3NoEt3Response("Test data");
         documentInfo = DocumentInfo.builder()
@@ -87,7 +96,7 @@ class Et3ResponseServiceTest {
 
     @Test
     void assertThatEt3DocumentIsSaved() {
-        et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
+        et3ResponseService.saveEt3Response(caseData, documentInfo);
         assertThat(caseData.getDocumentCollection().size(), is(1));
         assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
     }
@@ -148,5 +157,25 @@ class Et3ResponseServiceTest {
             "ccdId", "1683646754393041"
         );
         verify(emailService, times(1)).sendEmail(any(), eq("tribunal@email.com"), eq(expected));
+    }
+
+    @ParameterizedTest
+    @MethodSource("addEt3DataToRespondentExtensionResubmitted")
+    void addEt3DataToRespondent_setExtensionResubmitted(String responseReceived, String extensionRequested,
+                                                        String extensionGranted, String result) {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        respondentSumType.setResponseReceived(responseReceived);
+        respondentSumType.setExtensionRequested(extensionRequested);
+        respondentSumType.setExtensionGranted(extensionGranted);
+        et3ResponseService.saveEt3Response(caseData, documentInfo);
+        AssertionsForClassTypes.assertThat(respondentSumType.getExtensionResubmitted()).isEqualTo(result);
+    }
+
+    private static Stream<Arguments> addEt3DataToRespondentExtensionResubmitted() {
+        return Stream.of(
+                Arguments.of(YES, YES, YES, YES),
+                Arguments.of(NO, null, null, null),
+                Arguments.of(null, null, null, null)
+        );
     }
 }

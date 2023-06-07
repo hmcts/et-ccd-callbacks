@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_PAPERS;
@@ -131,7 +132,7 @@ public final class Helper {
                     .stream()
                     .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
                             || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (caseData.getRespondentCollection().size() == 1
                     && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseStruckOut())
@@ -153,7 +154,7 @@ public final class Helper {
                     .stream()
                     .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
                             || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO))
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return activeRespondents;
@@ -231,19 +232,22 @@ public final class Helper {
         if (caseData.getHearingCollection() != null) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
 
-                if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
+                if (hearingTypeItem.getValue() != null
+                    && hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
 
                         DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (isHearingStatusPostponed(dateListedType) && dateListedType.getPostponedDate() == null) {
-                            dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
-                        }
-                        if (dateListedType.getPostponedDate() != null
-                                &&
-                                (!isHearingStatusPostponed(dateListedType)
-                                        || dateListedType.getHearingStatus() == null)) {
-                            dateListedType.setPostponedDate(null);
+                        if (dateListedType != null) {
+                            if (isHearingStatusPostponed(dateListedType)
+                                && dateListedType.getPostponedDate() == null) {
+                                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
+                            }
+                            if (dateListedType.getPostponedDate() != null
+                                && (!isHearingStatusPostponed(dateListedType)
+                                    || dateListedType.getHearingStatus() == null)) {
+                                dateListedType.setPostponedDate(null);
+                            }
                         }
                     }
                 }
@@ -254,7 +258,7 @@ public final class Helper {
 
     private static boolean isHearingStatusPostponed(DateListedType dateListedType) {
         return dateListedType.getHearingStatus() != null
-                && dateListedType.getHearingStatus().equals(HEARING_STATUS_POSTPONED);
+                && HEARING_STATUS_POSTPONED.equals(dateListedType.getHearingStatus());
     }
 
     public static List<String> getJurCodesCollection(List<JurCodesTypeItem> jurCodesCollection) {
@@ -262,7 +266,7 @@ public final class Helper {
         return jurCodesCollection != null
                 ? jurCodesCollection.stream()
                 .map(jurCodesTypeItem -> jurCodesTypeItem.getValue().getJuridictionCodesList())
-                .collect(Collectors.toList())
+                .toList()
                 : new ArrayList<>();
     }
 

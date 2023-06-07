@@ -310,8 +310,8 @@ public class TimeToFirstHearingReport {
         if (total == 0) {
             return "0.00";
         }
-            double percentage = (Double.parseDouble(value) / total) * 100;
-            return String.format("%.2f", percentage);
+        double percentage = (Double.parseDouble(value) / total) * 100;
+        return String.format("%.2f", percentage);
     }
 
     private String getConciliationTrack(CaseData caseData) {

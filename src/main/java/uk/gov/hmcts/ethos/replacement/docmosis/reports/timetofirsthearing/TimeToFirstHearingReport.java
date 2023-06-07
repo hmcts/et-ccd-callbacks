@@ -222,7 +222,7 @@ public class TimeToFirstHearingReport {
                         updateFastTrack(reportSummary, isFirstHearingWithin26Weeks);
                 case CONCILIATION_TRACK_OPEN_TRACK ->
                         updateOpenTrack(reportSummary, isFirstHearingWithin26Weeks);
-                default -> {}
+                default -> { }
             }
         }
 

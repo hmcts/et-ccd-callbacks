@@ -19,7 +19,16 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_REMEDY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class TimeToFirstHearingReportTest {
 
@@ -185,9 +194,10 @@ class TimeToFirstHearingReportTest {
         assertEquals(reportData.getLocalReportsDetailHdr().getReportOffice(), TribunalOffice.SCOTLAND.getOfficeName());
     }
 
-    private SubmitEvent createSubmitEvent(List<HearingTypeItem> hearingCollection, String receiptDate, String conciliationTrackFastTrack) {
+    private SubmitEvent createSubmitEvent(List<HearingTypeItem> hearingCollection, String receiptDate,
+                                          String conciliationTrack) {
         CaseData caseData = new CaseData();
-        caseData.setConciliationTrack(conciliationTrackFastTrack);
+        caseData.setConciliationTrack(conciliationTrack);
         caseData.setReceiptDate(receiptDate);
         caseData.setHearingCollection(hearingCollection);
         SubmitEvent submitEvent = new SubmitEvent();

@@ -4,17 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -126,4 +132,34 @@ class ServingServiceTest {
         servingService.sendNotifications(notifyCaseDetails);
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
+
+    @ParameterizedTest
+    @MethodSource("saveServingDocToDocumentCollectionParameter")
+    void saveServingDocToDocumentCollection(String servingTypeOfDoc, String resultTypeOfDoc) throws Exception {
+        DocumentType documentType = new DocumentType();
+        documentType.setTypeOfDocument(servingTypeOfDoc);
+
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        documentTypeItem.setValue(documentType);
+
+        CaseData caseData = new CaseData();
+        caseData.setServingDocumentCollection(List.of(documentTypeItem));
+
+        servingService.addServingDocToDocumentCollection(caseData);
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument(), is(resultTypeOfDoc));
+    }
+
+    private static Stream<Arguments> saveServingDocToDocumentCollectionParameter() {
+        return Stream.of(
+            Arguments.of("1.1", "Acknowledgement of claim"),
+            Arguments.of("2.6", "Notice of a claim"),
+            Arguments.of("2.7", "Notice of a claim"),
+            Arguments.of("2.8", "Notice of a claim"),
+            Arguments.of("7.7", "Notice of Hearing"),
+            Arguments.of("7.8", "Notice of Hearing"),
+            Arguments.of("7.8a", "Notice of Hearing")
+        );
+    }
+
 }

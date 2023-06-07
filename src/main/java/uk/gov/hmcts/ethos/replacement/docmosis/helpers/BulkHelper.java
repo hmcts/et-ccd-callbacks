@@ -293,7 +293,7 @@ public final class BulkHelper {
                     .filter(key -> key.getId() != null && !key.getId().equals("null"))
                     .map(caseId -> caseId.getValue().getEthosCaseReference())
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
         } else {
             return new ArrayList<>();
         }
@@ -304,7 +304,7 @@ public final class BulkHelper {
                 .filter(key -> key.getId() != null)
                 .map(caseId -> caseId.getValue().getEthosCaseReferenceS())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static List<CaseIdTypeItem> getCaseIdTypeItems(BulkDetails bulkDetails, List<String> multipleTypeItems) {
@@ -313,7 +313,7 @@ public final class BulkHelper {
                 .filter(p -> p.getValue().getEthosCaseReference() != null)
                 .filter(distinctByKey(p -> p.getValue().getEthosCaseReference()))
                 .filter(p -> multipleTypeItems.contains(p.getValue().getEthosCaseReference()))
-                .collect(Collectors.toList())
+                .toList()
                 : new ArrayList<>();
     }
 
@@ -322,7 +322,7 @@ public final class BulkHelper {
                 ? bulkDetails.getCaseData().getMultipleCollection().stream()
                 .map(caseId -> caseId.getValue().getEthosCaseReferenceM())
                 .distinct()
-                .collect(Collectors.toList())
+                .toList()
                 : new ArrayList<>();
     }
 
@@ -331,7 +331,7 @@ public final class BulkHelper {
                 ? jurCodesTypeItems.stream()
                 .map(jurCodesTypeItem -> jurCodesTypeItem.getValue().getJuridictionCodesList())
                 .distinct()
-                .collect(Collectors.toList())
+                .toList()
                 : new ArrayList<>();
     }
 
@@ -356,7 +356,7 @@ public final class BulkHelper {
                         jurCodesTypeItem.setId(code);
                         return jurCodesTypeItem;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return jurCodesTypeItems;
     }
@@ -503,7 +503,7 @@ public final class BulkHelper {
         for (String caseId : caseIds) {
             int index = submitEvents.stream()
                     .map(submitEvent -> submitEvent.getCaseData().getEthosCaseReference())
-                    .collect(Collectors.toList())
+                    .toList()
                     .indexOf(caseId);
             if (index != -1) {
                 SubmitEvent submitEvent = submitEvents.get(index);

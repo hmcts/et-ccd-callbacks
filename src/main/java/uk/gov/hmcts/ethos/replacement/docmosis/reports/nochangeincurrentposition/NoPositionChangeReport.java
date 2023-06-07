@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
@@ -52,7 +51,7 @@ public class NoPositionChangeReport {
                         && StringUtils.isNotBlank(se.getCaseData().getMultipleReference()))
                 .map(e -> e.getCaseData().getMultipleReference())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         if (CollectionUtils.isNotEmpty(multipleIds)) {
             List<SubmitMultipleEvent> submitMultipleEvents = getMultipleCases(caseTypeId, multipleIds);

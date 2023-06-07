@@ -20,6 +20,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
@@ -73,7 +76,7 @@ class TimeToFirstHearingReportTest {
 
     @Test
     void testIgnoreCaseIfItContainsNoHearings() {
-        submitEvents.add(createSubmitEvent(Collections.emptyList(), "1970-01-01"));
+        submitEvents.add(createSubmitEvent(Collections.emptyList(), "1970-01-01", CONCILIATION_TRACK_FAST_TRACK));
 
         ListingData listingData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
 
@@ -85,7 +88,7 @@ class TimeToFirstHearingReportTest {
         DateListedTypeItem dateListedTypeItem = createHearingDateListed("2020-01-01T00:00:00");
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_REMEDY,
                 dateListedTypeItem));
-        submitEvents.add(createSubmitEvent(hearings, "2021-01-01T00:00:00"));
+        submitEvents.add(createSubmitEvent(hearings, "2021-01-01T00:00:00", CONCILIATION_TRACK_FAST_TRACK));
 
         ListingData reportListingData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
 
@@ -97,7 +100,7 @@ class TimeToFirstHearingReportTest {
         DateListedTypeItem dateListedTypeItem = createHearingDateListed("1970-06-01T00:00:00.000");
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING,
                 dateListedTypeItem));
-        submitEvents.add(createSubmitEvent(hearings, "1970-04-01"));
+        submitEvents.add(createSubmitEvent(hearings, "1970-04-01", CONCILIATION_TRACK_FAST_TRACK));
 
         ListingData reportListingData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
 
@@ -124,7 +127,7 @@ class TimeToFirstHearingReportTest {
         DateListedTypeItem dateListedTypeItem = createHearingDateListed("2021-01-01T00:00:00.000");
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING,
                 dateListedTypeItem));
-        submitEvents.add(createSubmitEvent(hearings, "2020-04-01"));
+        submitEvents.add(createSubmitEvent(hearings, "2020-04-01", CONCILIATION_TRACK_FAST_TRACK));
 
         ListingData reportListingData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
 
@@ -144,6 +147,46 @@ class TimeToFirstHearingReportTest {
     }
 
     @Test
+    void testLocalReportsDetailHdrPercentages() {
+        DateListedTypeItem dateListedTypeItem = createHearingDateListed("1970-06-01T00:00:00.000");
+        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING,
+                dateListedTypeItem));
+
+        submitEvents.add(createSubmitEvent(hearings, "1969-06-01", CONCILIATION_TRACK_FAST_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "1955-01-01", CONCILIATION_TRACK_FAST_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "2020-05-31", CONCILIATION_TRACK_FAST_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "1931-09-22", CONCILIATION_TRACK_FAST_TRACK));
+
+        submitEvents.add(createSubmitEvent(hearings, "1960-04-01", CONCILIATION_TRACK_OPEN_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "1970-06-01", CONCILIATION_TRACK_OPEN_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "1970-05-31", CONCILIATION_TRACK_OPEN_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "2009-08-11", CONCILIATION_TRACK_OPEN_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "1921-01-31", CONCILIATION_TRACK_OPEN_TRACK));
+
+        submitEvents.add(createSubmitEvent(hearings, "1919-04-01", CONCILIATION_TRACK_STANDARD_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "1970-06-01", CONCILIATION_TRACK_STANDARD_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "1987-03-03", CONCILIATION_TRACK_STANDARD_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "2000-07-12", CONCILIATION_TRACK_STANDARD_TRACK));
+        submitEvents.add(createSubmitEvent(hearings, "2022-05-01", CONCILIATION_TRACK_STANDARD_TRACK));
+
+        submitEvents.add(createSubmitEvent(hearings, "1960-04-01", CONCILIATION_TRACK_NO_CONCILIATION));
+        submitEvents.add(createSubmitEvent(hearings, "1999-04-01", CONCILIATION_TRACK_NO_CONCILIATION));
+        submitEvents.add(createSubmitEvent(hearings, "1970-05-31", CONCILIATION_TRACK_NO_CONCILIATION));
+
+        ListingData reportListingData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
+
+        AdhocReportType adhocReportType = reportListingData.getLocalReportsDetailHdr();
+        assertEquals("66.67", adhocReportType.getConNone26wkTotalPerCent());
+        assertEquals("80.00", adhocReportType.getConStd26wkTotalPerCent());
+        assertEquals("25.00", adhocReportType.getConFast26wkTotalPerCent());
+        assertEquals("60.00", adhocReportType.getConOpen26wkTotalPerCent());
+        assertEquals("33.33", adhocReportType.getNotConNone26wkTotalPerCent());
+        assertEquals("20.00", adhocReportType.getNotConStd26wkTotalPerCent());
+        assertEquals("75.00", adhocReportType.getNotConFast26wkTotalPerCent());
+        assertEquals("40.00", adhocReportType.getNotConOpen26wkTotalPerCent());
+    }
+
+    @Test
     void checkReportOffice_Scotland() {
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
@@ -151,9 +194,10 @@ class TimeToFirstHearingReportTest {
         assertEquals(reportData.getLocalReportsDetailHdr().getReportOffice(), TribunalOffice.SCOTLAND.getOfficeName());
     }
 
-    private SubmitEvent createSubmitEvent(List<HearingTypeItem> hearingCollection, String receiptDate) {
+    private SubmitEvent createSubmitEvent(List<HearingTypeItem> hearingCollection, String receiptDate,
+                                          String conciliationTrack) {
         CaseData caseData = new CaseData();
-        caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
+        caseData.setConciliationTrack(conciliationTrack);
         caseData.setReceiptDate(receiptDate);
         caseData.setHearingCollection(hearingCollection);
         SubmitEvent submitEvent = new SubmitEvent();

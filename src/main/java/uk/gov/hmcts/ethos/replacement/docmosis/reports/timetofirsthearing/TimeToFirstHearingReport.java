@@ -120,7 +120,7 @@ public class TimeToFirstHearingReport {
         List<AdhocReportTypeItem> localReportsDetailList = listingDetails.getCaseData().getLocalReportsDetail();
         for (SubmitEvent submitEvent : submitEvents) {
             AdhocReportTypeItem localReportsDetailItem =
-                    getLocalReportsDetail(listingDetails, submitEvent.getCaseData(), reportOffice);
+                    getLocalReportsDetail(submitEvent.getCaseData(), reportOffice);
             if (localReportsDetailItem != null) {
                 localReportsDetailList.add(localReportsDetailItem);
             }
@@ -128,9 +128,7 @@ public class TimeToFirstHearingReport {
         listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
     }
 
-    private AdhocReportTypeItem getLocalReportsDetail(ListingDetails listingDetails, CaseData caseData,
-                                                      String reportOffice) {
-
+    private AdhocReportTypeItem getLocalReportsDetail(CaseData caseData, String reportOffice) {
         LocalDate firstHearingDate = getFirstHearingDate(caseData);
         if (firstHearingDate == null || isFirstHearingWithin26Weeks(caseData, firstHearingDate)) {
             return null;
@@ -216,20 +214,15 @@ public class TimeToFirstHearingReport {
                     firstHearingDate);
 
             switch (getConciliationTrack(submitEvent.getCaseData())) {
-                case CONCILIATION_TRACK_NO_CONCILIATION:
-                    reportSummary = updateNoTrack(reportSummary, isFirstHearingWithin26Weeks);
-                    break;
-                case CONCILIATION_TRACK_STANDARD_TRACK:
-                    reportSummary = updateStandardTrack(reportSummary, isFirstHearingWithin26Weeks);
-                    break;
-                case CONCILIATION_TRACK_FAST_TRACK:
-                    reportSummary =  updateFastTrack(reportSummary, isFirstHearingWithin26Weeks);
-                    break;
-                case CONCILIATION_TRACK_OPEN_TRACK:
-                    reportSummary = updateOpenTrack(reportSummary, isFirstHearingWithin26Weeks);
-                    break;
-                default:
-                    break;
+                case CONCILIATION_TRACK_NO_CONCILIATION ->
+                        updateNoTrack(reportSummary, isFirstHearingWithin26Weeks);
+                case CONCILIATION_TRACK_STANDARD_TRACK ->
+                        updateStandardTrack(reportSummary, isFirstHearingWithin26Weeks);
+                case CONCILIATION_TRACK_FAST_TRACK ->
+                        updateFastTrack(reportSummary, isFirstHearingWithin26Weeks);
+                case CONCILIATION_TRACK_OPEN_TRACK ->
+                        updateOpenTrack(reportSummary, isFirstHearingWithin26Weeks);
+                default -> {}
             }
         }
 
@@ -253,44 +246,40 @@ public class TimeToFirstHearingReport {
         listingData.setLocalReportsSummary(Collections.singletonList(adhocReportTypeItem));
     }
 
-    private ReportSummary updateNoTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
+    private void updateNoTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
         reportSummary.conNoneTotal = reportSummary.conNoneTotal + 1;
         if (isFirstHearingWithin26Weeks) {
             reportSummary.conNone26WkTotal = reportSummary.conNone26WkTotal + 1;
         } else {
             reportSummary.notConNone26WkTotal = reportSummary.notConNone26WkTotal + 1;
         }
-        return reportSummary;
     }
 
-    private ReportSummary updateStandardTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
+    private void updateStandardTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
         reportSummary.conStdTotal = reportSummary.conStdTotal + 1;
         if (isFirstHearingWithin26Weeks) {
             reportSummary.conStd26WkTotal = reportSummary.conStd26WkTotal + 1;
         } else {
             reportSummary.notConStd26WkTotal = reportSummary.notConStd26WkTotal + 1;
         }
-        return reportSummary;
     }
 
-    private ReportSummary updateFastTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
+    private void updateFastTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
         reportSummary.conFastTotal = reportSummary.conFastTotal + 1;
         if (isFirstHearingWithin26Weeks) {
             reportSummary.conFast26WkTotal = reportSummary.conFast26WkTotal + 1;
         } else {
             reportSummary.notConFast26WkTotal = reportSummary.notConFast26WkTotal + 1;
         }
-        return reportSummary;
     }
 
-    private ReportSummary updateOpenTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
+    private void updateOpenTrack(ReportSummary reportSummary, boolean isFirstHearingWithin26Weeks) {
         reportSummary.conOpenTotal = reportSummary.conOpenTotal + 1;
         if (isFirstHearingWithin26Weeks) {
             reportSummary.conOpen26WkTotal = reportSummary.conOpen26WkTotal + 1;
         } else {
             reportSummary.notConOpen26WkTotal = reportSummary.notConOpen26WkTotal + 1;
         }
-        return reportSummary;
     }
 
     private void setPercent(AdhocReportType adhocReportType) {

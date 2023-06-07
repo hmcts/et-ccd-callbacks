@@ -52,6 +52,7 @@ public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+    private static final String ET3_RESPONSE_PDF = "ET3 Response.pdf";
     private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
 
     private final TornadoConnection tornadoConnection;
@@ -223,7 +224,8 @@ public class TornadoService {
 
     private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
         if (documentName.endsWith(".pdf")) {
-            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME_PDF,
+            String pdfFileName = documentName.contains("ET3") ? documentName : OUTPUT_FILE_NAME_PDF;
+            return documentManagementService.uploadDocument(authToken, bytes, pdfFileName,
                     APPLICATION_PDF_VALUE, caseTypeId);
         } else {
             return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
@@ -270,7 +272,9 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
-            dmStoreDocumentName = documentName;
+            dmStoreDocumentName = ET3_RESPONSE_PDF.equals(documentName)
+                    ? String.format("%s - " + ET3_RESPONSE_PDF, caseData.getSubmitEt3Respondent().getSelectedLabel())
+                    : documentName;
             connection = createConnection();
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             byte[] bytes = getDocumentByteArray(connection);
@@ -327,25 +331,31 @@ public class TornadoService {
     private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
             throws JsonProcessingException {
         switch (documentName) {
-            case "ET1 Vetting.pdf":
+            case "ET1 Vetting.pdf" -> {
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "ET3 Processing.pdf":
+            }
+            case "ET3 Processing.pdf" -> {
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "ET3 Response.pdf":
+            }
+            case ET3_RESPONSE_PDF -> {
                 dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
-                    caseData.getEt3ResponseRespondentLegalName());
+                        caseData.getEt3ResponseRespondentLegalName());
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "Initial Consideration.pdf" :
+            }
+            case "Initial Consideration.pdf" -> {
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
-            case RES_TSE_FILE_NAME:
+            }
+            case RES_TSE_FILE_NAME -> {
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "Referral Summary.pdf":
+            }
+            case "Referral Summary.pdf" -> {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            case "TSE Reply.pdf":
+            }
+            case "TSE Reply.pdf" -> {
                 return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
-            default:
-                throw new IllegalArgumentException("Unexpected document name " + documentName);
+            }
+            default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }
     }
 }

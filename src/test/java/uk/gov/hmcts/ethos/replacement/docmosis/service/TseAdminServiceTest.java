@@ -66,10 +66,10 @@ class TseAdminServiceTest {
 
     @MockBean
     private EmailService emailService;
-    @MockBean
-    private DocumentManagementService documentManagementService;
+
     @SpyBean
     private NotificationProperties notificationProperties;
+
     @MockBean
     private TseService tseService;
 
@@ -219,9 +219,11 @@ class TseAdminServiceTest {
 
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
-        TseAdminRecordDecisionType actual =
-            caseData.getGenericTseApplicationCollection().get(0).getValue()
-                .getAdminDecision().get(0).getValue();
+        GenericTseApplicationType app = caseData.getGenericTseApplicationCollection().get(0).getValue();
+        assertThat(app.getApplicationState())
+            .isEqualTo("notViewedYet");
+
+        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -279,9 +281,11 @@ class TseAdminServiceTest {
 
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
-        TseAdminRecordDecisionType actual =
-            caseData.getGenericTseApplicationCollection().get(0).getValue()
-                .getAdminDecision().get(0).getValue();
+        GenericTseApplicationType app = caseData.getGenericTseApplicationCollection().get(0).getValue();
+        assertThat(app.getApplicationState())
+            .isEqualTo("notViewedYet");
+
+        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -335,9 +339,11 @@ class TseAdminServiceTest {
 
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
-        TseAdminRecordDecisionType actual =
-            caseData.getGenericTseApplicationCollection().get(0).getValue()
-                .getAdminDecision().get(0).getValue();
+        GenericTseApplicationType app = caseData.getGenericTseApplicationCollection().get(0).getValue();
+        assertThat(app.getApplicationState())
+            .isEqualTo("notViewedYet");
+
+        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));

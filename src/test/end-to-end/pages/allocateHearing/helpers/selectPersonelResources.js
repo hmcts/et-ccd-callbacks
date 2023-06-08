@@ -5,7 +5,7 @@ const { I } = inject();
 function selectPersonelResources() {
 
     I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
-    I.waitForClickable('#allocateHearingClerk'); //Wait for the page to be loaded and Elements enabled
+    I.waitForElement('#allocateHearingClerk', 20); //Wait for the page to be loaded and Elements enabled
     I.see('Allocate Hearing');
     I.see('Case Number:');
     I.see('Sit Alone or Full Panel');

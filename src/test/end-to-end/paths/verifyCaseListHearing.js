@@ -13,4 +13,4 @@ Scenario('Verify Leeds case List Hearing', async ({I}) => {
 
     await listHearing(I, eventNames.LIST_HEARING, 'Leeds');
 
-}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT1').tag('@nightly').retry(testConfig.TestRetryScenarios);

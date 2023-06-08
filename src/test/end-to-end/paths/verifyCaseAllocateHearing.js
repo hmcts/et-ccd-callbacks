@@ -12,4 +12,4 @@ Scenario('Verify Case Allocate Hearing', async ({I}) => {
 
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
 
-}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT1').retry(testConfig.TestRetryScenarios);

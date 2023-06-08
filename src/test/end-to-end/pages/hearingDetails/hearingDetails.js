@@ -7,7 +7,7 @@ module.exports = async function (caseDisposed) {
 
     const I = this;
     I.waitForText(commonConfig.hearingDetails, testConfig.TestTimeToWaitForText);
-    I.waitForClickable('#hearingDetailsHearing');
+    I.waitForElement('#hearingDetailsHearing',20);
     const date = new Date();
     const formattedDate = date.toLocaleString('en-GB', {
         day: 'numeric',

@@ -35,6 +35,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -101,6 +103,9 @@ class CaseManagementForCaseWorkerServiceTest {
     private CcdClient ccdClient;
     @MockBean
     private ClerkService clerkService;
+    @MockBean
+    private AuthTokenGenerator serviceAuthTokenGenerator;
+    private String hmctsServiceId;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -191,7 +196,8 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseData(submitCaseData);
 
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService);
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService, serviceAuthTokenGenerator,
+                hmctsServiceId);
     }
 
     @Test

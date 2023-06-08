@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -138,10 +137,12 @@ public final class HearingsHelper {
 
     private static void checkBreakResumeTimes(List<String> errors, HearingDetailType hearingDetailType,
                                               String hearingNumber) {
-        LocalTime breakTime = !isNullOrEmpty(hearingDetailType.getHearingDetailsTimingBreak())
-                ? LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingBreak()).toLocalTime() : null;
-        LocalTime resumeTime = !isNullOrEmpty(hearingDetailType.getHearingDetailsTimingResume())
-                ? LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingResume()).toLocalTime() : null;
+        String timingBreak = hearingDetailType.getHearingDetailsTimingBreak();
+        LocalTime breakTime = isNullOrEmpty(timingBreak) ? null : LocalDateTime.parse(timingBreak).toLocalTime();
+
+        String timingResume = hearingDetailType.getHearingDetailsTimingResume();
+        LocalTime resumeTime = isNullOrEmpty(timingResume) ? null : LocalDateTime.parse(timingResume).toLocalTime();
+
         LocalTime invalidTime = LocalTime.of(0, 0, 0, 0);
         if (invalidTime.equals(breakTime) || invalidTime.equals(resumeTime)) {
             errors.add(String.format(HEARING_BREAK_RESUME_INVALID, hearingNumber));
@@ -214,7 +215,7 @@ public final class HearingsHelper {
         List<DateListedTypeItem> earliestDatePerHearing = hearingCollection.stream()
             .map(HearingsHelper::mapEarliest)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+            .toList();
 
         if (earliestDatePerHearing.isEmpty()) {
             return null;
@@ -237,6 +238,6 @@ public final class HearingsHelper {
         return hearingDateCollection.stream()
             .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now())
                     && HEARING_STATUS_LISTED.equals(d.getValue().getHearingStatus()))
-            .collect(Collectors.toList());
+            .toList();
     }
 }

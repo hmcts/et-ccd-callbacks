@@ -436,7 +436,7 @@ public final class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingRoom(listingTypeItem.getValue()))
                 .sorted(getVenueComparatorListingTypeItem())
-                .collect(toList());
+                .toList();
         if (!notAllocated.isEmpty()) {
             sortedMap.computeIfAbsent(ROOM_NOT_ALLOCATED, k -> new ArrayList<>()).addAll(notAllocated);
         }
@@ -461,7 +461,7 @@ public final class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingVenue(listingTypeItem.getValue()))
                 .sorted(getDateComparatorListingTypeItem().thenComparing(getTimeComparatorListingTypeItem()))
-                .collect(toList());
+                .toList();
         if (!notAllocated.isEmpty()) {
             sortedMap.computeIfAbsent(NOT_ALLOCATED, k -> new ArrayList<>()).addAll(notAllocated);
         }

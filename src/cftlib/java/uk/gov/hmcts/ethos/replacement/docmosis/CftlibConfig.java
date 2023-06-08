@@ -184,6 +184,8 @@ public class CftlibConfig implements CFTLibConfigurer {
 
         // Required by ccd-data-store-api
         lib.createIdamUser(IDAM_SYSTEM_USER_EMAIL, CASEWORKER);
+        lib.createIdamUser("et@acas.com", "et-acas-api");
+
     }
 
     private void importCcdDefinitions(CFTLib lib) {

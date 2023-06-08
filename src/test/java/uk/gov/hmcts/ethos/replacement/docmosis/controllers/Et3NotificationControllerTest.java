@@ -83,20 +83,17 @@ class Et3NotificationControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
-        when(servingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.et3OtherTypeDocumentName", notNullValue()))
-            .andExpect(jsonPath("$.data.et3ClaimantAndRespondentAddresses", notNullValue()))
             .andExpect(jsonPath("$.data.et3EmailLinkToAcas", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
-        verify(servingService, times(1)).generateClaimantAndRespondentAddress(any());
     }
 
     @Test

@@ -37,7 +37,7 @@ module.exports = async function () {
     I.click(commonConfig.findAddressButton);
     I.waitForText(commonConfig.claimantRepresentativeAddress, testConfig.TestTimeToWaitForText);
     I.selectOption('#representativeClaimantType_representative_address_representative_address_addressList', commonConfig.claimantRepresentativeAddress);
-    I.click(commonConfig.continue);
+    I.click(commonConfig.submit);
 
     I.waitForText('has been updated with event: Claimant Representative', testConfig.TestTimeToWaitForText);
 

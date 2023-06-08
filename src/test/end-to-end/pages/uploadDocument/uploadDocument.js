@@ -21,11 +21,7 @@ module.exports = async function () {
     I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
     I.wait(commonConfig.time_interval_5_seconds); //Wait for 5 Seconds for the File Upload to take place and complete before proceeding otherwise other issues would come up...
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
-    I.click('//button[contains(text(),\'Continue\')]');
 
-    I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
-    I.waitForText('Upload Document', testConfig.TestTimeToWaitForText);
-    I.see('Case Number:');
     I.click(commonConfig.submit);
 
     //Wait for Case Details to correctly load

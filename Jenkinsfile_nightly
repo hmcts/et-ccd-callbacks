@@ -74,8 +74,8 @@ withNightlyPipeline(type, product, component) {
                     alwaysLinkToLastBuild: true,
                     keepAll : true,
                     reportDir : "functional-output",
-                    reportFiles : "ET-CCD-Callbacks-tests.html",
-                    reportName : "ET E2E functional tests result"
+                    reportFiles : "ET-CCD-Callbacks-X-browser-tests.html",
+                    reportName : "ET E2E x-browser result"
             ]
         }
     }

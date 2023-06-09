@@ -42,7 +42,7 @@ function getBrowserConfig(browserGroup) {
 
 const setupConfig = {
     tests: config.TestPathToRun,
-    output: `${process.cwd()}/${config.TestOutputDir}`,
+    output: `${process.cwd()}/${config.TestXBOutputDir}`,
     helpers: {
         WebDriver: {
             url: testUrl,
@@ -85,13 +85,13 @@ const setupConfig = {
             'mocha-junit-reporter': {
                 stdout: '-',
                 options: {
-                    mochaFile: `${config.TestOutputDir}/result.xml`
+                    mochaFile: `${config.TestXBOutputDir}/result.xml`
                 }
             },
             'mochawesome': {
-                stdout: config.TestOutputDir + '/console.log',
+                stdout: config.TestXBOutputDir + '/console.log',
                 options: {
-                    reportDir: config.TestOutputDir,
+                    reportDir: config.TestXBOutputDir,
                     reportName: 'index',
                     reportTitle: 'Crossbrowser results for: ' + browser.toUpperCase(),
                     inlineAssets: true

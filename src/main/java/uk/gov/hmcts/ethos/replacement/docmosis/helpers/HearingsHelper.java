@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -219,7 +218,7 @@ public class HearingsHelper {
         List<DateListedTypeItem> earliestDatePerHearing = hearingCollection.stream()
             .map(HearingsHelper::mapEarliest)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+            .toList();
 
         if (earliestDatePerHearing.isEmpty()) {
             return null;
@@ -242,6 +241,6 @@ public class HearingsHelper {
         return hearingDateCollection.stream()
             .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now())
                     && HEARING_STATUS_LISTED.equals(d.getValue().getHearingStatus()))
-            .collect(Collectors.toList());
+            .toList();
     }
 }

@@ -52,9 +52,6 @@ module.exports = async function () {
 
     I.click('#judgementCollection_0_judgement_details_reasons_given_No');
     I.click('#judgementCollection_0_judgement_details_awardMade_No');
-    I.click('Continue');
-    I.waitForText('Judgment', testConfig.TestTimeToWaitForText);
-    I.see('Case Number:');
     I.click('Submit');
     I.waitForText('has been updated with event: Judgment', testConfig.TestTimeToWaitForText);
 

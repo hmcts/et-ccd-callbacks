@@ -550,5 +550,11 @@ public class CaseDataBuilder {
         caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
         return this;
     }
+
+    public CaseDataBuilder withSubmitEt3Respondent(String respondent) {
+        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create(respondent, respondent)));
+        caseData.getSubmitEt3Respondent().setValue(DynamicValueType.create(respondent, respondent));
+        return this;
+    }
 }
 

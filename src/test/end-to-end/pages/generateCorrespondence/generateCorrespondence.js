@@ -14,11 +14,6 @@ module.exports = async function () {
     I.waitForElement('#correspondenceType_part_2_Documents',10);
     I.selectOption('#correspondenceType_part_2_Documents', commonConfig.lettersCorrespondence1);
 
-
-    I.click(commonConfig.continue);
-    I.waitForText('Letters', testConfig.TestTimeToWaitForText);
-    I.see('Case Number:');
-
     I.click(commonConfig.submit);
 
     //After submitting letters

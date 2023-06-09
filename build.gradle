@@ -156,7 +156,7 @@ task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
 }
 
 task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/codecept.conf.js', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
 }
 
 task integration(type: Test) {

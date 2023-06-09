@@ -16,7 +16,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.ListedHearingData;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class HearingSelectionService {
@@ -27,30 +26,21 @@ public class HearingSelectionService {
      * Returns hearing list sorted by datetime only.
      */
     public List<DynamicValueType> getHearingSelectionSortedByDateTime(CaseData caseData) {
-        List<DynamicValueType> values = new ArrayList<>();
-        int index = 1;
-
-        List<ListedHearingData> hearingList = new ArrayList<>();
-
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             return null;
         }
 
+        List<DynamicValueType> values = new ArrayList<>();
+        int index = 1;
+
+        List<ListedHearingData> hearingList = new ArrayList<>();
         for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-            HearingType hearingValue = hearing.getValue();
-            hearingValue.getHearingDateCollection().stream()
-                    .forEach(h ->
-                            hearingList.add(
-                                    new ListedHearingData(hearingValue.getHearingType(),
-                                            hearingValue.getHearingVenue(),
-                                            hearingValue.getHearingVenueScotland(),
-                                            h.getId(),
-                                            h.getValue().getListedDate())));
+            generateHearingList(hearingList, hearing);
         }
 
         List<ListedHearingData> sortedHearingList = hearingList.stream()
                 .sorted(Comparator.comparing((ListedHearingData h) -> LocalDateTime.parse(h.getListedDate())))
-                .collect(Collectors.toList());
+                .toList();
 
         for (ListedHearingData listing : sortedHearingList) {
             String code = listing.getListedId();
@@ -72,6 +62,16 @@ public class HearingSelectionService {
         }
 
         return values;
+    }
+
+    private static void generateHearingList(List<ListedHearingData> hearingList, HearingTypeItem hearing) {
+        HearingType hearingValue = hearing.getValue();
+        hearingValue.getHearingDateCollection().forEach(h ->
+                hearingList.add(new ListedHearingData(hearingValue.getHearingType(),
+                        hearingValue.getHearingVenue(),
+                        hearingValue.getHearingVenueScotland(),
+                        h.getId(),
+                        h.getValue().getListedDate())));
     }
 
     public List<DynamicValueType> getHearingSelection(CaseData caseData) {

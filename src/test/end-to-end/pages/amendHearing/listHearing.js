@@ -55,9 +55,6 @@ module.exports = async function (jurisdiction) {
     I.fillField('#listedDate-month', today.getMonth() + 1);
     I.fillField('#listedDate-year', today.getFullYear());
 
-    I.click(commonConfig.continue);
-    I.waitForText('List Hearing', testConfig.TestTimeToWaitForText);
-    I.see('Case Number:');
     I.click(commonConfig.submit);
 
     //Verifying the Hearings Tab.

@@ -15,9 +15,6 @@ module.exports = async function () {
     claimantWorkDetails.verifyClaimantWorkDetails();
     claimantOtherDetails.verifyClaimantOtherDetails();
     claimantHearingPreferences.verifyClaimantHearingPreferences();
-    I.waitForText('Claimant Details', testConfig.TestTimeToWaitForText);
-    I.see('Case Number:');
-    I.click('Submit');
     I.waitForText('has been updated with event: Claimant Details');
 
     //Verify the CYA page...

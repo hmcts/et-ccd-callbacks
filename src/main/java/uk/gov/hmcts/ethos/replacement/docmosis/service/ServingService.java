@@ -9,9 +9,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,7 +23,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.UnusedPrivateField",
-    "PMD.LiteralsFirstInComparisons"})
+    "PMD.LiteralsFirstInComparisons", "PMD.SignatureDeclareThrowsException"})
 public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
@@ -38,7 +40,20 @@ public class ServingService {
     private static final String ET1_SERVING = "ET1%20serving";
     private static final String ET3_RELEVANT_PARTIES = "relevant%20parties";
     private static final String ET1_RESPONDENT = "respondent";
-    public static final String EMAIL_ADDRESS = "emailAddress";
+    private static final String EMAIL_ADDRESS = "emailAddress";
+
+    private static final String DOC_TYPE_ACK_OF_CLAIM = "Acknowledgement of claim";
+    private static final String DOC_TYPE_NOTICE_OF_CLAIM = "Notice of a claim";
+    private static final String DOC_TYPE_NOTICE_OF_HEARING = "Notice of Hearing";
+    private static final String DOC_TYPE_OTHER = "Other ";
+
+    private static final String SERVING_DOC_1_1 = "1.1";
+    private static final String SERVING_DOC_2_6 = "2.6";
+    private static final String SERVING_DOC_2_7 = "2.7";
+    private static final String SERVING_DOC_2_8 = "2.8";
+    private static final String SERVING_DOC_7_7 = "7.7";
+    private static final String SERVING_DOC_7_8 = "7.8";
+    private static final String SERVING_DOC_7_8A = "7.8a";
 
     @Value("${et1Serving.template.id}")
     private String templateId;
@@ -129,6 +144,36 @@ public class ServingService {
         }
 
         emailService.sendEmail(templateId, claimant.get(EMAIL_ADDRESS), claimant);
+    }
+
+    /**
+     * Copy servingDocumentCollection to documentCollection.
+     * @param caseData object that holds the case data.
+     */
+    public void addServingDocToDocumentCollection(CaseData caseData) throws Exception {
+        if (CollectionUtils.isEmpty(caseData.getServingDocumentCollection())) {
+            throw new Exception("Serving collection is empty");
+        }
+
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+
+        caseData.getServingDocumentCollection()
+            .forEach(d -> caseData.getDocumentCollection().add(
+                DocumentHelper.createDocumentTypeItem(
+                    d.getValue().getUploadedDocument(),
+                    updateServingTypeOfDocument(d.getValue().getTypeOfDocument()))
+            ));
+    }
+
+    private String updateServingTypeOfDocument(String typeOfDocument) {
+        return switch (typeOfDocument) {
+            case SERVING_DOC_1_1 -> DOC_TYPE_ACK_OF_CLAIM;
+            case SERVING_DOC_2_6, SERVING_DOC_2_7, SERVING_DOC_2_8 -> DOC_TYPE_NOTICE_OF_CLAIM;
+            case SERVING_DOC_7_7, SERVING_DOC_7_8, SERVING_DOC_7_8A ->  DOC_TYPE_NOTICE_OF_HEARING;
+            default ->  DOC_TYPE_OTHER;
+        };
     }
 
 }

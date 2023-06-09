@@ -85,5 +85,7 @@
   "time_interval_1_second" : 1,
   "time_interval_2_seconds" : 2,
   "time_interval_4_seconds" : 4,
-  "time_interval_5_seconds" : 5
+  "time_interval_5_seconds" : 5,
+  "time_interval_20_seconds" : 20
+
 }

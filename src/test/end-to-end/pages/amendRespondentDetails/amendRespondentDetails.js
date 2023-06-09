@@ -78,7 +78,6 @@ module.exports = async function () {
     I.seeInField('#responseReceivedDate-year', '2022');
     I.see('Response Struck Out (Optional)');
 
-    I.click(commonConfig.continue);
     I.click(commonConfig.submit);
 
     //Final Confirmation

@@ -9,8 +9,6 @@ module.exports = async function () {
     I.fillField('#dateRejected-month', commonConfig.caseAcceptedMonth);
     I.fillField('#dateRejected-year', commonConfig.caseAcceptedYear);
     I.checkOption('#preAcceptCase_rejectReason-Not\\ on\\ Prescribed\\ Form');
-    I.click(commonConfig.continue);
-    I.waitForText('Accept/Reject Case');
     I.click(commonConfig.submit);
 };
 

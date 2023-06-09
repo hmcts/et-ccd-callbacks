@@ -28,10 +28,7 @@ module.exports = async function () {
     I.fillField('#cleared-month', commonConfig.bfDateMonth);
     I.fillField('#cleared-year', commonConfig.bfDateYear);
     I.fillField('#bfActions_0_notes', 'Automated Testing Notes for BF Action');
-    I.click(commonConfig.continue);
 
-    I.waitForText('B/F Action');
-    I.see('Case Number:')
     I.click(commonConfig.submit);
 
     //Final Confirmation

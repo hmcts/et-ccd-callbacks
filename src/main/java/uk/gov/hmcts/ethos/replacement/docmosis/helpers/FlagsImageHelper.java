@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ZERO;
     "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
     "PMD.GodClass", "PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
     "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter",
-    "PMD.CyclomaticComplexity"})
+    "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity"})
 public class FlagsImageHelper {
 
     private static final String COLOR_ORANGE = "Orange";
@@ -181,11 +181,13 @@ public class FlagsImageHelper {
 
         for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
             HearingType hearingType = hearingTypeItem.getValue();
-            if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
+            if (hearingType != null && CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
                 for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
-                    String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
-                    if (YES.equals(hearingReservedJudgement)) {
-                        return true;
+                    if (dateListedTypeItem != null && dateListedTypeItem.getValue() != null) {
+                        String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
+                        if (YES.equals(hearingReservedJudgement)) {
+                            return true;
+                        }
                     }
                 }
             }

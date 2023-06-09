@@ -3,7 +3,6 @@ const commonConfig = require('../../../data/commonConfig.json');
 const { I } = inject();
 
 function verifyBeforeYouStartVetting() {
-    I.waitForText('Check the Documents tab for additional ET1 documents the claimant may have uploaded.', testConfig.TestTimeToWaitForText);
     I.see('ET1 case vetting');
     I.see('Case Number:');
     I.see('Before you start');

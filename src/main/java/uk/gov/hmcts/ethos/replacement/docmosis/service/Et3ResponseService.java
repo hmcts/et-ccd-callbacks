@@ -10,20 +10,20 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.buildPersonalisation;
 
 /**
@@ -34,6 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 @RequiredArgsConstructor
 public class Et3ResponseService {
 
+    public static final String ET3_ATTACHMENT = "ET3 Attachment";
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
     private final EmailService emailService;
@@ -63,40 +64,29 @@ public class Et3ResponseService {
      * Saves the generated ET3 Response form document in the document collection and the respondent.
      * @param caseData where the data is stored
      */
-    public void saveEt3ResponseDocument(CaseData caseData, DocumentInfo documentInfo) {
+    public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
-        DocumentType documentType = new DocumentType();
-        documentType.setUploadedDocument(uploadedDocument);
-        documentType.setTypeOfDocument("ET3");
-
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setValue(documentType);
-        documentTypeItem.setId(UUID.randomUUID().toString());
-
-        addDocumentToDocCollection(caseData, documentTypeItem);
-        addDocumentToRespondent(caseData, uploadedDocument);
+        addDocumentToDocCollection(caseData, DocumentHelper.createDocumenTypeItem(uploadedDocument, "ET3"));
+        saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }
 
-    private void addDocumentToRespondent(CaseData caseData, UploadedDocumentType uploadedDocument) {
-        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
-            return;
-        }
+    private void saveEt3DetailsToRespondent(CaseData caseData, UploadedDocumentType uploadedDocument) {
+        String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel();
 
-        Set<String> respondentSet = new HashSet<>();
-        for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
-            respondentSet.add(dynamicListTypeItem.getValue().getDynamicList().getSelectedLabel());
-        }
-
-        for (String respondentSelected : respondentSet) {
-            Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
-                    .filter(r -> respondentSelected.equals(r.getValue().getRespondentName()))
-                    .findFirst();
-            if (respondent.isPresent()) {
-                respondent.get().getValue().setEt3Form(uploadedDocument);
-                for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                    if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
-                        respondentSumTypeItem.setValue(respondent.get().getValue());
-                    }
+        Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
+                .filter(r -> respondentSelected.equals(r.getValue().getRespondentName()))
+                .findFirst();
+        if (respondent.isPresent()) {
+            respondent.get().getValue().setEt3Form(uploadedDocument);
+            respondent.get().getValue().setResponseReceived(YES);
+            respondent.get().getValue().setResponseReceivedDate(LocalDate.now().toString());
+            if (YES.equals(respondent.get().getValue().getExtensionRequested())
+                    && YES.equals(respondent.get().getValue().getExtensionGranted())) {
+                respondent.get().getValue().setExtensionResubmitted(YES);
+            }
+            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
+                    respondentSumTypeItem.setValue(respondent.get().getValue());
                 }
             }
         }
@@ -107,7 +97,6 @@ public class Et3ResponseService {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             caseData.setDocumentCollection(new ArrayList<>());
         }
-
         caseData.getDocumentCollection().add(documentTypeItem);
     }
 
@@ -122,21 +111,27 @@ public class Et3ResponseService {
                 .map(GenericTypeItem::getId)
                 .collect(Collectors.toCollection(HashSet::new));
 
-        documents.addAll(
-                Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
+        List<DocumentTypeItem> documentList = Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                 .orElse(List.of())
                 .stream()
                 .filter(o -> !documentSet.contains(o.getId()))
-                .collect(Collectors.toList())
-        );
+                .toList();
+        for (DocumentTypeItem documentTypeItem : documentList) {
+            documentTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
+        }
+
+        documents.addAll(documentList);
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
-            documents.add(DocumentTypeItem.fromUploadedDocument(caseData.getEt3ResponseEmployerClaimDocument()));
+            documents.add(DocumentHelper.createDocumenTypeItem(
+                    caseData.getEt3ResponseEmployerClaimDocument(), ET3_ATTACHMENT));
         }
 
         if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
-            documents.add(DocumentTypeItem.fromUploadedDocument(caseData.getEt3ResponseRespondentSupportDocument()));
+            documents.add(DocumentHelper.createDocumenTypeItem(
+                    caseData.getEt3ResponseRespondentSupportDocument(), ET3_ATTACHMENT));
         }
+
     }
 
     /**

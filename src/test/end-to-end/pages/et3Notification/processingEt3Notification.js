@@ -49,10 +49,6 @@ module.exports =  async function () {
 
     I.waitForText('ET3 notification');
     I.see('Case Number:');
-    I.click(commonConfig.submit);
-
-    I.waitForText('ET3 notification');
-    I.see('Case Number:');
     I.see('Documents submitted');
     I.see('We have notified the following parties:');
     I.click('//button[contains(text(),\'Close and Return to case details\')]');

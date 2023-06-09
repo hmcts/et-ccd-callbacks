@@ -114,9 +114,6 @@ module.exports = async function () {
     I.selectOption('#judgementCollection_0_reconsiderations_reconsiderationPartyInitiative', 'Claimant');
     I.selectOption('#judgementCollection_0_reconsiderations_reconsiderationDirection', 'Application refused');
     I.selectOption('#judgementCollection_0_reconsiderations_reconsiderationDecision', 'Judgment confirmed');
-    I.click('Continue');
-    I.waitForText('Judgment', testConfig.TestTimeToWaitForText);
-    I.see('Case Number:');
     I.click('Submit');
     I.waitForText('has been updated with event: Judgment', testConfig.TestTimeToWaitForText);
 

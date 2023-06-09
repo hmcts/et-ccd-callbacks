@@ -33,10 +33,9 @@ public class HearingSelectionService {
         List<DynamicValueType> values = new ArrayList<>();
         int index = 1;
 
-        List<ListedHearingData> hearingList = new ArrayList<>();
-        for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-            generateHearingList(hearingList, hearing);
-        }
+        List<ListedHearingData> hearingList = caseData.getHearingCollection().stream()
+            .flatMap(hearing -> generateHearingList(hearing).stream())
+            .toList();
 
         List<ListedHearingData> sortedHearingList = hearingList.stream()
                 .sorted(Comparator.comparing((ListedHearingData h) -> LocalDateTime.parse(h.getListedDate())))
@@ -64,14 +63,17 @@ public class HearingSelectionService {
         return values;
     }
 
-    private static void generateHearingList(List<ListedHearingData> hearingList, HearingTypeItem hearing) {
+    private static List<ListedHearingData> generateHearingList(HearingTypeItem hearing) {
         HearingType hearingValue = hearing.getValue();
-        hearingValue.getHearingDateCollection().forEach(h ->
-                hearingList.add(new ListedHearingData(hearingValue.getHearingType(),
-                        hearingValue.getHearingVenue(),
-                        hearingValue.getHearingVenueScotland(),
-                        h.getId(),
-                        h.getValue().getListedDate())));
+        return hearingValue.getHearingDateCollection().stream().map(h ->
+                new ListedHearingData(
+                    hearingValue.getHearingType(),
+                    hearingValue.getHearingVenue(),
+                    hearingValue.getHearingVenueScotland(),
+                    h.getId(),
+                    h.getValue().getListedDate()
+                )
+            ).toList();
     }
 
     public List<DynamicValueType> getHearingSelection(CaseData caseData) {

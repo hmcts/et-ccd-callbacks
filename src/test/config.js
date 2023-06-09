@@ -8,7 +8,6 @@ module.exports = {
     TestRetryScenarios: process.env.RETRY_SCENARIOS || 2,
     TestPathToRun: process.env.E2E_TEST_PATH || './paths/**/*.js',
     TestOutputDir: process.env.E2E_OUTPUT_DIR || './functional-output',
-    TestXBOutputDir: process.env.E2E_OUTPUT_DIR || './xbrowser-output',
     TestTimeToWaitForText: parseInt(process.env.E2E_TEST_TIME_TO_WAIT_FOR_TEXT || 30),
     TestEnvCWUser: process.env.ET_CCD_CASEWORKER_USER_NAME || '',
     TestEnvCWPassword: process.env.ET_CCD_CASEWORKER_PASSWORD || '',

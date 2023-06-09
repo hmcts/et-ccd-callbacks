@@ -151,7 +151,7 @@ class SendNotificationServiceTest {
     @Test
     void testPopulateHearingSelection() {
         sendNotificationService.populateHearingSelection(caseData);
-        verify(hearingSelectionService, times(1)).getHearingSelection(any(), eq("%s: %s - %s - %s"));
+        verify(hearingSelectionService, times(1)).getHearingSelectionSortedByDateTime(any());
     }
 
     @Test

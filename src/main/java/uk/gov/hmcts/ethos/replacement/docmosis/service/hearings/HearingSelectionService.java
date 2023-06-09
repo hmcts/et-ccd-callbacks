@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 public class HearingSelectionService {
 
-    public static final String HEARING_FORMAT = "%s: %s - %s - %s";
+    private static final String HEARING_FORMAT = "%s: %s - %s - %s";
 
     /**
      * Returns hearing list sorted by datetime only.
@@ -32,43 +32,45 @@ public class HearingSelectionService {
 
         List<ListedHearingData> hearingList = new ArrayList<>();
 
-        if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
-            for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-                HearingType hearingValue = hearing.getValue();
-                hearingValue.getHearingDateCollection().stream()
-                        .forEach(h ->
-                                hearingList.add(
-                                        new ListedHearingData(hearingValue.getHearingType(),
-                                                hearingValue.getHearingVenue(),
-                                                hearingValue.getHearingVenueScotland(),
-                                                h.getId(),
-                                                h.getValue().getListedDate())));
-            }
-
-            List<ListedHearingData> sortedHearingList = hearingList.stream()
-                    .sorted(Comparator.comparing((ListedHearingData h) -> LocalDateTime.parse(h.getListedDate())))
-                    .collect(Collectors.toList());
-
-            for (ListedHearingData listing : sortedHearingList) {
-                String code = listing.getListedId();
-
-                DynamicFixedListType hearingVenue = listing.getHearingVenue();
-
-                String venue = hearingVenue == null ? listing.getHearingVenueScotland() :
-                        hearingVenue.getValue().getLabel();
-
-                String date = UtilHelper.formatLocalDateTime(listing.getListedDate());
-                String label = String.format(
-                        HEARING_FORMAT,
-                        index,
-                        listing.getHearingType(),
-                        venue,
-                        date);
-                values.add(DynamicValueType.create(code, label));
-                index++;
-            }
-
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            return null;
         }
+
+        for (HearingTypeItem hearing : caseData.getHearingCollection()) {
+            HearingType hearingValue = hearing.getValue();
+            hearingValue.getHearingDateCollection().stream()
+                    .forEach(h ->
+                            hearingList.add(
+                                    new ListedHearingData(hearingValue.getHearingType(),
+                                            hearingValue.getHearingVenue(),
+                                            hearingValue.getHearingVenueScotland(),
+                                            h.getId(),
+                                            h.getValue().getListedDate())));
+        }
+
+        List<ListedHearingData> sortedHearingList = hearingList.stream()
+                .sorted(Comparator.comparing((ListedHearingData h) -> LocalDateTime.parse(h.getListedDate())))
+                .collect(Collectors.toList());
+
+        for (ListedHearingData listing : sortedHearingList) {
+            String code = listing.getListedId();
+
+            DynamicFixedListType hearingVenue = listing.getHearingVenue();
+
+            String venue = hearingVenue == null ? listing.getHearingVenueScotland() :
+                    hearingVenue.getValue().getLabel();
+
+            String date = UtilHelper.formatLocalDateTime(listing.getListedDate());
+            String label = String.format(
+                    HEARING_FORMAT,
+                    index,
+                    listing.getHearingType(),
+                    venue,
+                    date);
+            values.add(DynamicValueType.create(code, label));
+            index++;
+        }
+
         return values;
     }
 

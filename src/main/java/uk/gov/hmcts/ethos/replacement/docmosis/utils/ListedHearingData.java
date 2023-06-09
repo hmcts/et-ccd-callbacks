@@ -5,7 +5,7 @@ import lombok.Data;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 
 /**
- Listed Hearing Data object for sorting purposes
+ Listed Hearing Data object for sorting purposes.
  */
 @AllArgsConstructor
 @Data

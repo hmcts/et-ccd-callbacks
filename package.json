@@ -34,6 +34,7 @@
     },
     "scripts": {
         "test:fullfunctional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --steps —-reporter mocha-multi --grep @nightly",
+        "test:crossbrowser": "codeceptjs run-multiple ${BROWSER_GROUP:-'--all'} -c test/end-to-end/saucelabs.conf.js --grep @crossbrowser --steps --reporter mocha-multi --verbose",
         "test:functional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --steps —-reporter mocha-multi --grep @RET-BAT",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"

@@ -49,9 +49,9 @@ exports.config = {
                 stdout: './functional-output/console.log',
                 options: {
                     includeScreenshots: true,
-                    reportDir: testConfig.TestOutputDir || './functional-output',
-                    reportFilename: 'ET-CCD-Callbacks-tests',
-                    reportTitle: 'ET CCD Callbacks Tests',
+                    reportDir: testConfig.TestOutputDir,
+                    reportFilename: 'ET-ccd-callback-ui-functional-tests',
+                    reportTitle: 'ET CCD UI Functional Tests',
                     inline: true,
                     html: true,
                     json: true,
@@ -65,5 +65,5 @@ exports.config = {
             browsers: ['chrome']
         }
     },
-    'name': 'et-ccd-callbacks-tests'
+    name: 'et-ccd-callbacks-tests'
 };

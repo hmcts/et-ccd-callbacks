@@ -38,7 +38,6 @@ module.exports = async function (caseDisposed) {
     //enter finish time 1 minute before current
     await I.fillField('#hearingDetailsTimingFinish-minute',currentDate.split('-')[4]-1);
     await I.fillField('#hearingDetailsTimingFinish-second', '00');
-    I.click(commonConfig.continue);
     I.wait(2);
     I.click(commonConfig.submit);
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);

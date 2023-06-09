@@ -60,9 +60,27 @@ withNightlyPipeline(type, product, component) {
 
     loadVaultSecrets(secrets)
     enableCrossBrowserTest()
+    enableFullFunctionalTest()
     enableFortifyScan()
 
     afterAlways('crossBrowserTest') {
+        try {
+            sh "./gradlew :crossbrowser"
+        } finally {
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'crossbrowser-output/**/*'
+
+            publishHTML target: [
+                    allowMissing : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll : true,
+                    reportDir : "functional-output",
+                    reportFiles : "ET-CCD-Callbacks-tests.html",
+                    reportName : "ET E2E functional tests result"
+            ]
+        }
+    }
+
+    afterAlways('functionalTest') {
         try {
             sh "./gradlew :nightlyFunctional"
         } finally {

@@ -33,8 +33,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORD
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
@@ -95,6 +97,27 @@ public class TseAdmReplyService {
 
         return YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
                 || YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired());
+    }
+
+    /**
+     * Update status of application based on admin reply.
+     * @param caseData in which the case details are extracted from
+     */
+    public void updateApplicationStatus(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return;
+        }
+
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        if (applicationTypeItem == null) {
+            return;
+        }
+
+        if (isRequestAndResponseRequiredFromParty(caseData, CLAIMANT_TITLE)) {
+            applicationTypeItem.getValue().setApplicationState(NOT_STARTED_YET);
+        } else if (isRequestAndResponseRequiredFromParty(caseData, RESPONDENT_TITLE)) {
+            applicationTypeItem.getValue().setApplicationState(UPDATED);
+        }
     }
 
     /**
@@ -209,14 +232,22 @@ public class TseAdmReplyService {
         }
     }
 
-    private boolean isResponseRequired(CaseData caseData, String title) {
+    private boolean isResponseRequired(CaseData caseData, String party) {
         return CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
-                ? YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
-                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplyCmoSelectPartyRespond())
-                        || title.equals(caseData.getTseAdmReplyCmoSelectPartyRespond()))
-                : YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired())
-                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplyRequestSelectPartyRespond())
-                        || title.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
+            ? isCmoAndResponseRequiredFromParty(caseData, party)
+            : isRequestAndResponseRequiredFromParty(caseData, party);
+    }
+
+    private static boolean isCmoAndResponseRequiredFromParty(CaseData caseData, String party) {
+        return YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
+            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyCmoSelectPartyRespond())
+            || party.equals(caseData.getTseAdmReplyCmoSelectPartyRespond()));
+    }
+
+    private static boolean isRequestAndResponseRequiredFromParty(CaseData caseData, String party) {
+        return YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired())
+            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyRequestSelectPartyRespond())
+            || party.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
     }
 
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
@@ -249,5 +280,4 @@ public class TseAdmReplyService {
         caseData.setTseAdmReplyRequestSelectPartyRespond(null);
         caseData.setTseAdmReplySelectPartyNotify(null);
     }
-
 }

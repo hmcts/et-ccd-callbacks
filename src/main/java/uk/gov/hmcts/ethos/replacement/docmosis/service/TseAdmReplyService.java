@@ -107,40 +107,40 @@ public class TseAdmReplyService {
         }
 
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem != null) {
-
-            GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
-            if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-                genericTseApplicationType.setRespondCollection(new ArrayList<>());
-            }
-
-            genericTseApplicationType.getRespondCollection().add(
-                TseRespondTypeItem.builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(
-                        TseRespondType.builder()
-                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                            .from(ADMIN)
-                            .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
-                            .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
-                            .addDocument(caseData.getTseAdmReplyAddDocument())
-                            .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
-                            .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
-                            .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
-                            .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
-                                    caseData.getTseAdmReplyRequestEnterFullName()))
-                            .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
-                                    caseData.getTseAdmReplyRequestIsResponseRequired()))
-                            .selectPartyRespond(defaultIfEmpty(caseData.getTseAdmReplyCmoSelectPartyRespond(),
-                                    caseData.getTseAdmReplyRequestSelectPartyRespond()))
-                            .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                            .build()
-                    ).build());
-
-            genericTseApplicationType.setResponsesCount(
-                    String.valueOf(genericTseApplicationType.getRespondCollection().size())
-            );
+        if (applicationTypeItem == null) {
+            return;
         }
+
+        GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
+        if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+            genericTseApplicationType.setRespondCollection(new ArrayList<>());
+        }
+
+        genericTseApplicationType.getRespondCollection().add(
+            TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseRespondType.builder()
+                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                    .from(ADMIN)
+                    .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
+                    .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
+                    .addDocument(caseData.getTseAdmReplyAddDocument())
+                    .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
+                    .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
+                    .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
+                    .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
+                            caseData.getTseAdmReplyRequestEnterFullName()))
+                    .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
+                            caseData.getTseAdmReplyRequestIsResponseRequired()))
+                    .selectPartyRespond(defaultIfEmpty(caseData.getTseAdmReplyCmoSelectPartyRespond(),
+                            caseData.getTseAdmReplyRequestSelectPartyRespond()))
+                    .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                    .build()
+                ).build());
+
+        genericTseApplicationType.setResponsesCount(
+                String.valueOf(genericTseApplicationType.getRespondCollection().size())
+        );
     }
 
     /**

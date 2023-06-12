@@ -13,6 +13,7 @@ exports.config = {
             waitForTimeout: 10000,
             ignoreHTTPSErrors: true,
             windowSize: '1920x1080',
+            browser:'firefox'
         },
         REST: {
             endpoint: 'https://idam-api.aat.platform.hmcts.net/loginUser'
@@ -41,14 +42,14 @@ exports.config = {
             'codeceptjs-cli-reporter': {
                 stdout: '-',
                 options: {
-                    verbose: false,
+                    verbose: true,
                     steps: true,
                 },
             },
             mochawesome: {
                 stdout: './functional-output/console.log',
                 options: {
-                    includeScreenshots: true,
+                    uniqueScreenshotNames: true,
                     reportDir: testConfig.TestOutputDir || './functional-output',
                     reportFilename: 'ET-ccd-callback-ui-functional-tests',
                     reportTitle: 'ET CCD UI Functional Tests',
@@ -62,7 +63,7 @@ exports.config = {
     multiple: {
         parallel: {
             chunks: 2,
-            browsers: ['chrome']
+            browsers: ['firefox']
         }
     },
     name: 'et-ccd-callbacks-tests'

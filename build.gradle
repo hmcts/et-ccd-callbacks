@@ -135,8 +135,7 @@ task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
 }
 
 task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
-  workingDir '.'
-    commandLine 'yarn', 'run', 'test:fullfunctional'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/codecept.conf.js', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi', '--verbose'
 }
 
 task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
@@ -152,7 +151,8 @@ task nightlyFunctional(dependsOn: ':codeceptFunctionalNightly') {
 task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
     //IGNORE_SESSION_VALIDATION=true NODE_ENV=testing LOG_LEVEL=OFF NODE_PATH=. node_modules/.bin/codeceptjs run-multiple  ${BROWSER_GROUP:-'--all'} -c src/test/end-to-end/saucelabs.conf.js --grep @RET-XB --steps --reporter mocha-multi
     workingDir '.'
-    commandLine 'yarn', 'run', 'test:crossbrowser'
+    commandLine './bin/run-crossbrowser-tests.sh'
+    commandLine 'node_modules/.bin/codeceptjs', 'run-multiple', '--all', '-c', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--reporter', 'mocha-multi', '--verbose'
 }
 
 task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {

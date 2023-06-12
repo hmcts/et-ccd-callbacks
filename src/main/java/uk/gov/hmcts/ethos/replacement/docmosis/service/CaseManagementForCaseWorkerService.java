@@ -6,15 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -36,7 +29,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -66,7 +58,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
-import static uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi.SERVICE_AUTHORIZATION;
 
 @Slf4j
 @Service("caseManagementForCaseWorkerService")
@@ -449,25 +440,20 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setHmctsServiceIdSupplementary(CaseDetails caseDetails, String accessToken) throws IOException {
-
         Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
         payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
 
         Map<String, Object> payload = Maps.newHashMap();
         payload.put("supplementary_data_updates", payloadData);
-        ResponseEntity<Object> response = null;
 
         try {
-            response = ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
-            
+            var response = ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
+            if (response == null) {
+                throw new CaseCreationException("Call to Supplementary Data API did not return successfully");
+            }
+            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
-//            throw new CcdDataIntegrationException(
-//                    "Couldn't update CCD case supplementary data using API: " + ccdUrl + ccdSupplementaryApiPath,
-//                    e
-//            );
+            throw new CaseCreationException("Call to Supplementary Data API failed with " + e.getMessage());
         }
-
-        log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
     }
-
 }

@@ -282,23 +282,21 @@ public class CaseActionsForCaseWorkerController {
                     ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
             }
         }
-//        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails(), userToken);
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
-
     @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "update pre default values in a case.")
+    @Operation(summary = "Add HMCTSServiceId to supplementary_data on a case.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addServiceId(
             @RequestBody CCDRequest ccdRequest,

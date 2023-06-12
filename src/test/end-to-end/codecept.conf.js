@@ -13,7 +13,6 @@ exports.config = {
             waitForTimeout: 10000,
             ignoreHTTPSErrors: true,
             windowSize: '1920x1080',
-            browser:'firefox'
         },
         REST: {
             endpoint: 'https://idam-api.aat.platform.hmcts.net/loginUser'

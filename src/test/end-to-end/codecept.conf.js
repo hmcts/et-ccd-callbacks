@@ -49,7 +49,7 @@ exports.config = {
                 stdout: './functional-output/console.log',
                 options: {
                     includeScreenshots: true,
-                    reportDir: testConfig.TestOutputDir,
+                    reportDir: testConfig.TestOutputDir || './functional-output',
                     reportFilename: 'ET-ccd-callback-ui-functional-tests',
                     reportTitle: 'ET CCD UI Functional Tests',
                     inline: true,

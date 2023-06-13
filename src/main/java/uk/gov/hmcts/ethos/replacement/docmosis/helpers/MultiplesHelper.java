@@ -76,7 +76,7 @@ public final class MultiplesHelper {
                     .filter(caseId -> caseId.getValue().getEthosCaseReference() != null)
                     .map(caseId -> caseId.getValue().getEthosCaseReference())
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
 
         } else {
 
@@ -96,7 +96,7 @@ public final class MultiplesHelper {
                                     && !caseId.getValue().getEthosCaseReference().trim().equals(""))
                     .filter(distinctByValue(CaseIdTypeItem::getValue))
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
 
         } else {
 
@@ -270,7 +270,7 @@ public final class MultiplesHelper {
             return multipleData.getSubMultipleCollection().stream()
                     .map(subMultipleTypeItem -> subMultipleTypeItem.getValue().getSubMultipleName())
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
 
         } else {
 

@@ -47,11 +47,6 @@ module.exports =  async function () {
     I.click(commonConfig.continueButton);
 
     I.waitForText('ET1 serving', testConfig.TestTimeToWaitForText);
-    I.waitForVisible(commonConfig.continueButton, testConfig.TestTimeToWaitForText);
-    I.see('Case Number:');
-    I.click(commonConfig.submit);
-
-    I.waitForText('ET1 serving', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
     I.see('Documents submitted');
     I.see('We have notified the following parties:');

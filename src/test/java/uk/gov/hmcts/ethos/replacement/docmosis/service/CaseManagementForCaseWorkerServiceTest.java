@@ -846,7 +846,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            assertEquals(respondentSumTypeItem.getValue().getExtensionRequested(), NO);
+            assertEquals(NO, respondentSumTypeItem.getValue().getExtensionRequested(),);
         }
     }
 
@@ -873,7 +873,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setExtensionRequested(YES);
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals(caseData.getRespondentCollection().get(0).getValue().getExtensionRequested(),YES);
+        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getExtensionRequested());
     }
 
     @Test

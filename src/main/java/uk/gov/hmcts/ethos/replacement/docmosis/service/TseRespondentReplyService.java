@@ -1,19 +1,33 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TseRespondentReplyService {
     private final TornadoService tornadoService;
     private final EmailService emailService;
@@ -27,6 +41,43 @@ public class TseRespondentReplyService {
     private String acknowledgementRule92YesEmailTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+
+    /**
+     * Saves the data on the reply page onto the application object.
+     *
+     * @param caseData contains all the case data
+     */
+    public void saveReplyToApplication(CaseData caseData) {
+
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        if (CollectionUtils.isEmpty(applications)) {
+            return;
+        }
+
+        GenericTseApplicationType genericTseApplicationType = TseHelper.getSelectedApplication(caseData);
+
+        if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+            genericTseApplicationType.setRespondCollection(new ArrayList<>());
+        }
+
+        genericTseApplicationType.getRespondCollection().add(TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(
+                        TseRespondType.builder()
+                                .response(caseData.getTseResponseText())
+                                .supportingMaterial(caseData.getTseResponseSupportingMaterial())
+                                .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
+                                .from(RESPONDENT_TITLE)
+                                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                                .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
+                                .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                                .build()
+                ).build());
+
+        genericTseApplicationType.setResponsesCount(
+                String.valueOf(genericTseApplicationType.getRespondCollection().size())
+        );
+    }
 
     public void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
@@ -50,5 +101,21 @@ public class TseRespondentReplyService {
                 : acknowledgementRule92NoEmailTemplateId,
             legalRepEmail,
             TseHelper.getPersonalisationForAcknowledgement(caseDetails, notificationProperties.getExuiUrl()));
+    }
+
+    /**
+     * Clears fields that are used when responding to an application.
+     *
+     * @param caseData contains all the case data
+     */
+    public void resetReplyToApplicationPage(CaseData caseData) {
+        caseData.setTseResponseText(null);
+        caseData.setTseResponseIntro(null);
+        caseData.setTseResponseTable(null);
+        caseData.setTseResponseHasSupportingMaterial(null);
+        caseData.setTseResponseSupportingMaterial(null);
+        caseData.setTseResponseCopyToOtherParty(null);
+        caseData.setTseResponseCopyNoGiveDetails(null);
+        caseData.setTseRespondSelectApplication(null);
     }
 }

@@ -3,27 +3,21 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,11 +26,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 
 class TseHelperTest {
     private CaseData caseData;
@@ -168,62 +162,6 @@ class TseHelperTest {
     }
 
     @Test
-    void saveReplyToApplication_withEmptyList_doesNothing() {
-        caseData.setGenericTseApplicationCollection(null);
-        TseHelper.saveReplyToApplication(caseData);
-        assertNull(caseData.getGenericTseApplicationCollection());
-    }
-
-    @Test
-    void saveReplyToApplication_withApplication_savesReply() {
-        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
-
-        caseData.setTseResponseText("ResponseText");
-        caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
-
-        caseData.setTseResponseHasSupportingMaterial(YES);
-        caseData.setTseResponseCopyToOtherParty(NO);
-        caseData.setTseResponseCopyNoGiveDetails("It's a secret");
-
-        TseHelper.saveReplyToApplication(caseData);
-
-        TseRespondType replyType =
-            caseData.getGenericTseApplicationCollection().get(0).getValue().getRespondCollection().get(0).getValue();
-
-        String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
-
-        assertThat(replyType.getDate(), is(dateNow));
-        assertThat(replyType.getResponse(), is("ResponseText"));
-        assertThat(replyType.getCopyNoGiveDetails(), is("It's a secret"));
-        assertThat(replyType.getHasSupportingMaterial(), is(YES));
-        assertThat(replyType.getCopyToOtherParty(), is(NO));
-        assertThat(replyType.getFrom(), is(RESPONDENT_TITLE));
-        assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename(),
-            is("image.png"));
-    }
-
-    @Test
-    void resetReplyToApplicationPage_resetsData() {
-        caseData.setTseResponseCopyToOtherParty(YES);
-        caseData.setTseResponseCopyNoGiveDetails(YES);
-        caseData.setTseResponseText(YES);
-        caseData.setTseResponseIntro(YES);
-        caseData.setTseResponseTable(YES);
-        caseData.setTseResponseHasSupportingMaterial(YES);
-        caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
-        TseHelper.resetReplyToApplicationPage(caseData);
-
-        assertNull(caseData.getTseResponseText());
-        assertNull(caseData.getTseResponseIntro());
-        assertNull(caseData.getTseResponseTable());
-        assertNull(caseData.getTseResponseHasSupportingMaterial());
-        assertNull(caseData.getTseResponseSupportingMaterial());
-        assertNull(caseData.getTseResponseCopyToOtherParty());
-        assertNull(caseData.getTseResponseCopyNoGiveDetails());
-    }
-
-    @Test
     void getReplyDocumentRequest_generatesData() throws JsonProcessingException {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
@@ -256,13 +194,6 @@ class TseHelperTest {
             + "\"response\":\"response\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
-    }
-
-    private List<GenericTypeItem<DocumentType>> createSupportingMaterial() {
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId("1234");
-        documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument("image.png", "1234").build());
-        return List.of(documentTypeItem);
     }
 
     @Test

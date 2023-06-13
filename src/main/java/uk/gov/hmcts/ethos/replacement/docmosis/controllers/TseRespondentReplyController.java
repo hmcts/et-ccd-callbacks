@@ -47,8 +47,12 @@ public class TseRespondentReplyController {
     private final RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
-        + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
+    private static final String SUBMITTED_BODY = """
+        ### What happens next \r
+        \r
+        You have sent your response to the tribunal%s.\r
+        \r
+        The tribunal will consider all correspondence and let you know what happens next.""";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
 
     /**
@@ -183,12 +187,12 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        TseHelper.saveReplyToApplication(caseData);
+        tseRespondentReplyService.saveReplyToApplication(caseData);
 
         respondentTellSomethingElseService.sendAdminEmail(caseDetails);
         tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
 
-        TseHelper.resetReplyToApplicationPage(caseData);
+        tseRespondentReplyService.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

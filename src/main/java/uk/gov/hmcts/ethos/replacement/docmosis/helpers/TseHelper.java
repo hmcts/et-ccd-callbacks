@@ -20,10 +20,8 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -136,58 +134,6 @@ public final class TseHelper {
                 document
             )
         );
-    }
-
-    /**
-     * Saves the data on the reply page onto the application object.
-     *
-     * @param caseData contains all the case data
-     */
-    public static void saveReplyToApplication(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications)) {
-            return;
-        }
-
-        GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
-
-        if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            genericTseApplicationType.setRespondCollection(new ArrayList<>());
-        }
-
-        genericTseApplicationType.getRespondCollection().add(TseRespondTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(
-                        TseRespondType.builder()
-                                .response(caseData.getTseResponseText())
-                                .supportingMaterial(caseData.getTseResponseSupportingMaterial())
-                                .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
-                                .from(RESPONDENT_TITLE)
-                                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                                .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
-                                .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
-                                .build()
-                ).build());
-
-        genericTseApplicationType.setResponsesCount(
-                String.valueOf(genericTseApplicationType.getRespondCollection().size())
-        );
-    }
-
-    /**
-     * Clears fields that are used when responding to an application.
-     *
-     * @param caseData contains all the case data
-     */
-    public static void resetReplyToApplicationPage(CaseData caseData) {
-        caseData.setTseResponseText(null);
-        caseData.setTseResponseIntro(null);
-        caseData.setTseResponseTable(null);
-        caseData.setTseResponseHasSupportingMaterial(null);
-        caseData.setTseResponseSupportingMaterial(null);
-        caseData.setTseResponseCopyToOtherParty(null);
-        caseData.setTseResponseCopyNoGiveDetails(null);
-        caseData.setTseRespondSelectApplication(null);
     }
 
     /**

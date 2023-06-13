@@ -439,6 +439,11 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    /**
+     * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
+     * @param caseDetails Details on the case
+     * @param accessToken authorisation token for reference data api
+     */
     public void setHmctsServiceIdSupplementary(CaseDetails caseDetails, String accessToken) throws IOException {
         Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
         payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));

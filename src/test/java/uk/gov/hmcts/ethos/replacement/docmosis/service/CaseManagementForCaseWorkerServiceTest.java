@@ -846,7 +846,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            assertEquals(NO, respondentSumTypeItem.getValue().getExtensionRequested(),);
+            assertEquals(NO, respondentSumTypeItem.getValue().getExtensionRequested());
         }
     }
 

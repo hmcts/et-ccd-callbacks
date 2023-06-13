@@ -50,10 +50,7 @@ module.exports = async function (myHMMCTSOrganisation = false) {
         I.seeInField('#repCollection_0_representative_address__detailPostTown', 'Bromley');
         I.seeInField('#repCollection_0_representative_address__detailCountry', 'United Kingdom');
         I.seeInField('#repCollection_0_representative_address__detailPostCode', 'BR1 4NN');
-        I.click(commonConfig.continue);
 
-        I.see('Respondent Representative');
-        I.see('Case Number:');
         I.click(commonConfig.submit);
 
 

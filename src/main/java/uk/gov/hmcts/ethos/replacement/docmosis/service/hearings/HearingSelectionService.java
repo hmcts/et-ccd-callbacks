@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -10,39 +11,69 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ListedHearingData;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class HearingSelectionService {
 
-    public List<DynamicValueType> getHearingSelection(CaseData caseData, String format) {
+    private static final String HEARING_FORMAT = "%s: %s - %s - %s";
+
+    /**
+     * Returns hearing list sorted by datetime only.
+     */
+    public List<DynamicValueType> getHearingSelectionSortedByDateTime(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            return null;
+        }
+
         List<DynamicValueType> values = new ArrayList<>();
         int index = 1;
 
-        if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
-            for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-                HearingType hearingValue = hearing.getValue();
-                for (DateListedTypeItem listing : hearingValue.getHearingDateCollection()) {
-                    String code = listing.getId();
+        List<ListedHearingData> hearingList = caseData.getHearingCollection().stream()
+            .flatMap(hearing -> generateHearingList(hearing).stream())
+            .toList();
 
-                    DynamicFixedListType hearingVenue = hearingValue.getHearingVenue();
+        List<ListedHearingData> sortedHearingList = hearingList.stream()
+                .sorted(Comparator.comparing((ListedHearingData h) -> LocalDateTime.parse(h.getListedDate())))
+                .toList();
 
-                    String venue = hearingVenue == null ? hearingValue.getHearingVenueScotland() :
-                        hearingVenue.getValue().getLabel();
+        for (ListedHearingData listing : sortedHearingList) {
+            String code = listing.getListedId();
 
-                    String date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
-                    String label = String.format(format,
-                            index,
-                            hearingValue.getHearingType(),
-                            venue,
-                            date);
-                    values.add(DynamicValueType.create(code, label));
-                    index++;
-                }
-            }
+            DynamicFixedListType hearingVenue = listing.getHearingVenue();
+
+            String venue = hearingVenue == null ? listing.getHearingVenueScotland() :
+                    hearingVenue.getValue().getLabel();
+
+            String date = UtilHelper.formatLocalDateTime(listing.getListedDate());
+            String label = String.format(
+                    HEARING_FORMAT,
+                    index,
+                    listing.getHearingType(),
+                    venue,
+                    date);
+            values.add(DynamicValueType.create(code, label));
+            index++;
         }
+
         return values;
+    }
+
+    private static List<ListedHearingData> generateHearingList(HearingTypeItem hearing) {
+        HearingType hearingValue = hearing.getValue();
+        return hearingValue.getHearingDateCollection().stream().map(h ->
+                new ListedHearingData(
+                    hearingValue.getHearingType(),
+                    hearingValue.getHearingVenue(),
+                    hearingValue.getHearingVenueScotland(),
+                    h.getId(),
+                    h.getValue().getListedDate()
+                )
+            ).toList();
     }
 
     public List<DynamicValueType> getHearingSelection(CaseData caseData) {
@@ -74,8 +105,7 @@ public class HearingSelectionService {
     }
 
     public HearingType getSelectedHearingAllocateHearing(CaseData caseData) {
-        DynamicFixedListType dynamicFixedListType = caseData.getAllocateHearingHearing();
-        String id = dynamicFixedListType.getValue().getCode();
+        String id = caseData.getAllocateHearingHearing().getValue().getCode();
         for (HearingTypeItem hearing : caseData.getHearingCollection()) {
             for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
                 if (listing.getId().equals(id)) {
@@ -84,7 +114,7 @@ public class HearingSelectionService {
             }
         }
         throw new IllegalStateException(String.format("Selected hearing %s not found in case %s",
-                dynamicFixedListType.getValue().getLabel(), caseData.getEthosCaseReference()));
+            caseData.getAllocateHearingHearing().getValue().getLabel(), caseData.getEthosCaseReference()));
     }
 
     public HearingType getSelectedHearing(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
@@ -96,6 +126,11 @@ public class HearingSelectionService {
         }
         throw new IllegalStateException(String.format("Selected hearing %s not found in case %s",
                 dynamicFixedListType.getValue().getLabel(), caseData.getEthosCaseReference()));
+    }
+
+    public List<DateListedTypeItem> getDateListedItemsFromSelectedHearing(CaseData caseData,
+                                                                         DynamicFixedListType dynamicFixedListType) {
+        return getSelectedHearing(caseData, dynamicFixedListType).getHearingDateCollection();
     }
 
     public DateListedType getSelectedListing(CaseData caseData) {

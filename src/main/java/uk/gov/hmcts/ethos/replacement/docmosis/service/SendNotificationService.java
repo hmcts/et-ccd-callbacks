@@ -72,7 +72,7 @@ public class SendNotificationService {
 
     public void populateHearingSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelection(caseData, "%s: %s - %s - %s"));
+        dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelectionSortedByDateTime(caseData));
         caseData.setSendNotificationSelectHearing(dynamicFixedListType);
     }
 

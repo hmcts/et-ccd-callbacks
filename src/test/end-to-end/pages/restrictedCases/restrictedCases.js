@@ -43,13 +43,10 @@ module.exports = async function () {
     I.selectOption('#restrictedReporting_excludedRegister', commonConfig.excludedFromRegister);
     I.click('#restrictedReporting_deletedPhyRegister_Yes');
     I.fillField('#restrictedReporting_excludedNames', 'Not for Public Release')
-    I.click(commonConfig.continue);
 
-    I.waitForText('Restricted Reporting');
-    I.see('Case Number');
     I.click(commonConfig.submit);
 
-    I.waitForText('has been updated with event: Restricted Reporting');
+    I.waitForText('has been updated with event: Restricted Reporting', testConfig.TestTimeToWaitForText);
     I.see('RULE 50(3)b');
     I.see('REPORTING');
     

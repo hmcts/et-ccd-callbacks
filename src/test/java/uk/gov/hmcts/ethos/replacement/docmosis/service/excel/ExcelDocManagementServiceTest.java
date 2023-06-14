@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -22,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
@@ -31,7 +33,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ExcelDocManagementServiceTest {
 
     @Mock
@@ -49,7 +51,7 @@ public class ExcelDocManagementServiceTest {
     private String userToken;
     private byte[] bytes;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());

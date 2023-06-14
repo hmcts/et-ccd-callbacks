@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -17,7 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -27,7 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class CaseUpdateForCaseWorkerServiceTest {
 
     @InjectMocks
@@ -42,7 +44,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     private DefaultValues englandWalesDefaultValues;
     private DefaultValues scotlandDefaultValues;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         submitEvent = new SubmitEvent();
 
@@ -95,9 +97,10 @@ public class CaseUpdateForCaseWorkerServiceTest {
                 .build();
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void caseCreationEnglandWalesRequestException() throws IOException {
-        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(),
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.startEventForCase(anyString(), anyString(), anyString(),
                 anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(),
                 anyString(), any(), anyString())).thenReturn(submitEvent);

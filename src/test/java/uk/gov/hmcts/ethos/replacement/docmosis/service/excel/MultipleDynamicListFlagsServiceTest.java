@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -13,14 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.SELECT_ALL;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleDynamicListFlagsServiceTest {
 
     @Mock
@@ -32,7 +34,7 @@ public class MultipleDynamicListFlagsServiceTest {
     private TreeMap<String, Object> multipleObjectsDLFlags;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleObjectsDLFlags = MultipleUtil.getMultipleObjectsDLFlags();

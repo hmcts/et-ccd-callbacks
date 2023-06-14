@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -29,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.any;
@@ -48,7 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RequiredArgsConstructor
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleTransferServiceTest {
 
     private String ccdGatewayBaseUrl;
@@ -73,7 +75,7 @@ public class MultipleTransferServiceTest {
     private String userToken;
     private List<String> errors;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdGatewayBaseUrl = null; //NOPMD - suppressed NullAssignment - Null is intentional
         multipleObjects = MultipleUtil.getMultipleObjectsAll();

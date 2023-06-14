@@ -1,12 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -49,10 +51,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -92,7 +94,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.DUNDEE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ListingServiceTest {
 
     @InjectMocks
@@ -113,7 +115,7 @@ public class ListingServiceTest {
     private static final List<DynamicValueType> VENUES = List.of(DynamicValueType.create("venue1", "Venue 1"),
             DynamicValueType.create("venue2", "Venue 2"));
 
-    @Before
+    @BeforeEach
     public void setUp() {
         documentInfo = new DocumentInfo();
         caseDetails = new CaseDetails();
@@ -960,8 +962,9 @@ public class ListingServiceTest {
         assertEquals(expectedHearingsCount, listingDataResult.getListingCollection().size());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void processListingHearings_listedDateNullOrEmpty() throws IOException {
+        assertThrows(Exception.class, () -> {});
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
                 .get(1).getValue().setListedDate(null);
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
@@ -970,9 +973,10 @@ public class ListingServiceTest {
         listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void processListingHearings_causeListDateNull() throws IOException {
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingData = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
         List<ListingTypeItem> listingCollection = listingData.getListingCollection();
@@ -1024,9 +1028,10 @@ public class ListingServiceTest {
         assertEquals(result, listingDataResult.toString());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void processListingHearingsRequestWithException() throws IOException {
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString())).thenThrow(new Exception(ERROR_MESSAGE));
 
         listingService.processListingHearingsRequest(listingDetails, "authToken");
@@ -1042,9 +1047,10 @@ public class ListingServiceTest {
         assertEquals(documentInfo, documentInfo1);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void processHearingDocumentWithException() throws IOException {
-        when(tornadoService.listingGeneration(anyString(), any(), anyString()))
+assertThrows(Exception.class, () -> {});        
+when(tornadoService.listingGeneration(anyString(), any(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         listingService.processHearingDocument(listingDetails.getCaseData(),
                 listingDetails.getCaseTypeId(), "authToken");
@@ -1888,9 +1894,10 @@ public class ListingServiceTest {
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void generateReportDataWithException() throws IOException {
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         listingService.getDateRangeReport(listingDetails, "authToken", "userName");
     }
@@ -1917,8 +1924,8 @@ public class ListingServiceTest {
                 .contains(DynamicValueType.create(ALL_VENUES, ALL_VENUES)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void dynamicVenueListing_invalidCaseType() {
-        listingService.dynamicVenueListing("InvalidCaseType", listingDetails.getCaseData());
+assertThrows(IllegalArgumentException.class, () -> {});        listingService.dynamicVenueListing("InvalidCaseType", listingDetails.getCaseData());
     }
 }

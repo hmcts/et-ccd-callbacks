@@ -2,8 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -64,7 +64,7 @@ public class ReferenceDataControllerTest {
                 .getResource("/exampleV1.json").toURI()));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();

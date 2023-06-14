@@ -9,10 +9,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import java.io.IOException;
@@ -20,11 +22,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ExcelCreationServiceTest {
 
     @InjectMocks
@@ -34,7 +36,7 @@ public class ExcelCreationServiceTest {
 
     private TreeMap<String, Object> multipleObjects;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
     }

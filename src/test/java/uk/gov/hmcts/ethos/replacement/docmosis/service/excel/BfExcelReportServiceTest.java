@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
@@ -21,7 +21,7 @@ public class BfExcelReportServiceTest {
     BfActionReportData reportData;
     ExcelCreationService excelCreationService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         reportData = new BfActionReportData();
         reportData.setReportPeriodDescription("Period description");

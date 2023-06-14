@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class HelperTest {
@@ -29,7 +29,7 @@ public class HelperTest {
     private CaseDetails caseDetailsScot1;
     private CaseDetails caseDetailsScot2;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -16,8 +16,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfigura
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +29,7 @@ public class DefaultValuesReaderServiceTest {
 
     private DefaultValuesReaderService defaultValuesReaderService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         config = mock(CaseDefaultValuesConfiguration.class);
         tribunalOfficesService = mock(TribunalOfficesService.class);

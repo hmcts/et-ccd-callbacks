@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -25,7 +25,7 @@ public class BulkAddSinglesServiceTest {
     private MultipleDetails multipleDetails;
     private static final String AUTH_TOKEN = "some-token";
 
-    @Before
+    @BeforeEach
     public void setup() {
         multipleDetails = createMultipleDetails();
 

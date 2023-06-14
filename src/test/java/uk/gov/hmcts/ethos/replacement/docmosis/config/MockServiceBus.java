@@ -1,6 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.config;
-
-import com.microsoft.azure.servicebus.IQueueClient;
+import org.junit.jupiter.api.extension.ExtendWith;import com.microsoft.azure.servicebus.IQueueClient;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

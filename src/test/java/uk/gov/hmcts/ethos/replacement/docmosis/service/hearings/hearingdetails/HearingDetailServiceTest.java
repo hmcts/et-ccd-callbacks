@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -20,12 +22,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionService
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.NcssCount"})
 public class HearingDetailServiceTest {
 
@@ -34,7 +36,7 @@ public class HearingDetailServiceTest {
     private HearingSelectionService hearingSelectionService;
     private static final String TEST_ID = UUID.randomUUID().toString();
 
-    @Before
+    @BeforeEach
     public void setup() {
         selectedListing = new DateListedType();
         hearingSelectionService = mock(HearingSelectionService.class);

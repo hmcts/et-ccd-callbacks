@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -16,7 +18,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleBatchUpdate1ServiceTest {
 
     @Mock
@@ -29,7 +31,7 @@ public class MultipleBatchUpdate1ServiceTest {
     private MultipleDetails multipleDetails;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleDetails = new MultipleDetails();

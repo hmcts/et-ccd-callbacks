@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
@@ -9,7 +9,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -37,9 +37,9 @@ public class HearingsToJudgmentsCcdDataSourceTest {
         assertEquals(submitEvent, results.get(0));
     }
 
-    @Test(expected = ReportException.class)
+    @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        String authToken = "A test token";
+assertThrows(ReportException.class, () -> {});        String authToken = "A test token";
         String caseTypeId = "A test case type";
         String fromDate = "10-10-2021";
         String toDate = "10-11-2021";

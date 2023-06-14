@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.DOUBLE_SPACE_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.NEW_LINE_ERROR;
 
@@ -21,7 +21,7 @@ public class InvalidCharacterCheckTest {
 
     private CaseDetails caseDetails1;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
     }

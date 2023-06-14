@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
@@ -14,11 +16,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class UserServiceTest {
     @InjectMocks
     private UserService userService;
@@ -27,7 +29,7 @@ public class UserServiceTest {
     private TokenResponse tokenResponse;
     private OAuth2Configuration oauth2Configuration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         userDetails = HelperTest.getUserDetails();
         tokenResponse = HelperTest.getUserToken();

@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 
 import java.text.DecimalFormat;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
@@ -19,7 +19,7 @@ public class MemberDaysReportDocTest {
     MemberDaysReport memberDaysReport;
     MemberDaysReportDetail detailItem;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         memberDaysReport = new MemberDaysReport();
         detailItem = new MemberDaysReportDetail();
@@ -27,9 +27,9 @@ public class MemberDaysReportDocTest {
         memberDaysReportDoc = new MemberDaysReportDoc();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void shouldThrowException() {
-        ListingData nonMemberDaysReportDocListingData = new ListingData();
+assertThrows(IllegalStateException.class, () -> {});        ListingData nonMemberDaysReportDocListingData = new ListingData();
         memberDaysReportDoc.getReportDocPart(nonMemberDaysReportDocListingData);
     }
 

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
@@ -10,7 +10,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -39,9 +39,9 @@ public class HearingsByHearingTypeCcdReportDataSourceTest {
         assertEquals(submitEvent, results.get(0));
     }
 
-    @Test(expected = ReportException.class)
+    @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        String authToken = "token";
+assertThrows(ReportException.class, () -> {});        String authToken = "token";
         String caseTypeId = "caseTypeId_Listings";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         String fromDate = "1-1-2022";

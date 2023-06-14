@@ -2,13 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -45,9 +47,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -73,7 +75,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
     "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
                    "PMD.TooManyFields", "PMD.CyclomaticComplexity"})
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 class CaseManagementForCaseWorkerServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -818,9 +820,10 @@ class CaseManagementForCaseWorkerServiceTest {
                 new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(1).getValue().getCounterClaim());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void linkOriginalCaseECCException() throws IOException {
-        when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
+assertThrows(Exception.class, () -> {});        
+when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         when(ccdClient.submitEventForCase(

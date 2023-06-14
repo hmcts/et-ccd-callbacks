@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -21,7 +23,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleCasesReadingServiceTest {
 
     @Mock
@@ -33,7 +35,7 @@ public class MultipleCasesReadingServiceTest {
     private String userToken;
     private List<SubmitMultipleEvent> submitMultipleEvents;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -57,9 +59,10 @@ public class MultipleCasesReadingServiceTest {
         verifyNoMoreInteractions(ccdClient);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void retrieveMultipleCasesWithRetriesException() throws IOException {
-        when(ccdClient.retrieveMultipleCasesElasticSearchWithRetries(userToken,
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveMultipleCasesElasticSearchWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -87,9 +90,10 @@ public class MultipleCasesReadingServiceTest {
         verifyNoMoreInteractions(ccdClient);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void retrieveMultipleCasesException() throws IOException {
-        when(ccdClient.retrieveMultipleCasesElasticSearch(userToken,
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveMultipleCasesElasticSearch(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));

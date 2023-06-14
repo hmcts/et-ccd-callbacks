@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -12,7 +14,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -25,7 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BATCH_UPDATE_TYPE_3
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleUpdateServiceTest {
 
     @Mock
@@ -44,7 +46,7 @@ public class MultipleUpdateServiceTest {
     private MultipleDetails multipleDetails;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleDetails = new MultipleDetails();

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -12,7 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VenueAddressRe
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -23,7 +23,7 @@ public class VenueAddressReaderServiceTest {
     private VenueAddressesService venueAddressesService;
     private VenueAddressReaderService venueAddressReaderService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         venueAddressesService = mock(VenueAddressesService.class);
         venueAddressReaderService = new VenueAddressReaderService(venueAddressesService);
@@ -190,9 +190,9 @@ public class VenueAddressReaderServiceTest {
         assertEquals("Manchester1", resultAddress);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getVenueAddressForHearing_HearingVenueNotFound() {
-        // Arrange
+assertThrows(IllegalArgumentException.class, () -> {});        // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow3");
         venueAddress.setAddress("");
@@ -206,9 +206,9 @@ public class VenueAddressReaderServiceTest {
         venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
     }
 
-    @Test(expected = VenueAddressReaderException.class)
+    @Test
     public void getVenueAddressForHearing_HearingVenueEmpty() {
-        // Arrange
+assertThrows(VenueAddressReaderException.class, () -> {});        // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow4");
         venueAddress.setAddress("");
@@ -223,9 +223,9 @@ public class VenueAddressReaderServiceTest {
         venueAddressReaderService.getVenueAddress(hearing, SCOTLAND_CASE_TYPE_ID, officeName);
     }
 
-    @Test(expected = VenueAddressReaderException.class)
+    @Test
     public void getVenueAddressForHearing_ThrowsAddressReaderException() {
-        // Arrange
+assertThrows(VenueAddressReaderException.class, () -> {});        // Arrange
         List<VenueAddress> venueAddressList = new ArrayList<>();
         String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
@@ -237,9 +237,9 @@ public class VenueAddressReaderServiceTest {
                 ENGLANDWALES_CASE_TYPE_ID, officeName);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getVenueAddressForHearing_ThrowsArgumentException() {
-        // Arrange
+assertThrows(IllegalArgumentException.class, () -> {});        // Arrange
         HearingType hearing = new HearingType();
 
         // Act

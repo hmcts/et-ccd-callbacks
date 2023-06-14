@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -11,7 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,9 +36,9 @@ public class ExcelFileSingleCasesImporterTest {
         }
     }
 
-    @Test(expected = ImportException.class)
+    @Test
     public void shouldThrowImportException() throws ImportException, IOException {
-        String downloadUrl = "a-test-download-url";
+assertThrows(ImportException.class, () -> {});        String downloadUrl = "a-test-download-url";
         MultipleData multipleData = createMultipleData(downloadUrl);
         String authToken = "some-token";
         ExcelReadingService excelReadingService = mock(ExcelReadingService.class);

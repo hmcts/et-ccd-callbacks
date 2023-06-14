@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
@@ -22,11 +24,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_ALL_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class SubMultipleServiceTest {
 
     @InjectMocks
@@ -36,7 +38,7 @@ public class SubMultipleServiceTest {
 
     private BulkDetails bulkDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         BulkData bulkData = new BulkData();
         bulkDetails = new BulkDetails();

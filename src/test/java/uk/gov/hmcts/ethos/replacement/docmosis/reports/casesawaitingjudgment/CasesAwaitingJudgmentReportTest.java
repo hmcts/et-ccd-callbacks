@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
@@ -13,7 +13,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -47,7 +47,7 @@ public class CasesAwaitingJudgmentReportTest {
         validPositionType = CasesAwaitingJudgmentReport.VALID_POSITION_TYPES.stream().findAny().orElseThrow();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         submitEvents.clear();
 

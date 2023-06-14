@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims;
 
 import org.assertj.core.util.Strings;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
@@ -32,7 +32,7 @@ public class ServingClaimsReportTest {
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         listingDetails = new ListingDetails();
         ListingData listingDataRange = new ListingData();

@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -18,7 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -26,7 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class CaseCreationForCaseWorkerServiceTest {
 
     @InjectMocks
@@ -37,7 +39,7 @@ public class CaseCreationForCaseWorkerServiceTest {
     private SubmitEvent submitEvent;
     private String authToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdRequest = new CCDRequest();
         CaseData caseData = MultipleUtil.getCaseData("2123456/2020");
@@ -58,9 +60,10 @@ public class CaseCreationForCaseWorkerServiceTest {
         authToken = "authToken";
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void caseCreationRequestException() throws IOException {
-        when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
         caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
     }

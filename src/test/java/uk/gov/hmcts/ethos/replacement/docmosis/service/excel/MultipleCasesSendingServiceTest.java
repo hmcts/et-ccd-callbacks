@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleCasesSendingServiceTest {
 
     @Mock
@@ -32,7 +33,7 @@ public class MultipleCasesSendingServiceTest {
     private String userToken;
     private CCDRequest ccdRequest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -66,9 +67,10 @@ public class MultipleCasesSendingServiceTest {
         verifyNoMoreInteractions(ccdClient);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void sendUpdateToMultipleException() throws IOException {
-        when(ccdClient.startBulkAmendEventForCase(userToken,
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.startBulkAmendEventForCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
                 multipleDetails.getCaseId()))

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -18,7 +18,7 @@ public class NotificationHelperTest {
     private CaseData caseData;
     private CaseDetails caseDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")

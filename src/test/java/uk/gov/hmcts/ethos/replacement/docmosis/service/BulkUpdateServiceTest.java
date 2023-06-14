@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
@@ -41,8 +43,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -53,7 +55,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class BulkUpdateServiceTest {
 
     @InjectMocks
@@ -73,7 +75,7 @@ public class BulkUpdateServiceTest {
     private SubmitBulkEvent submitBulkEvent;
     private BulkRequestPayload bulkRequestPayload;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdRequest = new CCDRequest();
         BulkData bulkData = new BulkData();
@@ -127,9 +129,10 @@ public class BulkUpdateServiceTest {
         bulkRequestPayload.setBulkDetails(bulkDetails);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void caseUpdateFieldsRequestException() throws IOException {
-        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(),
@@ -211,9 +214,10 @@ public class BulkUpdateServiceTest {
                 "authToken").getBulkDetails() != null);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void bulkUpdateLogicException() throws IOException {
-        SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
+assertThrows(Exception.class, () -> {});        
+SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
         submitBulkEvent.setCaseData(bulkData);

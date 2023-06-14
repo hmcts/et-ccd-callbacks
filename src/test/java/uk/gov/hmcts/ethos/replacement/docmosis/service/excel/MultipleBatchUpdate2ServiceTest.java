@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleBatchUpdate2ServiceTest {
 
     @Mock
@@ -47,7 +49,7 @@ public class MultipleBatchUpdate2ServiceTest {
     private String userToken;
     private List<SubmitMultipleEvent> submitMultipleEvents;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleObjects = MultipleUtil.getMultipleObjectsAll();

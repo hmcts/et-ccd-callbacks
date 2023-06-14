@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,7 +25,7 @@ public class BulkAddSinglesValidatorTest {
     private List<String> ethosCaseReferences;
     private List<ValidatedSingleCase> validatedSingleCases;
 
-    @Before
+    @BeforeEach
     public void setup() throws ImportException, IOException {
         multipleDetails = createMultipleDetails();
         ethosCaseReferences = new ArrayList<>();

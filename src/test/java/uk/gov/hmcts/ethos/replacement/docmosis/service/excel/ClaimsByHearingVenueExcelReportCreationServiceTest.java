@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
@@ -18,7 +18,7 @@ public class ClaimsByHearingVenueExcelReportCreationServiceTest {
     ExcelCreationService excelCreationService;
     ClaimsByHearingVenueReportData reportData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         reportData = new ClaimsByHearingVenueReportData();
         ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();

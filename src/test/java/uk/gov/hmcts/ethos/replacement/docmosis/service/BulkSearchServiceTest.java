@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
@@ -33,14 +35,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class BulkSearchServiceTest {
 
     @InjectMocks
@@ -53,7 +55,7 @@ public class BulkSearchServiceTest {
     private BulkDetails bulkDetails;
     private SubmitEvent submitEvent;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         bulkRequest = new BulkRequest();
         bulkDetails = new BulkDetails();
@@ -318,9 +320,10 @@ public class BulkSearchServiceTest {
         assertEquals(result, bulkRequestPayload.getBulkDetails().toString());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void searchCasesByFieldsRequestException() {
-        List<MidSearchTypeItem> midSearchedListExpected = new ArrayList<>();
+assertThrows(Exception.class, () -> {});        
+List<MidSearchTypeItem> midSearchedListExpected = new ArrayList<>();
         List<MultipleTypeItem> multipleTypeItemToSearchBy = new ArrayList<>();
         List<MidSearchTypeItem> midSearchedList = bulkSearchService.midSearchCasesByFieldsRequest(
                 multipleTypeItemToSearchBy, new BulkDetails(), false);

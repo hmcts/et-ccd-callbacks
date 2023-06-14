@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
@@ -43,7 +45,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -57,7 +59,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.succe
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.successfulDocumentManagementUploadResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.unsuccessfulDocumentManagementUploadResponse;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class DocumentManagementServiceTest {
 
     @Mock
@@ -86,7 +88,7 @@ public class DocumentManagementServiceTest {
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String AUTH_TOKEN = "Bearer authToken";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         file = createTestFile();
         markup = "<a target=\"_blank\" href=\"null/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\">Document</a>";
@@ -146,9 +148,9 @@ public class DocumentManagementServiceTest {
         assertEquals("xslx", uploadedDocument.getContentType());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void downloadFileException() {
-        when(documentDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString()))
+assertThrows(IllegalStateException.class, () -> {});        when(documentDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(new ResponseEntity<>(HttpStatus.BAD_GATEWAY));
         documentManagementService.downloadFile("authString",
                 "documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");

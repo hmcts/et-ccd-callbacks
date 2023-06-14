@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -34,7 +36,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleLetterServiceTest {
 
     @Mock
@@ -57,7 +59,7 @@ public class MultipleLetterServiceTest {
     private List<LabelPayloadEvent> labelPayloadEvents;
     private List<String> errors;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleDetails = new MultipleDetails();
@@ -91,9 +93,10 @@ public class MultipleLetterServiceTest {
         verifyNoMoreInteractions(singleCasesReadingService);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void bulkLetterLogicException() throws IOException {
-        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+assertThrows(Exception.class, () -> {});        
+when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),

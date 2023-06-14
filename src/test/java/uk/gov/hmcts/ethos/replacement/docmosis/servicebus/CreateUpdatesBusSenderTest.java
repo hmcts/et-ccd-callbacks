@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.servicebus;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationDataModel;
@@ -20,7 +22,7 @@ import static org.mockito.Mockito.doThrow;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class CreateUpdatesBusSenderTest {
 
     @InjectMocks
@@ -34,7 +36,7 @@ public class CreateUpdatesBusSenderTest {
 
     private List<String> ethosCaseRefCollection;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         createUpdatesBusSender = new CreateUpdatesBusSender(serviceBusSender);
         ethosCaseRefCollection = Arrays.asList("4150001/2020", "4150002/2020",

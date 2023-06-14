@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -57,9 +57,9 @@ public class NoPositionChangeCcdDataSourceTests {
         assertEquals(0, results.size());
     }
 
-    @Test(expected = ReportException.class)
+    @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        String authToken = "A test token";
+assertThrows(ReportException.class, () -> {});        String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         String reportDate = "2021-07-10";
@@ -103,9 +103,9 @@ public class NoPositionChangeCcdDataSourceTests {
         assertEquals(0, results.size());
     }
 
-    @Test(expected = ReportException.class)
+    @Test
     public void shouldThrowReportExceptionWhenMultipleSearchFails() throws IOException {
-        String authToken = "A test token";
+assertThrows(ReportException.class, () -> {});        String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(MultipleCaseSearchResult.class)))

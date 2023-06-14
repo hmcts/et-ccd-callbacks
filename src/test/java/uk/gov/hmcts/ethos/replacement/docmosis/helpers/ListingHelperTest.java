@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
@@ -77,7 +77,7 @@ class ListingHelperTest {
     private ListingDetails listingDetails4;
     private UserDetails userDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         listingDetails = generateListingDetails("listingDetailsTest1.json");
         listingDetails2 = generateListingDetails("listingDetailsTest2.json");

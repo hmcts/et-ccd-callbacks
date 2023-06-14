@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -20,7 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.J
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -35,7 +35,7 @@ public class ScotlandAllocatedHearingServiceTest {
     private HearingType selectedHearing;
     private DateListedType selectedListing;
 
-    @Before
+    @BeforeEach
     public void setup() {
         caseData = createCaseData();
 

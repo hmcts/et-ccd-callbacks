@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.reference.ReferenceData;
@@ -27,7 +29,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ReferenceServiceTest {
 
     @Mock
@@ -43,7 +45,7 @@ public class ReferenceServiceTest {
     private List<ReferenceSubmitEvent> referenceSubmitEventsNoClerks;
     private List<ReferenceSubmitEvent> referenceSubmitEventsNoJudges;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         caseDetails = new CaseDetails();
@@ -149,9 +151,10 @@ public class ReferenceServiceTest {
         assertNotNull(caseDataResult);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void fetchHearingVenueRefDataException() throws IOException {
-        when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         referenceService.fetchHearingVenueRefData(caseDetails, "authToken");
     }
@@ -197,9 +200,10 @@ public class ReferenceServiceTest {
         assertNotNull(caseDataResult);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void fetchDateListedRefDataException() throws IOException {
-        when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         referenceService.fetchDateListedRefData(caseDetails, "authToken");
     }

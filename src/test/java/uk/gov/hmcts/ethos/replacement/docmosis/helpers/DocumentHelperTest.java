@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -65,7 +65,7 @@ public class DocumentHelperTest {
     private UserDetails userDetails;
     private VenueAddressReaderService venueAddressReaderService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails2 = generateCaseDetails("caseDetailsTest2.json");

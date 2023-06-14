@@ -1,12 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -22,9 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -34,7 +36,7 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_ERROR;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ExcelReadingServiceTest {
 
     @Mock
@@ -50,7 +52,7 @@ public class ExcelReadingServiceTest {
     private MultipleData multipleData;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         documentBinaryUrl = "http://127.0.0.1:3453/documents/20d8a494-4232-480a-aac3-23ad0746c07b/binary";
         errors = new ArrayList<>();
@@ -159,9 +161,9 @@ public class ExcelReadingServiceTest {
         assertEquals(1, errors.size());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void readExcelException() throws IOException {
-
+assertThrows(Exception.class, () -> {});
         body = new ClassPathResource(TESTING_FILE_NAME_ERROR);
         when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
                 .thenThrow(new IOException());

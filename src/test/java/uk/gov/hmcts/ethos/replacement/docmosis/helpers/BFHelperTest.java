@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 public class BFHelperTest {
@@ -21,7 +21,7 @@ public class BFHelperTest {
     private CaseData caseData;
     private List<BFActionTypeItem> bfActionTypeItemList;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseData = MultipleUtil.getCaseData("245000/2021");
         bfActionTypeItemList = generateBFActionTypeItems();

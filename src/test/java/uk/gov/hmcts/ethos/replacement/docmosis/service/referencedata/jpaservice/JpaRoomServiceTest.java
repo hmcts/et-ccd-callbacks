@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Room;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.RoomRepository;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

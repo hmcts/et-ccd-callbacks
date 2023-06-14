@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TornadoConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.MockHttpURLConnectionFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 

@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
@@ -32,8 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -45,7 +47,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class DocumentGenerationServiceTest {
 
     @InjectMocks
@@ -67,7 +69,7 @@ public class DocumentGenerationServiceTest {
     @Mock
     private CcdClient ccdClient;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         caseDetails9 = generateCaseDetails("caseDetailsTest9.json");
@@ -378,9 +380,10 @@ public class DocumentGenerationServiceTest {
         assertEquals(documentInfo, documentInfo1);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void processDocumentRequestException() throws IOException {
-        when(tornadoService.documentGeneration(
+assertThrows(Exception.class, () -> {});        
+when(tornadoService.documentGeneration(
                 anyString(), any(), anyString(), any(), any(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         documentGenerationService.processDocumentRequest(ccdRequest, "authToken");
@@ -417,9 +420,10 @@ public class DocumentGenerationServiceTest {
                 + "generate letters], documentInfo=null)", bulkDocumentInfo1.toString());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void processBulkDocumentRequestException() throws IOException {
-        SubmitEvent submitEvent = new SubmitEvent();
+assertThrows(Exception.class, () -> {});        
+SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseId(1);
         submitEvent.setCaseData(new CaseData());
         List<SubmitEvent> submitEvents = Collections.singletonList(submitEvent);
@@ -453,9 +457,10 @@ public class DocumentGenerationServiceTest {
                 bulkDocumentInfo1.toString());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void processBulkScheduleRequestException() throws IOException {
-        when(tornadoService.scheduleGeneration(anyString(), any(), anyString()))
+assertThrows(Exception.class, () -> {});        
+when(tornadoService.scheduleGeneration(anyString(), any(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         documentGenerationService.processBulkScheduleRequest(bulkRequest, "authToken");
     }

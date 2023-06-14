@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -9,7 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
 
 public class HearingSelectionServiceTest {
@@ -62,9 +62,9 @@ public class HearingSelectionServiceTest {
         assertEquals("3", selectedHearing.getHearingNumber());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testGetSelectedHearingNotFound() {
-        CaseData caseData = createCaseData();
+assertThrows(IllegalStateException.class, () -> {});        CaseData caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id5"));
@@ -87,9 +87,9 @@ public class HearingSelectionServiceTest {
         assertEquals("1970-01-07T10:00:00.000", selectedListing.getListedDate());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testGetListingsNotFound() {
-        CaseData caseData = createCaseData();
+assertThrows(IllegalStateException.class, () -> {});        CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         caseData.setAllocateHearingHearing(new DynamicFixedListType("id5"));
         hearingSelectionService.getSelectedListing(caseData);

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -27,7 +27,7 @@ public class UploadDocumentHelperTest {
     CaseDetails caseDetails;
     CaseData caseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")

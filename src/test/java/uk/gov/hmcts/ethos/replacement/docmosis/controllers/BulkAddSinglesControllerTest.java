@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
@@ -13,7 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles.
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,7 +25,7 @@ public class BulkAddSinglesControllerTest {
     private MultipleRequest multipleRequest;
     private String authToken;
 
-    @Before
+    @BeforeEach
     public void setup() {
         bulkAddSinglesValidator = mock(BulkAddSinglesValidator.class);
         bulkAddSinglesService = mock(BulkAddSinglesService.class);

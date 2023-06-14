@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -29,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
@@ -41,7 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MultipleHelperServiceTest {
 
     @Mock
@@ -68,7 +70,7 @@ public class MultipleHelperServiceTest {
     private TreeMap<String, Object> multipleObjects;
     private String gatewayURL;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         gatewayURL = "https://manage-case.test.platform.hmcts.net";
         ReflectionTestUtils.setField(multipleHelperService, "ccdGatewayBaseUrl", gatewayURL);

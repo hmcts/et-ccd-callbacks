@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -17,13 +19,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class CaseRetrievalForCaseWorkerServiceTest {
 
     @InjectMocks
@@ -33,7 +35,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     private CCDRequest ccdRequest;
     private SubmitEvent submitEvent;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         CaseDetails caseDetails;
         ccdRequest = new CCDRequest();
@@ -45,9 +47,10 @@ public class CaseRetrievalForCaseWorkerServiceTest {
         caseRetrievalForCaseWorkerService = new CaseRetrievalForCaseWorkerService(ccdClient);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void caseRetrievalRequestException() throws IOException {
-        when(ccdClient.retrieveCase(anyString(), anyString(),
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveCase(anyString(), anyString(),
                 anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         caseRetrievalForCaseWorkerService.caseRetrievalRequest(
                 "authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -62,9 +65,10 @@ public class CaseRetrievalForCaseWorkerServiceTest {
         assertEquals(submitEvent, submitEvent1);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void casesRetrievalRequestException() throws IOException {
-        when(ccdClient.retrieveCases(anyString(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveCases(anyString(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, "authToken");
     }
 
@@ -77,9 +81,10 @@ public class CaseRetrievalForCaseWorkerServiceTest {
         assertEquals(submitEventList, submitEventList1);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void casesRetrievalESRequestException() throws IOException {
-        when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
+assertThrows(Exception.class, () -> {});        
+when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
                 ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")));

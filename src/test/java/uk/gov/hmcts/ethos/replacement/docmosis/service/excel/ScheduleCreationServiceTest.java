@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -21,7 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_DETAILED_CONFIG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper.NOT_ALLOCATED;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ScheduleCreationServiceTest {
 
     @InjectMocks
@@ -32,7 +34,7 @@ public class ScheduleCreationServiceTest {
     private MultipleDetails multipleDetails;
     private List<SchedulePayload> schedulePayloads;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleObjectsSubMultiple = MultipleUtil.getMultipleObjectsSubMultiple();

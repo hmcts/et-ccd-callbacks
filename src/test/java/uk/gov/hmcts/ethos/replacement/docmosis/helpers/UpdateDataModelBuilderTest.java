@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -18,8 +18,8 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
 public class UpdateDataModelBuilderTest {
@@ -34,7 +34,7 @@ public class UpdateDataModelBuilderTest {
     private static final String RESPONDENT_REPRESENTATIVE_NAME = "Lionel Hutz";
     private static final String UNKNOWN_VALUE = "Unknown";
 
-    @Before
+    @BeforeEach
     public void setup() {
         caseData = new CaseData();
 

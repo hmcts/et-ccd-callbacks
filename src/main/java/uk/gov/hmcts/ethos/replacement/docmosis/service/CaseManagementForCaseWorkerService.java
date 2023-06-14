@@ -1,10 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -23,13 +27,16 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,6 +44,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
+import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -59,6 +67,8 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
+    private final AuthTokenGenerator serviceAuthTokenGenerator;
+    private final String hmctsServiceId;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -66,13 +76,18 @@ public class CaseManagementForCaseWorkerService {
     private static final String CASE_NOT_FOUND_MESSAGE = "Case Reference Number not found.";
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
+    public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
-                                              CcdClient ccdClient, ClerkService clerkService) {
+                                              CcdClient ccdClient, ClerkService clerkService,
+                                              AuthTokenGenerator serviceAuthTokenGenerator,
+                                              @Value("${hmcts_service_id}") String hmctsServiceId) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
+        this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
+        this.hmctsServiceId = hmctsServiceId;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -425,4 +440,28 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    /**
+     * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
+     * @param caseDetails Details on the case
+     * @param accessToken authorisation token for reference data api
+     */
+    public void setHmctsServiceIdSupplementary(CaseDetails caseDetails, String accessToken) throws IOException {
+        Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
+        payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
+
+        Map<String, Object> payload = Maps.newHashMap();
+        payload.put("supplementary_data_updates", payloadData);
+        String errorMessage = String.format("Call to Supplementary Data API failed for %s", caseDetails.getCaseId());
+
+        try {
+            ResponseEntity<Object> response =
+                    ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
+            if (response == null) {
+                throw new CaseCreationException(errorMessage);
+            }
+            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+        } catch (RestClientResponseException e) {
+            throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
+        }
+    }
 }

@@ -959,7 +959,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         Exception e = assertThrows(CaseCreationException.class,
                 () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
-        assertEquals("Call to Supplementary Data API did not return successfully", e.getMessage());
+        assertEquals("Call to Supplementary Data API failed for 123456789", e.getMessage());
     }
 
     @Test
@@ -973,7 +973,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         Exception e = assertThrows(CaseCreationException.class,
                 () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
-        assertEquals("Call to Supplementary Data API failed with call failed", e.getMessage());
+        assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", e.getMessage());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

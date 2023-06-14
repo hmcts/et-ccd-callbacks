@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -450,15 +451,17 @@ public class CaseManagementForCaseWorkerService {
 
         Map<String, Object> payload = Maps.newHashMap();
         payload.put("supplementary_data_updates", payloadData);
+        String errorMessage = String.format("Call to Supplementary Data API failed for %s", caseDetails.getCaseId());
 
         try {
-            var response = ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
+            ResponseEntity<Object> response =
+                    ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
             if (response == null) {
-                throw new CaseCreationException("Call to Supplementary Data API did not return successfully");
+                throw new CaseCreationException(errorMessage);
             }
             log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
-            throw new CaseCreationException("Call to Supplementary Data API failed with " + e.getMessage());
+            throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
     }
 }

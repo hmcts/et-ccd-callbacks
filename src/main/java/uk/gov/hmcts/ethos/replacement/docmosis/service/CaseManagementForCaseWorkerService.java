@@ -67,6 +67,7 @@ public class CaseManagementForCaseWorkerService {
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
+    private final String hmctsServiceId;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -75,7 +76,6 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
-    private String hmctsServiceId;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,

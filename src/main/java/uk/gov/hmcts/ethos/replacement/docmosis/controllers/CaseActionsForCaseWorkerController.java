@@ -301,8 +301,6 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> addServiceId(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) throws IOException {
-        log.info("PRE DEFAULT VALUES ---> " + LOG_MESSAGE);
-
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

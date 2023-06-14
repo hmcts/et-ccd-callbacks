@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -69,7 +70,7 @@ class TseRespondentReplyServiceTest {
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         doNothing().when(emailService).sendEmail(any(), any(), any());
 
-        mockStatic = mockStatic(TseHelper.class);
+        mockStatic = mockStatic(TseHelper.class, Mockito.CALLS_REAL_METHODS);
         mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any()))
                 .thenReturn(Collections.emptyMap());
         mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any()))

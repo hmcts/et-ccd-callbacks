@@ -1663,6 +1663,8 @@ public class CaseActionsForCaseWorkerControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(caseManagementForCaseWorkerService, times(1))
+                .setHmctsServiceIdSupplementary(any(), any());
     }
 
     @Test

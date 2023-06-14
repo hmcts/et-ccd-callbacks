@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -59,7 +60,7 @@ public class NoPositionChangeCcdDataSourceTests {
 
     @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-assertThrows(ReportException.class, () -> {});        String authToken = "A test token";
+        String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         String reportDate = "2021-07-10";
@@ -68,8 +69,10 @@ assertThrows(ReportException.class, () -> {});        String authToken = "A test
                 .thenThrow(new IOException());
 
         NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
-        fail("Should throw exception instead");
+
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice)
+        );
     }
 
     @Test
@@ -105,14 +108,16 @@ assertThrows(ReportException.class, () -> {});        String authToken = "A test
 
     @Test
     public void shouldThrowReportExceptionWhenMultipleSearchFails() throws IOException {
-assertThrows(ReportException.class, () -> {});        String authToken = "A test token";
+        String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(MultipleCaseSearchResult.class)))
                 .thenThrow(new IOException());
 
         NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>());
-        fail("Should throw exception instead");
+
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>())
+        );
     }
 }

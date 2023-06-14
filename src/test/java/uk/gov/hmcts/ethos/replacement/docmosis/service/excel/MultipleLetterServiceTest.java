@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -95,8 +96,7 @@ public class MultipleLetterServiceTest {
 
     @Test
     public void bulkLetterLogicException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
@@ -105,16 +105,20 @@ when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), a
                 .thenReturn(submitEvents.get(0));
         when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any()))
                 .thenThrow(new IOException());
-        multipleLetterService.bulkLetterLogic(userToken,
-                multipleDetails,
-                errors,
-                false);
+
+        assertThrows(Exception.class, () ->
+                multipleLetterService.bulkLetterLogic(userToken,
+                        multipleDetails,
+                        errors,
+                        false)
+        );
+
         verify(singleCasesReadingService, times(1)).retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleObjectsFlags.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource());
         verifyNoMoreInteractions(singleCasesReadingService);
-    }
+}
 
     @Test
     public void bulkLetterLogicWithoutCases() {

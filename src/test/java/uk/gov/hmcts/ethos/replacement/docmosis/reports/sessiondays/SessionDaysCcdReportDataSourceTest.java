@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,7 @@ public class SessionDaysCcdReportDataSourceTest {
 
     @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-assertThrows(ReportException.class, () -> {});        String authToken = "token";
+        String authToken = "token";
         String caseTypeId = "caseTypeId";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         String fromDate = "1-1-2022";
@@ -48,8 +49,9 @@ assertThrows(ReportException.class, () -> {});        String authToken = "token"
         when(ccdClient.sessionDaysSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
         SessionDaysCcdReportDataSource ccdReportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate);
-        fail("Should throw exception instead");
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate)
+        );
     }
 
 }

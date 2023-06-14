@@ -3,12 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -98,19 +98,17 @@ public class CaseUpdateForCaseWorkerServiceTest {
     }
 
     @Test
-    public void caseCreationEnglandWalesRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.startEventForCase(anyString(), anyString(), anyString(),
+    void caseCreationEnglandWalesRequestException() throws IOException {
+        // Test rethrowing exceptions
+        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(),
                 anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(ccdClient.submitEventForCase(anyString(), any(), anyString(),
-                anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName()))
-                .thenReturn(englandWalesDefaultValues);
-        caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken");
+        assertThrows(CaseCreationException.class, () ->
+                caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken")
+        );
     }
 
     @Test
-    public void caseCreationEnglandWalesRequest() throws IOException {
+    void caseCreationEnglandWalesRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(),
                 anyString(), anyString())).thenReturn(englandWalesCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(),
@@ -124,7 +122,7 @@ when(ccdClient.startEventForCase(anyString(), anyString(), anyString(),
     }
 
     @Test
-    public void caseCreationScotlandRequest() throws IOException {
+    void caseCreationScotlandRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(),
                 anyString(), anyString())).thenReturn(scotlandCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(),

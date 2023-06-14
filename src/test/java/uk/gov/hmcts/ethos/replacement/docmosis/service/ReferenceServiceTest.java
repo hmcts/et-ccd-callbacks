@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.reference.ReferenceData;
 import uk.gov.hmcts.ecm.common.model.reference.ReferenceDetails;
@@ -24,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -153,11 +153,13 @@ public class ReferenceServiceTest {
 
     @Test
     public void fetchHearingVenueRefDataException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
+    assertThrows(Exception.class, () -> {
+        when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         referenceService.fetchHearingVenueRefData(caseDetails, "authToken");
-    }
+
+    });
+}
 
     @Test
     public void fetchDateListedRefDataWithAllRefDataPresent() throws IOException {
@@ -202,10 +204,11 @@ when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString())
 
     @Test
     public void fetchDateListedRefDataException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
+        when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        referenceService.fetchDateListedRefData(caseDetails, "authToken");
-    }
 
+        assertThrows(Exception.class, () ->
+                referenceService.fetchDateListedRefData(caseDetails, "authToken")
+        );
+    }
 }

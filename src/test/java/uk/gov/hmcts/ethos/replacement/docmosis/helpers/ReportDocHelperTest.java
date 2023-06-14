@@ -54,8 +54,9 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
@@ -246,37 +247,47 @@ public class ReportDocHelperTest {
 
     @Test
     public void testCasesAwaitingJudgementInvalidListingData() {
-assertThrows(IllegalStateException.class, () -> {});        ListingData listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
-        ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails)
+        );
     }
 
     @Test
-    public void shouldThrowIllegalStateExceptionForHearingsByHearingTypeReportDataType() throws Exception {
-assertThrows(IllegalStateException.class, () -> {});        ListingData hearingsByHearingType = new EccReportData("test office");
+    public void shouldThrowIllegalStateExceptionForHearingsByHearingTypeReportDataType() {
+        ListingData hearingsByHearingType = new EccReportData("test office");
         hearingsByHearingType.setReportType(HEARINGS_BY_HEARING_TYPE_REPORT);
-        ReportDocHelper.buildReportDocumentContent(hearingsByHearingType, "access-key", "template-name", userDetails);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(hearingsByHearingType, "access-key", "template-name", userDetails)
+        );
     }
 
     @Test
-    public void shouldThrowIllegalStateExceptionForRespondentsReportDataType() throws Exception {
-assertThrows(IllegalStateException.class, () -> {});        ListingData respondentsReportData = new EccReportData("test Respondents Report office");
+    public void shouldThrowIllegalStateExceptionForRespondentsReportDataType() {
+        ListingData respondentsReportData = new EccReportData("test Respondents Report office");
         respondentsReportData.setReportType(RESPONDENTS_REPORT);
-        ReportDocHelper.buildReportDocumentContent(respondentsReportData, "access-key", "template-name", userDetails);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(respondentsReportData, "access-key", "template-name", userDetails)
+        );
     }
 
     @Test
-    public void shouldThrowIllegalStateExceptionForSessionDaysReportDataType() throws Exception {
-assertThrows(IllegalStateException.class, () -> {});        ListingData sessionDaysReportData = new EccReportData("test sessionDays Report office");
+    public void shouldThrowIllegalStateExceptionForSessionDaysReportDataType() {
+        ListingData sessionDaysReportData = new EccReportData("test sessionDays Report office");
         sessionDaysReportData.setReportType(SESSION_DAYS_REPORT);
-        ReportDocHelper.buildReportDocumentContent(sessionDaysReportData, "access-key", "template-name", userDetails);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(sessionDaysReportData, "access-key", "template-name", userDetails)
+        );
     }
 
     @Test
-    public void shouldThrowIllegalStateExceptionForEccReportDataType() throws Exception {
-assertThrows(IllegalStateException.class, () -> {});        ListingData eccReportData = new SessionDaysReportData(new SessionDaysReportSummary("test office"));
+    public void shouldThrowIllegalStateExceptionForEccReportDataType() {
+        ListingData eccReportData = new SessionDaysReportData(new SessionDaysReportSummary("test office"));
         eccReportData.setReportType(ECC_REPORT);
-        ReportDocHelper.buildReportDocumentContent(eccReportData, "access-key", "template-name", userDetails);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(eccReportData, "access-key", "template-name", userDetails)
+        );
     }
 
     @Test

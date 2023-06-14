@@ -9,8 +9,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,15 +37,13 @@ public class CcdReportDataSourceTest {
 
     @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-assertThrows(ReportException.class, () -> {});        String authToken = "A test token";
+        String authToken = "A test token";
         String caseTypeId = "A test case type";
         String owningOffice = TribunalOffice.LEEDS.getOfficeName();
         CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.casesAwaitingJudgmentSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
         CcdReportDataSource ccdReportDataSource = new CcdReportDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(caseTypeId, owningOffice);
-        fail("Should throw exception instead");
+        assertThrows(ReportException.class, () -> ccdReportDataSource.getData(caseTypeId, owningOffice));
     }
-
 }

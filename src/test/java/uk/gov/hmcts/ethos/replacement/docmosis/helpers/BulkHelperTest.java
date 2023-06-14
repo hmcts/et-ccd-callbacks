@@ -1,4 +1,6 @@
-import org.junit.jupiter.api.extension.ExtendWith;import com.fasterxml.jackson.databind.ObjectMapper;
+package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -27,8 +29,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.PENDING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 

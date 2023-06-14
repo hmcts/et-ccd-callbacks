@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -192,7 +193,6 @@ public class VenueAddressReaderServiceTest {
 
     @Test
     public void getVenueAddressForHearing_HearingVenueNotFound() {
-assertThrows(IllegalArgumentException.class, () -> {});        // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow3");
         venueAddress.setAddress("");
@@ -202,13 +202,13 @@ assertThrows(IllegalArgumentException.class, () -> {});        // Arrange
                 .thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_ScotlandNotFound();
 
-        // Act
-        venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
+        assertThrows(IllegalArgumentException.class, () ->
+                venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName)
+        );
     }
 
     @Test
     public void getVenueAddressForHearing_HearingVenueEmpty() {
-assertThrows(VenueAddressReaderException.class, () -> {});        // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow4");
         venueAddress.setAddress("");
@@ -219,31 +219,30 @@ assertThrows(VenueAddressReaderException.class, () -> {});        // Arrange
         HearingType hearing = new HearingType();
         hearing.setHearingVenueScotland("");
 
-        // Act
-        venueAddressReaderService.getVenueAddress(hearing, SCOTLAND_CASE_TYPE_ID, officeName);
+        assertThrows(VenueAddressReaderException.class, () ->
+                venueAddressReaderService.getVenueAddress(hearing, SCOTLAND_CASE_TYPE_ID, officeName)
+        );
     }
 
     @Test
     public void getVenueAddressForHearing_ThrowsAddressReaderException() {
-assertThrows(VenueAddressReaderException.class, () -> {});        // Arrange
         List<VenueAddress> venueAddressList = new ArrayList<>();
         String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
                 .thenReturn(venueAddressList);
         HearingType hearing = getHearingTypeForVenue_EnglandWales(officeName);
 
-        // Act
-        venueAddressReaderService.getVenueAddress(hearing,
-                ENGLANDWALES_CASE_TYPE_ID, officeName);
+        assertThrows(VenueAddressReaderException.class, () ->
+                venueAddressReaderService.getVenueAddress(hearing,
+                        ENGLANDWALES_CASE_TYPE_ID, officeName)
+        );
     }
 
     @Test
     public void getVenueAddressForHearing_ThrowsArgumentException() {
-assertThrows(IllegalArgumentException.class, () -> {});        // Arrange
-        HearingType hearing = new HearingType();
-
-        // Act
-        venueAddressReaderService.getVenueAddress(hearing, "NotFound", "");
+        assertThrows(IllegalArgumentException.class, () ->
+                venueAddressReaderService.getVenueAddress(new HearingType(), "NotFound", "")
+        );
     }
 
     private HearingType getHearingTypeForVenue_EnglandWales(String venue) {
@@ -265,19 +264,12 @@ assertThrows(IllegalArgumentException.class, () -> {});        // Arrange
 
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(venueOffice);
         switch (tribunalOffice) {
-            case GLASGOW:
-                hearing.setHearingGlasgow(hearingVenue);
-                break;
-            case ABERDEEN:
-                hearing.setHearingAberdeen(hearingVenue);
-                break;
-            case DUNDEE:
-                hearing.setHearingDundee(hearingVenue);
-                break;
-            case EDINBURGH:
-                hearing.setHearingEdinburgh(hearingVenue);
-                break;
-            default:
+            case GLASGOW -> hearing.setHearingGlasgow(hearingVenue);
+            case ABERDEEN -> hearing.setHearingAberdeen(hearingVenue);
+            case DUNDEE -> hearing.setHearingDundee(hearingVenue);
+            case EDINBURGH -> hearing.setHearingEdinburgh(hearingVenue);
+            default -> {
+            }
         }
 
         hearing.setHearingVenueScotland(venueOffice);

@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
@@ -19,7 +21,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ExcelReportDocumentInfoServiceTest {
     @Mock
     ExcelReportDocumentInfoService excelReportDocInfService;

@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -322,12 +323,9 @@ public class BulkSearchServiceTest {
 
     @Test
     public void searchCasesByFieldsRequestException() {
-assertThrows(Exception.class, () -> {});        
-List<MidSearchTypeItem> midSearchedListExpected = new ArrayList<>();
-        List<MultipleTypeItem> multipleTypeItemToSearchBy = new ArrayList<>();
-        List<MidSearchTypeItem> midSearchedList = bulkSearchService.midSearchCasesByFieldsRequest(
-                multipleTypeItemToSearchBy, new BulkDetails(), false);
-        assertEquals(midSearchedListExpected, midSearchedList);
+        assertThrows(Exception.class, () ->
+                bulkSearchService.midSearchCasesByFieldsRequest(new ArrayList<>(), new BulkDetails(), false)
+        );
     }
 
     @Test

@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HearingSelectionServiceTest {
 
@@ -64,12 +65,12 @@ public class HearingSelectionServiceTest {
 
     @Test
     public void testGetSelectedHearingNotFound() {
-assertThrows(IllegalStateException.class, () -> {});        CaseData caseData = createCaseData();
-
+        CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
-        hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id5"));
 
-        fail("No hearing should be found");
+        assertThrows(IllegalStateException.class, () ->
+                hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id5"))
+        );
     }
 
     @Test
@@ -89,11 +90,13 @@ assertThrows(IllegalStateException.class, () -> {});        CaseData caseData = 
 
     @Test
     public void testGetListingsNotFound() {
-assertThrows(IllegalStateException.class, () -> {});        CaseData caseData = createCaseData();
+        CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         caseData.setAllocateHearingHearing(new DynamicFixedListType("id5"));
-        hearingSelectionService.getSelectedListing(caseData);
-        fail("No listing should be found");
+
+        assertThrows(IllegalStateException.class, () ->
+                hearingSelectionService.getSelectedListing(caseData)
+        );
     }
 
     private CaseData createCaseData() {

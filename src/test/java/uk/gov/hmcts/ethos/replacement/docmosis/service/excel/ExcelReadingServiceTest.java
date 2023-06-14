@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -163,13 +164,15 @@ public class ExcelReadingServiceTest {
 
     @Test
     public void readExcelException() throws IOException {
-assertThrows(Exception.class, () -> {});
-        body = new ClassPathResource(TESTING_FILE_NAME_ERROR);
+    assertThrows(Exception.class, () -> {
+                body = new ClassPathResource(TESTING_FILE_NAME_ERROR);
         when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
                 .thenThrow(new IOException());
         SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(userToken, documentBinaryUrl,
                 errors, multipleData, FilterExcelType.ALL);
         assertEquals("{}", multipleObjects.toString());
-    }
+
+    });
+}
 
 }

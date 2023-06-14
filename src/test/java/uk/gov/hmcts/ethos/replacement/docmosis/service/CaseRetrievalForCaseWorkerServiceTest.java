@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -49,13 +50,15 @@ public class CaseRetrievalForCaseWorkerServiceTest {
 
     @Test
     public void caseRetrievalRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.retrieveCase(anyString(), anyString(),
+    assertThrows(Exception.class, () -> {
+        when(ccdClient.retrieveCase(anyString(), anyString(),
                 anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         caseRetrievalForCaseWorkerService.caseRetrievalRequest(
                 "authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
                 ccdRequest.getCaseDetails().getJurisdiction(), "11111");
-    }
+
+    });
+}
 
     @Test
     public void caseRetrievalRequest() throws IOException {
@@ -67,10 +70,12 @@ when(ccdClient.retrieveCase(anyString(), anyString(),
 
     @Test
     public void casesRetrievalRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.retrieveCases(anyString(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, "authToken");
-    }
+        when(ccdClient.retrieveCases(anyString(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+
+        assertThrows(Exception.class, () ->
+                caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, "authToken")
+        );
+}
 
     @Test
     public void casesRetrievalRequest() throws IOException {
@@ -83,12 +88,14 @@ when(ccdClient.retrieveCases(anyString(), any(), any())).thenThrow(new InternalE
 
     @Test
     public void casesRetrievalESRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
+        when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
-                ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")));
-    }
+
+        assertThrows(Exception.class, () ->
+                caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
+                        ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")))
+        );
+}
 
     @Test
     public void casesRetrievalESRequest() throws IOException {

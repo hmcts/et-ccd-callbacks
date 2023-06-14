@@ -17,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import java.io.IOException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -61,14 +62,17 @@ public class MultipleCasesReadingServiceTest {
 
     @Test
     public void retrieveMultipleCasesWithRetriesException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.retrieveMultipleCasesElasticSearchWithRetries(userToken,
+        when(ccdClient.retrieveMultipleCasesElasticSearchWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
-                multipleDetails.getCaseTypeId(),
-                multipleDetails.getCaseData().getMultipleReference());
+
+        assertThrows(Exception.class, () ->
+                multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
+                        multipleDetails.getCaseTypeId(),
+                        multipleDetails.getCaseData().getMultipleReference())
+        );
+
         verify(ccdClient, times(1)).retrieveMultipleCasesElasticSearchWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference());
@@ -92,18 +96,20 @@ when(ccdClient.retrieveMultipleCasesElasticSearchWithRetries(userToken,
 
     @Test
     public void retrieveMultipleCasesException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.retrieveMultipleCasesElasticSearch(userToken,
+        when(ccdClient.retrieveMultipleCasesElasticSearch(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        multipleCasesReadingService.retrieveMultipleCases(userToken,
-                multipleDetails.getCaseTypeId(),
-                multipleDetails.getCaseData().getMultipleReference());
+
+        assertThrows(Exception.class, () ->
+                multipleCasesReadingService.retrieveMultipleCases(userToken,
+                        multipleDetails.getCaseTypeId(),
+                        multipleDetails.getCaseData().getMultipleReference())
+        );
+
         verify(ccdClient, times(1)).retrieveMultipleCasesElasticSearch(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference());
         verifyNoMoreInteractions(ccdClient);
     }
-
 }

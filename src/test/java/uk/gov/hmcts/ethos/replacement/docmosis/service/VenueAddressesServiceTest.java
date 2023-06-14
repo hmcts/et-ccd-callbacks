@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +18,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = {
-    VenueAddressesService.class,
+        VenueAddressesService.class,
 })
 @EnableConfigurationProperties({VenueAddressesConfiguration.class})
 public class VenueAddressesServiceTest {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefScot
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
@@ -38,9 +40,9 @@ public class MultipleReferenceServiceTest {
 
     @Test
     public void createEnglandWalesReferenceCaseTypeNotFound() {
-assertThrows(IllegalArgumentException.class, () -> {});        multipleReferenceService.createReference("invalid-case-type-id");
-
-        fail("Should throw IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class, () ->
+                multipleReferenceService.createReference("invalid-case-type-id")
+        );
     }
 
     @Test
@@ -53,8 +55,8 @@ assertThrows(IllegalArgumentException.class, () -> {});        multipleReference
 
     @Test
     public void createScotlandReferenceCaseTypeNotFound() {
-assertThrows(IllegalArgumentException.class, () -> {});        multipleReferenceService.createReference("invalid-case-type-id");
-
-        fail("Should throw IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class, () ->
+                multipleReferenceService.createReference("invalid-case-type-id")
+        );
     }
 }

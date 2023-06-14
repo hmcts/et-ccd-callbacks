@@ -10,8 +10,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +42,7 @@ public class HearingsByHearingTypeCcdReportDataSourceTest {
 
     @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-assertThrows(ReportException.class, () -> {});        String authToken = "token";
+        String authToken = "token";
         String caseTypeId = "caseTypeId_Listings";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         String fromDate = "1-1-2022";
@@ -51,8 +52,9 @@ assertThrows(ReportException.class, () -> {});        String authToken = "token"
 
         HearingsByHearingTypeCcdReportDataSource ccdReportDataSource = new HearingsByHearingTypeCcdReportDataSource(
             authToken, ccdClient);
-        ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate));
-        fail("Should throw exception instead");
-    }
 
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate))
+        );
+    }
 }

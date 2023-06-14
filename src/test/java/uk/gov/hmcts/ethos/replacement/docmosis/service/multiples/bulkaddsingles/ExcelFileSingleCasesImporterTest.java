@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,8 +38,8 @@ public class ExcelFileSingleCasesImporterTest {
     }
 
     @Test
-    public void shouldThrowImportException() throws ImportException, IOException {
-assertThrows(ImportException.class, () -> {});        String downloadUrl = "a-test-download-url";
+    public void shouldThrowImportException() throws IOException {
+        String downloadUrl = "a-test-download-url";
         MultipleData multipleData = createMultipleData(downloadUrl);
         String authToken = "some-token";
         ExcelReadingService excelReadingService = mock(ExcelReadingService.class);
@@ -46,8 +47,11 @@ assertThrows(ImportException.class, () -> {});        String downloadUrl = "a-te
 
         ExcelFileSingleCasesImporter excelFileSingleCasesImporter = new ExcelFileSingleCasesImporter(
             excelReadingService);
-        excelFileSingleCasesImporter.importCases(multipleData, authToken);
-    }
+
+        assertThrows(ImportException.class, () ->
+                excelFileSingleCasesImporter.importCases(multipleData, authToken)
+        );
+}
 
     private MultipleData createMultipleData(String downloadUrl) {
         MultipleData multipleData = new MultipleData();

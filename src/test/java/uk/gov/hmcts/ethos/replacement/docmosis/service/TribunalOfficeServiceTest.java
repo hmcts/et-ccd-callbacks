@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDeta
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = {
-    TribunalOfficesService.class,
+        TribunalOfficesService.class,
 })
 @EnableConfigurationProperties({CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class})
 public class TribunalOfficeServiceTest {

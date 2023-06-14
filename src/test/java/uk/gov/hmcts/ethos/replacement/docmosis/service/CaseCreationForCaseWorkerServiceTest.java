@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -62,11 +64,13 @@ public class CaseCreationForCaseWorkerServiceTest {
 
     @Test
     public void caseCreationRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+    assertThrows(Exception.class, () -> {
+        when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
         caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
-    }
+
+    });
+}
 
     @Test
     public void caseCreationRequest() throws IOException {

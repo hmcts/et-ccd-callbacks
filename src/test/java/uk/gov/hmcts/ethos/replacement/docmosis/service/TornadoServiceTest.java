@@ -34,6 +34,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -75,34 +76,42 @@ public class TornadoServiceTest {
 
     @Test
     public void documentGenerationNoTornadoConnectionShouldThrowException() throws IOException {
-assertThrows(IOException.class, () -> {});        CaseData caseData = new CaseData();
+        CaseData caseData = new CaseData();
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
-                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
+        assertThrows(IOException.class, () ->
+                tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
+                        caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null)
+        );
     }
 
     @Test
     public void listingGenerationNoTornadoConnectionShouldThrowException() throws IOException {
-assertThrows(IOException.class, () -> {});        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
+        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.listingGeneration(AUTH_TOKEN, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        assertThrows(IOException.class, () ->
+                tornadoService.listingGeneration(AUTH_TOKEN, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID)
+        );
     }
 
     @Test
     public void scheduleGenerationNoTornadoConnectionShouldThrowException() throws IOException {
-assertThrows(IOException.class, () -> {});        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
+        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.scheduleGeneration(AUTH_TOKEN, createBulkData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        assertThrows(IOException.class, () ->
+                tornadoService.scheduleGeneration(AUTH_TOKEN, createBulkData(), ENGLANDWALES_LISTING_CASE_TYPE_ID)
+        );
     }
 
     @Test
     public void shouldThrowExceptionWhenTornadoReturnsErrorResponse() throws IOException {
-assertThrows(IOException.class, () -> {});        mockConnectionError();
+        mockConnectionError();
         CaseData caseData = new CaseData();
 
-        tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
-                caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
+        assertThrows(IOException.class, () ->
+                tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
+                        caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null)
+        );
     }
 
     @Test
@@ -224,16 +233,21 @@ assertThrows(IOException.class, () -> {});        mockConnectionError();
 
     @Test
     public void generateDocument_exception() throws IOException {
-assertThrows(IOException.class, () -> {});        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
-        tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
-                "random-string");
+        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
+
+        assertThrows(IOException.class, () ->
+                tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
+                        "random-string")
+        );
     }
 
     @Test
     public void generateDocument_noDocumentName() throws IOException {
-assertThrows(IllegalArgumentException.class, () -> {});        mockConnectionSuccess();
-        tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
-            null);
+        mockConnectionSuccess();
+
+        assertThrows(IllegalArgumentException.class, () ->
+                tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null)
+        );
     }
 
     @Test

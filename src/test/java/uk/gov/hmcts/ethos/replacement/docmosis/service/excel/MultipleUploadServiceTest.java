@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -111,8 +112,8 @@ public class MultipleUploadServiceTest {
 
     @Test
     public void bulkUploadLogicException() throws IOException {
-assertThrows(Exception.class, () -> {});
-        when(excelReadingService.checkExcelErrors(
+    assertThrows(Exception.class, () -> {
+                when(excelReadingService.checkExcelErrors(
                 userToken,
                 MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
                 new ArrayList<>()))
@@ -125,6 +126,8 @@ assertThrows(Exception.class, () -> {});
                 MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
                 new ArrayList<>());
         verifyNoMoreInteractions(excelReadingService);
-    }
+
+    });
+}
 
 }

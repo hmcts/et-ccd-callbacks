@@ -36,6 +36,7 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -382,12 +383,14 @@ public class DocumentGenerationServiceTest {
 
     @Test
     public void processDocumentRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(tornadoService.documentGeneration(
+    assertThrows(Exception.class, () -> {
+        when(tornadoService.documentGeneration(
                 anyString(), any(), anyString(), any(), any(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         documentGenerationService.processDocumentRequest(ccdRequest, "authToken");
-    }
+
+    });
+}
 
     @Test
     public void processBulkDocumentRequest() throws IOException {
@@ -422,8 +425,7 @@ when(tornadoService.documentGeneration(
 
     @Test
     public void processBulkDocumentRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-SubmitEvent submitEvent = new SubmitEvent();
+        SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseId(1);
         submitEvent.setCaseData(new CaseData());
         List<SubmitEvent> submitEvents = Collections.singletonList(submitEvent);
@@ -432,8 +434,10 @@ SubmitEvent submitEvent = new SubmitEvent();
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.retrieveCasesElasticSearch(anyString(), any(), any())).thenReturn(submitEvents);
 
-        documentGenerationService.processBulkDocumentRequest(bulkRequest, "authToken");
-    }
+        assertThrows(Exception.class, () ->
+                documentGenerationService.processBulkDocumentRequest(bulkRequest, "authToken")
+        );
+}
 
     @Test
     public void processBulkScheduleRequest() throws IOException {
@@ -459,11 +463,13 @@ SubmitEvent submitEvent = new SubmitEvent();
 
     @Test
     public void processBulkScheduleRequestException() throws IOException {
-assertThrows(Exception.class, () -> {});        
-when(tornadoService.scheduleGeneration(anyString(), any(), anyString()))
+        when(tornadoService.scheduleGeneration(anyString(), any(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        documentGenerationService.processBulkScheduleRequest(bulkRequest, "authToken");
-    }
+
+        assertThrows(Exception.class, () ->
+                documentGenerationService.processBulkScheduleRequest(bulkRequest, "authToken")
+        );
+}
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects

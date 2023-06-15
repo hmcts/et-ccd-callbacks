@@ -61,7 +61,7 @@ public class VenueAddressesServiceTest {
     }
 
     @Test
-    void testGetsCorrectVenueAddressList() {
+    public void testGetsCorrectVenueAddressList() {
         List<VenueAddress> venueAddressList = venueAddressesService.getTribunalVenueAddresses(managingOffice);
         assertEquals(expectedAddress, venueAddressList.get(0).getAddress());
     }

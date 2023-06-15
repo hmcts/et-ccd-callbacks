@@ -11,7 +11,6 @@ const defaultSauceOptions = {
     accessKey: process.env.SAUCE_ACCESS_KEY || 'privatekey',
     tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || 'reformtunnel',
     acceptSslCerts: true,
-    windowSize: '1600x900',
     tags: ['et-e2e'],
     extendedDebugging: true,
     capturePerformance: true
@@ -88,7 +87,7 @@ const setupConfig = {
                     mochaFile: `${config.TestOutputDir}/result.xml`
                 }
             },
-            'mochawesome': {
+            mochawesome: {
                 stdout: config.TestOutputDir + '/console.log',
                 options: {
                     reportDir: config.TestOutputDir,
@@ -100,9 +99,9 @@ const setupConfig = {
         }
     },
     multiple: {
-        // microsoft: {
-        //     browsers: getBrowserConfig('microsoft')
-        // },
+        safari: {
+            browsers: getBrowserConfig('safari')
+        },
         chrome: {
             browsers: getBrowserConfig('chrome')
         },

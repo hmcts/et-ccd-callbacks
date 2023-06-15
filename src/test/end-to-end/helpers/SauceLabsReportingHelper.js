@@ -3,10 +3,22 @@
 const event = require('codeceptjs').event;
 const container = require('codeceptjs').container;
 const exec = require('child_process').exec;
+const config = require('config');
+const logger = require('logger');
+
+const logPath = 'SauceLabs.ReportigHelper.js';
+
+
+const sauceUsername = process.env.SAUCE_USERNAME || config.get('saucelabs.username');
+const sauceKey = process.env.SAUCE_ACCESS_KEY || config.get('saucelabs.key');
+
 
 function updateSauceLabsResult(result, sessionId) {
-    console.log('SauceOnDemandSessionID=' + sessionId + ' job-name=ecm-ccd-xb-tests');
-    return 'curl -X PUT -s -d \'{"passed": ' + result + '}\' -u ' + process.env.SAUCE_USERNAME + ':' + process.env.SAUCE_ACCESS_KEY + ' https://eu-central-1.saucelabs.com/rest/v1/' + process.env.SAUCE_USERNAME + '/jobs/' + sessionId;
+    const sauceUrl = ` https://eu-central-1.saucelabs.com/rest/v1/${sauceUsername}/jobs/${sessionId}`;
+    const sauceCredentials = `-u ${sauceUsername}:${sauceKey}`;
+    // For publishing SauceLabs results through Jenkins Sauce OnDemand plugin:
+    logger.trace(`SauceOnDemandSessionID=${sessionId} job-name=et-ccd-callbacks-ui-functional`, logPath);
+    return `curl -X PUT -s -d '{"passed": ${result}}' ${sauceCredentials} ${sauceUrl}`;
 }
 
 module.exports = function () {

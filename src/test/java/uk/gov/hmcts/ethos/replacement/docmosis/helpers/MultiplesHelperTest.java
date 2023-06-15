@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
@@ -13,19 +15,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MultiplesHelperTest {
+@ExtendWith(SpringExtension.class)
+class MultiplesHelperTest {
 
     private MultipleData multipleData;
 
-    @Before
+    @BeforeEach
     public void setUp()  {
         multipleData = MultipleUtil.getMultipleData();
     }
 
     @Test
-    public void addLeadToCaseIdsWhenEmptyCollection() {
+    void addLeadToCaseIdsWhenEmptyCollection() {
         multipleData.setCaseIdCollection(null);
         MultiplesHelper.addLeadToCaseIds(multipleData, "245003/2020");
         assertEquals(1, multipleData.getCaseIdCollection().size());
@@ -33,7 +36,7 @@ public class MultiplesHelperTest {
     }
 
     @Test
-    public void filterDuplicatedAndEmptyCaseIds() {
+    void filterDuplicatedAndEmptyCaseIds() {
         multipleData.getCaseIdCollection().add(createCaseIdTypeItem("3", "245000/2020"));
         multipleData.getCaseIdCollection().add(createCaseIdTypeItem("4", null));
         multipleData.getCaseIdCollection().add(createCaseIdTypeItem("5", "245000/2020"));
@@ -45,13 +48,13 @@ public class MultiplesHelperTest {
     }
 
     @Test
-    public void getCurrentLead() {
+    void getCurrentLead() {
         String leadLink = "<a target=\"_blank\" href=\"https://www-ccd.perftest.platform.hmcts.net/v2/case/1604313560561842\">1852013/2020</a>";
         assertEquals("1852013/2020", MultiplesHelper.getCurrentLead(leadLink));
     }
 
     @Test
-    public void orderMultiplesStringRef() {
+    void orderMultiplesStringRef() {
         List<String> refList = Arrays.asList("1800074/2020", "1800074/2021", "1800075/2020", "1800075/2021");
         TreeMap<String, TreeMap<String, String>> expectedResult = new TreeMap<>(Map.of(
                 "2020", new TreeMap<>(Map.of("1800074", "1800074/2020", "1800075", "1800075/2020")),
@@ -62,7 +65,7 @@ public class MultiplesHelperTest {
     }
 
     @Test
-    public void orderMultipleObjects() {
+    void orderMultipleObjects() {
         List<MultipleObject> refList = Arrays.asList(
                 MultiplesHelper.createMultipleObject("1800074/2020", ""),
                 MultiplesHelper.createMultipleObject("1800074/2021", ""),
@@ -86,7 +89,7 @@ public class MultiplesHelperTest {
     }
 
     @Test
-    public void orderSchedulePayloads() {
+    void orderSchedulePayloads() {
         List<SchedulePayload> refList = Arrays.asList(
                 SchedulePayload.builder().ethosCaseRef("1800074/2020").build(),
                 SchedulePayload.builder().ethosCaseRef("1800074/2021").build(),
@@ -110,7 +113,7 @@ public class MultiplesHelperTest {
     }
 
     @Test
-    public void orderMultiplesObjectTypNotRecognised() {
+    void orderMultiplesObjectTypNotRecognised() {
         List<Object> refList = Arrays.asList(5, 6, 4, 5);
         TreeMap<Object, Object> expectedResult = new TreeMap<>();
         assertEquals(MultiplesHelper.createCollectionOrderedByCaseRef(refList), expectedResult);

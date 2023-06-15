@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
 import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
@@ -41,8 +41,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -53,8 +54,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class BulkUpdateServiceTest {
+@ExtendWith(SpringExtension.class)
+class BulkUpdateServiceTest {
 
     @InjectMocks
     private BulkUpdateService bulkUpdateService;
@@ -73,7 +74,7 @@ public class BulkUpdateServiceTest {
     private SubmitBulkEvent submitBulkEvent;
     private BulkRequestPayload bulkRequestPayload;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdRequest = new CCDRequest();
         BulkData bulkData = new BulkData();
@@ -108,7 +109,7 @@ public class BulkUpdateServiceTest {
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .nameOfRepresentative("Juan").build();
+                .nameOfRepresentative("Juan").build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(representedTypeR);
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));
@@ -127,19 +128,23 @@ public class BulkUpdateServiceTest {
         bulkRequestPayload.setBulkDetails(bulkDetails);
     }
 
-    @Test(expected = Exception.class)
-    public void caseUpdateFieldsRequestException() throws IOException {
-        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
-                bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
-        when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(),
-                anyString())).thenReturn(submitEvent);
-        bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(), searchTypeItem, "authToken",
-                submitBulkEvent);
+    @Test
+    void caseUpdateFieldsRequestException() {
+        assertThrows(Exception.class, () -> {
+            when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
+                    bulkDetails.getJurisdiction(), searchTypeItem.getId()))
+                    .thenThrow(new InternalException(ERROR_MESSAGE));
+            when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString()))
+                    .thenReturn(ccdRequest);
+            when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(),
+                    anyString())).thenReturn(submitEvent);
+            bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(), searchTypeItem, "authToken",
+                    submitBulkEvent);
+        });
     }
 
     @Test
-    public void caseUpdateFieldsRequest() throws IOException {
+    void caseUpdateFieldsRequest() throws IOException {
         when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
@@ -150,7 +155,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void caseUpdateFieldsWithNewValuesRequest() throws IOException {
+    void caseUpdateFieldsWithNewValuesRequest() throws IOException {
         when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString()))
@@ -162,7 +167,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogic() throws IOException {
+    void bulkUpdateLogic() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -183,7 +188,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogicSingleCasesUpdated() throws IOException {
+    void bulkUpdateLogicSingleCasesUpdated() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -211,8 +216,8 @@ public class BulkUpdateServiceTest {
                 "authToken").getBulkDetails() != null);
     }
 
-    @Test(expected = Exception.class)
-    public void bulkUpdateLogicException() throws IOException {
+    @Test
+    void bulkUpdateLogicException() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -228,11 +233,15 @@ public class BulkUpdateServiceTest {
                 bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
         when(ccdClient.retrieveBulkCasesElasticSearch("authToken", ENGLANDWALES_BULK_CASE_TYPE_ID,
                 bulkData.getMultipleReference())).thenThrow(new InternalException(ERROR_MESSAGE));
-        bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()), "authToken");
+
+        assertThrows(Exception.class, () ->
+                bulkUpdateService.bulkUpdateLogic(
+                        getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()), "authToken")
+        );
     }
 
     @Test
-    public void bulkUpdateLogicWithErrors() throws IOException {
+    void bulkUpdateLogicWithErrors() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -246,7 +255,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogicAsyncErrors() throws IOException {
+    void bulkUpdateLogicAsyncErrors() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -264,11 +273,11 @@ public class BulkUpdateServiceTest {
                 bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
         assertEquals("[Multiple reference does not exist or it is the same as the current multiple case]",
                 bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()),
-                "authToken").getErrors().toString());
+                        "authToken").getErrors().toString());
     }
 
     @Test
-    public void clearUpFields() {
+    void clearUpFields() {
         BulkData bulkData = bulkUpdateService.clearUpFields(bulkRequestPayload).getBulkDetails().getCaseData();
         assertNull(bulkData.getClaimantRepV2());
         assertNull(bulkData.getClerkResponsibleV2());
@@ -354,14 +363,14 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicEmptyCases() {
+    void bulkPreAcceptLogicEmptyCases() {
         List<String> errors = bulkUpdateService.bulkPreAcceptLogic(
                 bulkRequest.getCaseDetails(), new ArrayList<>(), "authToken", false).getErrors();
         assertEquals("[No cases on the multiple case: 2300001/2019]", errors.toString());
     }
 
     @Test
-    public void bulkPreAcceptLogic() {
+    void bulkPreAcceptLogic() {
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));
         BulkRequestPayload bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(
@@ -381,7 +390,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptPQLogic() {
+    void bulkPreAcceptPQLogic() {
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));
@@ -401,7 +410,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptPQLogicEmptyCases() {
+    void bulkPreAcceptPQLogicEmptyCases() {
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));

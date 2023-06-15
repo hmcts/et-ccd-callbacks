@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -17,24 +17,26 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.NcssCount"})
-public class HearingDetailServiceTest {
+class HearingDetailServiceTest {
 
     private HearingDetailsService hearingDetailsService;
     private DateListedType selectedListing;
     private HearingSelectionService hearingSelectionService;
     private static final String TEST_ID = UUID.randomUUID().toString();
 
-    @Before
+    @BeforeEach
     public void setup() {
         selectedListing = new DateListedType();
         hearingSelectionService = mock(HearingSelectionService.class);
@@ -42,7 +44,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testInitialiseHearingDetails() {
+    void testInitialiseHearingDetails() {
         CaseData caseData = new CaseData();
         hearingDetailsService.initialiseHearingDetails(caseData);
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
@@ -50,7 +52,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testHandleListingSelected() {
+    void testHandleListingSelected() {
         String hearingStatus = Constants.HEARING_STATUS_HEARD;
         selectedListing.setHearingStatus(hearingStatus);
         String postponedBy = "Arthur";
@@ -105,7 +107,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testHandleListingSelectedNullValue() {
+    void testHandleListingSelectedNullValue() {
         selectedListing.setHearingStatus(null);
         selectedListing.setPostponedBy(null);
         selectedListing.setHearingCaseDisposed(null);
@@ -141,7 +143,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testUpdateCase() {
+    void testUpdateCase() {
         HearingDetailType hearingDetailType = new HearingDetailType();
         selectedListing.setListedDate("2022-11-11 11:00:00");
         hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
@@ -212,7 +214,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testUpdateCase_Null_Or_Empty_HearingDetailsCollection() {
+    void testUpdateCase_Null_Or_Empty_HearingDetailsCollection() {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         String id = "22";
         hearingTypeItem.setId(id);
@@ -234,7 +236,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testUpdateCase_Null_Or_Empty_HearingDateCollection() {
+    void testUpdateCase_Null_Or_Empty_HearingDateCollection() {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId(TEST_ID);
         String expectedHearingType =  "Preliminary Hearing";

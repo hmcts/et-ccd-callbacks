@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -20,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
@@ -42,10 +44,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport.COMPLETED_PER_SESSION_FORMAT;
 
-public class CaseCompletedReportTest {
+@ExtendWith(SpringExtension.class)
+class CaseCompletedReportTest {
 
     @Test
-    public void testReportHeaderTotalsAreZeroIfNoCasesExist() {
+    void testReportHeaderTotalsAreZeroIfNoCasesExist() {
         // given no cases exist
         // when we generate report data
         // then totals are all zero
@@ -64,7 +67,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testIgnoreCaseIfNotClosed() {
+    void testIgnoreCaseIfNotClosed() {
         // given case is not closed
         // when we generate report data
         // then no data returned
@@ -84,7 +87,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testIgnoreCaseIfPositionTypeInvalid() {
+    void testIgnoreCaseIfPositionTypeInvalid() {
         // given case is closed
         // given position type is invalid
         // when we generate report data
@@ -112,7 +115,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testIgnoreCaseIfJurisdictionOutcomeInvalid() {
+    void testIgnoreCaseIfJurisdictionOutcomeInvalid() {
         // given case is closed
         // given position type is valid
         // given jurisdiction outcome is invalid
@@ -141,7 +144,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testIgnoreCaseIfItContainsNoHearings() {
+    void testIgnoreCaseIfItContainsNoHearings() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -165,7 +168,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testIgnoreCaseIfHearingTypeInvalid() {
+    void testIgnoreCaseIfHearingTypeInvalid() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -193,7 +196,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testIgnoreCaseIfHearingListingDateNotInSearchRange() {
+    void testIgnoreCaseIfHearingListingDateNotInSearchRange() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -224,7 +227,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testIgnoreCaseIfHearingNotDisposed() {
+    void testIgnoreCaseIfHearingNotDisposed() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -255,7 +258,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testValidNullConciliationTrackCaseIsAddedToReport() {
+    void testValidNullConciliationTrackCaseIsAddedToReport() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -295,7 +298,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testValidNoneConciliationTrackCaseIsAddedToReport() {
+    void testValidNoneConciliationTrackCaseIsAddedToReport() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -336,7 +339,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testValidFastConciliationTrackCaseIsAddedToReport() {
+    void testValidFastConciliationTrackCaseIsAddedToReport() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -377,7 +380,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testValidStdConciliationTrackCaseIsAddedToReport() {
+    void testValidStdConciliationTrackCaseIsAddedToReport() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -418,7 +421,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testValidOpenConciliationTrackCaseIsAddedToReport() {
+    void testValidOpenConciliationTrackCaseIsAddedToReport() {
         // given case is closed
         // given case position type is valid
         // given case jurisdiction outcome is valid
@@ -459,7 +462,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testMultipleCasesAreSummedUpInTotals() {
+    void testMultipleCasesAreSummedUpInTotals() {
         // given we have multiple cases that are valid
         // when we generate report data
         // then we have data for all cases
@@ -500,7 +503,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testMultipleCasesOnlyValidAreSummedUpInTotals() {
+    void testMultipleCasesOnlyValidAreSummedUpInTotals() {
         // given we have two cases that are valid
         // given we have two cases that are not valid
         // when we generate report data
@@ -542,7 +545,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testSessionDaysSingleCase() {
+    void testSessionDaysSingleCase() {
         // given the case is valid
         // given the case has a single hearing over multiple days
         // when we generate report data
@@ -585,7 +588,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testSessionDaysMultipleCases() {
+    void testSessionDaysMultipleCases() {
         // given there are multiple valid cases
         // when we generate report data
         // then we have some data
@@ -655,7 +658,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void testSessionDaysMultipleTracks() {
+    void testSessionDaysMultipleTracks() {
         // given there are multiple valid cases for different conciliation tracks
         // when we generate report data
         // then we have some data
@@ -716,7 +719,7 @@ public class CaseCompletedReportTest {
     }
 
     @Test
-    public void initReport_ReportOfficeName_Scotland() {
+    void initReport_ReportOfficeName_Scotland() {
         // given case office in Scotland
         // when we generate report data
         // then we have some data

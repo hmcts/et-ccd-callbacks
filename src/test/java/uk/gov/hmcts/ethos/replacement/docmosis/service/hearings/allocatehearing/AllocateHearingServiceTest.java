@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -20,15 +22,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.J
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AllocateHearingServiceTest {
+@ExtendWith(SpringExtension.class)
+class AllocateHearingServiceTest {
 
     private AllocateHearingService allocateHearingService;
     private RoomSelectionService roomSelectionService;
@@ -38,7 +41,7 @@ public class AllocateHearingServiceTest {
     private HearingType selectedHearing;
     private DateListedType selectedListing;
 
-    @Before
+    @BeforeEach
     public void setup() {
         caseData = createCaseData();
 
@@ -52,7 +55,7 @@ public class AllocateHearingServiceTest {
     }
 
     @Test
-    public void testHandleListingSelectedNoExistingSelections() {
+    void testHandleListingSelectedNoExistingSelections() {
         // Arrange
         String hearingSitAlone = String.valueOf(Boolean.TRUE);
         selectedHearing.setHearingSitAlone(hearingSitAlone);
@@ -85,7 +88,7 @@ public class AllocateHearingServiceTest {
     }
 
     @Test
-    public void testHandleListingSelectedWithExistingSelections() {
+    void testHandleListingSelectedWithExistingSelections() {
         // Arrange
         String hearingSitAlone = String.valueOf(Boolean.TRUE);
         selectedHearing.setHearingSitAlone(hearingSitAlone);
@@ -129,7 +132,7 @@ public class AllocateHearingServiceTest {
     }
 
     @Test
-    public void testPopulateRooms() {
+    void testPopulateRooms() {
         allocateHearingService.populateRooms(caseData);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
@@ -137,7 +140,7 @@ public class AllocateHearingServiceTest {
     }
 
     @Test
-    public void testPopulateRoomsNewVenueSelected() {
+    void testPopulateRoomsNewVenueSelected() {
         selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
             "venue1")));
         selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("room1",
@@ -152,7 +155,7 @@ public class AllocateHearingServiceTest {
     }
 
     @Test
-    public void testPopulateRoomsExistingVenueSelected() {
+    void testPopulateRoomsExistingVenueSelected() {
         selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
             "venue1")));
         DynamicValueType selectedRoom = DynamicValueType.create("room1", "Room 1");
@@ -167,7 +170,7 @@ public class AllocateHearingServiceTest {
     }
 
     @Test
-    public void testUpdateCase() {
+    void testUpdateCase() {
         // Arrange
         String sitAlone = String.valueOf(Boolean.TRUE);
         DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));

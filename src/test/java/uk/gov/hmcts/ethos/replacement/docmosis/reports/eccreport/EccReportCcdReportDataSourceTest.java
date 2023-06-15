@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
@@ -10,8 +12,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -19,10 +21,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
-public class EccReportCcdReportDataSourceTest {
+@ExtendWith(SpringExtension.class)
+class EccReportCcdReportDataSourceTest {
 
     @Test
-    public void shouldReturnSearchResultsForManagingOffice() throws IOException {
+    void shouldReturnSearchResultsForManagingOffice() throws IOException {
         String authToken = "token";
         String caseTypeId = ENGLANDWALES_CASE_TYPE_ID;
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -42,7 +45,7 @@ public class EccReportCcdReportDataSourceTest {
     }
 
     @Test
-    public void shouldReturnSearchResultsForNullManagingOffice() throws IOException {
+    void shouldReturnSearchResultsForNullManagingOffice() throws IOException {
         String authToken = "token";
         String caseTypeId = SCOTLAND_CASE_TYPE_ID;
         String fromDate = "1-1-2022";
@@ -60,8 +63,8 @@ public class EccReportCcdReportDataSourceTest {
         assertEquals(submitEvent, results.get(0));
     }
 
-    @Test(expected = ReportException.class)
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    @Test
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         String authToken = "token";
         String caseTypeId = "caseTypeId";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -71,8 +74,8 @@ public class EccReportCcdReportDataSourceTest {
         when(ccdClient.eccReportSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
         EccReportCcdDataSource ccdReportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate));
-        fail("Should throw exception instead");
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate))
+        );
     }
-
 }

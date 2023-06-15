@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
@@ -10,16 +12,17 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class HearingsByHearingTypeCcdReportDataSourceTest {
+@ExtendWith(SpringExtension.class)
+class HearingsByHearingTypeCcdReportDataSourceTest {
 
     @Test
-    public void shouldReturnSearchResults() throws IOException {
+    void shouldReturnSearchResults() throws IOException {
         String authToken = "token";
         String caseTypeId = "caseTypeId_Listings";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -39,8 +42,8 @@ public class HearingsByHearingTypeCcdReportDataSourceTest {
         assertEquals(submitEvent, results.get(0));
     }
 
-    @Test(expected = ReportException.class)
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    @Test
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         String authToken = "token";
         String caseTypeId = "caseTypeId_Listings";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -51,8 +54,9 @@ public class HearingsByHearingTypeCcdReportDataSourceTest {
 
         HearingsByHearingTypeCcdReportDataSource ccdReportDataSource = new HearingsByHearingTypeCcdReportDataSource(
             authToken, ccdClient);
-        ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate));
-        fail("Should throw exception instead");
-    }
 
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate))
+        );
+    }
 }

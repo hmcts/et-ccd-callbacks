@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
@@ -16,15 +16,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesReadin
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class FixCaseApiServiceTest {
+@ExtendWith(SpringExtension.class)
+class FixCaseApiServiceTest {
 
     @Mock
     private MultipleCasesReadingService multipleCasesReadingService;
@@ -36,7 +36,7 @@ public class FixCaseApiServiceTest {
     private String urlLinkMarkUp;
     private long ccdReference;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         userToken = "authToken";
         ccdReference = 1_643_639_063_185_009L;
@@ -62,28 +62,28 @@ public class FixCaseApiServiceTest {
     }
 
     @Test
-    public void checkUpdateMultipleReference_LinkMarkUp_Normal() {
+    void checkUpdateMultipleReference_LinkMarkUp_Normal() {
         caseDetails.getCaseData().setMultipleReferenceLinkMarkUp(urlLinkMarkUp);
         fixCaseApiService.checkUpdateMultipleReference(caseDetails, userToken);
         assertEquals(urlLinkMarkUp, caseDetails.getCaseData().getMultipleReferenceLinkMarkUp());
     }
 
     @Test
-    public void checkUpdateMultipleReference_LinkMarkUp_Null() {
+    void checkUpdateMultipleReference_LinkMarkUp_Null() {
         caseDetails.getCaseData().setMultipleReferenceLinkMarkUp(null);
         fixCaseApiService.checkUpdateMultipleReference(caseDetails, userToken);
         assertEquals(urlLinkMarkUp, caseDetails.getCaseData().getMultipleReferenceLinkMarkUp());
     }
 
     @Test
-    public void checkUpdateMultipleReference_LinkMarkUp_CcdReference() {
+    void checkUpdateMultipleReference_LinkMarkUp_CcdReference() {
         caseDetails.getCaseData().setMultipleReferenceLinkMarkUp(String.valueOf(ccdReference));
         fixCaseApiService.checkUpdateMultipleReference(caseDetails, userToken);
         assertEquals(urlLinkMarkUp, caseDetails.getCaseData().getMultipleReferenceLinkMarkUp());
     }
 
     @Test
-    public void checkUpdateMultipleReference_EcmCaseType_getCaseData() {
+    void checkUpdateMultipleReference_EcmCaseType_getCaseData() {
         CaseData caseData = MultipleUtil.getCaseData("245000/2021");
         caseDetails.setCaseData(caseData);
         fixCaseApiService.checkUpdateMultipleReference(caseDetails, userToken);
@@ -91,21 +91,21 @@ public class FixCaseApiServiceTest {
     }
 
     @Test
-    public void checkUpdateMultipleReference_EcmCaseType_Null() {
+    void checkUpdateMultipleReference_EcmCaseType_Null() {
         caseDetails.getCaseData().setEcmCaseType(null);
         fixCaseApiService.checkUpdateMultipleReference(caseDetails, userToken);
         assertNull(caseDetails.getCaseData().getMultipleReferenceLinkMarkUp());
     }
 
     @Test
-    public void checkUpdateMultipleReference_EcmCaseType_Single() {
+    void checkUpdateMultipleReference_EcmCaseType_Single() {
         caseDetails.getCaseData().setEcmCaseType(SINGLE_CASE_TYPE);
         fixCaseApiService.checkUpdateMultipleReference(caseDetails, userToken);
         assertNull(caseDetails.getCaseData().getMultipleReferenceLinkMarkUp());
     }
 
     @Test
-    public void checkUpdateMultipleReference_submitMultipleEvents_Null() {
+    void checkUpdateMultipleReference_submitMultipleEvents_Null() {
         List<SubmitMultipleEvent> newSubmitMultipleEvents = new ArrayList<>();
         when(multipleCasesReadingService.retrieveMultipleCases(userToken,
                 ENGLANDWALES_BULK_CASE_TYPE_ID,

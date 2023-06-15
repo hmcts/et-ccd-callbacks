@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -22,10 +24,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-public class SessionDaysTest {
+@ExtendWith(SpringExtension.class)
+class SessionDaysTest {
 
     @Test
-    public void shouldGetSessionDaysForSingleHearingSingleSession() {
+    void shouldGetSessionDaysForSingleHearingSingleSession() {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
@@ -39,7 +42,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetSessionDaysForSingleHearingMultipleSession() {
+    void shouldGetSessionDaysForSingleHearingMultipleSession() {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
@@ -54,7 +57,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetSessionDaysForMultipleHearings() {
+    void shouldGetSessionDaysForMultipleHearings() {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
@@ -71,7 +74,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetSessionDaysForMultipleHearingsScenario2() {
+    void shouldGetSessionDaysForMultipleHearingsScenario2() {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
@@ -89,7 +92,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetSessionDaysIgnoreInvalidHearingType() {
+    void shouldGetSessionDaysIgnoreInvalidHearingType() {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
@@ -106,7 +109,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetSessionDaysForValidHearingType() {
+    void shouldGetSessionDaysForValidHearingType() {
         for (String hearingType : CasesCompletedReport.VALID_HEARING_TYPES) {
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
             CaseData caseData = caseDataBuilder
@@ -123,13 +126,13 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetNoSessionDaysIfCaseHasNoHearings() {
+    void shouldGetNoSessionDaysIfCaseHasNoHearings() {
         SessionDays sessionDays = new SessionDays(new ListingData(), new CaseData());
         assertNull(sessionDays.getLatestDisposedHearingSession());
     }
 
     @Test
-    public void shouldGetNoSessionDaysIfCaseHasEmptyHearingsCollection() {
+    void shouldGetNoSessionDaysIfCaseHasEmptyHearingsCollection() {
         CaseData caseData = new CaseData();
         caseData.setHearingCollection(new ArrayList<>());
         SessionDays sessionDays = new SessionDays(new ListingData(), caseData);
@@ -137,7 +140,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetNoSessionDaysIfCaseHasNoValidHearingType() {
+    void shouldGetNoSessionDaysIfCaseHasNoValidHearingType() {
         List<String> invalidHearingTypes = List.of(
                 HEARING_TYPE_JUDICIAL_COSTS_HEARING,
                 HEARING_TYPE_JUDICIAL_MEDIATION,
@@ -161,7 +164,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetNoSessionDaysIfNotEqualsListedDate() {
+    void shouldGetNoSessionDaysIfNotEqualsListedDate() {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
@@ -176,7 +179,7 @@ public class SessionDaysTest {
     }
 
     @Test
-    public void shouldGetNoSessionDaysIfHearingNotDisposed() {
+    void shouldGetNoSessionDaysIfHearingNotDisposed() {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)

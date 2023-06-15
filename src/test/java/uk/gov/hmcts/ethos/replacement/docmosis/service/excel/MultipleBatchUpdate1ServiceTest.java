@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleBatchUpdate1ServiceTest {
+class MultipleBatchUpdate1ServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -38,7 +38,7 @@ public class MultipleBatchUpdate1ServiceTest {
     }
 
     @Test
-    public void batchUpdate1Logic() {
+    void batchUpdate1Logic() {
 
         multipleBatchUpdate1Service.batchUpdate1Logic(userToken,
                 multipleDetails,

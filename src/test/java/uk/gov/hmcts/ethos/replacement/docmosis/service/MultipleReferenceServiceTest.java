@@ -15,7 +15,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleReferenceServiceTest {
+class MultipleReferenceServiceTest {
 
     @InjectMocks
     private MultipleReferenceService multipleReferenceService;
@@ -27,7 +27,7 @@ public class MultipleReferenceServiceTest {
     private MultipleRefScotlandRepository multipleRefScotlandRepository;
 
     @Test
-    public void createEnglandWalesReference() {
+    void createEnglandWalesReference() {
         String expectedReference = "6000001";
         when(multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen()).thenReturn(expectedReference);
 
@@ -35,14 +35,14 @@ public class MultipleReferenceServiceTest {
     }
 
     @Test
-    public void createEnglandWalesReferenceCaseTypeNotFound() {
+    void createEnglandWalesReferenceCaseTypeNotFound() {
         assertThrows(IllegalArgumentException.class, () ->
                 multipleReferenceService.createReference("invalid-case-type-id")
         );
     }
 
     @Test
-    public void createScotlandReference() {
+    void createScotlandReference() {
         String expectedReference = "8000001";
         when(multipleRefScotlandRepository.ethosMultipleCaseRefGen()).thenReturn(expectedReference);
 
@@ -50,7 +50,7 @@ public class MultipleReferenceServiceTest {
     }
 
     @Test
-    public void createScotlandReferenceCaseTypeNotFound() {
+    void createScotlandReferenceCaseTypeNotFound() {
         assertThrows(IllegalArgumentException.class, () ->
                 multipleReferenceService.createReference("invalid-case-type-id")
         );

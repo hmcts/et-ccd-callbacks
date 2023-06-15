@@ -38,7 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTI
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_ERROR;
 
 @ExtendWith(SpringExtension.class)
-public class ExcelReadingServiceTest {
+class ExcelReadingServiceTest {
 
     @Mock
     private ExcelDocManagementService excelDocManagementService;
@@ -62,7 +62,7 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void readExcelAll() throws IOException {
+    void readExcelAll() throws IOException {
 
         body = new ClassPathResource(TESTING_FILE_NAME);
         when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
@@ -79,7 +79,7 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void readExcelFlags() throws IOException {
+    void readExcelFlags() throws IOException {
 
         body = new ClassPathResource(TESTING_FILE_NAME);
         when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
@@ -93,7 +93,7 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void readExcelSubMultiple() throws IOException {
+    void readExcelSubMultiple() throws IOException {
 
         body = new ClassPathResource(TESTING_FILE_NAME);
         when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
@@ -113,7 +113,7 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void setSubMultipleFieldInSingleCaseDataTest() throws IOException {
+    void setSubMultipleFieldInSingleCaseDataTest() throws IOException {
         SubmitEvent submitEvent = new SubmitEvent();
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("1234");
@@ -132,7 +132,7 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void readExcelDynamicListFlags() throws IOException {
+    void readExcelDynamicListFlags() throws IOException {
 
         body = new ClassPathResource(TESTING_FILE_NAME);
         when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
@@ -153,7 +153,7 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void readExcelError() throws IOException {
+    void readExcelError() throws IOException {
 
         body = new ClassPathResource(TESTING_FILE_NAME_ERROR);
         when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
@@ -163,7 +163,7 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void readExcelException() {
+    void readExcelException() {
         assertThrows(Exception.class, () -> {
             body = new ClassPathResource(TESTING_FILE_NAME_ERROR);
             when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))

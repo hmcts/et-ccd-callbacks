@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-public class ExcelReportDocumentInfoServiceTest {
+class ExcelReportDocumentInfoServiceTest {
     @Mock
     ExcelReportDocumentInfoService excelReportDocInfService;
     @Mock
@@ -64,7 +64,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnNonNullExcelReportDocumentInfo() {
+    void shouldReturnNonNullExcelReportDocumentInfo() {
         setUpClaimsReport();
         when(claimsByHearingVenueExcelReportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
@@ -80,7 +80,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnCorrectCountOfDependenciesInvocation() {
+    void shouldReturnCorrectCountOfDependenciesInvocation() {
         setUpClaimsReport();
         when(claimsByHearingVenueExcelReportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
@@ -103,7 +103,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnCorrectCountOfDependenciesInvocationBfReport() {
+    void shouldReturnCorrectCountOfDependenciesInvocationBfReport() {
         setUpBfReport();
         when(bfExcelReportService.getReportExcelFile(bfActionReportData))
                 .thenReturn(new byte[0]);
@@ -125,7 +125,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnNonNullExcelBfReportDocumentInfo() {
+    void shouldReturnNonNullExcelBfReportDocumentInfo() {
         setUpBfReport();
         when(bfExcelReportService.getReportExcelFile(bfActionReportData))
                 .thenReturn(new byte[0]);

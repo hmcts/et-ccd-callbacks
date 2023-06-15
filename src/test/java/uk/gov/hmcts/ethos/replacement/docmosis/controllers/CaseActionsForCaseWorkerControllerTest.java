@@ -43,6 +43,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEven
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,7 +79,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CaseActionsForCaseWorkerController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-public class CaseActionsForCaseWorkerControllerTest {
+class CaseActionsForCaseWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String CREATION_CASE_URL = "/createCase";
@@ -235,7 +236,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void createCase() throws Exception {
+    void createCase() throws Exception {
         when(caseCreationForCaseWorkerService.caseCreationRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(submitEvent);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -244,13 +245,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void retrieveCase() throws Exception {
+    void retrieveCase() throws Exception {
         when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN),
                 isA(String.class), isA(String.class), isA(String.class)))
                 .thenReturn(submitEvent);
@@ -260,13 +261,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void retrieveCases() throws Exception {
+    void retrieveCases() throws Exception {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(submitEventList);
@@ -276,13 +277,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void updateCase() throws Exception {
+    void updateCase() throws Exception {
         when(caseUpdateForCaseWorkerService.caseUpdateRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(submitEvent);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -291,13 +292,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void preDefaultValues() throws Exception {
+    void preDefaultValues() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
@@ -305,13 +306,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void postDefaultValuesFromET1WithPositionTypeDefined() throws Exception {
+    void postDefaultValuesFromET1WithPositionTypeDefined() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -322,13 +323,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void postDefaultValues() throws Exception {
+    void postDefaultValues() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -339,13 +340,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendCaseDetails() throws Exception {
+    void amendCaseDetails() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
@@ -354,13 +355,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendCaseDetailsWithErrors() throws Exception {
+    void amendCaseDetailsWithErrors() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(false);
@@ -369,26 +370,26 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath("$.errors[0]", is("null Case has not been Accepted.")))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendClaimantDetails() throws Exception {
+    void amendClaimantDetails() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendRespondentDetails() throws Exception {
+    void amendRespondentDetails() throws Exception {
         when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -400,13 +401,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendRespondentDetailsContinuingClaim() throws Exception {
+    void amendRespondentDetailsContinuingClaim() throws Exception {
         when(caseManagementForCaseWorkerService.continuingRespondent(isA(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -418,13 +419,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendRespondentRepresentative() throws Exception {
+    void amendRespondentRepresentative() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
@@ -436,104 +437,104 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void updateHearing() throws Exception {
+    void updateHearing() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void allocateHearing() throws Exception {
+    void allocateHearing() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void restrictedCases() throws Exception {
+    void restrictedCases() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicRestrictedCases() throws Exception {
+    void dynamicRestrictedCases() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendHearing() throws Exception {
+    void amendHearing() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_HEARING_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void midEventAmendHearing() throws Exception {
+    void midEventAmendHearing() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendCaseState() throws Exception {
+    void amendCaseState() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendCaseStateValidationErrors() throws Exception {
+    void amendCaseStateValidationErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doCallRealMethod().when(eventValidationService).validateJurisdictionOutcome(isA(CaseData.class),
                 eq(false), eq(false), eq(new ArrayList<>()));
@@ -542,78 +543,78 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void midRespondentAddress() throws Exception {
+    void midRespondentAddress() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void jurisdictionValidation() throws Exception {
+    void jurisdictionValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void judgementValidation() throws Exception {
+    void judgementValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void depositValidation() throws Exception {
+    void depositValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void midRespondentAddressPopulated() throws Exception {
+    void midRespondentAddressPopulated() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void midRespondentECC() throws Exception {
+    void midRespondentECC() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(caseManagementForCaseWorkerService.createECC(isA(CaseDetails.class),
                 eq(AUTH_TOKEN), isA(List.class), isA(String.class)))
@@ -623,13 +624,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void createECC() throws Exception {
+    void createECC() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(caseManagementForCaseWorkerService.createECC(isA(CaseDetails.class),
                 eq(AUTH_TOKEN), isA(List.class), isA(String.class)))
@@ -639,13 +640,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void linkOriginalCaseECC() throws Exception {
+    void linkOriginalCaseECC() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(caseManagementForCaseWorkerService.createECC(isA(CaseDetails.class),
                 eq(AUTH_TOKEN), isA(List.class), isA(String.class)))
@@ -655,65 +656,65 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void singleCaseMultipleMidEventValidation() throws Exception {
+    void singleCaseMultipleMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void hearingMidEventValidation() throws Exception {
+    void hearingMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void bfActions() throws Exception {
+    void bfActions() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(BF_ACTIONS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicListBfActions() throws Exception {
+    void dynamicListBfActions() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void aboutToStartDisposal() throws Exception {
+    void aboutToStartDisposal() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(eventValidationService.validateCaseBeforeCloseEvent(isA(CaseData.class),
                         eq(false), eq(false), anyList())).thenReturn(anyList());
@@ -723,15 +724,15 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(clerkService, times(1)).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(CaseData.class));
     }
 
     @Test
-    public void aboutToStartDisposalCaseCloseEventValidationErrors() throws Exception {
+    void aboutToStartDisposalCaseCloseEventValidationErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(eventValidationService.validateCaseBeforeCloseEvent(isA(CaseData.class),
                 eq(false), eq(false), anyList())).thenReturn(List.of("test error"));
@@ -741,68 +742,68 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicRespondentRepresentativeNamesErrors() throws Exception {
+    void dynamicRespondentRepresentativeNamesErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicDepositOrderErrors() throws Exception {
+    void dynamicDepositOrderErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicRestrictedReportingErrors() throws Exception {
+    void dynamicRestrictedReportingErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void initialiseAmendCaseDetails() throws Exception {
+    void initialiseAmendCaseDetails() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(clerkService, times(1)).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(CaseData.class));
     }
 
     @Test
-    public void reinstateClosedCaseMidEventValidation() throws Exception {
+    void reinstateClosedCaseMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(caseCloseValidator.validateReinstateClosedCaseMidEvent(isA(CaseData.class))).thenReturn(anyList());
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
@@ -810,13 +811,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void reinstateClosedCaseMidEventValidationErrors() throws Exception {
+    void reinstateClosedCaseMidEventValidationErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(caseCloseValidator.validateReinstateClosedCaseMidEvent(isA(CaseData.class)))
                 .thenReturn(List.of("test error"));
@@ -825,13 +826,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void createCaseError400() throws Exception {
+    void createCaseError400() throws Exception {
         mvc.perform(post(CREATION_CASE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -840,7 +841,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void retrieveCaseError400() throws Exception {
+    void retrieveCaseError400() throws Exception {
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -849,7 +850,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void retrieveCasesError400() throws Exception {
+    void retrieveCasesError400() throws Exception {
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -858,7 +859,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void updateCaseError400() throws Exception {
+    void updateCaseError400() throws Exception {
         mvc.perform(post(UPDATE_CASE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -867,7 +868,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void preDefaultValuesError400() throws Exception {
+    void preDefaultValuesError400() throws Exception {
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -876,7 +877,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void postDefaultValuesError400() throws Exception {
+    void postDefaultValuesError400() throws Exception {
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -885,7 +886,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendCaseDetailsError400() throws Exception {
+    void amendCaseDetailsError400() throws Exception {
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -894,7 +895,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendClaimantDetailsError400() throws Exception {
+    void amendClaimantDetailsError400() throws Exception {
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -903,7 +904,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendRespondentDetailsError400() throws Exception {
+    void amendRespondentDetailsError400() throws Exception {
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -912,7 +913,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendRespondentRepresentativeError400() throws Exception {
+    void amendRespondentRepresentativeError400() throws Exception {
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -921,7 +922,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void updateHearingError400() throws Exception {
+    void updateHearingError400() throws Exception {
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -930,7 +931,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void allocateHearingError400() throws Exception {
+    void allocateHearingError400() throws Exception {
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -939,7 +940,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void restrictedCasesError400() throws Exception {
+    void restrictedCasesError400() throws Exception {
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -948,7 +949,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendHearingError400() throws Exception {
+    void amendHearingError400() throws Exception {
         mvc.perform(post(AMEND_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -957,7 +958,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midEventAmendHearingError400() throws Exception {
+    void midEventAmendHearingError400() throws Exception {
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -966,7 +967,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendCaseStateError400() throws Exception {
+    void amendCaseStateError400() throws Exception {
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -975,7 +976,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midRespondentAddressError400() throws Exception {
+    void midRespondentAddressError400() throws Exception {
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -984,7 +985,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void jurisdictionValidationError400() throws Exception {
+    void jurisdictionValidationError400() throws Exception {
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -993,7 +994,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void judgementValidationError400() throws Exception {
+    void judgementValidationError400() throws Exception {
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1002,7 +1003,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void depositValidationError400() throws Exception {
+    void depositValidationError400() throws Exception {
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1011,7 +1012,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midRespondentECCError400() throws Exception {
+    void midRespondentECCError400() throws Exception {
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1020,7 +1021,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void createECCError400() throws Exception {
+    void createECCError400() throws Exception {
         mvc.perform(post(CREATE_ECC_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1029,7 +1030,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void linkOriginalCaseECCError400() throws Exception {
+    void linkOriginalCaseECCError400() throws Exception {
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1038,7 +1039,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void singleCaseMultipleMidEventValidationError400() throws Exception {
+    void singleCaseMultipleMidEventValidationError400() throws Exception {
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1047,7 +1048,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void hearingMidEventValidationError400() throws Exception {
+    void hearingMidEventValidationError400() throws Exception {
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1056,7 +1057,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void bfActionsError400() throws Exception {
+    void bfActionsError400() throws Exception {
         mvc.perform(post(BF_ACTIONS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1065,7 +1066,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicListBfActionsError400() throws Exception {
+    void dynamicListBfActionsError400() throws Exception {
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1074,7 +1075,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void aboutToStartDisposalError400() throws Exception {
+    void aboutToStartDisposalError400() throws Exception {
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1083,7 +1084,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicRespondentRepresentativeNamesUrlError400() throws Exception {
+    void dynamicRespondentRepresentativeNamesUrlError400() throws Exception {
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1092,7 +1093,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicDepositOrderError400() throws Exception {
+    void dynamicDepositOrderError400() throws Exception {
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1101,7 +1102,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicRestrictedReportingError400() throws Exception {
+    void dynamicRestrictedReportingError400() throws Exception {
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1110,7 +1111,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicJudgmentError400() throws Exception {
+    void dynamicJudgmentError400() throws Exception {
         mvc.perform(post(DYNAMIC_JUDGMENT_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1119,7 +1120,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void judgmentSubmittedError400() throws Exception {
+    void judgmentSubmittedError400() throws Exception {
         mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1128,7 +1129,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicFixCaseAPIError400() throws Exception {
+    void dynamicFixCaseAPIError400() throws Exception {
         mvc.perform(post(AMEND_FIX_CASE_API_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1138,7 +1139,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void reinstateClosedCaseError400() throws Exception {
+    void reinstateClosedCaseError400() throws Exception {
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                         .content("error")
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1148,7 +1149,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void createCaseError500() throws Exception {
+    void createCaseError500() throws Exception {
         when(caseCreationForCaseWorkerService.caseCreationRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -1160,7 +1161,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void retrieveCaseError500() throws Exception {
+    void retrieveCaseError500() throws Exception {
         when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN), isA(String.class),
                 isA(String.class), isA(String.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -1173,7 +1174,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void retrieveCasesError500() throws Exception {
+    void retrieveCasesError500() throws Exception {
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -1185,7 +1186,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void updateCaseError500() throws Exception {
+    void updateCaseError500() throws Exception {
         when(caseUpdateForCaseWorkerService.caseUpdateRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -1197,7 +1198,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void preDefaultValuesError500() throws Exception {
+    void preDefaultValuesError500() throws Exception {
         when(defaultValuesReaderService.getClaimantTypeOfClaimant()).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
@@ -1208,7 +1209,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void postDefaultValuesError500() throws Exception {
+    void postDefaultValuesError500() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenThrow(
                 new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -1222,7 +1223,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendCaseDetailsError500() throws Exception {
+    void amendCaseDetailsError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(eventValidationService.validateCaseState(isA(CaseDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -1235,7 +1236,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendRespondentDetailsError500() throws Exception {
+    void amendRespondentDetailsError500() throws Exception {
         when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -1247,7 +1248,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendRespondentDetailsClaimContinuingError500() throws Exception {
+    void amendRespondentDetailsClaimContinuingError500() throws Exception {
         when(caseManagementForCaseWorkerService.continuingRespondent(isA(CCDRequest.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -1259,7 +1260,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void singleCaseMultipleMidEventValidationError500() throws Exception {
+    void singleCaseMultipleMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(singleCaseMultipleMidEventValidationService)
                 .singleCaseMultipleValidationLogic(
                 eq(AUTH_TOKEN), isA(CaseDetails.class), isA(List.class));
@@ -1272,7 +1273,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void createCaseErrorForbidden() throws Exception {
+    void createCaseErrorForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATION_CASE_URL)
                 .content(requestContent.toString())
@@ -1282,7 +1283,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void retrieveCaseForbidden() throws Exception {
+    void retrieveCaseForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content(requestContent.toString())
@@ -1292,7 +1293,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void retrieveCasesForbidden() throws Exception {
+    void retrieveCasesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content(requestContent.toString())
@@ -1302,7 +1303,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void updateCaseForbidden() throws Exception {
+    void updateCaseForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_CASE_URL)
                 .content(requestContent.toString())
@@ -1312,7 +1313,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void preDefaultValuesForbidden() throws Exception {
+    void preDefaultValuesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
@@ -1322,7 +1323,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void postDefaultValuesForbidden() throws Exception {
+    void postDefaultValuesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent2.toString())
@@ -1332,7 +1333,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendCaseDetailsForbidden() throws Exception {
+    void amendCaseDetailsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -1342,7 +1343,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendClaimantDetailsForbidden() throws Exception {
+    void amendClaimantDetailsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -1352,7 +1353,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendRespondentDetailsForbidden() throws Exception {
+    void amendRespondentDetailsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -1362,7 +1363,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendRespondentRepresentativeForbidden() throws Exception {
+    void amendRespondentRepresentativeForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content(requestContent.toString())
@@ -1372,7 +1373,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void updateHearingForbidden() throws Exception {
+    void updateHearingForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content(requestContent.toString())
@@ -1382,7 +1383,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void allocateHearingForbidden() throws Exception {
+    void allocateHearingForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content(requestContent.toString())
@@ -1392,7 +1393,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void restrictedCasesForbidden() throws Exception {
+    void restrictedCasesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content(requestContent.toString())
@@ -1402,7 +1403,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendHearingForbidden() throws Exception {
+    void amendHearingForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_HEARING_URL)
                 .content(requestContent2.toString())
@@ -1412,7 +1413,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midEventAmendHearingForbidden() throws Exception {
+    void midEventAmendHearingForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content(requestContent2.toString())
@@ -1422,7 +1423,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void amendCaseStateForbidden() throws Exception {
+    void amendCaseStateForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
@@ -1432,7 +1433,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midRespondentAddressForbidden() throws Exception {
+    void midRespondentAddressForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent2.toString())
@@ -1442,7 +1443,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void jurisdictionValidationForbidden() throws Exception {
+    void jurisdictionValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1452,7 +1453,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void judgementValidationForbidden() throws Exception {
+    void judgementValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1462,7 +1463,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void depositValidationForbidden() throws Exception {
+    void depositValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1472,7 +1473,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midRespondentAddressPopulatedForbidden() throws Exception {
+    void midRespondentAddressPopulatedForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent.toString())
@@ -1482,7 +1483,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midRespondentECCForbidden() throws Exception {
+    void midRespondentECCForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content(requestContent2.toString())
@@ -1492,7 +1493,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void createECCForbidden() throws Exception {
+    void createECCForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_ECC_URL)
                 .content(requestContent2.toString())
@@ -1502,7 +1503,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void linkOriginalCaseECCForbidden() throws Exception {
+    void linkOriginalCaseECCForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content(requestContent2.toString())
@@ -1512,7 +1513,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void singleCaseMultipleMidEventValidationForbidden() throws Exception {
+    void singleCaseMultipleMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
@@ -1522,7 +1523,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void hearingMidEventValidationForbidden() throws Exception {
+    void hearingMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
@@ -1532,7 +1533,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void bfActionsForbidden() throws Exception {
+    void bfActionsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(BF_ACTIONS_URL)
                 .content(requestContent2.toString())
@@ -1542,7 +1543,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicListBfActionsForbidden() throws Exception {
+    void dynamicListBfActionsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content(requestContent2.toString())
@@ -1552,7 +1553,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void aboutToStartDisposalForbidden() throws Exception {
+    void aboutToStartDisposalForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content(requestContent2.toString())
@@ -1564,7 +1565,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicRespondentRepresentativeNamesUrlForbidden() throws Exception {
+    void dynamicRespondentRepresentativeNamesUrlForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content(requestContent2.toString())
@@ -1574,7 +1575,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicDepositOrderUrlForbidden() throws Exception {
+    void dynamicDepositOrderUrlForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content(requestContent2.toString())
@@ -1584,7 +1585,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicRestrictedReportingUrlForbidden() throws Exception {
+    void dynamicRestrictedReportingUrlForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent2.toString())
@@ -1594,7 +1595,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicJudgmentUrlForbidden() throws Exception {
+    void dynamicJudgmentUrlForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_JUDGMENT_URL)
                 .content(requestContent2.toString())
@@ -1604,7 +1605,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void judgmentSubmittedUrlForbidden() throws Exception {
+    void judgmentSubmittedUrlForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
                 .content(requestContent2.toString())
@@ -1614,7 +1615,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void dynamicFixCaseAPIForbidden() throws Exception {
+    void dynamicFixCaseAPIForbidden() throws Exception {
         CaseDetails caseDetails = new CaseDetails();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_FIX_CASE_API_URL)
@@ -1626,7 +1627,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void reinstateClosedCaseForbidden() throws Exception {
+    void reinstateClosedCaseForbidden() throws Exception {
         CaseData caseData = new CaseData();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
@@ -1638,7 +1639,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void initialiseAmendCaseDetailsForbidden() throws Exception {
+    void initialiseAmendCaseDetailsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())

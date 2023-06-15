@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleUpdateServiceTest {
+class MultipleUpdateServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -53,7 +53,7 @@ public class MultipleUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdate1Logic() {
+    void bulkUpdate1Logic() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         multipleUpdateService.bulkUpdateLogic(userToken,
@@ -68,7 +68,7 @@ public class MultipleUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdate2Logic() {
+    void bulkUpdate2Logic() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         multipleDetails.getCaseData().setBatchUpdateType(BATCH_UPDATE_TYPE_2);
@@ -84,7 +84,7 @@ public class MultipleUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdate3Logic() {
+    void bulkUpdate3Logic() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         multipleDetails.getCaseData().setBatchUpdateType(BATCH_UPDATE_TYPE_3);
@@ -100,7 +100,7 @@ public class MultipleUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogicEmptyAcceptedState() {
+    void bulkUpdateLogicEmptyAcceptedState() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());
         multipleUpdateService.bulkUpdateLogic(userToken,

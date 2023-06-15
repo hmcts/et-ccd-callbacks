@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleDocGenerationServiceTest {
+class MultipleDocGenerationServiceTest {
 
     @Mock
     private MultipleLetterService multipleLetterService;
@@ -40,7 +40,7 @@ public class MultipleDocGenerationServiceTest {
     }
 
     @Test
-    public void midSelectedAddressLabelsMultiple() {
+    void midSelectedAddressLabelsMultiple() {
         multipleDetails.getCaseData().setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
         multipleDocGenerationService.midSelectedAddressLabelsMultiple(userToken, multipleDetails, errors);
         verify(multipleLetterService, times(1)).bulkLetterLogic(

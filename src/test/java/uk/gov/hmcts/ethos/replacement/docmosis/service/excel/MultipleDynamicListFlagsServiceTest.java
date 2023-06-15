@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.SELECT_ALL;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleDynamicListFlagsServiceTest {
+class MultipleDynamicListFlagsServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -41,7 +41,7 @@ public class MultipleDynamicListFlagsServiceTest {
     }
 
     @Test
-    public void populateDynamicListFlagsLogic() {
+    void populateDynamicListFlagsLogic() {
 
         List<String> errors = new ArrayList<>();
 

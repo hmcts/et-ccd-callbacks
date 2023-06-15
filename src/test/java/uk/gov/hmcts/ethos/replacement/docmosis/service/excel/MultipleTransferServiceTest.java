@@ -49,7 +49,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RequiredArgsConstructor
 @ExtendWith(SpringExtension.class)
-public class MultipleTransferServiceTest {
+class MultipleTransferServiceTest {
 
     private String ccdGatewayBaseUrl;
 
@@ -88,7 +88,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void multipleTransferLogic() {
+    void multipleTransferLogic() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(singleCasesReadingService.retrieveSingleCases(anyString(), anyString(), anyList(), anyString()))
@@ -122,7 +122,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void multipleTransferLogicEmptyCollection() {
+    void multipleTransferLogicEmptyCollection() {
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());
@@ -134,7 +134,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void populateDataIfComingFromCT() {
+    void populateDataIfComingFromCT() {
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
@@ -163,7 +163,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void validateCasesBeforeTransfer() {
+    void validateCasesBeforeTransfer() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 
@@ -205,7 +205,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void validateCasesBeforeTransfer_withoutErrors() {
+    void validateCasesBeforeTransfer_withoutErrors() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 

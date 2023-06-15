@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUplo
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_ROWS;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleUploadServiceTest {
+class MultipleUploadServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -52,7 +52,7 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogic() throws IOException {
+    void bulkUploadLogic() throws IOException {
 
         List<String> errors = new ArrayList<>();
 
@@ -70,7 +70,7 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogicWrongColumnRow() throws IOException {
+    void bulkUploadLogicWrongColumnRow() throws IOException {
 
         List<String> errors = new ArrayList<>();
 
@@ -91,7 +91,7 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogicEmptySheet() throws IOException {
+    void bulkUploadLogicEmptySheet() throws IOException {
         List<String> errors = new ArrayList<>();
 
         setDocumentCollection(multipleDetails.getCaseData());
@@ -109,7 +109,7 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogicException() {
+    void bulkUploadLogicException() {
         assertThrows(Exception.class, () -> {
             when(excelReadingService.checkExcelErrors(
                     userToken,

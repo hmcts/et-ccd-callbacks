@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -33,8 +35,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.ExcessiveImports"})
-public class DocumentHelperTest {
+@ExtendWith(SpringExtension.class)
+class DocumentHelperTest {
 
     private static final String DUMMY_CASE_TYPE_ID = "dummy case type id";
     private static final String MANCHESTER_VENUE_ADDRESS =
@@ -107,7 +109,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent1() {
+    void buildDocumentContent1() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00026.docx\",\n"
@@ -186,7 +188,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent2_ResponseStruckOut() {
+    void buildDocumentContent2_ResponseStruckOut() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00027.docx\",\n"
@@ -258,7 +260,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent2_ResponseNotStruckOut() {
+    void buildDocumentContent2_ResponseNotStruckOut() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00027.docx\",\n"
@@ -338,7 +340,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent3() {
+    void buildDocumentContent3() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00028.docx\",\n"
@@ -414,7 +416,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent4() {
+    void buildDocumentContent4() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00029.docx\",\n"
@@ -490,7 +492,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent5() {
+    void buildDocumentContent5() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00030.docx\",\n"
@@ -569,7 +571,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent6() {
+    void buildDocumentContent6() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00031.docx\",\n"
@@ -647,7 +649,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent7() {
+    void buildDocumentContent7() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00032.docx\",\n"
@@ -726,7 +728,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent8() {
+    void buildDocumentContent8() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00033.docx\",\n"
@@ -804,7 +806,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent9() {
+    void buildDocumentContent9() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00034.docx\",\n"
@@ -881,7 +883,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent10() {
+    void buildDocumentContent10() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\",\n"
@@ -909,7 +911,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent12() {
+    void buildDocumentContent12() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\",\n"
@@ -959,7 +961,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent13() {
+    void buildDocumentContent13() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\",\n"
@@ -1000,7 +1002,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent14() {
+    void buildDocumentContent14() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\",\n"
@@ -1160,7 +1162,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent15() {
+    void buildDocumentContent15() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\",\n"
@@ -1385,7 +1387,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContent20() {
+    void buildDocumentContent20() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-EGW-ENG-00043.docx\",\n"
@@ -1465,7 +1467,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentWithNotContent() {
+    void buildDocumentWithNotContent() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\".docx\",\n"
@@ -1534,7 +1536,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContentScot1() {
+    void buildDocumentContentScot1() {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(GLASGOW_VENUE_ADDRESS);
 
         String expected = "{\n"
@@ -1613,7 +1615,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContentScot2() {
+    void buildDocumentContentScot2() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00043.docx\",\n"
@@ -1689,7 +1691,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContentScot3() {
+    void buildDocumentContentScot3() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx\",\n"
@@ -1764,7 +1766,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContentScot3AllocatedOffice() {
+    void buildDocumentContentScot3AllocatedOffice() {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
@@ -1846,7 +1848,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContentScot4() throws URISyntaxException, IOException {
+    void buildDocumentContentScot4() throws URISyntaxException, IOException {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
 
         String expectedResult = getExpectedResult("expectedDocumentContentScot4.json");
@@ -1862,7 +1864,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildScotDocumentTemplates() {
+    void buildScotDocumentTemplates() {
         CaseData caseData = new CaseData();
         CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
         String topLevel = "Part_3_Scot";
@@ -1952,7 +1954,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentTemplates() {
+    void buildDocumentTemplates() {
         CaseData caseData = new CaseData();
         CorrespondenceType correspondenceType = new CorrespondenceType();
         String topLevel = "Part_18";
@@ -2095,7 +2097,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void buildDocumentContentMultiples() {
+    void buildDocumentContentMultiples() {
         AddressLabelsAttributesType addressLabelsAttributesType = new AddressLabelsAttributesType();
         addressLabelsAttributesType.setNumberOfCopies("1");
         addressLabelsAttributesType.setStartingLabel("2");
@@ -2142,7 +2144,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void getCorrespondenceHearingNumber() {
+    void getCorrespondenceHearingNumber() {
         String expectedCorrespondenceHearingNumber = "2";
 
         assertEquals(expectedCorrespondenceHearingNumber, DocumentHelper.getCorrespondenceHearingNumber(
@@ -2151,7 +2153,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void getHearingByNumber() {
+    void getHearingByNumber() {
         String expectedHearingNumber = "2";
         String expectedHearingType = "Single";
         String expectedHearingVenue = "Manchester";
@@ -2181,7 +2183,7 @@ public class DocumentHelperTest {
     }
 
     @Test
-    public void setLegalRepVisibleDocuments_hidesDocuments() {
+    void setLegalRepVisibleDocuments_hidesDocuments() {
         CaseData caseData = new CaseData();
         DocumentTypeItem et1Doc = DocumentFixtures.getDocumentTypeItem("Visible", "ET1");
         DocumentTypeItem caseFileDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Tribunal case file");

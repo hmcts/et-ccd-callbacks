@@ -2,7 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
 
@@ -13,7 +15,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-public class ClaimsByHearingVenueExcelReportCreationServiceTest {
+@ExtendWith(SpringExtension.class)
+class ClaimsByHearingVenueExcelReportCreationServiceTest {
     @Mock
     ClaimsByHearingVenueExcelReportCreationService service;
     ExcelCreationService excelCreationService;
@@ -35,12 +38,12 @@ public class ClaimsByHearingVenueExcelReportCreationServiceTest {
     }
 
     @Test
-    public void shouldReturnReportExcelFileDocumentInfo() {
+    void shouldReturnReportExcelFileDocumentInfo() {
         assertNotNull(service.getReportExcelFile(reportData));
     }
 
     @Test
-    public void shouldReturnReportExcelFileEmptyByteArray() {
+    void shouldReturnReportExcelFileEmptyByteArray() {
         assertNotNull(service.getReportExcelFile(
                 new ClaimsByHearingVenueReportData()));
     }

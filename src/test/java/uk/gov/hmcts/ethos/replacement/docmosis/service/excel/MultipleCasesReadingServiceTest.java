@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleCasesReadingServiceTest {
+class MultipleCasesReadingServiceTest {
 
     @Mock
     private CcdClient ccdClient;
@@ -44,7 +44,7 @@ public class MultipleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveMultipleCasesWithRetries() throws IOException {
+    void retrieveMultipleCasesWithRetries() throws IOException {
         when(ccdClient.retrieveMultipleCasesElasticSearchWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))
@@ -59,7 +59,7 @@ public class MultipleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveMultipleCasesWithRetriesException() throws IOException {
+    void retrieveMultipleCasesWithRetriesException() throws IOException {
         when(ccdClient.retrieveMultipleCasesElasticSearchWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))
@@ -78,7 +78,7 @@ public class MultipleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveMultipleCases() throws IOException {
+    void retrieveMultipleCases() throws IOException {
         when(ccdClient.retrieveMultipleCasesElasticSearch(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))
@@ -93,7 +93,7 @@ public class MultipleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveMultipleCasesException() throws IOException {
+    void retrieveMultipleCasesException() throws IOException {
         when(ccdClient.retrieveMultipleCasesElasticSearch(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getMultipleReference()))

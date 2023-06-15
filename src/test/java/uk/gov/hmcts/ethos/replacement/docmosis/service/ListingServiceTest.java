@@ -96,7 +96,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUS
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class ListingServiceTest {
+class ListingServiceTest {
 
     @InjectMocks
     private ListingService listingService;
@@ -980,7 +980,7 @@ public class ListingServiceTest {
     @Test
     @Disabled
     // listingCollection.get(0) is null so cannot proceed
-    public void processListingHearingsRequest_causeListDateNull() throws IOException {
+    void processListingHearingsRequest_causeListDateNull() throws IOException {
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingData = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
         List<ListingTypeItem> listingCollection = listingData.getListingCollection();

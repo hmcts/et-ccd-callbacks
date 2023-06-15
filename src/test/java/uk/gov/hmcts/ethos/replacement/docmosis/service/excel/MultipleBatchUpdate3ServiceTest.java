@@ -33,7 +33,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleBatchUpdate3ServiceTest {
+class MultipleBatchUpdate3ServiceTest {
 
     @Mock
     private SingleCasesReadingService singleCasesReadingService;
@@ -60,7 +60,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3Logic() {
+    void batchUpdate3Logic() {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList("AA"));
@@ -94,7 +94,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3LogicClaimantRepRemoval() throws IOException {
+    void batchUpdate3LogicClaimantRepRemoval() throws IOException {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList("AA"));
@@ -133,7 +133,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3LogicRespondentRepRemoval() throws IOException {
+    void batchUpdate3LogicRespondentRepRemoval() throws IOException {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList("AA"));
@@ -171,7 +171,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3LogicNoChanges() {
+    void batchUpdate3LogicNoChanges() {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));

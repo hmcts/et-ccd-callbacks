@@ -60,7 +60,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.succe
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.unsuccessfulDocumentManagementUploadResponse;
 
 @ExtendWith(SpringExtension.class)
-public class DocumentManagementServiceTest {
+class DocumentManagementServiceTest {
 
     @Mock
     private DocumentUploadClientApi documentUploadClient;

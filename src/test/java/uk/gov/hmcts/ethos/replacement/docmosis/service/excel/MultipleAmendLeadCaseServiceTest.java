@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_IS_NOT_IN_MULTIPLE_ERROR;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleAmendLeadCaseServiceTest {
+class MultipleAmendLeadCaseServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -41,7 +41,7 @@ public class MultipleAmendLeadCaseServiceTest {
     }
 
     @Test
-    public void bulkAmendLeadCaseLogicDoesNotExist() {
+    void bulkAmendLeadCaseLogicDoesNotExist() {
         List<String> errors = new ArrayList<>();
         multipleDetails.getCaseData().setAmendLeadCase("245020/2020");
         multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(userToken,
@@ -53,7 +53,7 @@ public class MultipleAmendLeadCaseServiceTest {
     }
 
     @Test
-    public void bulkAmendLeadCaseLogicDifferentLead() {
+    void bulkAmendLeadCaseLogicDifferentLead() {
         String amendLeadCase = "245000/2020";
         multipleDetails.getCaseData().setAmendLeadCase(amendLeadCase);
         multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(userToken,

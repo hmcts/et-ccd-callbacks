@@ -14,7 +14,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-public class SubMultipleReferenceServiceTest {
+class SubMultipleReferenceServiceTest {
 
     @InjectMocks
     private SubMultipleReferenceService subMultipleReferenceService;
@@ -24,7 +24,7 @@ public class SubMultipleReferenceServiceTest {
     private SubMultipleRefScotlandRepository subMultipleRefScotlandRepository;
 
     @Test
-    public void createManchesterReference() {
+    void createManchesterReference() {
         String multipleRef = "6000001";
         when(subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1))
                 .thenReturn(multipleRef + "/1");
@@ -35,7 +35,7 @@ public class SubMultipleReferenceServiceTest {
     }
 
     @Test
-    public void createScotlandReference() {
+    void createScotlandReference() {
         String multipleRef = "8000001";
         when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1))
                 .thenReturn(multipleRef + "/1");

@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
@@ -32,7 +34,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
-public class CasesAwaitingJudgmentReportTest {
+@ExtendWith(SpringExtension.class)
+class CasesAwaitingJudgmentReportTest {
 
     ReportDataSource reportDataSource;
     CasesAwaitingJudgmentReport casesAwaitingJudgmentReport;
@@ -63,7 +66,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldNotShowClosedCase() {
+    void shouldNotShowClosedCase() {
         // Given a case is closed
         // When I request report data
         // Then the case should not be in the report data
@@ -80,7 +83,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldNotShowCaseWithInvalidPositionType() {
+    void shouldNotShowCaseWithInvalidPositionType() {
         // Given a case is not closed
         // And a case has an invalid position type
         // Examples
@@ -108,7 +111,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldNotShowCaseIfNoHearingsExist() {
+    void shouldNotShowCaseIfNoHearingsExist() {
         // Given a case is not closed
         // And has a valid position type
         // And has no hearings
@@ -129,7 +132,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldNotShowCaseIfNoHearingHasBeenHeard() {
+    void shouldNotShowCaseIfNoHearingHasBeenHeard() {
         // Given a case is not closed
         // And has a valid position type
         // And has no hearing that has been heard
@@ -151,7 +154,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldNotShowCaseIfHeardButJudgmentMade() {
+    void shouldNotShowCaseIfHeardButJudgmentMade() {
         // Given a case is not closed
         // And has a valid position type
         // And has been heard
@@ -175,7 +178,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldShowValidCase() {
+    void shouldShowValidCase() {
         // Given a case is not closed
         // And has been heard
         // And is awaiting judgment
@@ -197,7 +200,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldShowTotalPositionValuesInSummary() {
+    void shouldShowTotalPositionValuesInSummary() {
         // Given I have 3 valid cases with position type Draft with Members
         // When I request report data
         // Then the report summary shows 3 Draft with Members
@@ -219,7 +222,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldShowMultiplePositionValuesInSummaryInOrder() {
+    void shouldShowMultiplePositionValuesInSummaryInOrder() {
         // Given I have 3 valid cases with position type Draft with Members
         // And I have 2 valid cases with position type Awaiting written reasons
         // And I have 1 valid case with position type Fair copy, to chairman for signature
@@ -257,7 +260,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldContainCorrectDetailValuesForCaseWithOneHearing() {
+    void shouldContainCorrectDetailValuesForCaseWithOneHearing() {
         // Given I have a valid case
         // When I request report data
         // Then I have correct report detail values for the case
@@ -303,7 +306,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldContainCorrectMultipleReferenceIfInMultiple() {
+    void shouldContainCorrectMultipleReferenceIfInMultiple() {
         // Given I have a valid case
         // And the case is a Multiple case type
         // When I request report data
@@ -332,7 +335,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldContainCorrectDetailValuesForCaseWithMultipleHearings() {
+    void shouldContainCorrectDetailValuesForCaseWithMultipleHearings() {
         // Given I have a valid case
         // And the case has the following hearings:
         // | Listed Date | Hearing Number | Status |
@@ -380,7 +383,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void shouldOrderReportDetailsInDaysSinceHeardDescOrder() {
+    void shouldOrderReportDetailsInDaysSinceHeardDescOrder() {
         // Given I have valid cases
         // And the cases have the following listed dates
         // | Case Number | Listed Date |
@@ -444,7 +447,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void checkReportOfficeName_EngWales() {
+    void checkReportOfficeName_EngWales() {
         ListingDetails listingDetails = new ListingDetails();
         ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
@@ -455,7 +458,7 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
-    public void checkReportOfficeName_Scotland() {
+    void checkReportOfficeName_Scotland() {
         ListingDetails listingDetails = new ListingDetails();
         ListingData caseData = new ListingData();
         caseData.setManagingOffice(null);

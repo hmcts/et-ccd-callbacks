@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -14,10 +16,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class HearingSelectionServiceTest {
+@ExtendWith(SpringExtension.class)
+class HearingSelectionServiceTest {
 
     @Test
-    public void testGetHearingSelectionSortedByDateTime() {
+    void testGetHearingSelectionSortedByDateTime() {
         CaseData caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
@@ -35,7 +38,7 @@ public class HearingSelectionServiceTest {
     }
 
     @Test
-    public void testGetHearingSelection() {
+    void testGetHearingSelection() {
         CaseData caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
@@ -51,7 +54,7 @@ public class HearingSelectionServiceTest {
     }
 
     @Test
-    public void testGetSelectedHearing() {
+    void testGetSelectedHearing() {
         CaseData caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
@@ -65,7 +68,7 @@ public class HearingSelectionServiceTest {
     }
 
     @Test
-    public void testGetSelectedHearingNotFound() {
+    void testGetSelectedHearingNotFound() {
         CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
 
@@ -75,7 +78,7 @@ public class HearingSelectionServiceTest {
     }
 
     @Test
-    public void getSelectedListing() {
+    void getSelectedListing() {
         CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         caseData.setAllocateHearingHearing(new DynamicFixedListType("id1"));
@@ -90,7 +93,7 @@ public class HearingSelectionServiceTest {
     }
 
     @Test
-    public void testGetListingsNotFound() {
+    void testGetListingsNotFound() {
         CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         caseData.setAllocateHearingHearing(new DynamicFixedListType("id5"));

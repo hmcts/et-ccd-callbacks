@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class CaseRetrievalForCaseWorkerServiceTest {
+class CaseRetrievalForCaseWorkerServiceTest {
 
     @InjectMocks
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -47,7 +47,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     }
 
     @Test
-    public void caseRetrievalRequestException() {
+    void caseRetrievalRequestException() {
         assertThrows(Exception.class, () -> {
             when(ccdClient.retrieveCase(anyString(), anyString(),
                     anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
@@ -59,7 +59,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     }
 
     @Test
-    public void caseRetrievalRequest() throws IOException {
+    void caseRetrievalRequest() throws IOException {
         when(ccdClient.retrieveCase(anyString(), anyString(), anyString(), any())).thenReturn(submitEvent);
         SubmitEvent submitEvent1 = caseRetrievalForCaseWorkerService.caseRetrievalRequest("authToken",
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(), "11111");
@@ -67,7 +67,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     }
 
     @Test
-    public void casesRetrievalRequestException() throws IOException {
+    void casesRetrievalRequestException() throws IOException {
         when(ccdClient.retrieveCases(anyString(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
 
         assertThrows(Exception.class, () ->
@@ -76,7 +76,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     }
 
     @Test
-    public void casesRetrievalRequest() throws IOException {
+    void casesRetrievalRequest() throws IOException {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
         when(ccdClient.retrieveCases(anyString(), any(), any())).thenReturn(submitEventList);
         List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalRequest(
@@ -85,7 +85,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     }
 
     @Test
-    public void casesRetrievalESRequestException() throws IOException {
+    void casesRetrievalESRequestException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 
@@ -96,7 +96,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     }
 
     @Test
-    public void casesRetrievalESRequest() throws IOException {
+    void casesRetrievalESRequest() throws IOException {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any())).thenReturn(submitEventList);
         List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalESRequest(

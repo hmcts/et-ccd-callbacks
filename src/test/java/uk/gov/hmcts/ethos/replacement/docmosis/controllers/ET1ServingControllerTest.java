@@ -71,8 +71,8 @@ class ET1ServingControllerTest {
                 .andExpect(jsonPath("$.data.otherTypeDocumentName", notNullValue()))
                 .andExpect(jsonPath("$.data.claimantAndRespondentAddresses", notNullValue()))
                 .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
         verify(servingService, times(1)).generateClaimantAndRespondentAddress(any());
@@ -96,9 +96,9 @@ class ET1ServingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -128,9 +128,9 @@ class ET1ServingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

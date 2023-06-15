@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TornadoConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.MockHttpURLConnectionFactory;
 
@@ -11,10 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class TornadoConnectionTest {
+@ExtendWith(SpringExtension.class)
+class TornadoConnectionTest {
 
     @Test
-    public void shouldCreateConnection() throws IOException {
+    void shouldCreateConnection() throws IOException {
         String url = "http://tornadotest";
         TornadoConfiguration tornadoConfiguration = new TornadoConfiguration();
         tornadoConfiguration.setUrl(url);
@@ -28,7 +31,7 @@ public class TornadoConnectionTest {
     }
 
     @Test
-    public void shouldReturnAccessKey() {
+    void shouldReturnAccessKey() {
         String accessKey = "test-access-key";
         TornadoConfiguration tornadoConfiguration = new TornadoConfiguration();
         tornadoConfiguration.setAccessKey(accessKey);

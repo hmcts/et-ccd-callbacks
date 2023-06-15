@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleCasesSendingServiceTest {
+class MultipleCasesSendingServiceTest {
 
     @Mock
     private CcdClient ccdClient;
@@ -43,7 +43,7 @@ public class MultipleCasesSendingServiceTest {
     }
 
     @Test
-    public void sendUpdateToMultiple() throws IOException {
+    void sendUpdateToMultiple() throws IOException {
         when(ccdClient.startBulkAmendEventForCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
@@ -68,7 +68,7 @@ public class MultipleCasesSendingServiceTest {
     }
 
     @Test
-    public void sendUpdateToMultipleException() throws IOException {
+    void sendUpdateToMultipleException() throws IOException {
         assertThrows(Exception.class, () -> {
             when(ccdClient.startBulkAmendEventForCase(userToken,
                     multipleDetails.getCaseTypeId(),

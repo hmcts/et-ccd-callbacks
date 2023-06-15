@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -15,10 +17,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class JudgeSelectionServiceTest {
+@ExtendWith(SpringExtension.class)
+class JudgeSelectionServiceTest {
 
     @Test
-    public void testCreateJudgeSelectionNoSelectedJudgeEnglandWales() {
+    void testCreateJudgeSelectionNoSelectedJudgeEnglandWales() {
         TribunalOffice tribunalOffice = TribunalOffice.MANCHESTER;
         JudgeService judgeService = mockJudgeService(tribunalOffice);
         HearingType selectedHearing = mockHearing(null);
@@ -31,7 +34,7 @@ public class JudgeSelectionServiceTest {
     }
 
     @Test
-    public void testCreateJudgeSelectionWithSelectedJudgeEnglandWales() {
+    void testCreateJudgeSelectionWithSelectedJudgeEnglandWales() {
         TribunalOffice tribunalOffice = TribunalOffice.MANCHESTER;
         JudgeService judgeService = mockJudgeService(tribunalOffice);
         DynamicValueType selectedJudge = DynamicValueType.create("judge2", "Judge 2");
@@ -45,7 +48,7 @@ public class JudgeSelectionServiceTest {
     }
 
     @Test
-    public void testCreateJudgeSelectionNoSelectedJudgeScotland() {
+    void testCreateJudgeSelectionNoSelectedJudgeScotland() {
         TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
         JudgeService judgeService = mockJudgeService(TribunalOffice.SCOTLAND);
         HearingType selectedHearing = mockHearing(null);
@@ -59,7 +62,7 @@ public class JudgeSelectionServiceTest {
     }
 
     @Test
-    public void testCreateJudgeSelectionWithSelectedJudgeScotland() {
+    void testCreateJudgeSelectionWithSelectedJudgeScotland() {
         TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
         JudgeService judgeService = mockJudgeService(TribunalOffice.SCOTLAND);
         DynamicValueType selectedJudge = DynamicValueType.create("judge2", "Judge 2");

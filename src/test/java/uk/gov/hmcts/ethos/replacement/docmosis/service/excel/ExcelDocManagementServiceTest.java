@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
 
 @ExtendWith(SpringExtension.class)
-public class ExcelDocManagementServiceTest {
+class ExcelDocManagementServiceTest {
 
     @Mock
     private DocumentManagementService documentManagementService;
@@ -60,7 +60,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void uploadExcelDocument() {
+    void uploadExcelDocument() {
         URI uri = URI.create("http://google.com");
         when(documentManagementService.uploadDocument(userToken,
                 bytes,
@@ -78,7 +78,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void downloadExcelDocument() throws IOException {
+    void downloadExcelDocument() throws IOException {
         String binaryUrl = "http://127.0.0.1:3453/documents/20d8a494-4232-480a-aac3-23ad0746c07b/binary";
         when(documentManagementService.downloadFile(userToken,
                 binaryUrl))
@@ -87,7 +87,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void generateAndUploadExcel() {
+    void generateAndUploadExcel() {
         URI uri = URI.create("http://google.com");
         List<String> multipleCollection = new ArrayList<>(
                 Arrays.asList("245000/2020", "245001/2020", "245002/2020"));
@@ -117,7 +117,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void generateAndUploadExcelEmptySubMultipleCollection() {
+    void generateAndUploadExcelEmptySubMultipleCollection() {
         URI uri = URI.create("http://google.com");
         List<String> multipleCollection = new ArrayList<>(
                 Arrays.asList("245000/2020", "245001/2020", "245002/2020"));
@@ -148,7 +148,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void writeAndUploadScheduleDocument() {
+    void writeAndUploadScheduleDocument() {
         URI uri = URI.create("http://google.com");
         when(scheduleCreationService.writeSchedule(multipleDetails.getCaseData(),
                 new ArrayList<>(),

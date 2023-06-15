@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.NcssCount"})
-public class HearingDetailServiceTest {
+class HearingDetailServiceTest {
 
     private HearingDetailsService hearingDetailsService;
     private DateListedType selectedListing;
@@ -44,7 +44,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testInitialiseHearingDetails() {
+    void testInitialiseHearingDetails() {
         CaseData caseData = new CaseData();
         hearingDetailsService.initialiseHearingDetails(caseData);
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
@@ -52,7 +52,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testHandleListingSelected() {
+    void testHandleListingSelected() {
         String hearingStatus = Constants.HEARING_STATUS_HEARD;
         selectedListing.setHearingStatus(hearingStatus);
         String postponedBy = "Arthur";
@@ -107,7 +107,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testHandleListingSelectedNullValue() {
+    void testHandleListingSelectedNullValue() {
         selectedListing.setHearingStatus(null);
         selectedListing.setPostponedBy(null);
         selectedListing.setHearingCaseDisposed(null);
@@ -143,7 +143,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testUpdateCase() {
+    void testUpdateCase() {
         HearingDetailType hearingDetailType = new HearingDetailType();
         selectedListing.setListedDate("2022-11-11 11:00:00");
         hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
@@ -214,7 +214,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testUpdateCase_Null_Or_Empty_HearingDetailsCollection() {
+    void testUpdateCase_Null_Or_Empty_HearingDetailsCollection() {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         String id = "22";
         hearingTypeItem.setId(id);
@@ -236,7 +236,7 @@ public class HearingDetailServiceTest {
     }
 
     @Test
-    public void testUpdateCase_Null_Or_Empty_HearingDateCollection() {
+    void testUpdateCase_Null_Or_Empty_HearingDateCollection() {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId(TEST_ID);
         String expectedHearingType =  "Preliminary Hearing";

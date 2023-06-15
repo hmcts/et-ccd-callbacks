@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JUDGEMENT_J
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JURISDICTION_OUTCOME_ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleCloseEventValidationServiceTest {
+class MultipleCloseEventValidationServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -57,7 +57,7 @@ public class MultipleCloseEventValidationServiceTest {
     }
 
     @Test
-    public void multipleCloseEventValidationEmptyCaseIdCollection() {
+    void multipleCloseEventValidationEmptyCaseIdCollection() {
         when(multipleHelperService.getEthosCaseRefCollection(
                 userToken,
                 multipleDetails.getCaseData(),
@@ -72,7 +72,7 @@ public class MultipleCloseEventValidationServiceTest {
     }
 
     @Test
-    public void multipleCloseEventValidationReturnsErrors() {
+    void multipleCloseEventValidationReturnsErrors() {
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId("TEST");
         jurCodesTypeItem.setValue(new JurCodesType());
@@ -122,7 +122,7 @@ public class MultipleCloseEventValidationServiceTest {
     }
 
     @Test
-    public void multipleCloseEventValidationNoError() {
+    void multipleCloseEventValidationNoError() {
         JurCodesType jurCodeType = new JurCodesType();
         jurCodeType.setJudgmentOutcome("some outcome");
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();

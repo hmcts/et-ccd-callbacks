@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-public class SingleCaseMultipleMidEventValidationServiceTest {
+class SingleCaseMultipleMidEventValidationServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -47,7 +47,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void singleCaseMultipleValidationLogic() {
+    void singleCaseMultipleValidationLogic() {
 
         List<String> errors = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void singleCaseMultipleValidationLogicMultipleToSingleError() {
+    void singleCaseMultipleValidationLogicMultipleToSingleError() {
 
         List<String> errors = new ArrayList<>();
 
@@ -83,7 +83,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void singleCaseMultipleValidationLogicSingleToSingle() {
+    void singleCaseMultipleValidationLogicSingleToSingle() {
 
         List<String> errors = new ArrayList<>();
 

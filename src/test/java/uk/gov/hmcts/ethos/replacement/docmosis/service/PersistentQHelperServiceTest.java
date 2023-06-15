@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @ExtendWith(SpringExtension.class)
-public class PersistentQHelperServiceTest {
+class PersistentQHelperServiceTest {
 
     @InjectMocks
     private PersistentQHelperService persistentQHelperService;
@@ -61,7 +61,7 @@ public class PersistentQHelperServiceTest {
     }
 
     @Test
-    public void sendCreationEventToSinglesWithoutConfirmation() {
+    void sendCreationEventToSinglesWithoutConfirmation() {
 
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         persistentQHelperService.sendCreationEventToSingles(userToken,
@@ -82,7 +82,7 @@ public class PersistentQHelperServiceTest {
     }
 
     @Test
-    public void sendTransferToEcmEvent() {
+    void sendTransferToEcmEvent() {
 
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         persistentQHelperService.sendTransferToEcmEvent(userToken,

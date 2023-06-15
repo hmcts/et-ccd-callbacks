@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -16,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ExcelFileSingleCasesImporterTest {
+@ExtendWith(SpringExtension.class)
+class ExcelFileSingleCasesImporterTest {
 
     @Test
-    public void shouldImportCases() throws ImportException, IOException {
+    void shouldImportCases() throws ImportException, IOException {
         String downloadUrl = "a-test-download-url";
         MultipleData multipleData = createMultipleData(downloadUrl);
         String authToken = "some-token";
@@ -38,7 +41,7 @@ public class ExcelFileSingleCasesImporterTest {
     }
 
     @Test
-    public void shouldThrowImportException() throws IOException {
+    void shouldThrowImportException() throws IOException {
         String downloadUrl = "a-test-download-url";
         MultipleData multipleData = createMultipleData(downloadUrl);
         String authToken = "some-token";

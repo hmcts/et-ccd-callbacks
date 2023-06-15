@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
@@ -19,10 +21,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class NoPositionChangeCcdDataSourceTests {
+@ExtendWith(SpringExtension.class)
+class NoPositionChangeCcdDataSourceTests {
 
     @Test
-    public void shouldReturnSearchResults() throws IOException {
+    void shouldReturnSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -41,7 +44,7 @@ public class NoPositionChangeCcdDataSourceTests {
     }
 
     @Test
-    public void shouldReturnEmptyListForNullSearchResults() throws IOException {
+    void shouldReturnEmptyListForNullSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -58,7 +61,7 @@ public class NoPositionChangeCcdDataSourceTests {
     }
 
     @Test
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -75,7 +78,7 @@ public class NoPositionChangeCcdDataSourceTests {
     }
 
     @Test
-    public void shouldReturnMultipleSearchResults() throws IOException {
+    void shouldReturnMultipleSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);
@@ -91,7 +94,7 @@ public class NoPositionChangeCcdDataSourceTests {
     }
 
     @Test
-    public void shouldReturnEmptyListForNullMultipleSearchResults() throws IOException {
+    void shouldReturnEmptyListForNullMultipleSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);
@@ -106,7 +109,7 @@ public class NoPositionChangeCcdDataSourceTests {
     }
 
     @Test
-    public void shouldThrowReportExceptionWhenMultipleSearchFails() throws IOException {
+    void shouldThrowReportExceptionWhenMultipleSearchFails() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);

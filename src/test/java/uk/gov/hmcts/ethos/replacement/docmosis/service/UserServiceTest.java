@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
     @InjectMocks
     private UserService userService;
     private UserDetails userDetails;
@@ -54,12 +54,12 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldHaveUserDetails() {
+    void shouldHaveUserDetails() {
         assertEquals(userService.getUserDetails("TOKEN"), userDetails);
     }
 
     @Test
-    public void shouldCheckAllUserDetails() {
+    void shouldCheckAllUserDetails() {
         assertEquals(userDetails, userService.getUserDetails("TOKEN"));
         assertEquals("mail@mail.com", userService.getUserDetails("TOKEN").getEmail());
         assertEquals("Mike", userService.getUserDetails("TOKEN").getFirstName());
@@ -69,17 +69,17 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldGetUserById() {
+    void shouldGetUserById() {
         assertEquals(userDetails, userService.getUserDetailsById("TOKEN", "id"));
     }
 
     @Test
-    public void shouldGetAccessToken() {
+    void shouldGetAccessToken() {
         assertEquals("abcefg", userService.getAccessToken("John@email.com", "abc123"));
     }
 
     @Test
-    public void shouldReturnAccessTokenResponse() {
+    void shouldReturnAccessTokenResponse() {
         assertEquals(tokenResponse, userService.getAccessTokenResponse("John@email.com", "abc123"));
     }
 

@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class CaseCreationForCaseWorkerServiceTest {
+class CaseCreationForCaseWorkerServiceTest {
 
     @InjectMocks
     private CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
@@ -60,7 +60,7 @@ public class CaseCreationForCaseWorkerServiceTest {
     }
 
     @Test
-    public void caseCreationRequestException() {
+    void caseCreationRequestException() {
         assertThrows(Exception.class, () -> {
             when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
             when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
@@ -70,7 +70,7 @@ public class CaseCreationForCaseWorkerServiceTest {
     }
 
     @Test
-    public void caseCreationRequest() throws IOException {
+    void caseCreationRequest() throws IOException {
         when(ccdClient.startCaseCreation(anyString(), any())).thenReturn(ccdRequest);
         when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
         SubmitEvent submitEvent1 = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);

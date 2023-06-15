@@ -21,7 +21,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class CreateUpdatesBusSenderTest {
+class CreateUpdatesBusSenderTest {
 
     @InjectMocks
     private CreateUpdatesBusSender createUpdatesBusSender;
@@ -44,13 +44,13 @@ public class CreateUpdatesBusSenderTest {
     }
 
     @Test
-    public void runMainMethodTest() {
+    void runMainMethodTest() {
         createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, creationDataModel,
                 new ArrayList<>(), String.valueOf(ethosCaseRefCollection.size()));
     }
 
     @Test
-    public void runMainMethodTestException() {
+    void runMainMethodTestException() {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(serviceBusSender).sendMessage(any());
         createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, creationDataModel,

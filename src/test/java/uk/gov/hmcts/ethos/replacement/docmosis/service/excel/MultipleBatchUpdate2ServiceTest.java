@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleBatchUpdate2ServiceTest {
+class MultipleBatchUpdate2ServiceTest {
 
     @Mock
     private ExcelDocManagementService excelDocManagementService;
@@ -64,7 +64,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDetachCases() {
+    void batchUpdate2LogicDetachCases() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -81,7 +81,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDetachCasesEmptyNewLeadCase() {
+    void batchUpdate2LogicDetachCasesEmptyNewLeadCase() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -99,7 +99,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicSameMultipleEmptySubMultiple() {
+    void batchUpdate2LogicSameMultipleEmptySubMultiple() {
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
@@ -108,7 +108,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicSameMultipleWithSubMultiple() {
+    void batchUpdate2LogicSameMultipleWithSubMultiple() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
@@ -125,7 +125,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDifferentEmptyMultiple() {
+    void batchUpdate2LogicDifferentEmptyMultiple() {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -146,7 +146,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDifferentMultipleEmptySubMultiple() {
+    void batchUpdate2LogicDifferentMultipleEmptySubMultiple() {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -167,7 +167,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDifferentMultipleWithSubMultiple() {
+    void batchUpdate2LogicDifferentMultipleWithSubMultiple() {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")

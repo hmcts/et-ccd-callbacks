@@ -36,7 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMP
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleLetterServiceTest {
+class MultipleLetterServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -71,7 +71,7 @@ public class MultipleLetterServiceTest {
     }
 
     @Test
-    public void bulkLetterLogic() throws IOException {
+    void bulkLetterLogic() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
@@ -93,7 +93,7 @@ public class MultipleLetterServiceTest {
     }
 
     @Test
-    public void bulkLetterLogicException() throws IOException {
+    void bulkLetterLogicException() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
@@ -119,7 +119,7 @@ public class MultipleLetterServiceTest {
     }
 
     @Test
-    public void bulkLetterLogicWithoutCases() {
+    void bulkLetterLogicWithoutCases() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());
         multipleLetterService.bulkLetterLogic(userToken,
@@ -130,7 +130,7 @@ public class MultipleLetterServiceTest {
     }
 
     @Test
-    public void bulkLetterLogicForLabels() throws IOException {
+    void bulkLetterLogicForLabels() throws IOException {
         CorrespondenceType correspondenceType = new CorrespondenceType();
         correspondenceType.setTopLevelDocuments(ADDRESS_LABELS_TEMPLATE);
         multipleDetails.getCaseData().setCorrespondenceType(correspondenceType);
@@ -162,7 +162,7 @@ public class MultipleLetterServiceTest {
     }
 
     @Test
-    public void bulkLetterLogicForLabelsScotland() throws IOException {
+    void bulkLetterLogicForLabelsScotland() throws IOException {
         CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
         correspondenceScotType.setTopLevelScotDocuments(ADDRESS_LABELS_TEMPLATE);
         multipleDetails.getCaseData().setCorrespondenceScotType(correspondenceScotType);
@@ -194,7 +194,7 @@ public class MultipleLetterServiceTest {
     }
 
     @Test
-    public void bulkLetterLogicForLabelsValidation() {
+    void bulkLetterLogicForLabelsValidation() {
         CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
         correspondenceScotType.setTopLevelScotDocuments(ADDRESS_LABELS_TEMPLATE);
         multipleDetails.getCaseData().setCorrespondenceScotType(correspondenceScotType);
@@ -215,7 +215,7 @@ public class MultipleLetterServiceTest {
     }
 
     @Test
-    public void dynamicMultipleLetters() {
+    void dynamicMultipleLetters() {
         MultipleUtil.addHearingToCaseData(submitEvents.get(0).getCaseData());
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);

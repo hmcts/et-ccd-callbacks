@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ListHearingController.class, JsonMapper.class})
-public class ListHearingControllerTest {
+class ListHearingControllerTest {
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -48,7 +48,7 @@ public class ListHearingControllerTest {
     private JsonMapper jsonMapper;
 
     @Test
-    public void testInitialiseHearingEnglandWales() throws Exception {
+    void testInitialiseHearingEnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
         String userToken = "some-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(true);
@@ -59,16 +59,16 @@ public class ListHearingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(venueSelectionService, times(1)).initHearingCollection(ccdRequest.getCaseDetails().getCaseData());
         verify(scotlandVenueSelectionService, never()).initHearingCollection(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
-    public void testInitialiseHearingScotland() throws Exception {
+    void testInitialiseHearingScotland() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(SCOTLAND_CASE_TYPE_ID).build();
         String userToken = "some-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(true);
@@ -79,9 +79,9 @@ public class ListHearingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(scotlandVenueSelectionService, times(1)).initHearingCollection(
                 ccdRequest.getCaseDetails().getCaseData());
@@ -89,7 +89,7 @@ public class ListHearingControllerTest {
     }
 
     @Test
-    public void testInitialiseHearingInvalidToken() throws Exception {
+    void testInitialiseHearingInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
         String userToken = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(false);

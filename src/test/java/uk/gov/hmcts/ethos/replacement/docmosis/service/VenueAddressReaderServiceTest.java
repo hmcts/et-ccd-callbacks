@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -19,7 +21,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
-public class VenueAddressReaderServiceTest {
+@ExtendWith(SpringExtension.class)
+class VenueAddressReaderServiceTest {
 
     private VenueAddressesService venueAddressesService;
     private VenueAddressReaderService venueAddressReaderService;
@@ -31,7 +34,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_England() {
+    void getVenueAddressForHearing_England() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Manchester1");
@@ -50,7 +53,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_Wales() {
+    void getVenueAddressForHearing_Wales() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Wales1");
@@ -69,7 +72,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_ScotlandGlasgow() {
+    void getVenueAddressForHearing_ScotlandGlasgow() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow1");
@@ -90,7 +93,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_ScotlandAberdeen() {
+    void getVenueAddressForHearing_ScotlandAberdeen() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Aberdeen1");
@@ -111,7 +114,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_ScotlandDundee() {
+    void getVenueAddressForHearing_ScotlandDundee() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Dundee1");
@@ -131,7 +134,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_ScotlandEdinburgh() {
+    void getVenueAddressForHearing_ScotlandEdinburgh() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Edinburgh1");
@@ -152,7 +155,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_EmptyAddressValue() {
+    void getVenueAddressForHearing_EmptyAddressValue() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow2");
@@ -173,7 +176,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_HearingVenueNotInList() {
+    void getVenueAddressForHearing_HearingVenueNotInList() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("OtherVenue");
@@ -192,7 +195,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_HearingVenueNotFound() {
+    void getVenueAddressForHearing_HearingVenueNotFound() {
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow3");
         venueAddress.setAddress("");
@@ -208,7 +211,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_HearingVenueEmpty() {
+    void getVenueAddressForHearing_HearingVenueEmpty() {
         VenueAddress venueAddress = new VenueAddress();
         venueAddress.setVenue("Glasgow4");
         venueAddress.setAddress("");
@@ -225,7 +228,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_ThrowsAddressReaderException() {
+    void getVenueAddressForHearing_ThrowsAddressReaderException() {
         List<VenueAddress> venueAddressList = new ArrayList<>();
         String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
@@ -239,7 +242,7 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
-    public void getVenueAddressForHearing_ThrowsArgumentException() {
+    void getVenueAddressForHearing_ThrowsArgumentException() {
         assertThrows(IllegalArgumentException.class, () ->
                 venueAddressReaderService.getVenueAddress(new HearingType(), "NotFound", "")
         );

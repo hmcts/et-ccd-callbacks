@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -26,7 +28,8 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ScotlandAllocatedHearingServiceTest {
+@ExtendWith(SpringExtension.class)
+class ScotlandAllocatedHearingServiceTest {
 
     private ScotlandAllocateHearingService scotlandAllocateHearingService;
 
@@ -50,7 +53,7 @@ public class ScotlandAllocatedHearingServiceTest {
     }
 
     @Test
-    public void testHandleListingSelected() {
+    void testHandleListingSelected() {
         String selectedHearingVenue = tribunalOffice.getOfficeName();
         selectedListing.setHearingVenueDayScotland(selectedHearingVenue);
 
@@ -60,7 +63,7 @@ public class ScotlandAllocatedHearingServiceTest {
     }
 
     @Test
-    public void testHandleManagingOfficeSelected() {
+    void testHandleManagingOfficeSelected() {
         // Arrange
         String hearingSitAlone = String.valueOf(Boolean.TRUE);
         selectedHearing.setHearingSitAlone(hearingSitAlone);
@@ -96,7 +99,7 @@ public class ScotlandAllocatedHearingServiceTest {
     }
 
     @Test
-    public void testPopulateRooms() {
+    void testPopulateRooms() {
         scotlandAllocateHearingService.populateRooms(caseData);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
@@ -104,7 +107,7 @@ public class ScotlandAllocatedHearingServiceTest {
     }
 
     @Test
-    public void testUpdateCase() {
+    void testUpdateCase() {
         // Arrange
         String sitAlone = String.valueOf(Boolean.TRUE);
         DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));

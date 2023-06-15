@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleSingleMidEventValidationServiceTest {
+class MultipleSingleMidEventValidationServiceTest {
 
     @Mock
     private SingleCasesReadingService singleCasesReadingService;
@@ -50,7 +50,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogic() {
+    void multipleSingleValidationLogic() {
 
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
 
@@ -81,7 +81,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicDoesNotExist() {
+    void multipleSingleValidationLogicDoesNotExist() {
 
         multipleDetails.getCaseData().setBatchUpdateCase("245010/2020");
 
@@ -101,7 +101,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicEmptyCaseIdCollection() {
+    void multipleSingleValidationLogicEmptyCaseIdCollection() {
 
         multipleDetails.getCaseData().setCaseIdCollection(null);
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
@@ -117,7 +117,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicEmptyCaseSearch() {
+    void multipleSingleValidationLogicEmptyCaseSearch() {
 
         multipleDetails.getCaseData().setBatchUpdateCase(null);
 
@@ -131,7 +131,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicWithDynamicLists() {
+    void multipleSingleValidationLogicWithDynamicLists() {
 
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
 
@@ -175,7 +175,7 @@ public class MultipleSingleMidEventValidationServiceTest {
      * representativeClaimantType as a RepresentedTypeC object with no values set.
      */
     @Test
-    public void shouldHandleRepresentativeClaimantWithNoValues() {
+    void shouldHandleRepresentativeClaimantWithNoValues() {
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
 
         RepresentedTypeC representedTypeC = new RepresentedTypeC();

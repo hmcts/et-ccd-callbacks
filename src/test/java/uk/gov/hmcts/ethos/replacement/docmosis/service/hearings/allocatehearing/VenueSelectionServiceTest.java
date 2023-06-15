@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -19,10 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class VenueSelectionServiceTest {
+@ExtendWith(SpringExtension.class)
+class VenueSelectionServiceTest {
 
     @Test
-    public void testInitHearingCollectionNoHearings() {
+    void testInitHearingCollectionNoHearings() {
         TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
         VenueService venueService = mockVenueService(tribunalOffice);
         CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
@@ -36,7 +39,7 @@ public class VenueSelectionServiceTest {
     }
 
     @Test
-    public void testInitHearingCollectionWithHearings() {
+    void testInitHearingCollectionWithHearings() {
         TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
         VenueService venueService = mockVenueService(tribunalOffice);
         CaseData caseData = createCaseDataWithHearings(tribunalOffice, null);
@@ -50,7 +53,7 @@ public class VenueSelectionServiceTest {
     }
 
     @Test
-    public void testInitHearingCollectionWithHearingsAndSelectedVenue() {
+    void testInitHearingCollectionWithHearingsAndSelectedVenue() {
         TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
         VenueService venueService = mockVenueService(tribunalOffice);
         DynamicValueType selectedVenue = DynamicValueType.create("venue2", "Venue 2");
@@ -65,7 +68,7 @@ public class VenueSelectionServiceTest {
     }
 
     @Test
-    public void testCreateVenueSelectionNoSelectedVenue() {
+    void testCreateVenueSelectionNoSelectedVenue() {
         TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
         VenueService venueService = mockVenueService(tribunalOffice);
         DateListedType selectedListing = createSelectedListing(null);
@@ -77,7 +80,7 @@ public class VenueSelectionServiceTest {
     }
 
     @Test
-    public void testCreateVenueSelectionWithSelectedVenue() {
+    void testCreateVenueSelectionWithSelectedVenue() {
         TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
         VenueService venueService = mockVenueService(tribunalOffice);
         DynamicValueType selectedVenue = DynamicValueType.create("venue2", "Venue 2");

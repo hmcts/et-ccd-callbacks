@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -37,7 +39,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.fin
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_NUMBER_ERROR;
 
-public class HearingsHelperTest {
+@ExtendWith(SpringExtension.class)
+class HearingsHelperTest {
 
     private CaseDetails caseDetails1;
 
@@ -54,7 +57,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void hearingMidEventValidationNumberError() {
+    void hearingMidEventValidationNumberError() {
 
         caseDetails1.getCaseData().getHearingCollection().get(0).getValue().setHearingNumber(null);
 
@@ -73,7 +76,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void hearingMidEventValidationDayError() {
+    void hearingMidEventValidationDayError() {
 
         caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().setListedDate(null);
@@ -99,7 +102,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void updatePostponedDate() {
+    void updatePostponedDate() {
 
         caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_POSTPONED);
@@ -119,7 +122,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void findDateOfHearingTest() {
+    void findDateOfHearingTest() {
         String hearingDate = caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getListedDate().substring(0, 10);
         String hearingNumber = findHearingNumber(caseDetails1.getCaseData(), hearingDate);
@@ -128,19 +131,19 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void findDateOfHearing_DateNotInHearing() {
+    void findDateOfHearing_DateNotInHearing() {
         assertNull(findHearingNumber(caseDetails1.getCaseData(), "1970-10-01"));
     }
 
     @Test
-    public void validateStartFinishTime_validTime() {
+    void validateStartFinishTime_validTime() {
         setValidHearingStartFinishTimes();
         List<String> errors = HearingsHelper.hearingTimeValidation(caseDetails1.getCaseData());
         assertEquals(0, errors.size());
     }
 
     @Test
-    public void validateBreakResumeTime_invalidBreak() {
+    void validateBreakResumeTime_invalidBreak() {
         setValidHearingStartFinishTimes();
         caseDetails1.getCaseData().getHearingDetailsCollection().get(0)
                 .getValue()
@@ -152,7 +155,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void validateBreakResumeTime_invalidResume() {
+    void validateBreakResumeTime_invalidResume() {
         setValidHearingStartFinishTimes();
         caseDetails1.getCaseData().getHearingDetailsCollection().get(0)
                 .getValue()
@@ -164,7 +167,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void validateBreakResumeTime_nullBreakResume() {
+    void validateBreakResumeTime_nullBreakResume() {
         setValidHearingStartFinishTimes();
         caseDetails1.getCaseData().setHearingDetailsTimingBreak(null);
         caseDetails1.getCaseData().setHearingDetailsTimingResume(null);
@@ -173,7 +176,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void validateStartFinishTime_sameTime() {
+    void validateStartFinishTime_sameTime() {
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setId(UUID.randomUUID().toString());
         HearingDetailType hearingDetailType = new HearingDetailType();
@@ -190,7 +193,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void validateStartFinishTime_finishTimeBeforeStart() {
+    void validateStartFinishTime_finishTimeBeforeStart() {
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setId(UUID.randomUUID().toString());
         HearingDetailType hearingDetailType = new HearingDetailType();
@@ -206,7 +209,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void validateHearingDatesInPastTest() {
+    void validateHearingDatesInPastTest() {
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setId(UUID.randomUUID().toString());
         HearingDetailType hearingDetailType = new HearingDetailType();
@@ -222,7 +225,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void validateIsDateInFutureConsideringDST() {
+    void validateIsDateInFutureConsideringDST() {
         LocalDateTime dateTime = LocalDateTime.now().minusMinutes(25);
         LocalDateTime now = LocalDateTime.now(UTC);
         boolean val = HearingsHelper.isDateInFuture(dateTime.toString(), now);
@@ -230,7 +233,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void invalidateHearingDatesInFutureTest() {
+    void invalidateHearingDatesInFutureTest() {
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setId(UUID.randomUUID().toString());
         HearingDetailType hearingDetailType = new HearingDetailType();
@@ -250,7 +253,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void invalidateHearingDatesInFutureTestNullCheck() {
+    void invalidateHearingDatesInFutureTestNullCheck() {
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setId(UUID.randomUUID().toString());
         HearingDetailType hearingDetailType = new HearingDetailType();
@@ -270,7 +273,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void earliestDateReturnsEarliestDate() {
+    void earliestDateReturnsEarliestDate() {
         List<HearingTypeItem> hearingCollection = caseDetails1.getCaseData().getHearingCollection();
         setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 0, "2100-03-01T01:01:01.000");
@@ -281,7 +284,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void earliestDateHandlesAHearingWithNoDatesInFuture() {
+    void earliestDateHandlesAHearingWithNoDatesInFuture() {
         List<HearingTypeItem> hearingCollection = caseDetails1.getCaseData().getHearingCollection();
         setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 0, "1999-01-01T01:01:01.000");
@@ -293,7 +296,7 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void earliestDateReturnsNullWhenHearingCollectionIsEmpty() {
+    void earliestDateReturnsNullWhenHearingCollectionIsEmpty() {
         caseDetails1.getCaseData().setHearingCollection(new ArrayList<>());
         String actual = HearingsHelper.getEarliestFutureHearingDate(caseDetails1.getCaseData().getHearingCollection());
         assertNull(actual);

@@ -1049,7 +1049,7 @@ class ListingHelperTest {
 
     @Test
     @Disabled // Some extra properties on this
-    public void getListingTypeFromSubmitData() throws Exception {
+    void getListingTypeFromSubmitData() throws Exception {
         CaseData caseData = new CaseData();
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantLastName("Rodriguez");
@@ -1382,7 +1382,7 @@ class ListingHelperTest {
 
     @ParameterizedTest
     @CsvSource({"Glasgow", "Aberdeen", "Edinburgh", "Dundee"})
-    public void getVenueCodeFromDateListedTypeScotlandTest(String office) {
+    void getVenueCodeFromDateListedTypeScotlandTest(String office) {
         DateListedTypeItem dateListedTypeItem = setDateListedTimeItem(true, office);
         String result = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
         assertThat(result)

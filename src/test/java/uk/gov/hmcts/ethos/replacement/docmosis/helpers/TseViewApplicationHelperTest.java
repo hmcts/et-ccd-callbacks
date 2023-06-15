@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -32,7 +34,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-public class TseViewApplicationHelperTest {
+@ExtendWith(SpringExtension.class)
+class TseViewApplicationHelperTest {
     private CaseData caseData;
 
     @BeforeEach
@@ -56,7 +59,7 @@ public class TseViewApplicationHelperTest {
     }
 
     @Test
-    public void populateOpenOrClosedApplications_withEmptyList_doesNothing() {
+    void populateOpenOrClosedApplications_withEmptyList_doesNothing() {
         caseData.setGenericTseApplicationCollection(null);
         caseData.setTseViewApplicationOpenOrClosed("Open");
         DynamicFixedListType actual = TseViewApplicationHelper.populateOpenOrClosedApplications(caseData);
@@ -64,28 +67,28 @@ public class TseViewApplicationHelperTest {
     }
 
     @Test
-    public void populateOpenApplications_withAnOpenApplication_returnsDynamicList() {
+    void populateOpenApplications_withAnOpenApplication_returnsDynamicList() {
         caseData.setTseViewApplicationOpenOrClosed("Open");
         DynamicFixedListType actual = TseViewApplicationHelper.populateOpenOrClosedApplications(caseData);
         assertThat(actual.getListItems().size(), is(1));
     }
 
     @Test
-    public void populateClosedApplications_withNoClosedApplications_returnEmptyList() {
+    void populateClosedApplications_withNoClosedApplications_returnEmptyList() {
         caseData.setTseViewApplicationOpenOrClosed("Closed");
         DynamicFixedListType actual = TseViewApplicationHelper.populateOpenOrClosedApplications(caseData);
         assertThat(actual.getListItems().size(), is(0));
     }
 
     @Test
-    public void setDataForTseApplicationSummaryAndResponses_withEmptyList_doesNothing() {
+    void setDataForTseApplicationSummaryAndResponses_withEmptyList_doesNothing() {
         caseData.setGenericTseApplicationCollection(null);
         TseViewApplicationHelper.setDataForTseApplicationSummaryAndResponses(caseData);
         assertNull(caseData.getTseApplicationSummaryAndResponsesMarkup());
     }
 
     @Test
-    public void setDataForTseApplicationSummaryAndResponses_withAnApplication_setsApplicationSummary() {
+    void setDataForTseApplicationSummaryAndResponses_withAnApplication_setsApplicationSummary() {
 
         caseData.setTseViewApplicationOpenOrClosed(OPEN_STATE);
         caseData.setTseViewApplicationSelect(TseViewApplicationHelper.populateOpenOrClosedApplications(caseData));
@@ -104,7 +107,7 @@ public class TseViewApplicationHelperTest {
     }
 
     @Test
-    public void setDataForTseApplicationSummaryAndResponses_withAnApplicationToPostpone_setsApplicationSummary() {
+    void setDataForTseApplicationSummaryAndResponses_withAnApplicationToPostpone_setsApplicationSummary() {
         caseData.getGenericTseApplicationCollection().get(0).getValue().setType(TSE_APP_POSTPONE_A_HEARING);
         caseData.setTseViewApplicationOpenOrClosed(OPEN_STATE);
         caseData.setTseViewApplicationSelect(TseViewApplicationHelper.populateOpenOrClosedApplications(caseData));
@@ -123,7 +126,7 @@ public class TseViewApplicationHelperTest {
     }
 
     @Test
-    public void setDataForTseApplicationSummaryAndResponses_withApplicationWithDocument_setsApplicationSummary() {
+    void setDataForTseApplicationSummaryAndResponses_withApplicationWithDocument_setsApplicationSummary() {
         UploadedDocumentType documentType =
                 UploadedDocumentBuilder.builder().withFilename("image.png").withUuid("1234").build();
         caseData.getGenericTseApplicationCollection().get(0).getValue().setDocumentUpload(documentType);
@@ -142,7 +145,7 @@ public class TseViewApplicationHelperTest {
     }
 
     @Test
-    public void setData_withAmendResponseApplication_withAReponse_setsMarkup() {
+    void setData_withAmendResponseApplication_withAReponse_setsMarkup() {
         TseRespondType tseRespondType = TseRespondType.builder()
             .from(CLAIMANT_TITLE)
             .date("23 December 2022")
@@ -214,7 +217,7 @@ public class TseViewApplicationHelperTest {
     }
 
     @Test
-    public void shouldNotShareApplicationWithRespondent() {
+    void shouldNotShareApplicationWithRespondent() {
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
                 .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
                 .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")
@@ -227,7 +230,7 @@ public class TseViewApplicationHelperTest {
     }
 
     @Test
-    public void shouldShareApplicationWithRespondentForRespondentApplication() {
+    void shouldShareApplicationWithRespondentForRespondentApplication() {
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
                 .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
                 .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")

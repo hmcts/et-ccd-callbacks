@@ -2,7 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -28,7 +30,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-public class BfActionReportTest {
+@ExtendWith(SpringExtension.class)
+class BfActionReportTest {
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;
     private ListingData listingData;
@@ -64,7 +67,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldReturnOnlyOpenBfActionsWithInDateRange() {
+    void shouldReturnOnlyOpenBfActionsWithInDateRange() {
 
         BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setId("123");
@@ -130,7 +133,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldReturnBfActionsWithOnlyDateAndTimeInBfDate() {
+    void shouldReturnBfActionsWithOnlyDateAndTimeInBfDate() {
         listingData.setListingDateFrom("2019-12-08");
         listingData.setListingDateTo("2019-12-20");
         listingData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
@@ -149,7 +152,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldNotReturnClearedBfActionsWithInDateRange() {
+    void shouldNotReturnClearedBfActionsWithInDateRange() {
         // Given three BFActionTypeItems, where the first two are still open and the third
         // one is with cleared BF status, only the two open (i.e. not cleared) BFs should be returned.
         BFActionTypeItem bfActionTypeItem4 = new BFActionTypeItem();
@@ -173,7 +176,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldReturnBfActionsSortedByBfDate() {
+    void shouldReturnBfActionsSortedByBfDate() {
         listingData.setListingDateFrom("2019-12-08");
         listingData.setListingDateTo("2019-12-25");
         listingData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
@@ -207,7 +210,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldReturnBfActionsWithFormattedComment() {
+    void shouldReturnBfActionsWithFormattedComment() {
         listingData.setListingDateFrom("2019-12-03");
         listingData.setListingDateTo("2019-12-28");
         listingData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
@@ -237,7 +240,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldShowReportOfficeName_EngWales() {
+    void shouldShowReportOfficeName_EngWales() {
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
@@ -245,7 +248,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldShowManagingOffice() {
+    void shouldShowManagingOffice() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
@@ -253,7 +256,7 @@ public class BfActionReportTest {
     }
 
     @Test
-    public void shouldShowReportOfficeName_Scotland() {
+    void shouldShowReportOfficeName_Scotland() {
         listingDetails.getCaseData().setManagingOffice(null);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");

@@ -21,7 +21,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleMidEventValidationServiceTest {
+class MultipleMidEventValidationServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -39,7 +39,7 @@ public class MultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicCurrentMultiple() {
+    void multipleValidationLogicCurrentMultiple() {
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("246000");
         moveCasesType.setUpdatedSubMultipleRef("SubMultiple");
@@ -59,7 +59,7 @@ public class MultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicExternalMultiple() {
+    void multipleValidationLogicExternalMultiple() {
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("246001");
         moveCasesType.setUpdatedSubMultipleRef("SubMultiple");
@@ -80,7 +80,7 @@ public class MultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicConvertToSingle() {
+    void multipleValidationLogicConvertToSingle() {
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("");
         moveCasesType.setUpdatedSubMultipleRef("");

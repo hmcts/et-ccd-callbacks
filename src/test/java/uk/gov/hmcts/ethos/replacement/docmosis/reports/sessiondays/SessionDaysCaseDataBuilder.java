@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -17,7 +19,8 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 
-public class SessionDaysCaseDataBuilder {
+@ExtendWith(SpringExtension.class)
+class SessionDaysCaseDataBuilder {
     private final SessionDaysCaseData caseData = new SessionDaysCaseData();
 
     public void withNoHearings() {

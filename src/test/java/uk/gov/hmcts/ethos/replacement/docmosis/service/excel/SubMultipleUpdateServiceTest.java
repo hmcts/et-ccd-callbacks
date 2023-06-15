@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.AMEND_ACTION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DELETE_ACTION;
 
 @ExtendWith(SpringExtension.class)
-public class SubMultipleUpdateServiceTest {
+class SubMultipleUpdateServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -50,7 +50,7 @@ public class SubMultipleUpdateServiceTest {
     }
 
     @Test
-    public void subMultipleUpdateLogicCreate() {
+    void subMultipleUpdateLogicCreate() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsAll);
 
@@ -77,7 +77,7 @@ public class SubMultipleUpdateServiceTest {
     }
 
     @Test
-    public void subMultipleUpdateLogicCreateEmptySubMultiples() {
+    void subMultipleUpdateLogicCreateEmptySubMultiples() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsAll);
 
@@ -104,7 +104,7 @@ public class SubMultipleUpdateServiceTest {
     }
 
     @Test
-    public void subMultipleUpdateLogicAmend() {
+    void subMultipleUpdateLogicAmend() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsAll);
 
@@ -130,7 +130,7 @@ public class SubMultipleUpdateServiceTest {
     }
 
     @Test
-    public void subMultipleUpdateLogicDelete() {
+    void subMultipleUpdateLogicDelete() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsAll);
 

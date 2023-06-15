@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
@@ -15,10 +17,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CcdReportDataSourceTest {
+@ExtendWith(SpringExtension.class)
+class CcdReportDataSourceTest {
 
     @Test
-    public void shouldReturnSearchResults() throws IOException {
+    void shouldReturnSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String owningOffice = TribunalOffice.LEEDS.getOfficeName();
@@ -35,7 +38,7 @@ public class CcdReportDataSourceTest {
     }
 
     @Test
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String owningOffice = TribunalOffice.LEEDS.getOfficeName();

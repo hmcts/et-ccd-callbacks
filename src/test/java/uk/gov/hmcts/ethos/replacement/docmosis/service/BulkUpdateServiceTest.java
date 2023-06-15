@@ -55,7 +55,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class BulkUpdateServiceTest {
+class BulkUpdateServiceTest {
 
     @InjectMocks
     private BulkUpdateService bulkUpdateService;
@@ -129,7 +129,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void caseUpdateFieldsRequestException() {
+    void caseUpdateFieldsRequestException() {
         assertThrows(Exception.class, () -> {
             when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                     bulkDetails.getJurisdiction(), searchTypeItem.getId()))
@@ -144,7 +144,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void caseUpdateFieldsRequest() throws IOException {
+    void caseUpdateFieldsRequest() throws IOException {
         when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
@@ -155,7 +155,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void caseUpdateFieldsWithNewValuesRequest() throws IOException {
+    void caseUpdateFieldsWithNewValuesRequest() throws IOException {
         when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString()))
@@ -167,7 +167,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogic() throws IOException {
+    void bulkUpdateLogic() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -188,7 +188,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogicSingleCasesUpdated() throws IOException {
+    void bulkUpdateLogicSingleCasesUpdated() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -217,7 +217,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogicException() throws IOException {
+    void bulkUpdateLogicException() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -241,7 +241,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogicWithErrors() throws IOException {
+    void bulkUpdateLogicWithErrors() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -255,7 +255,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkUpdateLogicAsyncErrors() throws IOException {
+    void bulkUpdateLogicAsyncErrors() throws IOException {
         SubmitBulkEvent submitBulkEvent = new SubmitBulkEvent();
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
@@ -277,7 +277,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void clearUpFields() {
+    void clearUpFields() {
         BulkData bulkData = bulkUpdateService.clearUpFields(bulkRequestPayload).getBulkDetails().getCaseData();
         assertNull(bulkData.getClaimantRepV2());
         assertNull(bulkData.getClerkResponsibleV2());
@@ -363,14 +363,14 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicEmptyCases() {
+    void bulkPreAcceptLogicEmptyCases() {
         List<String> errors = bulkUpdateService.bulkPreAcceptLogic(
                 bulkRequest.getCaseDetails(), new ArrayList<>(), "authToken", false).getErrors();
         assertEquals("[No cases on the multiple case: 2300001/2019]", errors.toString());
     }
 
     @Test
-    public void bulkPreAcceptLogic() {
+    void bulkPreAcceptLogic() {
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));
         BulkRequestPayload bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(
@@ -390,7 +390,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptPQLogic() {
+    void bulkPreAcceptPQLogic() {
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));
@@ -410,7 +410,7 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptPQLogicEmptyCases() {
+    void bulkPreAcceptPQLogicEmptyCases() {
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));

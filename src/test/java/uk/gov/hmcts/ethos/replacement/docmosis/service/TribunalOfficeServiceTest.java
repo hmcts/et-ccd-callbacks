@@ -63,7 +63,7 @@ public class TribunalOfficeServiceTest {
     }
 
     @Test
-    public void testGetsCorrectTribunalContactDetails() {
+    void testGetsCorrectTribunalContactDetails() {
         ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(managingOffice);
         assertEquals(expectedPostcode, contactDetails.getPostcode());
     }

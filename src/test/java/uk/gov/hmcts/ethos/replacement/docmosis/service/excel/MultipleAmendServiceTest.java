@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADD_CASES_TO_MULTIP
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LEAD_CASE_AMENDMENT;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleAmendServiceTest {
+class MultipleAmendServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -54,7 +54,7 @@ public class MultipleAmendServiceTest {
     }
 
     @Test
-    public void bulkAmendMultipleLogic() {
+    void bulkAmendMultipleLogic() {
         multipleDetails.getCaseData().setTypeOfAmendmentMSL(typeOfAmendmentMSL);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);

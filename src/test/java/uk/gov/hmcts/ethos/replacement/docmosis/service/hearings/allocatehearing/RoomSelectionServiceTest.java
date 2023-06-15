@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -13,9 +15,10 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RoomSelectionServiceTest {
+@ExtendWith(SpringExtension.class)
+class RoomSelectionServiceTest {
     @Test
-    public void testCreateRoomSelectionNoSelectedRoom() {
+    void testCreateRoomSelectionNoSelectedRoom() {
         CaseData caseData = mockCaseData();
         RoomService roomService = mockRoomService();
         DateListedType selectedListing = mockSelectedListing(null);
@@ -27,7 +30,7 @@ public class RoomSelectionServiceTest {
     }
 
     @Test
-    public void testCreateRoomSelectionWithSelectedRoom() {
+    void testCreateRoomSelectionWithSelectedRoom() {
         CaseData caseData = mockCaseData();
         RoomService roomService = mockRoomService();
         DynamicValueType selectedRoom = DynamicValueType.create("room2", "Room 2");
@@ -40,7 +43,7 @@ public class RoomSelectionServiceTest {
     }
 
     @Test
-    public void testCreateRoomSelectionVenueChangedNoSelectedRoom() {
+    void testCreateRoomSelectionVenueChangedNoSelectedRoom() {
         CaseData caseData = mockCaseData();
         RoomService roomService = mockRoomService();
         DateListedType selectedListing = mockSelectedListing(null);
@@ -52,7 +55,7 @@ public class RoomSelectionServiceTest {
     }
 
     @Test
-    public void testCreateRoomSelectionVenueChangedWithSelectedRoom() {
+    void testCreateRoomSelectionVenueChangedWithSelectedRoom() {
         CaseData caseData = mockCaseData();
         RoomService roomService = mockRoomService();
         DynamicValueType selectedRoom = DynamicValueType.create("room2", "Room 2");

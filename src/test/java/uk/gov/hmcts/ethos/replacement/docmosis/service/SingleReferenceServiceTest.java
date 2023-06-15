@@ -15,7 +15,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-public class SingleReferenceServiceTest {
+class SingleReferenceServiceTest {
 
     @InjectMocks
     private SingleReferenceService singleReferenceService;
@@ -25,14 +25,14 @@ public class SingleReferenceServiceTest {
     private SingleRefEnglandWalesRepository singleRefEnglandWalesRepository;
 
     @Test
-    public void createEnglandWalesReference() {
+    void createEnglandWalesReference() {
         String expectedRef = "6000001/" + LocalDateTime.now().getYear();
         when(singleRefEnglandWalesRepository.ethosCaseRefGen(LocalDateTime.now().getYear())).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
-    public void createScotlandReference() {
+    void createScotlandReference() {
         String expectedRef = "8000001/" + LocalDateTime.now().getYear();
         when(singleRefScotlandRepository.ethosCaseRefGen(LocalDateTime.now().getYear())).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(SCOTLAND_CASE_TYPE_ID));

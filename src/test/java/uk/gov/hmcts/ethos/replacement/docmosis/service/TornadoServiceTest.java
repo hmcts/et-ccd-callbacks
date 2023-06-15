@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -50,7 +52,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-public class TornadoServiceTest {
+@ExtendWith(SpringExtension.class)
+class TornadoServiceTest {
     private TornadoService tornadoService;
     private TornadoConnection tornadoConnection;
     private DocumentManagementService documentManagementService;
@@ -75,7 +78,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void documentGenerationNoTornadoConnectionShouldThrowException() throws IOException {
+    void documentGenerationNoTornadoConnectionShouldThrowException() throws IOException {
         CaseData caseData = new CaseData();
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
@@ -86,7 +89,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void listingGenerationNoTornadoConnectionShouldThrowException() throws IOException {
+    void listingGenerationNoTornadoConnectionShouldThrowException() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         assertThrows(IOException.class, () ->
@@ -95,7 +98,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void scheduleGenerationNoTornadoConnectionShouldThrowException() throws IOException {
+    void scheduleGenerationNoTornadoConnectionShouldThrowException() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         assertThrows(IOException.class, () ->
@@ -104,7 +107,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenTornadoReturnsErrorResponse() throws IOException {
+    void shouldThrowExceptionWhenTornadoReturnsErrorResponse() throws IOException {
         mockConnectionError();
         CaseData caseData = new CaseData();
 
@@ -115,7 +118,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void shouldCreateDocumentInfoForDocumentGeneration() throws IOException {
+    void shouldCreateDocumentInfoForDocumentGeneration() throws IOException {
         mockConnectionSuccess();
         CaseData caseData = new CaseData();
 
@@ -126,7 +129,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() throws IOException {
+    void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() throws IOException {
         mockConnectionSuccess();
         DefaultValues defaultValues = mock(DefaultValues.class);
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
@@ -145,7 +148,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOfficeMultiples() throws IOException {
+    void shouldCreateDocumentInfoForDocumentGenerationAllocatedOfficeMultiples() throws IOException {
         mockConnectionSuccess();
         DefaultValues defaultValues = mock(DefaultValues.class);
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
@@ -164,7 +167,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void shouldCreateDocumentInfoForListingGeneration() throws IOException {
+    void shouldCreateDocumentInfoForListingGeneration() throws IOException {
         mockConnectionSuccess();
         ListingData listingData = createListingData();
 
@@ -175,7 +178,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void shouldCreateDocumentInforForScheduleGeneration() throws IOException {
+    void shouldCreateDocumentInforForScheduleGeneration() throws IOException {
         mockConnectionSuccess();
         BulkData bulkData = new BulkData();
         bulkData.setScheduleDocName(LIST_CASES_CONFIG);
@@ -188,7 +191,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void shouldCreateDocumentInfoForReportGeneration() throws IOException {
+    void shouldCreateDocumentInfoForReportGeneration() throws IOException {
         mockConnectionSuccess();
         ListingData listingData = createListingData();
         listingData.setReportType(CLAIMS_ACCEPTED_REPORT);
@@ -200,7 +203,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void generateEt1VettingDocument() throws IOException {
+    void generateEt1VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
@@ -208,7 +211,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void generateEt3VettingDocument() throws IOException {
+    void generateEt3VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
@@ -216,7 +219,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void generateInConEWDocument() throws IOException {
+    void generateInConEWDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
@@ -224,7 +227,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void generateInConSCDocument() throws IOException {
+    void generateInConSCDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, "Initial Consideration.pdf");
@@ -232,7 +235,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void generateDocument_exception() throws IOException {
+    void generateDocument_exception() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         assertThrows(IOException.class, () ->
@@ -242,7 +245,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void generateDocument_noDocumentName() throws IOException {
+    void generateDocument_noDocumentName() throws IOException {
         mockConnectionSuccess();
 
         assertThrows(IllegalArgumentException.class, () ->
@@ -251,7 +254,7 @@ public class TornadoServiceTest {
     }
 
     @Test
-    public void generateDocumentAsBytes() throws IOException {
+    void generateDocumentAsBytes() throws IOException {
         mockConnectionSuccess();
         byte[] bytes = tornadoService.generateEventDocumentBytes(new CaseData(), ENGLANDWALES_CASE_TYPE_ID, "Initial "
             + "Consideration.pdf");

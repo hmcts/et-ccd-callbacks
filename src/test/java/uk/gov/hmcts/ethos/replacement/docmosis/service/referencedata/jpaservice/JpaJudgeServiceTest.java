@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
@@ -12,9 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class JpaJudgeServiceTest {
+@ExtendWith(SpringExtension.class)
+class JpaJudgeServiceTest {
     @Test
-    public void testGetJudges() {
+    void testGetJudges() {
         TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
         List<Judge> judges = List.of(
                 createJudge("judge1", "Judge 1"),

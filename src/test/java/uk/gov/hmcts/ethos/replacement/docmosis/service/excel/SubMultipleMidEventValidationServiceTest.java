@@ -16,7 +16,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.AMEND_ACTION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DELETE_ACTION;
 
 @ExtendWith(SpringExtension.class)
-public class SubMultipleMidEventValidationServiceTest {
+class SubMultipleMidEventValidationServiceTest {
 
     @InjectMocks
     private SubMultipleMidEventValidationService subMultipleMidEventValidationService;
@@ -32,7 +32,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceCreate() {
+    void subMultipleMidEventValidationServiceCreate() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setCreateSubMultipleName("SubMultiple");
 
@@ -46,7 +46,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceAmend() {
+    void subMultipleMidEventValidationServiceAmend() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setActionType(AMEND_ACTION);
         multipleDetails.getCaseData().getSubMultipleAction().setAmendSubMultipleNameExisting("SubMultipleDoesNotExist");
@@ -63,7 +63,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceAmendEmptySubCollection() {
+    void subMultipleMidEventValidationServiceAmendEmptySubCollection() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setActionType(AMEND_ACTION);
         multipleDetails.getCaseData().getSubMultipleAction().setAmendSubMultipleNameExisting("SubMultipleDoesNotExist");
@@ -80,7 +80,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceDelete() {
+    void subMultipleMidEventValidationServiceDelete() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setActionType(DELETE_ACTION);
         multipleDetails.getCaseData().getSubMultipleAction().setDeleteSubMultipleName("SubMultipleDoesNotExist");

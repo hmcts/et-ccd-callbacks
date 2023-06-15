@@ -23,7 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-public class MultiplePreAcceptServiceTest {
+class MultiplePreAcceptServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -47,7 +47,7 @@ public class MultiplePreAcceptServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicETOnline() {
+    void bulkPreAcceptLogicETOnline() {
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multiplePreAcceptService.bulkPreAcceptLogic(userToken,
                 multipleDetails,
@@ -59,7 +59,7 @@ public class MultiplePreAcceptServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicAllAccepted() {
+    void bulkPreAcceptLogicAllAccepted() {
         multipleDetails.getCaseData().setMultipleSource(MANUALLY_CREATED_POSITION);
         multiplePreAcceptService.bulkPreAcceptLogic(userToken,
                 multipleDetails,
@@ -69,7 +69,7 @@ public class MultiplePreAcceptServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicRejected() {
+    void bulkPreAcceptLogicRejected() {
         multipleDetails.getCaseData().getPreAcceptCase().setCaseAccepted(NO);
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multiplePreAcceptService.bulkPreAcceptLogic(userToken,

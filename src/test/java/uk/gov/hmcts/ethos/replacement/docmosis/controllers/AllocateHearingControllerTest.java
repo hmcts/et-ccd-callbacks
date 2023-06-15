@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({AllocateHearingController.class, JsonMapper.class})
-public class AllocateHearingControllerTest {
+class AllocateHearingControllerTest {
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -47,7 +47,7 @@ public class AllocateHearingControllerTest {
     private JsonMapper jsonMapper;
 
     @Test
-    public void testInitialiseHearingDynamicList() throws Exception {
+    void testInitialiseHearingDynamicList() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -60,14 +60,14 @@ public class AllocateHearingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(allocateHearingService, times(1)).initialiseAllocateHearing(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
-    public void testInitialiseHearingDynamicListInvalidToken() throws Exception {
+    void testInitialiseHearingDynamicListInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -84,7 +84,7 @@ public class AllocateHearingControllerTest {
     }
 
     @Test
-    public void testHandleListingSelected() throws Exception {
+    void testHandleListingSelected() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -97,14 +97,14 @@ public class AllocateHearingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(allocateHearingService, times(1)).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
-    public void testHandleListingSelectedInvalidToken() throws Exception {
+    void testHandleListingSelectedInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -121,7 +121,7 @@ public class AllocateHearingControllerTest {
     }
 
     @Test
-    public void testHandleListingSelectedInvalidCaseTypeId() throws Exception {
+    void testHandleListingSelectedInvalidCaseTypeId() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId("InvalidCaseTypeId")
                 .build();
@@ -137,7 +137,7 @@ public class AllocateHearingControllerTest {
     }
 
     @Test
-    public void testPopulateRoomsEnglandWales() throws Exception {
+    void testPopulateRoomsEnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -150,15 +150,15 @@ public class AllocateHearingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(allocateHearingService, times(1)).populateRooms(ccdRequest.getCaseDetails().getCaseData());
         verify(scotlandAllocateHearingService, never()).populateRooms(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
-    public void testPopulateRoomsScotland() throws Exception {
+    void testPopulateRoomsScotland() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(SCOTLAND_CASE_TYPE_ID)
                 .build();
@@ -171,15 +171,15 @@ public class AllocateHearingControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(scotlandAllocateHearingService, times(1)).populateRooms(ccdRequest.getCaseDetails().getCaseData());
         verify(allocateHearingService, never()).populateRooms(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
-    public void testPopulateRoomsInvalidToken() throws Exception {
+    void testPopulateRoomsInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -196,7 +196,7 @@ public class AllocateHearingControllerTest {
     }
 
     @Test
-    public void testAboutToSubmit() throws Exception {
+    void testAboutToSubmit() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -209,14 +209,14 @@ public class AllocateHearingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(allocateHearingService, times(1)).updateCase(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
-    public void testAboutToSubmitInvalidToken() throws Exception {
+    void testAboutToSubmitInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();

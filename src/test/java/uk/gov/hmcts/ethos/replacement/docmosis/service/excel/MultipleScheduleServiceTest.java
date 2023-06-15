@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleScheduleServiceTest {
+class MultipleScheduleServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -58,7 +58,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicFlags() {
+    void bulkScheduleLogicFlags() {
         schedulePayloadEvents.iterator().next().getSchedulePayloadES().setClaimantCompany(null);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
@@ -76,7 +76,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicFlagsWithoutCompanyNorClaimant() {
+    void bulkScheduleLogicFlagsWithoutCompanyNorClaimant() {
         schedulePayloadEvents.iterator().next().getSchedulePayloadES().setClaimantCompany(null);
         schedulePayloadEvents.iterator().next().getSchedulePayloadES().setClaimantIndType(null);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
@@ -95,7 +95,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicFlagsMultipleRespondents() {
+    void bulkScheduleLogicFlagsMultipleRespondents() {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(new RespondentSumType());
         schedulePayloadEvents.iterator().next()
@@ -116,7 +116,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicSubMultiple() {
+    void bulkScheduleLogicSubMultiple() {
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsSubMultiple);
@@ -134,7 +134,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicSubMultipleNoCasesFiltered() {
+    void bulkScheduleLogicSubMultipleNoCasesFiltered() {
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());
@@ -149,7 +149,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicCasesFilteredExceeded() {
+    void bulkScheduleLogicCasesFilteredExceeded() {
         List<String> errors = new ArrayList<>();
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))

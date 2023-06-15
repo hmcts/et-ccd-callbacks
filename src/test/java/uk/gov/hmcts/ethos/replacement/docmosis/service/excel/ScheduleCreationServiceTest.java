@@ -22,7 +22,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_D
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper.NOT_ALLOCATED;
 
 @ExtendWith(SpringExtension.class)
-public class ScheduleCreationServiceTest {
+class ScheduleCreationServiceTest {
 
     @InjectMocks
     private ScheduleCreationService scheduleCreationService;
@@ -42,7 +42,7 @@ public class ScheduleCreationServiceTest {
     }
 
     @Test
-    public void writeSchedule() {
+    void writeSchedule() {
         multipleDetails.getCaseData().setScheduleDocName(MULTIPLE_SCHEDULE_CONFIG);
         assertNotNull(scheduleCreationService.writeSchedule(
                 multipleDetails.getCaseData(),
@@ -51,7 +51,7 @@ public class ScheduleCreationServiceTest {
     }
 
     @Test
-    public void writeScheduleDetailed() {
+    void writeScheduleDetailed() {
         multipleDetails.getCaseData().setScheduleDocName(MULTIPLE_SCHEDULE_DETAILED_CONFIG);
         assertNotNull(scheduleCreationService.writeSchedule(
                 multipleDetails.getCaseData(),
@@ -60,7 +60,7 @@ public class ScheduleCreationServiceTest {
     }
 
     @Test
-    public void writeScheduleSubMultiplesNoAllocated() {
+    void writeScheduleSubMultiplesNoAllocated() {
         multipleObjectsSubMultiple.put(NOT_ALLOCATED, new ArrayList<>(Collections.singletonList("245002/2020")));
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         assertNotNull(scheduleCreationService.writeSchedule(

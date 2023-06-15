@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
 @ExtendWith(SpringExtension.class)
-public class ExcelCreationServiceTest {
+class ExcelCreationServiceTest {
 
     @InjectMocks
     private ExcelCreationService excelCreationService;
@@ -42,7 +42,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void writeExcelObjects() {
+    void writeExcelObjects() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(multipleObjects.values()),
                 new ArrayList<>(Arrays.asList("245000/1", "245000/1")),
@@ -50,7 +50,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void writeExcelObjectsEmptySubMultiples() {
+    void writeExcelObjectsEmptySubMultiples() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(multipleObjects.values()),
                 new ArrayList<>(),
@@ -58,7 +58,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void writeExcelString() {
+    void writeExcelString() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(Arrays.asList("245000/2020", "245001/2020", "245002/2020")),
                 new ArrayList<>(),
@@ -66,7 +66,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void writeExcelStringEmpty() {
+    void writeExcelStringEmpty() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(),
                 new ArrayList<>(),
@@ -74,7 +74,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void reportTitleCellStyleTest() throws IOException {
+    void reportTitleCellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getReportTitleCellStyle(workbook);
             assertEquals(IndexedColors.BLUE_GREY.getIndex(), actualCellStyle.getFillBackgroundColor());
@@ -86,7 +86,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void headerCellStyleTest() throws IOException {
+    void headerCellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getHeaderCellStyle(workbook);
             assertEquals(BorderStyle.THIN, actualCellStyle.getBorderBottom());
@@ -102,7 +102,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void reportSubTitleCellStyleTest() throws IOException {
+    void reportSubTitleCellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getReportSubTitleCellStyle(workbook);
             assertEquals(IndexedColors.LIGHT_GREEN.getIndex(), actualCellStyle.getFillForegroundColor());
@@ -113,7 +113,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void addReportAdminDetailsTest() throws IOException {
+    void addReportAdminDetailsTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             XSSFSheet sheet = workbook.getSheetAt(0);
             excelCreationService.addReportAdminDetails(workbook,
@@ -126,7 +126,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void cellStyleTest() throws IOException {
+    void cellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getCellStyle(workbook);
             assertEquals(VerticalAlignment.CENTER, actualCellStyle.getVerticalAlignment());
@@ -142,7 +142,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void initializeReportHeadersTest() throws IOException {
+    void initializeReportHeadersTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             Sheet sheet = workbook.getSheetAt(0);
             excelCreationService.initializeReportHeaders("document1",

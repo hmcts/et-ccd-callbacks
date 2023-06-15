@@ -46,25 +46,25 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenEmptyDocumentCollection_returnsFalse() {
+    void shouldSendRejectionEmail_givenEmptyDocumentCollection_returnsFalse() {
         assertFalse(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void shouldSendRejectionEmail_noRejectionDocumentPresent_returnsFalse() {
+    void shouldSendRejectionEmail_noRejectionDocumentPresent_returnsFalse() {
         attachDocumentToCollection(caseData, "Not a Rejection of claim");
         assertFalse(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenRejectionEmailFlagPresent_returnsFalse() {
+    void shouldSendRejectionEmail_givenRejectionEmailFlagPresent_returnsFalse() {
         attachDocumentToCollection(caseData, "Not a Rejection of claim");
         caseData.setCaseRejectedEmailSent(YES);
         assertFalse(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndEmailFlag_returnsFalse() {
+    void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndEmailFlag_returnsFalse() {
         attachDocumentToCollection(caseData, "Rejection of claim");
         ccdRequest.getCaseDetails().setState("Rejected");
         caseData.setCaseRejectedEmailSent(YES);
@@ -72,14 +72,14 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndNoEmailFlag_returnsTrue() {
+    void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndNoEmailFlag_returnsTrue() {
         attachDocumentToCollection(caseData, "Rejection of claim");
         ccdRequest.getCaseDetails().setState("Rejected");
         assertTrue(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
+    void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
         Map<String, String> expected = buildPersonalisation("F");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
 
@@ -87,7 +87,7 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void buildPersonalisationForCaseRejection_givenClaimantTitle_returnsWithTitleLastName() {
+    void buildPersonalisationForCaseRejection_givenClaimantTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantTitle("Mr");
         Map<String, String> expected = buildPersonalisation("Mr");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
@@ -96,7 +96,7 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void buildPersonalisationForCaseRejection_givenClaimantPreferredTitle_returnsWithTitleLastName() {
+    void buildPersonalisationForCaseRejection_givenClaimantPreferredTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantPreferredTitle("Professor");
         Map<String, String> expected = buildPersonalisation("Professor");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);

@@ -10,7 +10,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.Assert.assertFalse;
 
 @ExtendWith(SpringExtension.class)
-public class VerifyTokenServiceServiceTest {
+class VerifyTokenServiceServiceTest {
 
     @InjectMocks
     private VerifyTokenService verifyTokenService;
@@ -22,7 +22,7 @@ public class VerifyTokenServiceServiceTest {
     }
 
     @Test
-    public void verifyTokenSignature() {
+    void verifyTokenSignature() {
         assertFalse(verifyTokenService.verifyTokenSignature("Bearer "
                 + "eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVa"
                 + "TlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0"

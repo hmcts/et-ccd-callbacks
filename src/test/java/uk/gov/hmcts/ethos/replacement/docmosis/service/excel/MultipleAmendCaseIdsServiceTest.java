@@ -18,7 +18,7 @@ import java.util.TreeMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-public class MultipleAmendCaseIdsServiceTest {
+class MultipleAmendCaseIdsServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -38,7 +38,7 @@ public class MultipleAmendCaseIdsServiceTest {
     }
 
     @Test
-    public void bulkAmendCaseIdsLogic() {
+    void bulkAmendCaseIdsLogic() {
         List<MultipleObject> multipleObjectList = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(userToken,
                 multipleDetails,
                 new ArrayList<>(),
@@ -48,7 +48,7 @@ public class MultipleAmendCaseIdsServiceTest {
     }
 
     @Test
-    public void bulkAmendCaseIdsLogicEmptyLead() {
+    void bulkAmendCaseIdsLogicEmptyLead() {
         multipleDetails.getCaseData().setLeadCase(null);
         List<MultipleObject>  multipleObjectList = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(userToken,
                 multipleDetails,

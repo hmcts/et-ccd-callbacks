@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
@@ -15,10 +17,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SessionDaysCcdReportDataSourceTest {
+@ExtendWith(SpringExtension.class)
+class SessionDaysCcdReportDataSourceTest {
 
     @Test
-    public void shouldReturnSearchResults() throws IOException {
+    void shouldReturnSearchResults() throws IOException {
         String authToken = "token";
         String caseTypeId = "caseTypeId";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -38,7 +41,7 @@ public class SessionDaysCcdReportDataSourceTest {
     }
 
     @Test
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         String authToken = "token";
         String caseTypeId = "caseTypeId";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();

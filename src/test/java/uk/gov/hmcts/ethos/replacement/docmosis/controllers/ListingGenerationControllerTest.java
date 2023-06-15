@@ -38,6 +38,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -71,7 +72,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ListingGenerationController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-public class ListingGenerationControllerTest {
+class ListingGenerationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String LISTING_CASE_CREATION_URL = "/listingCaseCreation";
@@ -243,7 +244,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingCaseCreation() throws Exception {
+    void listingCaseCreation() throws Exception {
         when(listingService.listingCaseCreation(isA(ListingDetails.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -252,13 +253,13 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void listingHearings() throws Exception {
+    void listingHearings() throws Exception {
         when(listingService.processListingHearingsRequest(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingDetails.getCaseData());
         when(defaultValuesReaderService.getListingDefaultValues(isA(ListingDetails.class)))
@@ -271,13 +272,13 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateHearingDocument() throws Exception {
+    void generateHearingDocument() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -286,39 +287,39 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicListingVenue() throws Exception {
+    void dynamicListingVenue() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LISTING_VENUE)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateHearingDocumentConfirmation() throws Exception {
+    void generateHearingDocumentConfirmation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateHearingDocumentWithErrors() throws Exception {
+    void generateHearingDocumentWithErrors() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -327,13 +328,13 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void listingSingleCases() throws Exception {
+    void listingSingleCases() throws Exception {
         when(listingService.processListingSingleCasesRequest(isA(CaseDetails.class))).thenReturn(caseData);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(LISTING_SINGLE_CASES_URL)
@@ -341,13 +342,13 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateListingsDocSingleCases() throws Exception {
+    void generateListingsDocSingleCases() throws Exception {
         when(listingService.setManagingOfficeAndCourtAddressFromCaseData(isA(CaseData.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
@@ -358,26 +359,26 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateListingsDocSingleCasesConfirmation() throws Exception {
+    void generateListingsDocSingleCasesConfirmation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL)
                 .content(requestContentSingleCase.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateListingsDocSingleCasesWithErrors() throws Exception {
+    void generateListingsDocSingleCasesWithErrors() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -386,13 +387,13 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateReportOk() throws Exception {
+    void generateReportOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingRequest.getCaseDetails().getCaseData());
@@ -404,13 +405,13 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateHearingsToJudgmentsReportOk() throws Exception {
+    void generateHearingsToJudgmentsReportOk() throws Exception {
         HearingsToJudgmentsReportSummary reportSummary = new HearingsToJudgmentsReportSummary(
             TribunalOffice.LEEDS.getOfficeName());
         HearingsToJudgmentsReportData reportData = new HearingsToJudgmentsReportData(reportSummary);
@@ -427,13 +428,13 @@ public class ListingGenerationControllerTest {
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateCasesAwaitingJudgmentReportOk() throws Exception {
+    void generateCasesAwaitingJudgmentReportOk() throws Exception {
         ReportSummary reportSummary = new ReportSummary(ENGLANDWALES_CASE_TYPE_ID);
         CasesAwaitingJudgmentReportData reportData = new CasesAwaitingJudgmentReportData(reportSummary);
         reportData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
@@ -449,13 +450,13 @@ public class ListingGenerationControllerTest {
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void generateCMemberDaysReportOk() throws Exception {
+    void generateCMemberDaysReportOk() throws Exception {
         MemberDaysReportData reportData = new MemberDaysReportData();
         reportData.setReportType(MEMBER_DAYS_REPORT);
 
@@ -472,28 +473,28 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void initGenerateReportOk() throws Exception {
+    void initGenerateReportOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestContent.toString()))
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(generateReportService, times(1)).initGenerateReport(any(ListingDetails.class));
     }
 
     @Test
-    public void generateReportError400() throws Exception {
+    void generateReportError400() throws Exception {
         mvc.perform(post(GENERATE_REPORT_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -502,7 +503,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateReportError500() throws Exception {
+    void generateReportError500() throws Exception {
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -514,7 +515,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateReportForbidden() throws Exception {
+    void generateReportForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_REPORT_URL)
                 .content(requestContent.toString())
@@ -524,7 +525,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void dynamicListingVenueError400() throws Exception {
+    void dynamicListingVenueError400() throws Exception {
         mvc.perform(post(DYNAMIC_LISTING_VENUE)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -533,7 +534,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateHearingDocumentError400() throws Exception {
+    void generateHearingDocumentError400() throws Exception {
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -542,7 +543,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingCaseCreationError400() throws Exception {
+    void listingCaseCreationError400() throws Exception {
         mvc.perform(post(LISTING_CASE_CREATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -551,7 +552,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingHearingsError400() throws Exception {
+    void listingHearingsError400() throws Exception {
         mvc.perform(post(LISTING_HEARINGS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -560,7 +561,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingSingleCasesError400() throws Exception {
+    void listingSingleCasesError400() throws Exception {
         mvc.perform(post(LISTING_SINGLE_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -569,7 +570,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateListingsDocSingleCasesError400() throws Exception {
+    void generateListingsDocSingleCasesError400() throws Exception {
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -578,7 +579,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void initGenerateReportError400() throws Exception {
+    void initGenerateReportError400() throws Exception {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -589,7 +590,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingCaseCreationError500() throws Exception {
+    void listingCaseCreationError500() throws Exception {
         when(listingService.listingCaseCreation(isA(ListingDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -601,7 +602,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingSingleCasesError500() throws Exception {
+    void listingSingleCasesError500() throws Exception {
         when(listingService.processListingSingleCasesRequest(isA(CaseDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -613,7 +614,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateListingsDocSingleCasesError500() throws Exception {
+    void generateListingsDocSingleCasesError500() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 
@@ -629,7 +630,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateHearingDocumentError500() throws Exception {
+    void generateHearingDocumentError500() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -641,7 +642,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingHearingsError500() throws Exception {
+    void listingHearingsError500() throws Exception {
         when(listingService.processListingHearingsRequest(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -653,7 +654,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void initGenerateReportError500() throws Exception {
+    void initGenerateReportError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doThrow(new InternalException(ERROR_MESSAGE)).when(generateReportService).initGenerateReport(
                 isA(ListingDetails.class));
@@ -668,7 +669,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingCaseCreationForbidden() throws Exception {
+    void listingCaseCreationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTING_CASE_CREATION_URL)
                 .content(requestContent.toString())
@@ -678,7 +679,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingHearingsForbidden() throws Exception {
+    void listingHearingsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTING_HEARINGS_URL)
                 .content(requestContent.toString())
@@ -688,7 +689,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateHearingDocumentConfirmationForbidden() throws Exception {
+    void generateHearingDocumentConfirmationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -698,7 +699,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateHearingDocumentWithErrorsForbidden() throws Exception {
+    void generateHearingDocumentWithErrorsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
                 .content(requestContent1.toString())
@@ -708,7 +709,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void listingSingleCasesForbidden() throws Exception {
+    void listingSingleCasesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTING_SINGLE_CASES_URL)
                 .content(requestContentSingleCase.toString())
@@ -718,7 +719,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateListingsDocSingleCasesForbidden() throws Exception {
+    void generateListingsDocSingleCasesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)
                 .content(requestContentSingleCase.toString())
@@ -728,7 +729,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void generateListingsDocSingleCasesConfirmationForbidden() throws Exception {
+    void generateListingsDocSingleCasesConfirmationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL)
                 .content(requestContentSingleCase.toString())
@@ -738,7 +739,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void initPrintHearingLists() throws Exception {
+    void initPrintHearingLists() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
@@ -746,15 +747,15 @@ public class ListingGenerationControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .content(requestContentSingleCase.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(printHearingListService, times(1)).initPrintHearingLists(any(CaseData.class));
     }
 
     @Test
-    public void initPrintHearingListsForbidden() throws Exception {
+    void initPrintHearingListsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
@@ -767,7 +768,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void initPrintHearingListsError400() throws Exception {
+    void initPrintHearingListsError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
@@ -780,7 +781,7 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
-    public void initGenerateReportForbidden() throws Exception {
+    void initGenerateReportForbidden() throws Exception {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)

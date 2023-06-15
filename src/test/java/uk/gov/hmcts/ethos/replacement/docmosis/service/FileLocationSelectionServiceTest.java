@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -14,12 +16,13 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class FileLocationSelectionServiceTest {
+@ExtendWith(SpringExtension.class)
+class FileLocationSelectionServiceTest {
 
     private final TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
 
     @Test
-    public void testInitialiseFileLocationNoFileLocationSelected() {
+    void testInitialiseFileLocationNoFileLocationSelected() {
         FileLocationService fileLocationService = mockFileLocationService();
         CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
@@ -32,7 +35,7 @@ public class FileLocationSelectionServiceTest {
     }
 
     @Test
-    public void testInitialiseFileLocationWithFileLocationSelected() {
+    void testInitialiseFileLocationWithFileLocationSelected() {
         FileLocationService fileLocationService = mockFileLocationService();
         CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         DynamicValueType selectedFileLocation = DynamicValueType.create("fileLocation2", "File Location 2");
@@ -47,7 +50,7 @@ public class FileLocationSelectionServiceTest {
     }
 
     @Test
-    public void testInitialiseFileLocationMultipleDataNoFileLocationSelected() {
+    void testInitialiseFileLocationMultipleDataNoFileLocationSelected() {
         FileLocationService fileLocationService = mockFileLocationService();
         CaseData multipleData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
@@ -60,7 +63,7 @@ public class FileLocationSelectionServiceTest {
     }
 
     @Test
-    public void testInitialiseFileLocationMultipleDataWithFileLocationSelected() {
+    void testInitialiseFileLocationMultipleDataWithFileLocationSelected() {
         FileLocationService fileLocationService = mockFileLocationService();
         MultipleData multipleData = SelectionServiceTestUtils.createMultipleData(tribunalOffice.getOfficeName());
         DynamicValueType selectedFileLocation = DynamicValueType.create("fileLocation2", "File Location 2");

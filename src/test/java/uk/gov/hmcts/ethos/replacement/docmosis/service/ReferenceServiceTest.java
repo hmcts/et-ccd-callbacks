@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class ReferenceServiceTest {
+class ReferenceServiceTest {
 
     @Mock
     private CcdClient ccdClient;
@@ -126,7 +126,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchHearingVenueRefDataWithThreeVenuesPresent() throws IOException {
+    void fetchHearingVenueRefDataWithThreeVenuesPresent() throws IOException {
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEvents);
         CaseData caseDataResult = referenceService.fetchHearingVenueRefData(caseDetails, "authToken");
@@ -134,7 +134,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchHearingVenueRefDataWithNoVenuesRefData() throws IOException {
+    void fetchHearingVenueRefDataWithNoVenuesRefData() throws IOException {
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEventsNoVenues);
         CaseData caseDataResult = referenceService.fetchHearingVenueRefData(caseDetails, "authToken");
@@ -142,7 +142,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchHearingVenueRefDataWithNoReferenceData() throws IOException {
+    void fetchHearingVenueRefDataWithNoReferenceData() throws IOException {
         referenceSubmitEvents.clear();
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEvents);
@@ -151,7 +151,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchHearingVenueRefDataException() {
+    void fetchHearingVenueRefDataException() {
         assertThrows(Exception.class, () -> {
             when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                     .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -161,7 +161,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchDateListedRefDataWithAllRefDataPresent() throws IOException {
+    void fetchDateListedRefDataWithAllRefDataPresent() throws IOException {
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEvents);
         CaseData caseDataResult = referenceService.fetchDateListedRefData(caseDetails, "authToken");
@@ -169,7 +169,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchDateListedRefDataWithNoVenuesRefData() throws IOException {
+    void fetchDateListedRefDataWithNoVenuesRefData() throws IOException {
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEventsNoVenues);
         CaseData caseDataResult = referenceService.fetchDateListedRefData(caseDetails, "authToken");
@@ -177,7 +177,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchDateListedRefDataWithNoClerksRefData() throws IOException {
+    void fetchDateListedRefDataWithNoClerksRefData() throws IOException {
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEventsNoClerks);
         CaseData caseDataResult = referenceService.fetchDateListedRefData(caseDetails, "authToken");
@@ -185,7 +185,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchDateListedRefDataWithNoJudgesRefData() throws IOException {
+    void fetchDateListedRefDataWithNoJudgesRefData() throws IOException {
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEventsNoJudges);
         CaseData caseDataResult = referenceService.fetchDateListedRefData(caseDetails, "authToken");
@@ -193,7 +193,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchDateListedRefDataWithNoReferenceData() throws IOException {
+    void fetchDateListedRefDataWithNoReferenceData() throws IOException {
         referenceSubmitEvents.clear();
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenReturn(referenceSubmitEvents);
@@ -202,7 +202,7 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchDateListedRefDataException() throws IOException {
+    void fetchDateListedRefDataException() throws IOException {
         when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 

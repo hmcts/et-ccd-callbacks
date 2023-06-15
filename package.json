@@ -33,7 +33,7 @@
         "totp-generator": "0.0.13"
     },
     "scripts": {
-        "test:fullfunctional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --grep @nightly --steps —-reporter mocha-multi  --verbose",
+        "test:fullfunctional": "codeceptjs run -c ./src/test/end-to-end/codecept.conf.js --grep @nightly --steps —-reporter mocha-multi  --verbose",
         "test:crossbrowser": "codeceptjs run-multiple ${BROWSER_GROUP:-'--all'} -c ./src/test/end-to-end/saucelabs.conf.js --grep @crossbrowser --steps --reporter mocha-multi --verbose",
         "test:functional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --grep @RET-BAT--steps —-reporter mocha-multi",
         "codeceptjs": "codeceptjs run --steps",

@@ -164,9 +164,35 @@ public final class SessionDaysReport {
                                         SessionDaysReportSummary reportSummary,
                                         List<SessionDaysReportSummary2> sessionDaysReportSummary2List,
                                         List<List<String>> sessionsList) {
-        for (HearingTypeItem hearingTypeItem : getHearings(caseData)) {
-            List<DateListedTypeItem> dates = hearingTypeItem.getValue().getHearingDateCollection();
-            dates = filterValidHearingDates(dates);
+        List<HearingTypeItem> hearings = getHearings(caseData);
+
+        for (HearingTypeItem hearing : hearings) {
+            List<DateListedTypeItem> validDates = filterValidHearingDates(hearing.getValue().getHearingDateCollection());
+
+            for (DateListedTypeItem date : validDates) {
+                if (isHearingStatusValid(date)) {
+                    String judgeName = getJudgeName(hearing.getValue().getJudge());
+                    JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
+                    SessionDaysReportSummary2 reportSummary2 = getReportSummary2Item(date.getValue(), sessionDaysReportSummary2List);
+
+                    if (!sessionExists(judgeName, date.getValue().getListedDate(), sessionsList)) {
+                        setReportSummariesFields(judgeStatus, reportSummary, reportSummary2);
+                    }
+                }
+            }
+        }
+    }
+
+    /*private void setCaseReportSummaries(SessionDaysCaseData caseData,
+                                        SessionDaysReportSummary reportSummary,
+                                        List<SessionDaysReportSummary2> sessionDaysReportSummary2List,
+                                        List<List<String>> sessionsList) {
+        List<HearingTypeItem> hearings = getHearings(caseData);
+
+        for (HearingTypeItem hearingTypeItem : hearings) {
+            List<DateListedTypeItem> dates =
+                    filterValidHearingDates(hearingTypeItem.getValue().getHearingDateCollection());
+
             if (CollectionUtils.isNotEmpty(dates)) {
                 for (DateListedTypeItem dateListedTypeItem : dates) {
                     if (isHearingStatusValid(dateListedTypeItem)) {
@@ -174,6 +200,7 @@ public final class SessionDaysReport {
                         JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
                         SessionDaysReportSummary2 reportSummary2 = getReportSummary2Item(
                                 dateListedTypeItem.getValue(), sessionDaysReportSummary2List);
+
                         if (!sessionExists(judgeName, dateListedTypeItem.getValue().getListedDate(), sessionsList)) {
                             setReportSummariesFields(judgeStatus, reportSummary, reportSummary2);
                         }
@@ -181,7 +208,7 @@ public final class SessionDaysReport {
                 }
             }
         }
-    }
+    }*/
 
     private void setReportSummariesFields(JudgeEmploymentStatus judgeStatus, SessionDaysReportSummary reportSummary,
                                           SessionDaysReportSummary2 reportSummary2) {
@@ -261,6 +288,48 @@ public final class SessionDaysReport {
         }
         return hearings;
     }
+
+    /*private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
+        for (HearingTypeItem hearing : getHearings(caseData)) {
+            List<DateListedTypeItem> validDates = filterValidHearingDates(hearing.getValue().getHearingDateCollection());
+
+            if (CollectionUtils.isNotEmpty(validDates)) {
+                for (DateListedTypeItem date : validDates) {
+                    if (isHearingStatusValid(date)) {
+                        SessionDaysReportDetail reportDetail = createReportDetail(hearing, date);
+                        setHearingDetails(hearing, date, reportDetail);
+                        reportDetailList.add(reportDetail);
+                    }
+                }
+            }
+        }
+    }*/
+
+    /*private SessionDaysReportDetail createReportDetail(HearingTypeItem hearing, DateListedTypeItem date) {
+        SessionDaysReportDetail reportDetail = new SessionDaysReportDetail();
+        reportDetail.setHearingDate(LocalDateTime.parse(date.getValue().getListedDate(), OLD_DATE_TIME_PATTERN)
+                .toLocalDate().toString());
+        return reportDetail;
+    }*/
+
+   /* private void setHearingDetails(HearingTypeItem hearing, DateListedTypeItem date, SessionDaysReportDetail reportDetail) {
+        String judgeName = getJudgeName(hearing.getValue().getJudge());
+        JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
+
+        reportDetail.setHearingJudge(Strings.isNullOrEmpty(judgeName) ? "* Not Allocated" : judgeName);
+        setJudgeType(judgeStatus, reportDetail);
+        reportDetail.setCaseReference(caseData.getEthosCaseReference());
+        reportDetail.setHearingNumber(hearing.getValue().getHearingNumber());
+        reportDetail.setHearingType(hearing.getValue().getHearingType());
+        reportDetail.setHearingSitAlone("Sit Alone".equals(hearing.getValue().getHearingSitAlone()) ? "Y" : "");
+        setTelCon(hearing, reportDetail);
+        String duration = getHearingDurationInMinutes(date);
+        reportDetail.setHearingDuration(duration);
+        reportDetail.setSessionType(getSessionType(Long.parseLong(duration)));
+        if (date.getValue().hasHearingClerk()) {
+            reportDetail.setHearingClerk(date.getValue().getHearingClerk().getSelectedLabel());
+        }
+    }*/
 
     private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
         for (HearingTypeItem hearingTypeItem : getHearings(caseData)) {

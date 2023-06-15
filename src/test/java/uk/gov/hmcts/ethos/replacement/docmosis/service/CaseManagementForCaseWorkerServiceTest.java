@@ -36,6 +36,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -817,7 +818,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    void linkOriginalCaseECCException() {
+    void linkOriginalCaseECCException() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));

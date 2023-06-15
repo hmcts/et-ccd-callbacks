@@ -246,23 +246,32 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                HearingType hearingType =  hearingTypeItem.getValue();
-                if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (dateListedType.getHearingStatus() == null) {
-                            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-                            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
-                            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
-                        }
-                        populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
-                    }
+        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return;
+        }
+
+        for (HearingTypeItem hearingTypeItem : hearingCollection) {
+            HearingType hearingType = hearingTypeItem.getValue();
+            List<DateListedTypeItem> hearingDateCollection = hearingType.getHearingDateCollection();
+            if (CollectionUtils.isEmpty(hearingDateCollection)) {
+                continue;
+            }
+
+            for (DateListedTypeItem dateListedTypeItem : hearingDateCollection) {
+                DateListedType dateListedType = dateListedTypeItem.getValue();
+                if (dateListedType.getHearingStatus() == null) {
+                    initializeHearingStatus(dateListedType);
                 }
+                populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
             }
         }
+    }
+
+    private void initializeHearingStatus(DateListedType dateListedType) {
+        dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+        dateListedType.setHearingTimingStart(dateListedType.getListedDate());
+        dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
     }
 
     public void midEventAmendHearing(CaseData caseData, List<String> errors) {
@@ -315,14 +324,9 @@ public class CaseManagementForCaseWorkerService {
     private void populateHearingVenueFromHearingLevelToDayLevel(DateListedType dateListedType, HearingType hearingType,
                                                                 String caseTypeId) {
         switch (caseTypeId) {
-            case ENGLANDWALES_CASE_TYPE_ID:
-                populateHearingVenueEnglandWales(dateListedType, hearingType);
-                break;
-            case SCOTLAND_CASE_TYPE_ID:
-                populateHearingVenueScotland(dateListedType, hearingType);
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+            case ENGLANDWALES_CASE_TYPE_ID -> populateHearingVenueEnglandWales(dateListedType, hearingType);
+            case SCOTLAND_CASE_TYPE_ID -> populateHearingVenueScotland(dateListedType, hearingType);
+            default -> throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
         }
     }
 

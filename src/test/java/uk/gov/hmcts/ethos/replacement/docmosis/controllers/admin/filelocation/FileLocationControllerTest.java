@@ -15,9 +15,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLo
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.SaveFileLocationException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;

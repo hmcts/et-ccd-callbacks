@@ -2,9 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
@@ -12,8 +10,10 @@ import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
+
 import java.util.List;
 import java.util.UUID;
+
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

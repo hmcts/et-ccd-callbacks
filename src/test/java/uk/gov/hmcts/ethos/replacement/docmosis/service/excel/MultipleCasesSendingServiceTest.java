@@ -15,7 +15,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -66,24 +69,24 @@ public class MultipleCasesSendingServiceTest {
 
     @Test
     public void sendUpdateToMultipleException() throws IOException {
-    assertThrows(Exception.class, () -> {
-        when(ccdClient.startBulkAmendEventForCase(userToken,
-                multipleDetails.getCaseTypeId(),
-                multipleDetails.getJurisdiction(),
-                multipleDetails.getCaseId()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
-        multipleCasesSendingService.sendUpdateToMultiple(userToken,
-                multipleDetails.getCaseTypeId(),
-                multipleDetails.getJurisdiction(),
-                multipleDetails.getCaseData(),
-                multipleDetails.getCaseId());
-        verify(ccdClient, times(1)).startBulkAmendEventForCase(userToken,
-                multipleDetails.getCaseTypeId(),
-                multipleDetails.getJurisdiction(),
-                multipleDetails.getCaseId());
-        verifyNoMoreInteractions(ccdClient);
+        assertThrows(Exception.class, () -> {
+            when(ccdClient.startBulkAmendEventForCase(userToken,
+                    multipleDetails.getCaseTypeId(),
+                    multipleDetails.getJurisdiction(),
+                    multipleDetails.getCaseId()))
+                    .thenThrow(new InternalException(ERROR_MESSAGE));
+            multipleCasesSendingService.sendUpdateToMultiple(userToken,
+                    multipleDetails.getCaseTypeId(),
+                    multipleDetails.getJurisdiction(),
+                    multipleDetails.getCaseData(),
+                    multipleDetails.getCaseId());
+            verify(ccdClient, times(1)).startBulkAmendEventForCase(userToken,
+                    multipleDetails.getCaseTypeId(),
+                    multipleDetails.getJurisdiction(),
+                    multipleDetails.getCaseId());
+            verifyNoMoreInteractions(ccdClient);
 
-    });
-}
+        });
+    }
 
 }

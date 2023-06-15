@@ -22,10 +22,8 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @RunWith(Parameterized.class)
-@SpringBootTest(classes = {
-        TribunalOfficesService.class,
-})
-@EnableConfigurationProperties({CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class})
+@SpringBootTest(classes = { TribunalOfficesService.class })
+@EnableConfigurationProperties({ CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class })
 public class TribunalOfficeServiceTest {
     @ClassRule public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     @Rule public final SpringMethodRule springMethodRule = new SpringMethodRule();

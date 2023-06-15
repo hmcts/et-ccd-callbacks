@@ -3,11 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
@@ -111,23 +109,23 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogicException() throws IOException {
-    assertThrows(Exception.class, () -> {
-                when(excelReadingService.checkExcelErrors(
-                userToken,
-                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                new ArrayList<>()))
-                .thenThrow(new IOException());
-        multipleUploadService.bulkUploadLogic(userToken,
-                multipleDetails,
-                new ArrayList<>());
-        verify(excelReadingService, times(1)).checkExcelErrors(
-                userToken,
-                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                new ArrayList<>());
-        verifyNoMoreInteractions(excelReadingService);
+    public void bulkUploadLogicException() {
+        assertThrows(Exception.class, () -> {
+            when(excelReadingService.checkExcelErrors(
+                    userToken,
+                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                    new ArrayList<>()))
+                    .thenThrow(new IOException());
+            multipleUploadService.bulkUploadLogic(userToken,
+                    multipleDetails,
+                    new ArrayList<>());
+            verify(excelReadingService, times(1)).checkExcelErrors(
+                    userToken,
+                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                    new ArrayList<>());
+            verifyNoMoreInteractions(excelReadingService);
 
-    });
-}
+        });
+    }
 
 }

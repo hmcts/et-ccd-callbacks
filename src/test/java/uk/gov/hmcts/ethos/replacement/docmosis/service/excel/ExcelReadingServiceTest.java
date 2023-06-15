@@ -3,13 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -18,17 +16,19 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -70,11 +70,11 @@ public class ExcelReadingServiceTest {
         SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(userToken, documentBinaryUrl,
                 errors, multipleData, FilterExcelType.ALL);
         assertEquals(6, multipleObjects.values().size());
-        assertEquals("2", ((MultipleObject)multipleObjects.get("1820001/2019")).getFlag2());
-        assertEquals("AA", ((MultipleObject)multipleObjects.get("1820002/2019")).getFlag1());
-        assertEquals("", ((MultipleObject)multipleObjects.get("1820005/2019")).getFlag2());
-        assertEquals("", ((MultipleObject)multipleObjects.get("1820005/2019")).getFlag3());
-        assertEquals("", ((MultipleObject)multipleObjects.get("1820005/2019")).getFlag4());
+        assertEquals("2", ((MultipleObject) multipleObjects.get("1820001/2019")).getFlag2());
+        assertEquals("AA", ((MultipleObject) multipleObjects.get("1820002/2019")).getFlag1());
+        assertEquals("", ((MultipleObject) multipleObjects.get("1820005/2019")).getFlag2());
+        assertEquals("", ((MultipleObject) multipleObjects.get("1820005/2019")).getFlag3());
+        assertEquals("", ((MultipleObject) multipleObjects.get("1820005/2019")).getFlag4());
         assertEquals(0, errors.size());
     }
 
@@ -163,16 +163,16 @@ public class ExcelReadingServiceTest {
     }
 
     @Test
-    public void readExcelException() throws IOException {
-    assertThrows(Exception.class, () -> {
-                body = new ClassPathResource(TESTING_FILE_NAME_ERROR);
-        when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
-                .thenThrow(new IOException());
-        SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(userToken, documentBinaryUrl,
-                errors, multipleData, FilterExcelType.ALL);
-        assertEquals("{}", multipleObjects.toString());
+    public void readExcelException() {
+        assertThrows(Exception.class, () -> {
+            body = new ClassPathResource(TESTING_FILE_NAME_ERROR);
+            when(excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl))
+                    .thenThrow(new IOException());
+            SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(userToken, documentBinaryUrl,
+                    errors, multipleData, FilterExcelType.ALL);
+            assertEquals("{}", multipleObjects.toString());
 
-    });
-}
+        });
+    }
 
 }

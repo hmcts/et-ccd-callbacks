@@ -3,11 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -49,16 +47,16 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     }
 
     @Test
-    public void caseRetrievalRequestException() throws IOException {
-    assertThrows(Exception.class, () -> {
-        when(ccdClient.retrieveCase(anyString(), anyString(),
-                anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        caseRetrievalForCaseWorkerService.caseRetrievalRequest(
-                "authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
-                ccdRequest.getCaseDetails().getJurisdiction(), "11111");
+    public void caseRetrievalRequestException() {
+        assertThrows(Exception.class, () -> {
+            when(ccdClient.retrieveCase(anyString(), anyString(),
+                    anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+            caseRetrievalForCaseWorkerService.caseRetrievalRequest(
+                    "authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
+                    ccdRequest.getCaseDetails().getJurisdiction(), "11111");
 
-    });
-}
+        });
+    }
 
     @Test
     public void caseRetrievalRequest() throws IOException {
@@ -75,7 +73,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
         assertThrows(Exception.class, () ->
                 caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, "authToken")
         );
-}
+    }
 
     @Test
     public void casesRetrievalRequest() throws IOException {
@@ -95,7 +93,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
                 caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
                         ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")))
         );
-}
+    }
 
     @Test
     public void casesRetrievalESRequest() throws IOException {

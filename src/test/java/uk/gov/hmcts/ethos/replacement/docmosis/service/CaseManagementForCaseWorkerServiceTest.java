@@ -2,16 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDate;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -37,6 +35,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -46,13 +45,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -72,9 +72,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
-                   "PMD.TooManyFields", "PMD.CyclomaticComplexity"})
 @ExtendWith(SpringExtension.class)
 class CaseManagementForCaseWorkerServiceTest {
 
@@ -646,8 +643,8 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"Listed, Yes", " , Yes"})
-     void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
+    @CsvSource({ "Listed, Yes", " , Yes" })
+    void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         DateListedType dateListedType = caseData.getHearingCollection().get(0)
@@ -834,7 +831,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                         new ArrayList<>(), SUBMITTED_CALLBACK)
         );
-}
+    }
 
     @Test
     void createECCFromClosedCaseWithoutET3() {
@@ -984,8 +981,8 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private RepresentedTypeRItem createRepresentedTypeR(String respondentName, String representativeName) {
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .respRepName(respondentName)
-            .nameOfRepresentative(representativeName).build();
+                .respRepName(respondentName)
+                .nameOfRepresentative(representativeName).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("111");
         representedTypeRItem.setValue(representedTypeR);

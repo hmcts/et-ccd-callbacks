@@ -1,4 +1,4 @@
-import org.junit.jupiter.api.extension.ExtendWith;import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,6 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.util.ArrayList;
 import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SolicitorRoleTest {

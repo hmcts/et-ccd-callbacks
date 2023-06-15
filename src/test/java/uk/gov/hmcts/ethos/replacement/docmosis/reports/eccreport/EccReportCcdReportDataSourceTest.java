@@ -10,7 +10,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;

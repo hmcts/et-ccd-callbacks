@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
@@ -382,15 +380,15 @@ public class DocumentGenerationServiceTest {
     }
 
     @Test
-    public void processDocumentRequestException() throws IOException {
-    assertThrows(Exception.class, () -> {
-        when(tornadoService.documentGeneration(
-                anyString(), any(), anyString(), any(), any(), any()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
-        documentGenerationService.processDocumentRequest(ccdRequest, "authToken");
+    public void processDocumentRequestException() {
+        assertThrows(Exception.class, () -> {
+            when(tornadoService.documentGeneration(
+                    anyString(), any(), anyString(), any(), any(), any()))
+                    .thenThrow(new InternalException(ERROR_MESSAGE));
+            documentGenerationService.processDocumentRequest(ccdRequest, "authToken");
 
-    });
-}
+        });
+    }
 
     @Test
     public void processBulkDocumentRequest() throws IOException {
@@ -437,7 +435,7 @@ public class DocumentGenerationServiceTest {
         assertThrows(Exception.class, () ->
                 documentGenerationService.processBulkDocumentRequest(bulkRequest, "authToken")
         );
-}
+    }
 
     @Test
     public void processBulkScheduleRequest() throws IOException {
@@ -445,7 +443,7 @@ public class DocumentGenerationServiceTest {
         BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkScheduleRequest(
                 bulkRequest, "authToken");
         assertEquals("BulkDocumentInfo(markUps=Markup, errors=[], documentInfo=DocumentInfo(type=Document, "
-                + "description=resources/exampleV1.json, url=http://google.com, markUp=Markup))",
+                        + "description=resources/exampleV1.json, url=http://google.com, markUp=Markup))",
                 bulkDocumentInfo1.toString());
     }
 
@@ -456,8 +454,8 @@ public class DocumentGenerationServiceTest {
         BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkScheduleRequest(
                 bulkRequest, "authToken");
         assertEquals("BulkDocumentInfo(markUps= , errors=[There are not cases searched "
-                + "to generate schedules], "
-                + "documentInfo=DocumentInfo(type=null, description=null, url=null, markUp=null))",
+                        + "to generate schedules], "
+                        + "documentInfo=DocumentInfo(type=null, description=null, url=null, markUp=null))",
                 bulkDocumentInfo1.toString());
     }
 
@@ -469,12 +467,12 @@ public class DocumentGenerationServiceTest {
         assertThrows(Exception.class, () ->
                 documentGenerationService.processBulkScheduleRequest(bulkRequest, "authToken")
         );
-}
+    }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects
                 .requireNonNull(getClass().getClassLoader()
-                .getResource(jsonFileName)).toURI())));
+                        .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }

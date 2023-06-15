@@ -3,11 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -118,7 +116,7 @@ public class MultipleLetterServiceTest {
                 multipleObjectsFlags.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource());
         verifyNoMoreInteractions(singleCasesReadingService);
-}
+    }
 
     @Test
     public void bulkLetterLogicWithoutCases() {

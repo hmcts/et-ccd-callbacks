@@ -903,7 +903,7 @@ public class DocumentHelperTest {
                 + "}\n";
         assertEquals(expected, DocumentHelper
                 .buildDocumentContent(caseDetails10.getCaseData(), "", userDetails, ENGLANDWALES_CASE_TYPE_ID,
-                         caseDetails10.getCaseData().getCorrespondenceType(),
+                        caseDetails10.getCaseData().getCorrespondenceType(),
                         caseDetails10.getCaseData().getCorrespondenceScotType(),
                         null, null, venueAddressReaderService).toString());
     }

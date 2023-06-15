@@ -5,12 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -45,6 +43,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,12 +51,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -756,7 +756,7 @@ public class ListingServiceTest {
                 + "hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk3, "
                 + "hearingDay=1 of 1, claimantName=RYAN AIR LTD, claimantTown= , "
                 + "claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , "
-                +  "estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, "
+                + "estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, "
                 + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , "
                 + "hearingReadingDeliberationMembersChambers= ))], " + "listingVenueOfficeGlas=null, "
                 + "listingVenueOfficeAber=null, venueGlasgow=null," + " venueAberdeen=null, venueDundee=null, "
@@ -964,17 +964,18 @@ public class ListingServiceTest {
     }
 
     @Test
-    void processListingHearings_listedDateNullOrEmpty() throws IOException {
-            assertThrows(Exception.class, () -> {
-                submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
-                .get(1).getValue().setListedDate(null);
-        submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
-                .get(1).getValue().setListedDate("");
-        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
+    void processListingHearings_listedDateNullOrEmpty() {
+        assertThrows(Exception.class, () -> {
+            submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
+                    .get(1).getValue().setListedDate(null);
+            submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
+                    .get(1).getValue().setListedDate("");
+            when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+                    .thenReturn(submitEvents);
+            listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
 
-    });
-}
+        });
+    }
 
     @Test
     @Disabled
@@ -1012,7 +1013,7 @@ public class ListingServiceTest {
                 + "hearingClerk=Clerk, hearingDay=1 of 3, claimantName= , claimantTown= , claimantRepresentative= , "
                 + "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, "
                 + "hearingPanel= , hearingRoom=Tribunal 4, respondentOthers= , hearingNotes= , judicialMediation= , "
-                +  "hearingFormat= , hearingReadingDeliberationMembersChambers= ))], listingVenueOfficeGlas=null, "
+                + "hearingFormat= , hearingReadingDeliberationMembersChambers= ))], listingVenueOfficeGlas=null, "
                 + "listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, venueDundee=null, "
                 + "venueEdinburgh=null, hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, "
                 + "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, "
@@ -1035,8 +1036,7 @@ public class ListingServiceTest {
     }
 
     @Test
-    @Disabled
-    // see processListingHearingsRequest_causeListDateNull
+    @Disabled // see processListingHearingsRequest_causeListDateNull
     void processListingHearingsRequestWithException() throws IOException {
         when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString())).thenThrow(new Exception(ERROR_MESSAGE));
@@ -1044,7 +1044,7 @@ public class ListingServiceTest {
         assertThrows(Exception.class, () ->
                 listingService.processListingHearingsRequest(listingDetails, "authToken")
         );
-}
+    }
 
     @Test
     void processHearingDocument() throws IOException {
@@ -1065,7 +1065,7 @@ public class ListingServiceTest {
                 listingService.processHearingDocument(listingDetails.getCaseData(),
                         listingDetails.getCaseTypeId(), "authToken")
         );
-}
+    }
 
     @Test
     void processListingHearingsRequestWithAdditionalInfo() throws IOException {
@@ -1146,7 +1146,7 @@ public class ListingServiceTest {
                         .asList(respondentSumTypeItem, respondentSumTypeItem1)));
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .nameOfOrganisation("ITV").build();
+                .nameOfOrganisation("ITV").build();
         representedTypeRItem.setId("222");
         representedTypeRItem.setValue(representedTypeR);
         submitEvents.get(0).getCaseData()

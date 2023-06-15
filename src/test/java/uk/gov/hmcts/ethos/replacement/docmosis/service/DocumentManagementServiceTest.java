@@ -91,7 +91,8 @@ public class DocumentManagementServiceTest {
     @BeforeEach
     public void setUp() {
         file = createTestFile();
-        markup = "<a target=\"_blank\" href=\"null/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\">Document</a>";
+        markup =
+                "<a target=\"_blank\" href=\"null/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\">Document</a>";
         when(authTokenGenerator.generate()).thenReturn("authString");
         responseEntity = MultipleUtil.getResponseOK();
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -113,15 +114,14 @@ public class DocumentManagementServiceTest {
     }
 
     @Test
-    @Disabled
-    // Mock is returning null - cannot map to an UploadResponse
+    @Disabled // Mock is returning null - cannot map to an UploadResponse
     void uploadDocumentToDocumentManagementThrowsException() throws IOException, URISyntaxException {
         when(documentUploadClient.upload(anyString(), anyString(), anyString(), anyList()))
                 .thenReturn(unsuccessfulDocumentManagementUploadResponse());
 
         DocumentManagementException ex = assertThrows(DocumentManagementException.class, () ->
                 documentManagementService.uploadDocument("authString", Files.readAllBytes(file.toPath()),
-                OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "123")
+                        OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "123")
         );
         assertEquals("Unable to upload document document.docx to document management", ex.getMessage());
     }
@@ -161,7 +161,7 @@ public class DocumentManagementServiceTest {
                 documentManagementService.downloadFile("authString",
                         "documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary")
         );
-}
+    }
 
     @Test
     void getDocumentUUID() {
@@ -173,9 +173,9 @@ public class DocumentManagementServiceTest {
     void downloadFileSecureDocStoreTrue() {
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
         when(documentDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(responseEntity);
+                .thenReturn(responseEntity);
         UploadedDocument uploadedDocument = documentManagementService.downloadFile("authString",
-            "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+                "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
         assertEquals("fileName", uploadedDocument.getName());
         assertEquals("xslx", uploadedDocument.getContentType());
     }
@@ -227,7 +227,9 @@ public class DocumentManagementServiceTest {
         String actual = documentManagementService.displayDocNameTypeSizeLink(uploadedDocumentType, AUTH_TOKEN);
 
         String size = FileUtils.byteCountToDisplaySize(Long.parseLong("2000"));
-        String expected = "<a href=\"/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\" target=\"_blank\">Test (TXT, " + size + ")</a>";
+        String expected =
+                "<a href=\"/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\" target=\"_blank\">Test (TXT, "
+                        + size + ")</a>";
 
         assertEquals(expected, actual);
     }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -152,14 +151,14 @@ public class ReferenceServiceTest {
     }
 
     @Test
-    public void fetchHearingVenueRefDataException() throws IOException {
-    assertThrows(Exception.class, () -> {
-        when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
-        referenceService.fetchHearingVenueRefData(caseDetails, "authToken");
+    public void fetchHearingVenueRefDataException() {
+        assertThrows(Exception.class, () -> {
+            when(ccdClient.retrieveReferenceDataCases(anyString(), anyString(), anyString()))
+                    .thenThrow(new InternalException(ERROR_MESSAGE));
+            referenceService.fetchHearingVenueRefData(caseDetails, "authToken");
 
-    });
-}
+        });
+    }
 
     @Test
     public void fetchDateListedRefDataWithAllRefDataPresent() throws IOException {

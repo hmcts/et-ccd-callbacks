@@ -109,7 +109,7 @@ public class BulkUpdateServiceTest {
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .nameOfRepresentative("Juan").build();
+                .nameOfRepresentative("Juan").build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(representedTypeR);
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));
@@ -129,18 +129,19 @@ public class BulkUpdateServiceTest {
     }
 
     @Test
-    public void caseUpdateFieldsRequestException() throws IOException {
-    assertThrows(Exception.class, () -> {
-        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
-                bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
-        when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(),
-                anyString())).thenReturn(submitEvent);
-        bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(), searchTypeItem, "authToken",
-                submitBulkEvent);
-
-    });
-}
+    public void caseUpdateFieldsRequestException() {
+        assertThrows(Exception.class, () -> {
+            when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
+                    bulkDetails.getJurisdiction(), searchTypeItem.getId()))
+                    .thenThrow(new InternalException(ERROR_MESSAGE));
+            when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString()))
+                    .thenReturn(ccdRequest);
+            when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(),
+                    anyString())).thenReturn(submitEvent);
+            bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(), searchTypeItem, "authToken",
+                    submitBulkEvent);
+        });
+    }
 
     @Test
     public void caseUpdateFieldsRequest() throws IOException {
@@ -233,7 +234,6 @@ public class BulkUpdateServiceTest {
         when(ccdClient.retrieveBulkCasesElasticSearch("authToken", ENGLANDWALES_BULK_CASE_TYPE_ID,
                 bulkData.getMultipleReference())).thenThrow(new InternalException(ERROR_MESSAGE));
 
-
         assertThrows(Exception.class, () ->
                 bulkUpdateService.bulkUpdateLogic(
                         getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()), "authToken")
@@ -273,7 +273,7 @@ public class BulkUpdateServiceTest {
                 bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
         assertEquals("[Multiple reference does not exist or it is the same as the current multiple case]",
                 bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()),
-                "authToken").getErrors().toString());
+                        "authToken").getErrors().toString());
     }
 
     @Test

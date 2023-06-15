@@ -28,7 +28,7 @@ public class ExcelFileSingleCasesImporterTest {
             ExcelReadingService excelReadingService = mock(ExcelReadingService.class);
             when(excelReadingService.readWorkbook(authToken, downloadUrl)).thenReturn(workbook);
             ExcelFileSingleCasesImporter excelFileSingleCasesImporter = new ExcelFileSingleCasesImporter(
-                excelReadingService);
+                    excelReadingService);
             List<String> cases = excelFileSingleCasesImporter.importCases(multipleData, authToken);
             assertEquals(3, cases.size());
             assertEquals("case1", cases.get(0));
@@ -46,12 +46,12 @@ public class ExcelFileSingleCasesImporterTest {
         when(excelReadingService.readWorkbook(authToken, downloadUrl)).thenThrow(IOException.class);
 
         ExcelFileSingleCasesImporter excelFileSingleCasesImporter = new ExcelFileSingleCasesImporter(
-            excelReadingService);
+                excelReadingService);
 
         assertThrows(ImportException.class, () ->
                 excelFileSingleCasesImporter.importCases(multipleData, authToken)
         );
-}
+    }
 
     private MultipleData createMultipleData(String downloadUrl) {
         MultipleData multipleData = new MultipleData();

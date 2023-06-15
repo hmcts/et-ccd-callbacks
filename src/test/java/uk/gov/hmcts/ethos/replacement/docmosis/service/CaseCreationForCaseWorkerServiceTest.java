@@ -1,14 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -63,14 +60,14 @@ public class CaseCreationForCaseWorkerServiceTest {
     }
 
     @Test
-    public void caseCreationRequestException() throws IOException {
-    assertThrows(Exception.class, () -> {
-        when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
-        caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
+    public void caseCreationRequestException() {
+        assertThrows(Exception.class, () -> {
+            when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+            when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
+            caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
 
-    });
-}
+        });
+    }
 
     @Test
     public void caseCreationRequest() throws IOException {

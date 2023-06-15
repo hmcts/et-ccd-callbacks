@@ -45,7 +45,7 @@ const setupConfig = {
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url: testUrl,
+            url: process.env.TEST_URL || 'https://manage-case.aat.platform.hmcts.net',
             browser,
             smartWait,
             waitForTimeout,
@@ -57,7 +57,7 @@ const setupConfig = {
         },
         MyHelper: {
             require: './helpers/saucelabsHelper.js',
-            url: testUrl,
+            url: 'https://manage-case.aat.platform.hmcts.net',
         },
         Mochawesome: {
             uniqueScreenshotNames: 'true'

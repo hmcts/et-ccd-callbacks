@@ -1,4 +1,9 @@
+const { setCommonPlugins } = require('@codeceptjs/configure');
+
 const testConfig = require('../config.js');
+
+// enable all common plugins https://github.com/codeceptjs/configure#setcommonplugins
+setCommonPlugins();
 
 exports.config = {
     tests: testConfig.TestPathToRun,
@@ -22,19 +27,6 @@ exports.config = {
     include: {
         I: './pages/steps.js'
     },
-    plugins: {
-        screenshotOnFail: {
-            enabled: true,
-            fullPageScreenshots: true
-        },
-        retryFailedStep: {
-            enabled: true,
-            retries: 1
-        },
-        autoDelay: {
-            enabled: true
-        }
-    },
     mocha: {
         reporterEnabled: 'codeceptjs-cli-reporter, mochawesome',
         reporterOptions: {
@@ -48,11 +40,12 @@ exports.config = {
             mochawesome: {
                 stdout: './functional-output/console.log',
                 options: {
+                    includeScreenshots: true,
                     uniqueScreenshotNames: true,
                     reportDir: testConfig.TestOutputDir || './functional-output',
                     reportFilename: 'ET-ccd-callback-ui-functional-tests',
                     reportTitle: 'ET CCD UI Functional Tests',
-                    inline: true,
+                    inlineAssets: true,
                     html: true,
                     json: true,
                 },
@@ -63,6 +56,18 @@ exports.config = {
         parallel: {
             chunks: 2,
             browsers: ['firefox']
+        }
+    },
+    plugins: {
+        retryFailedStep: {
+            enabled: true,
+            retries: 1
+        },
+        screenshotOnFail: {
+            enabled: true,
+        },
+        autoDelay: {
+            enabled: true
         }
     },
     name: 'et-ccd-callbacks-tests'

@@ -24,7 +24,6 @@
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ShortClassName"/>
         <exclude name="LinguisticNaming"/>
-        <exclude name="GodClass"/>
     </rule>
     <rule ref="category/java/codestyle.xml/ClassNamingConventions">
         <properties>
@@ -36,6 +35,7 @@
         <properties>
             <property name="junit4TestPattern" value="[a-z][a-zA-Z0-9_]+"/>
             <property name="junit5TestPattern" value="[a-z][a-zA-Z0-9_]*" />
+            <property name="methodPattern" value="[a-z][a-zA-Z0-9_]*" />
         </properties>
     </rule>
     <rule ref="category/java/codestyle.xml/FieldNamingConventions">
@@ -63,6 +63,7 @@
         <exclude name="ExcessiveImports"/>
         <exclude name="TooManyMethods"/>
         <exclude name="TooManyFields"/>
+        <exclude name="GodClass"/>
     </rule>
     <rule ref="category/java/design.xml/LawOfDemeter">
         <properties>

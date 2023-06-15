@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -19,8 +19,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelperTest {
 
@@ -29,7 +29,7 @@ public class HelperTest {
     private CaseDetails caseDetailsScot1;
     private CaseDetails caseDetailsScot2;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
@@ -59,7 +59,7 @@ public class HelperTest {
     }
 
     @Test
-    public void nullCheck() {
+    void nullCheck() {
         assertEquals("Value ' example ' ", Helper.nullCheck("Value \" example \" "));
         assertEquals("", Helper.nullCheck(null));
         assertEquals("Value example", Helper.nullCheck("Value example"));
@@ -67,14 +67,14 @@ public class HelperTest {
     }
 
     @Test
-    public void getDocumentName() {
+    void getDocumentName() {
         String expected = "EM-TRB-EGW-ENG-00029_4.2";
         assertEquals(expected, Helper.getDocumentName(caseDetails4.getCaseData().getCorrespondenceType(),
                 caseDetails4.getCaseData().getCorrespondenceScotType()));
     }
 
     @Test
-    public void getActiveRespondentsAllFound() {
+    void getActiveRespondentsAllFound() {
         int activeRespondentsFound = 3;
 
         List<RespondentSumTypeItem> activeRespondents = Helper.getActiveRespondents(caseDetails1.getCaseData());
@@ -83,7 +83,7 @@ public class HelperTest {
     }
 
     @Test
-    public void getActiveRespondentsSomeFound() {
+    void getActiveRespondentsSomeFound() {
         int activeRespondentsFound = 2;
 
         List<RespondentSumTypeItem> activeRespondents = Helper.getActiveRespondents(caseDetailsScot1.getCaseData());
@@ -92,7 +92,7 @@ public class HelperTest {
     }
 
     @Test
-    public void getActiveRespondentsNoneFound() {
+    void getActiveRespondentsNoneFound() {
         int activeRespondentsFound = 0;
 
         List<RespondentSumTypeItem> activeRespondents = Helper.getActiveRespondents(caseDetailsScot2.getCaseData());
@@ -101,7 +101,7 @@ public class HelperTest {
     }
 
     @Test
-    public void getCurrentDate() {
+    void getCurrentDate() {
         String currentDate = Helper.getCurrentDate();
         Pattern pattern = Pattern.compile("\\d{2} [A-Za-z]{3,4} \\d{4}");
         Matcher matcher = pattern.matcher(currentDate);
@@ -109,13 +109,13 @@ public class HelperTest {
     }
 
     @Test
-    public void getDocumentMatcher() {
+    void getDocumentMatcher() {
         Matcher matcher = Helper.getDocumentMatcher("testUrl");
         assertEquals("^.+?/documents/", matcher.pattern().toString());
     }
 
     @Test
-    public void createLinkForUploadedDocument() {
+    void createLinkForUploadedDocument() {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
         uploadedDocumentType.setDocumentFilename("testFileName");
@@ -126,7 +126,7 @@ public class HelperTest {
     }
 
     @Test
-    public void isClaimantNonSystemUser() {
+    void isClaimantNonSystemUser() {
         CaseData caseData = new CaseData();
         caseData.setEt1OnlineSubmission(null);
         caseData.setHubLinksStatuses(null);

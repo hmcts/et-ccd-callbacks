@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -13,15 +15,16 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.DOUBLE_SPACE_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.NEW_LINE_ERROR;
 
-public class InvalidCharacterCheckTest {
+@ExtendWith(SpringExtension.class)
+class InvalidCharacterCheckTest {
 
     private CaseDetails caseDetails1;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
     }
@@ -34,7 +37,7 @@ public class InvalidCharacterCheckTest {
     }
 
     @Test
-    public void checkInvalidCharactersInNames() {
+    void checkInvalidCharactersInNames() {
         CaseData casedata = caseDetails1.getCaseData();
         casedata.setClaimant("Double  Space");
         casedata.getRepresentativeClaimantType().setNameOfRepresentative("New\nLine");
@@ -59,7 +62,7 @@ public class InvalidCharacterCheckTest {
     }
 
     @Test
-    public void checkInvalidCharactersInNamesNoClaimantResp() {
+    void checkInvalidCharactersInNamesNoClaimantResp() {
         CaseData casedata = caseDetails1.getCaseData();
         casedata.setClaimant("Single Space");
         casedata.setClaimantRepresentedQuestion("No");

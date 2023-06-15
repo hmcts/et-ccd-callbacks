@@ -35,6 +35,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -70,9 +71,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
-                   "PMD.TooManyFields", "PMD.CyclomaticComplexity"})
 @ExtendWith(SpringExtension.class)
 class CaseManagementForCaseWorkerServiceTest {
 
@@ -820,16 +818,17 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void linkOriginalCaseECCException() {
-        assertThrows(Exception.class, () -> {
-            when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                    isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                    .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
-            when(ccdClient.submitEventForCase(
-                    anyString(), any(), anyString(), anyString(), any(), anyString()))
-                    .thenThrow(new InternalException(ERROR_MESSAGE));
-            caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-                    new ArrayList<>(), SUBMITTED_CALLBACK);
-        });
+        when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+        when(ccdClient.submitEventForCase(
+                anyString(), any(), anyString(), anyString(), any(), anyString()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
+
+        assertThrows(Exception.class, () ->
+                caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                        new ArrayList<>(), SUBMITTED_CALLBACK)
+        );
     }
 
     @Test
@@ -980,8 +979,8 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private RepresentedTypeRItem createRepresentedTypeR(String respondentName, String representativeName) {
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .respRepName(respondentName)
-            .nameOfRepresentative(representativeName).build();
+                .respRepName(respondentName)
+                .nameOfRepresentative(representativeName).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("111");
         representedTypeRItem.setValue(representedTypeR);

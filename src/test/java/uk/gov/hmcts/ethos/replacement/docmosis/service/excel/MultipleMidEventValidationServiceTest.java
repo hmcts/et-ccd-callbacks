@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -13,15 +13,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleMidEventValidationServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleMidEventValidationServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -31,7 +31,7 @@ public class MultipleMidEventValidationServiceTest {
     private MultipleDetails multipleDetails;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -39,7 +39,7 @@ public class MultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicCurrentMultiple() {
+    void multipleValidationLogicCurrentMultiple() {
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("246000");
         moveCasesType.setUpdatedSubMultipleRef("SubMultiple");
@@ -59,7 +59,7 @@ public class MultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicExternalMultiple() {
+    void multipleValidationLogicExternalMultiple() {
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("246001");
         moveCasesType.setUpdatedSubMultipleRef("SubMultiple");
@@ -80,7 +80,7 @@ public class MultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicConvertToSingle() {
+    void multipleValidationLogicConvertToSingle() {
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("");
         moveCasesType.setUpdatedSubMultipleRef("");

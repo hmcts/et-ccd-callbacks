@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleHelperServi
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -24,8 +24,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class SingleCaseMultipleMidEventValidationServiceTest {
+@ExtendWith(SpringExtension.class)
+class SingleCaseMultipleMidEventValidationServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -36,7 +36,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     private String userToken;
     private String multipleCaseTypeId;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseDetails = new CaseDetails();
         caseDetails.setState(ACCEPTED_STATE);
@@ -47,7 +47,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void singleCaseMultipleValidationLogic() {
+    void singleCaseMultipleValidationLogic() {
 
         List<String> errors = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void singleCaseMultipleValidationLogicMultipleToSingleError() {
+    void singleCaseMultipleValidationLogicMultipleToSingleError() {
 
         List<String> errors = new ArrayList<>();
 
@@ -83,7 +83,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void singleCaseMultipleValidationLogicSingleToSingle() {
+    void singleCaseMultipleValidationLogicSingleToSingle() {
 
         List<String> errors = new ArrayList<>();
 

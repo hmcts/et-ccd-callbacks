@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
@@ -14,7 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -28,8 +29,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUplo
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_COLUMNS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_ROWS;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleUploadServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleUploadServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -43,7 +44,7 @@ public class MultipleUploadServiceTest {
     private MultipleDetails multipleDetails;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -51,7 +52,7 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogic() throws IOException {
+    void bulkUploadLogic() throws IOException {
 
         List<String> errors = new ArrayList<>();
 
@@ -69,7 +70,7 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogicWrongColumnRow() throws IOException {
+    void bulkUploadLogicWrongColumnRow() throws IOException {
 
         List<String> errors = new ArrayList<>();
 
@@ -90,7 +91,7 @@ public class MultipleUploadServiceTest {
     }
 
     @Test
-    public void bulkUploadLogicEmptySheet() throws IOException {
+    void bulkUploadLogicEmptySheet() throws IOException {
         List<String> errors = new ArrayList<>();
 
         setDocumentCollection(multipleDetails.getCaseData());
@@ -107,22 +108,24 @@ public class MultipleUploadServiceTest {
         assertEquals(ERROR_SHEET_EMPTY, errors.get(0));
     }
 
-    @Test(expected = Exception.class)
-    public void bulkUploadLogicException() throws IOException {
+    @Test
+    void bulkUploadLogicException() {
+        assertThrows(Exception.class, () -> {
+            when(excelReadingService.checkExcelErrors(
+                    userToken,
+                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                    new ArrayList<>()))
+                    .thenThrow(new IOException());
+            multipleUploadService.bulkUploadLogic(userToken,
+                    multipleDetails,
+                    new ArrayList<>());
+            verify(excelReadingService, times(1)).checkExcelErrors(
+                    userToken,
+                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                    new ArrayList<>());
+            verifyNoMoreInteractions(excelReadingService);
 
-        when(excelReadingService.checkExcelErrors(
-                userToken,
-                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                new ArrayList<>()))
-                .thenThrow(new IOException());
-        multipleUploadService.bulkUploadLogic(userToken,
-                multipleDetails,
-                new ArrayList<>());
-        verify(excelReadingService, times(1)).checkExcelErrors(
-                userToken,
-                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                new ArrayList<>());
-        verifyNoMoreInteractions(excelReadingService);
+        });
     }
 
 }

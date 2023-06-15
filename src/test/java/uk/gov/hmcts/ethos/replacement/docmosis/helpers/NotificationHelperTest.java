@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -14,11 +16,12 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
-public class NotificationHelperTest {
+@ExtendWith(SpringExtension.class)
+class NotificationHelperTest {
     private CaseData caseData;
     private CaseDetails caseDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
@@ -42,14 +45,14 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void getParties_withRepresentedClaimant_shouldReturnClaimantRep() {
+    void getParties_withRepresentedClaimant_shouldReturnClaimantRep() {
         String actual = NotificationHelper.getParties(caseData);
 
         assertThat(actual).isEqualTo("Claimant Rep, Respondent Unrepresented, Rep LastName");
     }
 
     @Test
-    public void getParties_withUnrepresentedClaimant_shouldReturnClaimant() {
+    void getParties_withUnrepresentedClaimant_shouldReturnClaimant() {
         caseData.setRepresentativeClaimantType(null);
         String actual = NotificationHelper.getParties(caseData);
 
@@ -57,7 +60,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForClaimant_withRepresentedClaimant_shouldReturnClaimantRepDetails() {
+    void buildMapForClaimant_withRepresentedClaimant_shouldReturnClaimantRepDetails() {
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
         assertThat(actual).containsEntry("emailAddress", "claimant@represented.com")
@@ -66,7 +69,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForClaimant_withRepresentedClaimantWithNoEmail_shouldReturnClaimantRepDetails() {
+    void buildMapForClaimant_withRepresentedClaimantWithNoEmail_shouldReturnClaimantRepDetails() {
         caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
@@ -76,7 +79,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithTitle() {
+    void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithTitle() {
         caseData.setRepresentativeClaimantType(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
@@ -86,7 +89,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithPreferredTitle() {
+    void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithPreferredTitle() {
         caseData.setRepresentativeClaimantType(null);
         caseData.getClaimantIndType().setClaimantTitle(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
@@ -97,7 +100,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithInitial() {
+    void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithInitial() {
         caseData.setRepresentativeClaimantType(null);
         caseData.getClaimantIndType().setClaimantTitle(null);
         caseData.getClaimantIndType().setClaimantPreferredTitle(null);
@@ -109,7 +112,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForRespondent_withUnrepresentedRespondent_shouldReturnRespondentDetails() {
+    void buildMapForRespondent_withUnrepresentedRespondent_shouldReturnRespondentDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
@@ -120,7 +123,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForRespondent_withRespondentRepresentative_shouldReturnRepresentativeDetails() {
+    void buildMapForRespondent_withRespondentRepresentative_shouldReturnRepresentativeDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType representedRespondent = respondents.get(1).getValue();
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, representedRespondent);
@@ -131,7 +134,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForRespondent_withRespondentRepresentativeWithNoEmail_shouldReturnRepresentativeDetails() {
+    void buildMapForRespondent_withRespondentRepresentativeWithNoEmail_shouldReturnRepresentativeDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType representedRespondent = respondents.get(1).getValue();
         caseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
@@ -143,7 +146,7 @@ public class NotificationHelperTest {
     }
 
     @Test
-    public void buildMapForRespondent_withUnrepresentedRespondentWithNoEmail_shouldReturnRepresentativeDetails() {
+    void buildMapForRespondent_withUnrepresentedRespondentWithNoEmail_shouldReturnRepresentativeDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
         unrepresentedRespondent.setRespondentEmail(null);

@@ -57,6 +57,7 @@ exports.config = {
         },
         screenshotOnFail: {
             enabled: true,
+            outputPath: './functional-output/reports/screenshots',
         },
         autoDelay: {
             enabled: true

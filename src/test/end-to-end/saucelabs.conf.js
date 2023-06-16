@@ -71,7 +71,7 @@ const setupConfig = {
         stdout: './functional-output/console.log',
         options: {
           reportDir: './functional-output/reports',
-          reportName: 'et-ccd-callbacks-test',
+          reportName: 'et-ccd-callbacks-xbrowser-test',
           inlineAssets: true,
         },
       },

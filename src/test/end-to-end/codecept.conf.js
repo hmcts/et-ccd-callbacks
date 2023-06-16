@@ -27,27 +27,19 @@ exports.config = {
     include: {
         I: './pages/steps.js'
     },
+    bootstrap: null,
     mocha: {
-        reporterEnabled: 'codeceptjs-cli-reporter, mochawesome',
         reporterOptions: {
             'codeceptjs-cli-reporter': {
                 stdout: '-',
-                options: {
-                    verbose: true,
-                    steps: true,
-                },
+                options: { steps: true },
             },
             mochawesome: {
                 stdout: './functional-output/console.log',
                 options: {
-                    includeScreenshots: true,
-                    uniqueScreenshotNames: true,
-                    reportDir: testConfig.TestOutputDir || './functional-output',
-                    reportFilename: 'ET-ccd-callback-ui-functional-tests',
-                    reportTitle: 'ET CCD UI Functional Tests',
+                    reportDir: './functional-output/reports',
+                    reportName: 'et-ccd-callbacks-functional-test',
                     inlineAssets: true,
-                    html: true,
-                    json: true,
                 },
             },
         },

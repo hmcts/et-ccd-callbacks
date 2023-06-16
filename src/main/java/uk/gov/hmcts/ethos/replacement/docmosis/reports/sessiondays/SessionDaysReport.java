@@ -167,13 +167,15 @@ public final class SessionDaysReport {
         List<HearingTypeItem> hearings = getHearings(caseData);
 
         for (HearingTypeItem hearing : hearings) {
-            List<DateListedTypeItem> validDates = filterValidHearingDates(hearing.getValue().getHearingDateCollection());
+            List<DateListedTypeItem> validDates =
+                    filterValidHearingDates(hearing.getValue().getHearingDateCollection());
 
             for (DateListedTypeItem date : validDates) {
                 if (isHearingStatusValid(date)) {
                     String judgeName = getJudgeName(hearing.getValue().getJudge());
                     JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
-                    SessionDaysReportSummary2 reportSummary2 = getReportSummary2Item(date.getValue(), sessionDaysReportSummary2List);
+                    SessionDaysReportSummary2 reportSummary2 = getReportSummary2Item(date.getValue(),
+                            sessionDaysReportSummary2List);
 
                     if (!sessionExists(judgeName, date.getValue().getListedDate(), sessionsList)) {
                         setReportSummariesFields(judgeStatus, reportSummary, reportSummary2);
@@ -182,33 +184,6 @@ public final class SessionDaysReport {
             }
         }
     }
-
-    /*private void setCaseReportSummaries(SessionDaysCaseData caseData,
-                                        SessionDaysReportSummary reportSummary,
-                                        List<SessionDaysReportSummary2> sessionDaysReportSummary2List,
-                                        List<List<String>> sessionsList) {
-        List<HearingTypeItem> hearings = getHearings(caseData);
-
-        for (HearingTypeItem hearingTypeItem : hearings) {
-            List<DateListedTypeItem> dates =
-                    filterValidHearingDates(hearingTypeItem.getValue().getHearingDateCollection());
-
-            if (CollectionUtils.isNotEmpty(dates)) {
-                for (DateListedTypeItem dateListedTypeItem : dates) {
-                    if (isHearingStatusValid(dateListedTypeItem)) {
-                        String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
-                        JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
-                        SessionDaysReportSummary2 reportSummary2 = getReportSummary2Item(
-                                dateListedTypeItem.getValue(), sessionDaysReportSummary2List);
-
-                        if (!sessionExists(judgeName, dateListedTypeItem.getValue().getListedDate(), sessionsList)) {
-                            setReportSummariesFields(judgeStatus, reportSummary, reportSummary2);
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 
     private void setReportSummariesFields(JudgeEmploymentStatus judgeStatus, SessionDaysReportSummary reportSummary,
                                           SessionDaysReportSummary2 reportSummary2) {

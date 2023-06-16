@@ -289,83 +289,64 @@ public final class SessionDaysReport {
         return hearings;
     }
 
-    /*private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
+
+    private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
         for (HearingTypeItem hearing : getHearings(caseData)) {
             List<DateListedTypeItem> validDates = filterValidHearingDates(hearing.getValue().getHearingDateCollection());
 
-            if (CollectionUtils.isNotEmpty(validDates)) {
-                for (DateListedTypeItem date : validDates) {
-                    if (isHearingStatusValid(date)) {
-                        SessionDaysReportDetail reportDetail = createReportDetail(hearing, date);
-                        setHearingDetails(hearing, date, reportDetail);
-                        reportDetailList.add(reportDetail);
-                    }
+            for (DateListedTypeItem date : validDates) {
+                if (isHearingStatusValid(date)) {
+                    SessionDaysReportDetail reportDetail = createReportDetail(hearing, date);
+                    setHearingDetails(hearing, date, reportDetail, caseData);
+                    reportDetailList.add(reportDetail);
                 }
             }
         }
-    }*/
+    }
 
-    /*private SessionDaysReportDetail createReportDetail(HearingTypeItem hearing, DateListedTypeItem date) {
+    private SessionDaysReportDetail createReportDetail(HearingTypeItem hearing, DateListedTypeItem date) {
         SessionDaysReportDetail reportDetail = new SessionDaysReportDetail();
-        reportDetail.setHearingDate(LocalDateTime.parse(date.getValue().getListedDate(), OLD_DATE_TIME_PATTERN)
-                .toLocalDate().toString());
+        reportDetail.setHearingDate(getFormattedHearingDate(date));
         return reportDetail;
-    }*/
+    }
 
-   /* private void setHearingDetails(HearingTypeItem hearing, DateListedTypeItem date, SessionDaysReportDetail reportDetail) {
+    private void setHearingDetails(HearingTypeItem hearing, DateListedTypeItem date,
+                                   SessionDaysReportDetail reportDetail, SessionDaysCaseData caseData) {
         String judgeName = getJudgeName(hearing.getValue().getJudge());
         JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
 
-        reportDetail.setHearingJudge(Strings.isNullOrEmpty(judgeName) ? "* Not Allocated" : judgeName);
+        reportDetail.setHearingJudge(getFormattedHearingJudge(judgeName));
         setJudgeType(judgeStatus, reportDetail);
         reportDetail.setCaseReference(caseData.getEthosCaseReference());
         reportDetail.setHearingNumber(hearing.getValue().getHearingNumber());
         reportDetail.setHearingType(hearing.getValue().getHearingType());
-        reportDetail.setHearingSitAlone("Sit Alone".equals(hearing.getValue().getHearingSitAlone()) ? "Y" : "");
+        reportDetail.setHearingSitAlone(getFormattedHearingSitAlone(hearing.getValue().getHearingSitAlone()));
         setTelCon(hearing, reportDetail);
-        String duration = getHearingDurationInMinutes(date);
-        reportDetail.setHearingDuration(duration);
-        reportDetail.setSessionType(getSessionType(Long.parseLong(duration)));
+        reportDetail.setHearingDuration(getHearingDurationInMinutes(date));
+        reportDetail.setSessionType(getSessionType(getHearingDurationInMinutesAsLong(date)));
+        setHearingClerkIfAvailable(date, reportDetail);
+    }
+
+    private String getFormattedHearingDate(DateListedTypeItem date) {
+        return LocalDateTime.parse(date.getValue().getListedDate(), OLD_DATE_TIME_PATTERN)
+                .toLocalDate().toString();
+    }
+
+    private String getFormattedHearingJudge(String judgeName) {
+        return Strings.isNullOrEmpty(judgeName) ? "* Not Allocated" : judgeName;
+    }
+
+    private String getFormattedHearingSitAlone(String hearingSitAlone) {
+        return "Sit Alone".equals(hearingSitAlone) ? "Y" : "";
+    }
+
+    private long getHearingDurationInMinutesAsLong(DateListedTypeItem date) {
+        return Long.parseLong(getHearingDurationInMinutes(date));
+    }
+
+    private void setHearingClerkIfAvailable(DateListedTypeItem date, SessionDaysReportDetail reportDetail) {
         if (date.getValue().hasHearingClerk()) {
             reportDetail.setHearingClerk(date.getValue().getHearingClerk().getSelectedLabel());
-        }
-    }*/
-
-    private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
-        for (HearingTypeItem hearingTypeItem : getHearings(caseData)) {
-            List<DateListedTypeItem> dates = hearingTypeItem.getValue().getHearingDateCollection();
-            dates = filterValidHearingDates(dates);
-            if (CollectionUtils.isNotEmpty(dates)) {
-                for (DateListedTypeItem dateListedTypeItem : dates) {
-                    if (isHearingStatusValid(dateListedTypeItem)) {
-                        SessionDaysReportDetail reportDetail = new SessionDaysReportDetail();
-                        reportDetail.setHearingDate(LocalDateTime.parse(
-                                        dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN)
-                                .toLocalDate().toString());
-                        String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
-
-                        reportDetail.setHearingJudge(
-                                Strings.isNullOrEmpty(judgeName)
-                                        ? "* Not Allocated" : judgeName);
-                        JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
-                        setJudgeType(judgeStatus, reportDetail);
-                        reportDetail.setCaseReference(caseData.getEthosCaseReference());
-                        reportDetail.setHearingNumber(hearingTypeItem.getValue().getHearingNumber());
-                        reportDetail.setHearingType(hearingTypeItem.getValue().getHearingType());
-                        reportDetail.setHearingSitAlone("Sit Alone".equals(
-                                hearingTypeItem.getValue().getHearingSitAlone()) ? "Y" : "");
-                        setTelCon(hearingTypeItem, reportDetail);
-                        String duration = getHearingDurationInMinutes(dateListedTypeItem);
-                        reportDetail.setHearingDuration(duration);
-                        reportDetail.setSessionType(getSessionType(Long.parseLong(duration)));
-                        if (dateListedTypeItem.getValue().hasHearingClerk()) {
-                            reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
-                                    .getSelectedLabel());
-                        }
-                        reportDetailList.add(reportDetail);
-                    }
-                }
-            }
         }
     }
 

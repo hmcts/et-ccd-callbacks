@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.any;
@@ -48,8 +48,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RequiredArgsConstructor
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleTransferServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleTransferServiceTest {
 
     private String ccdGatewayBaseUrl;
 
@@ -73,7 +73,7 @@ public class MultipleTransferServiceTest {
     private String userToken;
     private List<String> errors;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdGatewayBaseUrl = null; //NOPMD - suppressed NullAssignment - Null is intentional
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
@@ -88,7 +88,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void multipleTransferLogic() {
+    void multipleTransferLogic() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(singleCasesReadingService.retrieveSingleCases(anyString(), anyString(), anyList(), anyString()))
@@ -122,7 +122,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void multipleTransferLogicEmptyCollection() {
+    void multipleTransferLogicEmptyCollection() {
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());
@@ -134,7 +134,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void populateDataIfComingFromCT() {
+    void populateDataIfComingFromCT() {
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
@@ -163,7 +163,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void validateCasesBeforeTransfer() {
+    void validateCasesBeforeTransfer() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 
@@ -205,7 +205,7 @@ public class MultipleTransferServiceTest {
     }
 
     @Test
-    public void validateCasesBeforeTransfer_withoutErrors() {
+    void validateCasesBeforeTransfer_withoutErrors() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 

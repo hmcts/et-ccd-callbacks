@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -17,14 +17,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class CaseRetrievalForCaseWorkerServiceTest {
+@ExtendWith(SpringExtension.class)
+class CaseRetrievalForCaseWorkerServiceTest {
 
     @InjectMocks
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -33,7 +34,7 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     private CCDRequest ccdRequest;
     private SubmitEvent submitEvent;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         CaseDetails caseDetails;
         ccdRequest = new CCDRequest();
@@ -45,31 +46,37 @@ public class CaseRetrievalForCaseWorkerServiceTest {
         caseRetrievalForCaseWorkerService = new CaseRetrievalForCaseWorkerService(ccdClient);
     }
 
-    @Test(expected = Exception.class)
-    public void caseRetrievalRequestException() throws IOException {
-        when(ccdClient.retrieveCase(anyString(), anyString(),
-                anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        caseRetrievalForCaseWorkerService.caseRetrievalRequest(
-                "authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
-                ccdRequest.getCaseDetails().getJurisdiction(), "11111");
+    @Test
+    void caseRetrievalRequestException() {
+        assertThrows(Exception.class, () -> {
+            when(ccdClient.retrieveCase(anyString(), anyString(),
+                    anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+            caseRetrievalForCaseWorkerService.caseRetrievalRequest(
+                    "authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
+                    ccdRequest.getCaseDetails().getJurisdiction(), "11111");
+
+        });
     }
 
     @Test
-    public void caseRetrievalRequest() throws IOException {
+    void caseRetrievalRequest() throws IOException {
         when(ccdClient.retrieveCase(anyString(), anyString(), anyString(), any())).thenReturn(submitEvent);
         SubmitEvent submitEvent1 = caseRetrievalForCaseWorkerService.caseRetrievalRequest("authToken",
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(), "11111");
         assertEquals(submitEvent, submitEvent1);
     }
 
-    @Test(expected = Exception.class)
-    public void casesRetrievalRequestException() throws IOException {
+    @Test
+    void casesRetrievalRequestException() throws IOException {
         when(ccdClient.retrieveCases(anyString(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, "authToken");
+
+        assertThrows(Exception.class, () ->
+                caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, "authToken")
+        );
     }
 
     @Test
-    public void casesRetrievalRequest() throws IOException {
+    void casesRetrievalRequest() throws IOException {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
         when(ccdClient.retrieveCases(anyString(), any(), any())).thenReturn(submitEventList);
         List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalRequest(
@@ -77,16 +84,19 @@ public class CaseRetrievalForCaseWorkerServiceTest {
         assertEquals(submitEventList, submitEventList1);
     }
 
-    @Test(expected = Exception.class)
-    public void casesRetrievalESRequestException() throws IOException {
+    @Test
+    void casesRetrievalESRequestException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
-                ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")));
+
+        assertThrows(Exception.class, () ->
+                caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
+                        ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")))
+        );
     }
 
     @Test
-    public void casesRetrievalESRequest() throws IOException {
+    void casesRetrievalESRequest() throws IOException {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any())).thenReturn(submitEventList);
         List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalESRequest(

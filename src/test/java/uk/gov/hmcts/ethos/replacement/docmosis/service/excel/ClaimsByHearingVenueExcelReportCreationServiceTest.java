@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -12,13 +15,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-public class ClaimsByHearingVenueExcelReportCreationServiceTest {
+@ExtendWith(SpringExtension.class)
+class ClaimsByHearingVenueExcelReportCreationServiceTest {
     @Mock
     ClaimsByHearingVenueExcelReportCreationService service;
     ExcelCreationService excelCreationService;
     ClaimsByHearingVenueReportData reportData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         reportData = new ClaimsByHearingVenueReportData();
         ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();
@@ -34,12 +38,12 @@ public class ClaimsByHearingVenueExcelReportCreationServiceTest {
     }
 
     @Test
-    public void shouldReturnReportExcelFileDocumentInfo() {
+    void shouldReturnReportExcelFileDocumentInfo() {
         assertNotNull(service.getReportExcelFile(reportData));
     }
 
     @Test
-    public void shouldReturnReportExcelFileEmptyByteArray() {
+    void shouldReturnReportExcelFileEmptyByteArray() {
         assertNotNull(service.getReportExcelFile(
                 new ClaimsByHearingVenueReportData()));
     }

@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
@@ -22,12 +22,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_ALL_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class SubMultipleServiceTest {
+@ExtendWith(SpringExtension.class)
+class SubMultipleServiceTest {
 
     @InjectMocks
     private SubMultipleService subMultipleService;
@@ -36,7 +36,7 @@ public class SubMultipleServiceTest {
 
     private BulkDetails bulkDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         BulkData bulkData = new BulkData();
         bulkDetails = new BulkDetails();
@@ -62,7 +62,7 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void createSubMultipleLogic() {
+    void createSubMultipleLogic() {
         String result = "BulkData(bulkCaseTitle=null, multipleReference=null, multipleReferenceLinkMarkUp=null,"
                 + " feeGroupReference=null, claimantSurname=null, respondentSurname=null, "
                 + "claimantRep=null, respondentRep=null, ethosCaseReference=null, clerkResponsible=null, "
@@ -98,7 +98,7 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void createSubMultipleLogicWithErrors() {
+    void createSubMultipleLogicWithErrors() {
         String result = "[No cases have been found]";
         bulkDetails.getCaseData().setMidSearchCollection(null);
         BulkRequestPayload bulkRequestPayload = subMultipleService.createSubMultipleLogic(bulkDetails);
@@ -106,14 +106,14 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void createSubMultipleLogicWithPreviousSubMultiples() {
+    void createSubMultipleLogicWithPreviousSubMultiples() {
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.createSubMultipleLogic(bulkDetails);
         assertEquals(2, bulkRequestPayload.getBulkDetails().getCaseData().getSubMultipleCollection().size());
     }
 
     @Test
-    public void populateSubMultipleDynamicListLogic() {
+    void populateSubMultipleDynamicListLogic() {
         String result = "DynamicFixedListType(value=DynamicValueType(code=1234567, label=SubMultiple1), "
                 + "listItems=[DynamicValueType(code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
@@ -122,7 +122,7 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void populateSubMultipleDynamicListLogicWithPreviousDynamicList() {
+    void populateSubMultipleDynamicListLogicWithPreviousDynamicList() {
         String result = "DynamicFixedListType(value=DynamicValueType(code=1234567, label=SubMultiple1), "
                 + "listItems=[DynamicValueType(code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleDynamicList(createDynamicFixedListType());
@@ -132,14 +132,14 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void populateSubMultipleDynamicListLogicWithErrors() {
+    void populateSubMultipleDynamicListLogicWithErrors() {
         String result = "[No sub multiples have been found]";
         BulkRequestPayload bulkRequestPayload = subMultipleService.populateSubMultipleDynamicListLogic(bulkDetails);
         assertEquals(result, bulkRequestPayload.getErrors().toString());
     }
 
     @Test
-    public void populateFilterDefaultedAllDynamicListLogic() {
+    void populateFilterDefaultedAllDynamicListLogic() {
         String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=Select All), "
                 + "listItems=[DynamicValueType(code=999999, label=Select All), DynamicValueType("
                 + "code=1234567, label=SubMultiple1)])";
@@ -150,7 +150,7 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void populateFilterDefaultedNoneDynamicListLogic() {
+    void populateFilterDefaultedNoneDynamicListLogic() {
         String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=None), "
                 + "listItems=[DynamicValueType(code=999999, label=None), DynamicValueType("
                 + "code=1234567, label=SubMultiple1)])";
@@ -161,7 +161,7 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void deleteSubMultipleLogic() {
+    void deleteSubMultipleLogic() {
         MultipleType multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM("3333");
         multipleType.setSubMultipleM("1111");
@@ -223,14 +223,14 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void deleteSubMultipleLogicWithErrors() {
+    void deleteSubMultipleLogicWithErrors() {
         String result = "[No sub multiples have been found]";
         BulkRequestPayload bulkRequestPayload = subMultipleService.deleteSubMultipleLogic(bulkDetails);
         assertEquals(result, bulkRequestPayload.getErrors().toString());
     }
 
     @Test
-    public void bulkMidUpdateLogic() {
+    void bulkMidUpdateLogic() {
         MultipleType multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM("3333");
         multipleType.setSubMultipleM("1111");
@@ -248,14 +248,14 @@ public class SubMultipleServiceTest {
     }
 
     @Test
-    public void bulkMidUpdateLogicWithErrors() {
+    void bulkMidUpdateLogicWithErrors() {
         String result = "[No sub multiples have been found]";
         BulkRequestPayload bulkRequestPayload = subMultipleService.bulkMidUpdateLogic(bulkDetails);
         assertEquals(result, bulkRequestPayload.getErrors().toString());
     }
 
     @Test
-    public void updateSubMultipleLogic() {
+    void updateSubMultipleLogic() {
         bulkDetails.getCaseData().setSubMultipleRef("1111");
         bulkDetails.getCaseData().setSubMultipleName("NewSubMultipleName");
         MultipleType multipleType = new MultipleType();

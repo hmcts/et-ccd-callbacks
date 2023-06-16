@@ -105,9 +105,9 @@ class RespondentTellSomethingElseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
@@ -141,9 +141,9 @@ class RespondentTellSomethingElseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath("$.errors[0]", equalTo(FUNCTION_NOT_AVAILABLE_ERROR)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
@@ -158,9 +158,9 @@ class RespondentTellSomethingElseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", empty()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
@@ -173,9 +173,9 @@ class RespondentTellSomethingElseControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(resTseService).validateGiveDetails(ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -197,9 +197,9 @@ class RespondentTellSomethingElseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(resTseService).sendAcknowledgeEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), false);
     }
@@ -222,9 +222,9 @@ class RespondentTellSomethingElseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(resTseService).generateTableMarkdown(ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -247,9 +247,9 @@ class RespondentTellSomethingElseControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.confirmation_body", notNullValue()))
-            .andExpect(jsonPath("$.data", nullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

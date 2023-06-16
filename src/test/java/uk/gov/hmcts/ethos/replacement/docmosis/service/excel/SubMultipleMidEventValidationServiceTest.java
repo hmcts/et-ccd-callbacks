@@ -1,22 +1,22 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.AMEND_ACTION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DELETE_ACTION;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class SubMultipleMidEventValidationServiceTest {
+@ExtendWith(SpringExtension.class)
+class SubMultipleMidEventValidationServiceTest {
 
     @InjectMocks
     private SubMultipleMidEventValidationService subMultipleMidEventValidationService;
@@ -24,7 +24,7 @@ public class SubMultipleMidEventValidationServiceTest {
     private MultipleDetails multipleDetails;
     private List<String> errors;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -32,7 +32,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceCreate() {
+    void subMultipleMidEventValidationServiceCreate() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setCreateSubMultipleName("SubMultiple");
 
@@ -46,7 +46,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceAmend() {
+    void subMultipleMidEventValidationServiceAmend() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setActionType(AMEND_ACTION);
         multipleDetails.getCaseData().getSubMultipleAction().setAmendSubMultipleNameExisting("SubMultipleDoesNotExist");
@@ -63,7 +63,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceAmendEmptySubCollection() {
+    void subMultipleMidEventValidationServiceAmendEmptySubCollection() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setActionType(AMEND_ACTION);
         multipleDetails.getCaseData().getSubMultipleAction().setAmendSubMultipleNameExisting("SubMultipleDoesNotExist");
@@ -80,7 +80,7 @@ public class SubMultipleMidEventValidationServiceTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationServiceDelete() {
+    void subMultipleMidEventValidationServiceDelete() {
 
         multipleDetails.getCaseData().getSubMultipleAction().setActionType(DELETE_ACTION);
         multipleDetails.getCaseData().getSubMultipleAction().setDeleteSubMultipleName("SubMultipleDoesNotExist");

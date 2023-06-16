@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -15,10 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleAmendCaseIdsServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleAmendCaseIdsServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -29,7 +29,7 @@ public class MultipleAmendCaseIdsServiceTest {
     private MultipleDetails multipleDetails;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
         multipleDetails = new MultipleDetails();
@@ -38,7 +38,7 @@ public class MultipleAmendCaseIdsServiceTest {
     }
 
     @Test
-    public void bulkAmendCaseIdsLogic() {
+    void bulkAmendCaseIdsLogic() {
         List<MultipleObject> multipleObjectList = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(userToken,
                 multipleDetails,
                 new ArrayList<>(),
@@ -48,7 +48,7 @@ public class MultipleAmendCaseIdsServiceTest {
     }
 
     @Test
-    public void bulkAmendCaseIdsLogicEmptyLead() {
+    void bulkAmendCaseIdsLogicEmptyLead() {
         multipleDetails.getCaseData().setLeadCase(null);
         List<MultipleObject>  multipleObjectList = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(userToken,
                 multipleDetails,

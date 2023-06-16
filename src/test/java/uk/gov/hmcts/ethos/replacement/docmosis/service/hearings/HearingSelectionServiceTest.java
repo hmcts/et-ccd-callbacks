@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -8,14 +10,17 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
-public class HearingSelectionServiceTest {
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@ExtendWith(SpringExtension.class)
+class HearingSelectionServiceTest {
 
     @Test
-    public void testGetHearingSelectionSortedByDateTime() {
+    void testGetHearingSelectionSortedByDateTime() {
         CaseData caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
@@ -33,7 +38,7 @@ public class HearingSelectionServiceTest {
     }
 
     @Test
-    public void testGetHearingSelection() {
+    void testGetHearingSelection() {
         CaseData caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
@@ -49,7 +54,7 @@ public class HearingSelectionServiceTest {
     }
 
     @Test
-    public void testGetSelectedHearing() {
+    void testGetSelectedHearing() {
         CaseData caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
@@ -62,18 +67,18 @@ public class HearingSelectionServiceTest {
         assertEquals("3", selectedHearing.getHearingNumber());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetSelectedHearingNotFound() {
+    @Test
+    void testGetSelectedHearingNotFound() {
         CaseData caseData = createCaseData();
-
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
-        hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id5"));
 
-        fail("No hearing should be found");
+        assertThrows(IllegalStateException.class, () ->
+                hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id5"))
+        );
     }
 
     @Test
-    public void getSelectedListing() {
+    void getSelectedListing() {
         CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         caseData.setAllocateHearingHearing(new DynamicFixedListType("id1"));
@@ -87,13 +92,15 @@ public class HearingSelectionServiceTest {
         assertEquals("1970-01-07T10:00:00.000", selectedListing.getListedDate());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetListingsNotFound() {
+    @Test
+    void testGetListingsNotFound() {
         CaseData caseData = createCaseData();
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         caseData.setAllocateHearingHearing(new DynamicFixedListType("id5"));
-        hearingSelectionService.getSelectedListing(caseData);
-        fail("No listing should be found");
+
+        assertThrows(IllegalStateException.class, () ->
+                hearingSelectionService.getSelectedListing(caseData)
+        );
     }
 
     private CaseData createCaseData() {

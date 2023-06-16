@@ -1,6 +1,6 @@
 'use strict';
 const commonConfig = require('../../data/commonConfig.json');
-const testConfig = require("../../../config");
+const testConfig = require("../../config");
 const verifyJurisdictionTab = require("./helpers/verifyJurisdictionTab");
 
 module.exports = async function (jurisdictionOutcome) {

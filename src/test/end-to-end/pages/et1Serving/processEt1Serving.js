@@ -2,7 +2,7 @@
 
 const commonConfig = require('../../data/commonConfig.json');
 const et1Config = require('./et1ServingConfig.json');
-const testConfig = require('./../../../config');
+const testConfig = require('../../config');
 
 module.exports =  async function () {
     const I = this;

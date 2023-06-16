@@ -1,6 +1,6 @@
 'use strict';
 const commonConfig = require('../../data/commonConfig.json');
-const testConfig = require("../../../config");
+const testConfig = require("../../config");
 const selectListedHearing = require('./helpers/selectListedHearing');
 const selectPersonelResources = require('./helpers/selectPersonelResources');
 const selectAllocateHearingRoom = require('./helpers/selectAllocateHearingRoom');

@@ -1,4 +1,4 @@
-const testConfig = require('../../config');
+const testConfig = require('../config');
 
 Feature('Verify login smoke scenario');
 

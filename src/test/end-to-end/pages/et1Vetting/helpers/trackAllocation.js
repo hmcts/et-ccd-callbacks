@@ -1,4 +1,4 @@
-const testConfig = require('../../../../config');
+const testConfig = require('../../../config');
 const commonConfig = require('../../../data/commonConfig.json');
 const { I } = inject();
 

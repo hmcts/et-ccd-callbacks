@@ -1,4 +1,4 @@
-const testConfig = require('../../../../config');
+const testConfig = require('../../../config');
 const { I } = inject();
 
 function verifyClaimantHearingPreferences() {

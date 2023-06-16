@@ -1,7 +1,7 @@
 'use strict';
 const commonConfig = require('../../data/commonConfig.json');
 const caseDetails = require("../amendCaseDetails/helper/caseDetails");
-const testConfig = require("../../../config");
+const testConfig = require("../../config");
 
 module.exports = async function (clerkResponsible, physicalLocation, suggestedHearingVenue) {
 

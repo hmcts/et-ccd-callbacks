@@ -1,5 +1,5 @@
 'use strict';
-const testConfig = require('./../../../config');
+const testConfig = require('../../config');
 const beforeYouStartVetting = require('./helpers/beforeYouStartVetting');
 const canWeServeTheClaim = require('./helpers/canWeServeTheClaim');
 const isThereAnACASCertificate = require('./helpers/isThereAnACASCertificate');

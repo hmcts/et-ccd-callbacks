@@ -1,7 +1,7 @@
 'use strict';
 
 const commonConfig = require('../../data/commonConfig.json');
-const testConfig = require("../../../config");
+const testConfig = require("../../config");
 const {eventNames} = require('../common/constants.js');
 
 module.exports = async function (jurisdiction, caseType, eventName) {

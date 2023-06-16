@@ -1,12 +1,12 @@
 const { setCommonPlugins } = require('@codeceptjs/configure');
 
-const testConfig = require('../config.js');
+const testConfig = require('./config.js');
 
 // enable all common plugins https://github.com/codeceptjs/configure#setcommonplugins
 setCommonPlugins();
 
 exports.config = {
-    tests: testConfig.TestPathToRun,
+    tests: './paths/*.js',
     output: `${process.cwd()}/${testConfig.TestOutputDir}`,
     helpers: {
         Playwright: {

@@ -1,5 +1,5 @@
 'use strict';
-const testConfig = require("../../../config");
+const testConfig = require("../../config");
 const claimantIndividualDetails = require('./helper/claimantIndividualDetails');
 const claimantContactDetails = require('./helper/claimantContactDetails');
 const claimantWorkDetails = require('./helper/claimantWorkDetails');

@@ -1,4 +1,4 @@
-const testConfig = require('./../../config');
+const testConfig = require('../config');
 const {eventNames} = require('../pages/common/constants.js');
 const {judgment,} = require("../helpers/caseHelper");
 const {processCaseToAcceptedWithAJurisdiction, processCaseToListedStateWithAJursdiction} = require("../helpers/etCaseHepler");

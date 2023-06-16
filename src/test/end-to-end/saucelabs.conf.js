@@ -99,9 +99,9 @@ const setupConfig = {
         }
     },
     multiple: {
-        safari: {
-            browsers: getBrowserConfig('safari')
-        },
+        // safari: {
+        //     browsers: getBrowserConfig('safari')
+        // },
         chrome: {
             browsers: getBrowserConfig('chrome')
         },

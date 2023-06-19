@@ -267,7 +267,8 @@ public final class SessionDaysReport {
 
     private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
         for (HearingTypeItem hearing : getHearings(caseData)) {
-            List<DateListedTypeItem> validDates = filterValidHearingDates(hearing.getValue().getHearingDateCollection());
+            List<DateListedTypeItem> validDates =
+                    filterValidHearingDates(hearing.getValue().getHearingDateCollection());
 
             for (DateListedTypeItem date : validDates) {
                 if (isHearingStatusValid(date)) {

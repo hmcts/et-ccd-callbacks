@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -21,8 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,8 +32,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleBatchUpdate3ServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleBatchUpdate3ServiceTest {
 
     @Mock
     private SingleCasesReadingService singleCasesReadingService;
@@ -50,7 +50,7 @@ public class MultipleBatchUpdate3ServiceTest {
     private List<SubmitEvent> submitEvents;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleDetails = new MultipleDetails();
@@ -60,7 +60,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3Logic() {
+    void batchUpdate3Logic() {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList("AA"));
@@ -94,7 +94,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3LogicClaimantRepRemoval() throws IOException {
+    void batchUpdate3LogicClaimantRepRemoval() throws IOException {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList("AA"));
@@ -133,7 +133,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3LogicRespondentRepRemoval() throws IOException {
+    void batchUpdate3LogicRespondentRepRemoval() throws IOException {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList("AA"));
@@ -171,7 +171,7 @@ public class MultipleBatchUpdate3ServiceTest {
     }
 
     @Test
-    public void batchUpdate3LogicNoChanges() {
+    void batchUpdate3LogicNoChanges() {
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));

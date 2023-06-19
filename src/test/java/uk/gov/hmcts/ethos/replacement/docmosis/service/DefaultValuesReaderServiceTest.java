@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -14,14 +16,17 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DefaultValuesReaderServiceTest {
+@ExtendWith(SpringExtension.class)
+class DefaultValuesReaderServiceTest {
 
     private CaseDefaultValuesConfiguration config;
 
@@ -29,7 +34,7 @@ public class DefaultValuesReaderServiceTest {
 
     private DefaultValuesReaderService defaultValuesReaderService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         config = mock(CaseDefaultValuesConfiguration.class);
         tribunalOfficesService = mock(TribunalOfficesService.class);
@@ -40,7 +45,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetDefaultValues() {
+    void testGetDefaultValues() {
         // Arrange
         ContactDetails contactDetails = new ContactDetails();
         contactDetails.setAddress1("TestAddress1");
@@ -80,7 +85,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetListingDefaultValuesScottishOfficeAll() {
+    void testGetListingDefaultValuesScottishOfficeAll() {
         // Arrange
         ContactDetails contactDetails = new ContactDetails();
         contactDetails.setAddress1("TestAddress1");
@@ -125,7 +130,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetClaimantTypeOfClaimant() {
+    void testGetClaimantTypeOfClaimant() {
         String claimantTypeOfClaimant = Constants.INDIVIDUAL_TYPE_CLAIMANT;
         when(config.getClaimantTypeOfClaimant()).thenReturn(claimantTypeOfClaimant);
 
@@ -133,7 +138,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetPositionType() {
+    void testGetPositionType() {
         String positionType = Constants.POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
@@ -141,7 +146,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetCaseDataWithNoValues() {
+    void testGetCaseDataWithNoValues() {
         DefaultValues defaultValues = createDefaultValues();
         CaseData caseData = new CaseData();
 
@@ -160,7 +165,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetCaseDataWithExistingValues() {
+    void testGetCaseDataWithExistingValues() {
         DefaultValues defaultValues = createDefaultValues();
         CaseData caseData = createCaseWithValues();
 
@@ -179,7 +184,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetCaseDataWithClaimantWorkAddress() {
+    void testGetCaseDataWithClaimantWorkAddress() {
         CaseData caseData = new CaseData();
         caseData.setClaimantWorkAddressQuestion(Constants.YES);
         caseData.setClaimantWorkAddressQRespondent(new DynamicFixedListType("Respondent 2"));
@@ -201,7 +206,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    public void testGetListingData() {
+    void testGetListingData() {
         DefaultValues defaultValues = createDefaultValues();
         ListingData listingData = new ListingData();
 

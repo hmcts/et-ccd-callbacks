@@ -2,13 +2,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -38,7 +38,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3VettingController.class, Et3VettingService.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
 class Et3VettingControllerTest {
@@ -94,9 +94,9 @@ class Et3VettingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -108,9 +108,9 @@ class Et3VettingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -140,9 +140,9 @@ class Et3VettingControllerTest {
             .header("Authorization", AUTH_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", hasSize(0)))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -154,9 +154,9 @@ class Et3VettingControllerTest {
             .header("Authorization", AUTH_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", hasSize(1)))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -186,9 +186,9 @@ class Et3VettingControllerTest {
             .header("Authorization", AUTH_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", hasSize(0)))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -219,9 +219,9 @@ class Et3VettingControllerTest {
             .header("Authorization", AUTH_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -253,9 +253,9 @@ class Et3VettingControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.confirmation_header", notNullValue()))
             .andExpect(jsonPath("$.confirmation_body", notNullValue()))
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -285,9 +285,9 @@ class Et3VettingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -317,9 +317,9 @@ class Et3VettingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -349,9 +349,9 @@ class Et3VettingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

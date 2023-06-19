@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
@@ -18,12 +18,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleSingleMidEventValidationServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleSingleMidEventValidationServiceTest {
 
     @Mock
     private SingleCasesReadingService singleCasesReadingService;
@@ -39,7 +39,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     private List<SubmitEvent> submitEventList;
     private List<String> caseIdCollection;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -50,7 +50,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogic() {
+    void multipleSingleValidationLogic() {
 
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
 
@@ -81,7 +81,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicDoesNotExist() {
+    void multipleSingleValidationLogicDoesNotExist() {
 
         multipleDetails.getCaseData().setBatchUpdateCase("245010/2020");
 
@@ -101,7 +101,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicEmptyCaseIdCollection() {
+    void multipleSingleValidationLogicEmptyCaseIdCollection() {
 
         multipleDetails.getCaseData().setCaseIdCollection(null);
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
@@ -117,7 +117,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicEmptyCaseSearch() {
+    void multipleSingleValidationLogicEmptyCaseSearch() {
 
         multipleDetails.getCaseData().setBatchUpdateCase(null);
 
@@ -131,7 +131,7 @@ public class MultipleSingleMidEventValidationServiceTest {
     }
 
     @Test
-    public void multipleSingleValidationLogicWithDynamicLists() {
+    void multipleSingleValidationLogicWithDynamicLists() {
 
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
 
@@ -175,7 +175,7 @@ public class MultipleSingleMidEventValidationServiceTest {
      * representativeClaimantType as a RepresentedTypeC object with no values set.
      */
     @Test
-    public void shouldHandleRepresentativeClaimantWithNoValues() {
+    void shouldHandleRepresentativeClaimantWithNoValues() {
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
 
         RepresentedTypeC representedTypeC = new RepresentedTypeC();

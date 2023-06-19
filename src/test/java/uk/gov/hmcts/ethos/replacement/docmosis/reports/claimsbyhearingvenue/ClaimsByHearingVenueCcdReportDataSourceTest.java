@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
@@ -8,15 +10,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ClaimsByHearingVenueCcdReportDataSourceTest {
+@ExtendWith(SpringExtension.class)
+class ClaimsByHearingVenueCcdReportDataSourceTest {
     @Test
-    public void shouldReturnSearchResults() throws IOException {
+    void shouldReturnSearchResults() throws IOException {
         String authToken = "test token";
         String caseTypeId = "test caseTypeId";
         String fromDate = "2021-12-13";
@@ -40,7 +43,7 @@ public class ClaimsByHearingVenueCcdReportDataSourceTest {
     }
 
     @Test
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         String authToken = "test token";
         String caseTypeId = "Test_caseTypeId";
         String fromDate = "2021-12-13";

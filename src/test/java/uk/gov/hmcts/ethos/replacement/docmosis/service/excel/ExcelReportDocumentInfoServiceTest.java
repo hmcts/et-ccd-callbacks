@@ -1,17 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
+
 import java.util.List;
 import java.util.UUID;
+
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,8 +21,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ExcelReportDocumentInfoServiceTest {
+@ExtendWith(SpringExtension.class)
+class ExcelReportDocumentInfoServiceTest {
     @Mock
     ExcelReportDocumentInfoService excelReportDocInfService;
     @Mock
@@ -62,7 +64,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnNonNullExcelReportDocumentInfo() {
+    void shouldReturnNonNullExcelReportDocumentInfo() {
         setUpClaimsReport();
         when(claimsByHearingVenueExcelReportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
@@ -78,7 +80,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnCorrectCountOfDependenciesInvocation() {
+    void shouldReturnCorrectCountOfDependenciesInvocation() {
         setUpClaimsReport();
         when(claimsByHearingVenueExcelReportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
@@ -101,7 +103,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnCorrectCountOfDependenciesInvocationBfReport() {
+    void shouldReturnCorrectCountOfDependenciesInvocationBfReport() {
         setUpBfReport();
         when(bfExcelReportService.getReportExcelFile(bfActionReportData))
                 .thenReturn(new byte[0]);
@@ -123,7 +125,7 @@ public class ExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    public void shouldReturnNonNullExcelBfReportDocumentInfo() {
+    void shouldReturnNonNullExcelBfReportDocumentInfo() {
         setUpBfReport();
         when(bfExcelReportService.getReportExcelFile(bfActionReportData))
                 .thenReturn(new byte[0]);

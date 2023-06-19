@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -54,8 +56,9 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
@@ -68,7 +71,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
-public class ReportDocHelperTest {
+@ExtendWith(SpringExtension.class)
+class ReportDocHelperTest {
 
     private ListingDetails reportDetails;
     private ListingDetails reportDetails2;
@@ -78,7 +82,7 @@ public class ReportDocHelperTest {
     private ListingDetails reportDetailsClaimsServed;
     private UserDetails userDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         reportDetails = generateReportDetails("reportDetailsTest1.json");
         reportDetails2 = generateReportDetails("reportDetailsTest2.json");
@@ -97,7 +101,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildClaimsAcceptedReport() {
+    void buildClaimsAcceptedReport() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00219.docx\",\n"
@@ -143,7 +147,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildLiveCaseLoadReport() {
+    void buildLiveCaseLoadReport() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00220.docx\",\n"
@@ -181,7 +185,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildCasesCompletedReport() {
+    void buildCasesCompletedReport() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00221.docx\",\n"
@@ -233,7 +237,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildCasesAwaitingJudgmentReport() throws URISyntaxException, IOException {
+    void buildCasesAwaitingJudgmentReport() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("casesAwaitingJudgmentExpected.json")).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -244,43 +248,56 @@ public class ReportDocHelperTest {
         assertEquals(expectedJson, actualJson);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testCasesAwaitingJudgementInvalidListingData() {
+    @Test
+    void testCasesAwaitingJudgementInvalidListingData() {
         ListingData listingData = new ListingData();
         listingData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
-        ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowIllegalStateExceptionForHearingsByHearingTypeReportDataType() throws Exception {
-        ListingData hearingsByHearingType = new EccReportData("test office");
-        hearingsByHearingType.setReportType(HEARINGS_BY_HEARING_TYPE_REPORT);
-        ReportDocHelper.buildReportDocumentContent(hearingsByHearingType, "access-key", "template-name", userDetails);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowIllegalStateExceptionForRespondentsReportDataType() throws Exception {
-        ListingData respondentsReportData = new EccReportData("test Respondents Report office");
-        respondentsReportData.setReportType(RESPONDENTS_REPORT);
-        ReportDocHelper.buildReportDocumentContent(respondentsReportData, "access-key", "template-name", userDetails);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowIllegalStateExceptionForSessionDaysReportDataType() throws Exception {
-        ListingData sessionDaysReportData = new EccReportData("test sessionDays Report office");
-        sessionDaysReportData.setReportType(SESSION_DAYS_REPORT);
-        ReportDocHelper.buildReportDocumentContent(sessionDaysReportData, "access-key", "template-name", userDetails);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowIllegalStateExceptionForEccReportDataType() throws Exception {
-        ListingData eccReportData = new SessionDaysReportData(new SessionDaysReportSummary("test office"));
-        eccReportData.setReportType(ECC_REPORT);
-        ReportDocHelper.buildReportDocumentContent(eccReportData, "access-key", "template-name", userDetails);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails)
+        );
     }
 
     @Test
-    public void buildTimeToFirstHearingReport() {
+    void shouldThrowIllegalStateExceptionForHearingsByHearingTypeReportDataType() {
+        ListingData hearingsByHearingType = new EccReportData("test office");
+        hearingsByHearingType.setReportType(HEARINGS_BY_HEARING_TYPE_REPORT);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(hearingsByHearingType, "access-key", "template-name",
+                        userDetails)
+        );
+    }
+
+    @Test
+    void shouldThrowIllegalStateExceptionForRespondentsReportDataType() {
+        ListingData respondentsReportData = new EccReportData("test Respondents Report office");
+        respondentsReportData.setReportType(RESPONDENTS_REPORT);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(respondentsReportData, "access-key", "template-name",
+                        userDetails)
+        );
+    }
+
+    @Test
+    void shouldThrowIllegalStateExceptionForSessionDaysReportDataType() {
+        ListingData sessionDaysReportData = new EccReportData("test sessionDays Report office");
+        sessionDaysReportData.setReportType(SESSION_DAYS_REPORT);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(sessionDaysReportData, "access-key", "template-name",
+                        userDetails)
+        );
+    }
+
+    @Test
+    void shouldThrowIllegalStateExceptionForEccReportDataType() {
+        ListingData eccReportData = new SessionDaysReportData(new SessionDaysReportSummary("test office"));
+        eccReportData.setReportType(ECC_REPORT);
+        assertThrows(IllegalStateException.class, () ->
+                ReportDocHelper.buildReportDocumentContent(eccReportData, "access-key", "template-name", userDetails)
+        );
+    }
+
+    @Test
+    void buildTimeToFirstHearingReport() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00751.docx\",\n"
@@ -337,9 +354,9 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildMembersDayLocalReport() {
+    void buildMembersDayLocalReport() {
         String todaysDate = UtilHelper.formatCurrentDate(LocalDate.now());
-        MemberDaysReportData  listingData = new MemberDaysReportData();
+        MemberDaysReportData listingData = new MemberDaysReportData();
         listingData.setReportDate(todaysDate);
         listingData.setReportType(MEMBER_DAYS_REPORT);
 
@@ -368,50 +385,50 @@ public class ReportDocHelperTest {
         listingData.getMemberDaySummaryItems().add(memberDaySummaryItem);
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
         String expected = "{\n"
-            + "\"accessKey\":\"\",\n"
-            + "\"templateName\":\"EM-TRB-SCO-ENG-00800.docx\",\n"
-            + "\"outputName\":\"document.docx\",\n"
-            + "\"data\":{\n"
-            + "\"Listed_date\":\"15 September 2021\",\n"
-            + "\"Report_Office\":\"MukeraCity\",\n"
-            + "\"Total_Full_Days\":\"2\",\n"
-            + "\"Total_Half_Days\":\"0\",\n"
-            + "\"Total_Days\":\"2.0\",\n"
-            + "\"memberDaySummaryItems\":[\n"
-            + "{\n"
-            + "\"Hearing_Date\":\"15 September 2021\",\n"
-            + "\"Full_Days\":\"2\",\n"
-            + "\"Half_Days\":\"0\",\n"
-            + "\"Total_Days\":\"2\"\n"
-            + "}],\n"
-            + "\"reportDetails\":[\n"
-            + "{\n"
-            + "\"Detail_Hearing_Date\":\"15 September 2021\",\n"
-            + "\"Employee_Member\":\"EE Member\",\n"
-            + "\"Employer_Member\":\"ER Member\",\n"
-            + "\"Case_Reference\":\"1800003/2021\",\n"
-            + "\"Hearing_Number\":\"33\",\n"
-            + "\"Hearing_Type\":\"Preliminary Hearing\",\n"
-            + "\"Hearing_Clerk\":\"Tester Clerk\",\n"
-            + "\"Hearing_Duration\":\""
-            + detailItem.getHearingDuration()
-            + "\"\n"
-            + "}],\n"
-            + "\"Report_Clerk\":\""
-            + userName
-            + "\",\n"
-            + "\"Today_date\":\""
-            + todaysDate
-            + "\"\n"
-            + "}\n"
-            + "}\n";
+                + "\"accessKey\":\"\",\n"
+                + "\"templateName\":\"EM-TRB-SCO-ENG-00800.docx\",\n"
+                + "\"outputName\":\"document.docx\",\n"
+                + "\"data\":{\n"
+                + "\"Listed_date\":\"15 September 2021\",\n"
+                + "\"Report_Office\":\"MukeraCity\",\n"
+                + "\"Total_Full_Days\":\"2\",\n"
+                + "\"Total_Half_Days\":\"0\",\n"
+                + "\"Total_Days\":\"2.0\",\n"
+                + "\"memberDaySummaryItems\":[\n"
+                + "{\n"
+                + "\"Hearing_Date\":\"15 September 2021\",\n"
+                + "\"Full_Days\":\"2\",\n"
+                + "\"Half_Days\":\"0\",\n"
+                + "\"Total_Days\":\"2\"\n"
+                + "}],\n"
+                + "\"reportDetails\":[\n"
+                + "{\n"
+                + "\"Detail_Hearing_Date\":\"15 September 2021\",\n"
+                + "\"Employee_Member\":\"EE Member\",\n"
+                + "\"Employer_Member\":\"ER Member\",\n"
+                + "\"Case_Reference\":\"1800003/2021\",\n"
+                + "\"Hearing_Number\":\"33\",\n"
+                + "\"Hearing_Type\":\"Preliminary Hearing\",\n"
+                + "\"Hearing_Clerk\":\"Tester Clerk\",\n"
+                + "\"Hearing_Duration\":\""
+                + detailItem.getHearingDuration()
+                + "\"\n"
+                + "}],\n"
+                + "\"Report_Clerk\":\""
+                + userName
+                + "\",\n"
+                + "\"Today_date\":\""
+                + todaysDate
+                + "\"\n"
+                + "}\n"
+                + "}\n";
 
         assertEquals(expected, ReportDocHelper.buildReportDocumentContent(listingData, "",
-            "EM-TRB-SCO-ENG-00800", userDetails).toString());
+                "EM-TRB-SCO-ENG-00800", userDetails).toString());
     }
 
     @Test
-    public void buildCaseSourceLocalReport() {
+    void buildCaseSourceLocalReport() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00783.docx\",\n"
@@ -437,7 +454,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildServingClaimsReportWithDay6EntriesSorted() throws URISyntaxException, IOException {
+    void buildServingClaimsReportWithDay6EntriesSorted() throws URISyntaxException, IOException {
         ListingData listingData = new ListingData();
         listingData.setReportType(SERVING_CLAIMS_REPORT);
         listingData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
@@ -501,12 +518,12 @@ public class ReportDocHelperTest {
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date-placeholder", today);
         String actualJson = ReportDocHelper.buildReportDocumentContent(listingData,
-            "", "EM-TRB-SCO-ENG-00781", userDetails).toString();
+                "", "EM-TRB-SCO-ENG-00781", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     @Test
-    public void buildCorrectServingClaimsReportDocForProvidedAllDaysEntries() throws URISyntaxException, IOException  {
+    void buildCorrectServingClaimsReportDocForProvidedAllDaysEntries() throws URISyntaxException, IOException {
         String expectedJson = getExpectedResult("servingClaimsAllDaysEntries.json");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         String expected = expectedJson.replace("current-date-placeholder", today);
@@ -515,7 +532,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildHearingsToJudgmentsReport() throws URISyntaxException, IOException {
+    void buildHearingsToJudgmentsReport() throws URISyntaxException, IOException {
         String expectedJson = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("hearingsToJudgmentsExpected.json")).toURI())).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -527,7 +544,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildRespondentsReport() throws URISyntaxException, IOException {
+    void buildRespondentsReport() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("respondentsReportExpected.json")).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -539,7 +556,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildSessionDaysReport() throws URISyntaxException, IOException {
+    void buildSessionDaysReport() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("sessionDaysExpected.json")).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -551,7 +568,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildEccReport() throws URISyntaxException, IOException {
+    void buildEccReport() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("eccExpected.json")).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -563,7 +580,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void testEccReportContainsOfficeWhenNoCasesFound() {
+    void testEccReportContainsOfficeWhenNoCasesFound() {
         EccReportData reportData = new EccReportData(TribunalOffice.MANCHESTER.getOfficeName());
         reportData.setReportType(ECC_REPORT);
         reportData.setDocumentName("TestDocument");
@@ -811,7 +828,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildHearingsByHearingTypeReport() throws URISyntaxException, IOException {
+    void buildHearingsByHearingTypeReport() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("hearingsByHearingTypeExpected.json")).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -823,7 +840,7 @@ public class ReportDocHelperTest {
     }
 
     @Test
-    public void buildNoPositionChangeReport() throws URISyntaxException, IOException {
+    void buildNoPositionChangeReport() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("noChangeInCurrentPositionExpected.json")).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -873,7 +890,7 @@ public class ReportDocHelperTest {
 
     private String getExpectedResult(String resourceFileName) throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource(resourceFileName)).toURI()))).replace("\r\n", "\n");
+                .getResource(resourceFileName)).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date-placeholder", today);
         return expectedJson;

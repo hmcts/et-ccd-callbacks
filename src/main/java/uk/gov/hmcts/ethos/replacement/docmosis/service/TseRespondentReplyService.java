@@ -67,26 +67,32 @@ public class TseRespondentReplyService {
             return;
         }
 
+        if (hasDueRequestForInfo(respondCollection)) {
+            applicationTypeItem.getValue().setApplicationState(UPDATED);
+        }
+    }
+
+    private static boolean hasDueRequestForInfo(List<TseRespondTypeItem> respondCollection) {
         boolean hasDueRequestForInfo = false;
-        for (TseRespondTypeItem tseRespondTypeItem : applicationTypeItem.getValue().getRespondCollection()) {
+        for (TseRespondTypeItem tseRespondTypeItem : respondCollection) {
             TseRespondType tseRespondType = tseRespondTypeItem.getValue();
             if (tseRespondType.getFrom().equals(RESPONDENT_TITLE)) {
                 hasDueRequestForInfo = false;
             }
-            boolean isResponseRequestForInfoFromRespondent = tseRespondType.getFrom().equals(ADMIN)
-                    && tseRespondType.getIsCmoOrRequest().equals(REQUEST)
-                    && tseRespondType.getIsResponseRequired().equals(YES)
-                    && (tseRespondType.getSelectPartyRespond().equals(RESPONDENT_TITLE)
-                        || tseRespondType.getSelectPartyRespond().equals(BOTH_PARTIES));
 
-            if (isResponseRequestForInfoFromRespondent) {
+            if (isResponseRequestForInfoFromRespondent(tseRespondType)) {
                 hasDueRequestForInfo = true;
             }
         }
+        return hasDueRequestForInfo;
+    }
 
-        if (hasDueRequestForInfo) {
-            applicationTypeItem.getValue().setApplicationState(UPDATED);
-        }
+    private static boolean isResponseRequestForInfoFromRespondent(TseRespondType tseRespondType) {
+        return tseRespondType.getFrom().equals(ADMIN)
+            && tseRespondType.getIsCmoOrRequest().equals(REQUEST)
+            && tseRespondType.getIsResponseRequired().equals(YES)
+            && (tseRespondType.getSelectPartyRespond().equals(RESPONDENT_TITLE)
+            || tseRespondType.getSelectPartyRespond().equals(BOTH_PARTIES));
     }
 
     /**

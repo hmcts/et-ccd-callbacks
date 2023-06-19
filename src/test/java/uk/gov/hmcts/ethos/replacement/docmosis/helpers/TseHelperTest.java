@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -24,16 +25,21 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 
 class TseHelperTest {
+    private static final DynamicValueType SELECT_APPLICATION = DynamicValueType.create("1", "");
+
     private CaseData caseData;
+    private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
 
     @BeforeEach
     public void setUp() {
@@ -49,7 +55,7 @@ class TseHelperTest {
             .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
@@ -117,7 +123,7 @@ class TseHelperTest {
     @Test
     void setDataForRespondingToApplication_withAGroupBApplication_restoresData() {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = "The respondent has applied to <b>Withdraw my claim</b>.</br>You do not need to respond to "
             + "this application.<br></br> If you have any objections or responses to their application you must send "
@@ -132,7 +138,7 @@ class TseHelperTest {
     void setDataForRespondingToApplication_withAGroupAApplication_restoresData() {
         caseData.getGenericTseApplicationCollection().get(0).getValue().setType(TSE_APP_POSTPONE_A_HEARING);
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = "The respondent has applied to <b>Postpone a hearing</b>.</br></br> If you have any "
             + "objections or responses to their application you must send them to the tribunal as soon as possible and "
@@ -149,7 +155,7 @@ class TseHelperTest {
             UploadedDocumentBuilder.builder().withFilename("image.png").withUuid("1234").build();
         caseData.getGenericTseApplicationCollection().get(0).getValue().setDocumentUpload(documentType);
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = """
             | | |\r
@@ -164,7 +170,7 @@ class TseHelperTest {
     @Test
     void getReplyDocumentRequest_generatesData() throws JsonProcessingException {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()
             .setRespondCollection(List.of(
@@ -199,7 +205,7 @@ class TseHelperTest {
     @Test
     void getPersonalisationForResponse_withResponse() throws NotificationClientException {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         caseData.setTseResponseText("TseResponseText");
 
         CaseDetails caseDetails = new CaseDetails();
@@ -224,7 +230,7 @@ class TseHelperTest {
     @Test
     void getPersonalisationForResponse_withoutResponse() throws NotificationClientException {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("CaseId");
@@ -243,5 +249,26 @@ class TseHelperTest {
         );
 
         assertThat(actual.toString(), is(expected.toString()));
+    }
+
+    @Nested
+    class GetRespondentSelectedApplicationTypeItem {
+        @Test
+        void findExistingApplication() {
+            caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+            caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
+
+            GenericTseApplicationTypeItem actualApplication = getRespondentSelectedApplicationTypeItem(caseData);
+
+            assertEquals(genericTseApplicationTypeItem, actualApplication);
+        }
+
+        @Test
+        void nullWhenApplicationDoesNotExist() {
+            caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+            caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("2", ""));
+
+            assertNull(getRespondentSelectedApplicationTypeItem(caseData));
+        }
     }
 }

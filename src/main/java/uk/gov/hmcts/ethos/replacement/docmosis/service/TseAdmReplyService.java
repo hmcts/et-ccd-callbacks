@@ -41,7 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationTypeItem;
 
 @Slf4j
 @Service
@@ -69,7 +69,7 @@ public class TseAdmReplyService {
      * @param authToken the caller's bearer token used to verify the caller
      */
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             return tseService.formatViewApplication(caseData, authToken);
         }
@@ -108,7 +108,7 @@ public class TseAdmReplyService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem == null) {
             return;
         }
@@ -129,7 +129,7 @@ public class TseAdmReplyService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem == null) {
             return;
         }

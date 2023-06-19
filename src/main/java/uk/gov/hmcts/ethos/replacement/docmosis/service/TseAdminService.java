@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationTypeItem;
 
 @Slf4j
 @Service
@@ -52,7 +52,7 @@ public class TseAdminService {
      * @param caseData contains all the case data
      */
     public void initialTseAdminTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem == null) {
             return;
         }
@@ -73,7 +73,7 @@ public class TseAdminService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem == null) {
             return;
         }

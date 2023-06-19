@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -171,18 +172,37 @@ public final class TseHelper {
     }
 
     /**
-     * Gets the select application in GenericTseApplicationTypeItem.
+     * Gets the admin select application in GenericTseApplicationTypeItem.
      *
      * @param caseData contains all the case data
      * @return the select application in GenericTseApplicationTypeItem
      */
-    public static GenericTseApplicationTypeItem getSelectedApplicationTypeItem(CaseData caseData) {
-        String selectedAppId = caseData.getTseAdminSelectApplication().getSelectedCode();
+    public static GenericTseApplicationTypeItem getAdminSelectedApplicationTypeItem(CaseData caseData) {
+        return getTseApplication(
+            caseData,
+            caseData.getTseAdminSelectApplication().getSelectedCode()
+        );
+    }
+
+    /**
+     * Gets the respondent select application in GenericTseApplicationTypeItem.
+     *
+     * @param caseData contains all the case data
+     * @return the select application in GenericTseApplicationTypeItem
+     */
+    public static GenericTseApplicationTypeItem getRespondentSelectedApplicationTypeItem(CaseData caseData) {
+        return getTseApplication(
+            caseData,
+            caseData.getTseRespondSelectApplication().getSelectedCode()
+        );
+    }
+
+    @Nullable
+    private static GenericTseApplicationTypeItem getTseApplication(CaseData caseData, String selectedAppId) {
         return caseData.getGenericTseApplicationCollection().stream()
-                .filter(genericTseApplicationTypeItem ->
-                        genericTseApplicationTypeItem.getValue().getNumber().equals(selectedAppId))
-                .findFirst()
-                .orElse(null);
+            .filter(item -> item.getValue().getNumber().equals(selectedAppId))
+            .findFirst()
+            .orElse(null);
     }
 
     /**

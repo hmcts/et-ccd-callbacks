@@ -264,7 +264,6 @@ public final class SessionDaysReport {
         return hearings;
     }
 
-
     private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
         for (HearingTypeItem hearing : getHearings(caseData)) {
             List<DateListedTypeItem> validDates =

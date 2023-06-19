@@ -27,6 +27,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -79,8 +81,11 @@ public final class TseHelper {
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
                 .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
-                        && isNoRespondentReply(o.getValue().getRespondCollection())
-                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo()))
+                        && (((isNoRespondentReply(o.getValue().getRespondCollection())
+                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo())
+                        || hasTribunalResponse(o.getValue().getRespondCollection())))
+                        )
+                )
                 .map(TseHelper::formatDropdownOption)
                 .toList());
     }
@@ -88,6 +93,22 @@ public final class TseHelper {
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
         return CollectionUtils.isEmpty(tseRespondTypeItems)
                 || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
+    }
+
+    /**
+     * Check if there is any request/order from Tribunal that hasn't been responded by Respondent and
+     * requires a response from Respondent.
+     */
+    private static boolean hasTribunalResponse(List<TseRespondTypeItem> tseRespondTypeItems) {
+        if (CollectionUtils.isEmpty(tseRespondTypeItems)) {
+            return false;
+        }
+        return tseRespondTypeItems.stream()
+                .anyMatch(r -> ADMIN.equals(r.getValue().getFrom())
+                        && NO.equals(r.getValue().getRespondentResponded())
+                        && (BOTH_PARTIES.equals(r.getValue().getSelectPartyRespond())
+                        || RESPONDENT_TITLE.equals(r.getValue().getSelectPartyRespond()))
+                );
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
@@ -142,8 +163,9 @@ public final class TseHelper {
      * Saves the data on the reply page onto the application object.
      *
      * @param caseData contains all the case data
+     * @param isRespondingToTribunal determines if responding to the Tribunal's request/order
      */
-    public static void saveReplyToApplication(CaseData caseData) {
+    public static void saveReplyToApplication(CaseData caseData, boolean isRespondingToTribunal) {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(applications)) {
             return;
@@ -168,6 +190,13 @@ public final class TseHelper {
                                 .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
                                 .build()
                 ).build());
+
+        if (isRespondingToTribunal) {
+            genericTseApplicationType.getRespondCollection().stream()
+                    .map(TseRespondTypeItem::getValue)
+                    .filter(r -> ADMIN.equals(r.getFrom()) && NO.equals(r.getRespondentResponded()))
+                    .forEach(r -> r.setRespondentResponded(YES));
+        }
 
         genericTseApplicationType.setResponsesCount(
                 String.valueOf(genericTseApplicationType.getRespondCollection().size())
@@ -219,6 +248,12 @@ public final class TseHelper {
 
         if (tseViewSelectApplication != null) {
             return applications.get(Integer.parseInt(tseViewSelectApplication.getValue().getCode()) - 1).getValue();
+        }
+
+        DynamicFixedListType tseRespondSelectApplication = caseData.getTseRespondSelectApplication();
+
+        if (tseRespondSelectApplication != null) {
+            return applications.get(Integer.parseInt(tseRespondSelectApplication.getValue().getCode()) - 1).getValue();
         }
 
         throw new IllegalStateException("Selected application is null");

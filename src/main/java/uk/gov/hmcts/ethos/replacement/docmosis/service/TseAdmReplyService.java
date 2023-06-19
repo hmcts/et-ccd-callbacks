@@ -33,6 +33,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORD
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -134,6 +135,7 @@ public class TseAdmReplyService {
                             .selectPartyRespond(defaultIfEmpty(caseData.getTseAdmReplyCmoSelectPartyRespond(),
                                     caseData.getTseAdmReplyRequestSelectPartyRespond()))
                             .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                            .respondentResponded(NO)
                             .build()
                     ).build());
 

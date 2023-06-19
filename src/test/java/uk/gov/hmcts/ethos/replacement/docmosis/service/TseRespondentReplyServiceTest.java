@@ -40,6 +40,8 @@ class TseRespondentReplyServiceTest {
     private UserService userService;
     @MockBean
     private NotificationProperties notificationProperties;
+    @MockBean
+    private TseService tseService;
     private UserDetails userDetails;
     private CaseData caseData;
     private MockedStatic mockStatic;
@@ -47,7 +49,7 @@ class TseRespondentReplyServiceTest {
     @BeforeEach
     void setUp() throws Exception {
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-                notificationProperties);
+                notificationProperties, tseService);
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});

@@ -150,7 +150,13 @@ public class TseRespondentReplyController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        TseHelper.setDataForRespondingToApplication(caseData);
+
+        if (tseRespondentReplyService.isRespondingToTribunal(caseData)) {
+            tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, userToken);
+        } else {
+            TseHelper.setDataForRespondingToApplication(caseData);
+        }
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -183,7 +189,7 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        TseHelper.saveReplyToApplication(caseData);
+        TseHelper.saveReplyToApplication(caseData, tseRespondentReplyService.isRespondingToTribunal(caseData));
 
         respondentTellSomethingElseService.sendAdminEmail(caseDetails);
         tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);

@@ -80,14 +80,14 @@ public class TseRespondentReplyService {
                 hasDueRequestForInfo = false;
             }
 
-            if (isResponseRequestForInfoFromRespondent(tseRespondType)) {
+            if (isRequestForInfoFromRespondent(tseRespondType)) {
                 hasDueRequestForInfo = true;
             }
         }
         return hasDueRequestForInfo;
     }
 
-    private static boolean isResponseRequestForInfoFromRespondent(TseRespondType tseRespondType) {
+    private static boolean isRequestForInfoFromRespondent(TseRespondType tseRespondType) {
         return tseRespondType.getFrom().equals(ADMIN)
             && tseRespondType.getIsCmoOrRequest().equals(REQUEST)
             && tseRespondType.getIsResponseRequired().equals(YES)

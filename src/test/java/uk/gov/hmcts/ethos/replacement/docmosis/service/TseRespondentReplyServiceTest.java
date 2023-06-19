@@ -16,20 +16,19 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,7 +47,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil
 
 @ExtendWith(SpringExtension.class)
 class TseRespondentReplyServiceTest {
-    private TseRespondentReplyService tseRespondentReplyService;
     @MockBean
     private TornadoService tornadoService;
     @MockBean
@@ -57,14 +55,17 @@ class TseRespondentReplyServiceTest {
     private UserService userService;
     @MockBean
     private NotificationProperties notificationProperties;
+
+    private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
     private CaseData caseData;
     private MockedStatic<TseHelper> mockStatic;
+    private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
 
     @BeforeEach
     void setUp() throws Exception {
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-                notificationProperties);
+            notificationProperties);
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
@@ -72,9 +73,9 @@ class TseRespondentReplyServiceTest {
 
         mockStatic = mockStatic(TseHelper.class, Mockito.CALLS_REAL_METHODS);
         mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any()))
-                .thenReturn(Collections.emptyMap());
+            .thenReturn(Collections.emptyMap());
         mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any()))
-                .thenReturn(Collections.emptyMap());
+            .thenReturn(Collections.emptyMap());
 
         caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("9876")
@@ -82,15 +83,18 @@ class TseRespondentReplyServiceTest {
             .withRespondent("respondent", YES, "01-Jan-2003", false)
             .build();
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
-            .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
-            .withResponsesCount("0").withStatus(OPEN_STATE).build();
+        GenericTseApplicationType application = GenericTseApplicationType.builder().applicant(CLAIMANT_TITLE)
+            .date("13 December 2022").dueDate("20 December 2022").type("Withdraw my claim")
+            .copyToOtherPartyYesOrNo(YES).details("Text").applicationState("notStartedYet")
+            .number("1").responsesCount("0").status(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
-        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        genericTseApplicationTypeItem.setValue(build);
+        genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+            .id(UUID.randomUUID().toString()).value(application).build();
+
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         caseData.setClaimant("Claimant LastName");
     }
@@ -98,6 +102,83 @@ class TseRespondentReplyServiceTest {
     @AfterEach
     void afterEach() {
         mockStatic.close();
+    }
+
+    @Nested
+    class UpdateApplicationStatus {
+        TseRespondTypeItem requestForInfoFromClaimant = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseRespondType.builder().from("Admin").isCmoOrRequest("Request").isResponseRequired("Yes")
+                .selectPartyRespond("Claimant").build())
+            .build();
+
+        TseRespondTypeItem adminRequestForInfoFromRespondent = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseRespondType.builder().from("Admin").isCmoOrRequest("Request").isResponseRequired("Yes")
+                .selectPartyRespond("Respondent").build())
+            .build();
+
+        TseRespondTypeItem adminRequestForInfoBothParties = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseRespondType.builder().from("Admin").isCmoOrRequest("Request").isResponseRequired("Yes")
+                .selectPartyRespond("Both parties").build())
+            .build();
+
+        TseRespondTypeItem respondentResponse = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseRespondType.builder().from("Respondent").build())
+            .build();
+
+        @Test
+        void noStatusChangeWhenNoResponses() {
+            tseRespondentReplyService.updateApplicationStatus(caseData);
+
+            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
+                .isEqualTo("notStartedYet");
+        }
+
+        @Test
+        void noStatusChangeWhenNoAdminRequestsForInfoFromRespondent() {
+            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(requestForInfoFromClaimant));
+
+            tseRespondentReplyService.updateApplicationStatus(caseData);
+
+            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
+                .isEqualTo("notStartedYet");
+        }
+
+        @Test
+        void noStatusChangeWhenAllAdminRequestsForInfoAreAnswered() {
+            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(
+                adminRequestForInfoFromRespondent, respondentResponse));
+
+            tseRespondentReplyService.updateApplicationStatus(caseData);
+
+            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
+                .isEqualTo("notStartedYet");
+
+        }
+
+        @Test
+        void changeStatusToUpdatedWhenHasDueRequestForInfo() {
+            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(adminRequestForInfoFromRespondent));
+
+            tseRespondentReplyService.updateApplicationStatus(caseData);
+
+            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
+                .isEqualTo("updated");
+        }
+
+        @Test
+        void changeStatusToUpdatedWhenHasNewDueRequestForInfo() {
+            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(adminRequestForInfoFromRespondent,
+                respondentResponse, adminRequestForInfoBothParties));
+
+            tseRespondentReplyService.updateApplicationStatus(caseData);
+
+            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
+                .isEqualTo("updated");
+        }
     }
 
     @Nested
@@ -128,14 +209,14 @@ class TseRespondentReplyServiceTest {
 
             String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
 
-            assertThat(replyType.getDate(), is(dateNow));
-            assertThat(replyType.getResponse(), is("ResponseText"));
-            assertThat(replyType.getCopyNoGiveDetails(), is("It's a secret"));
-            assertThat(replyType.getHasSupportingMaterial(), is(YES));
-            assertThat(replyType.getCopyToOtherParty(), is(NO));
-            assertThat(replyType.getFrom(), is(RESPONDENT_TITLE));
-            assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename(),
-                is("image.png"));
+            assertThat(replyType.getDate()).isEqualTo(dateNow);
+            assertThat(replyType.getResponse()).isEqualTo("ResponseText");
+            assertThat(replyType.getCopyNoGiveDetails()).isEqualTo("It's a secret");
+            assertThat(replyType.getHasSupportingMaterial()).isEqualTo(YES);
+            assertThat(replyType.getCopyToOtherParty()).isEqualTo(NO);
+            assertThat(replyType.getFrom()).isEqualTo(RESPONDENT_TITLE);
+            assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename())
+                .isEqualTo("image.png");
         }
     }
 

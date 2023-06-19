@@ -22,8 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationTypeItem;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +46,48 @@ public class TseRespondentReplyService {
     private String acknowledgementRule92YesEmailTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+
+    /**
+     * Change status of application to updated if there was an unanswered request for information from the admin.
+     *
+     * @param caseData in which the case details are extracted from
+     */
+    public void updateApplicationStatus(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return;
+        }
+
+        GenericTseApplicationTypeItem applicationTypeItem = getRespondentSelectedApplicationTypeItem(caseData);
+        if (applicationTypeItem == null) {
+            return;
+        }
+
+        List<TseRespondTypeItem> respondCollection = applicationTypeItem.getValue().getRespondCollection();
+        if (CollectionUtils.isEmpty(respondCollection)) {
+            return;
+        }
+
+        boolean hasDueRequestForInfo = false;
+        for (TseRespondTypeItem tseRespondTypeItem : applicationTypeItem.getValue().getRespondCollection()) {
+            TseRespondType tseRespondType = tseRespondTypeItem.getValue();
+            if (tseRespondType.getFrom().equals(RESPONDENT_TITLE)) {
+                hasDueRequestForInfo = false;
+            }
+            boolean isResponseRequestForInfoFromRespondent = tseRespondType.getFrom().equals(ADMIN)
+                    && tseRespondType.getIsCmoOrRequest().equals(REQUEST)
+                    && tseRespondType.getIsResponseRequired().equals(YES)
+                    && (tseRespondType.getSelectPartyRespond().equals(RESPONDENT_TITLE)
+                        || tseRespondType.getSelectPartyRespond().equals(BOTH_PARTIES));
+
+            if (isResponseRequestForInfoFromRespondent) {
+                hasDueRequestForInfo = true;
+            }
+        }
+
+        if (hasDueRequestForInfo) {
+            applicationTypeItem.getValue().setApplicationState(UPDATED);
+        }
+    }
 
     /**
      * Saves the data on the reply page onto the application object.

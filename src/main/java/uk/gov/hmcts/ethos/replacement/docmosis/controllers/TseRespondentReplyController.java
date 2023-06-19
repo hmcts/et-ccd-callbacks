@@ -187,6 +187,8 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
+        // todo get all this work to be done on the service.
+        tseRespondentReplyService.updateApplicationStatus(caseData);
         tseRespondentReplyService.saveReplyToApplication(caseData);
 
         respondentTellSomethingElseService.sendAdminEmail(caseDetails);

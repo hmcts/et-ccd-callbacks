@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.NoArgsConstructor;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
@@ -9,6 +10,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
+@NoArgsConstructor
 public class Et3ResponseDocument {
     @JsonProperty("accessKey")
     private String accessKey;

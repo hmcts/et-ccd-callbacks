@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseDocument;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
@@ -26,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -44,6 +45,10 @@ class Et3ResponseHelperTest {
 
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
     public static final String END_DATE_MUST_BE_AFTER_THE_START_DATE = "End date must be after the start date";
+
+    private static final String CHECKED = "■"; // U+25A0
+    private static final String UNCHECKED = "□"; // U+25A1
+
     private CaseData caseData;
 
     @BeforeEach
@@ -162,11 +167,32 @@ class Et3ResponseHelperTest {
         caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
+        String expected = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("et3ResponseDocument.json")).toURI()));
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void getDocumentRequest_whenFrequencyIsMonthly_buildsCorrectData() throws IOException {
+        caseData.setEthosCaseReference("1800001/2021");
+        caseData.setClaimant("claimant name");
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        addEt3RespondentData(respondentSumType);
+        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
+
+        respondentSumType.setEt3ResponsePayFrequency("Monthly");
+
+        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
+        Et3ResponseDocument et3ResponseDocument = new ObjectMapper().readValue(actual, Et3ResponseDocument.class);
+
+        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeMonthly()).isEqualTo(CHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeMonthly()).isEqualTo(CHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeWeekly()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeWeekly()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeAnnually()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeAnnually()).isEqualTo(UNCHECKED);
     }
 
     @Test
@@ -178,8 +204,8 @@ class Et3ResponseHelperTest {
         caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
+        String expected = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("et3ResponseDocument.json")).toURI()));
 
         JSONObject json = new JSONObject(expected);
         JSONObject data = (JSONObject) json.get("data");
@@ -204,7 +230,7 @@ class Et3ResponseHelperTest {
     @Test
     void validateRespondents_noErrors() {
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
-        assertThat(errors.isEmpty());
+        assertThat(errors.isEmpty()).isTrue();
     }
 
     @Test
@@ -248,8 +274,10 @@ class Et3ResponseHelperTest {
         caseData.getRespondentCollection().get(0).getValue().setPersonalDetailsSection(YES);
         caseData.getRespondentCollection().get(0).getValue().setClaimDetailsSection(YES);
         caseData.getRespondentCollection().get(0).getValue().setEmploymentDetailsSection(YES);
+
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
-        assertThat(errors.isEmpty());
+
+        assertThat(errors.isEmpty()).isTrue();
         assertThat(caseData.getSubmitEt3Respondent()).isNotNull();
     }
 

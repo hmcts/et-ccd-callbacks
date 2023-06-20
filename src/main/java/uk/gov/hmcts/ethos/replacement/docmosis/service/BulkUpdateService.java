@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -272,7 +271,7 @@ public class BulkUpdateService {
             throw new CaseCreationException(MESSAGE + bulkDetails.getCaseId() + ex.getMessage());
         }
     }
-
+    @SuppressWarnings({"PMD.CognitiveComplexity"})
     SubmitBulkEventSubmitEventType caseUpdateFieldsRequest(BulkDetails bulkDetails, SearchTypeItem searchTypeItem,
                                                            String authToken,
                                                            SubmitBulkEvent submitBulkEvent) {
@@ -490,7 +489,7 @@ public class BulkUpdateService {
         List<MultipleTypeItem> multipleTypeItemsAux = new ArrayList<>();
         List<String> refNumbersFromSearchList = searchTypeItemList.stream()
                 .map(searchTypeItem -> searchTypeItem.getValue().getEthosCaseReferenceS())
-                .collect(Collectors.toList());
+                .toList();
         String subMultipleRefNewValue = bulkData.getSubMultipleDynamicList() != null
                 ? bulkData.getSubMultipleDynamicList().getValue().getCode() : "";
         String subMultipleTitleNewValue = bulkData.getSubMultipleDynamicList() != null

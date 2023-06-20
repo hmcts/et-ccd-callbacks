@@ -109,23 +109,23 @@ class MultipleUploadServiceTest {
     }
 
     @Test
-    void bulkUploadLogicException() {
+    void bulkUploadLogicException() throws IOException {
+        when(excelReadingService.checkExcelErrors(
+                userToken,
+                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                new ArrayList<>()))
+                .thenThrow(new IOException());
+
         assertThrows(Exception.class, () -> {
-            when(excelReadingService.checkExcelErrors(
-                    userToken,
-                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                    new ArrayList<>()))
-                    .thenThrow(new IOException());
             multipleUploadService.bulkUploadLogic(userToken,
                     multipleDetails,
                     new ArrayList<>());
-            verify(excelReadingService, times(1)).checkExcelErrors(
-                    userToken,
-                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                    new ArrayList<>());
-            verifyNoMoreInteractions(excelReadingService);
-
         });
-    }
 
+        verify(excelReadingService, times(1)).checkExcelErrors(
+                userToken,
+                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                new ArrayList<>());
+        verifyNoMoreInteractions(excelReadingService);
+    }
 }

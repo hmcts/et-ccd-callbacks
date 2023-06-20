@@ -187,12 +187,33 @@ class Et3ResponseHelperTest {
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         Et3ResponseDocument et3ResponseDocument = new ObjectMapper().readValue(actual, Et3ResponseDocument.class);
 
-        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeMonthly()).isEqualTo(CHECKED);
-        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeMonthly()).isEqualTo(CHECKED);
         assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeWeekly()).isEqualTo(UNCHECKED);
         assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeWeekly()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeMonthly()).isEqualTo(CHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeMonthly()).isEqualTo(CHECKED);
         assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeAnnually()).isEqualTo(UNCHECKED);
         assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeAnnually()).isEqualTo(UNCHECKED);
+    }
+
+    @Test
+    void getDocumentRequest_whenFrequencyIsAnnually_buildsCorrectData() throws IOException {
+        caseData.setEthosCaseReference("1800001/2021");
+        caseData.setClaimant("claimant name");
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        addEt3RespondentData(respondentSumType);
+        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
+
+        respondentSumType.setEt3ResponsePayFrequency("Annually");
+
+        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
+        Et3ResponseDocument et3ResponseDocument = new ObjectMapper().readValue(actual, Et3ResponseDocument.class);
+
+        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeWeekly()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeWeekly()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeMonthly()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeMonthly()).isEqualTo(UNCHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getBeforeAnnually()).isEqualTo(CHECKED);
+        assertThat(et3ResponseDocument.getEt3ResponseData().getTakehomeAnnually()).isEqualTo(CHECKED);
     }
 
     @Test

@@ -271,6 +271,7 @@ public class BulkUpdateService {
             throw new CaseCreationException(MESSAGE + bulkDetails.getCaseId() + ex.getMessage());
         }
     }
+
     @SuppressWarnings({"PMD.CognitiveComplexity"})
     SubmitBulkEventSubmitEventType caseUpdateFieldsRequest(BulkDetails bulkDetails, SearchTypeItem searchTypeItem,
                                                            String authToken,

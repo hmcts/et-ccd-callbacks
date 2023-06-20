@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  */
 @Data
 @SuperBuilder
+@NoArgsConstructor
 public class Et3ResponseData {
     private String ethosCaseReference;
     private String et3ResponseClaimantName;

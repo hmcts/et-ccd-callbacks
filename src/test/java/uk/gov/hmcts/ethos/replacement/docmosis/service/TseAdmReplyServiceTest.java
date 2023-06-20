@@ -230,6 +230,8 @@ class TseAdmReplyServiceTest {
             .isEqualTo(BOTH_PARTIES);
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(CLAIMANT_ONLY);
+        assertThat(actual.getRespondentResponded())
+                .isEqualTo(NO);
     }
 
     @Test
@@ -282,6 +284,8 @@ class TseAdmReplyServiceTest {
             .isNull();
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(RESPONDENT_ONLY);
+        assertThat(actual.getRespondentResponded())
+                .isEqualTo(NO);
     }
 
     @Test
@@ -329,6 +333,8 @@ class TseAdmReplyServiceTest {
             .isNull();
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(BOTH_PARTIES);
+        assertThat(actual.getRespondentResponded())
+                .isEqualTo(NO);
     }
 
     @ParameterizedTest

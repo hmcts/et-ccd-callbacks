@@ -1,9 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -26,13 +30,18 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -75,6 +84,28 @@ class TseHelperTest {
     void populateSelectApplicationDropdown_withAnApplication_returnsDynamicList() {
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
         assertThat(actual.getListItems().size(), is(1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("populateSelectApplicationDropdown")
+    void populateSelectApplicationDropdown_hasTribunalResponse(String respondFrom,
+                                                               String selectPartyRespond,
+                                                               String respondentResponded,
+                                                               int numberOfApplication) {
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
+                respondFrom, selectPartyRespond, respondentResponded);
+        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
+        assertThat(actual.getListItems().size(), is(numberOfApplication));
+    }
+
+    private static Stream<Arguments> populateSelectApplicationDropdown() {
+        return Stream.of(
+                Arguments.of(ADMIN, RESPONDENT_TITLE, NO, 1),
+                Arguments.of(ADMIN, BOTH_PARTIES, NO, 1),
+                Arguments.of(ADMIN, BOTH_PARTIES, YES, 0)
+        );
     }
 
     @Test
@@ -167,7 +198,7 @@ class TseHelperTest {
     @Test
     void saveReplyToApplication_withEmptyList_doesNothing() {
         caseData.setGenericTseApplicationCollection(null);
-        TseHelper.saveReplyToApplication(caseData);
+        TseHelper.saveReplyToApplication(caseData, false);
         assertNull(caseData.getGenericTseApplicationCollection());
     }
 
@@ -183,7 +214,7 @@ class TseHelperTest {
         caseData.setTseResponseCopyToOtherParty(NO);
         caseData.setTseResponseCopyNoGiveDetails("It's a secret");
 
-        TseHelper.saveReplyToApplication(caseData);
+        TseHelper.saveReplyToApplication(caseData, false);
 
         TseRespondType replyType =
             caseData.getGenericTseApplicationCollection().get(0).getValue().getRespondCollection().get(0).getValue();
@@ -198,6 +229,32 @@ class TseHelperTest {
         assertThat(replyType.getFrom(), is(RESPONDENT_TITLE));
         assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename(),
             is("image.png"));
+    }
+
+    @Test
+    void saveReplyToApplication_withTribunalResponse_setRespondentResponded() {
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
+                ADMIN, RESPONDENT_TITLE, NO);
+        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+
+        caseData.setTseResponseText("ResponseText");
+        caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
+
+        caseData.setTseResponseHasSupportingMaterial(YES);
+        caseData.setTseResponseCopyToOtherParty(NO);
+        caseData.setTseResponseCopyNoGiveDetails("It's a secret");
+
+        TseHelper.saveReplyToApplication(caseData, true);
+
+        TseRespondType replyType =
+                caseData.getGenericTseApplicationCollection().get(0)
+                        .getValue().getRespondCollection().get(0).getValue();
+
+        assertThat(replyType.getRespondentResponded(), is(YES));
     }
 
     @Test
@@ -310,4 +367,30 @@ class TseHelperTest {
 
         assertThat(actual.toString(), is(expected.toString()));
     }
+
+    @NotNull
+    private static GenericTseApplicationTypeItem getGenericTseApplicationTypeItem(String respondFrom,
+                                                                                  String selectPartyRespond,
+                                                                                  String respondentResponded) {
+        TseRespondType tseRespondType = TseRespondType.builder()
+                .from(respondFrom)
+                .selectPartyRespond(selectPartyRespond)
+                .respondentResponded(respondentResponded)
+                .build();
+
+        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder().id("id").value(tseRespondType).build();
+        List<TseRespondTypeItem> respondCollection = new ArrayList<>(Arrays.asList(tseRespondTypeItem));
+
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+                .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
+                .withDetails("Text").withNumber("1")
+                .withResponsesCount("0").withStatus(OPEN_STATE)
+                .withRespondCollection(respondCollection).build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+        return genericTseApplicationTypeItem;
+    }
+
 }

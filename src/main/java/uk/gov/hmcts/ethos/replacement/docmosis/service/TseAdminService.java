@@ -59,7 +59,7 @@ public class TseAdminService {
 
         caseData.setTseAdminTableMarkUp(String.format("%s\r%n%s",
                 tseService.formatApplicationDetails(applicationTypeItem.getValue(), authToken, false),
-                tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken)
+                tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken, false)
         ));
     }
 

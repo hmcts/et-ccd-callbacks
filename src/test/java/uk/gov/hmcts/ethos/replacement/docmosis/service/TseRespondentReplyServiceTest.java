@@ -129,12 +129,12 @@ class TseRespondentReplyServiceTest {
 
     @ParameterizedTest
     @MethodSource
-    void isRespondingToTribunal(boolean respondentRespondRequired, boolean isRespondingToTribunal) {
+    void isRespondingToTribunal(boolean respondentResponseRequired, boolean isRespondingToTribunal) {
         caseData.setTseRespondSelectApplication(
                 DynamicFixedListType.of(DynamicValueType.create("1", "test")));
 
         mockStatic.when(() -> TseHelper.getSelectedApplication(any()))
-                .thenReturn(getApplicationType(respondentRespondRequired));
+                .thenReturn(getApplicationType(respondentResponseRequired));
 
         assertThat(tseRespondentReplyService.isRespondingToTribunal(caseData), is(isRespondingToTribunal));
     }
@@ -146,9 +146,9 @@ class TseRespondentReplyServiceTest {
         );
     }
 
-    private GenericTseApplicationType getApplicationType(boolean respondentRespondRequired) {
+    private GenericTseApplicationType getApplicationType(boolean respondentResponseRequired) {
         GenericTseApplicationType applicationType = GenericTseApplicationType.builder()
-                .respondentRespondRequired(respondentRespondRequired ? YES : NO).build();
+                .respondentResponseRequired(respondentResponseRequired ? YES : NO).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());

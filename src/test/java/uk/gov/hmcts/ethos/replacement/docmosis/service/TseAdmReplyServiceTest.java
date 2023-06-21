@@ -234,8 +234,8 @@ class TseAdmReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("setRespondRequiredFields")
-    void saveTseAdmReplyDataFromCaseData_SetRespondRequiredFields(String requestSelectPartyRespond,
+    @MethodSource
+    void saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields(String requestSelectPartyRespond,
                                                                   String cmoSelectPartyRespond,
                                                                   String respondentResponseRequired,
                                                                   String claimantResponseRequired) {
@@ -262,7 +262,7 @@ class TseAdmReplyServiceTest {
 
     }
 
-    private static Stream<Arguments> setRespondRequiredFields() {
+    private static Stream<Arguments> saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields() {
         return Stream.of(
                 Arguments.of(RESPONDENT_TITLE, null, NO, null),
                 Arguments.of(CLAIMANT_TITLE, null, null, NO),

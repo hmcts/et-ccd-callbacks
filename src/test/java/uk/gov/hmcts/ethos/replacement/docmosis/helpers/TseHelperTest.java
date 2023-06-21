@@ -84,10 +84,10 @@ class TseHelperTest {
 
     @ParameterizedTest
     @MethodSource
-    void populateSelectApplicationDropdown_hasTribunalResponse(String respondentRespondRequired,
+    void populateSelectApplicationDropdown_hasTribunalResponse(String respondentResponseRequired,
                                                                int numberOfApplication) {
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
-                respondentRespondRequired);
+                respondentResponseRequired);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
 
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
@@ -243,10 +243,10 @@ class TseHelperTest {
 
         TseHelper.saveReplyToApplication(caseData, true);
 
-        String respondentRespondRequired = caseData.getGenericTseApplicationCollection().get(0)
+        String respondentResponseRequired = caseData.getGenericTseApplicationCollection().get(0)
                 .getValue().getRespondentResponseRequired();
 
-        assertThat(respondentRespondRequired, is(YES));
+        assertThat(respondentResponseRequired, is(YES));
     }
 
     @Test
@@ -361,13 +361,13 @@ class TseHelperTest {
     }
 
     @NotNull
-    private static GenericTseApplicationTypeItem getGenericTseApplicationTypeItem(String respondentRespondRequired) {
+    private static GenericTseApplicationTypeItem getGenericTseApplicationTypeItem(String respondentResponseRequired) {
         GenericTseApplicationType build = GenericTseApplicationType.builder()
                 .applicant(CLAIMANT_TITLE)
                 .date("13 December 2022").dueDate("20 December 2022").type("Withdraw my claim")
                 .details("Text").number("1")
                 .responsesCount("0").status(OPEN_STATE)
-                .respondentResponseRequired(respondentRespondRequired).build();
+                .respondentResponseRequired(respondentResponseRequired).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());

@@ -8,13 +8,11 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplication;
@@ -75,8 +73,7 @@ public class TseRespondentReplyService {
     }
 
     /**
-     * We are assuming the Respondent is responding to a Tribunal's order/request if
-     * there is at least one order/request sent by Tribunal that hasn't been replied by the respondent yet.
+     * Check if the Tribunal has requested for a response from Respondent.
      *
      * @param caseData contains all the case data
      * @return a boolean value of whether the Respondent is responding to a Tribunal order/request
@@ -86,13 +83,8 @@ public class TseRespondentReplyService {
         if (applicationType == null) {
             throw new NotFoundException("No selected application type item found.");
         }
-        if (applicationType.getRespondCollection() == null) {
-            return false;
-        }
 
-        return applicationType.getRespondCollection().stream()
-                .map(TseRespondTypeItem::getValue)
-                .anyMatch(r -> ADMIN.equals(r.getFrom()) && NO.equals(r.getRespondentResponded()));
+        return NO.equals(applicationType.getRespondentResponseRequired());
     }
 
 }

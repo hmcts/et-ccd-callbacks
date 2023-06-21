@@ -135,13 +135,31 @@ public class TseAdmReplyService {
                             .selectPartyRespond(defaultIfEmpty(caseData.getTseAdmReplyCmoSelectPartyRespond(),
                                     caseData.getTseAdmReplyRequestSelectPartyRespond()))
                             .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                            .respondentResponded(NO)
                             .build()
                     ).build());
 
             genericTseApplicationType.setResponsesCount(
                     String.valueOf(genericTseApplicationType.getRespondCollection().size())
             );
+
+            if (caseData.getTseAdmReplyRequestSelectPartyRespond() != null
+                    || caseData.getTseAdmReplyCmoSelectPartyRespond() != null) {
+                switch (defaultIfEmpty(caseData.getTseAdmReplyRequestSelectPartyRespond(),
+                        caseData.getTseAdmReplyCmoSelectPartyRespond())) {
+                    case RESPONDENT_TITLE:
+                        genericTseApplicationType.setRespondentResponseRequired(NO);
+                        break;
+                    case CLAIMANT_TITLE:
+                        genericTseApplicationType.setClaimantResponseRequired(NO);
+                        break;
+                    case BOTH_PARTIES:
+                        genericTseApplicationType.setRespondentResponseRequired(NO);
+                        genericTseApplicationType.setClaimantResponseRequired(NO);
+                        break;
+                    default:
+                        // Leave the fields as null if it doesn't require a response from either party.
+                }
+            }
         }
     }
 

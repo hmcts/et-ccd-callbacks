@@ -115,6 +115,9 @@ public class TseAdmReplyService {
                 genericTseApplicationType.setRespondCollection(new ArrayList<>());
             }
 
+            String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
+            String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
+
             genericTseApplicationType.getRespondCollection().add(
                 TseRespondTypeItem.builder()
                     .id(UUID.randomUUID().toString())
@@ -132,8 +135,8 @@ public class TseAdmReplyService {
                                     caseData.getTseAdmReplyRequestEnterFullName()))
                             .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
                                     caseData.getTseAdmReplyRequestIsResponseRequired()))
-                            .selectPartyRespond(defaultIfEmpty(caseData.getTseAdmReplyCmoSelectPartyRespond(),
-                                    caseData.getTseAdmReplyRequestSelectPartyRespond()))
+                            .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
+                                tseAdmReplyRequestSelectPartyRespond))
                             .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
                             .build()
                     ).build());
@@ -142,22 +145,17 @@ public class TseAdmReplyService {
                     String.valueOf(genericTseApplicationType.getRespondCollection().size())
             );
 
-            if (caseData.getTseAdmReplyRequestSelectPartyRespond() != null
-                    || caseData.getTseAdmReplyCmoSelectPartyRespond() != null) {
-                switch (defaultIfEmpty(caseData.getTseAdmReplyRequestSelectPartyRespond(),
-                        caseData.getTseAdmReplyCmoSelectPartyRespond())) {
-                    case RESPONDENT_TITLE:
-                        genericTseApplicationType.setRespondentResponseRequired(NO);
-                        break;
-                    case CLAIMANT_TITLE:
-                        genericTseApplicationType.setClaimantResponseRequired(NO);
-                        break;
-                    case BOTH_PARTIES:
+            if (tseAdmReplyRequestSelectPartyRespond != null || tseAdmReplyCmoSelectPartyRespond != null) {
+                switch (defaultIfEmpty(tseAdmReplyRequestSelectPartyRespond, tseAdmReplyCmoSelectPartyRespond)) {
+                    case RESPONDENT_TITLE -> genericTseApplicationType.setRespondentResponseRequired(NO);
+                    case CLAIMANT_TITLE -> genericTseApplicationType.setClaimantResponseRequired(NO);
+                    case BOTH_PARTIES -> {
                         genericTseApplicationType.setRespondentResponseRequired(NO);
                         genericTseApplicationType.setClaimantResponseRequired(NO);
-                        break;
-                    default:
-                        // Leave the fields as null if it doesn't require a response from either party.
+                    }
+                    default ->
+                        throw new IllegalStateException("Illegal SelectPartyRespond values: "
+                            + tseAdmReplyRequestSelectPartyRespond + " " + tseAdmReplyCmoSelectPartyRespond);
                 }
             }
         }

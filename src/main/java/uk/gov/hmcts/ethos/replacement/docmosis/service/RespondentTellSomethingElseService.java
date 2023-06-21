@@ -273,7 +273,7 @@ public class RespondentTellSomethingElseService {
     /**
      * Builds personalisation data for sending an email to the admin about an application.
      */
-    public Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
+    private Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());

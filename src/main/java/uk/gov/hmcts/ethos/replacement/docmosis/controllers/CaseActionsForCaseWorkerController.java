@@ -20,6 +20,8 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.et.common.model.hmc.CaseFlags;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
@@ -306,8 +308,21 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        // <Temp>
+        caseData.setCaseFlagsXui(CaseFlagsType.builder().build());
+        caseData.setClaimantFlags(CaseFlagsType.builder().build());
+        caseData.setRespondentFlags(CaseFlagsType.builder().build());
+        caseData.getCaseFlagsXui().setPartyName("case");
+        caseData.getClaimantFlags().setPartyName("claimant");
+        caseData.getRespondentFlags().setPartyName("respondent");
+        caseData.getCaseFlagsXui().setRoleOnCase("case");
+        caseData.getClaimantFlags().setRoleOnCase("claimant");
+        caseData.getRespondentFlags().setRoleOnCase("respondent");
+        // </Temp>
+
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails(), userToken);
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/initialiseAmendCaseDetails", consumes = APPLICATION_JSON_VALUE)

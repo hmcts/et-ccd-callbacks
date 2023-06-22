@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.util.Map;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplication;
 
@@ -30,6 +32,8 @@ public class TseRespondentReplyService {
     private String acknowledgementRule92NoEmailTemplateId;
     @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
     private String acknowledgementRule92YesEmailTemplateId;
+    @Value("${tse.respondent.reply-to-tribunal.to-tribunbal}")
+    private String replyToTribunalEmailToTribunalTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
@@ -55,6 +59,24 @@ public class TseRespondentReplyService {
                 : acknowledgementRule92NoEmailTemplateId,
             legalRepEmail,
             TseHelper.getPersonalisationForAcknowledgement(caseDetails, notificationProperties.getExuiUrl()));
+    }
+
+    public void sendRespondingToTribunalEmails(CaseDetails caseDetails) {
+        String managingOffice = caseDetails.getCaseData().getManagingOffice();
+        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
+
+        if (tribunalOffice == null) {
+            return;
+        }
+
+        String email = tribunalOffice.getOfficeEmail();
+
+        if (isNullOrEmpty(email)) {
+            return;
+        }
+
+        Map<String, String> personalisation = (caseDetails);
+        emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 
     /**
@@ -85,5 +107,4 @@ public class TseRespondentReplyService {
 
         return YES.equals(applicationType.getRespondentResponseRequired());
     }
-
 }

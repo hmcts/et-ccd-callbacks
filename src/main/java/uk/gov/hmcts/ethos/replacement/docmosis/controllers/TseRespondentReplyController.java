@@ -189,9 +189,16 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        TseHelper.saveReplyToApplication(caseData, tseRespondentReplyService.isRespondingToTribunal(caseData));
 
-        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
+        boolean isRespondingToTribunal = tseRespondentReplyService.isRespondingToTribunal(caseData);
+
+        TseHelper.saveReplyToApplication(caseData, isRespondingToTribunal);
+
+        if (isRespondingToTribunal) {
+            tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails);
+        } else {
+            respondentTellSomethingElseService.sendAdminEmail(caseDetails);
+        }
         tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
 
         TseHelper.resetReplyToApplicationPage(caseData);

@@ -63,16 +63,18 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest()
     enableCrossBrowserTest()
 
-    afterAlways(‘fullFunctionalTest’) {
+        afterSuccess('fullFunctionalTest') {
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+
             publishHTML target: [
                     allowMissing : true,
                     alwaysLinkToLastBuild: true,
                     keepAll : true,
-                    reportDir : "functional-output",
-                    reportFiles : “ET-CCD-Callbacks-tests.html”,
-                    reportName : “ET E2E functional tests result”
+                    reportDir : "functional-output/reports/",
+                    reportFiles : "ET-CCD-Callbacks-tests.html",
+                    reportName : "ET E2E functional tests result"
             ]
+            //enableSlackNotification('#et-builds')
         }
 
     afterAlways('fortify-scan') {

@@ -27,8 +27,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -83,7 +81,7 @@ public final class TseHelper {
                 .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
                         && (((isNoRespondentReply(o.getValue().getRespondCollection())
                         && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo())
-                        || hasTribunalResponse(o.getValue().getRespondCollection())))
+                        || hasTribunalResponse(o.getValue())))
                         )
                 )
                 .map(TseHelper::formatDropdownOption)
@@ -96,19 +94,10 @@ public final class TseHelper {
     }
 
     /**
-     * Check if there is any request/order from Tribunal that hasn't been responded by Respondent and
-     * requires a response from Respondent.
+     * Check if there is any request/order from Tribunal that requires Respondent to respond to.
      */
-    private static boolean hasTribunalResponse(List<TseRespondTypeItem> tseRespondTypeItems) {
-        if (CollectionUtils.isEmpty(tseRespondTypeItems)) {
-            return false;
-        }
-        return tseRespondTypeItems.stream()
-                .anyMatch(r -> ADMIN.equals(r.getValue().getFrom())
-                        && NO.equals(r.getValue().getRespondentResponded())
-                        && (BOTH_PARTIES.equals(r.getValue().getSelectPartyRespond())
-                        || RESPONDENT_TITLE.equals(r.getValue().getSelectPartyRespond()))
-                );
+    private static boolean hasTribunalResponse(GenericTseApplicationType application) {
+        return YES.equals(application.getRespondentResponseRequired());
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
@@ -192,10 +181,7 @@ public final class TseHelper {
                 ).build());
 
         if (isRespondingToTribunal) {
-            genericTseApplicationType.getRespondCollection().stream()
-                    .map(TseRespondTypeItem::getValue)
-                    .filter(r -> ADMIN.equals(r.getFrom()) && NO.equals(r.getRespondentResponded()))
-                    .forEach(r -> r.setRespondentResponded(YES));
+            genericTseApplicationType.setRespondentResponseRequired(NO);
         }
 
         genericTseApplicationType.setResponsesCount(

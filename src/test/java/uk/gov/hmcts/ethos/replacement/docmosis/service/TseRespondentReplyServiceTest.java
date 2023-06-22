@@ -4,12 +4,19 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -17,8 +24,13 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.UUID;
+import java.util.stream.Stream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -45,6 +57,8 @@ class TseRespondentReplyServiceTest {
     private UserDetails userDetails;
     private CaseData caseData;
     private MockedStatic mockStatic;
+
+    private final String expectedResponseTables = "applicationDetails" + "\r\n" + "responses";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -102,5 +116,44 @@ class TseRespondentReplyServiceTest {
 
         verify(emailService, times(1)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+    }
+
+    @Test
+    void initialResReplyToTribunalTableMarkUp() {
+        when(tseService.formatApplicationDetails(any(), any(), anyBoolean())).thenReturn("applicationDetails");
+        when(tseService.formatApplicationResponses(any(), any(), anyBoolean())).thenReturn("responses");
+
+        tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
+        assertThat(caseData.getTseResponseTable(), is(expectedResponseTables));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void isRespondingToTribunal(boolean respondentResponseRequired, boolean isRespondingToTribunal) {
+        caseData.setTseRespondSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("1", "test")));
+
+        mockStatic.when(() -> TseHelper.getSelectedApplication(any()))
+                .thenReturn(getApplicationType(respondentResponseRequired));
+
+        assertThat(tseRespondentReplyService.isRespondingToTribunal(caseData), is(isRespondingToTribunal));
+    }
+
+    private static Stream<Arguments> isRespondingToTribunal() {
+        return Stream.of(
+                Arguments.of(true, true),
+                Arguments.of(false, false)
+        );
+    }
+
+    private GenericTseApplicationType getApplicationType(boolean respondentResponseRequired) {
+        GenericTseApplicationType applicationType = GenericTseApplicationType.builder()
+                .respondentResponseRequired(respondentResponseRequired ? YES : NO).build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(applicationType);
+
+        return applicationType;
     }
 }

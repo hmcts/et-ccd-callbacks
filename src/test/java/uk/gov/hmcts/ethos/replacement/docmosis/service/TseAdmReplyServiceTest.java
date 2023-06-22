@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -230,8 +231,46 @@ class TseAdmReplyServiceTest {
             .isEqualTo(BOTH_PARTIES);
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(CLAIMANT_ONLY);
-        assertThat(actual.getRespondentResponded())
-                .isEqualTo(NO);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields(String requestSelectPartyRespond,
+                                                                  String cmoSelectPartyRespond,
+                                                                  String respondentResponseRequired,
+                                                                  String claimantResponseRequired) {
+        caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(TseApplicationBuilder.builder()
+                                .withNumber("3")
+                                .withType(TSE_APP_CLAIMANT_NOT_COMPLIED)
+                                .build())
+                        .build())
+        );
+        caseData.setTseAdminSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
+
+        caseData.setTseAdmReplyRequestSelectPartyRespond(requestSelectPartyRespond);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(cmoSelectPartyRespond);
+
+        tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
+
+        GenericTseApplicationType application = caseData.getGenericTseApplicationCollection().get(0).getValue();
+        assertThat(application.getRespondentResponseRequired()).isEqualTo(respondentResponseRequired);
+        assertThat(application.getClaimantResponseRequired()).isEqualTo(claimantResponseRequired);
+
+    }
+
+    private static Stream<Arguments> saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields() {
+        return Stream.of(
+                Arguments.of(RESPONDENT_TITLE, null, YES, null),
+                Arguments.of(CLAIMANT_TITLE, null, null, YES),
+                Arguments.of(BOTH_PARTIES, null, YES, YES),
+                Arguments.of(null, RESPONDENT_TITLE, YES, null),
+                Arguments.of(null, CLAIMANT_TITLE, null, YES),
+                Arguments.of(null, BOTH_PARTIES, YES, YES)
+        );
     }
 
     @Test
@@ -284,8 +323,6 @@ class TseAdmReplyServiceTest {
             .isNull();
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(RESPONDENT_ONLY);
-        assertThat(actual.getRespondentResponded())
-                .isEqualTo(NO);
     }
 
     @Test
@@ -333,8 +370,6 @@ class TseAdmReplyServiceTest {
             .isNull();
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(BOTH_PARTIES);
-        assertThat(actual.getRespondentResponded())
-                .isEqualTo(NO);
     }
 
     @ParameterizedTest

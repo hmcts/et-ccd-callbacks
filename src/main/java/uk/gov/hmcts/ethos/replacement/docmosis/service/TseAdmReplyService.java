@@ -33,7 +33,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORD
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -115,6 +114,9 @@ public class TseAdmReplyService {
                 genericTseApplicationType.setRespondCollection(new ArrayList<>());
             }
 
+            String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
+            String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
+
             genericTseApplicationType.getRespondCollection().add(
                 TseRespondTypeItem.builder()
                     .id(UUID.randomUUID().toString())
@@ -132,16 +134,29 @@ public class TseAdmReplyService {
                                     caseData.getTseAdmReplyRequestEnterFullName()))
                             .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
                                     caseData.getTseAdmReplyRequestIsResponseRequired()))
-                            .selectPartyRespond(defaultIfEmpty(caseData.getTseAdmReplyCmoSelectPartyRespond(),
-                                    caseData.getTseAdmReplyRequestSelectPartyRespond()))
+                            .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
+                                tseAdmReplyRequestSelectPartyRespond))
                             .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                            .respondentResponded(NO)
                             .build()
                     ).build());
 
             genericTseApplicationType.setResponsesCount(
                     String.valueOf(genericTseApplicationType.getRespondCollection().size())
             );
+
+            if (tseAdmReplyRequestSelectPartyRespond != null || tseAdmReplyCmoSelectPartyRespond != null) {
+                switch (defaultIfEmpty(tseAdmReplyRequestSelectPartyRespond, tseAdmReplyCmoSelectPartyRespond)) {
+                    case RESPONDENT_TITLE -> genericTseApplicationType.setRespondentResponseRequired(YES);
+                    case CLAIMANT_TITLE -> genericTseApplicationType.setClaimantResponseRequired(YES);
+                    case BOTH_PARTIES -> {
+                        genericTseApplicationType.setRespondentResponseRequired(YES);
+                        genericTseApplicationType.setClaimantResponseRequired(YES);
+                    }
+                    default ->
+                        throw new IllegalStateException("Illegal SelectPartyRespond values: "
+                            + tseAdmReplyRequestSelectPartyRespond + " " + tseAdmReplyCmoSelectPartyRespond);
+                }
+            }
         }
     }
 

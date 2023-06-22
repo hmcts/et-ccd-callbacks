@@ -97,7 +97,7 @@ public final class TseHelper {
      * Check if there is any request/order from Tribunal that requires Respondent to respond to.
      */
     private static boolean hasTribunalResponse(GenericTseApplicationType application) {
-        return NO.equals(application.getRespondentResponseRequired());
+        return YES.equals(application.getRespondentResponseRequired());
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {

@@ -84,7 +84,7 @@ public class TseRespondentReplyService {
             throw new NotFoundException("No selected application type item found.");
         }
 
-        return NO.equals(applicationType.getRespondentResponseRequired());
+        return YES.equals(applicationType.getRespondentResponseRequired());
     }
 
 }

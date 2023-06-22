@@ -96,9 +96,9 @@ class TseHelperTest {
 
     private static Stream<Arguments> populateSelectApplicationDropdown_hasTribunalResponse() {
         return Stream.of(
-                Arguments.of(YES, 0),
+                Arguments.of(NO, 0),
                 Arguments.of(null, 0),
-                Arguments.of(NO, 1)
+                Arguments.of(YES, 1)
         );
     }
 

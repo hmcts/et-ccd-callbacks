@@ -165,6 +165,22 @@ public final class Et3ResponseHelper {
                 .filter(r -> submitRespondent.equals(r.getValue().getRespondentName()))
                 .toList().get(0).getValue();
 
+        Et3ResponseData data = getEt3ResponseDataBuilder(caseData, respondentSumType);
+
+        setTitle(data, respondentSumType.getEt3ResponseRespondentPreferredTitle());
+        et3CheckBoxes(caseData, respondentSumType, data);
+
+        Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
+                .accessKey(accessKey)
+                .outputName(OUTPUT_NAME)
+                .templateName(TEMPLATE_NAME)
+                .et3ResponseData(data)
+                .build();
+
+        return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
+    }
+
+    private static Et3ResponseData getEt3ResponseDataBuilder(CaseData caseData, RespondentSumType respondentSumType) {
         Et3ResponseData data = Et3ResponseData.builder()
             .ethosCaseReference(caseData.getEthosCaseReference())
             .et3ResponseClaimantName(isNullOrEmpty(respondentSumType.getEt3ResponseClaimantNameCorrection())
@@ -219,46 +235,70 @@ public final class Et3ResponseHelper {
                     ? CHECKED
                     : UNCHECKED)
             .build();
-
-        setTitle(data, respondentSumType.getEt3ResponseRespondentPreferredTitle());
-        et3CheckBoxes(caseData, respondentSumType, data);
-
-        Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
-                .accessKey(accessKey)
-                .outputName(OUTPUT_NAME)
-                .templateName(TEMPLATE_NAME)
-                .et3ResponseData(data)
-                .build();
-
-        return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
+        return data;
     }
 
     private static void et3CheckBoxes(CaseData caseData, RespondentSumType respondentSumType, Et3ResponseData data) {
-        setCheck(respondentSumType.getEt3ResponseMultipleSites(), data::setSiteYes, data::setSiteNo, null);
-        setCheck(respondentSumType.getEt3ResponseAcasAgree(), data::setAcasYes, data::setAcasNo, null);
-        setCheck(respondentSumType.getEt3ResponseAreDatesCorrect(),
-                data::setDatesYes, data::setDatesNo, data::setDatesNA);
-        setCheck(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
-                data::setJobYes, data::setJobNo, data::setJobNA);
+
+        et3ResponseFormSection2Checkboxes(respondentSumType, data);
+        et3ResponseFormSection3Checkboxes(respondentSumType, data);
+        et3ResponseFormSection4Checkboxes(respondentSumType, data);
+        et3ResponseFormSection5Checkboxes(respondentSumType, data);
+        et3ResponseFormSection6Checkboxes(respondentSumType, data);
+        et3ResponseFormSection7Checkboxes(respondentSumType, data);
+        et3ResponseFormSection9Checkboxes(respondentSumType, data);
+
+        addRepDetails(caseData, data);
+        resetCheckboxes(data);
+
+        setCheckboxesBasedOnEarningDetails(respondentSumType, data);
+    }
+
+    private static void et3ResponseFormSection7Checkboxes(RespondentSumType respondentSumType, Et3ResponseData data) {
+        setCheck(respondentSumType.getEt3ResponseEmployerClaim(), data::setEccYes, null, null);
+    }
+
+    private static void et3ResponseFormSection9Checkboxes(RespondentSumType respondentSumType, Et3ResponseData data) {
+        setCheck(respondentSumType.getEt3ResponseRespondentSupportNeeded(),
+                data::setHelpYes, data::setHelpNo, data::setHelpNA);
+    }
+
+    private static void et3ResponseFormSection6Checkboxes(RespondentSumType respondentSumType, Et3ResponseData data) {
+        setCheck(respondentSumType.getEt3ResponseRespondentContestClaim(),
+                data::setContestYes, data::setContestNo, null);
+    }
+
+    private static void et3ResponseFormSection5Checkboxes(RespondentSumType respondentSumType, Et3ResponseData data) {
         setCheck(respondentSumType.getEt3ResponseClaimantWeeklyHours(),
                 data::setHoursYes, data::setHoursNo, data::setHoursNA);
         setCheck(respondentSumType.getEt3ResponseEarningDetailsCorrect(),
                 data::setEarnYes, data::setEarnNo, data::setEarnNA);
         setCheck(respondentSumType.getEt3ResponseIsNoticeCorrect(),
                 data::setNoticeYes, data::setNoticeNo, data::setNoticeNA);
-        setCheck(respondentSumType.getEt3ResponseRespondentContestClaim(),
-                data::setContestYes, data::setContestNo, null);
-        setCheck(respondentSumType.getEt3ResponseRespondentSupportNeeded(),
-                data::setHelpYes, data::setHelpNo, data::setHelpNA);
-        setCheck(respondentSumType.getEt3ResponseEmployerClaim(), data::setEccYes, null, null);
-        setCheck(respondentSumType.getEt3ResponseContinuingEmployment(), data::setContinueYes, data::setContinueNo,
-                data::setContinueNA);
         setCheck(respondentSumType.getEt3ResponseIsPensionCorrect(), data::setPensionYes, data::setPensionNo,
                 data::setPensionNA);
+    }
+
+    private static void et3ResponseFormSection4Checkboxes(RespondentSumType respondentSumType, Et3ResponseData data) {
+        setCheck(respondentSumType.getEt3ResponseAreDatesCorrect(),
+                data::setDatesYes, data::setDatesNo, data::setDatesNA);
+        setCheck(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
+                data::setJobYes, data::setJobNo, data::setJobNA);
+        setCheck(respondentSumType.getEt3ResponseContinuingEmployment(), data::setContinueYes, data::setContinueNo,
+                data::setContinueNA);
+    }
+
+    private static void et3ResponseFormSection3Checkboxes(RespondentSumType respondentSumType, Et3ResponseData data) {
+        setCheck(respondentSumType.getEt3ResponseAcasAgree(), data::setAcasYes, data::setAcasNo, null);
+    }
+
+    private static void et3ResponseFormSection2Checkboxes(RespondentSumType respondentSumType, Et3ResponseData data) {
+        setCheck(respondentSumType.getEt3ResponseMultipleSites(), data::setSiteYes, data::setSiteNo, null);
         setCheck("Post".equals(respondentSumType.getResponseRespondentContactPreference()) ? "Yes" : "No",
                 data::setContactPost, data::setContactEmail, null);
+    }
 
-        addRepDetails(caseData, data);
+    private static void resetCheckboxes(Et3ResponseData data) {
         data.setRepContactEmail(UNCHECKED);
         data.setRepContactPost(UNCHECKED);
         data.setBeforeWeekly(UNCHECKED);
@@ -267,7 +307,9 @@ public final class Et3ResponseHelper {
         data.setTakehomeMonthly(UNCHECKED);
         data.setBeforeAnnually(UNCHECKED);
         data.setTakehomeAnnually(UNCHECKED);
+    }
 
+    private static void setCheckboxesBasedOnEarningDetails(RespondentSumType respondentSumType, Et3ResponseData data) {
         if (NO.equals(respondentSumType.getEt3ResponseEarningDetailsCorrect())
                 && respondentSumType.getEt3ResponsePayFrequency() != null) {
             if ("Weekly".equals(respondentSumType.getEt3ResponsePayFrequency())) {
@@ -364,33 +406,41 @@ public final class Et3ResponseHelper {
      * @param caseData data for the case
      * @return an error is the user has selected the same respondent multiple times
      */
+
     public static List<String> validateRespondents(CaseData caseData, String eventId) {
-        switch (eventId) {
-            case ET3_RESPONSE -> {
-                if (caseData.getSubmitEt3Respondent() == null) {
-                    return List.of(NO_RESPONDENTS_FOUND);
-                }
-            }
-            case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> {
-                if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
-                    return List.of(NO_RESPONDENTS_FOUND);
-                }
-
-                Set<String> respondentSet = new HashSet<>();
-                for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
-                    respondentSet.add(String.valueOf(DynamicFixedListType.getSelectedLabel(
-                            dynamicListTypeItem.getValue().getDynamicList())));
-                }
-
-                if (respondentSet.size() != caseData.getEt3RepresentingRespondent().size()) {
-                    return List.of("Please do not choose the same respondent multiple times");
-                }
-            }
+        return switch (eventId) {
+            case ET3_RESPONSE -> validateEt3Response(caseData);
+            case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> validateEt3ResponseDetails(caseData);
             default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
+        };
+    }
 
+    private static List<String> validateEt3Response(CaseData caseData) {
+        if (caseData.getSubmitEt3Respondent() == null) {
+            return List.of(NO_RESPONDENTS_FOUND);
+        }
+        return new ArrayList<>();
+    }
+
+    private static List<String> validateEt3ResponseDetails(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
+            return List.of(NO_RESPONDENTS_FOUND);
         }
 
+        Set<String> respondentSet = getRespondentSet(caseData);
+        if (respondentSet.size() != caseData.getEt3RepresentingRespondent().size()) {
+            return List.of("Please do not choose the same respondent multiple times");
+        }
         return new ArrayList<>();
+    }
+
+    private static Set<String> getRespondentSet(CaseData caseData) {
+        Set<String> respondentSet = new HashSet<>();
+        for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
+            respondentSet.add(String.valueOf(DynamicFixedListType.getSelectedLabel(
+                    dynamicListTypeItem.getValue().getDynamicList())));
+        }
+        return respondentSet;
     }
 
     /**

@@ -33,6 +33,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestr
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
@@ -105,6 +106,7 @@ public class CaseActionsForCaseWorkerController {
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     private final NocRespondentHelper nocRespondentHelper;
+    private final CaseFlagsService caseFlagsService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -275,6 +277,7 @@ public class CaseActionsForCaseWorkerController {
 
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            caseFlagsService.setupCaseFlags(caseData);
 
             if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
                 caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
@@ -282,6 +285,7 @@ public class CaseActionsForCaseWorkerController {
                     ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
             }
         }
+
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
 

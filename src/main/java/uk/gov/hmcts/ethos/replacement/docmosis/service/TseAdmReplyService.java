@@ -33,7 +33,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORD
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -147,11 +146,11 @@ public class TseAdmReplyService {
 
             if (tseAdmReplyRequestSelectPartyRespond != null || tseAdmReplyCmoSelectPartyRespond != null) {
                 switch (defaultIfEmpty(tseAdmReplyRequestSelectPartyRespond, tseAdmReplyCmoSelectPartyRespond)) {
-                    case RESPONDENT_TITLE -> genericTseApplicationType.setRespondentResponseRequired(NO);
-                    case CLAIMANT_TITLE -> genericTseApplicationType.setClaimantResponseRequired(NO);
+                    case RESPONDENT_TITLE -> genericTseApplicationType.setRespondentResponseRequired(YES);
+                    case CLAIMANT_TITLE -> genericTseApplicationType.setClaimantResponseRequired(YES);
                     case BOTH_PARTIES -> {
-                        genericTseApplicationType.setRespondentResponseRequired(NO);
-                        genericTseApplicationType.setClaimantResponseRequired(NO);
+                        genericTseApplicationType.setRespondentResponseRequired(YES);
+                        genericTseApplicationType.setClaimantResponseRequired(YES);
                     }
                     default ->
                         throw new IllegalStateException("Illegal SelectPartyRespond values: "

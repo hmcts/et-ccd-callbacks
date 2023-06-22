@@ -181,7 +181,7 @@ public final class TseHelper {
                 ).build());
 
         if (isRespondingToTribunal) {
-            genericTseApplicationType.setRespondentResponseRequired(YES);
+            genericTseApplicationType.setRespondentResponseRequired(NO);
         }
 
         genericTseApplicationType.setResponsesCount(

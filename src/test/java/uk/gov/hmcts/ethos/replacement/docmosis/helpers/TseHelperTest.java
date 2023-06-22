@@ -226,7 +226,7 @@ class TseHelperTest {
     }
 
     @Test
-    void saveReplyToApplication_withTribunalResponse_setRespondentResponded() {
+    void saveReplyToApplication_withTribunalResponse_setRespondentResponseRequired() {
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
@@ -246,7 +246,7 @@ class TseHelperTest {
         String respondentResponseRequired = caseData.getGenericTseApplicationCollection().get(0)
                 .getValue().getRespondentResponseRequired();
 
-        assertThat(respondentResponseRequired, is(YES));
+        assertThat(respondentResponseRequired, is(NO));
     }
 
     @Test

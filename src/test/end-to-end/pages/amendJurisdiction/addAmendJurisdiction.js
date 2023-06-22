@@ -43,7 +43,6 @@ module.exports = async function (jurisdictionOutcome) {
                 "Withdrawn or private settlement", true);
             break;
         default:
-            console.log("No jurisdiction code matched with" + jurisdictionOutcome);
             throw new Error("No jurisdiction code matched with" + jurisdictionOutcome);
     }
 };

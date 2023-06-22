@@ -6,8 +6,9 @@ module.exports = async function (nextStep, webDriverWait) {
 
     const I = this;
 
-    await I.waitForEnabled({css: '#next-step'}, 30);
-    await I.retry(3).selectOption('#next-step', nextStep);
-    await I.waitForEnabled(commonConfig.goButton, 30);
+    await I.waitForEnabled('#next-step', 30);
+    await I.selectOption('#next-step', nextStep);
+    I.wait(3)
     I.forceClick(commonConfig.goButton);
+    I.wait(2)
 };

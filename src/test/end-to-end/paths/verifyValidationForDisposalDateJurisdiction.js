@@ -49,5 +49,4 @@ Scenario('User enters a disposal date - check error scenarios and completes juri
     await enterDisposalDateJurisdiction(I, 'Date in the future');
     await enterDisposalDateJurisdiction(I,'Date contained in hearing collection');
 
-}).tag('@refactor')
-    .retry(testConfig.TestRetryScenarios);
+}).tag('@refactor');

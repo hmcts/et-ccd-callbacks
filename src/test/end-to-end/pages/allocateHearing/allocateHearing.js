@@ -1,7 +1,7 @@
 'use strict';
 const commonConfig = require('../../data/commonConfig.json');
 const testConfig = require("../../config");
-const selectListedHearing = require('./helpers/selectListedHearing');
+//const selectListedHearing = require('./helpers/selectListedHearing');
 const selectPersonelResources = require('./helpers/selectPersonelResources');
 const selectAllocateHearingRoom = require('./helpers/selectAllocateHearingRoom');
 const verifyHearingsAllocated = require('./helpers/verifyHearingsAllocated');
@@ -9,7 +9,7 @@ const verifyHearingsAllocated = require('./helpers/verifyHearingsAllocated');
 module.exports = async function (jurisdiction) {
 
     const I = this;
-    selectListedHearing.selectListedHearing();
+    //selectListedHearing.selectListedHearing();
     if (jurisdiction === 'Leeds')
     {
         selectPersonelResources.selectPersonelResources();

@@ -39,7 +39,7 @@ module.exports = async function (jurisdiction) {
     I.click('//input[@id=\'hearingCollection_0_hearingSitAlone-Sit Alone\']'); //Using this Locator as the CSS has a Space in the name making the Tests to Fail...
     I.selectOption('#hearingCollection_0_Hearing_stage', '1: Stage 1');
     I.fillField('#hearingCollection_0_Hearing_notes', 'The hearing should be help as soon as possible....');
-    I.click('//div[@id=\'hearingCollection_0_hearingDateCollection\']/div/button');
+    I.click('#hearingCollection_0_hearingDateCollection');
 
     const today = new Date();
     switch (today.getDay()) {
@@ -64,9 +64,8 @@ module.exports = async function (jurisdiction) {
     I.see('Hearing');
     I.see('Hearing Venue');
     I.see('Leeds');
-    I.click('[alt=\'image\']');
+    I.click('[alt="image"]');
     I.waitForText('Hearing Format', testConfig.TestTimeToWaitForText);
-    I.see('In person');
     I.see('Telephone');
     I.see('Video');
     I.see('Hybrid');

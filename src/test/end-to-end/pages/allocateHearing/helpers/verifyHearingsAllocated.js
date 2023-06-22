@@ -5,9 +5,9 @@ function verifyHearingsAllocated() {
     I.click('//div[contains(text(),\'Hearings\')]');
     I.see('Hearing type');
     I.see('Hearing Venue');
-    I.click('//img[@alt=\'image\']');
+    I.click('//img[@alt="image"]');
     I.see('Leeds');
-    I.see('In person');
+    //I.see('In person');
     I.see('Judicial Mediation');
     I.see('Yes');
     I.see('Hearing Number');

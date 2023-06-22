@@ -264,12 +264,12 @@ class TseAdmReplyServiceTest {
 
     private static Stream<Arguments> saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields() {
         return Stream.of(
-                Arguments.of(RESPONDENT_TITLE, null, NO, null),
-                Arguments.of(CLAIMANT_TITLE, null, null, NO),
-                Arguments.of(BOTH_PARTIES, null, NO, NO),
-                Arguments.of(null, RESPONDENT_TITLE, NO, null),
-                Arguments.of(null, CLAIMANT_TITLE, null, NO),
-                Arguments.of(null, BOTH_PARTIES, NO, NO)
+                Arguments.of(RESPONDENT_TITLE, null, YES, null),
+                Arguments.of(CLAIMANT_TITLE, null, null, YES),
+                Arguments.of(BOTH_PARTIES, null, YES, YES),
+                Arguments.of(null, RESPONDENT_TITLE, YES, null),
+                Arguments.of(null, CLAIMANT_TITLE, null, YES),
+                Arguments.of(null, BOTH_PARTIES, YES, YES)
         );
     }
 

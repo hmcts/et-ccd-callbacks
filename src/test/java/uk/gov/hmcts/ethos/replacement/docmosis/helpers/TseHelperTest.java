@@ -96,9 +96,9 @@ class TseHelperTest {
 
     private static Stream<Arguments> populateSelectApplicationDropdown_hasTribunalResponse() {
         return Stream.of(
-                Arguments.of(YES, 0),
+                Arguments.of(NO, 0),
                 Arguments.of(null, 0),
-                Arguments.of(NO, 1)
+                Arguments.of(YES, 1)
         );
     }
 
@@ -226,7 +226,7 @@ class TseHelperTest {
     }
 
     @Test
-    void saveReplyToApplication_withTribunalResponse_setRespondentResponded() {
+    void saveReplyToApplication_withTribunalResponse_setRespondentResponseRequired() {
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
@@ -246,7 +246,7 @@ class TseHelperTest {
         String respondentResponseRequired = caseData.getGenericTseApplicationCollection().get(0)
                 .getValue().getRespondentResponseRequired();
 
-        assertThat(respondentResponseRequired, is(YES));
+        assertThat(respondentResponseRequired, is(NO));
     }
 
     @Test

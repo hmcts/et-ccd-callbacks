@@ -141,8 +141,8 @@ class TseRespondentReplyServiceTest {
 
     private static Stream<Arguments> isRespondingToTribunal() {
         return Stream.of(
-                Arguments.of(false, true),
-                Arguments.of(true, false)
+                Arguments.of(true, true),
+                Arguments.of(false, false)
         );
     }
 

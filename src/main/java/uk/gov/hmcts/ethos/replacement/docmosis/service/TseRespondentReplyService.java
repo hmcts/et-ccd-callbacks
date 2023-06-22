@@ -13,7 +13,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplication;
 

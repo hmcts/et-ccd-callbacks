@@ -14,6 +14,8 @@ import static org.hamcrest.Matchers.nullValue;
 
 @ExtendWith(SpringExtension.class)
 class CaseFlagsServiceTest {
+    public static final String CLAIMANT_NAME = "Claimant Name";
+    public static final String RESPONDENT_NAME = "Respondent Name";
     private CaseFlagsService caseFlagsService;
     private CaseData caseData;
 
@@ -21,8 +23,8 @@ class CaseFlagsServiceTest {
     void setUp() {
         caseFlagsService = new CaseFlagsService();
         caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimant("Claimant Name");
-        caseData.setRespondent("Respondent Name");
+        caseData.setClaimant(CLAIMANT_NAME);
+        caseData.setRespondent(RESPONDENT_NAME);
     }
 
     @Test
@@ -34,11 +36,11 @@ class CaseFlagsServiceTest {
         assertThat(caseFlags.getRoleOnCase(), is(nullValue()));
 
         CaseFlagsType claimantFlags = caseData.getClaimantFlags();
-        assertThat(claimantFlags.getPartyName(), is("Claimant Name"));
+        assertThat(claimantFlags.getPartyName(), is(CLAIMANT_NAME));
         assertThat(claimantFlags.getRoleOnCase(), is("claimant"));
 
         CaseFlagsType respondentFlags = caseData.getRespondentFlags();
-        assertThat(respondentFlags.getPartyName(), is("Respondent Name"));
+        assertThat(respondentFlags.getPartyName(), is(RESPONDENT_NAME));
         assertThat(respondentFlags.getRoleOnCase(), is("respondent"));
     }
 }

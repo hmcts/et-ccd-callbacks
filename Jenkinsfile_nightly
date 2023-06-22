@@ -64,12 +64,12 @@ withNightlyPipeline(type, product, component) {
     enableCrossBrowserTest()
 
     afterAlways(‘fullFunctionalTest’) {
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: ‘functional-output/**/*’
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
             publishHTML target: [
                     allowMissing : true,
                     alwaysLinkToLastBuild: true,
                     keepAll : true,
-                    reportDir : “functional-output”,
+                    reportDir : "functional-output",
                     reportFiles : “ET-CCD-Callbacks-tests.html”,
                     reportName : “ET E2E functional tests result”
             ]

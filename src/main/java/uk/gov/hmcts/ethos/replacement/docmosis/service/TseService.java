@@ -35,6 +35,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -192,7 +193,7 @@ public class TseService {
         GenericTseApplicationType application = TseHelper.getSelectedApplication(caseData);
 
         String applicationTable = formatApplicationDetails(application, authToken, true);
-        String responses = formatApplicationResponses(application, authToken);
+        String responses = formatApplicationResponses(application, authToken, false);
         String decisions = formatApplicationDecisions(application, authToken);
         return applicationTable + "\r\n" + responses + "\r\n" +  decisions;
     }
@@ -228,9 +229,11 @@ public class TseService {
      * Formats all responses for an application into a two column Markdown table.
      * @param application the application that owns the responses
      * @param authToken user token for getting document metadata
+     * @param isRespondentView determines if it is the Respondent viewing the responses
      * @return Two column Markdown table string of all responses
      */
-    public String formatApplicationResponses(GenericTseApplicationType application, String authToken) {
+    public String formatApplicationResponses(GenericTseApplicationType application, String authToken,
+                                             boolean isRespondentView) {
         List<TseRespondTypeItem> respondCollection = application.getRespondCollection();
 
         if (isEmpty(respondCollection)) {
@@ -244,7 +247,8 @@ public class TseService {
                 .map(TseRespondTypeItem::getValue)
                 .map(o -> ADMIN.equals(o.getFrom())
                         ? formatAdminReply(o, respondCount.incrementAndReturnValue(), authToken)
-                        : formatNonAdminReply(o, respondCount.incrementAndReturnValue(), applicant, authToken)
+                        : formatNonAdminReply(o, respondCount.incrementAndReturnValue(), applicant,
+                            authToken, isRespondentView)
                 ).collect(Collectors.joining());
     }
 
@@ -318,12 +322,19 @@ public class TseService {
 
     /**
      * Formats an admin response into a two column Markdown table.
+     * If the responses are being viewed by Respondent then they will be filtered by Rule92
      * @param reply the admin response to format
      * @param count an arbitrary number representing the position of this response
      * @param authToken user token for getting document metadata
+     * @param isRespondentView determines if it is the Respondent viewing the responses
      * @return Two columned Markdown table detailing the admin response
      */
-    private String formatNonAdminReply(TseRespondType reply, int count, String applicant, String authToken) {
+    private String formatNonAdminReply(TseRespondType reply, int count, String applicant, String authToken,
+                                       boolean isRespondentView) {
+        if (isRespondentView && CLAIMANT_TITLE.equals(reply.getFrom()) && NO.equals(reply.getCopyToOtherParty())) {
+            return "";
+        }
+
         List<String[]> rows = new ArrayList<>();
 
         rows.addAll(List.of(

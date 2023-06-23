@@ -60,13 +60,13 @@ class CaseCreationForCaseWorkerServiceTest {
     }
 
     @Test
-    void caseCreationRequestException() {
-        assertThrows(Exception.class, () -> {
-            when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-            when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
-            caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
+    void caseCreationRequestException() throws IOException {
+        when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
 
-        });
+        assertThrows(Exception.class, () ->
+                caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken)
+        );
     }
 
     @Test

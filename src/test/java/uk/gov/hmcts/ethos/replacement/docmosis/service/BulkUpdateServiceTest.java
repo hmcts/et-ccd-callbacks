@@ -129,18 +129,18 @@ class BulkUpdateServiceTest {
     }
 
     @Test
-    void caseUpdateFieldsRequestException() {
-        assertThrows(Exception.class, () -> {
-            when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
-                    bulkDetails.getJurisdiction(), searchTypeItem.getId()))
-                    .thenThrow(new InternalException(ERROR_MESSAGE));
-            when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString()))
-                    .thenReturn(ccdRequest);
-            when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(),
-                    anyString())).thenReturn(submitEvent);
-            bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(), searchTypeItem, "authToken",
-                    submitBulkEvent);
-        });
+    void caseUpdateFieldsRequestException() throws IOException {
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
+                bulkDetails.getJurisdiction(), searchTypeItem.getId()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(ccdRequest);
+        when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(),
+                anyString())).thenReturn(submitEvent);
+
+        assertThrows(Exception.class, () -> bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(),
+                searchTypeItem, "authToken", submitBulkEvent)
+        );
     }
 
     @Test

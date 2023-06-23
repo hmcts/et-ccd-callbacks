@@ -69,24 +69,23 @@ class MultipleCasesSendingServiceTest {
 
     @Test
     void sendUpdateToMultipleException() throws IOException {
-        assertThrows(Exception.class, () -> {
-            when(ccdClient.startBulkAmendEventForCase(userToken,
-                    multipleDetails.getCaseTypeId(),
-                    multipleDetails.getJurisdiction(),
-                    multipleDetails.getCaseId()))
-                    .thenThrow(new InternalException(ERROR_MESSAGE));
-            multipleCasesSendingService.sendUpdateToMultiple(userToken,
-                    multipleDetails.getCaseTypeId(),
-                    multipleDetails.getJurisdiction(),
-                    multipleDetails.getCaseData(),
-                    multipleDetails.getCaseId());
-            verify(ccdClient, times(1)).startBulkAmendEventForCase(userToken,
-                    multipleDetails.getCaseTypeId(),
-                    multipleDetails.getJurisdiction(),
-                    multipleDetails.getCaseId());
-            verifyNoMoreInteractions(ccdClient);
+        when(ccdClient.startBulkAmendEventForCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getJurisdiction(),
+                multipleDetails.getCaseId()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
 
-        });
+        assertThrows(Exception.class, () -> multipleCasesSendingService.sendUpdateToMultiple(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getJurisdiction(),
+                multipleDetails.getCaseData(),
+                multipleDetails.getCaseId())
+        );
+
+        verify(ccdClient, times(1)).startBulkAmendEventForCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getJurisdiction(),
+                multipleDetails.getCaseId());
+        verifyNoMoreInteractions(ccdClient);
     }
-
 }

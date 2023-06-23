@@ -40,7 +40,7 @@ module.exports = async function (jurisdiction) {
     I.selectOption('#hearingCollection_0_Hearing_stage', '1: Stage 1');
     I.fillField('#hearingCollection_0_Hearing_notes', 'The hearing should be help as soon as possible....');
     I.click('#hearingCollection_0_hearingDateCollection');
-    I.waitForElement('#listedDate-day',10);
+    I.wait(2);
 
     const today = new Date();
     switch (today.getDay()) {

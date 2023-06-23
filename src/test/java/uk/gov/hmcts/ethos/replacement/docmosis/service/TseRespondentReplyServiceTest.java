@@ -5,12 +5,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -27,10 +31,14 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -44,6 +52,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
 @ExtendWith(SpringExtension.class)
 class TseRespondentReplyServiceTest {
@@ -55,6 +64,8 @@ class TseRespondentReplyServiceTest {
     private UserService userService;
     @MockBean
     private NotificationProperties notificationProperties;
+    @MockBean
+    private TseService tseService;
 
     private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
@@ -65,7 +76,8 @@ class TseRespondentReplyServiceTest {
     @BeforeEach
     void setUp() throws Exception {
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-            notificationProperties);
+            notificationProperties, tseService);
+
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
@@ -186,7 +198,7 @@ class TseRespondentReplyServiceTest {
         @Test
         void whenNoApplications_doesNothing() {
             caseData.setGenericTseApplicationCollection(null);
-            tseRespondentReplyService.saveReplyToApplication(caseData);
+            tseRespondentReplyService.saveReplyToApplication(caseData, false);
             assertNull(caseData.getGenericTseApplicationCollection());
         }
 
@@ -202,7 +214,7 @@ class TseRespondentReplyServiceTest {
             caseData.setTseResponseCopyToOtherParty(NO);
             caseData.setTseResponseCopyNoGiveDetails("It's a secret");
 
-            tseRespondentReplyService.saveReplyToApplication(caseData);
+            tseRespondentReplyService.saveReplyToApplication(caseData, false);
 
             TseRespondType replyType = caseData.getGenericTseApplicationCollection().get(0)
                 .getValue().getRespondCollection().get(0).getValue();
@@ -217,6 +229,29 @@ class TseRespondentReplyServiceTest {
             assertThat(replyType.getFrom()).isEqualTo(RESPONDENT_TITLE);
             assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename())
                 .isEqualTo("image.png");
+        }
+
+        @Test
+        void saveReplyToApplication_withTribunalResponse_setRespondentResponseRequired() {
+            GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
+            caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+            caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+            caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+
+            caseData.setTseResponseText("ResponseText");
+            caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
+
+            caseData.setTseResponseHasSupportingMaterial(YES);
+            caseData.setTseResponseCopyToOtherParty(NO);
+            caseData.setTseResponseCopyNoGiveDetails("It's a secret");
+
+            tseRespondentReplyService.saveReplyToApplication(caseData, true);
+
+            String respondentResponseRequired = caseData.getGenericTseApplicationCollection().get(0)
+                .getValue().getRespondentResponseRequired();
+
+            assertThat(respondentResponseRequired).isEqualTo(NO);
         }
     }
 
@@ -258,6 +293,7 @@ class TseRespondentReplyServiceTest {
         caseData.setTseResponseTable(YES);
         caseData.setTseResponseHasSupportingMaterial(YES);
         caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
+
         tseRespondentReplyService.resetReplyToApplicationPage(caseData);
 
         assertNull(caseData.getTseResponseText());
@@ -267,5 +303,45 @@ class TseRespondentReplyServiceTest {
         assertNull(caseData.getTseResponseSupportingMaterial());
         assertNull(caseData.getTseResponseCopyToOtherParty());
         assertNull(caseData.getTseResponseCopyNoGiveDetails());
+    }
+
+    @Test
+    void initialResReplyToTribunalTableMarkUp() {
+        when(tseService.formatApplicationDetails(any(), any(), anyBoolean())).thenReturn("applicationDetails");
+        when(tseService.formatApplicationResponses(any(), any(), anyBoolean())).thenReturn("responses");
+
+        tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
+        String expectedResponseTables = "applicationDetails" + "\r\n" + "responses";
+        assertThat(caseData.getTseResponseTable(), is(expectedResponseTables));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void isRespondingToTribunal(boolean respondentResponseRequired, boolean isRespondingToTribunal) {
+        caseData.setTseRespondSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("1", "test")));
+
+        mockStatic.when(() -> TseHelper.getSelectedApplication(any()))
+                .thenReturn(getApplicationType(respondentResponseRequired));
+
+        assertThat(tseRespondentReplyService.isRespondingToTribunal(caseData), is(isRespondingToTribunal));
+    }
+
+    private static Stream<Arguments> isRespondingToTribunal() {
+        return Stream.of(
+                Arguments.of(true, true),
+                Arguments.of(false, false)
+        );
+    }
+
+    private GenericTseApplicationType getApplicationType(boolean respondentResponseRequired) {
+        GenericTseApplicationType applicationType = GenericTseApplicationType.builder()
+                .respondentResponseRequired(respondentResponseRequired ? YES : NO).build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(applicationType);
+
+        return applicationType;
     }
 }

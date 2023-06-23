@@ -59,7 +59,7 @@ class TseRespondentReplyControllerTest {
     private TseRespondentReplyService tseRespondentReplyService;
     @MockBean
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
-    private MockedStatic mockHelper;
+    private MockedStatic<Helper> mockHelper;
     private CCDRequest ccdRequest;
 
     @BeforeEach
@@ -164,6 +164,22 @@ class TseRespondentReplyControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void midPopulateReply_isRespondingToTribunal() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(tseRespondentReplyService.isRespondingToTribunal(any())).thenReturn(true);
+        mockMvc.perform(post(MID_POPULATE_REPLY_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(tseRespondentReplyService, times(1))
+                .initialResReplyToTribunalTableMarkUp(any(), any());
     }
 
     @Test

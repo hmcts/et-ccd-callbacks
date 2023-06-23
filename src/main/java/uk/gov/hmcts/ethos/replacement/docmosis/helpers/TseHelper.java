@@ -78,8 +78,10 @@ public final class TseHelper {
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
                 .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
-                        && isNoRespondentReply(o.getValue().getRespondCollection())
-                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo()))
+                        && (isNoRespondentReply(o.getValue().getRespondCollection())
+                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo())
+                        || hasTribunalResponse(o.getValue()))
+                )
                 .map(TseHelper::formatDropdownOption)
                 .toList());
     }
@@ -87,6 +89,13 @@ public final class TseHelper {
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
         return CollectionUtils.isEmpty(tseRespondTypeItems)
                 || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
+    }
+
+    /**
+     * Check if there is any request/order from Tribunal that requires Respondent to respond to.
+     */
+    private static boolean hasTribunalResponse(GenericTseApplicationType application) {
+        return YES.equals(application.getRespondentResponseRequired());
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
@@ -166,6 +175,12 @@ public final class TseHelper {
 
         if (tseViewSelectApplication != null) {
             return applications.get(Integer.parseInt(tseViewSelectApplication.getValue().getCode()) - 1).getValue();
+        }
+
+        DynamicFixedListType tseRespondSelectApplication = caseData.getTseRespondSelectApplication();
+
+        if (tseRespondSelectApplication != null) {
+            return applications.get(Integer.parseInt(tseRespondSelectApplication.getValue().getCode()) - 1).getValue();
         }
 
         throw new IllegalStateException("Selected application is null");

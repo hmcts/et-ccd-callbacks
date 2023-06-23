@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -24,18 +27,21 @@ import uk.gov.service.notify.NotificationClientException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
 @ExtendWith(SpringExtension.class)
 class TseHelperTest {
@@ -78,19 +84,40 @@ class TseHelperTest {
         assertThat(actual.getListItems().size(), is(1));
     }
 
+    @ParameterizedTest
+    @MethodSource
+    void populateSelectApplicationDropdown_hasTribunalResponse(String respondentResponseRequired,
+                                                               int numberOfApplication) {
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
+            respondentResponseRequired);
+        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
+        assert actual != null;
+        assertThat(actual.getListItems().size(), is(numberOfApplication));
+    }
+
+    private static Stream<Arguments> populateSelectApplicationDropdown_hasTribunalResponse() {
+        return Stream.of(
+            Arguments.of(NO, 0),
+            Arguments.of(null, 0),
+            Arguments.of(YES, 1)
+        );
+    }
+
     @Test
     void populateSelectApplicationDropdown_withAnApplication_returnsEmpty() {
         CaseData caseData1 = CaseDataBuilder.builder()
-                .withClaimantIndType("First", "Last")
-                .withEthosCaseReference("1234")
-                .withClaimant("First Last")
-                .withRespondent("Respondent Name", YES, "13 December 2022", false)
-                .build();
+            .withClaimantIndType("First", "Last")
+            .withEthosCaseReference("1234")
+            .withClaimant("First Last")
+            .withRespondent("Respondent Name", YES, "13 December 2022", false)
+            .build();
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
-                .withDate("13 December 2022").withDue("20 December 2022").withType("Order a witness to attend")
-                .withDetails("Text").withNumber("1")
-                .withResponsesCount("0").withStatus(OPEN_STATE).build();
+            .withDate("13 December 2022").withDue("20 December 2022").withType("Order a witness to attend")
+            .withDetails("Text").withNumber("1")
+            .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -218,7 +245,7 @@ class TseHelperTest {
         Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrl");
 
         Map<String, Object> expected = Map.of(
-                "linkToCitizenHub", "citizenUrlCaseId",
+            "linkToCitizenHub", "citizenUrlCaseId",
             "caseNumber", "1234",
             "applicationType", "Withdraw my claim",
             "response", "TseResponseText",
@@ -242,7 +269,7 @@ class TseHelperTest {
         Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrl");
 
         Map<String, Object> expected = Map.of(
-                "linkToCitizenHub", "citizenUrlCaseId",
+            "linkToCitizenHub", "citizenUrlCaseId",
             "caseNumber", "1234",
             "applicationType", "Withdraw my claim",
             "response", "",

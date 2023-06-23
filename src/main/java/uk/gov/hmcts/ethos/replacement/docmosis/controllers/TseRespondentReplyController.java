@@ -154,7 +154,13 @@ public class TseRespondentReplyController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        TseHelper.setDataForRespondingToApplication(caseData);
+
+        if (tseRespondentReplyService.isRespondingToTribunal(caseData)) {
+            tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, userToken);
+        } else {
+            TseHelper.setDataForRespondingToApplication(caseData);
+        }
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -189,7 +195,8 @@ public class TseRespondentReplyController {
         CaseData caseData = caseDetails.getCaseData();
         // todo get all this work to be done on the service.
         tseRespondentReplyService.updateApplicationStatus(caseData);
-        tseRespondentReplyService.saveReplyToApplication(caseData);
+        tseRespondentReplyService.saveReplyToApplication(caseData,
+            tseRespondentReplyService.isRespondingToTribunal(caseData));
 
         respondentTellSomethingElseService.sendAdminEmail(caseDetails);
         tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);

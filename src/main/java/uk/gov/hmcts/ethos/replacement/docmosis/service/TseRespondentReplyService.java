@@ -41,7 +41,9 @@ public class TseRespondentReplyService {
     private final EmailService emailService;
     private final UserService userService;
     private final NotificationProperties notificationProperties;
+    private final RespondentTellSomethingElseService respondentTellSomethingElseService;
     private final TseService tseService;
+
     @Value("${tse.respondent.respond.notify.claimant.template.id}")
     private String tseRespondentResponseTemplateId;
     @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
@@ -51,12 +53,22 @@ public class TseRespondentReplyService {
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
+    public void respondentReplyToTse(String userToken, CaseDetails caseDetails, CaseData caseData) {
+        updateApplicationStatus(caseData);
+        saveReplyToApplication(caseData, isRespondingToTribunal(caseData));
+
+        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
+        sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
+
+        resetReplyToApplicationPage(caseData);
+    }
+
     /**
      * Change status of application to updated if there was an unanswered request for information from the admin.
      *
      * @param caseData in which the case details are extracted from
      */
-    public void updateApplicationStatus(CaseData caseData) {
+    void updateApplicationStatus(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
@@ -105,7 +117,7 @@ public class TseRespondentReplyService {
      * @param caseData contains all the case data
      * @param isRespondingToTribunal determines if responding to the Tribunal's request/order
      */
-    public void saveReplyToApplication(CaseData caseData, boolean isRespondingToTribunal) {
+    void saveReplyToApplication(CaseData caseData, boolean isRespondingToTribunal) {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(applications)) {
             return;
@@ -140,7 +152,7 @@ public class TseRespondentReplyService {
         );
     }
 
-    public void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
+    void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
         if (YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             try {
@@ -169,7 +181,7 @@ public class TseRespondentReplyService {
      *
      * @param caseData contains all the case data
      */
-    public void resetReplyToApplicationPage(CaseData caseData) {
+    void resetReplyToApplicationPage(CaseData caseData) {
         caseData.setTseResponseText(null);
         caseData.setTseResponseIntro(null);
         caseData.setTseResponseTable(null);

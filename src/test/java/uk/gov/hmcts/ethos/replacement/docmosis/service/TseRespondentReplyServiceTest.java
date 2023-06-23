@@ -66,6 +66,8 @@ class TseRespondentReplyServiceTest {
     private NotificationProperties notificationProperties;
     @MockBean
     private TseService tseService;
+    @MockBean
+    private RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
@@ -76,7 +78,7 @@ class TseRespondentReplyServiceTest {
     @BeforeEach
     void setUp() throws Exception {
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-            notificationProperties, tseService);
+            notificationProperties, respondentTellSomethingElseService, tseService);
 
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);

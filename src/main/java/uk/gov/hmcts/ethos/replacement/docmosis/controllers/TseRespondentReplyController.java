@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -44,7 +43,6 @@ public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;
     private final TseRespondentReplyService tseRespondentReplyService;
-    private final RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_BODY = """
@@ -193,15 +191,8 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        // todo get all this work to be done on the service.
-        tseRespondentReplyService.updateApplicationStatus(caseData);
-        tseRespondentReplyService.saveReplyToApplication(caseData,
-            tseRespondentReplyService.isRespondingToTribunal(caseData));
+        tseRespondentReplyService.respondentReplyToTse(userToken, caseDetails, caseData);
 
-        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
-
-        tseRespondentReplyService.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

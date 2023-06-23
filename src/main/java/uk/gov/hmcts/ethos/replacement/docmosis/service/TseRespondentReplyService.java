@@ -53,6 +53,13 @@ public class TseRespondentReplyService {
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
+    /**
+     * Reply to a TSE application as a respondent, including updating app status, saving the reply and sending emails.
+     *
+     * @param userToken autherisation token to get claimant's email address
+     * @param caseDetails case details
+     * @param caseData case data
+     */
     public void respondentReplyToTse(String userToken, CaseDetails caseDetails, CaseData caseData) {
         updateApplicationStatus(caseData);
         saveReplyToApplication(caseData, isRespondingToTribunal(caseData));

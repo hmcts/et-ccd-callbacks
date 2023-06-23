@@ -40,21 +40,22 @@ module.exports = async function (jurisdiction) {
     I.selectOption('#hearingCollection_0_Hearing_stage', '1: Stage 1');
     I.fillField('#hearingCollection_0_Hearing_notes', 'The hearing should be help as soon as possible....');
     I.click('#hearingCollection_0_hearingDateCollection');
-    I.wait(2);
+    //I.waitForElement('#hearingCollection_0_hearingDateCollection_0_Hearing_typeReadingDeliberation',10);
+    //pause();
 
-    const today = new Date();
-    switch (today.getDay()) {
-        case 0: //Sunday
-            today.setDate(today.getDate() + 1);
-            break;
-        case 6: //Saturday
-            today.setDate(today.getDate() + 2);
-            break;
-        default:
-    }
-    I.fillField('#listedDate-day', today.getDate());
-    I.fillField('#listedDate-month', today.getMonth() + 1);
-    I.fillField('#listedDate-year', today.getFullYear());
+    // const today = new Date();
+    // switch (today.getDay()) {
+    //     case 0: //Sunday
+    //         today.setDate(today.getDate() + 1);
+    //         break;
+    //     case 6: //Saturday
+    //         today.setDate(today.getDate() + 2);
+    //         break;
+    //     default:
+    // }
+    // I.fillField('#listedDate-day', today.getDate());
+    // I.fillField('#listedDate-month', today.getMonth() + 1);
+    // I.fillField('#listedDate-year', today.getFullYear());
 
     I.click(commonConfig.submit);
 

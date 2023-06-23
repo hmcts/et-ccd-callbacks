@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -57,8 +56,7 @@ class TseRespondentReplyControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
-    @MockBean
-    private RespondentTellSomethingElseService respondentTellSomethingElseService;
+
     private MockedStatic<Helper> mockHelper;
     private CCDRequest ccdRequest;
 
@@ -212,7 +210,7 @@ class TseRespondentReplyControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(respondentTellSomethingElseService, times(1)).sendAdminEmail(any());
+        verify(tseRespondentReplyService, times(1)).respondentReplyToTse(any(), any(), any());
     }
 
     @Test

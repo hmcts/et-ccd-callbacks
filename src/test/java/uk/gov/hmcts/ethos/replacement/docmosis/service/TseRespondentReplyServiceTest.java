@@ -97,7 +97,7 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, "userToken");
+        tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
 
         verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
@@ -112,7 +112,7 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, "userToken");
+        tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
 
         verify(emailService, times(1)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());

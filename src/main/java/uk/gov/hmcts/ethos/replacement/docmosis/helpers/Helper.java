@@ -334,9 +334,11 @@ public final class Helper {
      * @return errors Error message
      */
     public static boolean isClaimantNonSystemUser(CaseData caseData) {
-        if (caseData != null) {
-            return caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null;
-        }
-        return true;
+//        if (caseData != null) {
+//            return caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null;
+//        }
+//        return true;
+
+        return false;
     }
 }

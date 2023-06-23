@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 public final class NotificationServiceConstants {
 
     public static final String CASE_NUMBER = "caseNumber";
+    public static final String APPLICATION_TYPE = "applicationType";
     public static final String CASE_ID = "caseId";
     public static final String CLAIMANT = "claimant";
     public static final String RESPONDENTS = "respondents";

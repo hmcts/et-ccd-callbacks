@@ -44,7 +44,6 @@ public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;
     private final TseRespondentReplyService tseRespondentReplyService;
-    private final RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
@@ -197,9 +196,8 @@ public class TseRespondentReplyController {
         if (isRespondingToTribunal) {
             tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails);
         } else {
-            respondentTellSomethingElseService.sendAdminEmail(caseDetails);
+            tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, userToken);
         }
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
 
         TseHelper.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);

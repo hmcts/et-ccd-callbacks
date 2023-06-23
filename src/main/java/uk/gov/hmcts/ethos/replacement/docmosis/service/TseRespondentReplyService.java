@@ -5,17 +5,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.*;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplication;
 
 @Service
@@ -26,6 +27,8 @@ public class TseRespondentReplyService {
     private final UserService userService;
     private final NotificationProperties notificationProperties;
     private final TseService tseService;
+    private final TribunalOfficesService tribunalOfficesService;
+    private final RespondentTellSomethingElseService respondentTseService;
     @Value("${tse.respondent.respond.notify.claimant.template.id}")
     private String tseRespondentResponseTemplateId;
     @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
@@ -34,27 +37,40 @@ public class TseRespondentReplyService {
     private String acknowledgementRule92YesEmailTemplateId;
     @Value("${tse.respondent.reply-to-tribunal.to-tribunbal}")
     private String replyToTribunalEmailToTribunalTemplateId;
+    @Value("${tse.respondent.reply-to-tribunal.to-claimant}")
+    private String replyToTribunalEmailToClaimantTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
-    public void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
+    public void sendRespondingToApplicationEmails(CaseDetails caseDetails, String userToken) {
+        sendEmailToClaimantForRespondingToApp(caseDetails);
+        sendAcknowledgementEmailToLR(caseDetails, userToken);
+        respondentTseService.sendAdminEmail(caseDetails);
+    }
+
+    private void sendEmailToClaimantForRespondingToApp(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        if (YES.equals(caseData.getTseResponseCopyToOtherParty())) {
-            try {
-                byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
-                String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
-                Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                        bytes, notificationProperties.getCitizenUrl());
-                emailService.sendEmail(tseRespondentResponseTemplateId,
-                        claimantEmail, personalisation);
-            } catch (Exception e) {
-                throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
-            }
+
+        if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
+            return;
         }
 
+        try {
+            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
+            String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+            Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
+                    bytes, notificationProperties.getCitizenUrl());
+            emailService.sendEmail(tseRespondentResponseTemplateId,
+                    claimantEmail, personalisation);
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
+    }
+
+    private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken) {
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-            YES.equals(caseData.getTseResponseCopyToOtherParty())
+            YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty())
                 ? acknowledgementRule92YesEmailTemplateId
                 : acknowledgementRule92NoEmailTemplateId,
             legalRepEmail,
@@ -62,21 +78,41 @@ public class TseRespondentReplyService {
     }
 
     public void sendRespondingToTribunalEmails(CaseDetails caseDetails) {
-        String managingOffice = caseDetails.getCaseData().getManagingOffice();
-        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
+        sendEmailToTribunal(caseDetails.getCaseData());
+        sendEmailToClaimantForRespondingToTrib(caseDetails);
+    }
 
-        if (tribunalOffice == null) {
-            return;
-        }
-
-        String email = tribunalOffice.getOfficeEmail();
+    private void sendEmailToTribunal(CaseData caseData) {
+        String email = respondentTseService.getTribunalEmail(caseData);
 
         if (isNullOrEmpty(email)) {
             return;
         }
-
-        Map<String, String> personalisation = (caseDetails);
+        
+        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        Map<String, String> personalisation = Map.of(
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                APPLICATION_TYPE, selectedApplication.getType());
         emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
+    }
+
+    private void sendEmailToClaimantForRespondingToTrib(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+
+        if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
+            return;
+        }
+
+        String claimantEmail = getClaimantEmailAddress(caseData);
+
+        if (isNullOrEmpty(claimantEmail)) {
+            return;
+        }
+
+        Map<String, String> personalisation = Map.of(
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId()));
+        emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, claimantEmail, personalisation);
     }
 
     /**
@@ -106,5 +142,8 @@ public class TseRespondentReplyService {
         }
 
         return YES.equals(applicationType.getRespondentResponseRequired());
+    }
+    private static String getClaimantEmailAddress(CaseData caseData) {
+        return caseData.getClaimantType().getClaimantEmailAddress();
     }
 }

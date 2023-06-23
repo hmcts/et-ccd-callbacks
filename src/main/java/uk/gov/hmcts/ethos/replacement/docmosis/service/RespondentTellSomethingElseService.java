@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERS
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
@@ -216,7 +218,7 @@ public class RespondentTellSomethingElseService {
         return Map.of(
                 LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId()),
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                "applicationType", caseData.getResTseSelectApplication(),
+                APPLICATION_TYPE, caseData.getResTseSelectApplication(),
                 "instructions", instructions,
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, getRespondentNames(caseData),
@@ -253,21 +255,25 @@ public class RespondentTellSomethingElseService {
      * Sends an email notifying the admin that an application has been created/replied to.
      */
     public void sendAdminEmail(CaseDetails caseDetails) {
-        String managingOffice = caseDetails.getCaseData().getManagingOffice();
-        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
-
-        if (tribunalOffice == null) {
-            return;
-        }
-
-        String email = tribunalOffice.getOfficeEmail();
-
+        String email = getTribunalEmail(caseDetails.getCaseData());
         if (isNullOrEmpty(email)) {
             return;
         }
 
         Map<String, String> personalisation = buildPersonalisationForAdminEmail(caseDetails);
         emailService.sendEmail(tseNewApplicationAdminTemplateId, email, personalisation);
+    }
+
+    @Nullable
+    public String getTribunalEmail(CaseData caseData) {
+        String managingOffice = caseData.getManagingOffice();
+        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
+
+        if (tribunalOffice == null) {
+            return null;
+        }
+
+        return tribunalOffice.getOfficeEmail();
     }
 
     /**

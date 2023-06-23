@@ -36,6 +36,10 @@ class MultipleUploadServiceTest {
     private ExcelReadingService excelReadingService;
     @InjectMocks
     private MultipleUploadService multipleUploadService;
+    @Mock
+    private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
+    @Mock
+    private ExcelDocManagementService excelDocManagementService;
 
     private MultipleDetails multipleDetails;
     private String userToken;

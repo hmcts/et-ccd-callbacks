@@ -30,6 +30,7 @@ public class StaffImportStrategy implements ImportStrategy {
         deleteExistingData();
         rowHandlerImportStrategy.importWorkbook(workbook);
     }
+
     @Transactional
     public void deleteExistingData() {
         judgeRepository.deleteAll();

@@ -69,7 +69,6 @@ public class TseRespondentReplyService {
      *
      * @param caseData in which the case details are extracted from
      */
-    // todo fix tests
     void updateApplicationStatus(CaseData caseData) {
         if (isRespondingToTribunal(caseData)) {
             getRespondentSelectedApplicationType(caseData).setApplicationState(UPDATED);

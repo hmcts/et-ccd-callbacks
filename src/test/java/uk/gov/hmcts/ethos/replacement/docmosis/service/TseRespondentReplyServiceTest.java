@@ -20,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
@@ -73,7 +72,7 @@ class TseRespondentReplyServiceTest {
     private UserDetails userDetails;
     private CaseData caseData;
     private MockedStatic<TseHelper> mockStatic;
-    private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
+    private GenericTseApplicationType genericTseApplicationType;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -97,13 +96,13 @@ class TseRespondentReplyServiceTest {
             .withRespondent("respondent", YES, "01-Jan-2003", false)
             .build();
 
-        GenericTseApplicationType application = GenericTseApplicationType.builder().applicant(CLAIMANT_TITLE)
+        genericTseApplicationType = GenericTseApplicationType.builder().applicant(CLAIMANT_TITLE)
             .date("13 December 2022").dueDate("20 December 2022").type("Withdraw my claim")
             .copyToOtherPartyYesOrNo(YES).details("Text").applicationState("notStartedYet")
             .number("1").responsesCount("0").status(OPEN_STATE).build();
 
-        genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
-            .id(UUID.randomUUID().toString()).value(application).build();
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+            .id(UUID.randomUUID().toString()).value(genericTseApplicationType).build();
 
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
 
@@ -120,78 +119,23 @@ class TseRespondentReplyServiceTest {
 
     @Nested
     class UpdateApplicationStatus {
-        TseRespondTypeItem requestForInfoFromClaimant = TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(TseRespondType.builder().from("Admin").isCmoOrRequest("Request").isResponseRequired("Yes")
-                .selectPartyRespond("Claimant").build())
-            .build();
-
-        TseRespondTypeItem adminRequestForInfoFromRespondent = TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(TseRespondType.builder().from("Admin").isCmoOrRequest("Request").isResponseRequired("Yes")
-                .selectPartyRespond("Respondent").build())
-            .build();
-
-        TseRespondTypeItem adminRequestForInfoBothParties = TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(TseRespondType.builder().from("Admin").isCmoOrRequest("Request").isResponseRequired("Yes")
-                .selectPartyRespond("Both parties").build())
-            .build();
-
-        TseRespondTypeItem respondentResponse = TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(TseRespondType.builder().from("Respondent").build())
-            .build();
-
-        @Test
-        void noStatusChangeWhenNoResponses() {
-            tseRespondentReplyService.updateApplicationStatus(caseData);
-
-            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
-                .isEqualTo("notStartedYet");
-        }
-
-        @Test
-        void noStatusChangeWhenNoAdminRequestsForInfoFromRespondent() {
-            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(requestForInfoFromClaimant));
-
-            tseRespondentReplyService.updateApplicationStatus(caseData);
-
-            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
-                .isEqualTo("notStartedYet");
-        }
-
         @Test
         void noStatusChangeWhenAllAdminRequestsForInfoAreAnswered() {
-            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(
-                adminRequestForInfoFromRespondent, respondentResponse));
+            genericTseApplicationType.setRespondentResponseRequired(NO);
 
             tseRespondentReplyService.updateApplicationStatus(caseData);
 
-            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
-                .isEqualTo("notStartedYet");
+            assertThat(genericTseApplicationType.getApplicationState()).isEqualTo("notStartedYet");
 
         }
 
         @Test
         void changeStatusToUpdatedWhenHasDueRequestForInfo() {
-            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(adminRequestForInfoFromRespondent));
+            genericTseApplicationType.setRespondentResponseRequired(YES);
 
             tseRespondentReplyService.updateApplicationStatus(caseData);
 
-            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
-                .isEqualTo("updated");
-        }
-
-        @Test
-        void changeStatusToUpdatedWhenHasNewDueRequestForInfo() {
-            genericTseApplicationTypeItem.getValue().setRespondCollection(List.of(adminRequestForInfoFromRespondent,
-                respondentResponse, adminRequestForInfoBothParties));
-
-            tseRespondentReplyService.updateApplicationStatus(caseData);
-
-            assertThat(genericTseApplicationTypeItem.getValue().getApplicationState())
-                .isEqualTo("updated");
+            assertThat(genericTseApplicationType.getApplicationState()).isEqualTo("updated");
         }
     }
 

@@ -62,8 +62,8 @@ exports.config = {
       browsers: Object.keys(browsers),
     },
   },
-  plugins: {
-    saucelabs: {
+  services: {
+    'sauce': {
       enabled: true,
       user: sauceConfig.username,
       key: sauceConfig.accessKey,

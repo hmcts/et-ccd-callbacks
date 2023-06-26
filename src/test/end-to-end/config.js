@@ -22,4 +22,12 @@ module.exports = {
     TestIdamClientSecret: process.env.IDAM_CLIENT_SECRET || '',
     TestCcdGwSecret: process.env.MICROSERVICE_CCD_GW || '',
     oneTimePassword: process.env.ONE_TIME_PASSWORD || '',
+    saucelabs: {
+        browser: 'chrome',
+        username: 'username',
+        key: 'privatekey',
+        tunnelId: 'reformtunnel',
+        waitForTimeout: 20000,
+        smartWait: 20000,
+    },
 };

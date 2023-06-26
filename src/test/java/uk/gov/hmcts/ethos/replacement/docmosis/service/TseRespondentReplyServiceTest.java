@@ -198,13 +198,6 @@ class TseRespondentReplyServiceTest {
     @Nested
     class SaveReplyToApplication {
         @Test
-        void whenNoApplications_doesNothing() {
-            caseData.setGenericTseApplicationCollection(null);
-            tseRespondentReplyService.saveReplyToApplication(caseData, false);
-            assertNull(caseData.getGenericTseApplicationCollection());
-        }
-
-        @Test
         void savesReplyCorrectly() {
             caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
@@ -323,7 +316,7 @@ class TseRespondentReplyServiceTest {
         caseData.setTseRespondSelectApplication(
                 DynamicFixedListType.of(DynamicValueType.create("1", "test")));
 
-        mockStatic.when(() -> TseHelper.getSelectedApplication(any()))
+        mockStatic.when(() -> TseHelper.getRespondentSelectedApplicationType(any()))
                 .thenReturn(getApplicationType(respondentResponseRequired));
 
         assertThat(tseRespondentReplyService.isRespondingToTribunal(caseData), is(isRespondingToTribunal));

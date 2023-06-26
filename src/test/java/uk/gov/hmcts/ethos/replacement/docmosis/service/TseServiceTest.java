@@ -280,7 +280,7 @@ class TseServiceTest {
 
         DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
         listType.setValue(listType.getListItems().get(0));
-        caseData.setTseRespondSelectApplication(listType);
+        caseData.setTseViewApplicationSelect(listType);
 
         String expected = "|Application||\r\n"
                 + "|--|--|\r\n"
@@ -360,7 +360,7 @@ class TseServiceTest {
             decisionType2, decisionType3));
         DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
         listType.setValue(listType.getListItems().get(0));
-        caseData.setTseRespondSelectApplication(listType);
+        caseData.setTseViewApplicationSelect(listType);
 
         String expected = "|Application||\r\n"
             + "|--|--|\r\n"
@@ -433,6 +433,7 @@ class TseServiceTest {
         return GenericTseApplicationType.builder()
                 .applicant(RESPONDENT_TITLE)
                 .type(TSE_APP_AMEND_RESPONSE)
+                .number("1")
                 .date("2000-01-01")
                 .details("Details")
                 .copyToOtherPartyYesOrNo(NO)

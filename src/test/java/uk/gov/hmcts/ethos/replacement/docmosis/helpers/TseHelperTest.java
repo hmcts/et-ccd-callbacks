@@ -39,7 +39,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -288,9 +288,9 @@ class TseHelperTest {
             caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
             caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
 
-            GenericTseApplicationTypeItem actualApplication = getRespondentSelectedApplicationTypeItem(caseData);
+            GenericTseApplicationType actualApplication = getRespondentSelectedApplicationType(caseData);
 
-            assertEquals(genericTseApplicationTypeItem, actualApplication);
+            assertEquals(genericTseApplicationTypeItem.getValue(), actualApplication);
         }
 
         @Test
@@ -298,7 +298,7 @@ class TseHelperTest {
             caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("2", ""));
 
-            assertNull(getRespondentSelectedApplicationTypeItem(caseData));
+            assertNull(getRespondentSelectedApplicationType(caseData));
         }
     }
 }

@@ -5,13 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
@@ -23,15 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationTypeItem;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplication;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 
 @Service
 @RequiredArgsConstructor
@@ -75,47 +69,21 @@ public class TseRespondentReplyService {
      *
      * @param caseData in which the case details are extracted from
      */
+    // todo fix tests
     void updateApplicationStatus(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            return;
-        }
-
-        GenericTseApplicationTypeItem applicationTypeItem = getRespondentSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem == null) {
-            return;
-        }
-
-        List<TseRespondTypeItem> respondCollection = applicationTypeItem.getValue().getRespondCollection();
-        if (CollectionUtils.isEmpty(respondCollection)) {
-            return;
-        }
-
-        if (hasDueRequestForInfo(respondCollection)) {
-            applicationTypeItem.getValue().setApplicationState(UPDATED);
+        if (isRespondingToTribunal(caseData)) {
+            getRespondentSelectedApplicationType(caseData).setApplicationState(UPDATED);
         }
     }
 
-    private static boolean hasDueRequestForInfo(List<TseRespondTypeItem> respondCollection) {
-        boolean hasDueRequestForInfo = false;
-        for (TseRespondTypeItem tseRespondTypeItem : respondCollection) {
-            TseRespondType tseRespondType = tseRespondTypeItem.getValue();
-            if (tseRespondType.getFrom().equals(RESPONDENT_TITLE)) {
-                hasDueRequestForInfo = false;
-            }
-
-            if (isRequestForInfoFromRespondent(tseRespondType)) {
-                hasDueRequestForInfo = true;
-            }
-        }
-        return hasDueRequestForInfo;
-    }
-
-    private static boolean isRequestForInfoFromRespondent(TseRespondType tseRespondType) {
-        return tseRespondType.getFrom().equals(ADMIN)
-            && tseRespondType.getIsCmoOrRequest().equals(REQUEST)
-            && tseRespondType.getIsResponseRequired().equals(YES)
-            && (tseRespondType.getSelectPartyRespond().equals(RESPONDENT_TITLE)
-            || tseRespondType.getSelectPartyRespond().equals(BOTH_PARTIES));
+    /**
+     * Check if the Tribunal has requested for a response from Respondent.
+     *
+     * @param caseData contains all the case data
+     * @return a boolean value of whether the Respondent is responding to a Tribunal order/request
+     */
+    public boolean isRespondingToTribunal(CaseData caseData) {
+        return YES.equals(getRespondentSelectedApplicationType(caseData).getRespondentResponseRequired());
     }
 
     /**
@@ -125,18 +93,14 @@ public class TseRespondentReplyService {
      * @param isRespondingToTribunal determines if responding to the Tribunal's request/order
      */
     void saveReplyToApplication(CaseData caseData, boolean isRespondingToTribunal) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications)) {
-            return;
-        }
-
-        GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
+        GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
 
         if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
             genericTseApplicationType.setRespondCollection(new ArrayList<>());
         }
+        List<TseRespondTypeItem> respondCollection = genericTseApplicationType.getRespondCollection();
 
-        genericTseApplicationType.getRespondCollection().add(TseRespondTypeItem.builder()
+        respondCollection.add(TseRespondTypeItem.builder()
             .id(UUID.randomUUID().toString())
             .value(
                 TseRespondType.builder()
@@ -154,9 +118,7 @@ public class TseRespondentReplyService {
             genericTseApplicationType.setRespondentResponseRequired(NO);
         }
 
-        genericTseApplicationType.setResponsesCount(
-            String.valueOf(genericTseApplicationType.getRespondCollection().size())
-        );
+        genericTseApplicationType.setResponsesCount(String.valueOf(respondCollection.size()));
     }
 
     void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
@@ -205,26 +167,11 @@ public class TseRespondentReplyService {
      * @param authToken the caller's bearer token used to verify the caller
      */
     public void initialResReplyToTribunalTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationType application = getSelectedApplication(caseData);
+        GenericTseApplicationType application = getRespondentSelectedApplicationType(caseData);
 
         String applicationTable = tseService.formatApplicationDetails(application, authToken, true);
         String responses = tseService.formatApplicationResponses(application, authToken, true);
 
         caseData.setTseResponseTable(applicationTable + "\r\n" + responses);
-    }
-
-    /**
-     * Check if the Tribunal has requested for a response from Respondent.
-     *
-     * @param caseData contains all the case data
-     * @return a boolean value of whether the Respondent is responding to a Tribunal order/request
-     */
-    public boolean isRespondingToTribunal(CaseData caseData) {
-        GenericTseApplicationType applicationType = getSelectedApplication(caseData);
-        if (applicationType == null) {
-            throw new NotFoundException("No selected application type item found.");
-        }
-
-        return YES.equals(applicationType.getRespondentResponseRequired());
     }
 }

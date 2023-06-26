@@ -113,7 +113,8 @@ public final class TseHelper {
             return;
         }
 
-        GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
+        GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
+        assert genericTseApplicationType != null;
 
         LocalDate date = LocalDate.parse(genericTseApplicationType.getDate(), NEW_DATE_PATTERN);
 
@@ -151,72 +152,61 @@ public final class TseHelper {
      *
      * @param caseData contains all the case data
      * @return the select application
+     *
+     * @deprecated use getRespondentSelectedApplicationType, getAdminSelectedApplicationType and
+     *      getViewSelectedApplication instead as simpler and better tested.
      */
+    @Deprecated(since = "23/06/2023")
     public static GenericTseApplicationType getSelectedApplication(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-
-        if (CollectionUtils.isEmpty(applications)) {
-            throw new IllegalStateException("Selected application is null");
+        if (caseData.getTseAdminSelectApplication() != null) {
+            return getAdminSelectedApplicationType(caseData);
         }
 
-        DynamicFixedListType respondSelectApplication = caseData.getTseRespondSelectApplication();
-
-        if (caseData.getTseRespondSelectApplication() != null) {
-            return applications.get(Integer.parseInt(respondSelectApplication.getValue().getCode()) - 1).getValue();
-        }
-
-        DynamicFixedListType tseAdminSelectApplication = caseData.getTseAdminSelectApplication();
-
-        if (tseAdminSelectApplication != null) {
-            return applications.get(Integer.parseInt(tseAdminSelectApplication.getValue().getCode()) - 1).getValue();
-        }
-
-        DynamicFixedListType tseViewSelectApplication = caseData.getTseViewApplicationSelect();
-
-        if (tseViewSelectApplication != null) {
-            return applications.get(Integer.parseInt(tseViewSelectApplication.getValue().getCode()) - 1).getValue();
-        }
-
-        DynamicFixedListType tseRespondSelectApplication = caseData.getTseRespondSelectApplication();
-
-        if (tseRespondSelectApplication != null) {
-            return applications.get(Integer.parseInt(tseRespondSelectApplication.getValue().getCode()) - 1).getValue();
+        // has to be checked after the admin application as tseViewApplicationSelect isn't being reset when quitting
+        // the event
+        if (caseData.getTseViewApplicationSelect() != null) {
+            return getViewSelectedApplicationType(caseData);
         }
 
         throw new IllegalStateException("Selected application is null");
     }
 
     /**
-     * Gets the admin select application in GenericTseApplicationTypeItem.
+     * Gets the admin select application in GenericTseApplicationType.
      *
      * @param caseData contains all the case data
-     * @return the select application in GenericTseApplicationTypeItem
+     * @return the select application in GenericTseApplicationType
      */
-    public static GenericTseApplicationTypeItem getAdminSelectedApplicationTypeItem(CaseData caseData) {
-        return getTseApplication(
-            caseData,
-            caseData.getTseAdminSelectApplication().getSelectedCode()
-        );
+    public static GenericTseApplicationType getAdminSelectedApplicationType(CaseData caseData) {
+        return getTseApplication(caseData, caseData.getTseAdminSelectApplication().getSelectedCode());
     }
 
     /**
-     * Gets the respondent select application in GenericTseApplicationTypeItem.
+     * Gets the view select application in GenericTseApplicationType.
      *
      * @param caseData contains all the case data
-     * @return the select application in GenericTseApplicationTypeItem
+     * @return the select application in GenericTseApplicationType
      */
-    public static GenericTseApplicationTypeItem getRespondentSelectedApplicationTypeItem(CaseData caseData) {
-        return getTseApplication(
-            caseData,
-            caseData.getTseRespondSelectApplication().getSelectedCode()
-        );
+    public static GenericTseApplicationType getViewSelectedApplicationType(CaseData caseData) {
+        return getTseApplication(caseData, caseData.getTseViewApplicationSelect().getSelectedCode());
+    }
+
+    /**
+     * Gets the respondent select application in GenericTseApplicationType.
+     *
+     * @param caseData contains all the case data
+     * @return the select application in GenericTseApplicationType
+     */
+    public static GenericTseApplicationType getRespondentSelectedApplicationType(CaseData caseData) {
+        return getTseApplication(caseData, caseData.getTseRespondSelectApplication().getSelectedCode());
     }
 
     @Nullable
-    private static GenericTseApplicationTypeItem getTseApplication(CaseData caseData, String selectedAppId) {
+    private static GenericTseApplicationType getTseApplication(CaseData caseData, String selectedAppId) {
         return caseData.getGenericTseApplicationCollection().stream()
             .filter(item -> item.getValue().getNumber().equals(selectedAppId))
             .findFirst()
+            .map(GenericTseApplicationTypeItem::getValue)
             .orElse(null);
     }
 
@@ -228,7 +218,8 @@ public final class TseHelper {
      * @return a string representing the api request to docmosis
      */
     public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
-        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        assert selectedApplication != null;
 
         TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
@@ -251,7 +242,8 @@ public final class TseHelper {
                                                                     String citizenUrl)
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
-        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        assert selectedApplication != null;
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
@@ -268,7 +260,8 @@ public final class TseHelper {
 
     public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl) {
         CaseData caseData = caseDetails.getCaseData();
-        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        assert selectedApplication != null;
 
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),

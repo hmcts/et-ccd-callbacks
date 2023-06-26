@@ -9,7 +9,6 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
@@ -41,7 +40,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
 
 @Slf4j
 @Service
@@ -69,8 +68,7 @@ public class TseAdmReplyService {
      * @param authToken the caller's bearer token used to verify the caller
      */
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem != null) {
+        if (getAdminSelectedApplicationType(caseData) != null) {
             return tseService.formatViewApplication(caseData, authToken);
         }
         throw new NotFoundException("No selected application type item found.");
@@ -108,15 +106,15 @@ public class TseAdmReplyService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem == null) {
+        GenericTseApplicationType applicationType = getAdminSelectedApplicationType(caseData);
+        if (applicationType == null) {
             return;
         }
 
         if (isRequestAndResponseRequiredFromParty(caseData, CLAIMANT_TITLE)) {
-            applicationTypeItem.getValue().setApplicationState(NOT_STARTED_YET);
+            applicationType.setApplicationState(NOT_STARTED_YET);
         } else if (isRequestAndResponseRequiredFromParty(caseData, RESPONDENT_TITLE)) {
-            applicationTypeItem.getValue().setApplicationState(UPDATED);
+            applicationType.setApplicationState(UPDATED);
         }
     }
 
@@ -129,20 +127,19 @@ public class TseAdmReplyService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getAdminSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem == null) {
+        GenericTseApplicationType applicationType = getAdminSelectedApplicationType(caseData);
+        if (applicationType == null) {
             return;
         }
 
-        GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
-        if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            genericTseApplicationType.setRespondCollection(new ArrayList<>());
+        if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
+            applicationType.setRespondCollection(new ArrayList<>());
         }
 
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
         String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
 
-        genericTseApplicationType.getRespondCollection().add(
+        applicationType.getRespondCollection().add(
             TseRespondTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseRespondType.builder()
@@ -164,17 +161,15 @@ public class TseAdmReplyService {
                     .build()
             ).build());
 
-        genericTseApplicationType.setResponsesCount(
-                String.valueOf(genericTseApplicationType.getRespondCollection().size())
-        );
+        applicationType.setResponsesCount(String.valueOf(applicationType.getRespondCollection().size()));
 
         if (tseAdmReplyRequestSelectPartyRespond != null || tseAdmReplyCmoSelectPartyRespond != null) {
             switch (defaultIfEmpty(tseAdmReplyRequestSelectPartyRespond, tseAdmReplyCmoSelectPartyRespond)) {
-                case RESPONDENT_TITLE -> genericTseApplicationType.setRespondentResponseRequired(YES);
-                case CLAIMANT_TITLE -> genericTseApplicationType.setClaimantResponseRequired(YES);
+                case RESPONDENT_TITLE -> applicationType.setRespondentResponseRequired(YES);
+                case CLAIMANT_TITLE -> applicationType.setClaimantResponseRequired(YES);
                 case BOTH_PARTIES -> {
-                    genericTseApplicationType.setRespondentResponseRequired(YES);
-                    genericTseApplicationType.setClaimantResponseRequired(YES);
+                    applicationType.setRespondentResponseRequired(YES);
+                    applicationType.setClaimantResponseRequired(YES);
                 }
                 default ->
                     throw new IllegalStateException("Illegal SelectPartyRespond values: "

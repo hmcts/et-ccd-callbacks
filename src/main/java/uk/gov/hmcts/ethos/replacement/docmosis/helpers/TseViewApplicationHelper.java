@@ -105,7 +105,7 @@ public final class TseViewApplicationHelper {
                 .filter(o -> selectedClosed == CLOSED_STATE.equals(o.getValue().getStatus()))
                 .filter(TseViewApplicationHelper::applicationsSharedWithRespondent)
                 .map(TseViewApplicationHelper::formatDropdownOption)
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     /**
@@ -116,10 +116,11 @@ public final class TseViewApplicationHelper {
      */
     public static void setDataForTseApplicationSummaryAndResponses(CaseData caseData) {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
+        if (CollectionUtils.isEmpty(applications) || getViewSelectedApplication(caseData) == null) {
             return;
         }
-        GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
+
+        GenericTseApplicationType genericTseApplicationType = getViewSelectedApplication(caseData);
         String document = "N/A";
         if (genericTseApplicationType.getDocumentUpload() != null) {
             document = Helper.createLinkForUploadedDocument(genericTseApplicationType.getDocumentUpload());
@@ -216,7 +217,7 @@ public final class TseViewApplicationHelper {
         return DynamicValueType.create(value.getNumber(), String.format("%s %s", value.getNumber(), value.getType()));
     }
 
-    private static GenericTseApplicationType getChosenApplication(CaseData caseData) {
+    private static GenericTseApplicationType getViewSelectedApplication(CaseData caseData) {
         return caseData.getGenericTseApplicationCollection()
                 .get(Integer.parseInt(caseData.getTseViewApplicationSelect().getValue().getCode()) - 1).getValue();
     }

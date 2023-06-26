@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -56,11 +55,6 @@ public final class TseHelper {
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
     private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
-    private static final String RULE92_YES_OR_NO_MARKUP =
-            "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-                    + "%s";
-    private static final String RULE92_DETAILS_MARKUP =
-            "|Details of why you do not want to inform the other party | %s|\r\n";
 
     private TseHelper() {
         // Access through static methods
@@ -145,30 +139,6 @@ public final class TseHelper {
                 document
             )
         );
-    }
-
-    /**
-     * Gets the select application.
-     *
-     * @param caseData contains all the case data
-     * @return the select application
-     *
-     * @deprecated use getRespondentSelectedApplicationType, getAdminSelectedApplicationType and
-     *      getViewSelectedApplication instead as simpler and better tested.
-     */
-    @Deprecated(since = "23/06/2023")
-    public static GenericTseApplicationType getSelectedApplication(CaseData caseData) {
-        if (caseData.getTseAdminSelectApplication() != null) {
-            return getAdminSelectedApplicationType(caseData);
-        }
-
-        // has to be checked after the admin application as tseViewApplicationSelect isn't being reset when quitting
-        // the event
-        if (caseData.getTseViewApplicationSelect() != null) {
-            return getViewSelectedApplicationType(caseData);
-        }
-
-        throw new IllegalStateException("Selected application is null");
     }
 
     /**
@@ -284,23 +254,4 @@ public final class TseHelper {
                 .build();
     }
 
-    /**
-     * Format Rule92 No Given details markup.
-     *
-     * @param copyToOtherPartyYesOrNo Rule 92 Yes or No
-     * @param copyToOtherPartyText    Give details
-     * @return Markup String
-     */
-    public static String formatRule92(String copyToOtherPartyYesOrNo, String copyToOtherPartyText) {
-        return String.format(
-                RULE92_YES_OR_NO_MARKUP,
-                copyToOtherPartyYesOrNo,
-                NO.equals(copyToOtherPartyYesOrNo)
-                        ? String.format(
-                        RULE92_DETAILS_MARKUP,
-                        copyToOtherPartyText
-                )
-                        : ""
-        );
-    }
 }

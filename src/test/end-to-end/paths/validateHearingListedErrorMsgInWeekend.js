@@ -11,4 +11,4 @@ Scenario('Validate hearing error message if user schedules the hearing date duri
     console.log("... case id =>" +caseId);
     await scheduleHearingDuringTheWeekend(I, eventNames.LIST_HEARING, 'Leeds');
 
-}).tag('@BAT1').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

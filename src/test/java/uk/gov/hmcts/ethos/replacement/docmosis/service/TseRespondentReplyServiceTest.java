@@ -123,7 +123,7 @@ class TseRespondentReplyServiceTest {
         void noStatusChangeWhenAllAdminRequestsForInfoAreAnswered() {
             genericTseApplicationType.setRespondentResponseRequired(NO);
 
-            tseRespondentReplyService.updateApplicationStatus(caseData);
+            tseRespondentReplyService.updateApplicationState(caseData);
 
             assertThat(genericTseApplicationType.getApplicationState()).isEqualTo("notStartedYet");
 
@@ -133,7 +133,7 @@ class TseRespondentReplyServiceTest {
         void changeStatusToUpdatedWhenHasDueRequestForInfo() {
             genericTseApplicationType.setRespondentResponseRequired(YES);
 
-            tseRespondentReplyService.updateApplicationStatus(caseData);
+            tseRespondentReplyService.updateApplicationState(caseData);
 
             assertThat(genericTseApplicationType.getApplicationState()).isEqualTo("updated");
         }

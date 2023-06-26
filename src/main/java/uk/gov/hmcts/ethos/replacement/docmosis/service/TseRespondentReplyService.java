@@ -55,7 +55,7 @@ public class TseRespondentReplyService {
      * @param caseData case data
      */
     public void respondentReplyToTse(String userToken, CaseDetails caseDetails, CaseData caseData) {
-        updateApplicationStatus(caseData);
+        updateApplicationState(caseData);
         saveReplyToApplication(caseData, isRespondingToTribunal(caseData));
 
         respondentTellSomethingElseService.sendAdminEmail(caseDetails);
@@ -69,7 +69,7 @@ public class TseRespondentReplyService {
      *
      * @param caseData in which the case details are extracted from
      */
-    void updateApplicationStatus(CaseData caseData) {
+    void updateApplicationState(CaseData caseData) {
         if (isRespondingToTribunal(caseData)) {
             getRespondentSelectedApplicationType(caseData).setApplicationState(UPDATED);
         }

@@ -23,7 +23,6 @@ module.exports = {
     TestCcdGwSecret: process.env.MICROSERVICE_CCD_GW || '',
     oneTimePassword: process.env.ONE_TIME_PASSWORD || '',
     saucelabs: {
-        browser: 'chromium',
         username: 'username',
         key: 'privatekey',
         tunnelId: 'reformtunnel',

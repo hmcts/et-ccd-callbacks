@@ -18,22 +18,22 @@ function merge(intoObject, fromObject) {
   return Object.assign({}, intoObject, fromObject);
 }
 
-function getBrowserConfig(browserGroup) {
-  const browserConfig = [];
-  for (const candidateBrowser in supportedBrowsers[browserGroup]) {
-    if (candidateBrowser) {
-      const candidateCapabilities = supportedBrowsers[browserGroup][candidateBrowser];
-      candidateCapabilities['sauce:options'] = merge(defaultSauceOptions, candidateCapabilities['sauce:options']);
-      browserConfig.push({
-        browser: candidateCapabilities.browserName,
-        capabilities: candidateCapabilities,
-      });
-    } else {
-      console.error('ERROR: supportedBrowsers.js is empty or incorrectly defined');
-    }
-  }
-  return browserConfig;
-}
+// function getBrowserConfig(browserGroup) {
+//   const browserConfig = [];
+//   for (const candidateBrowser in supportedBrowsers[browserGroup]) {
+//     if (candidateBrowser) {
+//       const candidateCapabilities = supportedBrowsers[browserGroup][candidateBrowser];
+//       candidateCapabilities['sauce:options'] = merge(defaultSauceOptions, candidateCapabilities['sauce:options']);
+//       browserConfig.push({
+//         browser: candidateCapabilities.browserName,
+//         capabilities: candidateCapabilities,
+//       });
+//     } else {
+//       console.error('ERROR: supportedBrowsers.js is empty or incorrectly defined');
+//     }
+//   }
+//   return browserConfig;
+// }
 
 const setupConfig = {
   tests: './paths/*.js',
@@ -59,25 +59,25 @@ const setupConfig = {
     saucelabs: {
       browsers: [
         {
-          browserName: getBrowserConfig('chrome'),
+          browserName: 'chromium',
           'sauce:options': {
             extendedDebugging: true,
           },
         },
         {
-          browserName:  getBrowserConfig('firefox'),
+          browserName: 'firefox',
           'sauce:options': {
             extendedDebugging: true,
           },
         },
         {
-          browserName:  getBrowserConfig('microsoftEdge'),
+          browserName: 'webkit',
           'sauce:options': {
             extendedDebugging: true,
           },
         },
         {
-          browserName:  getBrowserConfig('safari'),
+          browserName: 'electron',
           'sauce:options': {
             extendedDebugging: true,
           },

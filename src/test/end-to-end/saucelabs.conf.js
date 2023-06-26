@@ -53,7 +53,7 @@ const setupConfig = {
     },
     MyHelper: {
       require: './saucelabsHelper.js',
-      url: config.TestUrl,
+      url: testConfig.TestUrl,
     },
   },
   include: {

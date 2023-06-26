@@ -39,7 +39,7 @@ const setupConfig = {
   output: './functional-output/',
   helpers: {
     WebDriver: {
-      url: config.TestUrl,
+      url: testConfig.TestUrl,
       //browser: process.env.SAUCE_BROWSER || '',
       //host: process.env.HOST || 'saucelabs',
       browser,

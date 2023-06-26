@@ -24,11 +24,13 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -125,6 +127,7 @@ class TseRespondentReplyServiceTest {
 
         tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
         assertThat(caseData.getTseResponseTable(), is(expectedResponseTables));
+        assertThat(caseData.getTseRespondToTribunal(), is(expectedResponseTables));
     }
 
     @ParameterizedTest
@@ -143,6 +146,25 @@ class TseRespondentReplyServiceTest {
         return Stream.of(
                 Arguments.of(true, true),
                 Arguments.of(false, false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void validateInput(String responseText, String supportingMaterial, int expectedErrorCount) {
+        caseData.setTseResponseText(responseText);
+        caseData.setTseResponseHasSupportingMaterial(supportingMaterial);
+
+        List<String> errors = tseRespondentReplyService.validateInput(caseData);
+
+        assertEquals(expectedErrorCount, errors.size());
+    }
+
+    private static Stream<Arguments> validateInput() {
+        return Stream.of(
+                Arguments.of(null, YES, 0),
+                Arguments.of("testResponseText", YES, 0),
+                Arguments.of(null, NO, 1)
         );
     }
 

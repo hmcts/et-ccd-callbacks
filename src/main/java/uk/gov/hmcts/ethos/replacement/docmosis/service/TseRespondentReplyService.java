@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -11,8 +12,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplication;
 
@@ -32,6 +36,7 @@ public class TseRespondentReplyService {
     private String acknowledgementRule92YesEmailTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+    private static final String GIVE_MISSING_DETAIL = "Use the text box or supporting materials to give details.";
 
     public void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
@@ -69,6 +74,7 @@ public class TseRespondentReplyService {
         String responses = tseService.formatApplicationResponses(application, authToken, true);
 
         caseData.setTseResponseTable(applicationTable + "\r\n" + responses);
+        caseData.setTseRespondToTribunal(YES);
     }
 
     /**
@@ -84,6 +90,20 @@ public class TseRespondentReplyService {
         }
 
         return YES.equals(applicationType.getRespondentResponseRequired());
+    }
+
+    /**
+     * Returns error if LR selects No to supporting materials question and does not enter response details.
+     * @param caseData contains all the case data
+     * @return Error Message List
+     */
+    public List<String> validateInput(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (StringUtils.isEmpty(caseData.getTseResponseText())
+                && NO.equals(caseData.getTseResponseHasSupportingMaterial())) {
+            errors.add(GIVE_MISSING_DETAIL);
+        }
+        return errors;
     }
 
 }

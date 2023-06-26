@@ -258,6 +258,7 @@ class TseHelperTest {
         caseData.setTseResponseTable(YES);
         caseData.setTseResponseHasSupportingMaterial(YES);
         caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
+        caseData.setTseRespondToTribunal(YES);
         TseHelper.resetReplyToApplicationPage(caseData);
 
         assertNull(caseData.getTseResponseText());
@@ -267,6 +268,7 @@ class TseHelperTest {
         assertNull(caseData.getTseResponseSupportingMaterial());
         assertNull(caseData.getTseResponseCopyToOtherParty());
         assertNull(caseData.getTseResponseCopyNoGiveDetails());
+        assertNull(caseData.getTseRespondToTribunal());
     }
 
     @Test

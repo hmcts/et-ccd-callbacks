@@ -203,6 +203,7 @@ public final class TseHelper {
         caseData.setTseResponseCopyToOtherParty(null);
         caseData.setTseResponseCopyNoGiveDetails(null);
         caseData.setTseRespondSelectApplication(null);
+        caseData.setTseRespondToTribunal(null);
     }
 
     /**

@@ -232,6 +232,7 @@ class TseRespondentReplyServiceTest {
         caseData.setTseResponseTable(YES);
         caseData.setTseResponseHasSupportingMaterial(YES);
         caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
+        caseData.setTseRespondToTribunal(YES);
 
         tseRespondentReplyService.resetReplyToApplicationPage(caseData);
 
@@ -242,6 +243,7 @@ class TseRespondentReplyServiceTest {
         assertNull(caseData.getTseResponseSupportingMaterial());
         assertNull(caseData.getTseResponseCopyToOtherParty());
         assertNull(caseData.getTseResponseCopyNoGiveDetails());
+        assertNull(caseData.getTseRespondToTribunal());
     }
 
     @Test
@@ -252,6 +254,26 @@ class TseRespondentReplyServiceTest {
         tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
         String expectedResponseTables = "applicationDetails" + "\r\n" + "responses";
         assertThat(caseData.getTseResponseTable(), is(expectedResponseTables));
+        assertThat(caseData.getTseRespondToTribunal(), is(expectedResponseTables));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void validateInput(String responseText, String supportingMaterial, int expectedErrorCount) {
+        caseData.setTseResponseText(responseText);
+        caseData.setTseResponseHasSupportingMaterial(supportingMaterial);
+
+        List<String> errors = tseRespondentReplyService.validateInput(caseData);
+
+        assertThat(errors.size(), is(expectedErrorCount));
+    }
+
+    private static Stream<Arguments> validateInput() {
+        return Stream.of(
+                Arguments.of(null, YES, 0),
+                Arguments.of("testResponseText", YES, 0),
+                Arguments.of(null, NO, 1)
+        );
     }
 
     @ParameterizedTest

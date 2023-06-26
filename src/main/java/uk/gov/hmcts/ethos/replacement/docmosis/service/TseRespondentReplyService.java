@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -46,6 +47,7 @@ public class TseRespondentReplyService {
     private String acknowledgementRule92YesEmailTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+    private static final String GIVE_MISSING_DETAIL = "Use the text box or supporting materials to give details.";
 
     /**
      * Reply to a TSE application as a respondent, including updating app status, saving the reply and sending emails.
@@ -158,6 +160,7 @@ public class TseRespondentReplyService {
         caseData.setTseResponseCopyToOtherParty(null);
         caseData.setTseResponseCopyNoGiveDetails(null);
         caseData.setTseRespondSelectApplication(null);
+        caseData.setTseRespondToTribunal(null);
     }
 
     /**
@@ -172,5 +175,20 @@ public class TseRespondentReplyService {
         String responses = tseService.formatApplicationResponses(application, authToken, true);
 
         caseData.setTseResponseTable(applicationTable + "\r\n" + responses);
+        caseData.setTseRespondToTribunal(YES);
+    }
+
+    /**
+     * Returns error if LR selects No to supporting materials question and does not enter response details.
+     * @param caseData contains all the case data
+     * @return Error Message List
+     */
+    public List<String> validateInput(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (StringUtils.isEmpty(caseData.getTseResponseText())
+                && NO.equals(caseData.getTseResponseHasSupportingMaterial())) {
+            errors.add(GIVE_MISSING_DETAIL);
+        }
+        return errors;
     }
 }

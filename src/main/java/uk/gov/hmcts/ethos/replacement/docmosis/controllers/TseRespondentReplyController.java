@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -44,11 +43,14 @@ public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;
     private final TseRespondentReplyService tseRespondentReplyService;
-    private final RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
-        + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
+    private static final String SUBMITTED_BODY = """
+        ### What happens next \r
+        \r
+        You have sent your response to the tribunal%s.\r
+        \r
+        The tribunal will consider all correspondence and let you know what happens next.""";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
 
     /**
@@ -189,12 +191,8 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        TseHelper.saveReplyToApplication(caseData, tseRespondentReplyService.isRespondingToTribunal(caseData));
+        tseRespondentReplyService.respondentReplyToTse(userToken, caseDetails, caseData);
 
-        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
-
-        TseHelper.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

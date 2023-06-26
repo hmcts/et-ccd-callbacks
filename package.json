@@ -34,8 +34,8 @@
     },
     "scripts": {
         "test:local": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --steps --reporter mocha-multi --verbose",
-        "test:fullfunctional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --steps --reporter mocha-multi --verbose --grep @nightly",
-        "test:crossbrowser": "codeceptjs run-multiple ${BROWSER_GROUP:-'--all'} --steps -c src/test/end-to-end/saucelabs.conf.js --steps --reporter mocha-multi --verbose --grep @crossbrowser",
+        "test:fullfunctional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @nightly --steps --reporter mocha-multi --verbose",
+        "test:crossbrowser": "codeceptjs run-multiple ${BROWSER_GROUP:-'--all'} --steps -c src/test/end-to-end/saucelabs.conf.js  --grep @crossbrowser --steps --reporter mocha-multi --verbose",
         "test:functional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --grep @RET-BAT --steps —-reporter mocha-multi",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"

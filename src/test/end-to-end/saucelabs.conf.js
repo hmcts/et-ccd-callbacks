@@ -1,4 +1,4 @@
-const config = require('../config.js');
+const config = require('../end-to-end/config');
 const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
 const testUrl = process.env.TEST_URL || config.TestUrl;
 

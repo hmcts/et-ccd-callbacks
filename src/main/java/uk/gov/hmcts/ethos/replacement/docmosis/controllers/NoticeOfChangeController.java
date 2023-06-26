@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -59,11 +54,8 @@ public class NoticeOfChangeController {
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "noc decision update")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+    
+    
     public GenericCallbackResponse nocSubmitted(@RequestBody CallbackRequest callbackRequest,
                                                 @RequestHeader("Authorization")
                                                 String userToken) {

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.external;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -27,12 +24,8 @@ public class StubApiController {
      * @return basic string
      */
     @GetMapping(value = "/stubApi")
-    @Operation(summary = "Stub API for test purposes only")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public String stubApi(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return "Invalid token";

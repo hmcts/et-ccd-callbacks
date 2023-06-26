@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -68,15 +63,8 @@ public class Et3ResponseController {
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for et3 response")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> initEt3Response(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -96,15 +84,8 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/validateRespondent", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "validate dates are correct for employment")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> validateRespondent(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -131,15 +112,8 @@ public class Et3ResponseController {
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/midEmploymentDates", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "validate dates are correct for employment")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> midEmploymentDates(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -156,15 +130,8 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/submitSection", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Save answers to the given specific respondent")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> submitSection(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -181,15 +148,8 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/sectionComplete", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "display the next steps after ET3 response section")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> sectionComplete(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -216,15 +176,8 @@ public class Et3ResponseController {
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Save answers to the given specific respondent")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -253,15 +206,8 @@ public class Et3ResponseController {
      * @return this will return and display a message to the user on the next steps.
      */
     @PostMapping(value = "/processingComplete", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "display the next steps after ET3 response submission")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> processingComplete(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -279,15 +225,8 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/startSubmitEt3", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "start et3 submission")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> startSubmitEt3(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -304,15 +243,8 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/reloadSubmitData", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "reloads the data onto the case for submission")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> reloadSubmitData(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {

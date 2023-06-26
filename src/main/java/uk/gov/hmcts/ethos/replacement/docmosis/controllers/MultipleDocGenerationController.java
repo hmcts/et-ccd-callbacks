@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -49,16 +43,8 @@ public class MultipleDocGenerationController {
     private final VerifyTokenService verifyTokenService;
 
     @PostMapping(value = "/printSchedule", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "generate a multiple schedule.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MultipleCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
+
     public ResponseEntity<MultipleCallbackResponse> printSchedule(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -78,16 +64,8 @@ public class MultipleDocGenerationController {
     }
 
     @PostMapping(value = "/printLetter", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "generate a letter for the first case in the filtered collection.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MultipleCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
+
     public ResponseEntity<MultipleCallbackResponse> printLetter(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -108,16 +86,8 @@ public class MultipleDocGenerationController {
     }
 
     @PostMapping(value = "/printDocumentConfirmation", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "generate a confirmation with a link to the document generated.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MultipleCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
+
     public ResponseEntity<MultipleCallbackResponse> printDocumentConfirmation(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -137,16 +107,8 @@ public class MultipleDocGenerationController {
     }
 
     @PostMapping(value = "/midSelectedAddressLabelsMultiple", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "populates the address labels list with the user selected addresses to be printed.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MultipleCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
+
     public ResponseEntity<MultipleCallbackResponse> midSelectedAddressLabelsMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -168,15 +130,8 @@ public class MultipleDocGenerationController {
     }
 
     @PostMapping(value = "/midValidateAddressLabelsMultiple", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "validates the address labels collection and print attributes before printing.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
+
     public ResponseEntity<MultipleCallbackResponse> midValidateAddressLabelsMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -195,16 +150,8 @@ public class MultipleDocGenerationController {
     }
 
     @PostMapping(value = "/dynamicMultipleLetters", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "populate flags in dynamic lists with all flags values are in the excel.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MultipleCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+
+
     public ResponseEntity<MultipleCallbackResponse> dynamicMultipleLetters(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader(value = "Authorization") String userToken) {

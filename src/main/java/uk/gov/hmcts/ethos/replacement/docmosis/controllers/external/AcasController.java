@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.external;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,12 +36,8 @@ public class AcasController {
      * @return a list of case ids
      */
     @GetMapping(value = "/getLastModifiedCaseList")
-    @Operation(summary = "Return a list of CCD case IDs from a provided date")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<Object> getLastModifiedCaseList(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken,
             @RequestParam(name = "datetime")
@@ -70,12 +63,8 @@ public class AcasController {
      * @return a list of cases in JSON format
      */
     @GetMapping(value = "/getCaseData")
-    @Operation(summary = "Return case data from a list of provided IDs")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<Object> getCaseData(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken,
             @RequestParam(name = "caseIds") List<String> caseIds) {

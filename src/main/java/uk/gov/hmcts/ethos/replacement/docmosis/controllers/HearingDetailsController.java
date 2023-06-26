@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,12 +38,8 @@ public class HearingDetailsController {
     }
 
     @PostMapping(value = "/initialiseHearings", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Initialise hearings selection list")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> initialiseHearingDynamicList(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -62,12 +55,8 @@ public class HearingDetailsController {
     }
 
     @PostMapping(value = "/handleListingSelected", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update case data when a listing has been selected")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> handleListingSelected(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -83,12 +72,8 @@ public class HearingDetailsController {
     }
 
     @PostMapping(value = "/hearingMidEventValidation", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "validates the hearing number and the hearing days to prevent their creation.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> hearingMidEventValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -103,12 +88,8 @@ public class HearingDetailsController {
     }
 
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update case data input in Hearing Details event")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {

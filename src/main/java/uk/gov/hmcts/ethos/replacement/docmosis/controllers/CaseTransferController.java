@@ -1,10 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -63,15 +58,8 @@ public class CaseTransferController {
     }
 
     @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Initialise case for transfer to Scotland")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> initTransferToScotland(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -89,15 +77,8 @@ public class CaseTransferController {
     }
 
     @PostMapping(value = "/initTransferToEnglandWales", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Initialise case for transfer to England/Wales")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> initTransferToEnglandWales(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -116,15 +97,8 @@ public class CaseTransferController {
     }
 
     @PostMapping(value = "/transferSameCountry", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Transfer a case to another office within the same country")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> transferSameCountry(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -142,15 +116,8 @@ public class CaseTransferController {
     }
 
     @PostMapping(value = "/transferSameCountryEccLinkedCase", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Transfer a ECC linked case to another office within the same country")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> transferSameCountryEccLinkedCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -170,15 +137,8 @@ public class CaseTransferController {
     }
 
     @PostMapping(value = "/transferDifferentCountry", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Transfer a case to another office in a different country")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> transferDifferentCountry(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
@@ -196,11 +156,8 @@ public class CaseTransferController {
     }
 
     @PostMapping(value = "/transferToEcm", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Transfer a case to ECM")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> transferToEcm(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
@@ -216,11 +173,8 @@ public class CaseTransferController {
     }
 
     @PostMapping(value = "/assignCase", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "assigns a case to a tribunal office")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> assignCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {

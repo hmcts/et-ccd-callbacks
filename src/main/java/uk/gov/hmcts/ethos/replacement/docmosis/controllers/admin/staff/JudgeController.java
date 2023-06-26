@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,12 +32,8 @@ public class JudgeController {
     private final JudgeService judgeService;
 
     @PostMapping(value = "/initAddJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Initial add Judge")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> initAddJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
@@ -63,12 +56,8 @@ public class JudgeController {
      * @return Callback response entity with case data and errors attached, if any.
      */
     @PostMapping(value = "/addJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Add Judge")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> addJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
@@ -95,12 +84,8 @@ public class JudgeController {
      * @return Callback response entity with case data and errors attached, if any.
      */
     @PostMapping(value = "/updateJudgeMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the dynamicList for judge when office and type selected")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> updateJudgeMidEventSelectOffice(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
@@ -123,12 +108,8 @@ public class JudgeController {
      * @return Callback response entity with case data and errors attached, if any.
      */
     @PostMapping(value = "/updateJudgeMidEventSelectJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the judge code and name when dynamicList selected")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> updateJudgeMidEventSelectJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
@@ -153,12 +134,8 @@ public class JudgeController {
      * @return Callback response entity with case data and errors attached, if any.
      */
     @PostMapping(value = "/updateJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update a judge")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> updateJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
@@ -181,12 +158,8 @@ public class JudgeController {
      * @return Callback response entity with case data and errors attached, if any.
      */
     @PostMapping(value = "/deleteJudgeMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the dynamicList for judges when an office is selected")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectOffice(
         @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
@@ -209,12 +182,8 @@ public class JudgeController {
      * @return Callback response entity with case data and errors attached, if any.
      */
     @PostMapping(value = "/deleteJudgeMidEventSelectJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the judge details when an item is selected from the judges dynamicList")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectJudge(
         @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
@@ -237,12 +206,8 @@ public class JudgeController {
      * @return Callback response entity with case data and errors attached, if any.
      */
     @PostMapping(value = "/deleteJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Deletes a judge")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    
+    
     public ResponseEntity<CCDCallbackResponse> deleteJudge(
         @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {

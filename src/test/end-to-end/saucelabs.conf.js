@@ -1,96 +1,58 @@
 const testConfig = require('./config.js');
-
-const sauceConfig = {
-  username: process.env.SAUCE_USERNAME || testConfig.saucelabs.username,
-  accessKey: process.env.SAUCE_ACCESS_KEY || testConfig.saucelabs.key,
-  tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || testConfig.saucelabs.tunnelId,
-  acceptSslCerts: true,
-  tags: ['ET'],
-  url: testConfig.TestUrl,
-};
-
-const browsers = {
-  chrome: {
-    browser: 'chromium',
-    desiredCapabilities: {
-      browserName: 'chrome',
-      'sauce:options': {
-        ...sauceConfig,
-      },
-    },
-  },
-  firefox: {
-    browser: 'firefox',
-    desiredCapabilities: {
-      browserName: 'firefox',
-      'sauce:options': {
-        ...sauceConfig,
-      },
-    },
-  },
-  safari: {
-    browser: 'webkit',
-    desiredCapabilities: {
-      browserName: 'safari',
-      'sauce:options': {
-        ...sauceConfig,
-      },
-    },
-  },
-};
-
 exports.config = {
-  tests: './*_test.js',
-  output: './output',
+  tests: './paths/*.js',
+  output: `${process.cwd()}/${testConfig.TestOutputDir}`,
   helpers: {
-    Playwright: {
+    WebDriverIO: {
+      host: 'ondemand.saucelabs.com',
+      port: 443,
+      protocol: 'https',
       url: testConfig.TestUrl,
-      show:false,
-      waitForNavigation: 'networkidle',
-      waitForAction: 100,
-      cssSelectorsEnabled: 'true',
-      browser:'chromium',
-      host: 'ondemand.eu-central-1.saucelabs.com',
-      port: 80,
-      region: 'eu',
-      capabilities: {},
-
+      show: false,
+      user: process.env.SAUCE_USERNAME || testConfig.saucelabs.username,
+      key: process.env.SAUCE_ACCESS_KEY || testConfig.saucelabs.key,
+      tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || testConfig.saucelabs.tunnelId,
+      acceptSslCerts: true,
+      tags: ['ET'],
+      desiredCapabilities: {
+        // Common capabilities for all browsers
+        build: process.env.SAUCE_BUILD_NAME || 'ET-CCD-X-Browser', // Set a build name in the environment variable
+        platform: 'any',
+        screenResolution: '1280x1024',
+        name: 'ET ccd-callbacks Crossbrowser Tests',
+      },
+    },
+  },
+  plugins: {
+    wdio: {
+      enabled: true,
+      services: ['sauce'],
     },
   },
   multiple: {
-    basic: {
-      browsers: Object.keys(browsers),
+    parallel: {
+      chunks: 2, // Number of browsers to run in parallel
     },
-  },
-  services: {
-    'sauce': {
-      enabled: true,
-      user: sauceConfig.username,
-      key: sauceConfig.accessKey,
-      browsers: browsers,
-    },
-  },
-  include: {
-    I: './pages/steps.js',
-  },
-
-  bootstrap: null,
-
-  mocha: {
-    reporterOptions: {
-      'codeceptjs-cli-reporter': {
-        stdout: '-',
-        options: { steps: true },
+    // Define configurations for different browsers
+    browsers: {
+      chrome: {
+        desiredCapabilities: {
+          browserName: 'chrome',
+          browserVersion: 'latest',
+        },
       },
-      mochawesome: {
-        stdout: './functional-output/console.log',
-        options: {
-          reportDir: './functional-output/reports',
-          reportName: 'et-ccd-callbacks-xbrowser-test',
-          inlineAssets: true,
+      firefox: {
+        desiredCapabilities: {
+          browserName: 'firefox',
+          browserVersion: 'latest',
+        },
+      },
+      safari: {
+        desiredCapabilities: {
+          browserName: 'safari',
+          browserVersion: 'latest',
         },
       },
     },
   },
-  name: 'ET ccd-callbacks Crossbrowser Tests',
 };

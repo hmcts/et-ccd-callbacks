@@ -1,11 +1,6 @@
 const testConfig = require('./config.js');
-const supportedBrowsers = require('./supportedBrowsers');
 
-const waitForTimeout = parseInt(testConfig.saucelabs.waitForTimeout);
-const smartWait = parseInt(testConfig.saucelabs.smartWait);
-const browser = process.env.SAUCE_BROWSER || testConfig.saucelabs.browser;
-
-const defaultSauceOptions = {
+const sauceConfig = {
   username: process.env.SAUCE_USERNAME || testConfig.saucelabs.username,
   accessKey: process.env.SAUCE_ACCESS_KEY || testConfig.saucelabs.key,
   tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || testConfig.saucelabs.tunnelId,
@@ -14,78 +9,67 @@ const defaultSauceOptions = {
   url: testConfig.TestUrl,
 };
 
-function merge(intoObject, fromObject) {
-  return Object.assign({}, intoObject, fromObject);
-}
+const browsers = {
+  chrome: {
+    browser: 'chromium',
+    desiredCapabilities: {
+      browserName: 'chrome',
+      'sauce:options': {
+        ...sauceConfig,
+      },
+    },
+  },
+  firefox: {
+    browser: 'firefox',
+    desiredCapabilities: {
+      browserName: 'firefox',
+      'sauce:options': {
+        ...sauceConfig,
+      },
+    },
+  },
+  safari: {
+    browser: 'webkit',
+    desiredCapabilities: {
+      browserName: 'safari',
+      'sauce:options': {
+        ...sauceConfig,
+      },
+    },
+  },
+};
 
-// function getBrowserConfig(browserGroup) {
-//   const browserConfig = [];
-//   for (const candidateBrowser in supportedBrowsers[browserGroup]) {
-//     if (candidateBrowser) {
-//       const candidateCapabilities = supportedBrowsers[browserGroup][candidateBrowser];
-//       candidateCapabilities['sauce:options'] = merge(defaultSauceOptions, candidateCapabilities['sauce:options']);
-//       browserConfig.push({
-//         browser: candidateCapabilities.browserName,
-//         capabilities: candidateCapabilities,
-//       });
-//     } else {
-//       console.error('ERROR: supportedBrowsers.js is empty or incorrectly defined');
-//     }
-//   }
-//   return browserConfig;
-// }
-
-const setupConfig = {
-  tests: './paths/*.js',
-  output: './functional-output/',
+exports.config = {
+  tests: './*_test.js',
+  output: './output',
   helpers: {
     Playwright: {
       url: testConfig.TestUrl,
       show:false,
       waitForNavigation: 'networkidle',
       waitForAction: 100,
-      browser,
-      waitForTimeout,
-      smartWait,
       cssSelectorsEnabled: 'true',
+      browser:'chromium',
       host: 'ondemand.eu-central-1.saucelabs.com',
       port: 80,
       region: 'eu',
       capabilities: {},
-    },
-  },
-  SauceLabs:defaultSauceOptions,
-  multiple: {
-    saucelabs: {
-      browsers: [
-        {
-          browserName: 'chromium',
-          'sauce:options': {
-            extendedDebugging: true,
-          },
-        },
-        {
-          browserName: 'firefox',
-          'sauce:options': {
-            extendedDebugging: true,
-          },
-        },
-        {
-          browserName: 'webkit',
-          'sauce:options': {
-            extendedDebugging: true,
-          },
-        },
-        {
-          browserName: 'electron',
-          'sauce:options': {
-            extendedDebugging: true,
-          },
-        },
-      ],
-    },
-  },
 
+    },
+  },
+  multiple: {
+    basic: {
+      browsers: Object.keys(browsers),
+    },
+  },
+  plugins: {
+    saucelabs: {
+      enabled: true,
+      user: sauceConfig.username,
+      key: sauceConfig.accessKey,
+      browsers: browsers,
+    },
+  },
   include: {
     I: './pages/steps.js',
   },
@@ -110,5 +94,3 @@ const setupConfig = {
   },
   name: 'ET ccd-callbacks Crossbrowser Tests',
 };
-
-exports.config = setupConfig;

@@ -11,6 +11,7 @@ const defaultSauceOptions = {
   tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || testConfig.saucelabs.tunnelId,
   acceptSslCerts: true,
   tags: ['ET'],
+  url: testConfig.TestUrl,
 };
 
 function merge(intoObject, fromObject) {
@@ -38,10 +39,11 @@ const setupConfig = {
   tests: './paths/*.js',
   output: './functional-output/',
   helpers: {
-    WebDriver: {
+    Playwright: {
       url: testConfig.TestUrl,
-      //browser: process.env.SAUCE_BROWSER || '',
-      //host: process.env.HOST || 'saucelabs',
+      show:false,
+      waitForNavigation: 'networkidle',
+      waitForAction: 100,
       browser,
       waitForTimeout,
       smartWait,
@@ -51,14 +53,43 @@ const setupConfig = {
       region: 'eu',
       capabilities: {},
     },
-    MyHelper: {
-      require: './saucelabsHelper.js',
-      url: testConfig.TestUrl,
+  },
+  SauceLabs:defaultSauceOptions,
+  multiple: {
+    saucelabs: {
+      browsers: [
+        {
+          browserName: getBrowserConfig('chrome'),
+          'sauce:options': {
+            extendedDebugging: true,
+          },
+        },
+        {
+          browserName:  getBrowserConfig('firefox'),
+          'sauce:options': {
+            extendedDebugging: true,
+          },
+        },
+        {
+          browserName:  getBrowserConfig('microsoftEdge'),
+          'sauce:options': {
+            extendedDebugging: true,
+          },
+        },
+        {
+          browserName:  getBrowserConfig('safari'),
+          'sauce:options': {
+            extendedDebugging: true,
+          },
+        },
+      ],
     },
   },
+
   include: {
     I: './pages/steps.js',
   },
+
   bootstrap: null,
 
   mocha: {
@@ -76,23 +107,6 @@ const setupConfig = {
         },
       },
     },
-  },
-  multiple: {
-    /* microsoftIE11: {
-      browsers: getBrowserConfig('microsoftIE11'),
-    },
-    microsoftEdge: {
-      browsers: getBrowserConfig('microsoftEdge'),
-    },*/
-    chrome: {
-      browsers: getBrowserConfig('chrome'),
-    },
-    firefox: {
-      browsers: getBrowserConfig('firefox'),
-    },
-    /* safari: {
-      browsers: getBrowserConfig('safari'),
-    },*/
   },
   name: 'ET ccd-callbacks Crossbrowser Tests',
 };

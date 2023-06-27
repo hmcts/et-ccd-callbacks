@@ -1,6 +1,5 @@
 const config =  require('./config.js');
 const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
-const testUrl = process.env.TEST_URL || config.TestUrl;
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;
 const smartWait = parseInt(process.env.SMART_WAIT) || 30000;
@@ -45,7 +44,7 @@ const setupConfig = {
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url: testUrl,
+            url: config.TestUrl,
             browser,
             smartWait,
             waitForTimeout,

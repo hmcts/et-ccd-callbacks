@@ -232,7 +232,7 @@ class TseRespondentReplyServiceTest {
         caseData.setTseResponseTable(YES);
         caseData.setTseResponseHasSupportingMaterial(YES);
         caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
-        caseData.setTseRespondToTribunal(YES);
+        caseData.setTseRespondingToTribunal(YES);
 
         tseRespondentReplyService.resetReplyToApplicationPage(caseData);
 
@@ -243,7 +243,7 @@ class TseRespondentReplyServiceTest {
         assertNull(caseData.getTseResponseSupportingMaterial());
         assertNull(caseData.getTseResponseCopyToOtherParty());
         assertNull(caseData.getTseResponseCopyNoGiveDetails());
-        assertNull(caseData.getTseRespondToTribunal());
+        assertNull(caseData.getTseRespondingToTribunal());
     }
 
     @Test
@@ -254,7 +254,7 @@ class TseRespondentReplyServiceTest {
         tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
         String expectedResponseTables = "applicationDetails" + "\r\n" + "responses";
         assertThat(caseData.getTseResponseTable(), is(expectedResponseTables));
-        assertThat(caseData.getTseRespondToTribunal(), is(expectedResponseTables));
+        assertThat(caseData.getTseRespondingToTribunal(), is(expectedResponseTables));
     }
 
     @ParameterizedTest

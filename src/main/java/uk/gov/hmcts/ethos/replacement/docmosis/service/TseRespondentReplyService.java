@@ -160,7 +160,7 @@ public class TseRespondentReplyService {
         caseData.setTseResponseCopyToOtherParty(null);
         caseData.setTseResponseCopyNoGiveDetails(null);
         caseData.setTseRespondSelectApplication(null);
-        caseData.setTseRespondToTribunal(null);
+        caseData.setTseRespondingToTribunal(null);
     }
 
     /**
@@ -175,7 +175,7 @@ public class TseRespondentReplyService {
         String responses = tseService.formatApplicationResponses(application, authToken, true);
 
         caseData.setTseResponseTable(applicationTable + "\r\n" + responses);
-        caseData.setTseRespondToTribunal(YES);
+        caseData.setTseRespondingToTribunal(YES);
     }
 
     /**

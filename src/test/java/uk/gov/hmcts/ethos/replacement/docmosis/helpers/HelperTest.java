@@ -27,7 +27,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelperTest {
 
@@ -150,9 +152,6 @@ public class HelperTest {
 
     @Test
     void updatePostponedDate_SetPostponedDate() {
-        CaseData caseData = new CaseData();
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        HearingType hearingType = new HearingType();
         List<DateListedTypeItem> hearingDateCollection = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
@@ -160,8 +159,11 @@ public class HelperTest {
         dateListedType.setHearingStatus("Postponed");
         dateListedTypeItem.setValue(dateListedType);
         hearingDateCollection.add(dateListedTypeItem);
+        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(hearingDateCollection);
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
+        CaseData caseData = new CaseData();
         caseData.setHearingCollection(Collections.singletonList(hearingTypeItem));
 
         Helper.updatePostponedDate(caseData);
@@ -173,9 +175,6 @@ public class HelperTest {
 
     @Test
     void updatePostponedDate_SetPostponedDateToNull() {
-        CaseData caseData = new CaseData();
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        HearingType hearingType = new HearingType();
         List<DateListedTypeItem> hearingDateCollection = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
@@ -183,14 +182,15 @@ public class HelperTest {
         dateListedType.setPostponedDate("anything");
         dateListedTypeItem.setValue(dateListedType);
         hearingDateCollection.add(dateListedTypeItem);
+        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(hearingDateCollection);
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
+        CaseData caseData = new CaseData();
         caseData.setHearingCollection(Collections.singletonList(hearingTypeItem));
 
         Helper.updatePostponedDate(caseData);
 
         Assertions.assertNull(dateListedType.getPostponedDate());
     }
-
-
 }

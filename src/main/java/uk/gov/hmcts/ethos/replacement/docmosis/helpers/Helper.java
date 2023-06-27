@@ -227,32 +227,34 @@ public final class Helper {
     }
 
     public static void updatePostponedDate(CaseData caseData) {
-
         if (caseData.getHearingCollection() != null) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-
                 if (hearingTypeItem.getValue() != null
-                    && hearingTypeItem.getValue().getHearingDateCollection() != null) {
+                        && hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
-
-                        DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (dateListedType != null) {
-                            if (isHearingStatusPostponed(dateListedType)
-                                && dateListedType.getPostponedDate() == null) {
-                                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
-                            }
-                            if (dateListedType.getPostponedDate() != null
-                                && (!isHearingStatusPostponed(dateListedType)
-                                    || dateListedType.getHearingStatus() == null)) {
-                                dateListedType.setPostponedDate(null);
-                            }
-                        }
+                        updatePostponedDateToCurrentDate(dateListedTypeItem);
                     }
                 }
             }
         }
+    }
 
+    private static void updatePostponedDateToCurrentDate(DateListedTypeItem dateListedTypeItem) {
+        DateListedType dateListedType = dateListedTypeItem.getValue();
+        if (dateListedType != null) {
+            if (isHearingStatusPostponed(dateListedType) && dateListedType.getPostponedDate() == null) {
+                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
+            }
+            updatePostponedDateToNull(dateListedType);
+        }
+    }
+
+    private static void updatePostponedDateToNull(DateListedType dateListedType) {
+        if (dateListedType.getPostponedDate() != null
+                && (!isHearingStatusPostponed(dateListedType) || dateListedType.getHearingStatus() == null)) {
+            dateListedType.setPostponedDate(null);
+        }
     }
 
     private static boolean isHearingStatusPostponed(DateListedType dateListedType) {

@@ -258,16 +258,16 @@ class Et3ResponseHelperTest {
         assertThat(errors, hasSize(1));
         assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
     }
-   @Test
-    void validateRespondents_DuplicateError() { //change name to match others
-       DynamicValueType respondent = DynamicValueType.create("respondentName", "respondentName");
-       DynamicFixedListType dynamicFixedListType = DynamicFixedListType.from(List.of(respondent));
-       dynamicFixedListType.setValue(respondent);
-       DynamicListType dynamicListType = new DynamicListType();
-       dynamicListType.setDynamicList(dynamicFixedListType);
-       DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
-       dynamicListTypeItem.setValue(dynamicListType);
-       caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem, dynamicListTypeItem));
+    @Test
+    void validateRespondents_DuplicateError() {
+        DynamicValueType respondent = DynamicValueType.create("respondentName", "respondentName");
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType.from(List.of(respondent));
+        dynamicFixedListType.setValue(respondent);
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(dynamicFixedListType);
+        DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
+        dynamicListTypeItem.setValue(dynamicListType);
+        caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem, dynamicListTypeItem));
 
         String eventId = "et3ResponseDetails";
 

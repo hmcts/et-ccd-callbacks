@@ -13,7 +13,9 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseDocument;
@@ -32,6 +34,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -249,6 +252,31 @@ class Et3ResponseHelperTest {
     }
 
     @Test
+    void validateRespondents_et3Response() {
+        caseData.setSubmitEt3Respondent(null);
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData, "et3Response");
+        assertThat(errors, hasSize(1));
+        assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
+    }
+   @Test
+    void validateRespondents_DuplicateError() { //change name to match others
+       DynamicValueType respondent = DynamicValueType.create("respondentName", "respondentName");
+       DynamicFixedListType dynamicFixedListType = DynamicFixedListType.from(List.of(respondent));
+       dynamicFixedListType.setValue(respondent);
+       DynamicListType dynamicListType = new DynamicListType();
+       dynamicListType.setDynamicList(dynamicFixedListType);
+       DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
+       dynamicListTypeItem.setValue(dynamicListType);
+       caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem, dynamicListTypeItem));
+
+        String eventId = "et3ResponseDetails";
+
+        List<String> result = Et3ResponseHelper.validateRespondents(caseData, eventId);
+
+        assertThat(result.get(0)).isEqualTo("Please do not choose the same respondent multiple times");
+    }
+
+    @Test
     void validateRespondents_noErrors() {
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
         assertThat(errors.isEmpty()).isTrue();
@@ -260,6 +288,15 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
         assertThat(errors, hasSize(1));
         assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
+    }
+
+    @Test
+    void validateRespondents_checkIllegalArgumentException() {
+        CaseData caseData = new CaseData();
+        String invalidEventId = "INVALID_EVENT_ID";
+
+        assertThrows(IllegalArgumentException.class, () ->
+                Et3ResponseHelper.validateRespondents(caseData, invalidEventId));
     }
 
     @Test

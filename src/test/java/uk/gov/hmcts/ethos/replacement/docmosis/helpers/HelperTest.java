@@ -1,26 +1,33 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HelperTest {
 
@@ -30,7 +37,7 @@ public class HelperTest {
     private CaseDetails caseDetailsScot2;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
         caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
@@ -130,17 +137,60 @@ public class HelperTest {
         CaseData caseData = new CaseData();
         caseData.setEt1OnlineSubmission(null);
         caseData.setHubLinksStatuses(null);
-        boolean actual = Helper.isClaimantNonSystemUser(caseData);
-        assertEquals(true, actual);
+        assertTrue(Helper.isClaimantNonSystemUser(caseData));
 
         caseData.setEt1OnlineSubmission("Yes");
         caseData.setHubLinksStatuses(null);
-        boolean actual2 = Helper.isClaimantNonSystemUser(caseData);
-        assertEquals(false, actual2);
+        assertFalse(Helper.isClaimantNonSystemUser(caseData));
 
         caseData.setEt1OnlineSubmission(null);
         caseData.setHubLinksStatuses(new HubLinksStatuses());
-        boolean actual3 = Helper.isClaimantNonSystemUser(caseData);
-        assertEquals(false, actual3);
+        assertFalse(Helper.isClaimantNonSystemUser(caseData));
     }
+
+    @Test
+    void updatePostponedDate_SetPostponedDate() {
+        CaseData caseData = new CaseData();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        HearingType hearingType = new HearingType();
+        List<DateListedTypeItem> hearingDateCollection = new ArrayList<>();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+
+        dateListedType.setHearingStatus("Postponed");
+        dateListedTypeItem.setValue(dateListedType);
+        hearingDateCollection.add(dateListedTypeItem);
+        hearingType.setHearingDateCollection(hearingDateCollection);
+        hearingTypeItem.setValue(hearingType);
+        caseData.setHearingCollection(Collections.singletonList(hearingTypeItem));
+
+        Helper.updatePostponedDate(caseData);
+
+        LocalDate currentDate = LocalDate.now();
+        String expectedPostponedDate = UtilHelper.formatCurrentDate2(currentDate);
+        assertEquals(expectedPostponedDate, dateListedType.getPostponedDate());
+    }
+
+    @Test
+    void updatePostponedDate_SetPostponedDateToNull() {
+        CaseData caseData = new CaseData();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        HearingType hearingType = new HearingType();
+        List<DateListedTypeItem> hearingDateCollection = new ArrayList<>();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+
+        dateListedType.setPostponedDate("anything");
+        dateListedTypeItem.setValue(dateListedType);
+        hearingDateCollection.add(dateListedTypeItem);
+        hearingType.setHearingDateCollection(hearingDateCollection);
+        hearingTypeItem.setValue(hearingType);
+        caseData.setHearingCollection(Collections.singletonList(hearingTypeItem));
+
+        Helper.updatePostponedDate(caseData);
+
+        Assertions.assertNull(dateListedType.getPostponedDate());
+    }
+
+
 }

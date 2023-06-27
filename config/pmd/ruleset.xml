@@ -60,6 +60,13 @@
         <exclude name="ExcessiveImports"/>
         <exclude name="TooManyMethods"/>
     </rule>
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <property name="classReportLevel" value="100" />
+            <property name="methodReportLevel" value="10" />
+            <property name="cycloOptions" value="" />
+        </properties>
+    </rule>
     <rule ref="category/java/design.xml/LawOfDemeter">
         <properties>
             <property name="violationSuppressRegex" value="(.*method chain calls.*|.*object not created locally.*|.*static property access.*)"/>

@@ -345,8 +345,6 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.92.Final'
 
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'
-    // CVE-2023-35116
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

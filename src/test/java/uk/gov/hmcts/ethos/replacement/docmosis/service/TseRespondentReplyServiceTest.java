@@ -232,6 +232,8 @@ class TseRespondentReplyServiceTest {
         caseData.setTseResponseTable(YES);
         caseData.setTseResponseHasSupportingMaterial(YES);
         caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
+        caseData.setTseRespondingToTribunal(YES);
+        caseData.setTseRespondingToTribunalText(YES);
 
         tseRespondentReplyService.resetReplyToApplicationPage(caseData);
 
@@ -242,6 +244,8 @@ class TseRespondentReplyServiceTest {
         assertNull(caseData.getTseResponseSupportingMaterial());
         assertNull(caseData.getTseResponseCopyToOtherParty());
         assertNull(caseData.getTseResponseCopyNoGiveDetails());
+        assertNull(caseData.getTseRespondingToTribunal());
+        assertNull(caseData.getTseRespondingToTribunalText());
     }
 
     @Test
@@ -252,6 +256,31 @@ class TseRespondentReplyServiceTest {
         tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
         String expectedResponseTables = "applicationDetails" + "\r\n" + "responses";
         assertThat(caseData.getTseResponseTable(), is(expectedResponseTables));
+        assertThat(caseData.getTseRespondingToTribunal(), is(YES));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void validateInput(String responseText, String respondingToTribunalText,
+                       String supportingMaterial, int expectedErrorCount) {
+        caseData.setTseResponseText(responseText);
+        caseData.setTseRespondingToTribunalText(respondingToTribunalText);
+        caseData.setTseResponseHasSupportingMaterial(supportingMaterial);
+
+        List<String> errors = tseRespondentReplyService.validateInput(caseData);
+
+        assertThat(errors.size(), is(expectedErrorCount));
+    }
+
+    private static Stream<Arguments> validateInput() {
+        return Stream.of(
+                Arguments.of(null, null, YES, 0),
+                Arguments.of("testResponseText", null, NO, 0),
+                Arguments.of("testResponseText", null, YES, 0),
+                Arguments.of(null, "respondingToTribunalText", NO, 0),
+                Arguments.of(null, "respondingToTribunalText", YES, 0),
+                Arguments.of(null, null, NO, 1)
+        );
     }
 
     @ParameterizedTest

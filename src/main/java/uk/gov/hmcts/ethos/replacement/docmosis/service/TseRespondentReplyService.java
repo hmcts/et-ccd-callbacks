@@ -161,6 +161,7 @@ public class TseRespondentReplyService {
         caseData.setTseResponseCopyNoGiveDetails(null);
         caseData.setTseRespondSelectApplication(null);
         caseData.setTseRespondingToTribunal(null);
+        caseData.setTseRespondingToTribunalText(null);
     }
 
     /**
@@ -186,6 +187,7 @@ public class TseRespondentReplyService {
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(caseData.getTseResponseText())
+                && StringUtils.isEmpty(caseData.getTseRespondingToTribunalText())
                 && NO.equals(caseData.getTseResponseHasSupportingMaterial())) {
             errors.add(GIVE_MISSING_DETAIL);
         }

@@ -57,7 +57,7 @@ const setupConfig = {
         },
         MyHelper: {
             require: './helpers/saucelabsHelper.js',
-            url: testUrl,
+            url: config.TestUrl,
         },
         Mochawesome: {
             uniqueScreenshotNames: 'true'

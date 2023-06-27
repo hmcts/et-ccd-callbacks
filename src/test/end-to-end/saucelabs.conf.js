@@ -12,7 +12,7 @@ const defaultSauceOptions = {
     tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || 'reformtunnel',
     acceptSslCerts: true,
     windowSize: '1600x900',
-    tags: ['et-e2e'],
+    tags: ['et-ccd'],
     extendedDebugging: true,
     capturePerformance: true
 };
@@ -92,7 +92,7 @@ const setupConfig = {
                 stdout: config.TestOutputDir + '/console.log',
                 options: {
                     reportDir: config.TestOutputDir,
-                    reportName: 'index',
+                    reportName: 'et ccd callback x-browsers test',
                     reportTitle: 'Crossbrowser results for: ' + browser.toUpperCase(),
                     inlineAssets: true
                 }
@@ -110,7 +110,7 @@ const setupConfig = {
             browsers: getBrowserConfig('firefox')
         }
     },
-    name: 'ET Cross Browser Tests'
+    name: 'ET CCD Callbacks Cross Browser Tests'
 };
 
 exports.config = setupConfig;

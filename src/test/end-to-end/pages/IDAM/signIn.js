@@ -8,6 +8,6 @@ module.exports = async function (userName, password) {
     I.fillField('username', userName);
     I.fillField('password', password);
     I.click('[name="save"]');
-    I.waitForText('Case list', 60);
-    I.waitForClickable('.hmcts-button--secondary');
+    I.waitForElement('.hmcts-button--secondary',30);
+    I.see('Case list');
 };

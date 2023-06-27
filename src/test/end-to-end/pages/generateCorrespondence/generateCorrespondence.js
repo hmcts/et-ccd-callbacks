@@ -11,7 +11,7 @@ module.exports = async function () {
     I.see('Case Number:')
     I.see('List of correspondence items');
     I.selectOption('#correspondenceType_topLevel_Documents', commonConfig.lettersCorrespondence);
-    I.waitForClickable('#correspondenceType_part_2_Documents');
+    I.waitForElement('#correspondenceType_part_2_Documents',5);
     I.selectOption('#correspondenceType_part_2_Documents', commonConfig.lettersCorrespondence1);
 
     I.click(commonConfig.submit);

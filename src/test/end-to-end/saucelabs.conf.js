@@ -44,7 +44,7 @@ const setupConfig = {
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url: config.TestUrl,
+            url: process.env.TEST_E2E_URL,
             browser,
             smartWait,
             waitForTimeout,
@@ -56,7 +56,7 @@ const setupConfig = {
         },
         MyHelper: {
             require: './helpers/saucelabsHelper.js',
-            url: config.TestUrl,
+            url: process.env.TEST_E2E_URL,
         },
         Mochawesome: {
             uniqueScreenshotNames: 'true'

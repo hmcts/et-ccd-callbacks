@@ -190,7 +190,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setEt3ResponseDueDate(CaseData caseData) {
-        if (!isNullOrEmpty(caseData.getClaimServedDate())) {
+        if (!isNullOrEmpty(caseData.getClaimServedDate()) && isNullOrEmpty(caseData.getEt3DueDate())) {
             caseData.setEt3DueDate(LocalDate.parse(
                 caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }

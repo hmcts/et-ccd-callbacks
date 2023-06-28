@@ -258,6 +258,7 @@ class Et3ResponseHelperTest {
         assertThat(errors, hasSize(1));
         assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
     }
+
     @Test
     void validateRespondents_DuplicateError() {
         DynamicValueType respondent = DynamicValueType.create("respondentName", "respondentName");

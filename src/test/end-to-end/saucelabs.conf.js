@@ -1,6 +1,5 @@
 const config = require('../config.js');
 const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
-const testUrl = config.TestUrl;
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;
 const smartWait = parseInt(process.env.SMART_WAIT) || 30000;
@@ -45,7 +44,7 @@ const setupConfig = {
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url: testUrl,
+            url: process.env.TEST_E2E_URL || 'https://manage-case.aat.platform.hmcts.net',
             browser,
             smartWait,
             waitForTimeout,
@@ -57,7 +56,7 @@ const setupConfig = {
         },
         MyHelper: {
             require: './helpers/saucelabsHelper.js',
-            url: testUrl,
+            url:'https://manage-case.aat.platform.hmcts.net',
         },
         Mochawesome: {
             uniqueScreenshotNames: 'true'

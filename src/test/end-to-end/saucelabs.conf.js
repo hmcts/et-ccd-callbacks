@@ -1,5 +1,6 @@
 const config = require('../config.js');
 const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
+const testUrl = process.env.TEST_URL || config.TestUrl;
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;
 const smartWait = parseInt(process.env.SMART_WAIT) || 30000;
@@ -11,7 +12,7 @@ const defaultSauceOptions = {
     tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || 'reformtunnel',
     acceptSslCerts: true,
     windowSize: '1600x900',
-    tags: ['et-ccd'],
+    tags: ['et-e2e'],
     extendedDebugging: true,
     capturePerformance: true
 };
@@ -44,7 +45,7 @@ const setupConfig = {
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url:'https://manage-case.aat.platform.hmcts.net',
+            url: testUrl,
             browser,
             smartWait,
             waitForTimeout,
@@ -56,7 +57,7 @@ const setupConfig = {
         },
         MyHelper: {
             require: './helpers/saucelabsHelper.js',
-            url:'https://manage-case.aat.platform.hmcts.net',
+            url: testUrl,
         },
         Mochawesome: {
             uniqueScreenshotNames: 'true'

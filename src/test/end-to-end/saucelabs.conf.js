@@ -1,10 +1,10 @@
 const config = require('../config.js');
 const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
-const testUrl = process.env.TEST_URL || config.TestUrl;
+const testUrl = 'https://manage-case.aat.platform.hmcts.net';
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;
 const smartWait = parseInt(process.env.SMART_WAIT) || 30000;
-const browser = process.env.BROWSER_GROUP || 'chrome';
+const browser = process.env.BROWSER_GROUP || 'chromium';
 
 const defaultSauceOptions = {
     username: process.env.SAUCE_USERNAME || 'username',
@@ -44,7 +44,7 @@ const setupConfig = {
     tests: config.TestPathToRun,
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
-        WebDriver: {
+        Playwright: {
             url: testUrl,
             browser,
             smartWait,
@@ -104,7 +104,7 @@ const setupConfig = {
         //     browsers: getBrowserConfig('microsoft')
         // },
         chrome: {
-            browsers: getBrowserConfig('chrome')
+            browsers: 'chromium'
         },
         firefox: {
             browsers: getBrowserConfig('firefox')

@@ -98,7 +98,7 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    private void respondentDefaults(CaseData caseData) {
+    public void respondentDefaults(CaseData caseData) {
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             caseData.setRespondent(nullCheck(respondentSumType.getRespondentName()));
@@ -424,5 +424,13 @@ public class CaseManagementForCaseWorkerService {
             throw new CaseCreationException(MESSAGE + caseIdToLink + e.getMessage());
         }
     }
-
+    public void setHmctsInternalCaseName (CaseData caseData){
+        if(caseData.getClaimant() == null) {
+            claimantDefaults(caseData);
+        }
+        if (caseData.getRespondent() == null) {
+            respondentDefaults(caseData);
+        }
+        caseData.setHmctsInternalCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
+    }
 }

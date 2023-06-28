@@ -995,4 +995,15 @@ class CaseManagementForCaseWorkerServiceTest {
         return respondentECC;
     }
 
+    @Test
+    public void testHmctsInternalCaseName() {
+        //given
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("respondent");
+        //when
+        caseData.setHmctsInternalCaseName(caseData.getClaimant() + "vs" + caseData.getRespondent());
+        //then
+        assertEquals("claimant vs respondent", caseData.getHmctsInternalCaseName());
+    }
 }

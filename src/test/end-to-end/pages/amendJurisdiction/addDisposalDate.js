@@ -13,7 +13,7 @@ module.exports = async function (hearingDisposalDate) {
             await I.fillField('#disposalDate-day', currentDate.split('-')[2]);
             await I.fillField('#disposalDate-month', currentDate.split('-')[1]);
             await I.fillField('#disposalDate-year', currentDate.split('-')[0]);
-            await I.click(commonConfig.submit);
+            await I.click(commonConfig.continue);
             break;
         //error message displayed if date entered doesn't match hearing date
         case "Date NOT contained in hearing collection":
@@ -28,7 +28,7 @@ module.exports = async function (hearingDisposalDate) {
             await I.fillField('#disposalDate-day', '10');
             await I.fillField('#disposalDate-month', '10');
             await I.fillField('#disposalDate-year', '2025');
-            await I.click(commonConfig.submit);
+            await I.click(commonConfig.continue);
             await I.see("Disposal Date cannot be a date in the future for jurisdiction code ADT.")
             break;
         default:

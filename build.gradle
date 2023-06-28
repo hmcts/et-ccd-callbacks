@@ -157,6 +157,7 @@ task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
 
 task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
     commandLine 'yarn', 'test:fullfunctional'
+}
 
 task integration(type: Test) {
     description = "Runs integration tests"

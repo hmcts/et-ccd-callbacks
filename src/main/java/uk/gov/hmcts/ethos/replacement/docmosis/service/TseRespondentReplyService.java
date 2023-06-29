@@ -49,7 +49,7 @@ public class TseRespondentReplyService {
     private String acknowledgementRule92NoEmailTemplateId;
     @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
     private String acknowledgementRule92YesEmailTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-tribunbal}")
+    @Value("${tse.respondent.reply-to-tribunal.to-tribunal}")
     private String replyToTribunalEmailToTribunalTemplateId;
     @Value("${tse.respondent.reply-to-tribunal.to-claimant}")
     private String replyToTribunalEmailToClaimantTemplateId;

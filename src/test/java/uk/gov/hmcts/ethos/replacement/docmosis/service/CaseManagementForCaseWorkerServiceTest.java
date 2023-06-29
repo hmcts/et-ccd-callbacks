@@ -509,7 +509,9 @@ class CaseManagementForCaseWorkerServiceTest {
                 + "<font size='5'> - </font>"
                 + "<font color='Olive' size='5'> ECC </font>"
                 + "<font size='5'> - </font>"
-                + "<font color='SlateGray' size='5'> DIGITAL FILE </font>";
+                + "<font color='SlateGray' size='5'> DIGITAL FILE </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
         assertEquals(expected, caseDetails.getCaseData().getFlagsImageAltText());
         //assertEquals("EMP-TRIB-01111111110.jpg", caseDetails.getCaseData().getFlagsImageFileName());
     }

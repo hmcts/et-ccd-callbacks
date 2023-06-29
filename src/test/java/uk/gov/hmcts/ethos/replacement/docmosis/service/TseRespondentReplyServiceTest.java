@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -40,9 +41,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -67,6 +69,8 @@ class TseRespondentReplyServiceTest {
     private TseService tseService;
     @MockBean
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
+
+    private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
 
     private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
@@ -194,33 +198,46 @@ class TseRespondentReplyServiceTest {
         }
     }
 
-    @Test
-    void sendAcknowledgementAndClaimantEmail_rule92Yes() {
-        caseData.setTseResponseCopyToOtherParty(YES);
+    @ParameterizedTest
+    @MethodSource("rule92Args")
+    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, "userToken");
+        tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
 
-        verify(emailService, times(2)).sendEmail(any(), any(), any());
-        verify(emailService).sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        verify(emailService, isEmailSentToClaimant)
+                .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+        verify(respondentTellSomethingElseService).sendAdminEmail(any());
     }
 
-    @Test
-    void sendAcknowledgementAndClaimantEmail_rule92No() {
-        caseData.setTseResponseCopyToOtherParty(NO);
+    @ParameterizedTest
+    @MethodSource("rule92Args")
+    void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, "userToken");
+        when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn("link");
+        when(respondentTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
+        tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails);
 
-        verify(emailService, times(1)).sendEmail(any(), any(), any());
-        verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), any());
+        verify(emailService, isEmailSentToClaimant)
+                .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+    }
+
+    private static Stream<Arguments> rule92Args() {
+        return Stream.of(
+                Arguments.of(YES, atLeastOnce()),
+                Arguments.of(NO, never())
+        );
     }
 
     @Test

@@ -20,6 +20,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.SIGN_LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_LITIGANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class CaseFlagsServiceTest {
@@ -57,10 +59,10 @@ class CaseFlagsServiceTest {
     void setDefaultFlags_setsDefaultFlags() {
         caseFlagsService.setDefaultFlags(caseData);
 
-        assertThat(caseData.getCaseRestrictedFlag(), is(false));
-        assertThat(caseData.getAutoListFlag(), is(true));
-        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(false));
-        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(false));
+        assertThat(caseData.getCaseRestrictedFlag(), is(NO));
+        assertThat(caseData.getAutoListFlag(), is(YES));
+        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(NO));
+        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(NO));
     }
 
     @Test
@@ -74,7 +76,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(true));
+        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(YES));
     }
 
     @Test
@@ -88,7 +90,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(true));
+        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(YES));
     }
 
     @Test
@@ -102,7 +104,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(true));
+        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(YES));
     }
 
     @Test
@@ -116,7 +118,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(true));
+        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(YES));
     }
 
     @Test
@@ -134,7 +136,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(false));
+        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(NO));
     }
 
     @Test
@@ -148,7 +150,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(true));
+        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(YES));
     }
 
     @Test
@@ -162,7 +164,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(true));
+        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(YES));
     }
 
     @Test
@@ -176,7 +178,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(true));
+        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(YES));
     }
 
     @Test
@@ -190,7 +192,7 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(true));
+        assertThat(caseData.getCaseAdditionalSecurityFlag(), is(YES));
     }
 
     @Test
@@ -208,6 +210,6 @@ class CaseFlagsServiceTest {
 
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(false));
+        assertThat(caseData.getCaseInterpreterRequiredFlag(), is(NO));
     }
 }

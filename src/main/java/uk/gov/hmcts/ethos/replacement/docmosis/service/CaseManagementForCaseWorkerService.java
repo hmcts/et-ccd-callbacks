@@ -128,7 +128,7 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    public void setHmctsInternalCaseName (CaseData caseData){
+    public void setHmctsInternalCaseName(CaseData caseData) {
         if (caseData.getClaimant() == null) {
             claimantDefaults(caseData);
         }

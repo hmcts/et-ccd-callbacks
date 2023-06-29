@@ -128,6 +128,18 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setHmctsInternalCaseName (CaseData caseData){
+        if (caseData.getClaimant() == null) {
+            claimantDefaults(caseData);
+        }
+
+        if (caseData.getRespondent() == null) {
+            respondentDefaults(caseData);
+        }
+        
+        caseData.setHmctsInternalCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
+    }
+
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
         if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
                 && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {

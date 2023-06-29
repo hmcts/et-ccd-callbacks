@@ -971,6 +971,17 @@ class CaseManagementForCaseWorkerServiceTest {
         assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", e.getMessage());
     }
 
+    @Test
+    public void testHmctsInternalCaseName() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("respondent");
+
+        caseData.setHmctsInternalCaseName(caseData.getClaimant() + "vs" + caseData.getRespondent());
+
+        assertEquals("claimant vs respondent", caseData.getHmctsInternalCaseName());
+    }
+
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {
         RespondentSumTypeItem respondentSumTypeItem1 = createRespondentSumType(
                 "RespondentName1", false);

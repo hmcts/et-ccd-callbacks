@@ -183,14 +183,14 @@ public class RespondentTellSomethingElseController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
-        // send Respondent confirmation Email
         resTseService.sendAcknowledgeEmail(caseDetails, userToken);
         resTseService.sendClaimantEmail(caseDetails);
         resTseService.sendAdminEmail(caseDetails);
 
-        tseService.createApplication(caseDetails.getCaseData(), false);
+        CaseData caseData = caseDetails.getCaseData();
+        tseService.createApplication(caseData, false);
 
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/displayTable", consumes = APPLICATION_JSON_VALUE)

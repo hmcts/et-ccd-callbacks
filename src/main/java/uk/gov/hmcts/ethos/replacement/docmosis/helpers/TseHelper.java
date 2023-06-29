@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -20,16 +21,13 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -57,11 +55,6 @@ public final class TseHelper {
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
     private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
-    private static final String RULE92_YES_OR_NO_MARKUP =
-            "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-                    + "%s";
-    private static final String RULE92_DETAILS_MARKUP =
-            "|Details of why you do not want to inform the other party | %s|\r\n";
 
     private TseHelper() {
         // Access through static methods
@@ -79,8 +72,10 @@ public final class TseHelper {
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
                 .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
-                        && isNoRespondentReply(o.getValue().getRespondCollection())
-                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo()))
+                        && (isNoRespondentReply(o.getValue().getRespondCollection())
+                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo())
+                        || hasTribunalResponse(o.getValue()))
+                )
                 .map(TseHelper::formatDropdownOption)
                 .toList());
     }
@@ -88,6 +83,13 @@ public final class TseHelper {
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
         return CollectionUtils.isEmpty(tseRespondTypeItems)
                 || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
+    }
+
+    /**
+     * Check if there is any request/order from Tribunal that requires Respondent to respond to.
+     */
+    private static boolean hasTribunalResponse(GenericTseApplicationType application) {
+        return YES.equals(application.getRespondentResponseRequired());
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
@@ -105,7 +107,8 @@ public final class TseHelper {
             return;
         }
 
-        GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
+        GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
+        assert genericTseApplicationType != null;
 
         LocalDate date = LocalDate.parse(genericTseApplicationType.getDate(), NEW_DATE_PATTERN);
 
@@ -139,104 +142,42 @@ public final class TseHelper {
     }
 
     /**
-     * Saves the data on the reply page onto the application object.
+     * Gets the admin select application in GenericTseApplicationType.
      *
      * @param caseData contains all the case data
+     * @return the select application in GenericTseApplicationType
      */
-    public static void saveReplyToApplication(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications)) {
-            return;
-        }
-
-        GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
-
-        if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            genericTseApplicationType.setRespondCollection(new ArrayList<>());
-        }
-
-        genericTseApplicationType.getRespondCollection().add(TseRespondTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(
-                        TseRespondType.builder()
-                                .response(caseData.getTseResponseText())
-                                .supportingMaterial(caseData.getTseResponseSupportingMaterial())
-                                .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
-                                .from(RESPONDENT_TITLE)
-                                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                                .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
-                                .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
-                                .build()
-                ).build());
-
-        genericTseApplicationType.setResponsesCount(
-                String.valueOf(genericTseApplicationType.getRespondCollection().size())
-        );
+    public static GenericTseApplicationType getAdminSelectedApplicationType(CaseData caseData) {
+        return getTseApplication(caseData, caseData.getTseAdminSelectApplication().getSelectedCode());
     }
 
     /**
-     * Clears fields that are used when responding to an application.
+     * Gets the view select application in GenericTseApplicationType.
      *
      * @param caseData contains all the case data
+     * @return the select application in GenericTseApplicationType
      */
-    public static void resetReplyToApplicationPage(CaseData caseData) {
-        caseData.setTseResponseText(null);
-        caseData.setTseResponseIntro(null);
-        caseData.setTseResponseTable(null);
-        caseData.setTseResponseHasSupportingMaterial(null);
-        caseData.setTseResponseSupportingMaterial(null);
-        caseData.setTseResponseCopyToOtherParty(null);
-        caseData.setTseResponseCopyNoGiveDetails(null);
-        caseData.setTseRespondSelectApplication(null);
+    public static GenericTseApplicationType getViewSelectedApplicationType(CaseData caseData) {
+        return getTseApplication(caseData, caseData.getTseViewApplicationSelect().getSelectedCode());
     }
 
     /**
-     * Gets the select application.
+     * Gets the respondent select application in GenericTseApplicationType.
      *
      * @param caseData contains all the case data
-     * @return the select application
+     * @return the select application in GenericTseApplicationType
      */
-    public static GenericTseApplicationType getSelectedApplication(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-
-        if (CollectionUtils.isEmpty(applications)) {
-            throw new IllegalStateException("Selected application is null");
-        }
-
-        DynamicFixedListType respondSelectApplication = caseData.getTseRespondSelectApplication();
-
-        if (caseData.getTseRespondSelectApplication() != null) {
-            return applications.get(Integer.parseInt(respondSelectApplication.getValue().getCode()) - 1).getValue();
-        }
-
-        DynamicFixedListType tseAdminSelectApplication = caseData.getTseAdminSelectApplication();
-
-        if (tseAdminSelectApplication != null) {
-            return applications.get(Integer.parseInt(tseAdminSelectApplication.getValue().getCode()) - 1).getValue();
-        }
-
-        DynamicFixedListType tseViewSelectApplication = caseData.getTseViewApplicationSelect();
-
-        if (tseViewSelectApplication != null) {
-            return applications.get(Integer.parseInt(tseViewSelectApplication.getValue().getCode()) - 1).getValue();
-        }
-
-        throw new IllegalStateException("Selected application is null");
+    public static GenericTseApplicationType getRespondentSelectedApplicationType(CaseData caseData) {
+        return getTseApplication(caseData, caseData.getTseRespondSelectApplication().getSelectedCode());
     }
 
-    /**
-     * Gets the select application in GenericTseApplicationTypeItem.
-     *
-     * @param caseData contains all the case data
-     * @return the select application in GenericTseApplicationTypeItem
-     */
-    public static GenericTseApplicationTypeItem getSelectedApplicationTypeItem(CaseData caseData) {
-        String selectedAppId = caseData.getTseAdminSelectApplication().getSelectedCode();
+    @Nullable
+    private static GenericTseApplicationType getTseApplication(CaseData caseData, String selectedAppId) {
         return caseData.getGenericTseApplicationCollection().stream()
-                .filter(genericTseApplicationTypeItem ->
-                        genericTseApplicationTypeItem.getValue().getNumber().equals(selectedAppId))
-                .findFirst()
-                .orElse(null);
+            .filter(item -> item.getValue().getNumber().equals(selectedAppId))
+            .findFirst()
+            .map(GenericTseApplicationTypeItem::getValue)
+            .orElse(null);
     }
 
     /**
@@ -247,7 +188,8 @@ public final class TseHelper {
      * @return a string representing the api request to docmosis
      */
     public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
-        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        assert selectedApplication != null;
 
         TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
@@ -270,7 +212,8 @@ public final class TseHelper {
                                                                     String citizenUrl)
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
-        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        assert selectedApplication != null;
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
@@ -287,7 +230,8 @@ public final class TseHelper {
 
     public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl) {
         CaseData caseData = caseDetails.getCaseData();
-        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        assert selectedApplication != null;
 
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
@@ -310,23 +254,4 @@ public final class TseHelper {
                 .build();
     }
 
-    /**
-     * Format Rule92 No Given details markup.
-     *
-     * @param copyToOtherPartyYesOrNo Rule 92 Yes or No
-     * @param copyToOtherPartyText    Give details
-     * @return Markup String
-     */
-    public static String formatRule92(String copyToOtherPartyYesOrNo, String copyToOtherPartyText) {
-        return String.format(
-                RULE92_YES_OR_NO_MARKUP,
-                copyToOtherPartyYesOrNo,
-                NO.equals(copyToOtherPartyYesOrNo)
-                        ? String.format(
-                        RULE92_DETAILS_MARKUP,
-                        copyToOtherPartyText
-                )
-                        : ""
-        );
-    }
 }

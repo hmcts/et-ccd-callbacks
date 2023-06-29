@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -44,11 +43,14 @@ public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;
     private final TseRespondentReplyService tseRespondentReplyService;
-    private final RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
-        + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
+    private static final String SUBMITTED_BODY = """
+        ### What happens next \r
+        \r
+        You have sent your response to the tribunal%s.\r
+        \r
+        The tribunal will consider all correspondence and let you know what happens next.""";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
 
     /**
@@ -150,8 +152,48 @@ public class TseRespondentReplyController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        TseHelper.setDataForRespondingToApplication(caseData);
+
+        if (tseRespondentReplyService.isRespondingToTribunal(caseData)) {
+            tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, userToken);
+        } else {
+            TseHelper.setDataForRespondingToApplication(caseData);
+        }
+
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Middle Event for validate user input.
+     * @param ccdRequest        CaseData which is a generic data type for most of the
+     *                          methods which holds case data
+     * @param  userToken        Used for authorisation
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
+     *                          includes caseData which contains the upload document names of
+     *                          type "Another type of document" in a html string format.
+     */
+    @PostMapping(value = "/midValidateInput", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Mid Event for initial Application & Response details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midValidateInput(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = tseRespondentReplyService.validateInput(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**
@@ -183,12 +225,8 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        TseHelper.saveReplyToApplication(caseData);
+        tseRespondentReplyService.respondentReplyToTse(userToken, caseDetails, caseData);
 
-        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
-
-        TseHelper.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

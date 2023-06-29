@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -57,9 +56,8 @@ class TseRespondentReplyControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
-    @MockBean
-    private RespondentTellSomethingElseService respondentTellSomethingElseService;
-    private MockedStatic mockHelper;
+
+    private MockedStatic<Helper> mockHelper;
     private CCDRequest ccdRequest;
 
     @BeforeEach
@@ -167,6 +165,22 @@ class TseRespondentReplyControllerTest {
     }
 
     @Test
+    void midPopulateReply_isRespondingToTribunal() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(tseRespondentReplyService.isRespondingToTribunal(any())).thenReturn(true);
+        mockMvc.perform(post(MID_POPULATE_REPLY_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(tseRespondentReplyService, times(1))
+                .initialResReplyToTribunalTableMarkUp(any(), any());
+    }
+
+    @Test
     void midPopulateReply_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_REPLY_URL)
@@ -196,7 +210,7 @@ class TseRespondentReplyControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(respondentTellSomethingElseService, times(1)).sendAdminEmail(any());
+        verify(tseRespondentReplyService, times(1)).respondentReplyToTse(any(), any(), any());
     }
 
     @Test

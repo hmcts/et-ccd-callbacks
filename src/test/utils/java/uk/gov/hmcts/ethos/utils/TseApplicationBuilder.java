@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.List;
 
+// todo remove this in favor of GenericTseApplicationType's superbuilder with lombok
 /**
  * Contains helper methods to build a GenericTseApplicationType object.
  * Each method returns an instance of itself for chaining method calls to build the object.

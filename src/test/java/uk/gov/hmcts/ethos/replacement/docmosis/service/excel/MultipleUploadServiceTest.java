@@ -34,12 +34,12 @@ class MultipleUploadServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
+    @InjectMocks
+    private MultipleUploadService multipleUploadService;
     @Mock
     private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
     @Mock
     private ExcelDocManagementService excelDocManagementService;
-    @InjectMocks
-    private MultipleUploadService multipleUploadService;
 
     private MultipleDetails multipleDetails;
     private String userToken;
@@ -109,23 +109,23 @@ class MultipleUploadServiceTest {
     }
 
     @Test
-    void bulkUploadLogicException() {
-        assertThrows(Exception.class, () -> {
-            when(excelReadingService.checkExcelErrors(
-                    userToken,
-                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                    new ArrayList<>()))
-                    .thenThrow(new IOException());
-            multipleUploadService.bulkUploadLogic(userToken,
-                    multipleDetails,
-                    new ArrayList<>());
-            verify(excelReadingService, times(1)).checkExcelErrors(
-                    userToken,
-                    MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                    new ArrayList<>());
-            verifyNoMoreInteractions(excelReadingService);
+    void bulkUploadLogicException() throws IOException {
+        when(excelReadingService.checkExcelErrors(
+                userToken,
+                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                new ArrayList<>()))
+                .thenThrow(new IOException());
 
-        });
+        assertThrows(Exception.class, () -> multipleUploadService.bulkUploadLogic(
+            userToken,
+            multipleDetails,
+            new ArrayList<>())
+        );
+
+        verify(excelReadingService, times(1)).checkExcelErrors(
+                userToken,
+                MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                new ArrayList<>());
+        verifyNoMoreInteractions(excelReadingService);
     }
-
 }

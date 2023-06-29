@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,7 +15,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
@@ -65,16 +65,14 @@ class TseAdmReplyServiceTest {
     private EmailService emailService;
 
     @MockBean
-    private DocumentManagementService documentManagementService;
-
-    @MockBean
     private TseService tseService;
 
     @SpyBean
     private NotificationProperties notificationProperties;
     private CaseData caseData;
 
-    private static final String AUTH_TOKEN = "Bearer authToken";
+    private static final String FILE_NAME = "document.txt";
+
     private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
 
     private static final String TEMPLATE_ID = "someTemplateId";
@@ -99,23 +97,16 @@ class TseAdmReplyServiceTest {
         caseData = CaseDataBuilder.builder().build();
     }
 
-    private List<GenericTypeItem<DocumentType>> createDocumentList(String fileName) {
-        return List.of(GenericTypeItem.from(DocumentType.from(createUploadedDocumentType(fileName))));
+    private List<GenericTypeItem<DocumentType>> createDocumentList() {
+        return List.of(GenericTypeItem.from(DocumentType.from(createUploadedDocumentType())));
     }
 
-    private UploadedDocumentType createUploadedDocumentType(String fileName) {
+    private UploadedDocumentType createUploadedDocumentType() {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
-        uploadedDocumentType.setDocumentFilename(fileName);
+        uploadedDocumentType.setDocumentFilename(FILE_NAME);
         uploadedDocumentType.setDocumentUrl("http://dm-store:8080/documents/1234");
         return uploadedDocumentType;
-    }
-
-    private DocumentTypeItem createDocumentTypeItem(String fileName) {
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId("1234");
-        documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
-        return documentTypeItem;
     }
 
     @Test
@@ -131,7 +122,7 @@ class TseAdmReplyServiceTest {
     void validateInput_CmoYes_HaveDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoIsResponseRequired(YES);
-        caseData.setTseAdmReplyAddDocument(createDocumentList("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createDocumentList());
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
     }
@@ -140,7 +131,7 @@ class TseAdmReplyServiceTest {
     void validateInput_RequestYes_HaveDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyRequestIsResponseRequired(YES);
-        caseData.setTseAdmReplyAddDocument(createDocumentList("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createDocumentList());
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
     }
@@ -149,7 +140,7 @@ class TseAdmReplyServiceTest {
     void validateInput_No_HaveDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoIsResponseRequired(NO);
-        caseData.setTseAdmReplyAddDocument(createDocumentList("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createDocumentList());
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
     }
@@ -165,7 +156,7 @@ class TseAdmReplyServiceTest {
     @Test
     void validateInput_Neither_HaveDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
-        caseData.setTseAdmReplyAddDocument(createDocumentList("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createDocumentList());
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
     }
@@ -175,6 +166,41 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
+    }
+
+    @Nested
+    class UpdateApplicationStatus {
+        @BeforeEach
+        void setUp() {
+            caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(TseApplicationBuilder.builder().withNumber("1").build())
+                    .build()
+                )
+            );
+            caseData.setTseAdminSelectApplication(DynamicFixedListType.of(DynamicValueType.create("1", "")));
+            caseData.setTseAdmReplyRequestIsResponseRequired("Yes");
+        }
+
+        @ParameterizedTest
+        @MethodSource("partyAndStatusArguments")
+        void requestInformationFromParty(String party, String expectedState) {
+            caseData.setTseAdmReplyRequestSelectPartyRespond(party);
+
+            tseAdmReplyService.updateApplicationStatus(caseData);
+
+            GenericTseApplicationType actual = caseData.getGenericTseApplicationCollection().get(0).getValue();
+            assertThat(actual.getApplicationState()).isEqualTo(expectedState);
+        }
+
+        static Stream<Arguments> partyAndStatusArguments() {
+            return Stream.of(
+                Arguments.of("Claimant", "notStartedYet"),
+                Arguments.of("Respondent", "updated"),
+                Arguments.of("Both parties", "notStartedYet")
+            );
+        }
     }
 
     @Test
@@ -193,7 +219,7 @@ class TseAdmReplyServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
         caseData.setTseAdmReplyEnterResponseTitle("Submit hearing agenda");
         caseData.setTseAdmReplyAdditionalInformation("Additional Information Details");
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        List<GenericTypeItem<DocumentType>> documentList = createDocumentList();
         caseData.setTseAdmReplyAddDocument(documentList);
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
@@ -232,6 +258,46 @@ class TseAdmReplyServiceTest {
             .isEqualTo(CLAIMANT_ONLY);
     }
 
+    @ParameterizedTest
+    @MethodSource
+    void saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields(String requestSelectPartyRespond,
+                                                                  String cmoSelectPartyRespond,
+                                                                  String respondentResponseRequired,
+                                                                  String claimantResponseRequired) {
+        caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(TseApplicationBuilder.builder()
+                                .withNumber("3")
+                                .withType(TSE_APP_CLAIMANT_NOT_COMPLIED)
+                                .build())
+                        .build())
+        );
+        caseData.setTseAdminSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
+
+        caseData.setTseAdmReplyRequestSelectPartyRespond(requestSelectPartyRespond);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(cmoSelectPartyRespond);
+
+        tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
+
+        GenericTseApplicationType application = caseData.getGenericTseApplicationCollection().get(0).getValue();
+        assertThat(application.getRespondentResponseRequired()).isEqualTo(respondentResponseRequired);
+        assertThat(application.getClaimantResponseRequired()).isEqualTo(claimantResponseRequired);
+
+    }
+
+    private static Stream<Arguments> saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields() {
+        return Stream.of(
+                Arguments.of(RESPONDENT_TITLE, null, YES, null),
+                Arguments.of(CLAIMANT_TITLE, null, null, YES),
+                Arguments.of(BOTH_PARTIES, null, YES, YES),
+                Arguments.of(null, RESPONDENT_TITLE, YES, null),
+                Arguments.of(null, CLAIMANT_TITLE, null, YES),
+                Arguments.of(null, BOTH_PARTIES, YES, YES)
+        );
+    }
+
     @Test
     void saveTseAdmReplyDataFromCaseData_RequestNo_SaveString() {
         caseData.setGenericTseApplicationCollection(
@@ -246,7 +312,7 @@ class TseAdmReplyServiceTest {
 
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
-        List<GenericTypeItem<DocumentType>> admReplyDocument = createDocumentList("document.txt");
+        List<GenericTypeItem<DocumentType>> admReplyDocument = createDocumentList();
         caseData.setTseAdmReplyAddDocument(admReplyDocument);
         caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyRequestMadeBy("Judge");
@@ -433,7 +499,7 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyTableMarkUp("| | |\r\n|--|--|\r\n|%s application | %s|\r\n\r\n");
         caseData.setTseAdmReplyEnterResponseTitle("View notice of hearing");
         caseData.setTseAdmReplyAdditionalInformation("Additional information text");
-        caseData.setTseAdmReplyAddDocument(createDocumentList("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createDocumentList());
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyRequestMadeBy("Legal Officer");

@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
@@ -151,7 +152,7 @@ class TseServiceTest {
                                 .build())
                 ).build();
 
-        String actual = tseService.formatApplicationResponses(application, AUTH_TOKEN);
+        String actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, false);
 
         String expected = "|Response 1||\r\n"
                 + "|--|--|\r\n"
@@ -173,7 +174,7 @@ class TseServiceTest {
                 + "\r\n"
                 + "|Response 2||\r\n"
                 + "|--|--|\r\n"
-                + "|Response from|Respondent|\r\n"
+                + "|Response from|Claimant|\r\n"
                 + "|Response date|2000-01-01|\r\n"
                 + "|What's your response to the respondent's application|I disagree|\r\n"
                 + "|Document|Document (txt, 1MB)|\r\n"
@@ -184,6 +185,43 @@ class TseServiceTest {
                 + " Rules of Procedure?|No|\r\n"
                 + "|Details of why you do not want to inform the other party|Details|\r\n\r\n";
 
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void formatApplicationResponses_respondentView() {
+        GenericTseApplicationType application = GenericTseApplicationType.builder()
+                .applicant(RESPONDENT_TITLE)
+                .respondCollection(List.of(
+                        TseRespondTypeItem.builder()
+                                .id(UUID.randomUUID().toString())
+                                .value(setupAdminTseRespondType())
+                                .build(),
+                        TseRespondTypeItem.builder()
+                                .id(UUID.randomUUID().toString())
+                                .value(setupNonAdminTseRespondType())
+                                .build())
+                ).build();
+
+        String actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, true);
+
+        String expected = "|Response 1||\r\n"
+                + "|--|--|\r\n"
+                + "|Response|Title|\r\n"
+                + "|Date|2000-01-01|\r\n"
+                + "|Sent by|Tribunal|\r\n"
+                + "|Case management order or request?|Request|\r\n"
+                + "|Is a response required?|No|\r\n"
+                + "|Party or parties to respond|Both parties|\r\n"
+                + "|Additional information|More data|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description1|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description2|\r\n"
+                + "|Case management order made by|Legal officer|\r\n"
+                + "|Request made by|Caseworker|\r\n"
+                + "|Full name|Mr Lee Gal Officer|\r\n"
+                + "|Sent to|Respondent|\r\n\r\n";
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -242,7 +280,7 @@ class TseServiceTest {
 
         DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
         listType.setValue(listType.getListItems().get(0));
-        caseData.setTseRespondSelectApplication(listType);
+        caseData.setTseViewApplicationSelect(listType);
 
         String expected = "|Application||\r\n"
                 + "|--|--|\r\n"
@@ -322,7 +360,7 @@ class TseServiceTest {
             decisionType2, decisionType3));
         DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
         listType.setValue(listType.getListItems().get(0));
-        caseData.setTseRespondSelectApplication(listType);
+        caseData.setTseViewApplicationSelect(listType);
 
         String expected = "|Application||\r\n"
             + "|--|--|\r\n"
@@ -395,6 +433,7 @@ class TseServiceTest {
         return GenericTseApplicationType.builder()
                 .applicant(RESPONDENT_TITLE)
                 .type(TSE_APP_AMEND_RESPONSE)
+                .number("1")
                 .date("2000-01-01")
                 .details("Details")
                 .copyToOtherPartyYesOrNo(NO)
@@ -441,7 +480,7 @@ class TseServiceTest {
     private TseRespondType setupNonAdminTseRespondType() {
         return TseRespondType.builder()
                 .date("2000-01-01")
-                .from(RESPONDENT_TITLE)
+                .from(CLAIMANT_TITLE)
                 .response("I disagree")
                 .copyToOtherParty(NO)
                 .copyNoGiveDetails("Details")

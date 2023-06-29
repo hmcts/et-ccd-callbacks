@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
@@ -119,6 +120,8 @@ class CaseActionsForCaseWorkerControllerTest {
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
     private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
             "/reinstateClosedCaseMidEventValidation";
+
+    private static final String ADD_SERVICE_ID_URL = "/addServiceId";
     private static final String AUTHORIZATION = "Authorization";
 
     @Autowired
@@ -185,6 +188,9 @@ class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private NocRespondentHelper nocRespondentHelper;
+
+    @MockBean
+    private CaseFlagsService caseFlagsService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -1649,5 +1655,39 @@ class CaseActionsForCaseWorkerControllerTest {
 
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
+    }
+
+    @Test
+    public void addServiceIdUrl_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(ADD_SERVICE_ID_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(caseManagementForCaseWorkerService, times(1))
+                .setHmctsServiceIdSupplementary(any(), any());
+    }
+
+    @Test
+    public void addServiceIdUrl_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(ADD_SERVICE_ID_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void addServiceIdUrl_badRequest() throws Exception {
+        mvc.perform(post(ADD_SERVICE_ID_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
 }

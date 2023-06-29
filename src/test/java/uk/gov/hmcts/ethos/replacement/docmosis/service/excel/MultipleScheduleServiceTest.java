@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -29,8 +29,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleScheduleServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleScheduleServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -47,7 +47,7 @@ public class MultipleScheduleServiceTest {
     private HashSet<SchedulePayloadEvent> schedulePayloadEvents;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleObjectsSubMultiple = MultipleUtil.getMultipleObjectsSubMultiple();
@@ -58,7 +58,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicFlags() {
+    void bulkScheduleLogicFlags() {
         schedulePayloadEvents.iterator().next().getSchedulePayloadES().setClaimantCompany(null);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
@@ -76,7 +76,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicFlagsWithoutCompanyNorClaimant() {
+    void bulkScheduleLogicFlagsWithoutCompanyNorClaimant() {
         schedulePayloadEvents.iterator().next().getSchedulePayloadES().setClaimantCompany(null);
         schedulePayloadEvents.iterator().next().getSchedulePayloadES().setClaimantIndType(null);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
@@ -95,7 +95,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicFlagsMultipleRespondents() {
+    void bulkScheduleLogicFlagsMultipleRespondents() {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(new RespondentSumType());
         schedulePayloadEvents.iterator().next()
@@ -116,7 +116,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicSubMultiple() {
+    void bulkScheduleLogicSubMultiple() {
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsSubMultiple);
@@ -134,7 +134,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicSubMultipleNoCasesFiltered() {
+    void bulkScheduleLogicSubMultipleNoCasesFiltered() {
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());
@@ -149,7 +149,7 @@ public class MultipleScheduleServiceTest {
     }
 
     @Test
-    public void bulkScheduleLogicCasesFilteredExceeded() {
+    void bulkScheduleLogicCasesFilteredExceeded() {
         List<String> errors = new ArrayList<>();
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))

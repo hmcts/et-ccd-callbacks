@@ -133,9 +133,9 @@ class CaseTransferMultiplesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(multipleTransferSameCountryService, times(1)).transferMultiple(multipleRequest.getCaseDetails(),
                 AUTH_TOKEN);
@@ -176,9 +176,9 @@ class CaseTransferMultiplesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(multipleTransferDifferentCountryService, times(1)).transferMultiple(multipleRequest.getCaseDetails(),
                 AUTH_TOKEN);

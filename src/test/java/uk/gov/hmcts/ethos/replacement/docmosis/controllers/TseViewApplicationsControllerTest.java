@@ -87,9 +87,9 @@ class TseViewApplicationsControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -119,9 +119,9 @@ class TseViewApplicationsControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -151,9 +151,9 @@ class TseViewApplicationsControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

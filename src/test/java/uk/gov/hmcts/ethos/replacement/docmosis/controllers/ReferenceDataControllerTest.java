@@ -2,15 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -21,6 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,10 +37,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(ReferenceDataController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-public class ReferenceDataControllerTest {
+class ReferenceDataControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String HEARING_VENUE_REFERENCE_DATA = "/hearingVenueReferenceData";
@@ -64,7 +65,7 @@ public class ReferenceDataControllerTest {
                 .getResource("/exampleV1.json").toURI()));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -73,7 +74,7 @@ public class ReferenceDataControllerTest {
     }
 
     @Test
-    public void hearingVenueReferenceData() throws Exception {
+    void hearingVenueReferenceData() throws Exception {
         when(referenceService.fetchHearingVenueRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
@@ -82,13 +83,13 @@ public class ReferenceDataControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dateListedReferenceData() throws Exception {
+    void dateListedReferenceData() throws Exception {
         when(referenceService.fetchDateListedRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
@@ -97,13 +98,13 @@ public class ReferenceDataControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void hearingVenueReferenceDataError400() throws Exception {
+    void hearingVenueReferenceDataError400() throws Exception {
         mvc.perform(post(HEARING_VENUE_REFERENCE_DATA)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -112,7 +113,7 @@ public class ReferenceDataControllerTest {
     }
 
     @Test
-    public void dateListedReferenceDataError400() throws Exception {
+    void dateListedReferenceDataError400() throws Exception {
         mvc.perform(post(DATE_LISTED_REFERENCE_DATA)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -121,7 +122,7 @@ public class ReferenceDataControllerTest {
     }
 
     @Test
-    public void hearingVenueReferenceDataError500() throws Exception {
+    void hearingVenueReferenceDataError500() throws Exception {
         when(referenceService.fetchHearingVenueRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
@@ -133,7 +134,7 @@ public class ReferenceDataControllerTest {
     }
 
     @Test
-    public void dateListedReferenceDataError500() throws Exception {
+    void dateListedReferenceDataError500() throws Exception {
         when(referenceService.fetchDateListedRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
@@ -145,7 +146,7 @@ public class ReferenceDataControllerTest {
     }
 
     @Test
-    public void hearingVenueReferenceDataForbidden() throws Exception {
+    void hearingVenueReferenceDataForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(HEARING_VENUE_REFERENCE_DATA)
                 .content(requestContent.toString())
@@ -155,7 +156,7 @@ public class ReferenceDataControllerTest {
     }
 
     @Test
-    public void dateListedReferenceDataForbidden() throws Exception {
+    void dateListedReferenceDataForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(DATE_LISTED_REFERENCE_DATA)
                 .content(requestContent.toString())

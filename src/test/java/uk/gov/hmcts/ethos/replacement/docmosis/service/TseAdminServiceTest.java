@@ -42,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -116,7 +117,7 @@ class TseAdminServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
 
         when(tseService.formatApplicationDetails(application, AUTH_TOKEN, false)).thenReturn("Application Details");
-        when(tseService.formatApplicationResponses(any(), any())).thenReturn("Responses");
+        when(tseService.formatApplicationResponses(any(), any(), anyBoolean())).thenReturn("Responses");
 
         String expected = "Application Details\r\nResponses";
 

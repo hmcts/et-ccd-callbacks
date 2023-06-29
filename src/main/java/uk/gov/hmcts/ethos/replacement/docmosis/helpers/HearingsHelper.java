@@ -124,10 +124,12 @@ public final class HearingsHelper {
 
     private static void checkBreakResumeTimes(List<String> errors, HearingDetailType hearingDetailType,
                                               String hearingNumber) {
-        LocalTime breakTime = isNullOrEmpty(hearingDetailType.getHearingDetailsTimingBreak())
-                ? null : LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingBreak()).toLocalTime();
-        LocalTime resumeTime = isNullOrEmpty(hearingDetailType.getHearingDetailsTimingResume())
-                ? null : LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingResume()).toLocalTime();
+        String timingBreak = hearingDetailType.getHearingDetailsTimingBreak();
+        LocalTime breakTime = isNullOrEmpty(timingBreak) ? null : LocalDateTime.parse(timingBreak).toLocalTime();
+
+        String timingResume = hearingDetailType.getHearingDetailsTimingResume();
+        LocalTime resumeTime = isNullOrEmpty(timingResume) ? null : LocalDateTime.parse(timingResume).toLocalTime();
+
         LocalTime invalidTime = LocalTime.of(0, 0, 0, 0);
         if (invalidTime.equals(breakTime) || invalidTime.equals(resumeTime)) {
             errors.add(String.format(HEARING_BREAK_RESUME_INVALID, hearingNumber));

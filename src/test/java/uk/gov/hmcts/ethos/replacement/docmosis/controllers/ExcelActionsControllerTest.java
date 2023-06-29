@@ -2,15 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -39,6 +39,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadServi
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleUpdateService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,10 +64,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(ExcelActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-public class ExcelActionsControllerTest {
+class ExcelActionsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String CREATE_MULTIPLE_URL = "/createMultiple";
@@ -173,7 +174,7 @@ public class ExcelActionsControllerTest {
                 .getResource("/exampleListingV3.json")).toURI()));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -182,230 +183,230 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void createMultiple() throws Exception {
+    void createMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendMultiple() throws Exception {
+    void amendMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void fixMultipleCaseApi() throws Exception {
+    void fixMultipleCaseApi() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void amendMultipleAPI() throws Exception {
+    void amendMultipleAPI() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void uploadBulkExcel() throws Exception {
+    void uploadBulkExcel() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void preAcceptMultiple() throws Exception {
+    void preAcceptMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void initialiseBatchUpdate() throws Exception {
+    void initialiseBatchUpdate() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(MultipleData.class));
     }
 
     @Test
-    public void batchUpdate() throws Exception {
+    void batchUpdate() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void updateSubMultiple() throws Exception {
+    void updateSubMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicListFlags() throws Exception {
+    void dynamicListFlags() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void multipleMidEventValidation() throws Exception {
+    void multipleMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void subMultipleMidEventValidation() throws Exception {
+    void subMultipleMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void multipleCreationMidEventValidation() throws Exception {
+    void multipleCreationMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void multipleAmendCaseIdsMidEventValidation() throws Exception {
+    void multipleAmendCaseIdsMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void multipleSingleMidEventValidation() throws Exception {
+    void multipleSingleMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void multipleMidBatch1Validation() throws Exception {
+    void multipleMidBatch1Validation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void initialiseCloseMultiple() throws Exception {
+    void initialiseCloseMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(MultipleData.class));
     }
 
     @Test
-    public void closeMultiple() throws Exception {
+    void closeMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleCloseEventValidationService.validateCasesBeforeCloseEvent(eq(AUTH_TOKEN),
                 isA(MultipleDetails.class))).thenReturn(new ArrayList<>());
@@ -414,13 +415,13 @@ public class ExcelActionsControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void closeMultipleValidationErrors() throws Exception {
+    void closeMultipleValidationErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleCloseEventValidationService.validateCasesBeforeCloseEvent(eq(AUTH_TOKEN),
                 isA(MultipleDetails.class))).thenReturn(List.of("some error"));
@@ -429,65 +430,65 @@ public class ExcelActionsControllerTest {
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void updatePayloadMultiple() throws Exception {
+    void updatePayloadMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void resetMultipleState() throws Exception {
+    void resetMultipleState() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicListOfficesMultiple() throws Exception {
+    void dynamicListOfficesMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void multipleTransfer() throws Exception {
+    void multipleTransfer() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void createMultipleError400() throws Exception {
+    void createMultipleError400() throws Exception {
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -496,7 +497,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void amendMultipleError400() throws Exception {
+    void amendMultipleError400() throws Exception {
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -505,7 +506,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void fixMultipleCaseApi400() throws Exception {
+    void fixMultipleCaseApi400() throws Exception {
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -514,7 +515,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void amendMultipleAPIError400() throws Exception {
+    void amendMultipleAPIError400() throws Exception {
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -523,7 +524,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void uploadBulkExcelError400() throws Exception {
+    void uploadBulkExcelError400() throws Exception {
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -532,7 +533,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void preAcceptMultipleError400() throws Exception {
+    void preAcceptMultipleError400() throws Exception {
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -541,7 +542,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void batchUpdateError400() throws Exception {
+    void batchUpdateError400() throws Exception {
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -550,7 +551,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void updateSubMultipleError400() throws Exception {
+    void updateSubMultipleError400() throws Exception {
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -559,7 +560,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void dynamicListFlagsError400() throws Exception {
+    void dynamicListFlagsError400() throws Exception {
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -568,7 +569,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleMidEventValidationError400() throws Exception {
+    void multipleMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -577,7 +578,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationError400() throws Exception {
+    void subMultipleMidEventValidationError400() throws Exception {
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -586,7 +587,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleCreationMidEventValidationError400() throws Exception {
+    void multipleCreationMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -595,7 +596,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleAmendCaseIdsMidEventValidationError400() throws Exception {
+    void multipleAmendCaseIdsMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -604,7 +605,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleSingleMidEventValidationError400() throws Exception {
+    void multipleSingleMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -613,7 +614,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleMidBatch1tValidationError400() throws Exception {
+    void multipleMidBatch1tValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -622,7 +623,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void closeMultipleError400() throws Exception {
+    void closeMultipleError400() throws Exception {
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -631,7 +632,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void updatePayloadMultipleError400() throws Exception {
+    void updatePayloadMultipleError400() throws Exception {
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -640,7 +641,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void resetMultipleStateError400() throws Exception {
+    void resetMultipleStateError400() throws Exception {
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -649,7 +650,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void dynamicListOfficesMultipleError400() throws Exception {
+    void dynamicListOfficesMultipleError400() throws Exception {
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -658,7 +659,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleTransferError400() throws Exception {
+    void multipleTransferError400() throws Exception {
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -667,7 +668,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void createMultipleError500() throws Exception {
+    void createMultipleError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleCreationService).bulkCreationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -679,7 +680,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void amendMultipleError500() throws Exception {
+    void amendMultipleError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleAmendService).bulkAmendMultipleLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -691,7 +692,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void uploadBulkExcelError500() throws Exception {
+    void uploadBulkExcelError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleUploadService).bulkUploadLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -703,7 +704,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void preAcceptMultipleError500() throws Exception {
+    void preAcceptMultipleError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multiplePreAcceptService).bulkPreAcceptLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -715,7 +716,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void batchUpdateError500() throws Exception {
+    void batchUpdateError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleUpdateService).bulkUpdateLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -727,7 +728,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void updateSubMultipleError500() throws Exception {
+    void updateSubMultipleError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(subMultipleUpdateService).subMultipleUpdateLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -739,7 +740,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void dynamicListFlagsError500() throws Exception {
+    void dynamicListFlagsError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleDynamicListFlagsService).populateDynamicListFlagsLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
@@ -752,7 +753,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleMidEventValidationError500() throws Exception {
+    void multipleMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleMidEventValidationService).multipleValidationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -764,7 +765,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationError500() throws Exception {
+    void subMultipleMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(subMultipleMidEventValidationService).subMultipleValidationLogic(
                 isA(MultipleDetails.class), anyList());
@@ -777,7 +778,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleCreationMidEventValidationError500() throws Exception {
+    void multipleCreationMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), isA(Boolean.class));
@@ -790,7 +791,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleAmendCaseIdsMidEventValidationError500() throws Exception {
+    void multipleAmendCaseIdsMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), isA(Boolean.class));
@@ -803,7 +804,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleSingleMidEventValidationError500() throws Exception {
+    void multipleSingleMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleSingleMidEventValidationService).multipleSingleValidationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
@@ -816,7 +817,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void createMultipleForbidden() throws Exception {
+    void createMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -826,7 +827,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void amendMultipleForbidden() throws Exception {
+    void amendMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -836,7 +837,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void amendMultipleAPIForbidden() throws Exception {
+    void amendMultipleAPIForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content(requestContent.toString())
@@ -846,7 +847,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void uploadBulkExcelForbidden() throws Exception {
+    void uploadBulkExcelForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -856,7 +857,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void preAcceptMultipleForbidden() throws Exception {
+    void preAcceptMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -866,7 +867,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void batchUpdateForbidden() throws Exception {
+    void batchUpdateForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content(requestContent.toString())
@@ -876,7 +877,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void initialiseBatchUpdateForbidden() throws Exception {
+    void initialiseBatchUpdateForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
                 .content(requestContent.toString())
@@ -887,7 +888,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void updateSubMultipleForbidden() throws Exception {
+    void updateSubMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -897,7 +898,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void dynamicListFlagsForbidden() throws Exception {
+    void dynamicListFlagsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content(requestContent.toString())
@@ -907,7 +908,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleMidEventValidationForbidden() throws Exception {
+    void multipleMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -917,7 +918,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void subMultipleMidEventValidationForbidden() throws Exception {
+    void subMultipleMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -927,7 +928,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleCreationMidEventValidationForbidden() throws Exception {
+    void multipleCreationMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -937,7 +938,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleAmendCaseIdsMidEventValidationForbidden() throws Exception {
+    void multipleAmendCaseIdsMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -947,7 +948,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleSingleMidEventValidationForbidden() throws Exception {
+    void multipleSingleMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -957,7 +958,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleMidBatch1ValidationForbidden() throws Exception {
+    void multipleMidBatch1ValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -967,7 +968,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void initialiseCloseMultipleForbidden() throws Exception {
+    void initialiseCloseMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -978,7 +979,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void closeMultipleForbidden() throws Exception {
+    void closeMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -988,7 +989,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void fixMultipleCaseForbidden() throws Exception {
+    void fixMultipleCaseForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
@@ -998,7 +999,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void updatePayloadMultipleForbidden() throws Exception {
+    void updatePayloadMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1008,7 +1009,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void resetMultipleStateForbidden() throws Exception {
+    void resetMultipleStateForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content(requestContent.toString())
@@ -1018,7 +1019,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void dynamicListOfficesMultipleForbidden() throws Exception {
+    void dynamicListOfficesMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1028,7 +1029,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void multipleTransferForbidden() throws Exception {
+    void multipleTransferForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content(requestContent.toString())
@@ -1038,20 +1039,20 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void listingsDateRangeMidEventValidationOk() throws Exception {
+    void listingsDateRangeMidEventValidationOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void listingsDateRangeMidEventValidationForbidden() throws Exception {
+    void listingsDateRangeMidEventValidationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1061,7 +1062,7 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
-    public void listingsDateRangeMidEventValidationError500() throws Exception {
+    void listingsDateRangeMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(eventValidationService).validateListingDateRange(
                 isA(String.class), isA(String.class));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);

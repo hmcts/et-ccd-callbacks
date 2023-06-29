@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -10,16 +12,18 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-public class FlagsImageHelperTest {
+@ExtendWith(SpringExtension.class)
+class FlagsImageHelperTest {
 
     @Test
-    public void testAddsOutstationForScotlandExcludingGlasgow() {
+    void testAddsOutstationForScotlandExcludingGlasgow() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.SCOTLAND_OFFICES);
         tribunalOffices.remove(TribunalOffice.GLASGOW);
         for (TribunalOffice tribunalOffice : tribunalOffices) {
@@ -36,7 +40,7 @@ public class FlagsImageHelperTest {
     }
 
     @Test
-    public void testAddWelshFlag() {
+    void testAddWelshFlag() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
         for (TribunalOffice tribunalOffice : tribunalOffices) {
             CaseData caseData = new CaseData();
@@ -51,7 +55,7 @@ public class FlagsImageHelperTest {
     }
 
     @Test
-    public void testAddWelshFlagHearingLang() {
+    void testAddWelshFlagHearingLang() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
         for (TribunalOffice tribunalOffice : tribunalOffices) {
             CaseData caseData = new CaseData();
@@ -66,7 +70,7 @@ public class FlagsImageHelperTest {
     }
 
     @Test
-    public void testAddWelshFlagBothOptions() {
+    void testAddWelshFlagBothOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
         for (TribunalOffice tribunalOffice : tribunalOffices) {
             CaseData caseData = new CaseData();
@@ -82,7 +86,7 @@ public class FlagsImageHelperTest {
     }
 
     @Test
-    public void testAddWelshFlagNoOptions() {
+    void testAddWelshFlagNoOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
         for (TribunalOffice tribunalOffice : tribunalOffices) {
             CaseData caseData = new CaseData();
@@ -94,7 +98,7 @@ public class FlagsImageHelperTest {
     }
 
     @Test
-    public void testDoesNotAddOutstationForGlasgow() {
+    void testDoesNotAddOutstationForGlasgow() {
         CaseData caseData = new CaseData();
         caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         CaseDetails caseDetails = createCaseDetails(SCOTLAND_CASE_TYPE_ID, caseData);
@@ -107,7 +111,7 @@ public class FlagsImageHelperTest {
     }
 
     @Test
-    public void testDoesNotAddOutstationForEnglandWales() {
+    void testDoesNotAddOutstationForEnglandWales() {
         for (TribunalOffice tribunalOffice : TribunalOffice.ENGLANDWALES_OFFICES) {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
@@ -123,7 +127,7 @@ public class FlagsImageHelperTest {
     }
 
     @Test
-    public void addReasonableAdjustmentFlagForRespondent() {
+    void addReasonableAdjustmentFlagForRespondent() {
         CaseData caseData = CaseDataBuilder.builder()
                 .withRespondent("Test", NO, null, false)
                 .build();

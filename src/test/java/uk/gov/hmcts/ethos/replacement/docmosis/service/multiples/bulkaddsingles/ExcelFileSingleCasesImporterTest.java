@@ -2,7 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -11,14 +13,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ExcelFileSingleCasesImporterTest {
+@ExtendWith(SpringExtension.class)
+class ExcelFileSingleCasesImporterTest {
 
     @Test
-    public void shouldImportCases() throws ImportException, IOException {
+    void shouldImportCases() throws ImportException, IOException {
         String downloadUrl = "a-test-download-url";
         MultipleData multipleData = createMultipleData(downloadUrl);
         String authToken = "some-token";
@@ -27,7 +31,7 @@ public class ExcelFileSingleCasesImporterTest {
             ExcelReadingService excelReadingService = mock(ExcelReadingService.class);
             when(excelReadingService.readWorkbook(authToken, downloadUrl)).thenReturn(workbook);
             ExcelFileSingleCasesImporter excelFileSingleCasesImporter = new ExcelFileSingleCasesImporter(
-                excelReadingService);
+                    excelReadingService);
             List<String> cases = excelFileSingleCasesImporter.importCases(multipleData, authToken);
             assertEquals(3, cases.size());
             assertEquals("case1", cases.get(0));
@@ -36,8 +40,8 @@ public class ExcelFileSingleCasesImporterTest {
         }
     }
 
-    @Test(expected = ImportException.class)
-    public void shouldThrowImportException() throws ImportException, IOException {
+    @Test
+    void shouldThrowImportException() throws IOException {
         String downloadUrl = "a-test-download-url";
         MultipleData multipleData = createMultipleData(downloadUrl);
         String authToken = "some-token";
@@ -45,8 +49,11 @@ public class ExcelFileSingleCasesImporterTest {
         when(excelReadingService.readWorkbook(authToken, downloadUrl)).thenThrow(IOException.class);
 
         ExcelFileSingleCasesImporter excelFileSingleCasesImporter = new ExcelFileSingleCasesImporter(
-            excelReadingService);
-        excelFileSingleCasesImporter.importCases(multipleData, authToken);
+                excelReadingService);
+
+        assertThrows(ImportException.class, () ->
+                excelFileSingleCasesImporter.importCases(multipleData, authToken)
+        );
     }
 
     private MultipleData createMultipleData(String downloadUrl) {

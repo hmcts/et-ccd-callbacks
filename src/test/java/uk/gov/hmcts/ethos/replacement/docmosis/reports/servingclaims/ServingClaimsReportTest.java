@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims;
 
 import org.assertj.core.util.Strings;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
@@ -27,12 +29,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 
-public class ServingClaimsReportTest {
+@ExtendWith(SpringExtension.class)
+class ServingClaimsReportTest {
 
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         listingDetails = new ListingDetails();
         ListingData listingDataRange = new ListingData();
@@ -163,7 +166,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldIncludeCasesWithClaimsServedDate() {
+    void shouldIncludeCasesWithClaimsServedDate() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         String caseTotalCount =  resultListingData.getLocalReportsDetail().get(0)
@@ -173,7 +176,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldReturnCorrectCasesCountByServingDay() {
+    void shouldReturnCorrectCasesCountByServingDay() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         AdhocReportType adhocReportType =  resultListingData.getLocalReportsDetail().get(0)
@@ -200,7 +203,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetCorrectCountForDay1Serving() {
+    void shouldSetCorrectCountForDay1Serving() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         AdhocReportType adhocReportType =  resultListingData.getLocalReportsDetail().get(0)
@@ -212,7 +215,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetCorrectCountForDay2Serving() {
+    void shouldSetCorrectCountForDay2Serving() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         AdhocReportType adhocReportType =  resultListingData.getLocalReportsDetail().get(0)
@@ -224,7 +227,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetCorrectCountForDay3Serving() {
+    void shouldSetCorrectCountForDay3Serving() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         AdhocReportType adhocReportType =  resultListingData.getLocalReportsDetail().get(0)
@@ -236,7 +239,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetCorrectCountFor6PlusDaysServing() {
+    void shouldSetCorrectCountFor6PlusDaysServing() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         AdhocReportType adhocReportType =  resultListingData.getLocalReportsDetail().get(0)
@@ -248,7 +251,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetCorrectActualAndReportedDayCountFor6PlusDaysServing() {
+    void shouldSetCorrectActualAndReportedDayCountFor6PlusDaysServing() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         List<ClaimServedTypeItem> claimServedItems = resultListingData.getLocalReportsDetail()
@@ -265,7 +268,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetCorrectDayForLessThan6DaysServingClaim() {
+    void shouldSetCorrectDayForLessThan6DaysServingClaim() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         List<ClaimServedTypeItem> claimServedItems = resultListingData.getLocalReportsDetail()
@@ -276,7 +279,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldNotAddServedClaimItemWhenNoClaimsServedFound() {
+    void shouldNotAddServedClaimItemWhenNoClaimsServedFound() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, null);
         int claimServedItemsCount = resultListingData.getLocalReportsDetail().get(0).getValue()
@@ -285,7 +288,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldNotIncludeCasesWithNoReceiptDateAndClaimServedDateProvided() {
+    void shouldNotIncludeCasesWithNoReceiptDateAndClaimServedDateProvided() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         SubmitEvent caseOne = submitEvents.get(0);
         caseOne.getCaseData().setReceiptDate(null);
@@ -301,7 +304,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetCorrectReportedNumberOfDays() {
+    void shouldSetCorrectReportedNumberOfDays() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         ClaimServedTypeItem fourthClaimServedItem = resultListingData.getLocalReportsDetail().get(0).getValue()
@@ -310,7 +313,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldSetReportSummaryFromReportDetailsWhenReportDetailsIsNotEmpty() {
+    void shouldSetReportSummaryFromReportDetailsWhenReportDetailsIsNotEmpty() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         ListingData resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
         int localReportsDetailSize = resultListingData.getLocalReportsDetail().size();
@@ -322,7 +325,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldNotSetReportSummaryFromReportDetailsWhenReportDetailsIsEmpty() {
+    void shouldNotSetReportSummaryFromReportDetailsWhenReportDetailsIsEmpty() {
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
         //Set ReceiptDate for each case to null to make LocalReportsDetail empty
         submitEvents.forEach(s -> s.getCaseData().setReceiptDate(null));
@@ -335,7 +338,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldShowReportOfficeName_EngWales() {
+    void shouldShowReportOfficeName_EngWales() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();
@@ -345,7 +348,7 @@ public class ServingClaimsReportTest {
     }
 
     @Test
-    public void shouldShowReportOfficeName_Scotland() {
+    void shouldShowReportOfficeName_Scotland() {
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(null);
         ServingClaimsReport servingClaimsReport = new ServingClaimsReport();

@@ -91,8 +91,8 @@ class Et3NotificationControllerTest {
             .andExpect(jsonPath("$.data.et3OtherTypeDocumentName", notNullValue()))
             .andExpect(jsonPath("$.data.et3ClaimantAndRespondentAddresses", notNullValue()))
             .andExpect(jsonPath("$.data.et3EmailLinkToAcas", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
         verify(servingService, times(1)).generateClaimantAndRespondentAddress(any());
@@ -127,9 +127,9 @@ class Et3NotificationControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.confirmation_header", notNullValue()))
             .andExpect(jsonPath("$.confirmation_body", notNullValue()))
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

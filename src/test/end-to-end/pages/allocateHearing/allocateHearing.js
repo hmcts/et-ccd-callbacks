@@ -16,9 +16,6 @@ module.exports = async function (jurisdiction) {
         selectAllocateHearingRoom.selectAllocateHearingRoom();
     }
     I.click(commonConfig.continue);
-    I.see('Allocate Hearing');
-    I.see('Case Number:');
-    I.click(commonConfig.submit);
     I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
     I.see('has been updated with event: Allocate Hearing\n');
     verifyHearingsAllocated.verifyHearingsAllocated();

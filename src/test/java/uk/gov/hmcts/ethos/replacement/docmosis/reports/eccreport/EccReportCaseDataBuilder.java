@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
@@ -10,7 +12,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class EccReportCaseDataBuilder {
+@ExtendWith(SpringExtension.class)
+class EccReportCaseDataBuilder {
     private final EccReportCaseData caseData = new EccReportCaseData();
 
     public static EccReportCaseDataBuilder builder() {

@@ -123,6 +123,7 @@ public class TseAdmReplyController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        tseAdmReplyService.updateApplicationStatus(caseData);
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
         tseAdmReplyService.sendAdmReplyEmails(ccdRequest.getCaseDetails().getCaseId(), caseData);
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);

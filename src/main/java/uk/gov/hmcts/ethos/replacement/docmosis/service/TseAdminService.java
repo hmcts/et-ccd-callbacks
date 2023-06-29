@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
@@ -31,7 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
 
 @Slf4j
 @Service
@@ -52,14 +51,14 @@ public class TseAdminService {
      * @param caseData contains all the case data
      */
     public void initialTseAdminTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem == null) {
+        GenericTseApplicationType applicationType = getAdminSelectedApplicationType(caseData);
+        if (applicationType == null) {
             return;
         }
 
         caseData.setTseAdminTableMarkUp(String.format("%s\r%n%s",
-                tseService.formatApplicationDetails(applicationTypeItem.getValue(), authToken, false),
-                tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken, false)
+                tseService.formatApplicationDetails(applicationType, authToken, false),
+                tseService.formatApplicationResponses(applicationType, authToken, false)
         ));
     }
 
@@ -73,16 +72,15 @@ public class TseAdminService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem == null) {
+        GenericTseApplicationType applicationType = getAdminSelectedApplicationType(caseData);
+        if (applicationType == null) {
             return;
         }
 
-        applicationTypeItem.getValue().setApplicationState(NOT_VIEWED_YET);
+        applicationType.setApplicationState(NOT_VIEWED_YET);
 
-        GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
-        if (CollectionUtils.isEmpty(genericTseApplicationType.getAdminDecision())) {
-            genericTseApplicationType.setAdminDecision(new ArrayList<>());
+        if (CollectionUtils.isEmpty(applicationType.getAdminDecision())) {
+            applicationType.setAdminDecision(new ArrayList<>());
         }
 
         TseAdminRecordDecisionType decision = TseAdminRecordDecisionType.builder()
@@ -100,7 +98,7 @@ public class TseAdminService {
             .selectPartyNotify(caseData.getTseAdminSelectPartyNotify())
             .build();
 
-        genericTseApplicationType.getAdminDecision().add(
+        applicationType.getAdminDecision().add(
             TseAdminRecordDecisionTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(decision)

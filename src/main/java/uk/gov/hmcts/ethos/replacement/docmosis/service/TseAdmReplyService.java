@@ -9,7 +9,6 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
@@ -33,13 +32,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORD
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
 
 @Slf4j
 @Service
@@ -67,8 +68,7 @@ public class TseAdmReplyService {
      * @param authToken the caller's bearer token used to verify the caller
      */
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem != null) {
+        if (getAdminSelectedApplicationType(caseData) != null) {
             return tseService.formatViewApplication(caseData, authToken);
         }
         throw new NotFoundException("No selected application type item found.");
@@ -98,6 +98,27 @@ public class TseAdmReplyService {
     }
 
     /**
+     * Update status of application based on admin reply.
+     * @param caseData in which the case details are extracted from
+     */
+    public void updateApplicationStatus(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return;
+        }
+
+        GenericTseApplicationType applicationType = getAdminSelectedApplicationType(caseData);
+        if (applicationType == null) {
+            return;
+        }
+
+        if (isRequestAndResponseRequiredFromParty(caseData, CLAIMANT_TITLE)) {
+            applicationType.setApplicationState(NOT_STARTED_YET);
+        } else if (isRequestAndResponseRequiredFromParty(caseData, RESPONDENT_TITLE)) {
+            applicationType.setApplicationState(UPDATED);
+        }
+    }
+
+    /**
      * Save Tse Admin Record a Decision data to the application object.
      * @param caseData in which the case details are extracted from
      */
@@ -106,56 +127,53 @@ public class TseAdmReplyService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem != null) {
+        GenericTseApplicationType applicationType = getAdminSelectedApplicationType(caseData);
+        if (applicationType == null) {
+            return;
+        }
 
-            GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
-            if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-                genericTseApplicationType.setRespondCollection(new ArrayList<>());
-            }
+        if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
+            applicationType.setRespondCollection(new ArrayList<>());
+        }
 
-            String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
-            String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
+        String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
+        String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
 
-            genericTseApplicationType.getRespondCollection().add(
-                TseRespondTypeItem.builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(
-                        TseRespondType.builder()
-                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                            .from(ADMIN)
-                            .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
-                            .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
-                            .addDocument(caseData.getTseAdmReplyAddDocument())
-                            .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
-                            .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
-                            .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
-                            .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
-                                    caseData.getTseAdmReplyRequestEnterFullName()))
-                            .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
-                                    caseData.getTseAdmReplyRequestIsResponseRequired()))
-                            .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
-                                tseAdmReplyRequestSelectPartyRespond))
-                            .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                            .build()
-                    ).build());
+        applicationType.getRespondCollection().add(
+            TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseRespondType.builder()
+                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                    .from(ADMIN)
+                    .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
+                    .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
+                    .addDocument(caseData.getTseAdmReplyAddDocument())
+                    .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
+                    .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
+                    .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
+                    .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
+                        caseData.getTseAdmReplyRequestEnterFullName()))
+                    .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
+                        caseData.getTseAdmReplyRequestIsResponseRequired()))
+                    .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
+                        tseAdmReplyRequestSelectPartyRespond))
+                    .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                    .build()
+            ).build());
 
-            genericTseApplicationType.setResponsesCount(
-                    String.valueOf(genericTseApplicationType.getRespondCollection().size())
-            );
+        applicationType.setResponsesCount(String.valueOf(applicationType.getRespondCollection().size()));
 
-            if (tseAdmReplyRequestSelectPartyRespond != null || tseAdmReplyCmoSelectPartyRespond != null) {
-                switch (defaultIfEmpty(tseAdmReplyRequestSelectPartyRespond, tseAdmReplyCmoSelectPartyRespond)) {
-                    case RESPONDENT_TITLE -> genericTseApplicationType.setRespondentResponseRequired(YES);
-                    case CLAIMANT_TITLE -> genericTseApplicationType.setClaimantResponseRequired(YES);
-                    case BOTH_PARTIES -> {
-                        genericTseApplicationType.setRespondentResponseRequired(YES);
-                        genericTseApplicationType.setClaimantResponseRequired(YES);
-                    }
-                    default ->
-                        throw new IllegalStateException("Illegal SelectPartyRespond values: "
-                            + tseAdmReplyRequestSelectPartyRespond + " " + tseAdmReplyCmoSelectPartyRespond);
+        if (tseAdmReplyRequestSelectPartyRespond != null || tseAdmReplyCmoSelectPartyRespond != null) {
+            switch (defaultIfEmpty(tseAdmReplyRequestSelectPartyRespond, tseAdmReplyCmoSelectPartyRespond)) {
+                case RESPONDENT_TITLE -> applicationType.setRespondentResponseRequired(YES);
+                case CLAIMANT_TITLE -> applicationType.setClaimantResponseRequired(YES);
+                case BOTH_PARTIES -> {
+                    applicationType.setRespondentResponseRequired(YES);
+                    applicationType.setClaimantResponseRequired(YES);
                 }
+                default ->
+                    throw new IllegalStateException("Illegal SelectPartyRespond values: "
+                        + tseAdmReplyRequestSelectPartyRespond + " " + tseAdmReplyCmoSelectPartyRespond);
             }
         }
     }
@@ -226,14 +244,22 @@ public class TseAdmReplyService {
         }
     }
 
-    private boolean isResponseRequired(CaseData caseData, String title) {
+    private boolean isResponseRequired(CaseData caseData, String party) {
         return CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
-                ? YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
-                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplyCmoSelectPartyRespond())
-                        || title.equals(caseData.getTseAdmReplyCmoSelectPartyRespond()))
-                : YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired())
-                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplyRequestSelectPartyRespond())
-                        || title.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
+            ? isCmoAndResponseRequiredFromParty(caseData, party)
+            : isRequestAndResponseRequiredFromParty(caseData, party);
+    }
+
+    private static boolean isCmoAndResponseRequiredFromParty(CaseData caseData, String party) {
+        return YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
+            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyCmoSelectPartyRespond())
+            || party.equals(caseData.getTseAdmReplyCmoSelectPartyRespond()));
+    }
+
+    private static boolean isRequestAndResponseRequiredFromParty(CaseData caseData, String party) {
+        return YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired())
+            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyRequestSelectPartyRespond())
+            || party.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
     }
 
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
@@ -266,5 +292,4 @@ public class TseAdmReplyService {
         caseData.setTseAdmReplyRequestSelectPartyRespond(null);
         caseData.setTseAdmReplySelectPartyNotify(null);
     }
-
 }

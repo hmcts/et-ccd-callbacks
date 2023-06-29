@@ -35,9 +35,16 @@
         <packageUrl regex="true">^pkg:maven/net.minidev/accessors-smart@.*$</packageUrl>
         <cve>CVE-2022-45688</cve>
     </suppress>
-    <suppress>
+   <suppress>
         <notes>No later version of woodstox (6.5.1) or xml-rs (0.8.14) exist as of 13-06-2023</notes>
         <packageUrl regex="true">^pkg:maven/com\.sun\.xml\.bind\.jaxb/isorelax@.*$</packageUrl>
         <cve>CVE-2023-34411</cve>
+  </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jackson-databind-2.13.5.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+        <cve>CVE-2023-35116</cve>
     </suppress>
 </suppressions>

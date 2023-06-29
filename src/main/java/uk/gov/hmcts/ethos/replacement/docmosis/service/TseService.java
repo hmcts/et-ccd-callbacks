@@ -190,7 +190,14 @@ public class TseService {
      * @return two column Markdown table string
      */
     public String formatViewApplication(CaseData caseData, String authToken) {
-        GenericTseApplicationType application = TseHelper.getSelectedApplication(caseData);
+        GenericTseApplicationType application;
+        if (caseData.getTseAdminSelectApplication() != null) {
+            application = TseHelper.getAdminSelectedApplicationType(caseData);
+        } else if (caseData.getTseViewApplicationSelect() != null) {
+            application = TseHelper.getViewSelectedApplicationType(caseData);
+        } else {
+            throw new IllegalStateException("Selected application is null");
+        }
 
         String applicationTable = formatApplicationDetails(application, authToken, true);
         String responses = formatApplicationResponses(application, authToken, false);

@@ -37,7 +37,7 @@ public class CaseFlagsController {
     private final VerifyTokenService verifyTokenService;
 
     /**
-     * AboutToSubmit callback.
+     * AboutToSubmit for creating/managing case flags. Validates flags and sets other flags as needed.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -66,7 +66,6 @@ public class CaseFlagsController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
-        // Code here
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

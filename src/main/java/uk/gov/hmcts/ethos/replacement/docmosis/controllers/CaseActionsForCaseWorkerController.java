@@ -278,6 +278,7 @@ public class CaseActionsForCaseWorkerController {
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseFlagsService.setupCaseFlags(caseData);
+            caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
             if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
                 caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
@@ -419,6 +420,7 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
+        caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -464,6 +466,7 @@ public class CaseActionsForCaseWorkerController {
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         }
 
+        caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);

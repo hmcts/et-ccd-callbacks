@@ -225,13 +225,15 @@ public class TseRespondentReplyService {
     }
 
     private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {
+        boolean copyToOtherParty = YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty());
+
         if (isRespondingToTribunal) {
-            return YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty())
+            return copyToOtherParty
                     ? replyToTribunalAckEmailToLRRule92YesTemplateId
                     : replyToTribunalAckEmailToLRRule92NoTemplateId;
         }
 
-        return YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty())
+        return copyToOtherParty
                 ? acknowledgementRule92YesEmailTemplateId
                 : acknowledgementRule92NoEmailTemplateId;
     }

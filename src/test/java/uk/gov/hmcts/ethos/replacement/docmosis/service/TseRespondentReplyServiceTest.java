@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -71,6 +72,10 @@ class TseRespondentReplyServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
+    private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
+    private static final String REPLY_TO_TRIB_ACK_TEMPLATE_NO = "replyToTribAckTemplateNo";
+    private static final String REPLY_TO_APP_ACK_TEMPLATE_YES = "replyToAppAckTemplateYes";
+    private static final String REPLY_TO_APP_ACK_TEMPLATE_NO = "replyToAppAckTemplateNo";
 
     private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
@@ -199,13 +204,19 @@ class TseRespondentReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("rule92Args")
-    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant) {
+    @MethodSource
+    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant,
+                                           String ackEmailTemplate) {
         caseData.setTseResponseCopyToOtherParty(rule92);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
+
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92YesEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
 
         tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
 
@@ -213,11 +224,22 @@ class TseRespondentReplyServiceTest {
         verify(emailService, isEmailSentToClaimant)
                 .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
         verify(respondentTellSomethingElseService).sendAdminEmail(any());
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
+    }
+
+    private static Stream<Arguments> sendRespondingToApplicationEmails() {
+        return Stream.of(
+                Arguments.of(YES, atLeastOnce(), REPLY_TO_APP_ACK_TEMPLATE_YES),
+                Arguments.of(NO, never(), REPLY_TO_APP_ACK_TEMPLATE_NO)
+        );
     }
 
     @ParameterizedTest
-    @MethodSource("rule92Args")
-    void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant) {
+    @MethodSource
+    void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant,
+                                        String ackEmailTemplate) {
         caseData.setTseResponseCopyToOtherParty(rule92);
 
         CaseDetails caseDetails = new CaseDetails();
@@ -226,17 +248,26 @@ class TseRespondentReplyServiceTest {
 
         when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn("link");
         when(respondentTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
-        tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails);
+
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
+
+        tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
 
         verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), any());
         verify(emailService, isEmailSentToClaimant)
                 .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }
 
-    private static Stream<Arguments> rule92Args() {
+    private static Stream<Arguments> sendRespondingToTribunalEmails() {
         return Stream.of(
-                Arguments.of(YES, atLeastOnce()),
-                Arguments.of(NO, never())
+                Arguments.of(YES, atLeastOnce(), REPLY_TO_TRIB_ACK_TEMPLATE_YES),
+                Arguments.of(NO, never(), REPLY_TO_TRIB_ACK_TEMPLATE_NO)
         );
     }
 

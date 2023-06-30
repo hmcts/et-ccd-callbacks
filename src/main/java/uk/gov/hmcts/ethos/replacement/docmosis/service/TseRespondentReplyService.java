@@ -53,6 +53,10 @@ public class TseRespondentReplyService {
     private String replyToTribunalEmailToTribunalTemplateId;
     @Value("${tse.respondent.reply-to-tribunal.to-claimant}")
     private String replyToTribunalEmailToClaimantTemplateId;
+    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-yes}")
+    private String replyToTribunalAckEmailToLRRule92YesTemplateId;
+    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-no}")
+    private String replyToTribunalAckEmailToLRRule92NoTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String GIVE_MISSING_DETAIL = "Use the text box or supporting materials to give details.";
@@ -71,7 +75,7 @@ public class TseRespondentReplyService {
         saveReplyToApplication(caseData, isRespondingToTribunal);
 
         if (isRespondingToTribunal) {
-            sendRespondingToTribunalEmails(caseDetails);
+            sendRespondingToTribunalEmails(caseDetails, userToken);
         } else {
             sendRespondingToApplicationEmails(caseDetails, userToken);
         }
@@ -188,7 +192,7 @@ public class TseRespondentReplyService {
      */
     public void sendRespondingToApplicationEmails(CaseDetails caseDetails, String userToken) {
         sendEmailToClaimantForRespondingToApp(caseDetails);
-        sendAcknowledgementEmailToLR(caseDetails, userToken);
+        sendAcknowledgementEmailToLR(caseDetails, userToken, false);
         respondentTseService.sendAdminEmail(caseDetails);
     }
 
@@ -211,22 +215,34 @@ public class TseRespondentReplyService {
 
     }
 
-    private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken) {
+    private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken,
+                                              boolean isRespondingToTribunal) {
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-                YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty())
-                        ? acknowledgementRule92YesEmailTemplateId
-                        : acknowledgementRule92NoEmailTemplateId,
+                getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
                 legalRepEmail,
                 TseHelper.getPersonalisationForAcknowledgement(caseDetails, notificationProperties.getExuiUrl()));
+    }
+
+    private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {
+        if (isRespondingToTribunal) {
+            return YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty())
+                    ? replyToTribunalAckEmailToLRRule92YesTemplateId
+                    : replyToTribunalAckEmailToLRRule92NoTemplateId;
+        }
+
+        return YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty())
+                ? acknowledgementRule92YesEmailTemplateId
+                : acknowledgementRule92NoEmailTemplateId;
     }
 
     /**
      * Send emails when LR submits response to Tribunal request/order.
      */
-    public void sendRespondingToTribunalEmails(CaseDetails caseDetails) {
+    public void sendRespondingToTribunalEmails(CaseDetails caseDetails, String userToken) {
         sendEmailToTribunal(caseDetails.getCaseData());
         sendEmailToClaimantForRespondingToTrib(caseDetails);
+        sendAcknowledgementEmailToLR(caseDetails, userToken, true);
     }
 
     private void sendEmailToTribunal(CaseData caseData) {

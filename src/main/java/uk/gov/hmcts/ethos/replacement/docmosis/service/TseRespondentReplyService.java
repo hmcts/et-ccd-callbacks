@@ -23,9 +23,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -90,7 +92,14 @@ public class TseRespondentReplyService {
      * @param caseData in which the case details are extracted from
      */
     void updateApplicationState(CaseData caseData) {
-        if (isRespondingToTribunal(caseData)) {
+        GenericTseApplicationType selectedApplicationType = getRespondentSelectedApplicationType(caseData);
+        if (selectedApplicationType.getApplicant().equals(CLAIMANT_TITLE)) {
+            if (isRespondingToTribunal(caseData)) {
+                getRespondentSelectedApplicationType(caseData).setApplicationState(WAITING_FOR_THE_TRIBUNAL);
+            } else {
+                selectedApplicationType.setApplicationState(UPDATED);
+            }
+        } else if (isRespondingToTribunal(caseData)) {
             getRespondentSelectedApplicationType(caseData).setApplicationState(UPDATED);
         }
     }

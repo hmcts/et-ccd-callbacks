@@ -136,9 +136,29 @@ class TseRespondentReplyServiceTest {
     }
 
     @Nested
-    class UpdateApplicationStatus {
+    class UpdateApplicationState {
         @Test
-        void noStatusChangeWhenAllAdminRequestsForInfoAreAnswered() {
+        void changeStatusToUpdatedWhenReplyingToClaimantApplication() {
+            genericTseApplicationType.setRespondentResponseRequired(NO);
+
+            tseRespondentReplyService.updateApplicationState(caseData);
+
+            assertThat(genericTseApplicationType.getApplicationState()).isEqualTo("updated");
+
+        }
+
+        @Test
+        void changeStatusToWaitingForTheTribunalWhenHasDueRequestForInfo() {
+            genericTseApplicationType.setRespondentResponseRequired(YES);
+
+            tseRespondentReplyService.updateApplicationState(caseData);
+
+            assertThat(genericTseApplicationType.getApplicationState()).isEqualTo("waitingForTheTribunal");
+        }
+
+        @Test
+        void noStatusChangeWhenAllAdminRequestsForInfoAreAnsweredRespondentApp() {
+            genericTseApplicationType.setApplicant("Respondent");
             genericTseApplicationType.setRespondentResponseRequired(NO);
 
             tseRespondentReplyService.updateApplicationState(caseData);
@@ -148,7 +168,8 @@ class TseRespondentReplyServiceTest {
         }
 
         @Test
-        void changeStatusToUpdatedWhenHasDueRequestForInfo() {
+        void changeStatusToUpdatedWhenHasDueRequestForInfoRespondentApp() {
+            genericTseApplicationType.setApplicant("Respondent");
             genericTseApplicationType.setRespondentResponseRequired(YES);
 
             tseRespondentReplyService.updateApplicationState(caseData);

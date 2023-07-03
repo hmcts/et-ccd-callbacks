@@ -1,6 +1,6 @@
 const config = require('../config.js');
 const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
-const testUrl = 'https://manage-case.aat.platform.hmcts.net';
+const testUrl = process.env.TEST_URL || config.TestUrl;
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;
 const smartWait = parseInt(process.env.SMART_WAIT) || 30000;

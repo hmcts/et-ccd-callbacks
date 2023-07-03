@@ -195,6 +195,14 @@ class TseAdmReplyServiceTest {
             assertThat(actual.getApplicationState()).isEqualTo(expectedState);
         }
 
+        static Stream<Arguments> partyAndStatusArguments() {
+            return Stream.of(
+                    Arguments.of("Claimant", "notStartedYet"),
+                    Arguments.of("Respondent", "updated"),
+                    Arguments.of("Both parties", "notStartedYet")
+            );
+        }
+
         @Nested
         class UpdateApplicationStatusCMO {
             @BeforeEach

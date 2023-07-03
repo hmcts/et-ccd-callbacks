@@ -821,7 +821,9 @@ class CaseManagementForCaseWorkerServiceTest {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
-      
+        when(ccdClient.submitEventForCase(
+                anyString(), any(), anyString(), anyString(), any(), anyString()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () ->
                 caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                         new ArrayList<>(), SUBMITTED_CALLBACK)

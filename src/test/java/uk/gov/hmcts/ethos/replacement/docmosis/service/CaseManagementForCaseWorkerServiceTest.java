@@ -51,6 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
@@ -66,6 +68,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 class CaseManagementForCaseWorkerServiceTest {
@@ -638,7 +641,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "Listed, Yes", " , Yes" })
+    @CsvSource({"Listed, Yes", " , Yes"})
     void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
@@ -821,7 +824,6 @@ class CaseManagementForCaseWorkerServiceTest {
         when(ccdClient.submitEventForCase(
                 anyString(), any(), anyString(), anyString(), any(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-
         assertThrows(Exception.class, () ->
                 caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                         new ArrayList<>(), SUBMITTED_CALLBACK)
@@ -1002,5 +1004,4 @@ class CaseManagementForCaseWorkerServiceTest {
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
     }
-
 }

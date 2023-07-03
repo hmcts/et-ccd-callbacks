@@ -95,12 +95,12 @@ public class TseRespondentReplyService {
         GenericTseApplicationType selectedApplicationType = getRespondentSelectedApplicationType(caseData);
         if (selectedApplicationType.getApplicant().equals(CLAIMANT_TITLE)) {
             if (isRespondingToTribunal(caseData)) {
-                getRespondentSelectedApplicationType(caseData).setApplicationState(WAITING_FOR_THE_TRIBUNAL);
+                selectedApplicationType.setApplicationState(WAITING_FOR_THE_TRIBUNAL);
             } else {
                 selectedApplicationType.setApplicationState(UPDATED);
             }
         } else if (isRespondingToTribunal(caseData)) {
-            getRespondentSelectedApplicationType(caseData).setApplicationState(UPDATED);
+            selectedApplicationType.setApplicationState(UPDATED);
         }
     }
 

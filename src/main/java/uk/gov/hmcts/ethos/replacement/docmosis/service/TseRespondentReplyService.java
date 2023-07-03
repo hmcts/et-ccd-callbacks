@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 
 @Service
@@ -242,12 +243,13 @@ public class TseRespondentReplyService {
      * Send emails when LR submits response to Tribunal request/order.
      */
     public void sendRespondingToTribunalEmails(CaseDetails caseDetails, String userToken) {
-        sendEmailToTribunal(caseDetails.getCaseData());
+        sendEmailToTribunal(caseDetails);
         sendEmailToClaimantForRespondingToTrib(caseDetails);
         sendAcknowledgementEmailToLR(caseDetails, userToken, true);
     }
 
-    private void sendEmailToTribunal(CaseData caseData) {
+    private void sendEmailToTribunal(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
         String email = respondentTseService.getTribunalEmail(caseData);
 
         if (isNullOrEmpty(email)) {
@@ -257,7 +259,8 @@ public class TseRespondentReplyService {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, selectedApplication.getType());
+                APPLICATION_TYPE, selectedApplication.getType(),
+                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId()));
         emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 

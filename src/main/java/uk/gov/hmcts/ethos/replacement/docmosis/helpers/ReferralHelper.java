@@ -275,6 +275,12 @@ public final class ReferralHelper {
         return caseData.getReferralCollection().size() + 1;
     }
 
+    public static int getCurrentReferralNumber(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
+            return 0;
+        }
+        return caseData.getReferralCollection().size();
+    }
     /**
      * Creates a referral and adds it to the referral collection.
      * @param caseData contains all the case data

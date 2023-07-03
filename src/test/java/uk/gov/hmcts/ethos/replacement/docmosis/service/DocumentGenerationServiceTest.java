@@ -124,7 +124,7 @@ class DocumentGenerationServiceTest {
     void midAddressLabelsCustomiseSelectedAddressesNoAddressLabelsSelectionFields() {
         CaseData caseData = caseDetails11.getCaseData();
         documentGenerationService.midAddressLabels(caseData);
-        assertNull(caseData.getAddressLabelCollection());
+        assertEquals(new ArrayList<>(), caseData.getAddressLabelCollection());
     }
 
     @Test

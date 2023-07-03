@@ -74,7 +74,6 @@ public class Et3NotificationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt3OtherTypeDocumentName(
             servingService.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));
-        caseData.setEt3ClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
         caseData.setEt3EmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, true));
 
         return getCallbackRespEntityNoErrors(caseData);

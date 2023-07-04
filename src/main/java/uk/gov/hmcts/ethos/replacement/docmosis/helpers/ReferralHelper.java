@@ -314,7 +314,6 @@ public final class ReferralHelper {
         List<ReferralTypeItem> referralCollection = caseData.getReferralCollection();
         referralCollection.add(referralTypeItem);
         caseData.setReferralCollection(referralCollection);
-        clearReferralDataFromCaseData(caseData);
     }
 
     /**

@@ -211,26 +211,6 @@ class ReferralHelperTest {
     }
 
     @Test
-    void clearReferralInformationFromCaseDataAfterSaving() {
-        caseData.setReferCaseTo("Judge Judy");
-        caseData.setIsUrgent("Yes");
-        caseData.setReferralSubject("Subject line here");
-        caseData.setReferralSubjectSpecify("Custom subject line");
-        caseData.setReferralDetails("This is an explanation");
-        caseData.setReferralInstruction("Custom instructions for judge");
-
-        ReferralHelper.createReferral(caseData, "", null);
-
-        assertNull(caseData.getReferCaseTo());
-        assertNull(caseData.getIsUrgent());
-        assertNull(caseData.getReferralSubject());
-        assertNull(caseData.getReferralSubjectSpecify());
-        assertNull(caseData.getReferralDetails());
-        assertNull(caseData.getReferralDocument());
-        assertNull(caseData.getReferralInstruction());
-    }
-
-    @Test
     void whenCalledWithNoReferrals_ReturnEmptyDropdown() {
         ReferralHelper.populateSelectReferralDropdown(caseData);
 

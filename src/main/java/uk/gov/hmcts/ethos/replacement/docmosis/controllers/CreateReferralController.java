@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
@@ -195,7 +196,7 @@ public class CreateReferralController {
                 + ". EventId: " + ccdRequest.getEventId()
                 + ". Referral number: " + referralNumber
                 + ". Emailed at: " + DateTime.now());
-
+        clearReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

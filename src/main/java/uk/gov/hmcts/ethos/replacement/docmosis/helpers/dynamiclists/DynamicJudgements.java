@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+@Slf4j
 public final class DynamicJudgements {
     public static final String NO_HEARINGS = "No Hearings";
 
@@ -79,7 +81,6 @@ public final class DynamicJudgements {
             }
         } else {
             dynamicValueType = judgementType.getDynamicJudgementHearing().getValue();
-            judgementType.setDynamicJudgementHearing(hearingDynamicList);
         }
         judgementType.getDynamicJudgementHearing().setValue(dynamicValueType);
     }

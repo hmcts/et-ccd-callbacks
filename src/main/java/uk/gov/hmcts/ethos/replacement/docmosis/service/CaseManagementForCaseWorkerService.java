@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -190,7 +189,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setEt3ResponseDueDate(CaseData caseData) {
-        if (!isNullOrEmpty(caseData.getClaimServedDate())) {
+        if (!isNullOrEmpty(caseData.getClaimServedDate()) && isNullOrEmpty(caseData.getEt3DueDate())) {
             caseData.setEt3DueDate(LocalDate.parse(
                 caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }
@@ -215,7 +214,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(activeRespondent.stream(),
-                    struckRespondent.stream()).collect(Collectors.toList()));
+                    struckRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;
@@ -238,7 +237,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
-                    notContinuingRespondent.stream()).collect(Collectors.toList()));
+                    notContinuingRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;

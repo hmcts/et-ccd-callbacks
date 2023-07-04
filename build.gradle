@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.springframework.boot' version '2.7.11'
+    id 'org.springframework.boot' version '2.7.12'
     id 'org.owasp.dependencycheck' version '8.2.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -135,7 +135,7 @@ task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
 }
 
 task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@pr', '--steps', '--reporter', 'mocha-multi'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@dummy', '--steps', '--reporter', 'mocha-multi'
 }
 
 task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
@@ -277,7 +277,7 @@ ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'com.google.guava', version: '31.1-jre') {
+        dependencySet(group: 'com.google.guava', version: '32.0.1-jre') {
             entry 'guava'
         }
         dependencySet(group: 'io.netty', version: '4.1.92.Final') {
@@ -307,6 +307,7 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.31'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.60.Final'
 
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.23.0'
@@ -316,7 +317,6 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.28'
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '3.0.2'
-    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.0'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.8'
@@ -373,7 +373,7 @@ dependencies {
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.5.6'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.41'
-    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.11'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.12'
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion

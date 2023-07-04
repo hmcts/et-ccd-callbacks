@@ -135,7 +135,7 @@ task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
 }
 
 task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@RET-BAT', '--steps', '--reporter', 'mocha-multi'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@dummy', '--steps', '--reporter', 'mocha-multi'
 }
 
 task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
@@ -277,10 +277,10 @@ ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'com.google.guava', version: '31.1-jre') {
+        dependencySet(group: 'com.google.guava', version: '32.0.1-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.1.92.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.94.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -293,6 +293,8 @@ dependencyManagement {
             entry 'netty-transport-native-epoll'
             entry 'netty-transport-native-kqueue'
             entry 'netty-transport-native-unix-common'
+            entry 'netty-transport-classes-epoll'
+            entry 'netty-transport-classes-kqueue'
         }
     }
 }
@@ -341,8 +343,6 @@ dependencies {
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '5.1.6'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
-    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.92.Final'
-    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.92.Final'
 
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'
 

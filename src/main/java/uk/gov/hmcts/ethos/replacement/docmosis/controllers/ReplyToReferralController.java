@@ -200,21 +200,6 @@ public class ReplyToReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
         String referralCode = caseData.getSelectReferral().getValue().getCode();
-        emailService.sendEmail(
-            referralTemplateId,
-            caseData.getReplyToEmailAddress(),
-            ReferralHelper.buildPersonalisation(
-                ccdRequest.getCaseDetails(),
-                referralCode,
-                false,
-                userDetails.getName()
-            )
-        );
-
-        log.info("Event: Referral Reply Email sent. "
-            + ". EventId: " + ccdRequest.getEventId()
-            + ". Referral code: " + referralCode
-            + ". Emailed at: " + DateTime.now());
 
         ReferralHelper.createReferralReply(
             caseData,
@@ -228,7 +213,21 @@ public class ReplyToReferralController {
             .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
+        emailService.sendEmail(
+                referralTemplateId,
+                caseData.getReplyToEmailAddress(),
+                ReferralHelper.buildPersonalisation(
+                        ccdRequest.getCaseDetails(),
+                        referralCode,
+                        false,
+                        userDetails.getName()
+                )
+        );
 
+        log.info("Event: Referral Reply Email sent. "
+                + ". EventId: " + ccdRequest.getEventId()
+                + ". Referral code: " + referralCode
+                + ". Emailed at: " + DateTime.now());
         return getCallbackRespEntityNoErrors(caseData);
     }
 

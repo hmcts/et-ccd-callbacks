@@ -172,21 +172,6 @@ public class CreateReferralController {
         }
         UserDetails userDetails = userService.getUserDetails(userToken);
         String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData));
-        emailService.sendEmail(
-            referralTemplateId,
-            caseData.getReferentEmail(),
-            ReferralHelper.buildPersonalisation(
-                ccdRequest.getCaseDetails(),
-                referralNumber,
-                true,
-                userDetails.getName()
-            )
-        );
-
-        log.info("Event: Referral Email sent. "
-            + ". EventId: " + ccdRequest.getEventId()
-            + ". Referral number: " + referralNumber
-            + ". Emailed at: " + DateTime.now());
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
@@ -196,6 +181,20 @@ public class CreateReferralController {
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
             this.documentManagementService.addDocumentToDocumentField(documentInfo));
+        emailService.sendEmail(
+                referralTemplateId,
+                caseData.getReferentEmail(),
+                ReferralHelper.buildPersonalisation(
+                        ccdRequest.getCaseDetails(),
+                        referralNumber,
+                        true,
+                        userDetails.getName()
+                )
+        );
+        log.info("Event: Referral Email sent. "
+                + ". EventId: " + ccdRequest.getEventId()
+                + ". Referral number: " + referralNumber
+                + ". Emailed at: " + DateTime.now());
 
         return getCallbackRespEntityNoErrors(caseData);
     }

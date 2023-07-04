@@ -48,12 +48,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CLAIMANT_NOT_COMPLIED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -197,9 +199,9 @@ class TseAdmReplyServiceTest {
 
         static Stream<Arguments> partyAndStatusArguments() {
             return Stream.of(
-                    Arguments.of("Claimant", "notStartedYet"),
-                    Arguments.of("Respondent", "updated"),
-                    Arguments.of("Both parties", "notStartedYet")
+                    Arguments.of(CLAIMANT_TITLE, NOT_STARTED_YET),
+                    Arguments.of(RESPONDENT_TITLE, UPDATED),
+                    Arguments.of("Both parties", NOT_STARTED_YET)
             );
         }
 

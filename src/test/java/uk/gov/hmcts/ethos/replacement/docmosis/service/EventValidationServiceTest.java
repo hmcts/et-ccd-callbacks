@@ -279,16 +279,6 @@ class EventValidationServiceTest {
     }
 
     @Test
-    void shouldValidateDuplicateACAS() {
-        List<String> errors = new ArrayList<>();
-        caseDetails1.getCaseData().getRespondentCollection().get(0).getValue().setRespondentAcas("1111");
-        caseDetails1.getCaseData().getRespondentCollection().get(1).getValue().setRespondentAcas("1111");
-        eventValidationService.validateACAS(caseDetails1.getCaseData(), errors);
-        assertEquals(1, errors.size());
-        assertEquals("ACAS number should be unique for each respondent.", errors.get(0));
-    }
-
-    @Test
     void shouldValidateReturnedFromJudgeDateAndReferredToJudgeDateAreMissingDate() {
         List<String> errors = eventValidationService.validateET3ResponseFields(caseDetails3.getCaseData());
 

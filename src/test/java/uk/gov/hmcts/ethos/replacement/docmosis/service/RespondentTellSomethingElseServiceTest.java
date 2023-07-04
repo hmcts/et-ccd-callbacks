@@ -113,6 +113,8 @@ class RespondentTellSomethingElseServiceTest {
         + "|\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType"
         + "|Respondent|testDate|testDueDate|0|Open|\r\n\r\n";
 
+    private static final String BRISTOL_OFFICE = "Bristol";
+
     @BeforeEach
     void setUp() {
         respondentTellSomethingElseService =
@@ -533,6 +535,17 @@ class RespondentTellSomethingElseServiceTest {
 
         verify(emailService, times(1)).sendEmail(any(), any(), eq(caseNumber));
 
+    }
+
+    @Test
+    void getTribunalEmail() {
+        CaseData caseData = createCaseData("", YES);
+        caseData.setManagingOffice(BRISTOL_OFFICE);
+
+        when(tribunalOfficesService.getTribunalOffice(eq(BRISTOL_OFFICE))).thenReturn(TribunalOffice.BRISTOL);
+
+        assertThat(respondentTellSomethingElseService.getTribunalEmail(caseData),
+                is(TribunalOffice.BRISTOL.getOfficeEmail()));
     }
 
     private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {

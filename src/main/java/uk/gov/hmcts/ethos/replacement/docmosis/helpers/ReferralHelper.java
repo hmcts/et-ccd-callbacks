@@ -314,7 +314,6 @@ public final class ReferralHelper {
         List<ReferralTypeItem> referralCollection = caseData.getReferralCollection();
         referralCollection.add(referralTypeItem);
         caseData.setReferralCollection(referralCollection);
-        clearReferralDataFromCaseData(caseData);
     }
 
     /**
@@ -435,8 +434,7 @@ public final class ReferralHelper {
                 .filter(r -> !r.getValue().getReferralStatus().equals(ReferralStatus.CLOSED))
                 .map(r -> DynamicValueType.create(
                         r.getValue().getReferralNumber(),
-                        r.getValue().getReferralNumber() + " " + r.getValue().getReferralSubject()))
-                .collect(Collectors.toList()));
+                        r.getValue().getReferralNumber() + " " + r.getValue().getReferralSubject())).toList());
     }
 
     /**

@@ -79,7 +79,6 @@ public final class DynamicJudgements {
             }
         } else {
             dynamicValueType = judgementType.getDynamicJudgementHearing().getValue();
-            judgementType.setDynamicJudgementHearing(hearingDynamicList);
         }
         judgementType.getDynamicJudgementHearing().setValue(dynamicValueType);
     }

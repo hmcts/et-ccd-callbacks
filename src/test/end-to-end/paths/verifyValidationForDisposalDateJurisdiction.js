@@ -1,5 +1,5 @@
 const {eventNames} = require('../pages/common/constants.js');
-const {jurisdiction, listHearing, allocateHearing, hearingDetails, enterDisposalDateJurisdiction} = require("../helpers/caseHelper");
+const {jurisdiction, enterDisposalDateJurisdiction} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 const testConfig = require("../../config");
 

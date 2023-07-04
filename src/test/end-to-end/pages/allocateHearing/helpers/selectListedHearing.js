@@ -23,7 +23,7 @@ function selectListedHearing() {
     I.waitForElement('#allocateHearingHearing',10);
     I.see('Allocate Hearing');
     I.see('Case Number:');
-    I.selectOption('#allocateHearingHearing', 'Hearing 1, '+ formattedDate + ' 00:00');
+    I.selectOption('#allocateHearingHearing', '1');
     I.click(commonConfig.continue);
 
 }

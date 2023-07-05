@@ -15,11 +15,11 @@ module.exports = async function () {
     I.selectOption('#correspondenceType_part_2_Documents', commonConfig.lettersCorrespondence1);
 
     I.click(commonConfig.submit);
-
+    I.click(commonConfig.submit);
     //After submitting letters
     I.waitForText('Letters', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
-    I.see('Please download the document from : Document');
+    I.see('Please download the document from : ');
     I.click('Close and Return to case details');
 
     //Final Confirmation

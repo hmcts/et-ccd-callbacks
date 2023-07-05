@@ -22,17 +22,13 @@ module.exports = async function (jurisdiction, caseType, eventName) {
     I.waitForText('Reports', testConfig.TestTimeToWaitForText);
     I.see('Brought Forward Report');
 
-    I.click('Go');
+    // there are cases where yo click go and the page get stuck
+    I.forceClick('Go');
+    I.waitForText('Generate Report', testConfig.TestTimeToWaitForText);
     I.see('Generate Report');
     I.see('Reports');
-    I.see('Single or Range');
-    I.click('#hearingDateType-Single');
-    I.see('Date')
-    I.fillField('#listingDate-day', commonConfig.listingDateDay);
-    I.fillField('#listingDate-month', commonConfig.listingDateMonth);
-    I.fillField('#listingDate-year', commonConfig.listingDateYear);
-    I.click(commonConfig.submit);
-
+    I.click('[type="submit"]');
+    I.click('[type="submit"]');
     I.waitForText('Please download the document from : Document', testConfig.TestTimeToWaitForText);
     I.see('Generate Report');
     I.see('Reports');

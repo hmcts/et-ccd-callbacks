@@ -36,6 +36,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -109,6 +110,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private ClerkService clerkService;
     @MockBean
     private AuthTokenGenerator serviceAuthTokenGenerator;
+    @MockBean
+    private NotificationProperties notificationProperties;
     private final String hmctsServiceId = "BHA1";
 
     @BeforeEach
@@ -200,7 +203,8 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseData(submitCaseData);
 
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService, serviceAuthTokenGenerator, hmctsServiceId);
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
+                serviceAuthTokenGenerator, hmctsServiceId, notificationProperties);
     }
 
     @Test
@@ -980,6 +984,15 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
         assertEquals("claimant vs respondent", caseData.getHmctsInternalCaseName());
+    }
+
+    @Test
+    public void testCaseDeepLink() {
+        when(notificationProperties.getExuiLinkWithCaseId("123"))
+                .thenReturn("http://domain/cases/case-details/123");
+        CaseData caseData = new CaseData();
+        caseManagementForCaseWorkerService.setCaseDeepLink(caseData, "123");
+        assertEquals("http://domain/cases/case-details/123#Documents", caseData.getCaseDeepLink());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

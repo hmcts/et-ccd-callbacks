@@ -6,7 +6,7 @@ module.exports = async function () {
 
     const I = this;
     //Before Letters Page Starts
-    I.waitForText('Letters', testConfig.TestTimeToWaitForText); 
+    I.waitForText('Letters', testConfig.TestTimeToWaitForText);
     I.waitForText('Top Level', testConfig.TestTimeToWaitForText); 
     I.see('Case Number:')
     I.see('List of correspondence items');

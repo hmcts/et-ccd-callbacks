@@ -45,18 +45,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static java.util.Collections.singletonMap;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
@@ -140,6 +129,22 @@ public class CaseManagementForCaseWorkerService {
         caseData.setHmctsInternalCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
     }
 
+    public void setPublicCaseName(CaseData caseData) {
+        if (caseData.getClaimant() == null) {
+            claimantDefaults(caseData);
+        }
+
+        if (caseData.getRespondent() == null) {
+            respondentDefaults(caseData);
+        }
+
+        if (caseData.getRestrictedReporting() == null) {
+            caseData.setPublicCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
+
+        } else {
+            caseData.setPublicCaseName(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE);
+        }
+    }
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
         if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
                 && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {

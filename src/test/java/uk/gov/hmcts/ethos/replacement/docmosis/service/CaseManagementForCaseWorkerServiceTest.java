@@ -27,15 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
-import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -76,6 +68,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -980,6 +974,31 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
         assertEquals("claimant vs respondent", caseData.getHmctsInternalCaseName());
+    }
+
+    @Test
+    public void testPublicCaseName() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("respondent");
+
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+
+        assertEquals("claimant vs respondent", caseData.getPublicCaseName());
+    }
+
+    @Test
+    public void testPublicCaseNameWithRule50() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("Person1");
+        caseData.setRespondent("Person2");
+        RestrictedReportingType restrictedReportingType = new RestrictedReportingType();
+        restrictedReportingType.setRule503b(YES);
+        caseData.setRestrictedReporting(restrictedReportingType);
+
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+
+        assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE , caseData.getPublicCaseName());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

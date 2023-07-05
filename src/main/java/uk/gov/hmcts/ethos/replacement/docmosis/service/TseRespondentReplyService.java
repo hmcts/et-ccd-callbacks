@@ -23,13 +23,16 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 
 @Service
@@ -53,6 +56,10 @@ public class TseRespondentReplyService {
     private String replyToTribunalEmailToTribunalTemplateId;
     @Value("${tse.respondent.reply-to-tribunal.to-claimant}")
     private String replyToTribunalEmailToClaimantTemplateId;
+    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-yes}")
+    private String replyToTribunalAckEmailToLRRule92YesTemplateId;
+    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-no}")
+    private String replyToTribunalAckEmailToLRRule92NoTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String GIVE_MISSING_DETAIL = "Use the text box or supporting materials to give details.";
@@ -71,7 +78,7 @@ public class TseRespondentReplyService {
         saveReplyToApplication(caseData, isRespondingToTribunal);
 
         if (isRespondingToTribunal) {
-            sendRespondingToTribunalEmails(caseDetails);
+            sendRespondingToTribunalEmails(caseDetails, userToken);
         } else {
             sendRespondingToApplicationEmails(caseDetails, userToken);
         }
@@ -85,8 +92,15 @@ public class TseRespondentReplyService {
      * @param caseData in which the case details are extracted from
      */
     void updateApplicationState(CaseData caseData) {
-        if (isRespondingToTribunal(caseData)) {
-            getRespondentSelectedApplicationType(caseData).setApplicationState(UPDATED);
+        GenericTseApplicationType selectedApplicationType = getRespondentSelectedApplicationType(caseData);
+        if (selectedApplicationType.getApplicant().equals(CLAIMANT_TITLE)) {
+            if (isRespondingToTribunal(caseData)) {
+                selectedApplicationType.setApplicationState(WAITING_FOR_THE_TRIBUNAL);
+            } else {
+                selectedApplicationType.setApplicationState(UPDATED);
+            }
+        } else if (isRespondingToTribunal(caseData)) {
+            selectedApplicationType.setApplicationState(UPDATED);
         }
     }
 
@@ -188,7 +202,7 @@ public class TseRespondentReplyService {
      */
     public void sendRespondingToApplicationEmails(CaseDetails caseDetails, String userToken) {
         sendEmailToClaimantForRespondingToApp(caseDetails);
-        sendAcknowledgementEmailToLR(caseDetails, userToken);
+        sendAcknowledgementEmailToLR(caseDetails, userToken, false);
         respondentTseService.sendAdminEmail(caseDetails);
     }
 
@@ -211,25 +225,40 @@ public class TseRespondentReplyService {
 
     }
 
-    private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken) {
+    private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken,
+                                              boolean isRespondingToTribunal) {
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-                YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty())
-                        ? acknowledgementRule92YesEmailTemplateId
-                        : acknowledgementRule92NoEmailTemplateId,
+                getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
                 legalRepEmail,
                 TseHelper.getPersonalisationForAcknowledgement(caseDetails, notificationProperties.getExuiUrl()));
+    }
+
+    private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {
+        boolean copyToOtherParty = YES.equals(caseDetails.getCaseData().getTseResponseCopyToOtherParty());
+
+        if (isRespondingToTribunal) {
+            return copyToOtherParty
+                    ? replyToTribunalAckEmailToLRRule92YesTemplateId
+                    : replyToTribunalAckEmailToLRRule92NoTemplateId;
+        }
+
+        return copyToOtherParty
+                ? acknowledgementRule92YesEmailTemplateId
+                : acknowledgementRule92NoEmailTemplateId;
     }
 
     /**
      * Send emails when LR submits response to Tribunal request/order.
      */
-    public void sendRespondingToTribunalEmails(CaseDetails caseDetails) {
-        sendEmailToTribunal(caseDetails.getCaseData());
+    public void sendRespondingToTribunalEmails(CaseDetails caseDetails, String userToken) {
+        sendEmailToTribunal(caseDetails);
         sendEmailToClaimantForRespondingToTrib(caseDetails);
+        sendAcknowledgementEmailToLR(caseDetails, userToken, true);
     }
 
-    private void sendEmailToTribunal(CaseData caseData) {
+    private void sendEmailToTribunal(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
         String email = respondentTseService.getTribunalEmail(caseData);
 
         if (isNullOrEmpty(email)) {
@@ -239,7 +268,8 @@ public class TseRespondentReplyService {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, selectedApplication.getType());
+                APPLICATION_TYPE, selectedApplication.getType(),
+                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId()));
         emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 

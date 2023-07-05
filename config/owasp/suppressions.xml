@@ -16,6 +16,7 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
+
    file name: json-20230227.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
@@ -23,17 +24,17 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: commons-fileupload-1.4.jar
+   file name: adal4j-1.6.7.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/commons-fileupload/commons-fileupload@.*$</packageUrl>
-        <cve>CVE-2023-24998</cve>
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
+        <cve>CVE-2021-42306</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: accessors-smart-2.4.9.jar
+   file name: jackson-databind-2.13.5.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/net.minidev/accessors-smart@.*$</packageUrl>
-        <cve>CVE-2022-45688</cve>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+        <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -42,4 +43,5 @@
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2023-35116</cve>
     </suppress>
+
 </suppressions>

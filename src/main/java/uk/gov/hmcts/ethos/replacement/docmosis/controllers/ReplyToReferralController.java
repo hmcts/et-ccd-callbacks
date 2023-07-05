@@ -34,6 +34,8 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
+
 
 /**
  * REST controller for the Referral Reply event pages, formats data appropriately for rendering on the front end.
@@ -232,6 +234,7 @@ public class ReplyToReferralController {
                 + ". EventId: " + ccdRequest.getEventId()
                 + ". Referral code: " + referralCode
                 + ". Emailed at: " + DateTime.now());
+        clearReferralReplyDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -37,54 +37,46 @@ public class CaseSourceLocalReport {
 
     private void populateLocalReportSummary(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
         ListingData listingData = listingDetails.getCaseData();
-        if (CollectionUtils.isEmpty(listingData.getLocalReportsSummary())) {
-            AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
-            AdhocReportType reportType = new AdhocReportType();
-            adhocReportTypeItem.setId(UUID.randomUUID().toString());
-            adhocReportTypeItem.setValue(reportType);
-            List<AdhocReportTypeItem> newSummary = new ArrayList<>();
-            newSummary.add(adhocReportTypeItem);
-            listingData.setLocalReportsSummary(newSummary);
-        }
+        collectionUtilsIsEmpty(listingData);
         AdhocReportType adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
         adhocReportType.setReportOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
                 listingData.getManagingOffice()));
-        int manuallyCreatedCases = 0;
-        int et1OnlineCases = 0;
-        int eccCases = 0;
-        int migrationCases = 0;
 
-        for (SubmitEvent submitEvent : submitEvents) {
-            if (ET1_ONLINE_CASE_SOURCE.equals(submitEvent.getCaseData().getCaseSource())) {
-                et1OnlineCases = et1OnlineCases + 1;
-            }
-
-            if (MIGRATION_CASE_SOURCE.equals(submitEvent.getCaseData().getCaseSource())) {
-                migrationCases = migrationCases + 1;
-            }
-
-            if (FLAG_ECC.equals(submitEvent.getCaseData().getCaseSource())) {
-                eccCases = eccCases + 1;
-            }
-
-            if (MANUALLY_CREATED_POSITION.equals(submitEvent.getCaseData().getCaseSource())) {
-                manuallyCreatedCases = manuallyCreatedCases + 1;
-            }
-        }
+        int manuallyCreatedCases = countCasesBySource(submitEvents, MANUALLY_CREATED_POSITION);
+        int et1OnlineCases = countCasesBySource(submitEvents, ET1_ONLINE_CASE_SOURCE);
+        int eccCases = countCasesBySource(submitEvents, FLAG_ECC);
+        int migrationCases = countCasesBySource(submitEvents, MIGRATION_CASE_SOURCE);
         int totalCases = manuallyCreatedCases + et1OnlineCases + eccCases + migrationCases;
 
-        float manuallyCreatedPercent = (totalCases != 0)
-                ? ((float)manuallyCreatedCases / totalCases) * 100 : 0;
+        float manuallyCreatedPercent = calculatePercentage(manuallyCreatedCases, totalCases);
+        float et1OnlinePercent = calculatePercentage(et1OnlineCases, totalCases);
+        float eccPercent = calculatePercentage(eccCases, totalCases);
+        float migrationCasesPercent = calculatePercentage(migrationCases, totalCases);
 
-        float et1OnlinePercent = (totalCases != 0)
-                ? ((float)et1OnlineCases / totalCases) * 100 : 0;
+        setReportTypeProperties(adhocReportType, manuallyCreatedCases, et1OnlineCases,
+                migrationCases, eccCases, totalCases, manuallyCreatedPercent, et1OnlinePercent,
+                migrationCasesPercent, eccPercent);
+    }
 
-        float eccPercent = (totalCases != 0)
-                ? ((float)eccCases / totalCases) * 100 : 0;
+    private int countCasesBySource(List<SubmitEvent> submitEvents, String caseSource) {
+        int count = 0;
+        for (SubmitEvent submitEvent : submitEvents) {
+            if (caseSource.equals(submitEvent.getCaseData().getCaseSource())) {
+                count++;
+            }
+        }
+        return count;
+    }
 
-        float migrationCasesPercent = (totalCases != 0)
-                ? ((float)migrationCases / totalCases) * 100 : 0;
+    private float calculatePercentage(int cases, int totalCases) {
+        return (totalCases != 0) ? ((float) cases / totalCases) * 100 : 0;
+    }
 
+    private void setReportTypeProperties(AdhocReportType adhocReportType, int manuallyCreatedCases,
+                                         int et1OnlineCases, int migrationCases, int eccCases,
+                                         int totalCases, float manuallyCreatedPercent,
+                                         float et1OnlinePercent, float migrationCasesPercent,
+                                         float eccPercent) {
         adhocReportType.setManuallyCreatedTotalCases(String.valueOf(manuallyCreatedCases));
         adhocReportType.setEt1OnlineTotalCases(String.valueOf(et1OnlineCases));
         adhocReportType.setMigratedTotalCases(String.valueOf(migrationCases));
@@ -95,6 +87,18 @@ public class CaseSourceLocalReport {
         adhocReportType.setEt1OnlineTotalCasesPercent(String.format("%.2f", et1OnlinePercent));
         adhocReportType.setMigratedTotalCasesPercent(String.format("%.2f", migrationCasesPercent));
         adhocReportType.setEccTotalCasesPercent(String.format("%.2f", eccPercent));
+    }
+
+    private static void collectionUtilsIsEmpty(ListingData listingData) {
+        if (CollectionUtils.isEmpty(listingData.getLocalReportsSummary())) {
+            AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
+            AdhocReportType reportType = new AdhocReportType();
+            adhocReportTypeItem.setId(UUID.randomUUID().toString());
+            adhocReportTypeItem.setValue(reportType);
+            List<AdhocReportTypeItem> newSummary = new ArrayList<>();
+            newSummary.add(adhocReportTypeItem);
+            listingData.setLocalReportsSummary(newSummary);
+        }
     }
 
 }

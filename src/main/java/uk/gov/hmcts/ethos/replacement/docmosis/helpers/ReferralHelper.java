@@ -469,7 +469,6 @@ public final class ReferralHelper {
         referralReplyCollection.add(referralReplyTypeItem);
         referral.setReferralReplyCollection(referralReplyCollection);
         referral.setReferralStatus(ReferralStatus.INSTRUCTIONS_ISSUED);
-        clearReferralReplyDataFromCaseData(caseData);
     }
 
     /**

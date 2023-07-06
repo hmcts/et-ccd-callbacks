@@ -335,8 +335,8 @@ public final class HearingsByHearingTypeReport {
 
         String listedDate = dateListedTypeItem.getValue().getListedDate();
 
-        List<String> hearingFormats = hearingTypeItem.getValue() !=
-                null ? hearingTypeItem.getValue().getHearingFormat() : null;
+        List<String> hearingFormats = hearingTypeItem.getValue()
+                != null ? hearingTypeItem.getValue().getHearingFormat() : null;
         if (CollectionUtils.isNotEmpty(hearingFormats)) {
             for (String format : hearingFormats) {
                 String subSplit = getSubSplitHearingFormat(format);

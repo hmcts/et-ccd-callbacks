@@ -10,8 +10,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -29,6 +32,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -40,9 +44,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -50,6 +55,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -67,6 +75,16 @@ class TseRespondentReplyServiceTest {
     private TseService tseService;
     @MockBean
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
+
+    private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
+    private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
+    private static final String REPLY_TO_TRIB_ACK_TEMPLATE_NO = "replyToTribAckTemplateNo";
+    private static final String REPLY_TO_APP_ACK_TEMPLATE_YES = "replyToAppAckTemplateYes";
+    private static final String REPLY_TO_APP_ACK_TEMPLATE_NO = "replyToAppAckTemplateNo";
+    public static final String TEST_XUI_URL = "test.xui.com";
+    public static final String TEST_CUI_URL = "test.cui.com";
+    public static final String CASE_NUMBER = "9876";
+    public static final String WITHDRAW_MY_CLAIM = "Withdraw my claim";
 
     private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
@@ -91,13 +109,13 @@ class TseRespondentReplyServiceTest {
             .thenReturn(Collections.emptyMap());
 
         caseData = CaseDataBuilder.builder()
-            .withEthosCaseReference("9876")
+            .withEthosCaseReference(CASE_NUMBER)
             .withClaimantType("person@email.com")
             .withRespondent("respondent", YES, "01-Jan-2003", false)
             .build();
 
         genericTseApplicationType = GenericTseApplicationType.builder().applicant(CLAIMANT_TITLE)
-            .date("13 December 2022").dueDate("20 December 2022").type("Withdraw my claim")
+            .date("13 December 2022").dueDate("20 December 2022").type(WITHDRAW_MY_CLAIM)
             .copyToOtherPartyYesOrNo(YES).details("Text").applicationState("notStartedYet")
             .number("1").responsesCount("0").status(OPEN_STATE).build();
 
@@ -194,33 +212,85 @@ class TseRespondentReplyServiceTest {
         }
     }
 
-    @Test
-    void sendAcknowledgementAndClaimantEmail_rule92Yes() {
-        caseData.setTseResponseCopyToOtherParty(YES);
+    @ParameterizedTest
+    @MethodSource
+    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant,
+                                           String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, "userToken");
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92YesEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
 
-        verify(emailService, times(2)).sendEmail(any(), any(), any());
-        verify(emailService).sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+        tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
+
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        verify(emailService, isEmailSentToClaimant)
+                .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+        verify(respondentTellSomethingElseService).sendAdminEmail(any());
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }
 
-    @Test
-    void sendAcknowledgementAndClaimantEmail_rule92No() {
-        caseData.setTseResponseCopyToOtherParty(NO);
+    private static Stream<Arguments> sendRespondingToApplicationEmails() {
+        return Stream.of(
+                Arguments.of(YES, atLeastOnce(), REPLY_TO_APP_ACK_TEMPLATE_YES),
+                Arguments.of(NO, never(), REPLY_TO_APP_ACK_TEMPLATE_NO)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant,
+                                        String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, "userToken");
+        when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn("link");
+        when(respondentTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
+        when(notificationProperties.getExuiLinkWithCaseId(any())).thenReturn(TEST_XUI_URL);
+        when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn(TEST_CUI_URL);
 
-        verify(emailService, times(1)).sendEmail(any(), any(), any());
-        verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
+
+        Map<String, String> tribunlPersonalisation = Map.of(
+                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
+                APPLICATION_TYPE, WITHDRAW_MY_CLAIM,
+                LINK_TO_EXUI, TEST_XUI_URL);
+
+        Map<String, String> claimantPersonalisation = Map.of(
+                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
+                LINK_TO_CITIZEN_HUB, TEST_CUI_URL);
+
+        tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
+
+        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunlPersonalisation));
+        verify(emailService, isEmailSentToClaimant)
+                .sendEmail(any(),
+                        eq(caseData.getClaimantType().getClaimantEmailAddress()),
+                        eq(claimantPersonalisation));
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
+    }
+
+    private static Stream<Arguments> sendRespondingToTribunalEmails() {
+        return Stream.of(
+                Arguments.of(YES, atLeastOnce(), REPLY_TO_TRIB_ACK_TEMPLATE_YES),
+                Arguments.of(NO, never(), REPLY_TO_TRIB_ACK_TEMPLATE_NO)
+        );
     }
 
     @Test

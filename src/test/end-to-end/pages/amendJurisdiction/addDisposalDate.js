@@ -30,7 +30,7 @@ module.exports = async function (hearingDisposalDate) {
             await I.fillField('#disposalDate-month', '10');
             await I.fillField('#disposalDate-year', '2025');
             await I.click(commonConfig.continue);
-            await I.click(commonConfig.submit);
+            await I.click(commonConfig.continue);
             await I.see("Disposal Date cannot be a date in the future for jurisdiction code ADT.")
             break;
         default:

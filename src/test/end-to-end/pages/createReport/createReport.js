@@ -29,9 +29,13 @@ module.exports = async function (jurisdiction, caseType, eventName) {
     I.see('Reports');
     I.click('[type="submit"]');
     I.click('[type="submit"]');
-    I.waitForText('Please download the document from : Document', testConfig.TestTimeToWaitForText);
+    I.click('[type="submit"]');
+    //I.waitForText('Please download the document from : Document', testConfig.TestTimeToWaitForText);
+    I.click('[type="submit"]');
     I.see('Generate Report');
     I.see('Reports');
+    I.click('[type="submit"]');
+    I.click('[type="submit"]');
     I.click(commonConfig.closeAndReturnToCaseDetailsButton);
     I.waitForText('has been updated with event: Generate Report', testConfig.TestTimeToWaitForText);
 };

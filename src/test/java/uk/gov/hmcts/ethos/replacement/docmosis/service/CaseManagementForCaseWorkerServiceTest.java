@@ -51,13 +51,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -112,7 +110,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private final String hmctsServiceId = "BHA1";
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         scotlandCcdRequest1 = new CCDRequest();
         CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
@@ -653,7 +651,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "Listed, Yes", " , Yes" })
+    @CsvSource({"Listed, Yes", " , Yes"})
     void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
@@ -836,7 +834,6 @@ class CaseManagementForCaseWorkerServiceTest {
         when(ccdClient.submitEventForCase(
                 anyString(), any(), anyString(), anyString(), any(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-
         assertThrows(Exception.class, () ->
                 caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                         new ArrayList<>(), SUBMITTED_CALLBACK)
@@ -864,7 +861,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            assertThat(respondentSumTypeItem.getValue().getExtensionRequested(), is(NO));
+            assertEquals(NO, respondentSumTypeItem.getValue().getExtensionRequested());
         }
     }
 
@@ -876,6 +873,16 @@ class CaseManagementForCaseWorkerServiceTest {
         caseData.setClaimServedDate(localDate.toString());
         caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
         assertEquals(expectedEt3DueDate, caseData.getEt3DueDate());
+    }
+
+    @Test
+    void setEt3ResponseDueDate_doesNotOverideExistingValue() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        LocalDate localDate = LocalDate.now();
+        caseData.setClaimServedDate(localDate.toString());
+        caseData.setEt3DueDate("12/06/2023");
+        caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
+        assertEquals("12/06/2023", caseData.getEt3DueDate());
     }
 
     @Test
@@ -891,7 +898,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setExtensionRequested(YES);
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertThat(caseData.getRespondentCollection().get(0).getValue().getExtensionRequested(), is(YES));
+        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getExtensionRequested());
     }
 
     @Test
@@ -1060,5 +1067,4 @@ class CaseManagementForCaseWorkerServiceTest {
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
     }
-
 }

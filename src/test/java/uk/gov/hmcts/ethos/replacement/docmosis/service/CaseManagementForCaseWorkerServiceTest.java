@@ -67,9 +67,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -998,7 +998,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
-        assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE , caseData.getPublicCaseName());
+        assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE, caseData.getPublicCaseName());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

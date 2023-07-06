@@ -139,19 +139,11 @@ public final class HearingsByHearingTypeReport {
     }
 
     private String getSubSplitHearingFormat(String format) {
-        if ("Telephone".equals(format)) {
-            return "Tel Con";
-        }
-        if (VIDEO.equals(format)) {
-            return VIDEO;
-        }
-        if (HYBRID.equals(format)) {
-            return HYBRID;
-        }
-        if (IN_PERSON.equals(format)) {
-            return IN_PERSON;
-        }
-        return "";
+        return switch (format) {
+            case "Telephone" -> "Tel Con";
+            case VIDEO, HYBRID, IN_PERSON -> format;
+            default -> "";
+        };
     }
 
     private List<HearingsByHearingTypeSubmitEvent> getCases(ReportParams params) {
@@ -201,35 +193,28 @@ public final class HearingsByHearingTypeReport {
     }
 
     private void setReportFields(String hearingType, ReportFields fields) {
+        int hearingCount = Integer.parseInt(fields.getHearingCount());
+        int total = Integer.parseInt(fields.getTotal());
+
         switch (hearingType) {
-            case HEARING_TYPE_JUDICIAL_HEARING:
-                fields.setHearingCount(String.valueOf(Integer.parseInt(fields.getHearingCount()) + 1));
-                fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
-                break;
-            case HEARING_TYPE_PERLIMINARY_HEARING_CM:
-                fields.setCmCount(String.valueOf(Integer.parseInt(fields.getCmCount()) + 1));
-                fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
-                break;
-            case HEARING_TYPE_PERLIMINARY_HEARING:
-                fields.setHearingPrelimCount(String.valueOf(Integer.parseInt(fields.getHearingPrelimCount()) + 1));
-                fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
-                break;
-            case COSTS_HEARING_TYPE:
-            case COSTS_HEARING_TYPE_SCOTLAND:
-                fields.setCostsCount(String.valueOf(Integer.parseInt(fields.getCostsCount()) + 1));
-                fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
-                break;
-            case HEARING_TYPE_JUDICIAL_RECONSIDERATION:
-                fields.setReconsiderCount(String.valueOf(Integer.parseInt(fields.getReconsiderCount()) + 1));
-                fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
-                break;
-            case HEARING_TYPE_JUDICIAL_REMEDY:
-                fields.setRemedyCount(String.valueOf(Integer.parseInt(fields.getRemedyCount()) + 1));
-                fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
-                break;
-            default:
-                break;
+            case HEARING_TYPE_JUDICIAL_HEARING -> fields.setHearingCount(incrementValue(String.valueOf(hearingCount)));
+            case HEARING_TYPE_PERLIMINARY_HEARING_CM -> fields.setCmCount(incrementValue(fields.getCmCount()));
+            case HEARING_TYPE_PERLIMINARY_HEARING ->
+                    fields.setHearingPrelimCount(incrementValue(fields.getHearingPrelimCount()));
+            case COSTS_HEARING_TYPE, COSTS_HEARING_TYPE_SCOTLAND ->
+                    fields.setCostsCount(incrementValue(fields.getCostsCount()));
+            case HEARING_TYPE_JUDICIAL_RECONSIDERATION ->
+                    fields.setReconsiderCount(incrementValue(fields.getReconsiderCount()));
+            case HEARING_TYPE_JUDICIAL_REMEDY -> fields.setRemedyCount(incrementValue(fields.getRemedyCount()));
+            default -> {
+            }
         }
+
+        fields.setTotal(incrementValue(String.valueOf(total)));
+    }
+
+    private String incrementValue(String value) {
+        return String.valueOf(Integer.parseInt(value) + 1);
     }
 
     private HearingsByHearingTypeReportSummary getSummaryRow(
@@ -342,51 +327,47 @@ public final class HearingsByHearingTypeReport {
     }
 
     private void setSummary2Fields(HearingTypeItem hearingTypeItem,
-                                    DateListedTypeItem dateListedTypeItem,
-                                    List<HearingsByHearingTypeReportSummary2> reportSummaryList2) {
-        if (isValidHearing(dateListedTypeItem.getValue())) {
-            if (hearingTypeItem.getValue() != null
-                    && CollectionUtils.isNotEmpty(hearingTypeItem.getValue().getHearingFormat())) {
-                for (String format : hearingTypeItem.getValue().getHearingFormat()) {
-                    String subSplit = getSubSplitHearingFormat(format);
-                    HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
-                            dateListedTypeItem.getValue().getListedDate(),
-                            subSplit, reportSummaryList2);
-                    setReportFields(
-                            hearingTypeItem.getValue().getHearingType(),
-                            reportSummary2.getFields());
-                }
-            }
-            if (isSubSplitJM(hearingTypeItem)) {
-                HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
-                        dateListedTypeItem.getValue().getListedDate(), "JM",
-                        reportSummaryList2);
-                setReportFields(
-                        hearingTypeItem.getValue().getHearingType(),
-                        reportSummary2.getFields());
-            }
-
-            String subSplitStages = getSubSplitStages(hearingTypeItem);
-            if (!isNullOrEmpty(subSplitStages)) {
-                HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
-                        dateListedTypeItem.getValue().getListedDate(), subSplitStages,
-                        reportSummaryList2);
-                setReportFields(
-                        hearingTypeItem.getValue().getHearingType(),
-                        reportSummary2.getFields());
-            }
-
-            String subSplitSitAlone = getSubSplitSitAlone(hearingTypeItem);
-            if (!isNullOrEmpty(subSplitSitAlone)) {
-                HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
-                        dateListedTypeItem.getValue().getListedDate(), subSplitSitAlone,
-                        reportSummaryList2);
-                setReportFields(
-                        hearingTypeItem.getValue().getHearingType(),
-                        reportSummary2.getFields());
-            }
-
+                                   DateListedTypeItem dateListedTypeItem,
+                                   List<HearingsByHearingTypeReportSummary2> reportSummaryList2) {
+        if (!isValidHearing(dateListedTypeItem.getValue())) {
+            return;
         }
+
+        String listedDate = dateListedTypeItem.getValue().getListedDate();
+
+        List<String> hearingFormats = hearingTypeItem.getValue() !=
+                null ? hearingTypeItem.getValue().getHearingFormat() : null;
+        if (CollectionUtils.isNotEmpty(hearingFormats)) {
+            for (String format : hearingFormats) {
+                String subSplit = getSubSplitHearingFormat(format);
+                updateReportSummary(listedDate, subSplit, reportSummaryList2,
+                        hearingTypeItem.getValue().getHearingType());
+            }
+        }
+
+        if (isSubSplitJM(hearingTypeItem)) {
+            updateReportSummary(listedDate, "JM", reportSummaryList2,
+                    hearingTypeItem.getValue().getHearingType());
+        }
+
+        processSubSplit(listedDate, getSubSplitStages(hearingTypeItem), reportSummaryList2,
+                hearingTypeItem.getValue().getHearingType());
+        processSubSplit(listedDate, getSubSplitSitAlone(hearingTypeItem), reportSummaryList2,
+                hearingTypeItem.getValue().getHearingType());
+    }
+
+    private void processSubSplit(String listedDate, String subSplit,
+                                 List<HearingsByHearingTypeReportSummary2> reportSummaryList2, String hearingType) {
+        if (!isNullOrEmpty(subSplit)) {
+            updateReportSummary(listedDate, subSplit, reportSummaryList2, hearingType);
+        }
+    }
+
+    private void updateReportSummary(String listedDate, String subSplit,
+                                     List<HearingsByHearingTypeReportSummary2> reportSummaryList2,
+                                     String hearingType) {
+        HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(listedDate, subSplit, reportSummaryList2);
+        setReportFields(hearingType, reportSummary2.getFields());
     }
 
     private void setLocalReportSummaryDetail(

@@ -651,7 +651,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "Listed, Yes", " , Yes" })
+    @CsvSource({"Listed, Yes", " , Yes"})
     void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
@@ -1056,5 +1056,4 @@ class CaseManagementForCaseWorkerServiceTest {
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
     }
-
 }

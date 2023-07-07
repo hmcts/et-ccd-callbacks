@@ -458,7 +458,7 @@ public final class HearingsByHearingTypeReport {
     }
 
     private void removeRowsWithNoData(List<HearingsByHearingTypeReportSummary2Hdr> reportSummary2HdrList) {
-        reportSummary2HdrList.removeIf(row -> row.getFields().getTotal().equals("0"));
+        reportSummary2HdrList.removeIf(row -> "0".equals(row.getFields().getTotal()));
     }
 
     private void setHdr2Fields(

@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHea
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
@@ -126,16 +127,17 @@ public final class HearingsByHearingTypeReport {
         return YES.equals(hearingTypeItem.getValue().getJudicialMediation());
     }
 
-    private String getSubSplitStages(HearingTypeItem hearingTypeItem) {
-        if (STAGE_1.equals(hearingTypeItem.getValue().getHearingStage())) {
-            return STAGE_1;
-        } else if (STAGE_2.equals(hearingTypeItem.getValue().getHearingStage())) {
-            return STAGE_2;
-        } else if (STAGE_3.equals(hearingTypeItem.getValue().getHearingStage())) {
-            return STAGE_3;
-        } else {
+    String getSubSplitStages(HearingTypeItem hearingTypeItem) {
+        if (hearingTypeItem.getValue().getHearingStage() == null) {
             return "";
         }
+
+        return switch (hearingTypeItem.getValue().getHearingStage()) {
+            case STAGE_1 -> STAGE_1;
+            case STAGE_2 -> STAGE_2;
+            case STAGE_3 -> STAGE_3;
+            default -> "";
+        };
     }
 
     private String getSubSplitHearingFormat(String format) {
@@ -335,25 +337,29 @@ public final class HearingsByHearingTypeReport {
 
         String listedDate = dateListedTypeItem.getValue().getListedDate();
 
-        List<String> hearingFormats = hearingTypeItem.getValue()
-                != null ? hearingTypeItem.getValue().getHearingFormat() : null;
+        HearingType hearingTypeValue = hearingTypeItem.getValue();
+        List<String> hearingFormats = hearingTypeValue != null ? hearingTypeValue.getHearingFormat() : null;
+        String hearingType = hearingTypeValue.getHearingType();
+
+        updateAllReportSummaries(hearingTypeItem, reportSummaryList2, listedDate, hearingFormats, hearingType);
+    }
+
+    private void updateAllReportSummaries(HearingTypeItem hearingTypeItem,
+                                          List<HearingsByHearingTypeReportSummary2> reportSummaryList2,
+                                          String listedDate, List<String> hearingFormats, String hearingType) {
         if (CollectionUtils.isNotEmpty(hearingFormats)) {
             for (String format : hearingFormats) {
                 String subSplit = getSubSplitHearingFormat(format);
-                updateReportSummary(listedDate, subSplit, reportSummaryList2,
-                        hearingTypeItem.getValue().getHearingType());
+                updateReportSummary(listedDate, subSplit, reportSummaryList2, hearingType);
             }
         }
 
         if (isSubSplitJM(hearingTypeItem)) {
-            updateReportSummary(listedDate, "JM", reportSummaryList2,
-                    hearingTypeItem.getValue().getHearingType());
+            updateReportSummary(listedDate, "JM", reportSummaryList2, hearingType);
         }
 
-        processSubSplit(listedDate, getSubSplitStages(hearingTypeItem), reportSummaryList2,
-                hearingTypeItem.getValue().getHearingType());
-        processSubSplit(listedDate, getSubSplitSitAlone(hearingTypeItem), reportSummaryList2,
-                hearingTypeItem.getValue().getHearingType());
+        processSubSplit(listedDate, getSubSplitStages(hearingTypeItem), reportSummaryList2, hearingType);
+        processSubSplit(listedDate, getSubSplitSitAlone(hearingTypeItem), reportSummaryList2, hearingType);
     }
 
     private void processSubSplit(String listedDate, String subSplit,

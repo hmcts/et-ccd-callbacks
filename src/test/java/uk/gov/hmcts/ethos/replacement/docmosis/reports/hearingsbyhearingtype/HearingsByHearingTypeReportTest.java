@@ -6,6 +6,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
 import java.time.LocalDateTime;
@@ -249,5 +251,27 @@ class HearingsByHearingTypeReportTest {
         HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         HearingsByHearingTypeReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(result, reportDetail.getDuration());
+    }
+
+    private static final String STAGE_1 = "Stage 1";
+    private static final String STAGE_2 = "Stage 2";
+    private static final String STAGE_3 = "Stage 3";
+
+    @ParameterizedTest
+    @CsvSource({
+            STAGE_1 + "," + STAGE_1,
+            STAGE_2 + "," + STAGE_2,
+            STAGE_3 + "," + STAGE_3,
+            "unknown, ''",
+            ", ''"
+    })
+    public void testGetSubSplitStages(String inputStage, String expected) {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingStage(inputStage);
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+
+        String result = hearingsByHearingTypeReport.getSubSplitStages(hearingTypeItem);
+        assertEquals(expected, result);
     }
 }

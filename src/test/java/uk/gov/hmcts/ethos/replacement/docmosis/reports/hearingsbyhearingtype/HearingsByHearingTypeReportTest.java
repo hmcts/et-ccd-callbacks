@@ -259,11 +259,11 @@ class HearingsByHearingTypeReportTest {
 
     @ParameterizedTest
     @CsvSource({
-            STAGE_1 + "," + STAGE_1,
-            STAGE_2 + "," + STAGE_2,
-            STAGE_3 + "," + STAGE_3,
-            "unknown, ''",
-            ", ''"
+        STAGE_1 + "," + STAGE_1,
+        STAGE_2 + "," + STAGE_2,
+        STAGE_3 + "," + STAGE_3,
+        "unknown, ''",
+        ", ''"
     })
     public void testGetSubSplitStages(String inputStage, String expected) {
         HearingType hearingType = new HearingType();

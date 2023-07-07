@@ -36,6 +36,9 @@ class CaseFlagsServiceTest {
         caseData = CaseDataBuilder.builder().build();
         caseData.setClaimant(CLAIMANT_NAME);
         caseData.setRespondent(RESPONDENT_NAME);
+
+        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
+        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
     }
 
     @Test
@@ -67,9 +70,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_claimantNeedsLanguageInterpreter_setsInterpreterRequiredFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getClaimantFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(LANGUAGE_INTERPRETER).status(ACTIVE).build())
         );
@@ -81,9 +81,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_respondentNeedsLanguageInterpreter_setsInterpreterRequiredFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getRespondentFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(LANGUAGE_INTERPRETER).status(ACTIVE).build())
         );
@@ -95,9 +92,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_claimantNeedsSignLanguageInterpreter_setsInterpreterRequiredFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getClaimantFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(SIGN_LANGUAGE_INTERPRETER).status(ACTIVE).build())
         );
@@ -109,9 +103,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_respondentNeedsSignLanguageInterpreter_setsInterpreterRequiredFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getRespondentFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(SIGN_LANGUAGE_INTERPRETER).status(ACTIVE).build())
         );
@@ -123,9 +114,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_noInterpretersNeeded_setsInterpreterRequiredFlagFalse() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getClaimantFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(LANGUAGE_INTERPRETER).status(INACTIVE).build())
         );
@@ -141,9 +129,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_claimantIsVexatious_setsAdditionalSecurityFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getClaimantFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(VEXATIOUS_LITIGANT).status(ACTIVE).build())
         );
@@ -155,9 +140,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_respondentIsVexatious_setsAdditionalSecurityFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getRespondentFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(VEXATIOUS_LITIGANT).status(ACTIVE).build())
         );
@@ -169,9 +151,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_claimantIsDisruptive_setsAdditionalSecurityFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getClaimantFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(DISRUPTIVE_CUSTOMER).status(ACTIVE).build())
         );
@@ -183,9 +162,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_respondentIsDisruptive_setsAdditionalSecurityFlagTrue() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getRespondentFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(DISRUPTIVE_CUSTOMER).status(ACTIVE).build())
         );
@@ -197,9 +173,6 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_noPartyIsVexatiousOrDisruptive_setsAdditionalSecurityFlagFalse() {
-        caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-        caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
-
         caseData.getClaimantFlags().getDetails().add(
                 GenericTypeItem.from(FlagDetailType.builder().name(VEXATIOUS_LITIGANT).status(INACTIVE).build())
         );

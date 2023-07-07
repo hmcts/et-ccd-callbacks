@@ -20,12 +20,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.RES_TSE_FILE_NAME;
 
 public final class RespondentTellSomethingElseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
     private static final String RES_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
 
     private RespondentTellSomethingElseHelper() {

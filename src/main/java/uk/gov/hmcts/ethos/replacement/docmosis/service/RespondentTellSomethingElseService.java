@@ -46,6 +46,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.RES_TSE_FILE_NAME;
 
 @Slf4j
 @Service
@@ -80,7 +81,6 @@ public class RespondentTellSomethingElseService {
             + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
     private static final String CLAIMANT_EMAIL_GROUP_A = "You should respond as soon as possible, and in any "
             + "event by %s.";
-    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
 
     private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String TABLE_COLUMNS_MARKDOWN =

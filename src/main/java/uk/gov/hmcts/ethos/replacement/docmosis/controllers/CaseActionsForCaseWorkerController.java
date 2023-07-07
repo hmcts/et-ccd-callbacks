@@ -448,7 +448,6 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = eventValidationService.validateActiveRespondents(caseData);
-        eventValidationService.validateACAS(caseData, errors);
         if (errors.isEmpty()) {
             errors = eventValidationService.validateET3ResponseFields(caseData);
             if (errors.isEmpty()) {
@@ -599,7 +598,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        HearingsHelper.updatePostponedDate(caseData);
+        Helper.updatePostponedDate(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

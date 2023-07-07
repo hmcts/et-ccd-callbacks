@@ -98,10 +98,10 @@ public class TseAdmReplyService {
     }
 
     /**
-     * Update status of application based on admin reply.
+     * Update state of application based on admin reply.
      * @param caseData in which the case details are extracted from
      */
-    public void updateApplicationStatus(CaseData caseData) {
+    public void updateApplicationState(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
@@ -111,9 +111,9 @@ public class TseAdmReplyService {
             return;
         }
 
-        if (isRequestAndResponseRequiredFromParty(caseData, CLAIMANT_TITLE)) {
+        if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
             applicationType.setApplicationState(NOT_STARTED_YET);
-        } else if (isRequestAndResponseRequiredFromParty(caseData, RESPONDENT_TITLE)) {
+        } else if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
             applicationType.setApplicationState(UPDATED);
         }
     }

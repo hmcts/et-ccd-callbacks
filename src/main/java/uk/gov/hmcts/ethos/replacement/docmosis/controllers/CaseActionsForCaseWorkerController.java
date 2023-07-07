@@ -278,6 +278,7 @@ public class CaseActionsForCaseWorkerController {
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseFlagsService.setupCaseFlags(caseData);
+            caseFlagsService.setDefaultFlags(caseData);
             caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
             if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {

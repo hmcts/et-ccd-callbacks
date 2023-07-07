@@ -13,6 +13,8 @@ def secrets = [
         'et-cos-${env}': [
                 secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
                 secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
+                secret('et-ccd-api-user-name', 'ET_CCD_API_USER_NAME'),
+                secret('et-ccd-api-password', 'ET_CCD_API_PASSWORD'),
                 secret('et-caseworker-username', 'ET_CASEWORKER_USER_NAME'),
                 secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
                 secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),

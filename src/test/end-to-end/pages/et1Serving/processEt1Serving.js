@@ -45,6 +45,7 @@ module.exports =  async function () {
     I.see('Attach and send document PDFs to Acas at etsmail@acas.org.uk');
     I.see('Instructions for the content of the email are on the \'Sending general correspondence to Acas via email\' job card.');
     I.click(commonConfig.continueButton);
+    I.click(commonConfig.submit);
 
     I.waitForText('ET1 serving', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');

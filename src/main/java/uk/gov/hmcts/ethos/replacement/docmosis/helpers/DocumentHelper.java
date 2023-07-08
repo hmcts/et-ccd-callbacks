@@ -971,12 +971,15 @@ public final class DocumentHelper {
      * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
      * @param uploadedDocumentType UploadedDocumentType to be added
      * @param typeOfDocument String to update TypeOfDocument
+     * @param shortDescription short description of the document
      * @return DocumentTypeItem
      */
     public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
-                                                          String typeOfDocument) {
+                                                          String typeOfDocument, String shortDescription) {
         DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
-        documentTypeItem.getValue().setTypeOfDocument(typeOfDocument);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setTypeOfDocument(typeOfDocument);
+        documentType.setShortDescription(shortDescription);
         return documentTypeItem;
     }
 

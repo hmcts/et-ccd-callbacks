@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,9 +19,11 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
@@ -83,6 +86,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @SpyBean
     private NotificationProperties notificationProperties;
+
     @MockBean
     private DocumentManagementService documentManagementService;
 
@@ -119,7 +123,7 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
-                        tornadoService, notificationProperties);
+                        tornadoService, notificationProperties, documentManagementService);
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
@@ -680,5 +684,21 @@ class RespondentTellSomethingElseServiceTest {
             personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
         }
         return personalisation;
+    }
+
+    @Test
+    void generatesAndAddsTsePdfToDocumentCollection() {
+        CaseData caseData = new CaseData();
+        caseData.setResTseSelectApplication("withdraw");
+        respondentTellSomethingElseService.generateAndAddTsePdf(caseData, "token", "typeId");
+
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        DocumentType actual = documentCollection.get(0).getValue();
+
+        DocumentType expected = DocumentType.builder().typeOfDocument("Respondent correspondence")
+            .shortDescription("Withdraw all/part of claim").build();
+
+        Assertions.assertThat(documentCollection).hasSize(1);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 }

@@ -2189,9 +2189,12 @@ class DocumentHelperTest {
     void createDocumentTypeItem_createsCorrectly() {
         UploadedDocumentType build = UploadedDocumentType.builder().documentFilename("fileName").documentUrl("url")
             .documentBinaryUrl("binaryUrl").build();
-        DocumentTypeItem actual = DocumentHelper.createDocumentTypeItem(build, "typeOfDocument");
+        DocumentTypeItem actual = DocumentHelper.createDocumentTypeItem(
+            build, "typeOfDocument", "shortDescription"
+        );
 
-        DocumentType expected = DocumentType.builder().typeOfDocument("typeOfDocument").uploadedDocument(build).build();
+        DocumentType expected = DocumentType.builder().typeOfDocument("typeOfDocument")
+            .shortDescription("shortDescription").uploadedDocument(build).build();
 
         assertThat(actual.getId()).isNotEmpty();
         assertThat(actual.getValue()).isEqualTo(expected);

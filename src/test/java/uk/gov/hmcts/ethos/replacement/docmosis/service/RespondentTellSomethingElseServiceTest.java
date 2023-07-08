@@ -687,14 +687,14 @@ class RespondentTellSomethingElseServiceTest {
     @Test
     void generatesAndAddsTsePdfToDocumentCollection() {
         CaseData caseData = new CaseData();
-        caseData.setResTseSelectApplication("withdraw");
+        caseData.setResTseSelectApplication("Amend response");
         respondentTellSomethingElseService.generateAndAddTsePdf(caseData, "token", "typeId");
 
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         DocumentType actual = documentCollection.get(0).getValue();
 
         DocumentType expected = DocumentType.builder().typeOfDocument("Respondent correspondence")
-            .shortDescription("Withdraw all/part of claim").build();
+            .shortDescription("Amend response").build();
 
         Assertions.assertThat(documentCollection).hasSize(1);
         Assertions.assertThat(actual).isEqualTo(expected);

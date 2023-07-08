@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -433,23 +434,20 @@ class RespondentTellSomethingElseServiceTest {
 
         tseService.createApplication(caseData, false);
 
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue().getDetails(), is(textBoxData));
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getCopyToOtherPartyText(), is("copyToOtherPartyTextArea"));
+        var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
+        assertThat(genericTseApplicationType.getDetails(), is(textBoxData));
+        assertThat(genericTseApplicationType.getCopyToOtherPartyText(), is("copyToOtherPartyTextArea"));
+        assertThat(genericTseApplicationType.getCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
+        assertThat(genericTseApplicationType.getDocumentUpload().getDocumentUrl(), is(documentUrl));
+        assertThat(genericTseApplicationType.getApplicant(), is(RESPONDENT_TITLE));
+        assertThat(genericTseApplicationType.getType(), is(selectedApplication));
 
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        DocumentType actualDocumentType = documentCollection.get(0).getValue();
 
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getDocumentUpload().getDocumentUrl(), is(documentUrl));
-
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getApplicant(), is(RESPONDENT_TITLE));
-
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getType(), is(selectedApplication));
-
-        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(documentCollection.size(), is(1));
+        assertEquals(selectedApplication, actualDocumentType.getShortDescription());
+        assertEquals("Respondent correspondence", actualDocumentType.getTypeOfDocument());
 
         assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
         assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));

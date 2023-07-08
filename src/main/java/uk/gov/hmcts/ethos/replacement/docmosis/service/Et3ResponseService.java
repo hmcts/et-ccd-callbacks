@@ -66,7 +66,7 @@ public class Et3ResponseService {
      */
     public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
-        addDocumentToDocCollection(caseData, DocumentHelper.createDocumenTypeItem(uploadedDocument, "ET3"));
+        addDocumentToDocCollection(caseData, DocumentHelper.createDocumentTypeItem(uploadedDocument, "ET3"));
         saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }
 
@@ -123,12 +123,12 @@ public class Et3ResponseService {
         documents.addAll(documentList);
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
-            documents.add(DocumentHelper.createDocumenTypeItem(
+            documents.add(DocumentHelper.createDocumentTypeItem(
                     caseData.getEt3ResponseEmployerClaimDocument(), ET3_ATTACHMENT));
         }
 
         if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
-            documents.add(DocumentHelper.createDocumenTypeItem(
+            documents.add(DocumentHelper.createDocumentTypeItem(
                     caseData.getEt3ResponseRespondentSupportDocument(), ET3_ATTACHMENT));
         }
 

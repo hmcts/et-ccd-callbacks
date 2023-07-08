@@ -14,6 +14,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
@@ -26,6 +28,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -2183,6 +2186,18 @@ class DocumentHelperTest {
     }
 
     @Test
+    void createDocumentTypeItem_createsCorrectly() {
+        UploadedDocumentType build = UploadedDocumentType.builder().documentFilename("fileName").documentUrl("url")
+            .documentBinaryUrl("binaryUrl").build();
+        DocumentTypeItem actual = DocumentHelper.createDocumentTypeItem(build, "typeOfDocument");
+
+        DocumentType expected = DocumentType.builder().typeOfDocument("typeOfDocument").uploadedDocument(build).build();
+
+        assertThat(actual.getId()).isNotEmpty();
+        assertThat(actual.getValue()).isEqualTo(expected);
+    }
+
+    @Test
     void setLegalRepVisibleDocuments_hidesDocuments() {
         CaseData caseData = new CaseData();
         DocumentTypeItem et1Doc = DocumentFixtures.getDocumentTypeItem("Visible", "ET1");
@@ -2197,8 +2212,8 @@ class DocumentHelperTest {
 
         List<DocumentTypeItem> legalRepDocuments = caseData.getLegalrepDocumentCollection();
 
-        assertEquals(legalRepDocuments.size(), 2);
-        assertEquals(legalRepDocuments.get(0).getValue().getUploadedDocument().getDocumentFilename(), "Visible");
-        assertEquals(legalRepDocuments.get(1).getValue().getUploadedDocument().getDocumentFilename(), "Visible");
+        assertEquals(2, legalRepDocuments.size());
+        assertEquals("Visible", legalRepDocuments.get(0).getValue().getUploadedDocument().getDocumentFilename());
+        assertEquals("Visible", legalRepDocuments.get(1).getValue().getUploadedDocument().getDocumentFilename());
     }
 }

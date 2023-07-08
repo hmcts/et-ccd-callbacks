@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -969,20 +968,15 @@ public final class DocumentHelper {
     }
 
     /**
-     * Create a documentTypeItem.
-     * @param uploadedDocument document uploaded to DM store
-     * @param typeOfDocument type of document
-     * @return a document to be added to the doc collection
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param typeOfDocument String to update TypeOfDocument
+     * @return DocumentTypeItem
      */
-    public static DocumentTypeItem createDocumenTypeItem(UploadedDocumentType uploadedDocument, String typeOfDocument) {
-        DocumentType documentType = DocumentType.builder()
-                .typeOfDocument(typeOfDocument)
-                .uploadedDocument(uploadedDocument)
-                .build();
-
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setValue(documentType);
-        documentTypeItem.setId(UUID.randomUUID().toString());
+    public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
+                                                          String typeOfDocument) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        documentTypeItem.getValue().setTypeOfDocument(typeOfDocument);
         return documentTypeItem;
     }
 
@@ -1006,18 +1000,5 @@ public final class DocumentHelper {
         }
 
         return types.contains(typeOfDocument);
-    }
-
-    /**
-     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
-     * @param uploadedDocumentType UploadedDocumentType to be added
-     * @param typeOfDocument String to update TypeOfDocument
-     * @return DocumentTypeItem
-     */
-    public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
-                                                          String typeOfDocument) {
-        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
-        documentTypeItem.getValue().setTypeOfDocument(typeOfDocument);
-        return documentTypeItem;
     }
 }

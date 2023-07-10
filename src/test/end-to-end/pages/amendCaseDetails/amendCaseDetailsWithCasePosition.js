@@ -10,5 +10,6 @@ module.exports = async function (clerkResponsible, casePosition, physicalLocatio
     I.selectOption('#conciliationTrack', conciliationTrack);
     I.click(commonConfig.continue);
     I.click(commonConfig.continue);
+    I.click(commonConfig.submit);
     I.see(commonConfig.moveAcceptedCaseToCloseCaseErrorCheck);
 };

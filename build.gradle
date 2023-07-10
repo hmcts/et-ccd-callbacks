@@ -131,11 +131,11 @@ task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
 }
 
 task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--steps', '--reporter', 'mocha-multi'
+    commandLine 'yarn', 'test:smoke'
 }
 
 task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@RET-BAT', '--steps', '--reporter', 'mocha-multi'
+    commandLine 'yarn', 'test:functional'
 }
 
 task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
@@ -152,11 +152,11 @@ task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
     //IGNORE_SESSION_VALIDATION=true NODE_ENV=testing LOG_LEVEL=OFF NODE_PATH=. node_modules/.bin/codeceptjs run-multiple  ${BROWSER_GROUP:-'--all'} -c src/test/end-to-end/saucelabs.conf.js --grep @RET-XB --steps --reporter mocha-multi
     workingDir '.'
     commandLine './bin/run-crossbrowser-tests.sh'
-    commandLine 'node_modules/.bin/codeceptjs', 'run-multiple', '--all', '-c', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--reporter', 'mocha-multi'
+    commandLine 'yarn', 'test:crossbrowser'
 }
 
 task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
+    commandLine 'yarn', 'test:fullfunctional'
 }
 
 task integration(type: Test) {
@@ -277,10 +277,10 @@ ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'com.google.guava', version: '31.1-jre') {
+        dependencySet(group: 'com.google.guava', version: '32.0.1-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.1.92.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.94.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -293,6 +293,8 @@ dependencyManagement {
             entry 'netty-transport-native-epoll'
             entry 'netty-transport-native-kqueue'
             entry 'netty-transport-native-unix-common'
+            entry 'netty-transport-classes-epoll'
+            entry 'netty-transport-classes-kqueue'
         }
     }
 }
@@ -307,6 +309,7 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.31'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.60.Final'
 
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.23.0'
@@ -317,7 +320,6 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.28'
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '3.0.2'
-    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.0'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.0.0'
@@ -342,9 +344,8 @@ dependencies {
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '5.1.6'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
-    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.92.Final'
-    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.92.Final'
-
+    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.94.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.94.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'
 
     compileOnly 'org.projectlombok:lombok'

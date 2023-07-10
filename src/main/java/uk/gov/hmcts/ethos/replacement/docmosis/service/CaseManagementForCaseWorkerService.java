@@ -152,7 +152,6 @@ public class CaseManagementForCaseWorkerService {
 
         if (caseData.getRestrictedReporting() == null) {
             caseData.setPublicCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
-
         } else {
             caseData.setPublicCaseName(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE);
         }

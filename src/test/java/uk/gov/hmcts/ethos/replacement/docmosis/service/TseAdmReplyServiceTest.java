@@ -48,12 +48,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CLAIMANT_NOT_COMPLIED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -169,17 +171,18 @@ class TseAdmReplyServiceTest {
     }
 
     @Nested
-    class UpdateApplicationStatus {
+    class UpdateApplicationStatusRequest {
         @BeforeEach
         void setUp() {
             caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder().withNumber("1").build())
-                    .build()
-                )
+                    List.of(GenericTseApplicationTypeItem.builder()
+                            .id(UUID.randomUUID().toString())
+                            .value(TseApplicationBuilder.builder().withNumber("1").build())
+                            .build()
+                    )
             );
             caseData.setTseAdminSelectApplication(DynamicFixedListType.of(DynamicValueType.create("1", "")));
+            caseData.setTseAdmReplyIsCmoOrRequest("Request");
             caseData.setTseAdmReplyRequestIsResponseRequired("Yes");
         }
 
@@ -188,7 +191,7 @@ class TseAdmReplyServiceTest {
         void requestInformationFromParty(String party, String expectedState) {
             caseData.setTseAdmReplyRequestSelectPartyRespond(party);
 
-            tseAdmReplyService.updateApplicationStatus(caseData);
+            tseAdmReplyService.updateApplicationState(caseData);
 
             GenericTseApplicationType actual = caseData.getGenericTseApplicationCollection().get(0).getValue();
             assertThat(actual.getApplicationState()).isEqualTo(expectedState);
@@ -196,10 +199,46 @@ class TseAdmReplyServiceTest {
 
         static Stream<Arguments> partyAndStatusArguments() {
             return Stream.of(
-                Arguments.of("Claimant", "notStartedYet"),
-                Arguments.of("Respondent", "updated"),
-                Arguments.of("Both parties", "notStartedYet")
+                    Arguments.of(CLAIMANT_TITLE, NOT_STARTED_YET),
+                    Arguments.of(RESPONDENT_TITLE, UPDATED),
+                    Arguments.of("Both parties", NOT_STARTED_YET)
             );
+        }
+
+        @Nested
+        class UpdateApplicationStatusCMO {
+            @BeforeEach
+            void setUp() {
+                caseData.setGenericTseApplicationCollection(
+                        List.of(GenericTseApplicationTypeItem.builder()
+                                .id(UUID.randomUUID().toString())
+                                .value(TseApplicationBuilder.builder().withNumber("1").build())
+                                .build()
+                        )
+                );
+                caseData.setTseAdminSelectApplication(DynamicFixedListType.of(DynamicValueType.create("1", "")));
+                caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+                caseData.setTseAdmReplyCmoIsResponseRequired("Yes");
+            }
+
+            @ParameterizedTest
+            @MethodSource("partyAndStatusArguments")
+            void requestInformationFromParty(String party, String expectedState) {
+                caseData.setTseAdmReplyCmoSelectPartyRespond(party);
+
+                tseAdmReplyService.updateApplicationState(caseData);
+
+                GenericTseApplicationType actual = caseData.getGenericTseApplicationCollection().get(0).getValue();
+                assertThat(actual.getApplicationState()).isEqualTo(expectedState);
+            }
+
+            static Stream<Arguments> partyAndStatusArguments() {
+                return Stream.of(
+                        Arguments.of("Claimant", "notStartedYet"),
+                        Arguments.of("Respondent", "updated"),
+                        Arguments.of("Both parties", "notStartedYet")
+                );
+            }
         }
     }
 

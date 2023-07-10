@@ -16,37 +16,37 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmReplyService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
-@RequestMapping("/tseAdmReply")
+@RequestMapping("/bundlesRespondent")
 @RestController
 @RequiredArgsConstructor
-public class TseAdmReplyController {
+public class BundlesRespondentController {
+
+    private final VerifyTokenService verifyTokenService;
+    private final BundlesRespondentService bundlesRespondentService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final VerifyTokenService verifyTokenService;
-    private final TseAdmReplyService tseAdmReplyService;
 
     /**
-     * Middle Event for initial Application & Response details.
-     * @param ccdRequest        CaseData which is a generic data type for most of the
-     *                          methods which holds case data
-     * @param  userToken        Used for authorisation
-     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
-     *                          includes caseData which contains the upload document names of
-     *                          type "Another type of document" in a html string format.
+     * Called at the start of Bundles Respondent Prepare Doc for Hearing journey.
+     * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
      */
-    @PostMapping(value = "/midDetailsTable", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Mid Event for initial Application & Response details")
+    @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "initialize data for bundles respondent")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -56,9 +56,9 @@ public class TseAdmReplyController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> midDetailsTable(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -66,80 +66,114 @@ public class TseAdmReplyController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseAdmReplyTableMarkUp(tseAdmReplyService.initialTseAdmReplyTableMarkUp(caseData, userToken));
-        return getCallbackRespEntityNoErrors(caseData);
+        caseData.setBundlesRespondentPrepareDocNotesShow(YES);
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     /**
-     * Middle Event for validate user input.
-     * @param ccdRequest        CaseData which is a generic data type for most of the
-     *                          methods which holds case data
-     * @param  userToken        Used for authorisation
-     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
-     *                          includes caseData which contains the upload document names of
-     *                          type "Another type of document" in a html string format.
+     * About to Submit for Bundles Respondent Prepare Doc for Hearing journey.
+     * @param ccdRequest generic request from CCD
+     * @param userToken authentication token to verify the user
+     * @return Callback response entity with case data attached.
      */
-    @PostMapping(value = "/midValidateInput", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Mid Event for initial Application & Response details")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> midValidateInput(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = tseAdmReplyService.validateInput(caseData);
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "About to Submit for bundles respondent")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        tseAdmReplyService.updateApplicationState(caseData);
-        tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
-        tseAdmReplyService.sendAdmReplyEmails(ccdRequest.getCaseDetails().getCaseId(), caseData);
-        tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
+        bundlesRespondentService.addToBundlesCollection(caseData);
+        bundlesRespondentService.clearInputData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
-     * Returns data needed to populate the submitted page.
+     * Populates the hearing list on page 3.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
+    @PostMapping(value = "/midPopulateHearings", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the hearing list on page 3.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midPopulateHearings(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        bundlesRespondentService.populateSelectHearings(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Validates the uploaded file is a PDF.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/midValidateUpload", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Validates the uploaded file is a PDF")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midValidateUpload(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = bundlesRespondentService.validateFileUpload(caseData);
+
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
+     * Renders data for the submitted page.
+     */
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates data for the submitted page")
+    @Operation(summary = "Renders data for the submitted page.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -158,13 +192,14 @@ public class TseAdmReplyController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("### What happens next\r\n\r\nYou can view the response in the <a href"
-                + "=\"/cases/case-details/%s#Applications\" target=\"_blank\">Applications tab (opens in a new tab)"
-                + "</a>",
-            ccdRequest.getCaseDetails().getCaseId());
+        String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
+        String body = "<h2>What happens next</h2>\r\n\r\nThe tribunal will let you know"
+                + " if they have any questions about the hearing documents you have submitted.";
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .confirmation_body(body)
-            .build());
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_header(header)
+                .confirmation_body(body)
+                .build());
     }
 }

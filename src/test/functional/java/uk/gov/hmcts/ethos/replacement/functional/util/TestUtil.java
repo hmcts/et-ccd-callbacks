@@ -9,6 +9,7 @@ import io.restassured.config.SSLConfig;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import jakarta.xml.bind.JAXBException;
 import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import jakarta.xml.bind.JAXBException;
 
 public class TestUtil {
 
@@ -47,13 +47,13 @@ public class TestUtil {
 
     //End-point /generateDocument
     public void executeGenerateDocumentTest(String topLevel, String childLevel, String expectedValue)
-            throws IOException, JAXBException, Docx4JException {
+            throws IOException, JAXBException, Docx4JException, javax.xml.bind.JAXBException {
         executeGenerateDocumentTest(topLevel, childLevel, expectedValue, false);
     }
 
     public void executeGenerateDocumentTest(String topLevel, String childLevel, String expectedValue,
                                             boolean isScotland)
-            throws IOException, JAXBException, Docx4JException {
+            throws IOException, JAXBException, Docx4JException, javax.xml.bind.JAXBException {
         if (isScotland) {
             executeGenerateDocumentTest(topLevel, childLevel, expectedValue, true, Constants.TEST_DATA_SCOT_CASE1);
         } else {
@@ -63,7 +63,7 @@ public class TestUtil {
 
     public void executeGenerateDocumentTest(String topLevel, String childLevel, String expectedValue,
                                             boolean isScotland, String testData)
-            throws IOException, JAXBException, Docx4JException {
+            throws IOException, JAXBException, Docx4JException, javax.xml.bind.JAXBException {
 
         this.topLevel = topLevel;
         this.childLevel = childLevel;
@@ -82,7 +82,7 @@ public class TestUtil {
 
     public void executeOutstationDocumentTest(String topLevel, String childLevel, String expectedValue,
                                               boolean isScotland, String testData)
-            throws IOException, JAXBException, Docx4JException {
+            throws IOException, JAXBException, Docx4JException, javax.xml.bind.JAXBException {
 
         this.topLevel = topLevel;
         this.childLevel = childLevel;
@@ -481,7 +481,7 @@ public class TestUtil {
     private void verifyDocument(String topLevel, String expectedValue, boolean isScotland,
                                 CCDRequest ccdRequest,
                                 Response response) throws IOException,
-            JAXBException, Docx4JException {
+            JAXBException, Docx4JException, javax.xml.bind.JAXBException {
         Pattern pattern = Pattern.compile(Constants.URL_PATTERN);
         String url = ResponseUtil.getUrlFromResponse(response);
 
@@ -494,7 +494,7 @@ public class TestUtil {
     }
 
     private void existsInDocument(String expectedValue, File actualDocument, boolean isScotland)
-            throws JAXBException, Docx4JException {
+            throws JAXBException, Docx4JException, javax.xml.bind.JAXBException {
 
         String docVersion;
 

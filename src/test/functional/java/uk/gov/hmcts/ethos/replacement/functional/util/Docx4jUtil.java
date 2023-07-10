@@ -1,24 +1,26 @@
 package uk.gov.hmcts.ethos.replacement.functional.util;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.Text;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
 
 public class Docx4jUtil {
 
     private Docx4jUtil() {
     }
 
-    public static List<String> getAllTextElementsFromDocument(File document) throws JAXBException, Docx4JException {
+    public static List<String> getAllTextElementsFromDocument(File document) throws JAXBException, Docx4JException,
+            javax.xml.bind.JAXBException {
         List<String> result = new LinkedList<>();
 
         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(document);
@@ -38,7 +40,7 @@ public class Docx4jUtil {
     }
 
     public static List<String> getSelectedTextElementsFromDocument(File document, String docVersion)
-            throws JAXBException, Docx4JException {
+            throws JAXBException, Docx4JException, javax.xml.bind.JAXBException {
         List<String> result = new LinkedList<>();
 
         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(document);
@@ -85,7 +87,7 @@ public class Docx4jUtil {
     }
 
     public static List<String> getTagsFromDocument(File document, boolean isScotland)
-            throws JAXBException, Docx4JException {
+            throws JAXBException, Docx4JException, javax.xml.bind.JAXBException {
         List<String> result = new LinkedList<>();
 
         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(document);

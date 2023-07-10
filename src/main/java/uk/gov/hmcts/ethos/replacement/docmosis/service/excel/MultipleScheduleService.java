@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 @RequiredArgsConstructor
 @Service("multipleScheduleService")
 @SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.DoNotUseThreads"})
+    "PMD.DoNotUseThreads", "PMD.CloseResource"})
 public class MultipleScheduleService {
 
     private final ExcelReadingService excelReadingService;

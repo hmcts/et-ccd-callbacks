@@ -280,6 +280,7 @@ public class CaseActionsForCaseWorkerController {
             caseFlagsService.setupCaseFlags(caseData);
             caseFlagsService.setDefaultFlags(caseData);
             caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
             if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
                 caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
@@ -422,6 +423,7 @@ public class CaseActionsForCaseWorkerController {
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
         caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -467,6 +469,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -626,6 +629,7 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         eventValidationService.validateRestrictedReportingNames(caseData);
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

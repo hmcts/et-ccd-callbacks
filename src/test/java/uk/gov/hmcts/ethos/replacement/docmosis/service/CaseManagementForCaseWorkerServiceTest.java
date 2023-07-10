@@ -36,6 +36,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -64,12 +65,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
@@ -987,6 +990,31 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
         assertEquals("claimant vs respondent", caseData.getHmctsInternalCaseName());
+    }
+
+    @Test
+     void testPublicCaseName() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("respondent");
+
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+
+        assertEquals("claimant vs respondent", caseData.getPublicCaseName());
+    }
+
+    @Test
+     void testPublicCaseNameWithRule50() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("Person1");
+        caseData.setRespondent("Person2");
+        RestrictedReportingType restrictedReportingType = new RestrictedReportingType();
+        restrictedReportingType.setRule503b(YES);
+        caseData.setRestrictedReporting(restrictedReportingType);
+
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+
+        assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE, caseData.getPublicCaseName());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

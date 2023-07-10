@@ -993,7 +993,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void testPublicCaseName() {
+     void testPublicCaseName() {
         CaseData caseData = new CaseData();
         caseData.setClaimant("claimant");
         caseData.setRespondent("respondent");
@@ -1004,7 +1004,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void testPublicCaseNameWithRule50() {
+     void testPublicCaseNameWithRule50() {
         CaseData caseData = new CaseData();
         caseData.setClaimant("Person1");
         caseData.setRespondent("Person2");

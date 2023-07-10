@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.springframework.boot' version '3.0.7'
+    id 'org.springframework.boot' version '3.0.8'
     id 'org.owasp.dependencycheck' version '8.2.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -270,7 +270,7 @@ ext {
     log4JVersion = '2.20.0'
     pact_version = '4.3.10'
     serenity = '3.7.1'
-    tomcatEmbedVersion = '9.0.75'
+    tomcatEmbedVersion = '10.1.10'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -367,14 +367,14 @@ dependencies {
         exclude module: 'slf4j-log4j12'
     }
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitJupiterVersion
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.0.8'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.18.0'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.5.6'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.41'
-    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.0.7'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.0.8'
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion

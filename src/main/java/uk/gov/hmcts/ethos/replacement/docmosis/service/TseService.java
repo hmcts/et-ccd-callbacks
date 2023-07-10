@@ -261,8 +261,6 @@ public class TseService {
     }
 
     private String getSingleDecisionMarkdown(TseAdminRecordDecisionType decision, String authToken) {
-        List<GenericTypeItem<DocumentType>> documents = decision.getResponseRequiredDoc();
-        List<String[]> documentsRows = addDocumentRows(documents, authToken);
         List<String[]> rows = new ArrayList<>(List.of(
             new String[]{"Notification", decision.getEnterNotificationTitle()},
             new String[]{"Decision", decision.getDecision()},
@@ -271,7 +269,7 @@ public class TseService {
             new String[]{"Sent by", TRIBUNAL},
             new String[]{"Type of decision", decision.getTypeOfDecision()}
         ));
-        rows.addAll(documentsRows);
+        rows.addAll(addDocumentRows(decision.getResponseRequiredDoc(), authToken));
         rows.addAll(List.of(
             new String[]{"Additional information", decision.getAdditionalInformation()},
             new String[]{"Decision made by", decision.getDecisionMadeBy()},
@@ -283,10 +281,10 @@ public class TseService {
     }
 
     private String formatApplicationDecisions(GenericTseApplicationType application, String authToken) {
-
         if (application.getAdminDecision() == null) {
             return "";
         }
+
         List<String> decisionsMarkdown = application.getAdminDecision()
             .stream()
             .sorted(Comparator.comparing((TseAdminRecordDecisionTypeItem d) -> d.getValue().getDate()).reversed())
@@ -305,7 +303,7 @@ public class TseService {
      * @param authToken user token for getting document metadata
      * @return Two columned Markdown table detailing the admin response
      */
-    public String formatAdminReply(TseRespondType reply, int count, String authToken) {
+    String formatAdminReply(TseRespondType reply, int count, String authToken) {
         List<String[]> rows = new ArrayList<>();
 
         rows.addAll(List.of(

@@ -166,7 +166,7 @@ task integration(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     failFast = true
     reports {
-        html.enabled(true)
+        html.required = true
         html.destination file("${buildDir}/integration/")
     }
 }

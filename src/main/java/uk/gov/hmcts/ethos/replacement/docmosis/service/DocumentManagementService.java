@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 
 @Service
 @Slf4j
-@ComponentScan("uk.gov.hmcts.reform.ccd.document.am.feign")
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform.ccd.document.am.feign", "uk.gov.hmcts.reform.document"})
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 public class DocumentManagementService {
 

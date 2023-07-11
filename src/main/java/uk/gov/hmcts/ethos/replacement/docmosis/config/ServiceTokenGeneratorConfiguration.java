@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Configuration
+@ComponentScan(basePackages = "uk.gov.hmcts.reform.authorisation")
 @Lazy
 public class ServiceTokenGeneratorConfiguration {
 

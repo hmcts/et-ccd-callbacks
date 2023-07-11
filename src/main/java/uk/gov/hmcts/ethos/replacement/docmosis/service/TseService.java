@@ -41,6 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.MD_TABLE_EMPTY_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 
 @Slf4j
@@ -48,7 +49,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.cre
 @RequiredArgsConstructor
 public class TseService {
     public static final String WHATS_YOUR_RESPONSE = "What's your response to the %s's application";
-    protected static final String[] MD_TABLE_EMPTY_LINE = {"", ""};
 
     private static final String RULE92_QUESTION =
             "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
@@ -283,7 +283,7 @@ public class TseService {
             new String[]{"Sent by", TRIBUNAL},
             new String[]{"Type of decision", decision.getTypeOfDecision()}
         ));
-        rows.addAll(addDocumentRows(decision.getResponseRequiredDoc(), authToken));
+        rows.addAll(addDocumentsRows(decision.getResponseRequiredDoc(), authToken));
         rows.addAll(List.of(
             new String[]{"Additional information", decision.getAdditionalInformation()},
             new String[]{"Decision made by", decision.getDecisionMadeBy()},
@@ -328,7 +328,7 @@ public class TseService {
                 new String[]{"Party or parties to respond", reply.getSelectPartyRespond()},
                 new String[]{"Additional information", reply.getAdditionalInformation()}
         ));
-        rows.addAll(addDocumentRows(reply.getAddDocument(), authToken));
+        rows.addAll(addDocumentsRows(reply.getAddDocument(), authToken));
         rows.addAll(List.of(
                 new String[]{"Case management order made by", reply.getCmoMadeBy()},
                 new String[]{"Request made by", reply.getRequestMadeBy()},
@@ -363,7 +363,7 @@ public class TseService {
                 new String[]{"Response date", reply.getDate()},
                 new String[]{String.format(WHATS_YOUR_RESPONSE, applicant), reply.getResponse()}
         ));
-        rows.addAll(addDocumentRows(reply.getSupportingMaterial(), authToken));
+        rows.addAll(addDocumentsRows(reply.getSupportingMaterial(), authToken));
         rows.addAll(List.of(
                 new String[]{RULE92_QUESTION, copyToOtherParty},
                 new String[]{RULE92_DETAILS, reply.getCopyNoGiveDetails()}
@@ -376,7 +376,7 @@ public class TseService {
      * Returns a list of rows for multiple documents for use in a two columned Markdown table.
      * @return A list of String arrays, one string array for each document's name and another for the short description
      */
-    List<String[]> addDocumentRows(List<GenericTypeItem<DocumentType>> documents, String authToken) {
+    List<String[]> addDocumentsRows(List<GenericTypeItem<DocumentType>> documents, String authToken) {
         return documents.stream().flatMap(o -> addDocumentRow(o.getValue(), authToken).stream()).toList();
     }
 
@@ -389,6 +389,6 @@ public class TseService {
     List<String[]> addDocumentRow(DocumentType document, String authToken) {
         UploadedDocumentType uploadedDocument = document.getUploadedDocument();
         String nameTypeSizeLink = documentManagementService.displayDocNameTypeSizeLink(uploadedDocument, authToken);
-        return MarkdownHelper.addDocumentRow(document, nameTypeSizeLink);
+        return MarkdownHelper.addRowsForDocument(document, nameTypeSizeLink);
     }
 }

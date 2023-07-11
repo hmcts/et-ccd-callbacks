@@ -92,7 +92,7 @@ class TseAdmCloseServiceTest {
 
         String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
 
-        when(tseService.addDocumentRows(any(), any())).thenReturn(List.of(
+        when(tseService.addDocumentsRows(any(), any())).thenReturn(List.of(
                 new String[]{"Document", fileDisplay1},
                 new String[]{"Description", ""})
         );

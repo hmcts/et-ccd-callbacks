@@ -58,7 +58,7 @@ class TseServiceTest {
 
     @Test
     void addDocumentRows_withNoDocuments_returnsEmptyList() {
-        List<String[]> actual = tseService.addDocumentRows(null, AUTH_TOKEN);
+        List<String[]> actual = tseService.addDocumentsRows(null, AUTH_TOKEN);
 
         assertThat(actual).isEmpty();
     }
@@ -77,7 +77,7 @@ class TseServiceTest {
                 .thenReturn("File2 (txt, 1MB)");
 
         var documents = List.of(GenericTypeItem.from(document), GenericTypeItem.from(documentTwo));
-        List<String[]> actual = tseService.addDocumentRows(documents, AUTH_TOKEN);
+        List<String[]> actual = tseService.addDocumentsRows(documents, AUTH_TOKEN);
 
         assertThat(actual).hasSize(4);
         assertThat(actual.get(0)).isEqualTo(new String[] {"Document", "File1 (txt, 1MB)"});

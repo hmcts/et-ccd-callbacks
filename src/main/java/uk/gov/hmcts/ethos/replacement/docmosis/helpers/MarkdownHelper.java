@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
  * Helper class for formatting strings into markdown.
  */
 public final class MarkdownHelper {
+    public static final String[] MD_TABLE_EMPTY_LINE = {"", ""};
+
     private MarkdownHelper() {
         // Access through static methods
     }
@@ -33,6 +36,7 @@ public final class MarkdownHelper {
     // Formats data for use in a two column table. Ignores rows if any cell is null.
     private static String createTwoColumnRows(List<String[]> rows) {
         return rows.stream()
+            .filter(columns -> columns[1] != null)
             .map(columns -> String.format("|%s|%s|\r\n", columns[0], columns[1]))
             .collect(Collectors.joining());
     }
@@ -44,9 +48,15 @@ public final class MarkdownHelper {
      */
     public static List<String[]> addDocumentRow(DocumentType document) {
         UploadedDocumentType uploadedDocument = document.getUploadedDocument();
+        if (uploadedDocument == null) {
+            List<String[]> ignoredLine = new ArrayList<>();
+            ignoredLine.add(new String[]{"Document", null});
+            return ignoredLine;
+        }
+
         String documentLink = String.format(DOCUMENT_LINK_MARKDOWN,
             Helper.extractLink(uploadedDocument.getDocumentBinaryUrl()), uploadedDocument.getDocumentFilename());
-        return addDocumentRow(document, documentLink);
+        return addRowsForDocument(document, documentLink);
     }
 
     /**
@@ -55,7 +65,7 @@ public final class MarkdownHelper {
      * @param documentString String to show for the document in the table
      * @return A list of String arrays representing the two columned rows
      */
-    public static List<String[]> addDocumentRow(DocumentType document, String documentString) {
+    public static List<String[]> addRowsForDocument(DocumentType document, String documentString) {
         return List.of(
             new String[]{"Document", documentString},
             new String[]{"Description", document.getShortDescription()}

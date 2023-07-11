@@ -984,6 +984,17 @@ public final class DocumentHelper {
     }
 
     /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param typeOfDocument String to update TypeOfDocument
+     * @return DocumentTypeItem
+     */
+    public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
+                                                          String typeOfDocument) {
+        return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
+    }
+
+    /**
      *  Filter documents that only the legal rep should be able to see.
      */
     public static void setLegalRepVisibleDocuments(CaseData caseData) {

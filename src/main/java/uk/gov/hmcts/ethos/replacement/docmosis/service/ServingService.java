@@ -161,7 +161,7 @@ public class ServingService {
             .forEach(d -> caseData.getDocumentCollection().add(
                 DocumentHelper.createDocumentTypeItem(
                     d.getValue().getUploadedDocument(),
-                    updateServingTypeOfDocument(d.getValue().getTypeOfDocument()), null)
+                    updateServingTypeOfDocument(d.getValue().getTypeOfDocument()))
             ));
     }
 

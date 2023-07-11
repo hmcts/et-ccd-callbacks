@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.buildPersonalisation;
 
 /**
@@ -66,7 +66,7 @@ public class Et3ResponseService {
      */
     public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
-        addDocumentToDocCollection(caseData, DocumentHelper.createDocumentTypeItem(uploadedDocument, "ET3", null));
+        addDocumentToDocCollection(caseData, createDocumentTypeItem(uploadedDocument, "ET3"));
         saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }
 
@@ -123,13 +123,11 @@ public class Et3ResponseService {
         documents.addAll(documentList);
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
-            documents.add(DocumentHelper.createDocumentTypeItem(
-                    caseData.getEt3ResponseEmployerClaimDocument(), ET3_ATTACHMENT, null));
+            documents.add(createDocumentTypeItem(caseData.getEt3ResponseEmployerClaimDocument(), ET3_ATTACHMENT));
         }
 
         if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
-            documents.add(DocumentHelper.createDocumentTypeItem(
-                    caseData.getEt3ResponseRespondentSupportDocument(), ET3_ATTACHMENT, null));
+            documents.add(createDocumentTypeItem(caseData.getEt3ResponseRespondentSupportDocument(), ET3_ATTACHMENT));
         }
 
     }

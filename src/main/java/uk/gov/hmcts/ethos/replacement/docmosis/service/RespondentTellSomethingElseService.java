@@ -297,7 +297,7 @@ public class RespondentTellSomethingElseService {
      * type.
      *
      * @param caseData contains all the case data
-     * @param userToken token sed for authorisation
+     * @param userToken token used for authorisation
      * @param caseTypeId reference which casetype the document will be uploaded to
      */
     public void generateAndAddTsePdf(CaseData caseData, String userToken, String caseTypeId) {

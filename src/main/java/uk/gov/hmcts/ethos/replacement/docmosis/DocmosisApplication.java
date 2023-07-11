@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ImportAutoConfiguration({FeignAutoConfiguration.class, JacksonAutoConfiguration.class})

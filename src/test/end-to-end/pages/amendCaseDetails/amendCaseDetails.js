@@ -23,6 +23,7 @@ module.exports = async function (clerkResponsible, physicalLocation, suggestedHe
     I.checkOption('#additionalCaseInfo_reasonableAdjustment_Yes');
     I.click(commonConfig.continue);
 
+    I.click(commonConfig.submit);
     //Verify the Case Details tab
     //I.click("//div[text()='Case Details']");
     caseDetails.verifyCaseDetails();

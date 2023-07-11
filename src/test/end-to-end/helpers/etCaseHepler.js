@@ -14,8 +14,8 @@ const {I} = inject()
 const location = 'ET_EnglandWales';
 const etDataLocation = dataLocation.data;
 const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/testing-support/lease`;
-const username = testConfig.TestEnvCWUser;
-const password = testConfig.TestEnvCWPassword;
+const username = testConfig.TestEnvApiUser;
+const password = testConfig.TestEnvApiPassword;
 const idamBaseUrl = `https://idam-api.${env}.platform.hmcts.net/loginUser`;
 const getUserIdurl = `https://idam-api.${env}.platform.hmcts.net/details`;
 const ccdApiUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.internal`;
@@ -471,7 +471,7 @@ async function jurisdictionToTheCaseEvent(authToken, serviceToken, case_id, user
 }
 
 async function navigateToCaseDetailsScreen(case_id) {
-    await I.authenticateWithIdam(username, password);
+    await I.authenticateWithIdam(testConfig.TestEnvCWUser, testConfig.TestEnvCWPassword);
     await I.amOnPage('/case-details/' + case_id);
 }
 

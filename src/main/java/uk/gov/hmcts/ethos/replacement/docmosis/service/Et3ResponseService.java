@@ -66,9 +66,7 @@ public class Et3ResponseService {
      */
     public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
-        addDocumentToDocCollection(caseData, DocumentHelper.createDocumentTypeItem(
-            uploadedDocument, "ET3", null)
-        );
+        addDocumentToDocCollection(caseData, DocumentHelper.createDocumentTypeItem(uploadedDocument, "ET3", null));
         saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }
 

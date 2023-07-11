@@ -18,9 +18,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -33,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 
 @Service
@@ -175,10 +178,11 @@ public class TseRespondentReplyService {
     public void initialResReplyToTribunalTableMarkUp(CaseData caseData, String authToken) {
         GenericTseApplicationType application = getRespondentSelectedApplicationType(caseData);
 
-        String applicationTable = tseService.formatApplicationDetails(application, authToken, true);
-        String responses = tseService.formatApplicationResponses(application, authToken, true);
+        List<String[]> applicationTable = tseService.getApplicationDetailsRows(application, authToken, true);
+        List<String[]> responses = tseService.formatApplicationResponses(application, authToken, true);
 
-        caseData.setTseResponseTable(applicationTable + "\r\n" + responses);
+        caseData.setTseResponseTable(createTwoColumnTable(new String[]{"Application", ""},
+            Stream.of(applicationTable, responses).flatMap(Collection::stream).toList()));
         caseData.setTseRespondingToTribunal(YES);
     }
 

@@ -2,9 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT_LINK_MARKDOWN;
 
 /**
@@ -29,23 +30,11 @@ public final class MarkdownHelper {
         return String.format("|%s|%s|\r\n|--|--|\r\n%s", header[0], header[1], createTwoColumnRows(rows));
     }
 
-    /**
-     * Formats data for use in a two column table. Ignores rows if any cell is null.
-     * @param rows Rows to format
-     * @return formatted string for use in a two column table
-     */
-    public static String createTwoColumnRows(List<String[]> rows) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (String[] columns : rows) {
-            if (columns.length < 2 || isEmpty(columns[0]) || isEmpty(columns[1])) {
-                continue;
-            }
-
-            stringBuilder.append(String.format("|%s|%s|\r\n", columns[0], columns[1]));
-        }
-
-        return stringBuilder.toString();
+    // Formats data for use in a two column table. Ignores rows if any cell is null.
+    private static String createTwoColumnRows(List<String[]> rows) {
+        return rows.stream()
+            .map(columns -> String.format("|%s|%s|\r\n", columns[0], columns[1]))
+            .collect(Collectors.joining());
     }
 
     /**

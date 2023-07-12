@@ -82,6 +82,7 @@ class BaseFunctionalTest {
 
     @BeforeAll
     public void setup() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException {
+        log.info("BaseFunctionalTest setup started.");
         client = buildClient();
         idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
         CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
@@ -89,6 +90,7 @@ class BaseFunctionalTest {
             : idamTestApiRequests.getAccessToken(user.getEmail());
         useRelaxedHTTPSValidation();
         spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
+        log.info("BaseFunctionalTest setup completed.");
     }
 
     private String createRandomEmail() {

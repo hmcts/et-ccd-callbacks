@@ -54,6 +54,7 @@ public class IdamTestApiRequests {
 
         String body = new ObjectMapper().writeValueAsString(createUser);
         makePostRequest(baseIdamApiUrl + "/testing-support/accounts", body);
+        log.info("BaseFunctionalTest user created.");
 
         return createUser;
     }

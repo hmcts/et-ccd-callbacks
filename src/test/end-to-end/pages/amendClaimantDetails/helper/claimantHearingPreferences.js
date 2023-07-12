@@ -22,5 +22,6 @@ function verifyClaimantHearingPreferences() {
     I.click('#claimantHearingPreference_contact_language-English');
     I.click('#claimantHearingPreference_hearing_language-Welsh');
     I.click('Continue');
+    I.click('Submit');
 }
 module.exports = { verifyClaimantHearingPreferences };

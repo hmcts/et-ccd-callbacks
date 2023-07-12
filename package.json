@@ -33,7 +33,11 @@
         "totp-generator": "0.0.13"
     },
     "scripts": {
-        "test:functional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --steps —-reporter mocha-multi --grep @RET-BAT",
+        "test:local": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --steps --reporter mocha-multi --verbose",
+        "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @smoke --steps --reporter mocha-multi --verbose",
+        "test:fullfunctional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @nightly --steps --reporter mocha-multi --verbose",
+        "test:crossbrowser": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run-multiple ${BROWSER_GROUP:-'--all'} --steps -c src/test/end-to-end/saucelabs.conf.js  --grep @crossbrowser --steps --reporter mocha-multi --verbose",
+        "test:functional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @nightly --steps --reporter mocha-multi --verbose",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"
     },
@@ -57,14 +61,14 @@
         "@types/supertest": "^2.0.8",
         "@typescript-eslint/eslint-plugin": "^5.13.0",
         "@typescript-eslint/parser": "^5.13.0",
-        "@wdio/cli": "^7.27.0",
-        "@wdio/sauce-service": "^7.27.0",
+        "@wdio/cli": "^8.11.2",
+        "@wdio/sauce-service": "^8.11.2",
         "@wdio/selenium-standalone-service": "^7.26.0",
         "@wdio/types": "^7.26.0",
         "chai": "4.3.6",
         "chai-as-promised": "7.1.1",
         "chai-http": "4.3.0",
-        "codeceptjs": "3.3.6",
+        "codeceptjs": "3.4.1",
         "codeceptjs-saucehelper": "^1.4.0",
         "eslint": "8.26.0",
         "eslint-config-prettier": "^8.5.0",
@@ -74,18 +78,18 @@
         "eslint-plugin-prettier": "^4.2.1",
         "husky": "8.0.1",
         "istanbul": "1.1.0-alpha.1",
-        "mocha": "9.2.2",
-        "mocha-jenkins-reporter": "0.4.7",
-        "mocha-junit-reporter": "2.0.2",
-        "mocha-multi": "1.1.6",
+        "mocha": "10.2.0",
+        "mocha-jenkins-reporter": "0.4.8",
+        "mocha-junit-reporter": "2.2.0",
+        "mocha-multi": "1.1.7",
         "mochawesome": "7.1.3",
         "nock": "13.2.4",
         "nodemon": "2.0.15",
         "nsp": "3.2.1",
         "pa11y": "6.2.3",
         "phantomjs-prebuilt": "2.1.16",
-        "playwright": "^1.28.1",
-        "playwright-core": "^1.28.1",
+        "playwright": "^1.35.1",
+        "playwright-core": "^1.35.1",
         "proxyquire": "2.1.3",
         "puppeteer": "13.5.2",
         "rewire": "6.0.0",
@@ -99,7 +103,7 @@
         "unirest": "0.6.0",
         "uuid": "8.3.2",
         "watch": "1.0.2",
-        "webdriverio": "7.27.0",
+        "webdriverio": "8.11.2",
         "when": "3.7.8"
     },
     "resolutions": {
@@ -120,5 +124,5 @@
         "qs": ">=6.10.3",
         "ua-parser-js": "^1.0.33"
     },
-    "packageManager": "yarn@3.4.1"
+    "packageManager": "yarn@3.6.0"
 }

@@ -39,8 +39,9 @@ module.exports = async function (jurisdiction) {
     I.click('//input[@id=\'hearingCollection_0_hearingSitAlone-Sit Alone\']'); //Using this Locator as the CSS has a Space in the name making the Tests to Fail...
     I.selectOption('#hearingCollection_0_Hearing_stage', '1: Stage 1');
     I.fillField('#hearingCollection_0_Hearing_notes', 'The hearing should be help as soon as possible....');
-    I.click('//div[@id=\'hearingCollection_0_hearingDateCollection\']/div/button');
-
+    I.scrollPageToBottom();
+    I.click('#hearingCollection_0_hearingDateCollection > div > button');
+    I.wait(2);
     const today = new Date();
     switch (today.getDay()) {
         case 0: //Sunday
@@ -54,9 +55,11 @@ module.exports = async function (jurisdiction) {
     I.fillField('#listedDate-day', today.getDate());
     I.fillField('#listedDate-month', today.getMonth() + 1);
     I.fillField('#listedDate-year', today.getFullYear());
-
+    //New expected behaviour introduced
+    //by EXUI. The POs are delibrating on it
     I.click(commonConfig.submit);
-
+    I.wait(2)
+    I.click(commonConfig.submit);
     //Verifying the Hearings Tab.
     I.waitForText('has been updated with event: List Hearing', testConfig.TestTimeToWaitForText);
     I.click("//div[text()='Hearings']");
@@ -64,7 +67,7 @@ module.exports = async function (jurisdiction) {
     I.see('Hearing');
     I.see('Hearing Venue');
     I.see('Leeds');
-    I.click('[alt=\'image\']');
+    I.click('[alt="image"]');
     I.waitForText('Hearing Format', testConfig.TestTimeToWaitForText);
     I.see('In person');
     I.see('Telephone');

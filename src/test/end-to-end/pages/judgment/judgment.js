@@ -115,6 +115,12 @@ module.exports = async function () {
     I.selectOption('#judgementCollection_0_reconsiderations_reconsiderationDirection', 'Application refused');
     I.selectOption('#judgementCollection_0_reconsiderations_reconsiderationDecision', 'Judgment confirmed');
     I.click('Submit');
+    // exui change CYA page is displayed by default hence
+    // it is possible to have 2 pages with submit button
+    // subject to change though but this is the current expected behaviour
+    I.scrollPageToBottom();
+    I.waitForText('Submit', 5);
+    I.click('Submit');
     I.waitForText('has been updated with event: Judgment', testConfig.TestTimeToWaitForText);
 
     //Verifying the Judgements Tab

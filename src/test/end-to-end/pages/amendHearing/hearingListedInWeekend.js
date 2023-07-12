@@ -21,6 +21,6 @@ module.exports = async function (jurisdiction) {
     I.fillField('#listedDate-day', currentDate.split('-')[2]);
     I.fillField('#listedDate-month', currentDate.split('-')[1]);
     I.fillField('#listedDate-year', currentDate.split('-')[0]);
-    I.click(commonConfig.continue);
+    I.click(commonConfig.submit);
     I.waitForText(commonConfig.weekendHearingMsgError, testConfig.TestTimeToWaitForText);
 };

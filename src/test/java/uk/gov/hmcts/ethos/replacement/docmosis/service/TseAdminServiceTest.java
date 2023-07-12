@@ -13,15 +13,18 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -91,6 +94,10 @@ class TseAdminServiceTest {
     private static final String XUI_URL = "exuiUrl";
 
     private static final String CITIZEN_URL = "citizenUrl";
+
+    private static final String RESPONDENT_1 = "Respondent 1";
+    private static final String RESPONDENT_2 = "Respondent 2";
+    private static final String REP_EMAIL = "rep@test.com";
 
     @BeforeEach
     void setUp() {
@@ -374,7 +381,7 @@ class TseAdminServiceTest {
 
     @ParameterizedTest
     @CsvSource({BOTH_PARTIES, CLAIMANT_ONLY, RESPONDENT_ONLY})
-    void sendRecordADecisionEmails(String partyNotified) {
+    void sendEmailToClaimant(String partyNotified) {
         caseData.setEthosCaseReference(CASE_NUMBER);
         createClaimant(caseData);
         createRespondent(caseData);
@@ -385,17 +392,10 @@ class TseAdminServiceTest {
         Map<String, String> expectedPersonalisationRespondent =
             createPersonalisation(caseData, RESPONDENT_TITLE);
 
-        tseAdminService.sendRecordADecisionEmails(CASE_ID, caseData);
+        tseAdminService.sendEmailToClaimant(CASE_ID, caseData);
 
-        if (CLAIMANT_ONLY.equals(partyNotified)) {
+        if (!RESPONDENT_ONLY.equals(partyNotified)) {
             verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
-            verify(emailService, never()).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisationRespondent);
-        } else if (RESPONDENT_ONLY.equals(partyNotified)) {
-            verify(emailService, never()).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
-            verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisationRespondent);
-        } else {
-            verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
-            verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisationRespondent);
         }
     }
 
@@ -468,4 +468,68 @@ class TseAdminServiceTest {
         assertThat(caseData.getTseAdminSelectPartyNotify()).isNull();
     }
 
+    @Test
+    void sendNotifyEmailsToRespondents_selectPartyNotifyClaimantOnly_noEmailSent() {
+        caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        tseAdminService.sendNotifyEmailsToRespondents(caseDetails);
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendNotifyEmailsToRespondents_sendEmailToRespondents() {
+        // Given that there are two respondents in the case, one has a Representative assigned and one does not.
+        setRespondents();
+        setRepresentative();
+
+        caseData.setEthosCaseReference(CASE_NUMBER);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        Map<String, String> expectedPersonalisation1 =
+                createPersonalisation(caseData, "Respondent 1");
+
+        Map<String, String> expectedPersonalisation2 =
+                createPersonalisation(caseData, "Respondent 2");
+
+        tseAdminService.sendNotifyEmailsToRespondents(caseDetails);
+
+        // Email will be sent to the Representative if it exists,
+        // if not then email will be sent to the Respondent instead.
+        verify(emailService).sendEmail(TEMPLATE_ID, "rep@test.com", expectedPersonalisation1);
+        verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisation2);
+    }
+
+    private void setRepresentative() {
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setValue(RepresentedTypeR.builder()
+                .respRepName(RESPONDENT_1)
+                .representativeEmailAddress(REP_EMAIL)
+                .build());
+
+        caseData.setRepCollection(List.of(representedTypeRItem));
+    }
+
+    private void setRespondents() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
+        respondentSumType.setRespondentName(RESPONDENT_1);
+
+        RespondentSumType respondentSumType2 = new RespondentSumType();
+        respondentSumType2.setRespondentEmail(RESPONDENT_EMAIL);
+        respondentSumType2.setRespondentName(RESPONDENT_2);
+
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        RespondentSumTypeItem respondentSumTypeItem2 = new RespondentSumTypeItem();
+        respondentSumTypeItem2.setValue(respondentSumType2);
+
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem, respondentSumTypeItem2));
+    }
 }

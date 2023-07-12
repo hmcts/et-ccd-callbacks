@@ -118,7 +118,7 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
 }
 
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification', dependsOn: ':codeceptFunctional') {
+task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
@@ -130,7 +130,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     maxHeapSize = '1G'
 }
 
-task yarnInstall(type: Exec) {
+task yarnInstall(type: Exec, dependsOn: ':functional') {
     workingDir '.'
     commandLine 'yarn', 'install'
 }

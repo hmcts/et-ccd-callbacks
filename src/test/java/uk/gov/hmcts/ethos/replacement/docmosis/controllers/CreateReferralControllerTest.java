@@ -17,9 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -55,11 +53,7 @@ class CreateReferralControllerTest {
     @MockBean
     private UserService userService;
     @MockBean
-    private EmailService emailService;
-    @MockBean
-    private CreateReferralService createReferralService;
-    @MockBean
-    private DocumentManagementService documentManagementService;
+    private ReferralService referralService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -120,7 +114,7 @@ class CreateReferralControllerTest {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userService.getUserDetails(any())).thenReturn(details);
-        when(createReferralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
             .thenReturn(new DocumentInfo());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)

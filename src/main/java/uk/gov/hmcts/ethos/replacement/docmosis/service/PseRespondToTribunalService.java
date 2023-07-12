@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -53,7 +52,6 @@ public class PseRespondToTribunalService {
     private final UserService userService;
     private final HearingSelectionService hearingSelectionService;
     private final TribunalOfficesService tribunalOfficesService;
-    private final NotificationProperties notificationProperties;
 
     @Value("${pse.respondent.acknowledgement.yes.template.id}")
     private String acknowledgeEmailYesTemplateId;
@@ -185,7 +183,7 @@ public class PseRespondToTribunalService {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_EXUI,  notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_EXUI,  emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -197,7 +195,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -229,7 +227,7 @@ public class PseRespondToTribunalService {
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
-                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -263,7 +261,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 

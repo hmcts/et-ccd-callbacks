@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.EmailServiceException;
 import uk.gov.service.notify.NotificationClient;
@@ -18,8 +19,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class EmailService {
-
     private final NotificationClient emailClient;
+
+    @Value("${url.exui.case-details}")
+    private String exuiUrl;
+    @Value("${url.citizen.case-details}")
+    private String citizenUrl;
 
     /**
      * Sends email to an email address using a specified email template.
@@ -43,5 +48,13 @@ public class EmailService {
             log.warn("Failed to send email. Reference ID: {}. Reason:", referenceId, e);
             throw new EmailServiceException("Failed to send email", e);
         }
+    }
+
+    String getCitizenCaseLink(String caseId) {
+        return citizenUrl + caseId;
+    }
+
+    String getExuiCaseLink(String caseId) {
+        return exuiUrl + caseId;
     }
 }

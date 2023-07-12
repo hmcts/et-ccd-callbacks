@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -58,8 +56,6 @@ class RespondNotificationServiceTest {
     private EmailService emailService;
     @Mock
     private HearingSelectionService hearingSelectionService;
-    @SpyBean
-    private NotificationProperties notificationProperties;
 
     private RespondNotificationService respondNotificationService;
 
@@ -68,12 +64,11 @@ class RespondNotificationServiceTest {
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyMap());
 
         SendNotificationService sendNotificationService =
-            new SendNotificationService(hearingSelectionService, emailService, notificationProperties);
+            new SendNotificationService(hearingSelectionService, emailService);
 
-        respondNotificationService = new RespondNotificationService(emailService, sendNotificationService,
-                notificationProperties);
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
+        respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
+        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
 
         caseDetails = new CaseDetails();
         caseData = new CaseData();

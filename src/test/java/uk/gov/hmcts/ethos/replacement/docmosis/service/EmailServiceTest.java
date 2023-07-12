@@ -78,5 +78,4 @@ class EmailServiceTest {
         personalisation.put("body", "You have a new message about this employment tribunal case.");
         return personalisation;
     }
-
 }

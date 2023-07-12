@@ -26,7 +26,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
@@ -85,9 +84,6 @@ class RespondentTellSomethingElseServiceTest {
     @MockBean
     private TornadoService tornadoService;
 
-    @SpyBean
-    private NotificationProperties notificationProperties;
-
     @MockBean
     private DocumentManagementService documentManagementService;
 
@@ -124,15 +120,15 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
-                        tornadoService, notificationProperties, documentManagementService);
+                        tornadoService, documentManagementService);
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
+        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);

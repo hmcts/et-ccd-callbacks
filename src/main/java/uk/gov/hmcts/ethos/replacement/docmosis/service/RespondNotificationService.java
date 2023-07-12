@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.time.LocalDate;
@@ -44,7 +43,6 @@ public class RespondNotificationService {
 
     private final EmailService emailService;
     private final SendNotificationService sendNotificationService;
-    private final NotificationProperties notificationProperties;
     @Value("${sendNotification.template.id}")
     private String responseTemplateId;
     @Value("${respondNotification.noResponseTemplate.id}")
@@ -140,7 +138,7 @@ public class RespondNotificationService {
         List<String> documents = respondNotificationType.getRespondNotificationUploadDocument().stream()
             .map(documentTypeItem ->
                 getRespondNotificationSingleDocumentMarkdown(documentTypeItem.getValue().getUploadedDocument()))
-            .collect(Collectors.toList());
+            .toList();
         return String.join("\r\n", documents);
     }
 
@@ -171,7 +169,7 @@ public class RespondNotificationService {
                         YES
                     );
                 }
-            ).collect(Collectors.toList());
+            ).toList();
         return String.join("\r\n", respondNotificationMarkdownList);
     }
 
@@ -191,7 +189,7 @@ public class RespondNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
             "caseNumber", caseData.getEthosCaseReference(),
-            "environmentUrl", envUrl + caseDetails.getCaseId(),
+            "environmentUrl", envUrl,
             "claimant", caseData.getClaimant(),
             "respondents", getRespondentNames(caseData),
             "notificationTitle", sendNotificationTitle
@@ -209,7 +207,7 @@ public class RespondNotificationService {
 
     /**
      * Sends notification emails for the claimant and/or respondent(s) based on the radio list from the
-     * respond to a notification event.
+     * "respond to a notification" event.
      * @param caseDetails - caseDetails
      * @param sendNotificationType - the notification containing the details of the response
      */
@@ -225,14 +223,18 @@ public class RespondNotificationService {
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
 
         String sendNotificationTitle = sendNotificationType.getSendNotificationTitle();
+        String caseId = caseDetails.getCaseId();
         if (!RESPONDENT_ONLY.equals(caseData.getRespondNotificationPartyToNotify()) && !isNullOrEmpty(claimantEmail)) {
-            emailService.sendEmail(templateId, claimantEmail,
-                buildPersonalisation(caseDetails, notificationProperties.getCitizenUrl(), sendNotificationTitle));
+            emailService.sendEmail(
+                templateId,
+                claimantEmail,
+                buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId), sendNotificationTitle)
+            );
         }
 
         if (!CLAIMANT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
             Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                    notificationProperties.getExuiUrl(), sendNotificationTitle);
+                    emailService.getExuiCaseLink(caseId), sendNotificationTitle);
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue(), templateId));
         }

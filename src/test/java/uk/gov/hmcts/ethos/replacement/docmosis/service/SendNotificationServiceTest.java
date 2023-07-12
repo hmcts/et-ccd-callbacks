@@ -7,13 +7,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -40,8 +38,6 @@ class SendNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
-    @SpyBean
-    private NotificationProperties notificationProperties;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
@@ -54,12 +50,11 @@ class SendNotificationServiceTest {
 
     @BeforeEach
     public void setUp() {
-        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService,
-                notificationProperties);
+        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
         ReflectionTestUtils.setField(sendNotificationService,
                 SEND_NOTIFICATION_TEMPLATE_ID, "sendNotificationTemplateId");
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
+        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
             .withClaimantType("claimant@email.com")

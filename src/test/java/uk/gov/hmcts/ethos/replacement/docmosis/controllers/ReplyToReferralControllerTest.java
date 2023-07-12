@@ -22,9 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -61,12 +59,6 @@ class ReplyToReferralControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private UserService userService;
-    @MockBean
-    private EmailService emailService;
-    @MockBean
-    private CreateReferralService createReferralService;
-    @MockBean
-    private DocumentManagementService documentManagementService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired

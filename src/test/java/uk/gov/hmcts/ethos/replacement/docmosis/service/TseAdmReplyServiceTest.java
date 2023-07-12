@@ -8,7 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
@@ -69,8 +67,6 @@ class TseAdmReplyServiceTest {
     @MockBean
     private TseService tseService;
 
-    @SpyBean
-    private NotificationProperties notificationProperties;
     private CaseData caseData;
 
     private static final String FILE_NAME = "document.txt";
@@ -90,9 +86,9 @@ class TseAdmReplyServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdmReplyService = new TseAdmReplyService(emailService, tseService, notificationProperties);
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
+        tseAdmReplyService = new TseAdmReplyService(emailService, tseService);
+        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");

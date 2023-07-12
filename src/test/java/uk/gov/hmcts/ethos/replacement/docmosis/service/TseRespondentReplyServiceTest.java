@@ -23,7 +23,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -73,8 +72,6 @@ class TseRespondentReplyServiceTest {
     @MockBean
     private UserService userService;
     @MockBean
-    private NotificationProperties notificationProperties;
-    @MockBean
     private TseService tseService;
     @MockBean
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
@@ -98,7 +95,7 @@ class TseRespondentReplyServiceTest {
     @BeforeEach
     void setUp() throws Exception {
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-                notificationProperties, respondentTellSomethingElseService, tseService);
+                respondentTellSomethingElseService, tseService);
 
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -257,10 +254,10 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn("link");
+        when(emailService.getCitizenCaseLink(any())).thenReturn("link");
         when(respondentTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
-        when(notificationProperties.getExuiLinkWithCaseId(any())).thenReturn(TEST_XUI_URL);
-        when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn(TEST_CUI_URL);
+        when(emailService.getExuiCaseLink(any())).thenReturn(TEST_XUI_URL);
+        when(emailService.getCitizenCaseLink(any())).thenReturn(TEST_CUI_URL);
 
         ReflectionTestUtils.setField(tseRespondentReplyService,
                 "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);

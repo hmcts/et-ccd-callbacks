@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -28,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -46,7 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 public class SendNotificationService {
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
-    private final NotificationProperties notificationProperties;
     @Value("${sendNotification.template.id}")
     private String sendNotificationTemplateId;
 
@@ -163,7 +160,7 @@ public class SendNotificationService {
         return sendNotificationTypeItemList.stream()
             .map(sendNotificationType -> DynamicValueType.create(sendNotificationType.getId(),
                 format.apply(sendNotificationType)))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
@@ -173,18 +170,18 @@ public class SendNotificationService {
      * @param caseDetails Details of the case
      */
     public void sendNotifyEmails(CaseDetails caseDetails) {
-
         CaseData caseData = caseDetails.getCaseData();
-
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        String caseId = caseDetails.getCaseId();
+
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify()) && !isNullOrEmpty(claimantEmailAddress)) {
             emailService.sendEmail(sendNotificationTemplateId, claimantEmailAddress,
-                buildPersonalisation(caseDetails, notificationProperties.getCitizenUrl()));
+                buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
         }
 
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
             Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                    notificationProperties.getExuiUrl());
+                    emailService.getExuiCaseLink(caseId));
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue()));
         }
@@ -214,7 +211,7 @@ public class SendNotificationService {
         List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()
                 .map(documentTypeItem ->
                         getSendNotificationSingleDocumentMarkdown(documentTypeItem.getValue()))
-                .collect(Collectors.toList());
+                .toList();
         return String.join("\r\n", documents);
     }
 

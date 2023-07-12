@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -40,7 +39,6 @@ public class TseAdminService {
 
     private final EmailService emailService;
     private final TseService tseService;
-    private final NotificationProperties notificationProperties;
     @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
     private String tseAdminRecordClaimantTemplateId;
     @Value("${tse.admin.record-a-decision.notify.respondent.template.id}")
@@ -167,8 +165,8 @@ public class TseAdminService {
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseNumber);
-        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseId));
-        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseId));
+        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
+        personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("name", recipientName);
         return personalisation;
     }

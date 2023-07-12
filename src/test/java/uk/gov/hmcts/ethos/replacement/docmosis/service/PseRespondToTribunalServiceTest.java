@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -25,7 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
@@ -85,18 +83,14 @@ class PseRespondToTribunalServiceTest {
     private HearingSelectionService hearingSelectionService;
     @MockBean
     private TribunalOfficesService tribunalOfficesService;
-    @SpyBean
-    private NotificationProperties notificationProperties;
 
     @BeforeEach
     void setUp() {
         pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService,
-            tribunalOfficesService, notificationProperties);
+            tribunalOfficesService);
         caseData = CaseDataBuilder.builder().build();
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl",
-                CITIZEN_HUB_URL);
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl",
-                EXUI_URL);
+        ReflectionTestUtils.setField(emailService, "citizenUrl", CITIZEN_HUB_URL);
+        ReflectionTestUtils.setField(emailService, "exuiUrl", EXUI_URL);
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToClaimantTemplateId", TEMPLATE_ID);

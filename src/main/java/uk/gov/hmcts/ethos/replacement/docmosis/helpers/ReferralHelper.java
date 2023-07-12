@@ -44,6 +44,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 
 @Slf4j
@@ -435,7 +436,7 @@ public final class ReferralHelper {
                 .map(r -> DynamicValueType.create(
                         r.getValue().getReferralNumber(),
                         r.getValue().getReferralNumber() + " " + r.getValue().getReferralSubject()))
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     /**
@@ -524,14 +525,15 @@ public final class ReferralHelper {
     /**
      * Generates a map of personalised information that will be used for the
      * placeholder fields in the Referral email template.
-     * @param detail Contains all the case details.
+     * @param details Contains all the case details.
      * @param referralNumber The number of the referral.
      * @param username Name of the user making or replying to this referral.
+     * @param linkToExui link to Exui with the caseId as a parameter
      * @param isNew Flag for if this is a new referral.
      */
-    public static Map<String, String> buildPersonalisation(CaseDetails detail, String referralNumber, boolean isNew,
-                                                           String username) {
-        CaseData caseData = detail.getCaseData();
+    public static Map<String, String> buildPersonalisation(CaseDetails details, String referralNumber, boolean isNew,
+                                                           String username, String linkToExui) {
+        CaseData caseData = details.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put(EMAIL_FLAG, getEmailFlag(isNew ? caseData.getIsUrgent() : caseData.getIsUrgentReply()));
@@ -543,7 +545,8 @@ public final class ReferralHelper {
         personalisation.put("subject", getReferralSubject(caseData, isNew));
         personalisation.put("username", username);
         personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
-        personalisation.put(CCD_ID, detail.getCaseId());
+        personalisation.put(CCD_ID, details.getCaseId());
+        personalisation.put(LINK_TO_EXUI, linkToExui);
         return personalisation;
     }
 

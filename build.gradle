@@ -181,6 +181,14 @@ task integration(type: Test) {
     }
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
 project.tasks['check'].dependsOn integration
 
 project.ext {

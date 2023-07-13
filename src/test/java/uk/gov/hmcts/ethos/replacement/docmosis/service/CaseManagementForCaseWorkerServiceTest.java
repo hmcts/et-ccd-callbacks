@@ -9,8 +9,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -35,6 +38,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -55,6 +60,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -98,6 +105,9 @@ class CaseManagementForCaseWorkerServiceTest {
     private CcdClient ccdClient;
     @MockBean
     private ClerkService clerkService;
+    @MockBean
+    private AuthTokenGenerator serviceAuthTokenGenerator;
+    private final String hmctsServiceId = "BHA1";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -188,7 +198,7 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseData(submitCaseData);
 
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService);
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService, serviceAuthTokenGenerator, hmctsServiceId);
     }
 
     @Test
@@ -923,6 +933,48 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setScotlandAllocatedOffice(SCOTLAND_CASE_TYPE_ID, caseData);
         assertEquals(expectedAllocatedOffice, caseData.getAllocatedOffice());
         assertEquals(expectedManagingOffice, caseData.getManagingOffice());
+    }
+
+    @Test
+    void setHmctsServiceIdSupplementary_success() throws IOException {
+        Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
+                hmctsServiceId)));
+        CaseDetails caseDetails = ccdRequest10.getCaseDetails();
+        String token = ccdRequest10.getToken();
+        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+                .thenReturn(ResponseEntity.ok().build());
+
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token);
+        verify(ccdClient, times(1)).setSupplementaryData(eq(token), eq(payload),
+                eq(ccdRequest10.getCaseDetails().getCaseId()));
+    }
+
+    @Test
+    void setHmctsServiceIdSupplementary_noResponse() throws IOException {
+        Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
+                hmctsServiceId)));
+        CaseDetails caseDetails = ccdRequest10.getCaseDetails();
+        String token = ccdRequest10.getToken();
+        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+                .thenReturn(null);
+
+        Exception e = assertThrows(CaseCreationException.class,
+                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
+        assertEquals("Call to Supplementary Data API failed for 123456789", e.getMessage());
+    }
+
+    @Test
+    void setHmctsServiceIdSupplementary_failedResponse() throws IOException {
+        Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
+                hmctsServiceId)));
+        CaseDetails caseDetails = ccdRequest10.getCaseDetails();
+        String token = ccdRequest10.getToken();
+        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+                .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
+
+        Exception e = assertThrows(CaseCreationException.class,
+                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
+        assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", e.getMessage());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

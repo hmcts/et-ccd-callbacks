@@ -38,6 +38,7 @@ public class RespondentTellSomethingElseControllerFunctionalTest extends BaseFun
             .withEthosCaseReference("testCaseReference")
             .withClaimant("claimant")
             .withClaimantType("person@email.com")
+            .withManagingOffice("Manchester")
             .build();
         caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
         caseData.setResTseCopyToOtherPartyYesOrNo(NO);

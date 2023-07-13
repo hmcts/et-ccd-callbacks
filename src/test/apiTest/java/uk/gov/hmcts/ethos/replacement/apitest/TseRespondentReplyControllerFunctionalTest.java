@@ -73,6 +73,8 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
                             .build()
                     ).build()));
 
+        caseData.setManagingOffice("Manchester");
+
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
             .withCaseId("123")

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 
 @Service
 @RequiredArgsConstructor
@@ -131,6 +132,8 @@ public class ServingService {
         caseData.getRespondentCollection()
             .forEach(o -> {
                 Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseDetails, o.getValue());
+                respondent.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+
                 if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
                     return;
                 }

@@ -123,7 +123,7 @@ tasks.register('functional', Test) {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
-    useJUnitPlatform()
+    useJUnit()
     testLogging {
         exceptionFormat = 'full'
     }

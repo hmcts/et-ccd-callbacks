@@ -16,7 +16,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.List;
 
 @Slf4j
-class PseRespondentViewControllerFunctionalTest extends BaseFunctionalTest {
+public class PseRespondentViewControllerFunctionalTest extends BaseFunctionalTest {
 
     private static final String AUTHORIZATION = "Authorization";
 

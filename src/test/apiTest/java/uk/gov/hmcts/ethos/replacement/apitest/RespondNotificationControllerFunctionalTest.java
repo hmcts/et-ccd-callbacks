@@ -23,7 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-class RespondNotificationControllerFunctionalTest extends BaseFunctionalTest {
+public class RespondNotificationControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
 
     private static final String ABOUT_TO_START_URL = "/respondNotification/aboutToStart";

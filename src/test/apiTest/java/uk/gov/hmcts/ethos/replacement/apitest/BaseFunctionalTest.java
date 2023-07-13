@@ -44,7 +44,7 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-class BaseFunctionalTest {
+public abstract class BaseFunctionalTest {
     protected String userToken;
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;

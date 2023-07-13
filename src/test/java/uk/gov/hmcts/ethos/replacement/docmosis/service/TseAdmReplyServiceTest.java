@@ -87,11 +87,12 @@ class TseAdmReplyServiceTest {
     @BeforeEach
     void setUp() {
         tseAdmReplyService = new TseAdmReplyService(emailService, tseService);
-        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");
+        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
+        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
+
         caseData = CaseDataBuilder.builder().build();
     }
 

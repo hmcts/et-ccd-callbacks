@@ -89,13 +89,16 @@ class PseRespondToTribunalServiceTest {
         pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService,
             tribunalOfficesService);
         caseData = CaseDataBuilder.builder().build();
-        ReflectionTestUtils.setField(emailService, "citizenUrl", CITIZEN_HUB_URL);
-        ReflectionTestUtils.setField(emailService, "exuiUrl", EXUI_URL);
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
+
+        when(emailService.getExuiCaseLink("1677174791076683"))
+            .thenReturn("https://manage-case.test.platform.hmcts.net/cases/case-details/1677174791076683");
+        when(emailService.getCitizenCaseLink("1677174791076683"))
+            .thenReturn("https://et-sya.test.platform.hmcts.net/citizen-hub/1677174791076683");
     }
 
     @Test

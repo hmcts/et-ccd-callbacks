@@ -51,21 +51,23 @@ public class SendNotificationService {
 
     private static final String POPULATED_DOCUMENT_MARKDOWN = "| Document |%s|\r\n| Description |%s|";
 
-    private static final String NOTIFICATION_DETAILS = "|  | |\r\n"
-             + "| --- | --- |\r\n"
-             + "| Subject | %1$s |\r\n"
-             + "| Notification | %2$s |\r\n"
-             + "| Hearing | %3$s |\r\n"
-             + "| Date Sent | %4$s |\r\n"
-             + "| Sent By | %5$s  |\r\n"
-             + "| Case management order or request | %6$s |\r\n"
-             + "| Response due | %7$s |\r\n"
-             + "| Party or parties to respond | %8$s |\r\n"
-             + "| Additional Information | %9$s |\r\n"
-             + " %10$s\r\n"
-             + "| Case management order made by | %11$s |\r\n"
-             + "| Name | %12$s |\r\n"
-             + "| Sent to | %8$s |\r\n";
+    private static final String NOTIFICATION_DETAILS = """
+        |  | |\r
+        | --- | --- |\r
+        | Subject | %1$s |\r
+        | Notification | %2$s |\r
+        | Hearing | %3$s |\r
+        | Date Sent | %4$s |\r
+        | Sent By | %5$s  |\r
+        | Case management order or request | %6$s |\r
+        | Response due | %7$s |\r
+        | Party or parties to respond | %8$s |\r
+        | Additional Information | %9$s |\r
+         %10$s\r
+        | Case management order made by | %11$s |\r
+        | Name | %12$s |\r
+        | Sent to | %8$s |\r
+        """;
 
     public void populateHearingSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -246,7 +248,7 @@ public class SendNotificationService {
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {
         return Map.of(
                 CASE_NUMBER, caseDetails.getCaseData().getEthosCaseReference(),
-            "environmentUrl", envUrl + caseDetails.getCaseId()
+            "environmentUrl", envUrl
         );
     }
 }

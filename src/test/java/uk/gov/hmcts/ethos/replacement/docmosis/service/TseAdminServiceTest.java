@@ -92,8 +92,10 @@ class TseAdminServiceTest {
         tseAdminService = new TseAdminService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(emailService, "exuiUrl", XUI_URL);
-        ReflectionTestUtils.setField(emailService, "citizenUrl", CITIZEN_URL);
+
+        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
+        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
+
         caseData = CaseDataBuilder.builder().build();
     }
 

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.UUID.randomUUID;
@@ -40,25 +39,26 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
 @RequiredArgsConstructor
 @Slf4j
 public class RespondNotificationService {
+    private static final String UPLOAD_DOCUMENT_IS_REQUIRED = "Upload document is required";
+    private static final String SUPPORTING_MATERIAL = "| Supporting material | |";
+    private static final String RESPONSE_DETAILS = """
+        |  | |\r
+        | --- | --- |\r
+        | Response %1$S | |\r
+        | Response from | %2$s |\r
+        | Response date | %3$s |\r
+         %4$s\r
+        | What's your response to the tribunal? | %5$s\r
+        | Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | %6$s |\r
+        """;
 
     private final EmailService emailService;
     private final SendNotificationService sendNotificationService;
+
     @Value("${sendNotification.template.id}")
     private String responseTemplateId;
     @Value("${respondNotification.noResponseTemplate.id}")
     private String noResponseTemplateId;
-    private static final String RESPONSE_DETAILS = "|  | |\r\n"
-        + "| --- | --- |\r\n"
-        + "| Response %1$S | |\r\n"
-        + "| Response from | %2$s |\r\n"
-        + "| Response date | %3$s |\r\n"
-        + " %4$s\r\n"
-        + "| What's your response to the tribunal? | %5$s\r\n"
-        + "| Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | %6$s |\r\n";
-
-    private static final String UPLOAD_DOCUMENT_IS_REQUIRED = "Upload document is required";
-
-    private static final String SUPPORTING_MATERIAL = "| Supporting material | |";
 
     public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -147,7 +147,7 @@ public class RespondNotificationService {
      * @param sendNotificationType notification
      * @return markdown of responses
      */
-    public String getRespondNotificationMarkdown(SendNotificationType sendNotificationType) {
+    private String getRespondNotificationMarkdown(SendNotificationType sendNotificationType) {
         var respondNotificationTypeCollection = sendNotificationType.getRespondNotificationTypeCollection();
         if (respondNotificationTypeCollection == null) {
             return "";

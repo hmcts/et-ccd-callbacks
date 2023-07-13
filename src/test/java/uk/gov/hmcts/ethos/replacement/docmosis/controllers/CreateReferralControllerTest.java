@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -52,6 +53,8 @@ class CreateReferralControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private UserService userService;
+    @MockBean
+    private DocumentManagementService documentManagementService;
     @MockBean
     private ReferralService referralService;
     @Autowired

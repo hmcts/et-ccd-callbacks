@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -127,8 +126,9 @@ class RespondentTellSomethingElseServiceTest {
                 "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
-        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
+
+        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
+        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -540,7 +540,7 @@ class RespondentTellSomethingElseServiceTest {
         CaseData caseData = createCaseData("", YES);
         caseData.setManagingOffice(BRISTOL_OFFICE);
 
-        when(tribunalOfficesService.getTribunalOffice(eq(BRISTOL_OFFICE))).thenReturn(TribunalOffice.BRISTOL);
+        when(tribunalOfficesService.getTribunalOffice(BRISTOL_OFFICE)).thenReturn(TribunalOffice.BRISTOL);
 
         assertThat(respondentTellSomethingElseService.getTribunalEmail(caseData),
                 is(TribunalOffice.BRISTOL.getOfficeEmail()));

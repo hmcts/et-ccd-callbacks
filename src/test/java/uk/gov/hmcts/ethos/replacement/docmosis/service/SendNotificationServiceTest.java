@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
@@ -53,8 +54,9 @@ class SendNotificationServiceTest {
         sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
         ReflectionTestUtils.setField(sendNotificationService,
                 SEND_NOTIFICATION_TEMPLATE_ID, "sendNotificationTemplateId");
-        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
-        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
+
+        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
+        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
             .withClaimantType("claimant@email.com")

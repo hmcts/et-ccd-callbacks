@@ -254,7 +254,6 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        when(emailService.getCitizenCaseLink(any())).thenReturn("link");
         when(respondentTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
         when(emailService.getExuiCaseLink(any())).thenReturn(TEST_XUI_URL);
         when(emailService.getCitizenCaseLink(any())).thenReturn(TEST_CUI_URL);

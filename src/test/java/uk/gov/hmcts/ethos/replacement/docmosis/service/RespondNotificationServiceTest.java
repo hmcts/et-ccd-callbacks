@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -52,7 +53,7 @@ class RespondNotificationServiceTest {
     private CaseDetails caseDetails;
     private CaseData caseData;
 
-    @Mock
+    @MockBean
     private EmailService emailService;
     @Mock
     private HearingSelectionService hearingSelectionService;
@@ -67,8 +68,9 @@ class RespondNotificationServiceTest {
             new SendNotificationService(hearingSelectionService, emailService);
 
         respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
-        ReflectionTestUtils.setField(emailService, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(emailService, "citizenUrl", "citizenUrl");
+
+        when(emailService.getExuiCaseLink(any())).thenReturn("");
+        when(emailService.getCitizenCaseLink(any())).thenReturn("");
 
         caseDetails = new CaseDetails();
         caseData = new CaseData();

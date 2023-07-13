@@ -124,9 +124,6 @@ tasks.register('functional', Test) {
     classpath = sourceSets.functional.runtimeClasspath
 
     useJUnit()
-    testLogging {
-        exceptionFormat = 'full'
-    }
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'

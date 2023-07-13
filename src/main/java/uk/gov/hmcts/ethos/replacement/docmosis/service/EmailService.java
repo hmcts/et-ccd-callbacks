@@ -50,7 +50,7 @@ public class EmailService {
         }
     }
 
-    String getCitizenCaseLink(String caseId) {
+    public String getCitizenCaseLink(String caseId) {
         return citizenUrl + caseId;
     }
 

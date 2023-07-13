@@ -44,7 +44,7 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-class BaseFunctionalTest {
+public class BaseFunctionalTest {
     protected String userToken;
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;
@@ -76,7 +76,7 @@ class BaseFunctionalTest {
 
     @Value("${docmosis.test.url}")
     protected String baseUrl;
-    @Value("${idam.url}")
+    @Value(" ${idam.url}")
     private String idamApiUrl;
     protected RequestSpecification spec;
 

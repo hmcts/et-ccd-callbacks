@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +56,7 @@ public class ServingService {
     private static final String SERVING_DOC_7_8A = "7.8a";
 
     @Value("${et1Serving.template.id}")
-    private String templateId;
+    private String claimantTemplateId;
 
     @Value("${et1Serving.respondent.template.id}")
     private String respondentTemplateId;
@@ -126,13 +127,10 @@ public class ServingService {
      * @param caseDetails object that holds the case data.
      */
     public void sendNotifications(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseDetails);
-
-        caseData.getRespondentCollection()
+        caseDetails.getCaseData().getRespondentCollection()
             .forEach(o -> {
                 Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseDetails, o.getValue());
-                respondent.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+                respondent.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
 
                 if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
                     return;
@@ -140,11 +138,13 @@ public class ServingService {
                 emailService.sendEmail(respondentTemplateId, respondent.get(EMAIL_ADDRESS), respondent);
             });
 
+        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseDetails);
+        claimant.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
         if (isNullOrEmpty(claimant.get(EMAIL_ADDRESS))) {
             return;
         }
 
-        emailService.sendEmail(templateId, claimant.get(EMAIL_ADDRESS), claimant);
+        emailService.sendEmail(claimantTemplateId, claimant.get(EMAIL_ADDRESS), claimant);
     }
 
     /**

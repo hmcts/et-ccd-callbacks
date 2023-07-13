@@ -122,10 +122,9 @@ tasks.register('smoke', Test) {
 tasks.register('functional', Test) {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
-
-    useJUnitPlatform {
-        includeTags 'FunctionalTest'
-        excludeTags 'SmokeTest'
+    
+    useJUnit {
+        excludeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
     }
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))

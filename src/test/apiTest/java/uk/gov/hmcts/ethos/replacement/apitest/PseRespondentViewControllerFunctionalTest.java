@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import lombok.extern.slf4j.Slf4j;
+import net.thucydides.core.annotations.WithTag;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.List;
 
 @Slf4j
+@WithTag("FunctionalTest")
 public class PseRespondentViewControllerFunctionalTest extends BaseFunctionalTest {
 
     private static final String AUTHORIZATION = "Authorization";

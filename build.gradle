@@ -113,8 +113,9 @@ tasks.register('smoke', Test) {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
-    useJUnit {
-        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
+    useJUnitPlatform {
+        includeTags 'SmokeTest'
+        excludeTags 'FunctionalTest'
     }
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
 }
@@ -123,7 +124,10 @@ tasks.register('functional', Test) {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
-    useJUnit()
+    useJUnitPlatform {
+        includeTags 'FunctionalTest'
+        excludeTags 'SmokeTest'
+    }
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'
@@ -389,6 +393,7 @@ dependencies {
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
+    testImplementation(platform('org.junit:junit-bom:5.9.2'))
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitJupiterVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.18.0'

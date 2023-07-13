@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import lombok.extern.slf4j.Slf4j;
+import net.thucydides.core.annotations.WithTag;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
+@WithTag("FunctionalTest")
 public class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
 
     private CCDRequest ccdRequest;

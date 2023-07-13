@@ -4,7 +4,7 @@ const testUrl = process.env.TEST_URL || config.TestUrl;
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;
 const smartWait = parseInt(process.env.SMART_WAIT) || 30000;
-const browser = process.env.BROWSER_GROUP || 'chrome';
+const browser = process.env.BROWSER_GROUP || 'chromium';
 
 const defaultSauceOptions = {
     username: process.env.SAUCE_USERNAME || 'username',
@@ -44,7 +44,7 @@ const setupConfig = {
     tests: config.TestPathToRun,
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
-        WebDriver: {
+        Playwright: {
             url: testUrl,
             browser,
             smartWait,
@@ -92,7 +92,7 @@ const setupConfig = {
                 stdout: config.TestOutputDir + '/console.log',
                 options: {
                     reportDir: config.TestOutputDir,
-                    reportName: 'index',
+                    reportName: 'et ccd callback x-browsers test',
                     reportTitle: 'Crossbrowser results for: ' + browser.toUpperCase(),
                     inlineAssets: true
                 }
@@ -104,13 +104,13 @@ const setupConfig = {
         //     browsers: getBrowserConfig('microsoft')
         // },
         chrome: {
-            browsers: getBrowserConfig('chrome')
+            browsers: 'chromium'
         },
         firefox: {
             browsers: getBrowserConfig('firefox')
         }
     },
-    name: 'ET Cross Browser Tests'
+    name: 'ET CCD Callbacks Cross Browser Tests'
 };
 
 exports.config = setupConfig;

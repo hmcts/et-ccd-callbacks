@@ -67,6 +67,21 @@ To run all unit tests:
 ./gradlew test
 ```
 
+### UI Functional Tests
+To run all UI functional test :
+Ensure your node version is `18` or greater
+proceed to `cofig.js` file change the test url to the desired environment
+Add corresponding user details for those environment
+
+To run all test (using script in package.json)
+```bash
+yarn test:fullfunctional
+```
+To run a specific test with specific tag
+```bash
+yarn test:local --grep @<yourtag>
+```
+
 ### Coding Style Tests
 To run all checks (including unit tests):
 

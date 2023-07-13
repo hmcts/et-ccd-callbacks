@@ -76,7 +76,6 @@ withPipeline(type, product, component) {
   }
 
   afterAlways('smoketest:preview') {
-    env.TEST_E2E_URL="https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
 
     publishHTML target: [

@@ -65,11 +65,20 @@ sourceSets {
     functional {
         java {
             srcDir 'src/test/functional/java'
-            srcDir 'src/test/apiTest/java'
             srcDir 'src/test/utils/java'
         }
         resources {
             srcDir 'src/test/functional/resources'
+        }
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+    apiTest {
+        java {
+            srcDir 'src/test/apiTest/java'
+            srcDir 'src/test/utils/java'
+        }
+        resources {
             srcDir 'src/test/apiTest/resources'
         }
         compileClasspath += main.output + test.output
@@ -101,6 +110,8 @@ configurations {
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    apiTestImplementation.extendsFrom testImplementation
+    apiTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -120,12 +131,10 @@ tasks.register('smoke', Test) {
 }
 
 tasks.register('functional', Test) {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
-    
-    useJUnit {
-        excludeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
-    }
+    testClassesDirs = sourceSets.apiTest.output.classesDirs
+    classpath = sourceSets.apiTest.runtimeClasspath
+
+    useJUnitPlatform()
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'

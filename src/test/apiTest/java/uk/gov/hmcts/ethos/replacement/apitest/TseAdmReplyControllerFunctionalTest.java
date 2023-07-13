@@ -24,7 +24,7 @@ import java.util.UUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
-@WithTag("FunctionalTest")
+@WithTag("ApiTest")
 public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
 
     private static final String AUTHORIZATION = "Authorization";

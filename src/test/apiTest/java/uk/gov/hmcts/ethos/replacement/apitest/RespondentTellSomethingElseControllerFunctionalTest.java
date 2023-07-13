@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
-@WithTag("FunctionalTest")
+@WithTag("ApiTest")
 public class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
 
     private CCDRequest ccdRequest;

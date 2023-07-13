@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
-@WithTag("FunctionalTest")
+@WithTag("ApiTest")
 public class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";

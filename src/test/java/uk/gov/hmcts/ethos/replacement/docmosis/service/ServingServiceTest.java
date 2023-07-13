@@ -26,9 +26,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
@@ -44,6 +44,8 @@ class ServingServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        when(emailService.getCitizenCaseLink(any())).thenReturn("");
+
         caseDetails = generateCaseDetails("midServingCaseDetailsTest.json");
         servingService = new ServingService(emailService);
         notifyCaseDetails = CaseDataBuilder.builder()
@@ -125,7 +127,6 @@ class ServingServiceTest {
 
     @Test
     void sendNotifications_shouldHandleMissingEmails() {
-        reset(emailService);
         notifyCaseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
         notifyCaseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
         notifyCaseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);

@@ -133,7 +133,6 @@ tasks.register('functional', Test) {
 }
 
 tasks.register('yarnInstall', Exec) {
-    dependsOn ':functional'
     workingDir '.'
     commandLine 'yarn', 'install'
 }

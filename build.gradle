@@ -400,7 +400,6 @@ dependencies {
         exclude module: 'slf4j-log4j12'
     }
     testImplementation(platform('org.junit:junit-bom:5.9.2'))
-    testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitJupiterVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.18.0'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'

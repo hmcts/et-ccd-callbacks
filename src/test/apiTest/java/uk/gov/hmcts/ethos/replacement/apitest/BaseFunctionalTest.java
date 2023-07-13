@@ -17,21 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefEnglandWalesRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefScotlandRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefEnglandWalesRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefScotlandRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefEnglandWalesRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefScotlandRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.VenueRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -50,31 +38,6 @@ public abstract class BaseFunctionalTest {
     protected String userToken;
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;
-
-    @MockBean
-    private JudgeRepository judgeRepository;
-    @MockBean
-    private VenueRepository venueRepository;
-    @MockBean
-    private uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.RoomRepository roomRepository;
-    @MockBean
-    private CourtWorkerRepository courtWorkerRepository;
-    @MockBean
-    private MultipleRefEnglandWalesRepository multipleRefEnglandWalesRepository;
-    @MockBean
-    private MultipleRefScotlandRepository multipleRefScotlandRepository;
-    @MockBean
-    private DocumentManagementService documentManagementService;
-    @MockBean
-    private SubMultipleRefEnglandWalesRepository subMultipleRefEnglandWalesRepository;
-    @MockBean
-    private SubMultipleRefScotlandRepository subMultipleRefScotlandRepository;
-    @MockBean
-    private SingleRefScotlandRepository singleRefScotlandRepository;
-    @MockBean
-    private SingleRefEnglandWalesRepository singleRefEnglandWalesRepository;
-    @MockBean
-    private FileLocationRepository fileLocationRepository;
 
     @Value("${docmosis.test.url}")
     protected String baseUrl;

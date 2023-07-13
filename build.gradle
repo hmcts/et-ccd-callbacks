@@ -123,8 +123,9 @@ tasks.register('functional', Test) {
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
-    useJUnit {
-        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat = 'full'
     }
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))

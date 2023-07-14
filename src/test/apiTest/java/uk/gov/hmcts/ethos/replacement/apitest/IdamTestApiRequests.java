@@ -44,6 +44,7 @@ public class IdamTestApiRequests {
     }
 
     public CreateUser createUser(String email) throws IOException {
+        log.info("BaseFunctionalTest creating user...");
         CreateUser createUser = new CreateUser(
             email,
             "ATestForename",

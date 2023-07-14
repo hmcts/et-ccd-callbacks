@@ -37,7 +37,7 @@
         "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @smoke --steps --reporter mocha-multi --verbose",
         "test:fullfunctional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @nightly --steps --reporter mocha-multi --verbose",
         "test:crossbrowser": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run-multiple ${BROWSER_GROUP:-'--all'} --steps -c src/test/end-to-end/saucelabs.conf.js  --grep @crossbrowser --steps --reporter mocha-multi --verbose",
-        "test:functional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @nightly --steps --reporter mocha-multi --verbose",
+        "test:functional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @dummy --steps --reporter mocha-multi --verbose",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"
     },

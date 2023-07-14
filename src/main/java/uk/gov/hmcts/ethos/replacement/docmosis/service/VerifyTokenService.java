@@ -23,7 +23,7 @@ import java.security.Key;
 @Service("verifyTokenService")
 public class VerifyTokenService {
 
-    @Value("${idam.api.url.jwkUrl}")
+    @Value("${idam.api.jwkUrl}")
     private String idamJwkUrl;
 
     private final JWSVerifierFactory jwsVerifierFactory;

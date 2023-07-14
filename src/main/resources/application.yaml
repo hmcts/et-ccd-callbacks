@@ -61,9 +61,8 @@ idam:
     totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: ${MICRO_SERVICE:ccd_gw}
   api:
-    url:
-      jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
-      nodeValue: ${IDAM_API_URL:http://sidam-api:5000}
+    url: ${IDAM_API_URL:http://sidam-api:5000}
+    jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
   client:
     scope: openid profile roles manage-user
     secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}

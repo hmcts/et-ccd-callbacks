@@ -13,9 +13,8 @@ idam:
     totp_secret: AAAAAAAAAAAAAAAA
     microservice: et_cos
   api:
-    url:
-      nodeValue: http://localhost:5000
-      jwkUrl: http://localhost:5000/o/jwks
+    url: http://localhost:5000
+    jwkUrl: http://localhost:5000/o/jwks
 
 ccd:
   data:

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 

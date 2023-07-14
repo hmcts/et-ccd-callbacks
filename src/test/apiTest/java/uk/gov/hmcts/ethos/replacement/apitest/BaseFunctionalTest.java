@@ -21,7 +21,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 
-import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -60,7 +59,7 @@ public abstract class BaseFunctionalTest {
             useRelaxedHTTPSValidation();
             spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
             log.info("BaseFunctionalTest setup completed.");
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("BaseFunctionTest Error: " + e.getMessage());
             log.error(Arrays.toString(e.getStackTrace()));
         }

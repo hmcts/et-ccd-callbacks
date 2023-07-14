@@ -21,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -46,24 +47,16 @@ public abstract class BaseFunctionalTest {
     protected RequestSpecification spec;
 
     @BeforeAll
-    public void setup()  {
-        try {
-            log.info("BaseFunctionalTest setup started.");
-            client = buildClient();
-            idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
-            CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
-            userToken = baseUrl.contains("localhost") ? idamTestApiRequests.getLocalAccessToken()
-                    : idamTestApiRequests.getAccessToken(user.getEmail());
-            log.info("BaseFunctionalTest user token: " + userToken);
-            log.info("BaseFunctionalTest baseUrl: " + baseUrl);
-            useRelaxedHTTPSValidation();
-            spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
-            log.info("BaseFunctionalTest setup completed.");
-        } catch (Exception e) {
-            log.error("BaseFunctionTest Error: " + e.getMessage());
-            log.error(Arrays.toString(e.getStackTrace()));
-        }
-
+    public void setup() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException {
+        log.info("BaseFunctionalTest setup started.");
+        client = buildClient();
+        idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
+        CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
+        userToken = baseUrl.contains("localhost") ? idamTestApiRequests.getLocalAccessToken()
+                : idamTestApiRequests.getAccessToken(user.getEmail());
+        useRelaxedHTTPSValidation();
+        spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
+        log.info("BaseFunctionalTest setup completed.");
     }
 
     private String createRandomEmail() {

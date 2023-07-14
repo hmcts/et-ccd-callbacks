@@ -56,6 +56,8 @@ class Et3ResponseServiceTest {
 
     @BeforeEach
     void setUp() {
+        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
+
         et3ResponseService = new Et3ResponseService(documentManagementService, tornadoService, emailService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
@@ -153,7 +155,7 @@ class Et3ResponseServiceTest {
             "claimant", "Claimant LastName",
             "list_of_respondents", "Respondent",
             "date", "25 Nov 2099",
-            "ccdId", "1683646754393041"
+            "linkToExUI", "exuiUrl1683646754393041"
         );
         verify(emailService, times(1)).sendEmail(any(), eq("tribunal@email.com"), eq(expected));
     }

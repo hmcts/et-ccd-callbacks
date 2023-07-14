@@ -44,9 +44,10 @@ class ServingServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        when(emailService.getExuiCaseLink(any())).thenReturn("");
         when(emailService.getCitizenCaseLink(any())).thenReturn("");
 
-        caseDetails = generateCaseDetails("midServingCaseDetailsTest.json");
+        caseDetails = generateCaseDetails();
         servingService = new ServingService(emailService);
         notifyCaseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
@@ -69,10 +70,10 @@ class ServingServiceTest {
         notifyCaseData.setClaimant("Claimant LastName");
     }
 
-    private static CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private static CaseDetails generateCaseDetails() throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
                 ServingServiceTest.class.getClassLoader()
-                .getResource(jsonFileName)).toURI())));
+                .getResource("midServingCaseDetailsTest.json")).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }

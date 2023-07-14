@@ -37,8 +37,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.hmc.EntityRoleCode;
+import uk.gov.hmcts.et.common.model.hmc.PartyDetails;
+import uk.gov.hmcts.et.common.model.hmc.PartyType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -54,6 +58,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -993,7 +998,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-     void testPublicCaseName() {
+    void testPublicCaseName() {
         CaseData caseData = new CaseData();
         caseData.setClaimant("claimant");
         caseData.setRespondent("respondent");
@@ -1004,7 +1009,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-     void testPublicCaseNameWithRule50() {
+    void testPublicCaseNameWithRule50() {
         CaseData caseData = new CaseData();
         caseData.setClaimant("Person1");
         caseData.setRespondent("Person2");
@@ -1015,6 +1020,39 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
         assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE, caseData.getPublicCaseName());
+    }
+
+    @Test
+    void setPartyDetails_populatesPartiesWithOrgRespondentType() {
+        String respondentOrgName = "Fake Organisation";
+        String respondentIndName = "An individual";
+        CaseData caseData = CaseDataBuilder.builder()
+                .withRespondent(respondentOrgName, YES, "2000-01-01", false)
+                .withRespondent(respondentIndName, YES, "2000-01-01", false)
+                .build();
+
+        RespondentSumTypeItem orgRespondent = caseData.getRespondentCollection().get(0);
+        orgRespondent.getValue().setRespondentName(respondentOrgName);
+        orgRespondent.getValue().setRespondentOrganisation(respondentOrgName);
+
+        RespondentSumTypeItem indRespondent = caseData.getRespondentCollection().get(1);
+        indRespondent.getValue().setRespondentName(respondentIndName);
+
+        caseManagementForCaseWorkerService.setPartyDetails(caseData);
+
+        PartyDetails orgPartyDetails = caseData.getParties().get(0);
+        assertNotNull(orgPartyDetails.getPartyID());
+        assertEquals(orgPartyDetails.getPartyID(), orgRespondent.getId());
+        assertEquals(orgPartyDetails.getPartyName(), orgRespondent.getValue().getRespondentName());
+        assertEquals(orgPartyDetails.getPartyType(), PartyType.ORG.getLabel());
+        assertEquals(orgPartyDetails.getPartyRole(), EntityRoleCode.RESPONDENT.getHmcReference());
+
+        PartyDetails indPartyDetails = caseData.getParties().get(1);
+        assertNotNull(indPartyDetails.getPartyID());
+        assertEquals(indPartyDetails.getPartyID(), indRespondent.getId());
+        assertEquals(indPartyDetails.getPartyName(), indRespondent.getValue().getRespondentName());
+        assertEquals(indPartyDetails.getPartyType(), PartyType.IND.getLabel());
+        assertEquals(indPartyDetails.getPartyRole(), EntityRoleCode.RESPONDENT.getHmcReference());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

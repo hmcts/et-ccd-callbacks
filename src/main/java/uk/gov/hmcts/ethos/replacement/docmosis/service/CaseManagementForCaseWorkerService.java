@@ -24,6 +24,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.hmc.EntityRoleCode;
+import uk.gov.hmcts.et.common.model.hmc.PartyDetails;
+import uk.gov.hmcts.et.common.model.hmc.PartyType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -38,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -492,5 +496,27 @@ public class CaseManagementForCaseWorkerService {
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
+    }
+
+    /**
+     * Populates parties on case data with basic data from the respondent.
+     * @param caseData common CCD object for representing case data
+     */
+    public void setPartyDetails(CaseData caseData) {
+        // TODO: This will need moving/expanding so 'parties' is worked out after multiple events (RET-3881 & 3882)
+        caseData.setParties(caseData.getRespondentCollection().stream()
+                .map(this::createRespondentPartyDetails)
+                .toList()
+        );
+    }
+
+    private PartyDetails createRespondentPartyDetails(RespondentSumTypeItem respondent) {
+        var type = isNullOrEmpty(respondent.getValue().getRespondentOrganisation()) ? PartyType.IND : PartyType.ORG;
+        return PartyDetails.builder()
+                .partyID(respondent.getId())
+                .partyName(respondent.getValue().getRespondentName())
+                .partyType(type.getLabel())
+                .partyRole(EntityRoleCode.RESPONDENT.getHmcReference())
+                .build();
     }
 }

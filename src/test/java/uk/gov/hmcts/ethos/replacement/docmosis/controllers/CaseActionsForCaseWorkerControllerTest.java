@@ -349,6 +349,8 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseManagementForCaseWorkerService, times(1)).setPartyDetails(any());
     }
 
     @Test

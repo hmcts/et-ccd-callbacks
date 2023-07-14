@@ -36,6 +36,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
@@ -376,6 +377,7 @@ public class CaseDataBuilder {
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
+        respondentSumTypeItem.setId(UUID.randomUUID().toString());
 
         if (caseData.getRespondentCollection() == null) {
             caseData.setRespondentCollection(new ArrayList<>());

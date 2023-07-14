@@ -13,7 +13,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.hamcrest.Matchers;
 import org.json.JSONException;
 import org.json.JSONObject;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;

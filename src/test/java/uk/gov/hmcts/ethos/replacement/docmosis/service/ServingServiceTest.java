@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -18,12 +20,12 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -42,10 +44,13 @@ class ServingServiceTest {
 
     private static ServingService servingService;
 
+    @Captor
+    private ArgumentCaptor<Map<String, Object>> personalisation;
+
     @BeforeEach
     void setUp() throws Exception {
-        when(emailService.getExuiCaseLink(any())).thenReturn("");
-        when(emailService.getCitizenCaseLink(any())).thenReturn("");
+        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
+        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
 
         caseDetails = generateCaseDetails();
         servingService = new ServingService(emailService);
@@ -65,7 +70,7 @@ class ServingServiceTest {
             .withRespondentRepresentative("Respondent Represented", "Rep LastName", "res@rep.com")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        notifyCaseDetails.setCaseId("1234");
+        notifyCaseDetails.setCaseId("1683646754393041");
         notifyCaseData = notifyCaseDetails.getCaseData();
         notifyCaseData.setClaimant("Claimant LastName");
     }
@@ -84,7 +89,7 @@ class ServingServiceTest {
             + "href=\"/documents/test-document/binary\">test-filename.xlsx</a></small><br/>";
         List<DocumentTypeItem> documentTypeItems = caseDetails.getCaseData().getServingDocumentCollection();
         assertThat(servingService
-            .generateOtherTypeDocumentLink(documentTypeItems), is(expectedDocumentName));
+            .generateOtherTypeDocumentLink(documentTypeItems)).isEqualTo(expectedDocumentName);
     }
 
     @Test
@@ -97,8 +102,8 @@ class ServingServiceTest {
                 + "<br/>Manchester<br/>M12 4ED<br/><br/>";
 
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(servingService.generateClaimantAndRespondentAddress(caseData),
-                is(expectedClaimantAndRespondentAddress));
+        assertThat(servingService.generateClaimantAndRespondentAddress(caseData))
+            .isEqualTo(expectedClaimantAndRespondentAddress);
     }
 
     @Test
@@ -114,16 +119,22 @@ class ServingServiceTest {
             + "has%20completed%20ET3%20notifications%20to%20the%20relevant%20parties.%0D%0A%0D%0AThe%20documents%20we"
             + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(servingService.generateEmailLinkToAcas(caseData, false), is(expectedEt1EmailLinkToAcas));
-        assertThat(servingService.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
+        assertThat(servingService.generateEmailLinkToAcas(caseData, false)).isEqualTo(expectedEt1EmailLinkToAcas);
+        assertThat(servingService.generateEmailLinkToAcas(caseData, true)).isEqualTo(expectedEt3EmailLinkToAcas);
     }
 
     @Test
     void sendNotifications_shouldSendThreeNotifications() {
         servingService.sendNotifications(notifyCaseDetails);
-        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
-        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
-        verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), any());
+
+        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), personalisation.capture());
+        assertThat(personalisation.getValue()).containsEntry("linkToCitizenHub", "citizenUrl1683646754393041");
+
+        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), personalisation.capture());
+        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1683646754393041");
+
+        verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), personalisation.capture());
+        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1683646754393041");
     }
 
     @Test
@@ -149,7 +160,7 @@ class ServingServiceTest {
         caseData.setServingDocumentCollection(List.of(documentTypeItem));
 
         servingService.addServingDocToDocumentCollection(caseData);
-        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument(), is(resultTypeOfDoc));
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument()).isEqualTo(resultTypeOfDoc);
     }
 
     private static Stream<Arguments> saveServingDocToDocumentCollectionParameter() {

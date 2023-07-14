@@ -1,0 +1,50 @@
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev
+  datasource:
+    url: jdbc:postgresql://localhost:5050/et_cos
+
+document_management:
+  url: http://localhost:4506
+
+idam:
+  s2s-auth:
+    url: http://localhost:4502
+    totp_secret: AAAAAAAAAAAAAAAA
+    microservice: et_cos
+  api:
+    url:
+      nodeValue: http://localhost:5000
+      jwkUrl: http://localhost:5000/o/jwks
+
+ccd:
+  data:
+    store:
+      api:
+        url: http://localhost:4452
+
+tornado:
+  accessKey: ${TORNADO_ACCESS_KEY:}
+  url: https://eu.dws3.docmosis.com/api/render
+
+case_document_am:
+  url: http://localhost:4455
+
+rd_professional:
+  api:
+    url: http://localhost:4507
+
+queue:
+  create-updates:
+    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
+    send:
+      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
+
+assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
+apply_noc_access_api_assignments_path: /noc/apply-decision
+
+url:
+  exui:
+    case-details: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}
+  citizen:
+    case-details: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}

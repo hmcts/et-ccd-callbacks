@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 
 /**
  * Service to support ET3 Notification journey.
@@ -30,12 +31,11 @@ public class Et3NotificationService {
      * Sends notification emails to the claimant and respondent (or their reps if applicable).
      */
     public void sendNotifications(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        Map<String, String> claimantPersonalisation = NotificationHelper.buildMapForClaimant(caseDetails);
-
-        caseData.getRespondentCollection()
+        String caseId = caseDetails.getCaseId();
+        caseDetails.getCaseData().getRespondentCollection()
             .forEach(obj -> {
                 Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseDetails, obj.getValue());
+                respondent.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
                 String respondentEmail = respondent.get(EMAIL_ADDRESS);
                 if (isNullOrEmpty(respondentEmail)) {
                     return;
@@ -43,11 +43,13 @@ public class Et3NotificationService {
                 emailService.sendEmail(et3MyHmctsTemplateId, respondentEmail, respondent);
             });
 
-        String claimantEmail = claimantPersonalisation.get(EMAIL_ADDRESS);
+        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseDetails);
+        claimant.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
+        String claimantEmail = claimant.get(EMAIL_ADDRESS);
         if (isNullOrEmpty(claimantEmail)) {
             return;
         }
 
-        emailService.sendEmail(et3CitizenTemplateId, claimantEmail, claimantPersonalisation);
+        emailService.sendEmail(et3CitizenTemplateId, claimantEmail, claimant);
     }
 }

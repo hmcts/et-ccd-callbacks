@@ -45,6 +45,7 @@ public class IdamTestApiRequests {
 
     public CreateUser createUser(String email) throws IOException {
         log.info("BaseFunctionalTest creating user...");
+        log.info("BaseFunctionalTest user email: " + email);
         CreateUser createUser = new CreateUser(
             email,
             "ATestForename",
@@ -61,10 +62,13 @@ public class IdamTestApiRequests {
     }
 
     private void makePostRequest(String uri, String body) throws IOException {
+        log.info("BaseFunctionalTest makePostRequest");
         HttpResponse createUserResponse = client.execute(post(uri)
                                                              .setEntity(new StringEntity(body, APPLICATION_JSON))
                                                              .build());
-
+        log.info("BaseFunctionalTest makePostRequest response: " + createUserResponse.getStatusLine().getStatusCode());
+        log.info("BaseFunctionalTest makePostRequest response reason: "
+                + createUserResponse.getStatusLine().getReasonPhrase());
         assertEquals(OK.value(), createUserResponse.getStatusLine().getStatusCode());
     }
 

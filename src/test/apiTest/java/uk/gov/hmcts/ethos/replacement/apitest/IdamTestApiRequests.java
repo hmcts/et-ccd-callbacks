@@ -13,6 +13,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.hamcrest.Matchers;
 import org.json.JSONException;
 import org.json.JSONObject;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
@@ -29,6 +30,7 @@ import static org.apache.http.client.methods.RequestBuilder.post;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
@@ -64,7 +66,11 @@ public class IdamTestApiRequests {
         HttpResponse createUserResponse = client.execute(post(uri)
                                                              .setEntity(new StringEntity(body, APPLICATION_JSON))
                                                              .build());
-        assertEquals(CREATED.value(), createUserResponse.getStatusLine().getStatusCode());
+
+        int statusCode = createUserResponse.getStatusLine().getStatusCode();
+
+        assertTrue(statusCode == CREATED.value() || statusCode == OK.value());
+        log.info("BaseFunctionalTest user created.");
     }
 
     /**

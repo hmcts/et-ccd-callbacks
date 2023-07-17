@@ -195,6 +195,41 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setNextListedDate(CaseData caseData) {
+        List<String> dates = new ArrayList<>();
+        String nextListedDate = "";
+
+        if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
+            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+                dates = getListedDates(hearingTypeItem);
+
+            }
+        for (String date : dates) {
+            if (nextListedDate.equals("") && LocalDate.parse(date).isAfter(LocalDate.now())
+                    || LocalDate.parse(date).isAfter(LocalDate.now()) && LocalDate.parse(date).isBefore(LocalDate.parse(nextListedDate))) {
+                nextListedDate = date;
+            }
+        }
+
+        caseData.setNextListedDate(nextListedDate);
+        }
+    }
+
+    private List<String> getListedDates(HearingTypeItem hearingTypeItem) {
+        HearingType hearingType = hearingTypeItem.getValue();
+        List<String> dates = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
+            for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
+                DateListedType dateListedType = dateListedTypeItem.getValue();
+                if (HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
+                        && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
+                    dates.add(dateListedType.getListedDate());
+                }
+            }
+        }
+        return dates;
+    }
+
     public CaseData struckOutRespondents(CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {

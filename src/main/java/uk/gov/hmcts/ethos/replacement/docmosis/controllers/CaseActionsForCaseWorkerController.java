@@ -361,7 +361,7 @@ public class CaseActionsForCaseWorkerController {
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
-
+            caseManagementForCaseWorkerService.setNextListedDate(caseData);
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
                     userToken, caseData, caseDetails.getCaseTypeId(),

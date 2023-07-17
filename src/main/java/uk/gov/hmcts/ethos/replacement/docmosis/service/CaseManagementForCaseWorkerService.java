@@ -202,16 +202,16 @@ public class CaseManagementForCaseWorkerService {
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 dates.addAll(getListedDates(hearingTypeItem));
-
             }
         for (String date : dates) {
-            if (nextListedDate.equals("") && LocalDate.parse(date).isAfter(LocalDate.now())
-                    || LocalDate.parse(date).isAfter(LocalDate.now()) && LocalDate.parse(date).isBefore(LocalDate.parse(nextListedDate))) {
+            LocalDateTime parsedDate = LocalDateTime.parse(date);
+            if (nextListedDate.equals("") && parsedDate.isAfter(LocalDateTime.now())
+                    || parsedDate.isAfter(LocalDateTime.now()) && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
                 nextListedDate = date;
             }
         }
 
-        caseData.setNextListedDate(nextListedDate);
+        caseData.setNextListedDate(nextListedDate.split("T")[0]);
         }
     }
 

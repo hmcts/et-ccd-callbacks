@@ -43,6 +43,8 @@ public abstract class BaseFunctionalTest {
     protected String baseUrl;
     @Value("${idam.url}")
     private String idamApiUrl;
+    @Value("${et-sya-api.url}")
+    protected String syaApiUrl;
     protected RequestSpecification spec;
 
     @BeforeAll

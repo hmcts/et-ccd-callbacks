@@ -27,6 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -58,6 +60,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
     private PseRespondToTribunalService pseRespondToTribService;
+    private EmailService emailService;
     private CaseData caseData;
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -70,13 +73,11 @@ class PseRespondToTribunalServiceTest {
         + "The tribunal will consider all correspondence and let you know what happens next.";
     private static final String RULE92_ANSWERED_YES =
             "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
-    public static final String LINK_TO_CITIZEN_HUB = "linkToCitizenHub";
-    public static final String LINK_TO_EXUI = "linkToExUI";
-    public static final String CITIZEN_HUB_URL = "https://et-sya.test.platform.hmcts.net/citizen-hub/";
-    public static final String EXUI_URL = "https://manage-case.test.platform.hmcts.net/cases/case-details/";
+    private static final String LINK_TO_CITIZEN_HUB = "linkToCitizenHub";
+    private static final String LINK_TO_EXUI = "linkToExUI";
+    private static final String CITIZEN_HUB_URL = "citizenUrl";
+    private static final String EXUI_URL = "exuiUrl";
 
-    @MockBean
-    private EmailService emailService;
     @MockBean
     private UserService userService;
     @MockBean
@@ -86,6 +87,7 @@ class PseRespondToTribunalServiceTest {
 
     @BeforeEach
     void setUp() {
+        emailService = spy(new TestEmailService());
         pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService,
             tribunalOfficesService);
         caseData = CaseDataBuilder.builder().build();
@@ -94,11 +96,6 @@ class PseRespondToTribunalServiceTest {
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
-
-        when(emailService.getExuiCaseLink("1677174791076683"))
-            .thenReturn("https://manage-case.test.platform.hmcts.net/cases/case-details/1677174791076683");
-        when(emailService.getCitizenCaseLink("1677174791076683"))
-            .thenReturn("https://et-sya.test.platform.hmcts.net/citizen-hub/1677174791076683");
     }
 
     @Test

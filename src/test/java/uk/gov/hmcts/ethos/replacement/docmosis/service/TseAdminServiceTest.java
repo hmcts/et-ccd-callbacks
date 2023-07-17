@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -42,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
@@ -62,8 +64,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 class TseAdminServiceTest {
     private TseAdminService tseAdminService;
-
-    @MockBean
     private EmailService emailService;
 
     @MockBean
@@ -89,12 +89,10 @@ class TseAdminServiceTest {
 
     @BeforeEach
     void setUp() {
+        emailService = spy(new TestEmailService());
         tseAdminService = new TseAdminService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
-
-        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
-        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
 
         caseData = CaseDataBuilder.builder().build();
     }

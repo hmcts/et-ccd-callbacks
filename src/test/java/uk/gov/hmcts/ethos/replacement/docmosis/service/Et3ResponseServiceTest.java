@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,14 +51,14 @@ class Et3ResponseServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TornadoService tornadoService;
-    @MockBean
+
     private EmailService emailService;
     private CaseData caseData;
     private DocumentInfo documentInfo;
 
     @BeforeEach
     void setUp() {
-        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
+        emailService = spy(new TestEmailService());
 
         et3ResponseService = new Et3ResponseService(documentManagementService, tornadoService, emailService);
         caseData = CaseDataBuilder.builder()

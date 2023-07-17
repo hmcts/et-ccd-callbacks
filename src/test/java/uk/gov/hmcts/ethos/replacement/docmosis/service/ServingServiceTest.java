@@ -9,12 +9,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.nio.file.Files;
@@ -28,9 +28,9 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
@@ -39,9 +39,7 @@ class ServingServiceTest {
     private static CaseData notifyCaseData;
     private static CaseDetails notifyCaseDetails;
 
-    @MockBean
     private static EmailService emailService;
-
     private static ServingService servingService;
 
     @Captor
@@ -49,9 +47,7 @@ class ServingServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
-        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
-
+        emailService = spy(new TestEmailService());
         caseDetails = generateCaseDetails();
         servingService = new ServingService(emailService);
         notifyCaseDetails = CaseDataBuilder.builder()

@@ -18,8 +18,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.UpdateReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.et.common.model.ccd.types.UpdateReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeDocument;
@@ -203,7 +205,8 @@ public final class ReferralHelper {
     private static boolean documentExists(DocumentTypeItem documentTypeItem) {
         return documentTypeItem != null && documentTypeItem.getValue() != null
                 && documentTypeItem.getValue().getUploadedDocument() != null
-                && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
+                && !Strings.isNullOrEmpty(documentTypeItem.getValue()
+                .getUploadedDocument().getDocumentBinaryUrl());
     }
 
     private static String populateReplyDetails(CaseData caseData) {
@@ -266,13 +269,13 @@ public final class ReferralHelper {
 
     /**
      * Gets the number a new referral should be labelled as.
-     * @param caseData contains all the case data
+     * @param referrals contains the list of referrals
      */
-    public static int getNextReferralNumber(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
+    public static int getNextReferralNumber(List<?> referrals) {
+        if (CollectionUtils.isEmpty(referrals)) {
             return 1;
         }
-        return caseData.getReferralCollection().size() + 1;
+        return referrals.size() + 1;
     }
 
     /**
@@ -288,7 +291,7 @@ public final class ReferralHelper {
 
         ReferralType referralType = new ReferralType();
 
-        referralType.setReferralNumber(String.valueOf(getNextReferralNumber(caseData)));
+        referralType.setReferralNumber(String.valueOf(getNextReferralNumber(caseData.getReferralCollection())));
         referralType.setReferCaseTo(caseData.getReferCaseTo());
         referralType.setIsUrgent(caseData.getIsUrgent());
         referralType.setReferralSubject(caseData.getReferralSubject());
@@ -314,6 +317,44 @@ public final class ReferralHelper {
         List<ReferralTypeItem> referralCollection = caseData.getReferralCollection();
         referralCollection.add(referralTypeItem);
         caseData.setReferralCollection(referralCollection);
+    }
+
+    /**
+     * Updates a referral and adds it to the update referral collection.
+     * @param caseData contains all the case data
+     * @param userFullName Full name of the logged-in user
+     */
+    public static void updateReferral(CaseData caseData, String userFullName) {
+        if (CollectionUtils.isEmpty(caseData.getReferralCollection()
+                .get(0).getValue().getUpdateReferralCollection())) {
+            caseData.getReferralCollection().get(0).getValue().setUpdateReferralCollection(new ArrayList<>());
+        }
+        UpdateReferralType updateReferralType = new UpdateReferralType();
+
+        updateReferralType.setUpdateReferralNumber(String.valueOf(
+                getNextReferralNumber(caseData.getReferralCollection()
+                        .get(0).getValue().getUpdateReferralCollection())));
+        updateReferralType.setUpdateReferCaseTo(caseData.getReferCaseTo());
+        updateReferralType.setUpdateIsUrgent(caseData.getIsUrgent());
+        updateReferralType.setUpdateReferralSubject(caseData.getReferralSubject());
+        updateReferralType.setUpdateReferralSubjectSpecify(caseData.getReferralSubjectSpecify());
+        updateReferralType.setUpdateReferralDetails(caseData.getReferralDetails());
+        updateReferralType.setUpdateReferralDocument(caseData.getReferralDocument());
+        updateReferralType.setUpdateReferralInstruction(caseData.getReferralInstruction());
+
+        updateReferralType.setUpdateReferralDate(Helper.getCurrentDate());
+
+        updateReferralType.setUpdateReferredBy(userFullName);
+
+        updateReferralType.setUpdateReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
+        UpdateReferralTypeItem updateReferralTypeItem = new UpdateReferralTypeItem();
+        updateReferralTypeItem.setId(UUID.randomUUID().toString());
+        updateReferralTypeItem.setValue(updateReferralType);
+
+        List<UpdateReferralTypeItem> updateReferralCollection = caseData.getReferralCollection()
+                .get(0).getValue().getUpdateReferralCollection();
+        updateReferralCollection.add(updateReferralTypeItem);
+        caseData.getReferralCollection().get(0).getValue().setUpdateReferralCollection(updateReferralCollection);
     }
 
     /**
@@ -489,7 +530,7 @@ public final class ReferralHelper {
     }
 
     /**
-     * Resets the case data fields relating to closing a referral so that they won't be auto populated when
+     * Resets the case data fields relating to closing a referral so that they won't be auto-populated when
      * creating a new referral.
      * @param caseData contains all the case data
      */

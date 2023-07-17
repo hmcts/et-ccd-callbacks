@@ -38,10 +38,6 @@ tornado:
   accessKey: ${TORNADO_ACCESS_KEY}
   url: ${TORNADO_URL:http://localhost:8090/rs/render}
 
-azure:
-  application-insights:
-    instrumentation-key: ${APP_INSIGHTS_KEY:00000000-0000-0000-0000-000000000000}
-
 ccd:
   client:
     timeout: '60000'
@@ -232,4 +228,5 @@ url:
     case-details: ${EXUI_CASE_DETAILS_URL}
 
 feature-flags:
-  hearings-api: ${HEARINGS_API_FLAG:true}
+  # noinspection SpringBootApplicationYaml
+  hearings-api: ${HEARINGS_API_FLAG:true} # will be used in future releases, remove noinspection once in use

@@ -57,7 +57,8 @@ document_management:
 
 idam:
   s2s-auth:
-    url: ${SERVICE_AUTH_PROVIDER_URL:http://service-auth-provider-api:8080}
+    # noinspection SpringBootApplicationYaml
+    url: ${SERVICE_AUTH_PROVIDER_URL:http://service-auth-provider-api:8080} # used in ServiceAuthorisationApi
     totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: ${MICRO_SERVICE:ccd_gw}
   api:

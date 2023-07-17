@@ -9,7 +9,8 @@ document_management:
 
 idam:
   s2s-auth:
-    url: http://localhost:4502
+    # noinspection SpringBootApplicationYaml
+    url: http://localhost:4502 # used in ServiceAuthorisationApi
     totp_secret: AAAAAAAAAAAAAAAA
     microservice: et_cos
   api:

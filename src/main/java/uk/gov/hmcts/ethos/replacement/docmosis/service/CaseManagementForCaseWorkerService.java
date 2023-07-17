@@ -201,7 +201,7 @@ public class CaseManagementForCaseWorkerService {
 
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                dates = getListedDates(hearingTypeItem);
+                dates.addAll(getListedDates(hearingTypeItem));
 
             }
         for (String date : dates) {

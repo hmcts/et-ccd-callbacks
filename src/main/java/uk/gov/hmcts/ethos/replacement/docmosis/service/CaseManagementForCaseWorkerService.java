@@ -211,7 +211,7 @@ public class CaseManagementForCaseWorkerService {
                     nextListedDate = date;
                 }
             }
-                caseData.setNextListedDate(nextListedDate.split("T")[0]);
+            caseData.setNextListedDate(nextListedDate.split("T")[0]);
         }
     }
 

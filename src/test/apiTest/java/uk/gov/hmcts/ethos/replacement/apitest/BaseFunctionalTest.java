@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.apitest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -33,7 +32,6 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-@WithTag("ApiTest")
 public abstract class BaseFunctionalTest {
     protected String userToken;
     protected CloseableHttpClient client;

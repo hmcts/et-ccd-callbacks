@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.apitest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
+@Slf4j
 public class TseViewApplicationsControllerFunctionalTest extends BaseFunctionalTest  {
     private static final String AUTHORIZATION = "Authorization";
     private static final String APPLICATION_LABEL = "1 - Amend response";

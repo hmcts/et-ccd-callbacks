@@ -4,16 +4,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
+
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INACTIVE;
@@ -21,12 +32,16 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.LANGUAGE_IN
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.SIGN_LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_LITIGANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class CaseFlagsServiceTest {
     public static final String CLAIMANT_NAME = "Claimant Name";
     public static final String RESPONDENT_NAME = "Respondent Name";
+    public static final String GRANTED = "Granted";
+    public static final String REFUSED = "Refused";
     private CaseFlagsService caseFlagsService;
     private CaseData caseData;
 
@@ -184,5 +199,101 @@ class CaseFlagsServiceTest {
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
         assertThat(caseData.getCaseInterpreterRequiredFlag(), is(NO));
+    }
+
+    private void setSingleApplicationOfTypeAndDecision(CaseData caseData, String applicationType, String decision) {
+        caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(TseApplicationBuilder.builder()
+                                .withNumber("4")
+                                .withType(applicationType)
+                                .build())
+                        .build())
+        );
+
+        caseData.setTseAdminSelectApplication(DynamicFixedListType.of(DynamicValueType.create("4", "")));
+        caseData.getGenericTseApplicationCollection().get(0).getValue().setAdminDecision(List.of(
+                TseAdminRecordDecisionTypeItem.builder()
+                        .value(TseAdminRecordDecisionType.builder().decision(decision).build())
+                        .build()
+                )
+        );
+    }
+
+    @Test
+    void setPrivateHearingFlag_defaultCaseData_doesNotSetFlag() {
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(NO, caseData.getPrivateHearingRequiredFlag());
+    }
+
+    @Test
+    void setPrivateHearingFlag_notRestrictedHearingType_doesNotSetFlag() {
+        setSingleApplicationOfTypeAndDecision(caseData, TSE_APP_CONSIDER_A_DECISION_AFRESH, GRANTED);
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(NO, caseData.getPrivateHearingRequiredFlag());
+    }
+
+    @Test
+    void setPrivateHearingFlag_whenGrantedRestrictPublicityApplication_setsFlag() {
+        setSingleApplicationOfTypeAndDecision(caseData, TSE_APP_RESTRICT_PUBLICITY, GRANTED);
+
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(YES, caseData.getPrivateHearingRequiredFlag());
+    }
+
+    @Test
+    void setPrivateHearingFlag_whenRefusedRestrictPublicityApplication_doesNotSetFlag() {
+        setSingleApplicationOfTypeAndDecision(caseData, TSE_APP_RESTRICT_PUBLICITY, REFUSED);
+
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(NO, caseData.getPrivateHearingRequiredFlag());
+    }
+
+    @Test
+    void setPrivateHearingFlag_whenRule503bIsYes_setsFlag() {
+        RestrictedReportingType restrictedReporting = new RestrictedReportingType();
+        restrictedReporting.setRule503b(YES);
+        caseData.setRestrictedReporting(restrictedReporting);
+
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(YES, caseData.getPrivateHearingRequiredFlag());
+    }
+
+    @Test
+    void setPrivateHearingFlag_whenImposedIsYes_setsFlag() {
+        RestrictedReportingType restrictedReporting = new RestrictedReportingType();
+        restrictedReporting.setImposed(YES);
+        caseData.setRestrictedReporting(restrictedReporting);
+
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(YES, caseData.getPrivateHearingRequiredFlag());
+    }
+
+    @Test
+    void setPrivateHearingFlag_whenRule503bAndImposedAreNo_setsFlag() {
+        RestrictedReportingType restrictedReporting = new RestrictedReportingType();
+        restrictedReporting.setRule503b(NO);
+        restrictedReporting.setImposed(NO);
+        caseData.setRestrictedReporting(restrictedReporting);
+
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(NO, caseData.getPrivateHearingRequiredFlag());
+    }
+
+    @Test
+    void setPrivateHearingFlag_withPreliminaryHearing_setsFlag() {
+        caseData.setIcListingPreliminaryHearing(YES);
+
+        caseFlagsService.setPrivateHearingFlag(caseData);
+
+        assertEquals(YES, caseData.getPrivateHearingRequiredFlag());
     }
 }

@@ -116,14 +116,22 @@ class TseAdminServiceTest {
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
 
-        when(tseService.formatApplicationDetails(application, AUTH_TOKEN, false)).thenReturn("Application Details");
+        List<String[]> applicationDetailsRows = new ArrayList<>();
+        applicationDetailsRows.add(new String[] {"details", ""});
+        when(tseService.getApplicationDetailsRows(application, AUTH_TOKEN, false)).thenReturn(applicationDetailsRows);
 
         List<String[]> formattedApplicationResponses = new ArrayList<>();
-        formattedApplicationResponses.add(new String[] { "responses"});
+        formattedApplicationResponses.add(new String[] {"responses", ""});
         when(tseService.formatApplicationResponses(any(), any(), anyBoolean()))
             .thenReturn(formattedApplicationResponses);
 
-        String expected = "Application Details\r\nResponses";
+        String expected = """
+            |Application||
+            |--|--|
+            |details||
+            |--|--|
+            |responses||
+            """;
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
 

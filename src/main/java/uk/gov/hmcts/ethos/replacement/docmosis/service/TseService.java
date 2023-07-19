@@ -213,18 +213,6 @@ public class TseService {
             Stream.of(applicationTable, responses, decisions).flatMap(Collection::stream).toList());
     }
 
-    /**
-     * Builds a two column Markdown table for details of an application without any responses or decisions.
-     * @param application the application to build from
-     * @param authToken user token for getting document metadata
-     * @param rule92 Whether to include rows about rule92 declaration
-     * @return two column Markdown table string
-     */
-    String formatApplicationDetails(GenericTseApplicationType application, String authToken, boolean rule92) {
-        List<String[]> rows = getApplicationDetailsRows(application, authToken, rule92);
-        return createTwoColumnTable(new String[]{"Application", ""}, rows);
-    }
-
     List<String[]> getApplicationDetailsRows(GenericTseApplicationType application, String authToken, boolean rule92) {
         UploadedDocumentType document = application.getDocumentUpload();
         String supportingMaterial = documentManagementService.displayDocNameTypeSizeLink(document, authToken);
@@ -377,6 +365,9 @@ public class TseService {
      * @return A list of String arrays, one string array for each document's name and another for the short description
      */
     List<String[]> addDocumentsRows(List<GenericTypeItem<DocumentType>> documents, String authToken) {
+        if (isEmpty(documents)) {
+            return Collections.emptyList();
+        }
         return documents.stream().flatMap(o -> addDocumentRow(o.getValue(), authToken).stream()).toList();
     }
 

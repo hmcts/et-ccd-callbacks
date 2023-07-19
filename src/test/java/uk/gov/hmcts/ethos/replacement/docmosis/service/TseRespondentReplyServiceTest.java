@@ -323,16 +323,19 @@ class TseRespondentReplyServiceTest {
 
     @Test
     void initialResReplyToTribunalTableMarkUp() {
-        when(tseService.formatApplicationDetails(any(), any(), anyBoolean())).thenReturn("applicationDetails");
+        List<String[]> strings = new ArrayList<>();
+        strings.add(new String[] {"applicationDetails", ""});
+        when(tseService.getApplicationDetailsRows(any(), any(), anyBoolean())).thenReturn(strings);
 
         List<String[]> formattedApplicationResponses = new ArrayList<>();
-        formattedApplicationResponses.add(new String[] { "responses"});
+        formattedApplicationResponses.add(new String[] {"responses", ""});
         when(tseService.formatApplicationResponses(any(), any(), anyBoolean()))
             .thenReturn(formattedApplicationResponses);
 
         tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
 
-        assertThat(caseData.getTseResponseTable(), is("applicationDetails" + "\r\n" + "responses"));
+        assertThat(caseData.getTseResponseTable(),
+            is("|Application||\r\n|--|--|\r\n|applicationDetails||\r\n|responses||\r\n"));
         assertThat(caseData.getTseRespondingToTribunal(), is(YES));
     }
 

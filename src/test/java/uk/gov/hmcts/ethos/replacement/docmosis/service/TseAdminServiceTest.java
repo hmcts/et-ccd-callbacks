@@ -118,7 +118,8 @@ class TseAdminServiceTest {
 
         List<String[]> applicationDetailsRows = new ArrayList<>();
         applicationDetailsRows.add(new String[] {"details", ""});
-        when(tseService.getApplicationDetailsRows(application, AUTH_TOKEN, false)).thenReturn(applicationDetailsRows);
+        when(tseService.getApplicationDetailsRows(application, AUTH_TOKEN, true))
+            .thenReturn(applicationDetailsRows);
 
         List<String[]> formattedApplicationResponses = new ArrayList<>();
         formattedApplicationResponses.add(new String[] {"responses", ""});
@@ -126,11 +127,10 @@ class TseAdminServiceTest {
             .thenReturn(formattedApplicationResponses);
 
         String expected = """
-            |Application||
-            |--|--|
-            |details||
-            |--|--|
-            |responses||
+            |Application||\r
+            |--|--|\r
+            |details||\r
+            |responses||\r
             """;
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);

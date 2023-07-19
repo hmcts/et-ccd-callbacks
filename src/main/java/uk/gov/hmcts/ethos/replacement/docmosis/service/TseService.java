@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -121,14 +121,15 @@ public class TseService {
 
     private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application) {
         if (application.getDocumentUpload() != null) {
-            DocumentTypeItem documentTypeItem = DocumentTypeItem.fromUploadedDocument(application.getDocumentUpload());
-            documentTypeItem.getValue().setTypeOfDocument("Respondent correspondence");
-            documentTypeItem.getValue().setShortDescription("Application supporting material");
-
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
-            caseData.getDocumentCollection().add(documentTypeItem);
+
+            caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItem(
+                application.getDocumentUpload(),
+                "Respondent correspondence",
+                application.getType()
+            ));
         }
     }
 

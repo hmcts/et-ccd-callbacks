@@ -12,6 +12,7 @@ module.exports = async function () {
     I.selectOption('#ecmOfficeCT', commonConfig.caseTransferOffice);
     I.fillField('#reasonForCT', 'Claimant lives near to the selected Jurisdiction');
     I.click(commonConfig.submit);
+    I.click(commonConfig.submit);
     I.see('Case Transfer: Transferred to ECM');
     I.waitForText('has been updated with event: Case Transfer to ECM');
 

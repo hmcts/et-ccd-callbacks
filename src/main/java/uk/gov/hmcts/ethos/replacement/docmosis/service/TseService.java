@@ -49,11 +49,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.cre
 public class TseService {
     public static final String WHATS_YOUR_RESPONSE = "What's your response to the %s's application";
 
+    static final String[] MD_TABLE_EMPTY_LINE = {"", ""};
+
     private static final String RULE92_QUESTION =
             "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
     private static final String RULE92_DETAILS =
             "Details of why you do not want to inform the other party";
-    private static final String[] MD_TABLE_EMPTY_LINE = {"", ""};
 
     private final DocumentManagementService documentManagementService;
 
@@ -205,7 +206,6 @@ public class TseService {
         }
 
         List<String[]> applicationTable = getApplicationDetailsRows(application, authToken, true);
-        applicationTable.add(0, MD_TABLE_EMPTY_LINE);
         List<String[]> responses = formatApplicationResponses(application, authToken, false);
         List<String[]> decisions = formatApplicationDecisions(application, authToken);
 
@@ -218,6 +218,8 @@ public class TseService {
         String supportingMaterial = documentManagementService.displayDocNameTypeSizeLink(document, authToken);
 
         List<String[]> rows = new ArrayList<>(List.of(
+                MD_TABLE_EMPTY_LINE,
+                MD_TABLE_EMPTY_LINE,
                 new String[]{"Applicant", application.getApplicant()},
                 new String[]{"Type of application", application.getType()},
                 new String[]{"Application date", application.getDate()},
@@ -263,6 +265,7 @@ public class TseService {
     private List<String[]> getSingleDecisionMarkdown(TseAdminRecordDecisionType decision, String authToken) {
         List<String[]> rows = new ArrayList<>(List.of(
             MD_TABLE_EMPTY_LINE,
+            MD_TABLE_EMPTY_LINE,
             new String[]{"Decision", ""},
             new String[]{"Notification", decision.getEnterNotificationTitle()},
             new String[]{"Decision", decision.getDecision()},
@@ -307,6 +310,7 @@ public class TseService {
     List<String[]> formatAdminReply(TseRespondType reply, int count, String authToken) {
         List<String[]> rows = new ArrayList<>(List.of(
                 MD_TABLE_EMPTY_LINE,
+                MD_TABLE_EMPTY_LINE,
                 new String[]{"Response " + count, ""},
                 new String[]{"Response", reply.getEnterResponseTitle()},
                 new String[]{"Date", reply.getDate()},
@@ -345,6 +349,7 @@ public class TseService {
         }
 
         List<String[]> rows = new ArrayList<>(List.of(
+                MD_TABLE_EMPTY_LINE,
                 MD_TABLE_EMPTY_LINE,
                 new String[]{"Response " + count, ""},
                 new String[]{"Response from", from},

@@ -102,6 +102,7 @@ class TseServiceTest {
 
             List<String[]> expected = List.of(
                 MD_TABLE_EMPTY_LINE,
+                MD_TABLE_EMPTY_LINE,
                 new String[] {"Response 1", ""},
                 new String[] {"Response", "Title"},
                 new String[] {"Date", "2000-01-01"},
@@ -131,6 +132,7 @@ class TseServiceTest {
             List<String[]> actual = tseService.formatAdminReply(reply, 1, AUTH_TOKEN);
 
             List<String[]> expected = List.of(
+                MD_TABLE_EMPTY_LINE,
                 MD_TABLE_EMPTY_LINE,
                 new String[] {"Response 1", ""},
                 new String[] {"Response", "Title"},
@@ -174,6 +176,7 @@ class TseServiceTest {
 
             List<String[]> expected = List.of(
                 MD_TABLE_EMPTY_LINE,
+                MD_TABLE_EMPTY_LINE,
                 new String[] {"Response 1", ""},
                 new String[] {"Response", "Title"},
                 new String[] {"Date", "2000-01-01"},
@@ -190,6 +193,7 @@ class TseServiceTest {
                 new String[] {"Request made by", "Caseworker"},
                 new String[] {"Full name", "Mr Lee Gal Officer"},
                 new String[] {"Sent to", "Respondent"},
+                MD_TABLE_EMPTY_LINE,
                 MD_TABLE_EMPTY_LINE,
                 new String[] {"Response 2", ""},
                 new String[] {"Response from", "Claimant"},
@@ -225,6 +229,7 @@ class TseServiceTest {
 
             List<String[]> expected = List.of(
                 MD_TABLE_EMPTY_LINE,
+                MD_TABLE_EMPTY_LINE,
                 new String[] {"Response 1", ""},
                 new String[] {"Response", "Title"},
                 new String[] {"Date", "2000-01-01"},
@@ -256,6 +261,8 @@ class TseServiceTest {
         List<String[]> actual = tseService.getApplicationDetailsRows(application, AUTH_TOKEN, false);
 
         List<String[]> expected = List.of(
+            MD_TABLE_EMPTY_LINE,
+            MD_TABLE_EMPTY_LINE,
             new String[] {"Applicant", "Respondent"},
             new String[] {"Type of application", "Amend response"},
             new String[] {"Application date", "2000-01-01"},
@@ -272,6 +279,8 @@ class TseServiceTest {
         List<String[]> actual = tseService.getApplicationDetailsRows(application, AUTH_TOKEN, true);
 
         List<String[]> expected = List.of(
+            MD_TABLE_EMPTY_LINE,
+            MD_TABLE_EMPTY_LINE,
             new String[] {"Applicant", "Respondent"},
             new String[] {"Type of application", "Amend response"},
             new String[] {"Application date", "2000-01-01"},
@@ -312,6 +321,7 @@ class TseServiceTest {
                 |Application||\r
                 |--|--|\r
                 |||\r
+                |||\r
                 |Applicant|Respondent|\r
                 |Type of application|Amend response|\r
                 |Application date|2000-01-01|\r
@@ -319,6 +329,7 @@ class TseServiceTest {
                 |Supporting material|Document (txt, 1MB)|\r
                 |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|No|\r
                 |Details of why you do not want to inform the other party|Details|\r
+                |||\r
                 |||\r
                 |Response 1||\r
                 |Response|Title|\r
@@ -393,6 +404,7 @@ class TseServiceTest {
                 |Application||\r
                 |--|--|\r
                 |||\r
+                |||\r
                 |Applicant|Respondent|\r
                 |Type of application|Amend response|\r
                 |Application date|2000-01-01|\r
@@ -400,6 +412,7 @@ class TseServiceTest {
                 |Supporting material|Document (txt, 1MB)|\r
                 |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|No|\r
                 |Details of why you do not want to inform the other party|Details|\r
+                |||\r
                 |||\r
                 |Response 1||\r
                 |Response|Title|\r
@@ -418,6 +431,7 @@ class TseServiceTest {
                 |Full name|Mr Lee Gal Officer|\r
                 |Sent to|Respondent|\r
                 |||\r
+                |||\r
                 |Decision||\r
                 |Notification|title3|\r
                 |Decision|Granted|\r
@@ -428,6 +442,7 @@ class TseServiceTest {
                 |Decision made by|Judge|\r
                 |Name|John Doe|\r
                 |Sent to|Respondent|\r
+                |||\r
                 |||\r
                 |Decision||\r
                 |Notification|title2|\r

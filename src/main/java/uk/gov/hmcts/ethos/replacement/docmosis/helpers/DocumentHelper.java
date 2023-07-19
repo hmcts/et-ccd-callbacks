@@ -76,8 +76,7 @@ public final class DocumentHelper {
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
         // Start building the instruction
-        sb.append("{\n");
-        sb.append("\"accessKey\":\"").append(accessKey).append(NEW_LINE);
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE);
         sb.append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE);
         sb.append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
 
@@ -103,22 +102,22 @@ public final class DocumentHelper {
 
         sb.append("\"i").append(getEWSectionName(correspondenceType)
                 .replace(".", "_"))
-                .append("_enhmcts\":\"").append("[userImage:").append("enhmcts.png]").append(NEW_LINE);
+                .append("_enhmcts\":\"[userImage:enhmcts.png]").append(NEW_LINE);
         sb.append("\"i").append(getEWSectionName(correspondenceType)
                 .replace(".", "_"))
-                .append("_enhmcts1\":\"").append("[userImage:").append("enhmcts.png]").append(NEW_LINE);
+                .append("_enhmcts1\":\"[userImage:enhmcts.png]").append(NEW_LINE);
         sb.append("\"i").append(getEWSectionName(correspondenceType)
                 .replace(".", "_"))
-                .append("_enhmcts2\":\"").append("[userImage:").append("enhmcts.png]").append(NEW_LINE);
+                .append("_enhmcts2\":\"[userImage:enhmcts.png]").append(NEW_LINE);
         sb.append("\"iScot").append(getScotSectionName(correspondenceScotType)
                 .replace(".", "_"))
-                .append("_schmcts\":\"").append("[userImage:").append("schmcts.png]").append(NEW_LINE);
+                .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE);
         sb.append("\"iScot").append(getScotSectionName(correspondenceScotType)
                 .replace(".", "_"))
-                .append("_schmcts1\":\"").append("[userImage:").append("schmcts.png]").append(NEW_LINE);
+                .append("_schmcts1\":\"[userImage:schmcts.png]").append(NEW_LINE);
         sb.append("\"iScot").append(getScotSectionName(correspondenceScotType)
                 .replace(".", "_"))
-                .append("_schmcts2\":\"").append("[userImage:").append("schmcts.png]").append(NEW_LINE);
+                .append("_schmcts2\":\"[userImage:schmcts.png]").append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
         sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE);
@@ -126,8 +125,7 @@ public final class DocumentHelper {
         sb.append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
                 .append(NEW_LINE);
         sb.append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE);
-        sb.append("}\n");
-        sb.append("}\n");
+        sb.append("}\n}\n");
 
         return sb;
     }

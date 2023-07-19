@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
@@ -32,10 +34,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
@@ -554,6 +558,23 @@ public class CaseDataBuilder {
     public CaseDataBuilder withSubmitEt3Respondent(String respondent) {
         caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create(respondent, respondent)));
         caseData.getSubmitEt3Respondent().setValue(DynamicValueType.create(respondent, respondent));
+        return this;
+    }
+
+    public CaseDataBuilder withDocumentCollection(String docType) {
+        if (caseData.getDocumentCollection() == null) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentFilename("test.pdf");
+        uploadedDocumentType.setDocumentBinaryUrl("http://dummy.link");
+        DocumentType documentType = new DocumentType();
+        documentType.setTypeOfDocument(docType);
+        documentType.setUploadedDocument(uploadedDocumentType);
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(documentType);
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        caseData.getDocumentCollection().add(documentTypeItem);
         return this;
     }
 }

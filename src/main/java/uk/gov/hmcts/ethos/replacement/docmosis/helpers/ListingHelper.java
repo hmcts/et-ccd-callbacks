@@ -278,8 +278,7 @@ public final class ListingHelper {
         StringBuilder sb = new StringBuilder();
 
         // Start building the instruction
-        sb.append("{\n");
-        sb.append("\"accessKey\":\"").append(accessKey).append(NEW_LINE);
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE);
         sb.append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE);
         sb.append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
 
@@ -308,9 +307,8 @@ public final class ListingHelper {
         }
 
         log.info("Document data ends");
-        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n");
-        sb.append("}\n");
-        sb.append("}\n");
+        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now()));
+        sb.append("\"\n}\n}\n");
         return sb;
     }
 
@@ -619,28 +617,28 @@ public final class ListingHelper {
         String hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
         switch (tribunalOffice) {
-            case GLASGOW:
+            case GLASGOW -> {
                 if (dateListedType.hasHearingGlasgow()) {
                     return dateListedType.getHearingGlasgow().getSelectedLabel();
                 }
-                break;
-            case ABERDEEN:
+            }
+            case ABERDEEN -> {
                 if (dateListedType.hasHearingAberdeen()) {
                     return dateListedType.getHearingAberdeen().getSelectedLabel();
                 }
-                break;
-            case DUNDEE:
+            }
+            case DUNDEE -> {
                 if (dateListedType.hasHearingDundee()) {
                     return dateListedType.getHearingDundee().getSelectedLabel();
                 }
-                break;
-            case EDINBURGH:
+            }
+            case EDINBURGH -> {
                 if (dateListedType.hasHearingEdinburgh()) {
                     return dateListedType.getHearingEdinburgh().getSelectedLabel();
                 }
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
 
         return " ";
@@ -662,28 +660,28 @@ public final class ListingHelper {
         String hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
         switch (tribunalOffice) {
-            case GLASGOW:
+            case GLASGOW -> {
                 if (dateListedType.hasHearingGlasgow()) {
                     return dateListedType.getHearingGlasgow().getSelectedCode();
                 }
-                break;
-            case ABERDEEN:
+            }
+            case ABERDEEN -> {
                 if (dateListedType.hasHearingAberdeen()) {
                     return dateListedType.getHearingAberdeen().getSelectedCode();
                 }
-                break;
-            case DUNDEE:
+            }
+            case DUNDEE -> {
                 if (dateListedType.hasHearingDundee()) {
                     return dateListedType.getHearingDundee().getSelectedCode();
                 }
-                break;
-            case EDINBURGH:
+            }
+            case EDINBURGH -> {
                 if (dateListedType.hasHearingEdinburgh()) {
                     return dateListedType.getHearingEdinburgh().getSelectedCode();
                 }
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         throw new IllegalStateException();
     }
@@ -801,40 +799,24 @@ public final class ListingHelper {
     }
 
     private static String getReportDocTemplateName(String reportType) {
-        switch (reportType) {
-            case BROUGHT_FORWARD_REPORT:
-                return "EM-TRB-SCO-ENG-00218";
-            case CLAIMS_ACCEPTED_REPORT:
-                return "EM-TRB-SCO-ENG-00219";
-            case LIVE_CASELOAD_REPORT:
-                return "EM-TRB-SCO-ENG-00220";
-            case CASES_COMPLETED_REPORT:
-                return "EM-TRB-SCO-ENG-00221";
-            case CASES_AWAITING_JUDGMENT_REPORT:
-                return "EM-TRB-SCO-ENG-00749";
-            case TIME_TO_FIRST_HEARING_REPORT:
-                return "EM-TRB-SCO-ENG-00751";
-            case SERVING_CLAIMS_REPORT:
-                return "EM-TRB-SCO-ENG-00781";
-            case CASE_SOURCE_LOCAL_REPORT:
-                return "EM-TRB-SCO-ENG-00783";
-            case HEARINGS_BY_HEARING_TYPE_REPORT:
-                return "EM-TRB-SCO-ENG-00785";
-            case HEARINGS_TO_JUDGEMENTS_REPORT:
-                return "EM-TRB-SCO-ENG-00786";
-            case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
-                return "EM-TRB-SCO-ENG-00794";
-            case MEMBER_DAYS_REPORT:
-                return "EM-TRB-SCO-ENG-00800";
-            case RESPONDENTS_REPORT:
-                return "EM-TRB-SCO-ENG-00815";
-            case SESSION_DAYS_REPORT:
-                return "EM-TRB-SCO-ENG-00817";
-            case ECC_REPORT:
-                return "EM-TRB-SCO-ENG-00818";
-            default:
-                return NO_DOCUMENT_FOUND;
-        }
+        return switch (reportType) {
+            case BROUGHT_FORWARD_REPORT -> "EM-TRB-SCO-ENG-00218";
+            case CLAIMS_ACCEPTED_REPORT -> "EM-TRB-SCO-ENG-00219";
+            case LIVE_CASELOAD_REPORT -> "EM-TRB-SCO-ENG-00220";
+            case CASES_COMPLETED_REPORT -> "EM-TRB-SCO-ENG-00221";
+            case CASES_AWAITING_JUDGMENT_REPORT -> "EM-TRB-SCO-ENG-00749";
+            case TIME_TO_FIRST_HEARING_REPORT -> "EM-TRB-SCO-ENG-00751";
+            case SERVING_CLAIMS_REPORT -> "EM-TRB-SCO-ENG-00781";
+            case CASE_SOURCE_LOCAL_REPORT -> "EM-TRB-SCO-ENG-00783";
+            case HEARINGS_BY_HEARING_TYPE_REPORT -> "EM-TRB-SCO-ENG-00785";
+            case HEARINGS_TO_JUDGEMENTS_REPORT -> "EM-TRB-SCO-ENG-00786";
+            case NO_CHANGE_IN_CURRENT_POSITION_REPORT -> "EM-TRB-SCO-ENG-00794";
+            case MEMBER_DAYS_REPORT -> "EM-TRB-SCO-ENG-00800";
+            case RESPONDENTS_REPORT -> "EM-TRB-SCO-ENG-00815";
+            case SESSION_DAYS_REPORT -> "EM-TRB-SCO-ENG-00817";
+            case ECC_REPORT -> "EM-TRB-SCO-ENG-00818";
+            default -> NO_DOCUMENT_FOUND;
+        };
     }
 
     private static String getHearingDocTemplateName(ListingData listingData) {

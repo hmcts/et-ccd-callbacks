@@ -9,5 +9,7 @@ module.exports = async function (nextStep, webDriverWait) {
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 30);
     await I.retry(5).selectOption('#next-step', nextStep);
     await I.waitForEnabled(commonConfig.goButton, testConfig.TestTimeToWaitForText || 30);
-    I.click(commonConfig.goButton);
+    I.wait(2);
+    I.forceClick(commonConfig.goButton);
+    I.wait(2);
 };

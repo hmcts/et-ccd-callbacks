@@ -1,6 +1,5 @@
 const testConfig = require('./../../config');
 const {caseDetailsEvent} = require("../helpers/caseHelper");
-const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
 const {eventNames} = require('../pages/common/constants.js');
 const {processCaseToRejectedState} = require("../helpers/etCaseHepler");
 

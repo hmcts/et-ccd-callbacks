@@ -42,9 +42,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class RespondentTellSomethingElseController {
 
     private final VerifyTokenService verifyTokenService;
-
     private final RespondentTellSomethingElseService resTseService;
-
     private final TseService tseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -182,12 +180,13 @@ public class RespondentTellSomethingElseController {
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        resTseService.generateAndAddTsePdf(caseData, userToken, caseDetails.getCaseTypeId());
 
         resTseService.sendAcknowledgeEmail(caseDetails, userToken);
         resTseService.sendClaimantEmail(caseDetails);
         resTseService.sendAdminEmail(caseDetails);
 
-        CaseData caseData = caseDetails.getCaseData();
         tseService.createApplication(caseData, false);
 
         return getCallbackRespEntityNoErrors(caseData);

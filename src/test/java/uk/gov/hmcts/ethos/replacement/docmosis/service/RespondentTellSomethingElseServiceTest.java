@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,9 +19,11 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
@@ -40,6 +43,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -83,6 +87,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @SpyBean
     private NotificationProperties notificationProperties;
+
     @MockBean
     private DocumentManagementService documentManagementService;
 
@@ -119,7 +124,7 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
-                        tornadoService, notificationProperties);
+                        tornadoService, notificationProperties, documentManagementService);
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
@@ -429,23 +434,20 @@ class RespondentTellSomethingElseServiceTest {
 
         tseService.createApplication(caseData, false);
 
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue().getDetails(), is(textBoxData));
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getCopyToOtherPartyText(), is("copyToOtherPartyTextArea"));
+        var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
+        assertThat(genericTseApplicationType.getDetails(), is(textBoxData));
+        assertThat(genericTseApplicationType.getCopyToOtherPartyText(), is("copyToOtherPartyTextArea"));
+        assertThat(genericTseApplicationType.getCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
+        assertThat(genericTseApplicationType.getDocumentUpload().getDocumentUrl(), is(documentUrl));
+        assertThat(genericTseApplicationType.getApplicant(), is(RESPONDENT_TITLE));
+        assertThat(genericTseApplicationType.getType(), is(selectedApplication));
 
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        DocumentType actualDocumentType = documentCollection.get(0).getValue();
 
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getDocumentUpload().getDocumentUrl(), is(documentUrl));
-
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getApplicant(), is(RESPONDENT_TITLE));
-
-        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getType(), is(selectedApplication));
-
-        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(documentCollection.size(), is(1));
+        assertEquals(selectedApplication, actualDocumentType.getShortDescription());
+        assertEquals("Respondent correspondence", actualDocumentType.getTypeOfDocument());
 
         assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
         assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));
@@ -680,5 +682,21 @@ class RespondentTellSomethingElseServiceTest {
             personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
         }
         return personalisation;
+    }
+
+    @Test
+    void generatesAndAddsTsePdfToDocumentCollection() {
+        CaseData caseData = new CaseData();
+        caseData.setResTseSelectApplication("Amend response");
+        respondentTellSomethingElseService.generateAndAddTsePdf(caseData, "token", "typeId");
+
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        DocumentType actual = documentCollection.get(0).getValue();
+
+        DocumentType expected = DocumentType.builder().typeOfDocument("Respondent correspondence")
+            .shortDescription("Amend response").build();
+
+        Assertions.assertThat(documentCollection).hasSize(1);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 }

@@ -72,94 +72,89 @@ public final class ReportDocHelper {
         log.info("Building {} report document data", listingData.getReportType());
 
         StringBuilder sb = new StringBuilder();
-        sb.append("{\n");
-        sb.append("\"accessKey\":\"").append(accessKey).append(NEW_LINE);
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE);
         sb.append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE);
         sb.append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
         sb.append("\"data\":{\n");
 
         switch (listingData.getReportType()) {
-            case CLAIMS_ACCEPTED_REPORT:
+            case CLAIMS_ACCEPTED_REPORT -> {
                 sb.append(ListingHelper.getListingDate(listingData));
                 addReportOffice(listingData, sb);
                 sb.append(getCasesAcceptedReport(listingData));
-                break;
-            case LIVE_CASELOAD_REPORT:
+            }
+            case LIVE_CASELOAD_REPORT -> {
                 sb.append(ListingHelper.getListingDate(listingData));
                 addReportOffice(listingData, sb);
                 sb.append(getLiveCaseLoadReport(listingData));
-                break;
-            case CASES_COMPLETED_REPORT:
+            }
+            case CASES_COMPLETED_REPORT -> {
                 sb.append(ListingHelper.getListingDate(listingData));
                 addReportOffice(listingData, sb);
                 sb.append(getCasesCompletedReport(listingData));
-                break;
-            case TIME_TO_FIRST_HEARING_REPORT:
+            }
+            case TIME_TO_FIRST_HEARING_REPORT -> {
                 sb.append(ListingHelper.getListingDate(listingData));
                 addReportOffice(listingData, sb);
                 sb.append(getTimeToFirstHearingReport(listingData));
-                break;
-            case CASE_SOURCE_LOCAL_REPORT:
+            }
+            case CASE_SOURCE_LOCAL_REPORT -> {
                 sb.append(ListingHelper.getListingDate(listingData));
                 addReportOffice(listingData, sb);
                 sb.append(getCaseSourceLocalReport(listingData));
-                break;
-            case SERVING_CLAIMS_REPORT:
+            }
+            case SERVING_CLAIMS_REPORT -> {
                 sb.append(ListingHelper.getListingDate(listingData));
                 addReportOffice(listingData, sb);
                 sb.append(getServedClaimsReport(listingData));
-                break;
-            case HEARINGS_BY_HEARING_TYPE_REPORT:
+            }
+            case HEARINGS_BY_HEARING_TYPE_REPORT -> {
                 try {
                     sb.append(ListingHelper.getListingDate(listingData));
                     sb.append(getHearingsByHearingTypeReport(listingData));
                 } catch (JsonProcessingException e) {
                     throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
                 }
-                break;
-            case CASES_AWAITING_JUDGMENT_REPORT:
+            }
+            case CASES_AWAITING_JUDGMENT_REPORT -> {
                 try {
                     sb.append(getCasesAwaitingJudgmentReport(listingData));
                 } catch (JsonProcessingException e) {
                     throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
                 }
-                break;
-            case HEARINGS_TO_JUDGEMENTS_REPORT:
+            }
+            case HEARINGS_TO_JUDGEMENTS_REPORT -> {
                 sb.append(ListingHelper.getListingDate(listingData));
                 sb.append(getHearingsToJudgmentsReport(listingData));
-                break;
-            case RESPONDENTS_REPORT:
+            }
+            case RESPONDENTS_REPORT -> {
                 try {
                     sb.append(ListingHelper.getListingDate(listingData));
                     sb.append(getRespondentsReport(listingData));
                 } catch (JsonProcessingException e) {
                     throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
                 }
-                break;
-            case SESSION_DAYS_REPORT:
+            }
+            case SESSION_DAYS_REPORT -> {
                 try {
                     sb.append(ListingHelper.getListingDate(listingData));
                     sb.append(getSessionDaysReport(listingData));
                 } catch (JsonProcessingException e) {
                     throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
                 }
-                break;
-            case ECC_REPORT:
+            }
+            case ECC_REPORT -> {
                 try {
                     sb.append(ListingHelper.getListingDate(listingData));
                     sb.append(getEccReport(listingData));
                 } catch (JsonProcessingException e) {
                     throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
                 }
-                break;
-            case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
-                sb.append(getNoPositionChangeReport(listingData));
-                break;
-            case MEMBER_DAYS_REPORT:
-                sb.append(new MemberDaysReportDoc().getReportDocPart(listingData));
-                break;
-            default:
-                throw new IllegalStateException("Report type - Unexpected value: " + listingData.getReportType());
+            }
+            case NO_CHANGE_IN_CURRENT_POSITION_REPORT -> sb.append(getNoPositionChangeReport(listingData));
+            case MEMBER_DAYS_REPORT -> sb.append(new MemberDaysReportDoc().getReportDocPart(listingData));
+            default ->
+                    throw new IllegalStateException("Report type - Unexpected value: " + listingData.getReportType());
         }
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());

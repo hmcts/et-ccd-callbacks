@@ -41,8 +41,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
@@ -100,28 +103,32 @@ class TseAdminServiceTest {
     }
 
     @Test
-//    void initialTseAdminTableMarkUp_ReturnString() {
-//        GenericTseApplicationType application = getGenericTseApplicationTypeItemBuild();
-//
-//        caseData.setGenericTseApplicationCollection(
-//            List.of(GenericTseApplicationTypeItem.builder()
-//                .id(UUID.randomUUID().toString())
-//                .value(application)
-//                .build())
-//        );
-//
-//        caseData.setTseAdminSelectApplication(
-//            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
-//
-//        when(tseService.formatApplicationDetails(application, AUTH_TOKEN, false)).thenReturn("Application Details");
-//        when(tseService.formatApplicationResponses(any(), any(), anyBoolean())).thenReturn("Responses");
-//
-//        String expected = "Application Details\r\nResponses";
-//
-//        tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
-//        assertThat(caseData.getTseAdminTableMarkUp())
-//            .isEqualTo(expected);
-//    }
+    void initialTseAdminTableMarkUp_ReturnString() {
+        GenericTseApplicationType application = getGenericTseApplicationTypeItemBuild();
+
+        caseData.setGenericTseApplicationCollection(
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(application)
+                .build())
+        );
+
+        caseData.setTseAdminSelectApplication(
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+
+        when(tseService.formatApplicationDetails(application, AUTH_TOKEN, false)).thenReturn("Application Details");
+
+        List<String[]> formattedApplicationResponses = new ArrayList<>();
+        formattedApplicationResponses.add(new String[] { "responses"});
+        when(tseService.formatApplicationResponses(any(), any(), anyBoolean()))
+            .thenReturn(formattedApplicationResponses);
+
+        String expected = "Application Details\r\nResponses";
+
+        tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
+
+        assertThat(caseData.getTseAdminTableMarkUp()).isEqualTo(expected);
+    }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {
         TseRespondTypeItem claimantReply = TseRespondTypeItem.builder()

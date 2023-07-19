@@ -13,8 +13,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
  * Helper class for formatting strings into markdown.
  */
 public final class MarkdownHelper {
-    public static final String[] MD_TABLE_EMPTY_LINE = {"", ""};
-
     private MarkdownHelper() {
         // Access through static methods
     }

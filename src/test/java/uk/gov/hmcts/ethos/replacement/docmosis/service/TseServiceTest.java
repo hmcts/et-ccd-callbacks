@@ -86,144 +86,144 @@ class TseServiceTest {
         assertThat(actual.get(3)).isEqualTo(new String[] {"Description", "Description2"});
     }
 
-//    @Test todo
-//    void formatAdminReply_withAllData() {
-//        TseRespondType reply = setupAdminTseRespondType();
-//        List<String[]> actual = tseService.formatAdminReply(reply, 1, AUTH_TOKEN);
-//
-//        List<String[]> expected = List.of(
-//            new String[] {"|Response 1", "|"},
-//                new String[] {"--", "--"},
-//                new String[] {"Response", "Title"},
-//                new String[] {"Date", "2000-01-01"},
-//                new String[] {"Sent by", "Tribunal"},
-//                new String[] {"Case management order or request?", "Request"},
-//                new String[] {"Is a response required?", "No"},
-//                new String[] {"Party or parties to respond", "Both parties"},
-//                new String[] {"Additional information", "More data"},
-//                new String[] {"Document", "Document (txt, 1MB)"},
-//                new String[] {"Description", "Description1"},
-//                new String[] {"Document", "Document (txt, 1MB)"},
-//                new String[] {"Description", "Description2"},
-//                new String[] {"Case management order made by", "Legal officer"},
-//                new String[] {"Request made by", "Caseworker"},
-//                new String[] {"Full name", "Mr Lee Gal Officer"},
-//                new String[] {"Sent to", "Respondent"});
-//
-//        assertThat(actual).isEqualTo(expected);
-//    }
+    @Test
+    void formatAdminReply_withAllData() {
+        TseRespondType reply = setupAdminTseRespondType();
+        List<String[]> actual = tseService.formatAdminReply(reply, 1, AUTH_TOKEN);
 
-//    @Test
-//    void formatAdminReply_withMissingData() {
-//        TseRespondType reply = setupAdminTseRespondType();
-//        reply.setAddDocument(null);
-//        reply.setRequestMadeBy(null);
-//        String actual = tseService.formatAdminReply(reply, 1, AUTH_TOKEN);
-//
-//        String expected = "|Response 1||\r\n"
-//                + "|--|--|\r\n"
-//                + "|Response|Title|\r\n"
-//                + "|Date|2000-01-01|\r\n"
-//                + "|Sent by|Tribunal|\r\n"
-//                + "|Case management order or request?|Request|\r\n"
-//                + "|Is a response required?|No|\r\n"
-//                + "|Party or parties to respond|Both parties|\r\n"
-//                + "|Additional information|More data|\r\n"
-//                + "|Case management order made by|Legal officer|\r\n"
-//                + "|Full name|Mr Lee Gal Officer|\r\n"
-//                + "|Sent to|Respondent|\r\n"
-//                + "\r\n";
-//
-//        assertThat(actual).isEqualTo(expected);
-//    }
+        List<String[]> expected = List.of(
+            new String[] {"|Response 1", "|"},
+                new String[] {"--", "--"},
+                new String[] {"Response", "Title"},
+                new String[] {"Date", "2000-01-01"},
+                new String[] {"Sent by", "Tribunal"},
+                new String[] {"Case management order or request?", "Request"},
+                new String[] {"Is a response required?", "No"},
+                new String[] {"Party or parties to respond", "Both parties"},
+                new String[] {"Additional information", "More data"},
+                new String[] {"Document", "Document (txt, 1MB)"},
+                new String[] {"Description", "Description1"},
+                new String[] {"Document", "Document (txt, 1MB)"},
+                new String[] {"Description", "Description2"},
+                new String[] {"Case management order made by", "Legal officer"},
+                new String[] {"Request made by", "Caseworker"},
+                new String[] {"Full name", "Mr Lee Gal Officer"},
+                new String[] {"Sent to", "Respondent"});
 
-//    @Test
-//    void formatApplicationResponses_withFullData() {
-//        GenericTseApplicationType application = GenericTseApplicationType.builder()
-//                .applicant(RESPONDENT_TITLE)
-//                .respondCollection(List.of(
-//                        TseRespondTypeItem.builder()
-//                                .id(UUID.randomUUID().toString())
-//                                .value(setupAdminTseRespondType())
-//                                .build(),
-//                        TseRespondTypeItem.builder()
-//                                .id(UUID.randomUUID().toString())
-//                                .value(setupNonAdminTseRespondType())
-//                                .build())
-//                ).build();
-//
-//        String actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, false);
-//
-//        String expected = "|Response 1||\r\n"
-//                + "|--|--|\r\n"
-//                + "|Response|Title|\r\n"
-//                + "|Date|2000-01-01|\r\n"
-//                + "|Sent by|Tribunal|\r\n"
-//                + "|Case management order or request?|Request|\r\n"
-//                + "|Is a response required?|No|\r\n"
-//                + "|Party or parties to respond|Both parties|\r\n"
-//                + "|Additional information|More data|\r\n"
-//                + "|Document|Document (txt, 1MB)|\r\n"
-//                + "|Description|Description1|\r\n"
-//                + "|Document|Document (txt, 1MB)|\r\n"
-//                + "|Description|Description2|\r\n"
-//                + "|Case management order made by|Legal officer|\r\n"
-//                + "|Request made by|Caseworker|\r\n"
-//                + "|Full name|Mr Lee Gal Officer|\r\n"
-//                + "|Sent to|Respondent|\r\n"
-//                + "\r\n"
-//                + "|Response 2||\r\n"
-//                + "|--|--|\r\n"
-//                + "|Response from|Claimant|\r\n"
-//                + "|Response date|2000-01-01|\r\n"
-//                + "|What's your response to the respondent's application|I disagree|\r\n"
-//                + "|Document|Document (txt, 1MB)|\r\n"
-//                + "|Description|Description1|\r\n"
-//                + "|Document|Document (txt, 1MB)|\r\n"
-//                + "|Description|Description2|\r\n"
-//                + "|Do you want to copy this correspondence to the other party to satisfy the"
-//                + " Rules of Procedure?|No|\r\n"
-//                + "|Details of why you do not want to inform the other party|Details|\r\n\r\n";
-//
-//        assertThat(actual).isEqualTo(expected);
-//    }
-//
-//    @Test
-//    void formatApplicationResponses_respondentView() {
-//        GenericTseApplicationType application = GenericTseApplicationType.builder()
-//                .applicant(RESPONDENT_TITLE)
-//                .respondCollection(List.of(
-//                        TseRespondTypeItem.builder()
-//                                .id(UUID.randomUUID().toString())
-//                                .value(setupAdminTseRespondType())
-//                                .build(),
-//                        TseRespondTypeItem.builder()
-//                                .id(UUID.randomUUID().toString())
-//                                .value(setupNonAdminTseRespondType())
-//                                .build())
-//                ).build();
-//
-//        String actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, true);
-//
-//        String expected = "|Response 1||\r\n"
-//                + "|--|--|\r\n"
-//                + "|Response|Title|\r\n"
-//                + "|Date|2000-01-01|\r\n"
-//                + "|Sent by|Tribunal|\r\n"
-//                + "|Case management order or request?|Request|\r\n"
-//                + "|Is a response required?|No|\r\n"
-//                + "|Party or parties to respond|Both parties|\r\n"
-//                + "|Additional information|More data|\r\n"
-//                + "|Document|Document (txt, 1MB)|\r\n"
-//                + "|Description|Description1|\r\n"
-//                + "|Document|Document (txt, 1MB)|\r\n"
-//                + "|Description|Description2|\r\n"
-//                + "|Case management order made by|Legal officer|\r\n"
-//                + "|Request made by|Caseworker|\r\n"
-//                + "|Full name|Mr Lee Gal Officer|\r\n"
-//                + "|Sent to|Respondent|\r\n\r\n";
-//        assertThat(actual).isEqualTo(expected);
-//    }
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void formatAdminReply_withMissingData() {
+        TseRespondType reply = setupAdminTseRespondType();
+        reply.setAddDocument(null);
+        reply.setRequestMadeBy(null);
+        List<String[]> actual = tseService.formatAdminReply(reply, 1, AUTH_TOKEN);
+
+        String expected = "|Response 1||\r\n"
+                + "|--|--|\r\n"
+                + "|Response|Title|\r\n"
+                + "|Date|2000-01-01|\r\n"
+                + "|Sent by|Tribunal|\r\n"
+                + "|Case management order or request?|Request|\r\n"
+                + "|Is a response required?|No|\r\n"
+                + "|Party or parties to respond|Both parties|\r\n"
+                + "|Additional information|More data|\r\n"
+                + "|Case management order made by|Legal officer|\r\n"
+                + "|Full name|Mr Lee Gal Officer|\r\n"
+                + "|Sent to|Respondent|\r\n"
+                + "\r\n";
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void formatApplicationResponses_withFullData() {
+        GenericTseApplicationType application = GenericTseApplicationType.builder()
+                .applicant(RESPONDENT_TITLE)
+                .respondCollection(List.of(
+                        TseRespondTypeItem.builder()
+                                .id(UUID.randomUUID().toString())
+                                .value(setupAdminTseRespondType())
+                                .build(),
+                        TseRespondTypeItem.builder()
+                                .id(UUID.randomUUID().toString())
+                                .value(setupNonAdminTseRespondType())
+                                .build())
+                ).build();
+
+        List<String[]> actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, false);
+
+        String expected = "|Response 1||\r\n"
+                + "|--|--|\r\n"
+                + "|Response|Title|\r\n"
+                + "|Date|2000-01-01|\r\n"
+                + "|Sent by|Tribunal|\r\n"
+                + "|Case management order or request?|Request|\r\n"
+                + "|Is a response required?|No|\r\n"
+                + "|Party or parties to respond|Both parties|\r\n"
+                + "|Additional information|More data|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description1|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description2|\r\n"
+                + "|Case management order made by|Legal officer|\r\n"
+                + "|Request made by|Caseworker|\r\n"
+                + "|Full name|Mr Lee Gal Officer|\r\n"
+                + "|Sent to|Respondent|\r\n"
+                + "\r\n"
+                + "|Response 2||\r\n"
+                + "|--|--|\r\n"
+                + "|Response from|Claimant|\r\n"
+                + "|Response date|2000-01-01|\r\n"
+                + "|What's your response to the respondent's application|I disagree|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description1|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description2|\r\n"
+                + "|Do you want to copy this correspondence to the other party to satisfy the"
+                + " Rules of Procedure?|No|\r\n"
+                + "|Details of why you do not want to inform the other party|Details|\r\n\r\n";
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void formatApplicationResponses_respondentView() {
+        GenericTseApplicationType application = GenericTseApplicationType.builder()
+                .applicant(RESPONDENT_TITLE)
+                .respondCollection(List.of(
+                        TseRespondTypeItem.builder()
+                                .id(UUID.randomUUID().toString())
+                                .value(setupAdminTseRespondType())
+                                .build(),
+                        TseRespondTypeItem.builder()
+                                .id(UUID.randomUUID().toString())
+                                .value(setupNonAdminTseRespondType())
+                                .build())
+                ).build();
+
+        List<String[]> actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, true);
+
+        String expected = "|Response 1||\r\n"
+                + "|--|--|\r\n"
+                + "|Response|Title|\r\n"
+                + "|Date|2000-01-01|\r\n"
+                + "|Sent by|Tribunal|\r\n"
+                + "|Case management order or request?|Request|\r\n"
+                + "|Is a response required?|No|\r\n"
+                + "|Party or parties to respond|Both parties|\r\n"
+                + "|Additional information|More data|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description1|\r\n"
+                + "|Document|Document (txt, 1MB)|\r\n"
+                + "|Description|Description2|\r\n"
+                + "|Case management order made by|Legal officer|\r\n"
+                + "|Request made by|Caseworker|\r\n"
+                + "|Full name|Mr Lee Gal Officer|\r\n"
+                + "|Sent to|Respondent|\r\n\r\n";
+        assertThat(actual).isEqualTo(expected);
+    }
 
     @Test
     void formatApplicationDetails_noRule92() {

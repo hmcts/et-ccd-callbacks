@@ -4,7 +4,7 @@ const { I } = inject();
 
 function selectAllocateHearingRoom() {
 
-    I.waitForClickable('#allocateHearingRoom'); //Wait for the page to be loaded and Elements enabled
+    I.waitForElement('#allocateHearingRoom',10); //Wait for the page to be loaded and Elements enabled
     I.see('Allocate Hearing');
     I.see('Case Number:');
     I.see('Select Room (Optional)');

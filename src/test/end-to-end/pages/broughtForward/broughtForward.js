@@ -30,6 +30,7 @@ module.exports = async function () {
     I.fillField('#bfActions_0_notes', 'Automated Testing Notes for BF Action');
 
     I.click(commonConfig.submit);
+    I.click(commonConfig.submit);
 
     //Final Confirmation
     I.waitForText('has been updated with event: B/F Action', testConfig.TestTimeToWaitForText);

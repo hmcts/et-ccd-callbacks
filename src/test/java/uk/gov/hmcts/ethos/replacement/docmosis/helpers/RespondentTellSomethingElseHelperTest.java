@@ -29,7 +29,7 @@ class RespondentTellSomethingElseHelperTest {
 
     private CaseData caseData;
 
-    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+    private static final String RES_TSE_FILE_NAME = "Contact the tribunal.pdf";
     private static final String RES_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
 
     @BeforeEach

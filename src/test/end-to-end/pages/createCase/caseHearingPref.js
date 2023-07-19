@@ -16,4 +16,5 @@ module.exports =  async function () {
     I.fillField(caseRepConfig.why_cant_claimant_not_take_part, 'Because of a Learning Condition');
 
     I.click('Continue');
+    I.click(commonConfig.submit);
 }

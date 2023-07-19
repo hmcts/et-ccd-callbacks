@@ -677,8 +677,8 @@ public final class DocumentHelper {
         String sectionName = getEWSectionName(correspondence);
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append('"').append('t').append(sectionName.replace(".", "_"))
-                    .append("\":\"").append("true").append(NEW_LINE);
+            sb.append("\"t").append(sectionName.replace(".", "_"))
+                    .append("\":\"true").append(NEW_LINE);
         }
         return sb;
     }
@@ -688,8 +688,8 @@ public final class DocumentHelper {
         String scotSectionName = getScotSectionName(correspondenceScotType);
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.equals("")) {
-            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
-                    .append("\":\"").append("true").append(NEW_LINE);
+            sb.append("\"t_Scot_").append(scotSectionName.replace(".", "_"))
+                    .append("\":\"true").append(NEW_LINE);
         }
         return sb;
     }

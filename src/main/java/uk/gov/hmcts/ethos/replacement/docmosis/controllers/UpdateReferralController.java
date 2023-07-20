@@ -28,7 +28,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
- * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
+ * REST controller for the Update Referral event pages, formats data appropriately for rendering on the front end.
  */
 @Slf4j
 @RequestMapping("/updateReferral")
@@ -44,10 +44,6 @@ public class UpdateReferralController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
-    private static final String CREATE_REFERRAL_BODY = "<hr>"
-        + "<h3>What happens next</h3>"
-        + "<p>Your referral has been sent. Replies and instructions will appear in the "
-        + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
 
     public UpdateReferralController(@Value("${referral.template.id}") String referralTemplateId,
                                     VerifyTokenService verifyTokenService,
@@ -60,14 +56,14 @@ public class UpdateReferralController {
     }
 
     /**
-     * Called for the first page of the Create Referral event.
+     * Called for the first page of the Update Referral event.
      * Populates the Referral hearing detail's section on the page.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for referral create")
+    @Operation(summary = "initialize data for referral update")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -168,7 +164,7 @@ public class UpdateReferralController {
     }
 
     /**
-     * Called after submitting a create referral event.
+     * Called after submitting a update referral event.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -180,7 +176,7 @@ public class UpdateReferralController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeCreateReferral(
+    public ResponseEntity<CCDCallbackResponse> completeUpdateReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
         log.info("COMPLETE UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());

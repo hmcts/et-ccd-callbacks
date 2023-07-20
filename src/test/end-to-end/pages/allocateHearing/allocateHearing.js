@@ -15,7 +15,11 @@ module.exports = async function (jurisdiction) {
         selectPersonelResources.selectPersonelResources();
         selectAllocateHearingRoom.selectAllocateHearingRoom();
     }
+    //New expected behaviour introduced
+    //by EXUI. The POs are delibrating on it
     I.click(commonConfig.continue);
+    I.wait(2)
+    I.click(commonConfig.submit);
     I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
     I.see('has been updated with event: Allocate Hearing\n');
     verifyHearingsAllocated.verifyHearingsAllocated();

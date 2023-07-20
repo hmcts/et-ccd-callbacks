@@ -39,6 +39,7 @@ module.exports = async function () {
     I.selectOption('#representativeClaimantType_representative_address_representative_address_addressList', commonConfig.claimantRepresentativeAddress);
     I.click(commonConfig.submit);
 
+    I.click(commonConfig.submit);
     I.waitForText('has been updated with event: Claimant Representative', testConfig.TestTimeToWaitForText);
 
     I.click("//div[text()='Claimant Representative']");

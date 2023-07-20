@@ -53,6 +53,7 @@ module.exports = async function (myHMMCTSOrganisation = false) {
 
         I.click(commonConfig.submit);
 
+        I.click(commonConfig.submit);
 
         I.waitForText('has been updated with event: Respondent Representative', testConfig.TestTimeToWaitForText);
 

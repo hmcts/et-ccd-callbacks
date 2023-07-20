@@ -102,6 +102,7 @@ public class CaseManagementForCaseWorkerService {
         struckOutDefaults(caseData);
         dateToCurrentPosition(caseData);
         flagsImageFileNameDefaults(caseData);
+        caseLinksDefault(caseData);
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -116,6 +117,13 @@ public class CaseManagementForCaseWorkerService {
             }
         } else {
             caseData.setClaimant(MISSING_CLAIMANT);
+        }
+    }
+
+    private void caseLinksDefault(CaseData caseData) {
+        if (caseData.getCaseLinks() == null) {
+            List<CaseLink> caseLinks = new ArrayList<>();
+            caseData.setCaseLinks(caseLinks);
         }
     }
 
@@ -142,7 +150,7 @@ public class CaseManagementForCaseWorkerService {
         if (caseData.getRespondent() == null) {
             respondentDefaults(caseData);
         }
-        
+
         caseData.setHmctsInternalCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
     }
 

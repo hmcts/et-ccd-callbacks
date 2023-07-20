@@ -38,7 +38,6 @@ public class UpdateReferralController {
 
     private final String referralTemplateId;
     private final VerifyTokenService verifyTokenService;
-    private final EmailService emailService;
     private final UserService userService;
     private final DocumentManagementService documentManagementService;
 
@@ -52,10 +51,9 @@ public class UpdateReferralController {
 
     public UpdateReferralController(@Value("${referral.template.id}") String referralTemplateId,
                                     VerifyTokenService verifyTokenService,
-                                    EmailService emailService, UserService userService,
+                                    UserService userService,
                                     DocumentManagementService documentManagementService) {
         this.referralTemplateId = referralTemplateId;
-        this.emailService = emailService;
         this.verifyTokenService = verifyTokenService;
         this.userService = userService;
         this.documentManagementService = documentManagementService;

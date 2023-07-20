@@ -19,6 +19,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
@@ -175,10 +176,23 @@ public class CreateReferralController {
         String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData.getReferralCollection()));
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
+                userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+
         ReferralHelper.createReferral(
-            caseData,
-            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
-            null);
+                caseData,
+                String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
+                this.documentManagementService.addDocumentToDocumentField(documentInfo));
+        emailService.sendEmail(
+                referralTemplateId,
+                caseData.getReferentEmail(),
+                ReferralHelper.buildPersonalisation(
+                        ccdRequest.getCaseDetails(),
+                        referralNumber,
+                        true,
+                        userDetails.getName()
+                )
+        );
         log.info("Event: Referral Email sent. "
                 + ". EventId: " + ccdRequest.getEventId()
                 + ". Referral number: " + referralNumber

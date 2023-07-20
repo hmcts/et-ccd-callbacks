@@ -182,12 +182,19 @@ class ReferralHelperTest {
                 + "referralDocument=[GenericTypeItem(id=1, value=DocumentType(typeOfDocument=null, "
                 + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
                 + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
-                + "shortDescription=null)), GenericTypeItem(id=2, value=DocumentType(typeOfDocument=null, "
-                + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
-                + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
-                + "shortDescription=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
-                + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
-                + "closeReferralGeneralNotes=null, referralReplyCollection=null, referralSummaryPdf=null)";
+                + "shortDescription=null, topLevelDocuments=null, startingClaimDocuments=null, "
+                + "responseClaimDocuments=null, initialConsiderationDocuments=null, caseManagementDocuments=null, "
+                + "withdrawalSettledDocuments=null, hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
+                + "reconsiderationDocuments=null, miscDocuments=null, documentType=null)), GenericTypeItem(id=2, "
+                + "value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType("
+                + "documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl=null), "
+                + "ownerDocument=null, creationDate=null, shortDescription=null, topLevelDocuments=null, "
+                + "startingClaimDocuments=null, responseClaimDocuments=null, initialConsiderationDocuments=null, "
+                + "caseManagementDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, j"
+                + "udgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
+                + "documentType=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
+                + "referralDate=20 Jul 2023, referralStatus=Awaiting instructions, closeReferralGeneralNotes=null, "
+                + "referralReplyCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);
@@ -408,10 +415,19 @@ class ReferralHelperTest {
             + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null}},{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
+            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\""
+            + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
+            + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
+            + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null}},"
+            + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null}}],\"referralInstruction\":null,"
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
+            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
+            + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
+            + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
+            + "documentType\":null}}],\"referralInstruction\":null,"
             + "\"referralReplyCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
@@ -443,7 +459,11 @@ class ReferralHelperTest {
             + "\"directionDetails\":\"details\",\"replyDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
+            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,"
+            + "\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
+            + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
+            + "documentType\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
             + "\"replyBy\",\"replyDate\":\"replyDate\"}}]}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");

@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearUpdateReferralDataFromCaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
@@ -89,6 +90,43 @@ public class UpdateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Called for the second page of the Reply Referral event.
+     * Populates the Referral hearing and reply detail's section on the page.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
+    @PostMapping(value = "/initHearingAndReferralDetails", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "initialize data for reply to referral event")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                        @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initHearingDetailsForReplyToReferral(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info("INIT HEARING AND UPDATE REFERRAL DETAILS ---> "
+                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        ReferralHelper.populateUpdateReferralDetails(caseData);
+
+        caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -121,14 +159,13 @@ public class UpdateReferralController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
-            caseData.setReferralSubject("Party not responded/complied");
+            caseData.setUpdateReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userService.getUserDetails(userToken);
-        caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         ReferralHelper.updateReferral(
-            caseData,
-            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
-
+                caseData,
+                String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        clearUpdateReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -154,11 +191,7 @@ public class UpdateReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format(CREATE_REFERRAL_BODY,
-            ccdRequest.getCaseDetails().getCaseId());
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .confirmation_body(body)
             .build());
     }
 }

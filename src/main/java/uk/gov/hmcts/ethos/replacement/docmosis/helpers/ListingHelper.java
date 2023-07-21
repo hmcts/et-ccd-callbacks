@@ -315,9 +315,9 @@ public final class ListingHelper {
     private static StringBuilder getLogo(String caseType) {
         StringBuilder sb = new StringBuilder();
         if (caseType.equals(SCOTLAND_LISTING_CASE_TYPE_ID)) {
-            sb.append("\"listing_logo\":\"").append("[userImage:").append("schmcts.png]").append(NEW_LINE);
+            sb.append("\"listing_logo\":\"[userImage:schmcts.png]").append(NEW_LINE);
         } else {
-            sb.append("\"listing_logo\":\"").append("[userImage:").append("enhmcts.png]").append(NEW_LINE);
+            sb.append("\"listing_logo\":\"[userImage:enhmcts.png]").append(NEW_LINE);
         }
         return sb;
     }

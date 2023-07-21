@@ -96,7 +96,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    void StartUpdate_Success() throws Exception {
+    void startUpdate_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -137,7 +137,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    void ReferralStatusNotCorrect() throws Exception {
+    void referralStatusNotCorrect() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");

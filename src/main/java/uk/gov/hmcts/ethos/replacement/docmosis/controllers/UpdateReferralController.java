@@ -64,7 +64,7 @@ public class UpdateReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> initReferralHearingDetails(
+    public ResponseEntity<CCDCallbackResponse> updateReferralAboutToStart(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
         log.info("ABOUT TO START UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
@@ -97,7 +97,7 @@ public class UpdateReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> initHearingDetailsForReplyToReferral(
+    public ResponseEntity<CCDCallbackResponse> initHearingDetailsForUpdateReferral(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
         log.info("INIT HEARING AND UPDATE REFERRAL DETAILS ---> "

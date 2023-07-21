@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -34,6 +33,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 
 @ExtendWith(SpringExtension.class)
@@ -67,7 +67,7 @@ class UpdateReferralControllerTest {
                 0,
                 "hearingNumber",
                 "2019-11-25T12:11:00.000",
-                Constants.HEARING_STATUS_HEARD,
+                HEARING_STATUS_HEARD,
                 true)
             .build();
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
@@ -151,6 +151,24 @@ class UpdateReferralControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors").value(
                         "Only referrals with status awaiting instructions can be updated."))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void referralStatusCorrect() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        ccdRequest.getCaseDetails().getCaseData().getReferralCollection()
+                .get(0).getValue().setReferralStatus("Awaiting instructions");
+        when(userService.getUserDetails(any())).thenReturn(details);
+        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors").isEmpty())
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 

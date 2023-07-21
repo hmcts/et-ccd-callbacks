@@ -19,8 +19,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import java.util.ArrayList;
+import java.util.List;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearUpdateReferralDataFromCaseData;
 
@@ -104,12 +107,15 @@ public class UpdateReferralController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
+        List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        ReferralHelper.populateUpdateReferralDetails(caseData);
-
-        caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData));
-        return getCallbackRespEntityNoErrors(caseData);
+        if (ReferralHelper.isValidReferralStatus(caseData)) {
+            ReferralHelper.populateUpdateReferralDetails(caseData);
+            caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData));
+        } else {
+            errors.add("Only referrals with status awaiting instructions can be updated.");
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**

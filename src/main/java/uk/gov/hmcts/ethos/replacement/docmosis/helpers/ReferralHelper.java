@@ -49,7 +49,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
                    "PMD.ConfusingTernary",
                    "PMD.SimpleDateFormatNeedsLocale",
                    "PMD.GodClass",
-                   "PMD.ExcessiveImports"
+                   "PMD.ExcessiveImports",
+                   "PMD.LawOfDemeter"
 })
 public final class ReferralHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -327,6 +328,12 @@ public final class ReferralHelper {
         List<ReferralTypeItem> referralCollection = caseData.getReferralCollection();
         referralCollection.add(referralTypeItem);
         caseData.setReferralCollection(referralCollection);
+    }
+
+    public static boolean isValidReferralStatus(CaseData caseData) {
+        ReferralType referral = caseData.getReferralCollection()
+                .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+        return ReferralStatus.AWAITING_INSTRUCTIONS.equals(referral.getReferralStatus());
     }
 
     /**

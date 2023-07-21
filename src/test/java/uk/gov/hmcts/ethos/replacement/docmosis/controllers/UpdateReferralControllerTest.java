@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import java.util.List;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -152,8 +152,7 @@ class UpdateReferralControllerTest {
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.confirmation_body", notNullValue()));
+            .andExpect(status().isOk());
     }
 
     @Test

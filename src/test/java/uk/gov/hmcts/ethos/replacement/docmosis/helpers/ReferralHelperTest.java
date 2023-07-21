@@ -187,7 +187,7 @@ class ReferralHelperTest {
                 + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
                 + "shortDescription=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
-                + "closeReferralGeneralNotes=null, referralReplyCollection=null, referralSummaryPdf=null)";
+                + "closeReferralGeneralNotes=null, referralReplyCollection=null, updateReferralCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);
@@ -270,6 +270,20 @@ class ReferralHelperTest {
 
         assertEquals(expectedHearingReferralDetailsMultipleReplies,
             ReferralHelper.populateHearingReferralDetails(caseData));
+    }
+
+    @Test
+    void populateUpdateReferralDetails() {
+        caseData.setSelectReferral(new DynamicFixedListType("1"));
+        ReferralType referral = new ReferralType();
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
+        referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setId("1");
+        referralTypeItem.setValue(referral);
+        caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+        ReferralHelper.populateUpdateReferralDetails(caseData);
     }
 
     @Test

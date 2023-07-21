@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -34,22 +32,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @RestController
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class UpdateReferralController {
-
-    private final String referralTemplateId;
     private final VerifyTokenService verifyTokenService;
     private final UserService userService;
-    private final DocumentManagementService documentManagementService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
-    public UpdateReferralController(@Value("${referral.template.id}") String referralTemplateId,
-                                    VerifyTokenService verifyTokenService,
-                                    UserService userService,
-                                    DocumentManagementService documentManagementService) {
-        this.referralTemplateId = referralTemplateId;
+    public UpdateReferralController(VerifyTokenService verifyTokenService,
+                                    UserService userService) {
         this.verifyTokenService = verifyTokenService;
         this.userService = userService;
-        this.documentManagementService = documentManagementService;
     }
 
     /**

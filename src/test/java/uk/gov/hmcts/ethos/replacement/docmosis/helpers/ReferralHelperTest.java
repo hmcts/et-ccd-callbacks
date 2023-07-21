@@ -188,7 +188,8 @@ class ReferralHelperTest {
                 + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
                 + "shortDescription=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
-                + "closeReferralGeneralNotes=null, referralReplyCollection=null, updateReferralCollection=null, referralSummaryPdf=null)";
+                + "closeReferralGeneralNotes=null, referralReplyCollection=null, updateReferralCollection=null," +
+                " referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);
@@ -297,7 +298,6 @@ class ReferralHelperTest {
     void updateReferral() {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
         caseData.setUpdateReferCaseTo("Judge");
         caseData.setUpdateReferralSubject("Subject");
         caseData.setUpdateReferralDetails("Details");
@@ -305,6 +305,7 @@ class ReferralHelperTest {
         caseData.setUpdateReferralInstruction("Instruction");
         caseData.setUpdateReferralSubjectSpecify("Subject Specify");
         ReferralHelper.updateReferral(caseData, "FullName");
+        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
         UpdateReferralType updateReferralType = referral.getUpdateReferralCollection().get(0).getValue();
         assertEquals("Judge", updateReferralType.getUpdateReferCaseTo());
         assertEquals("Subject", updateReferralType.getUpdateReferralSubject());
@@ -318,7 +319,6 @@ class ReferralHelperTest {
     void updateOriginalReferral() {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
         caseData.setUpdateReferCaseTo("Judge");
         caseData.setUpdateReferralSubject("Subject");
         caseData.setUpdateReferralDetails("Details");
@@ -326,12 +326,32 @@ class ReferralHelperTest {
         caseData.setUpdateReferralInstruction("Instruction");
         caseData.setUpdateReferralSubjectSpecify("Subject Specify");
         ReferralHelper.updateReferral(caseData, "FullName");
+        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
         assertEquals("Judge", referral.getReferCaseTo());
         assertEquals("Subject", referral.getReferralSubject());
         assertEquals("Details", referral.getReferralDetails());
         assertEquals("Yes", referral.getIsUrgent());
         assertEquals("Instruction", referral.getReferralInstruction());
         assertEquals("Subject Specify", referral.getReferralSubjectSpecify());
+    }
+
+    @Test
+    void clearUpdateReferralDataFromCaseData() {
+        caseData.setUpdateReferCaseTo("Judge");
+        caseData.setUpdateReferralSubject("Subject");
+        caseData.setUpdateReferralDetails("Details");
+        caseData.setUpdateReferentEmail("Email");
+        caseData.setUpdateIsUrgent("Yes");
+        caseData.setUpdateReferralInstruction("Instruction");
+        caseData.setUpdateReferralSubjectSpecify("Subject Specify");
+        ReferralHelper.clearUpdateReferralDataFromCaseData(caseData);
+        assertNull(caseData.getUpdateReferCaseTo());
+        assertNull(caseData.getUpdateReferralSubject());
+        assertNull(caseData.getUpdateReferralDetails());
+        assertNull(caseData.getUpdateReferentEmail());
+        assertNull(caseData.getUpdateIsUrgent());
+        assertNull(caseData.getUpdateReferralInstruction());
+        assertNull(caseData.getUpdateReferralSubjectSpecify());
     }
 
     @Test

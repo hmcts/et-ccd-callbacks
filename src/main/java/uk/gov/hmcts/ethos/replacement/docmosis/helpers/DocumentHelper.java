@@ -69,9 +69,9 @@ public final class DocumentHelper {
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
         // Start building the instruction
-        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE);
-        sb.append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE);
-        sb.append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+                .append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE)
+                .append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
 
         // Building the document data
         sb.append("\"data\":{\n");

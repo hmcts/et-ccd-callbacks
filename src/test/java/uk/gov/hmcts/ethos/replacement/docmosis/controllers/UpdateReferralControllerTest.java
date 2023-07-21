@@ -43,6 +43,7 @@ class UpdateReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String START_UPDATE_REFERRAL_URL = "/updateReferral/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/updateReferral/aboutToSubmit";
+    private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = "/updateReferral/initHearingAndReferralDetails";
     private static final String SUBMITTED_REFERRAL_URL = "/updateReferral/completeUpdateReferral";
 
     @MockBean
@@ -95,7 +96,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    void initReferralHearingDetails_Success() throws Exception {
+    void StartUpdate_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -133,6 +134,24 @@ class UpdateReferralControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void ReferralStatusNotCorrect() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        ccdRequest.getCaseDetails().getCaseData().getReferralCollection().get(0).getValue().setReferralStatus("Closed");
+        when(userService.getUserDetails(any())).thenReturn(details);
+        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors").value(
+                        "Only referrals with status awaiting instructions can be updated."))
+                .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
     @Test

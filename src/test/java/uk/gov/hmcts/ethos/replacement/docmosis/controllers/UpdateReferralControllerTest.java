@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,22 +13,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.*;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
-import java.util.ArrayList;
-import java.util.Collections;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -68,15 +69,29 @@ class UpdateReferralControllerTest {
                 Constants.HEARING_STATUS_HEARD,
                 true)
             .build();
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
         caseData.setEthosCaseReference("caseRef");
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
-        caseData.setReferentEmail("test@gmail.com");
         caseData.setReferralSubject("ET1");
+        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
+        selectReferralList.setValue(new DynamicValueType());
+        selectReferralList.getValue().setCode("1");
+        caseData.setSelectReferral(selectReferralList);
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("123")
                 .build();
+    }
+
+    private ReferralTypeItem createReferralTypeItem() {
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        ReferralType referralType = new ReferralType();
+        referralType.setReferralNumber("1");
+        referralType.setReferralSubject("Other");
+        referralTypeItem.setValue(referralType);
+        referralType.setReferralStatus("referralStatus");
+        return referralTypeItem;
     }
 
     @Test
@@ -95,6 +110,7 @@ class UpdateReferralControllerTest {
 
     @Test
     void initReferralHearingDetails_invalidToken() throws Exception {
+
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)

@@ -6,9 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,68 +16,45 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
+import java.util.ArrayList;
 import java.util.List;
-
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearUpdateReferralDataFromCaseData;
 
 /**
- * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
+ * REST controller for the Update Referral event pages, formats data appropriately for rendering on the front end.
  */
 @Slf4j
-@RequestMapping("/createReferral")
+@RequestMapping("/updateReferral")
 @RestController
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
-public class CreateReferralController {
-
-    private final String referralTemplateId;
+public class UpdateReferralController {
     private final VerifyTokenService verifyTokenService;
-    private final EmailService emailService;
     private final UserService userService;
-    private final CreateReferralService createReferralService;
-    private final DocumentManagementService documentManagementService;
-
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
-    private static final String CREATE_REFERRAL_BODY = "<hr>"
-        + "<h3>What happens next</h3>"
-        + "<p>Your referral has been sent. Replies and instructions will appear in the "
-        + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
-
-    public CreateReferralController(@Value("${referral.template.id}") String referralTemplateId,
-                                    VerifyTokenService verifyTokenService,
-                                    EmailService emailService, UserService userService,
-                                    CreateReferralService createReferralService,
-                                    DocumentManagementService documentManagementService) {
-        this.referralTemplateId = referralTemplateId;
-        this.emailService = emailService;
+    public UpdateReferralController(VerifyTokenService verifyTokenService,
+                                    UserService userService) {
         this.verifyTokenService = verifyTokenService;
         this.userService = userService;
-        this.createReferralService = createReferralService;
-        this.documentManagementService = documentManagementService;
     }
 
     /**
-     * Called for the first page of the Create Referral event.
+     * Called for the first page of the Update Referral event.
      * Populates the Referral hearing detail's section on the page.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for referral create")
+    @Operation(summary = "initialize data for referral update")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -93,7 +67,7 @@ public class CreateReferralController {
     public ResponseEntity<CCDCallbackResponse> initReferralHearingDetails(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
-        log.info("ABOUT TO START CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ABOUT TO START UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -101,48 +75,52 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
-     * Called for the email validation of the Create Referral event.
+     * Called for the second page of the Reply Referral event.
+     * Populates the Referral hearing and reply detail's section on the page.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
-    @PostMapping(value = "/validateReferentEmail", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for referral create")
+    @PostMapping(value = "/initHearingAndReferralDetails", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "initialize data for reply to referral event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
+                    content = {
+                        @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> validateReferentEmail(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
-        log.info("VALIDATE REFERENT EMAIL CREATE REFERRAL ---> " + LOG_MESSAGE
-                + ccdRequest.getCaseDetails().getCaseId());
+    public ResponseEntity<CCDCallbackResponse> initHearingDetailsForReplyToReferral(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info("INIT HEARING AND UPDATE REFERRAL DETAILS ---> "
+                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+        List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = ReferralHelper.validateEmail(caseData.getReferentEmail());
-
-        if (CollectionUtils.isNotEmpty(caseData.getReferralDocument())) {
-            ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);
+        if (ReferralHelper.isValidReferralStatus(caseData)) {
+            ReferralHelper.populateUpdateReferralDetails(caseData);
+            caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData));
+        } else {
+            errors.add("Only referrals with status awaiting instructions can be updated.");
         }
-
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**
-     * Called at the end of creating a referral, takes the information saved in case data and stores it in the
-     * referral collection.
+     * Called at the end of updating a referral, takes the information saved in case data and stores it in the
+     * update referral collection.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
@@ -158,76 +136,50 @@ public class CreateReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralDetails(
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitUpdateReferralDetails(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
-        log.info("ABOUT TO SUBMIT CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ABOUT TO SUBMIT UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
-            caseData.setReferralSubject("Party not responded/complied");
+            caseData.setUpdateReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userService.getUserDetails(userToken);
-        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData.getReferralCollection()));
-
-        caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
-        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
-                userToken, ccdRequest.getCaseDetails().getCaseTypeId());
-
-        ReferralHelper.createReferral(
+        ReferralHelper.updateReferral(
                 caseData,
-                String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
-                this.documentManagementService.addDocumentToDocumentField(documentInfo));
-        emailService.sendEmail(
-                referralTemplateId,
-                caseData.getReferentEmail(),
-                ReferralHelper.buildPersonalisation(
-                        ccdRequest.getCaseDetails(),
-                        referralNumber,
-                        true,
-                        userDetails.getName()
-                )
-        );
-        log.info("Event: Referral Email sent. "
-                + ". EventId: " + ccdRequest.getEventId()
-                + ". Referral number: " + referralNumber
-                + ". Emailed at: " + DateTime.now());
-        clearReferralDataFromCaseData(caseData);
+                String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        clearUpdateReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
-     * Called after submitting a create referral event.
+     * Called after submitting a update referral event.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
-    @PostMapping(value = "/completeCreateReferral", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/completeUpdateReferral", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the reply to referral event flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeCreateReferral(
+    public ResponseEntity<CCDCallbackResponse> completeUpdateReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
-        log.info("COMPLETE CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("COMPLETE UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format(CREATE_REFERRAL_BODY,
-            ccdRequest.getCaseDetails().getCaseId());
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .confirmation_body(body)
             .build());
     }
 }

@@ -135,7 +135,6 @@ public final class ReferralHelper {
         caseData.setUpdateIsUrgent(referral.getIsUrgent());
         caseData.setUpdateReferralInstruction(referral.getReferralInstruction());
         caseData.setUpdateReferralSubjectSpecify(referral.getReferralSubjectSpecify());
-        caseData.setUpdateReferralDetails(referral.getReferralDetails());
         caseData.setUpdateReferralDocument(referral.getReferralDocument());
     }
 
@@ -360,7 +359,7 @@ public final class ReferralHelper {
         updateOriginalReferral(caseData, userFullName);
     }
 
-    public static void updateOriginalReferral(CaseData caseData, String userFullName) {
+    private static void updateOriginalReferral(CaseData caseData, String userFullName) {
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 

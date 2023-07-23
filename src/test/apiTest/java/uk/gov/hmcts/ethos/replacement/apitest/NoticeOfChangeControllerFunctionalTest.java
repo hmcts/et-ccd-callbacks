@@ -60,7 +60,7 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log().all(true)
-                .extract().body().jsonPath();;
+                .extract().body().jsonPath();
 
         DynamicFixedListType caseRole = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();

@@ -37,7 +37,7 @@ public abstract class BaseFunctionalTest {
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;
 
-    @Value("${docmosis.test.url}")
+    @Value("${test.url}")
     protected String baseUrl;
     @Value("${idam.url}")
     private String idamApiUrl;

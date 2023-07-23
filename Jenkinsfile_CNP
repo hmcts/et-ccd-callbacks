@@ -75,6 +75,11 @@ withPipeline(type, product, component) {
     ]
   }
 
+  before('smoketest:preview') {
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.TEST_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  }
+
   afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
 
@@ -100,6 +105,11 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET E2E test report"
     ]
+  }
+
+  before('smoketest:aat') {
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.TEST_URL = "https://et-cos-staging.aat.platform.hmcts.net/"
   }
 
   afterAlways('smoketest:aat') {

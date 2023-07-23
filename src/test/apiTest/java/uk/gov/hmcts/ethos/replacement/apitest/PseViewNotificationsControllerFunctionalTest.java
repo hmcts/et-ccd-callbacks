@@ -21,23 +21,20 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Slf4j
-public class PseRespondentViewControllerFunctionalTest extends BaseFunctionalTest {
-
+public class PseViewNotificationsControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
 
-    private static final String ABOUT_TO_START_URL = "/pseRespondentView/aboutToStart";
-    private static final String MID_TABLE_DETAILS = "/pseRespondentView/midDetailsTable";
-
+    private static final String ABOUT_TO_START_URL = "/pseViewNotifications/aboutToStart";
     private CCDRequest ccdRequest;
 
     @BeforeAll
     public void setUpCaseData() {
         CaseData caseData = CaseDataBuilder.builder()
-            .withEthosCaseReference("testCaseReference")
-            .build();
+                .withEthosCaseReference("testCaseReference")
+                .build();
 
         caseData.setSendNotificationCollection(List.of(
-            SendNotificationTypeItem.builder().build()
+                SendNotificationTypeItem.builder().build()
         ));
 
         caseData.setSendNotificationCollection(List.of(
@@ -59,37 +56,23 @@ public class PseRespondentViewControllerFunctionalTest extends BaseFunctionalTes
         ));
 
         ccdRequest = CCDRequestBuilder.builder()
-            .withCaseData(caseData)
-            .withCaseId("123")
-            .build();
+                .withCaseData(caseData)
+                .withCaseId("123")
+                .build();
     }
 
     @Test
     void shouldReceiveSuccessResponseWhenAboutToStartViewInvoked() {
         RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post(ABOUT_TO_START_URL)
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log()
-            .all(true);
-    }
-
-    @Test
-    void shouldReceiveSuccessResponseWhenMidDetailsTableInvoked() {
-        RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post(MID_TABLE_DETAILS)
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log()
-            .all(true);
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(ccdRequest)
+                .post(ABOUT_TO_START_URL)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
     }
 
 }

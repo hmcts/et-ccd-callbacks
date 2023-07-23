@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +26,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-class RespondNotificationControllerFunctionalTest extends BaseFunctionalTest {
+public class RespondNotificationControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
 
     private static final String ABOUT_TO_START_URL = "/respondNotification/aboutToStart";
@@ -38,6 +41,7 @@ class RespondNotificationControllerFunctionalTest extends BaseFunctionalTest {
     public void setUpCaseData() {
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("testCaseReference")
+            .withManagingOffice("Manchester")
             .build();
 
         caseData.setSendNotificationCollection(List.of(
@@ -54,6 +58,20 @@ class RespondNotificationControllerFunctionalTest extends BaseFunctionalTest {
                     .build())
                 .build()
         ));
+
+        caseData.setSelectNotificationDropdown(DynamicFixedListType.of(DynamicValueType.create("uuid", "")));
+
+        SendNotificationType notificationType = new SendNotificationType();
+        notificationType.setSendNotificationSubject(List.of("Judgment"));
+
+        SendNotificationTypeItem notificationTypeItem = new SendNotificationTypeItem();
+        String uuid = UUID.randomUUID().toString();
+        notificationTypeItem.setId(uuid);
+        notificationTypeItem.setValue(notificationType);
+
+        List<SendNotificationTypeItem> notificationTypeItems = new ArrayList<>();
+        notificationTypeItems.add(notificationTypeItem);
+        caseData.setSendNotificationCollection(notificationTypeItems);
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)

@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -44,7 +45,7 @@ class TseAdmCloseServiceTest {
     void setUp() {
         tseAdmCloseService = new TseAdmCloseService(tseService);
         caseData = CaseDataBuilder.builder().build();
-        when(tseService.formatViewApplication(any(), any(), false)).thenReturn("Application Details\r\n");
+        when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
     }
 
     @Test

@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -95,7 +96,7 @@ class TseAdmReplyServiceTest {
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
-        when(tseService.formatViewApplication(any(), any(), false)).thenReturn("Application Details\r\n");
+        when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
         caseData = CaseDataBuilder.builder().build();
     }
 

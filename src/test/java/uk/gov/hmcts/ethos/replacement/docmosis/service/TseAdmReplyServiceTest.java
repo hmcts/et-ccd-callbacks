@@ -95,7 +95,7 @@ class TseAdmReplyServiceTest {
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
-        when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");
+        when(tseService.formatViewApplication(any(), any(), false)).thenReturn("Application Details\r\n");
         caseData = CaseDataBuilder.builder().build();
     }
 

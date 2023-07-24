@@ -44,7 +44,7 @@ class TseAdmCloseServiceTest {
     void setUp() {
         tseAdmCloseService = new TseAdmCloseService(tseService);
         caseData = CaseDataBuilder.builder().build();
-        when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");
+        when(tseService.formatViewApplication(any(), any(), false)).thenReturn("Application Details\r\n");
     }
 
     @Test

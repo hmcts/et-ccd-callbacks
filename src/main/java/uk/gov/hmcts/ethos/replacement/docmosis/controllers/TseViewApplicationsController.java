@@ -122,7 +122,9 @@ public class TseViewApplicationsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseApplicationSummaryAndResponsesMarkup(tseService.formatViewApplication(caseData, userToken));
+        caseData.setTseApplicationSummaryAndResponsesMarkup(
+            tseService.formatViewApplication(caseData, userToken, true)
+        );
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

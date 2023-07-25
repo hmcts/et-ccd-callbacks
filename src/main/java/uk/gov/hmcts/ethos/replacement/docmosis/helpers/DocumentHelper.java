@@ -65,16 +65,11 @@ public final class DocumentHelper {
                                                      MultipleData multipleData,
                                                      DefaultValues allocatedCourtAddress,
                                                      VenueAddressReaderService venueAddressReaderService) {
-        StringBuilder sb = new StringBuilder();
+
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
-
-        // Start building the instruction
-        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+        StringBuilder sb = new StringBuilder().append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
                 .append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE)
-                .append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
-
-        // Building the document data
-        sb.append("\"data\":{\n");
+                .append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
 
         if (templateName.equals(ADDRESS_LABELS_TEMPLATE) && multipleData == null) {
             log.info("Getting address labels data for single case:" + caseData.getEthosCaseReference());
@@ -84,65 +79,65 @@ public final class DocumentHelper {
             sb.append(getAddressLabelsDataMultipleCase(multipleData));
         } else {
             log.info("Getting data for single template for case:" + caseData.getEthosCaseReference());
-            sb.append(getClaimantData(caseData));
-            sb.append(getRespondentData(caseData));
-            sb.append(getHearingData(caseData, caseTypeId, correspondenceType,
-                    correspondenceScotType, venueAddressReaderService));
-            sb.append(getCorrespondenceData(correspondenceType));
-            sb.append(getCorrespondenceScotData(correspondenceScotType));
-            sb.append(getCourtData(caseData, allocatedCourtAddress));
+            sb.append(getClaimantData(caseData)).append(getRespondentData(caseData))
+                .append(getHearingData(caseData, caseTypeId, correspondenceType,
+                correspondenceScotType, venueAddressReaderService))
+                .append(getCorrespondenceData(correspondenceType))
+                .append(getCorrespondenceScotData(correspondenceScotType))
+                .append(getCourtData(caseData, allocatedCourtAddress));
         }
 
         sb.append("\"i").append(getEWSectionName(correspondenceType)
-                .replace(".", "_"))
-                .append("_enhmcts\":\"[userImage:enhmcts.png]").append(NEW_LINE);
-        sb.append("\"i").append(getEWSectionName(correspondenceType)
-                .replace(".", "_"))
-                .append("_enhmcts1\":\"[userImage:enhmcts.png]").append(NEW_LINE);
-        sb.append("\"i").append(getEWSectionName(correspondenceType)
-                .replace(".", "_"))
-                .append("_enhmcts2\":\"[userImage:enhmcts.png]").append(NEW_LINE);
-        sb.append("\"iScot").append(getScotSectionName(correspondenceScotType)
-                .replace(".", "_"))
-                .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE);
-        sb.append("\"iScot").append(getScotSectionName(correspondenceScotType)
-                .replace(".", "_"))
-                .append("_schmcts1\":\"[userImage:schmcts.png]").append(NEW_LINE);
-        sb.append("\"iScot").append(getScotSectionName(correspondenceScotType)
-                .replace(".", "_"))
-                .append("_schmcts2\":\"[userImage:schmcts.png]").append(NEW_LINE);
+            .replace(".", "_"))
+            .append("_enhmcts\":\"[userImage:enhmcts.png]").append(NEW_LINE)
+            .append("\"i").append(getEWSectionName(correspondenceType)
+            .replace(".", "_"))
+            .append("_enhmcts1\":\"[userImage:enhmcts.png]").append(NEW_LINE)
+            .append("\"i").append(getEWSectionName(correspondenceType)
+            .replace(".", "_"))
+            .append("_enhmcts2\":\"[userImage:enhmcts.png]").append(NEW_LINE)
+            .append("\"iScot").append(getScotSectionName(correspondenceScotType)
+            .replace(".", "_"))
+            .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE)
+            .append("\"iScot").append(getScotSectionName(correspondenceScotType)
+            .replace(".", "_"))
+            .append("_schmcts1\":\"[userImage:schmcts.png]").append(NEW_LINE)
+            .append("\"iScot").append(getScotSectionName(correspondenceScotType)
+            .replace(".", "_"))
+            .append("_schmcts2\":\"[userImage:schmcts.png]").append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
-        sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE);
-        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE);
-        sb.append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
-                .append(NEW_LINE);
-        sb.append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE);
-        sb.append("}\n}\n");
+        sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE)
+                .append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE)
+                .append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
+                .append(NEW_LINE)
+                .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
+                .append("}\n}\n");
 
         return sb;
     }
 
     private static StringBuilder getClaimantAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"claimant_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE);
-        sb.append("\"claimant_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE);
-        sb.append("\"claimant_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE);
-        sb.append("\"claimant_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE);
-        sb.append("\"claimant_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE);
-        sb.append("\"claimant_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder().append("\"claimant_addressLine1\":\"")
+            .append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
+            .append("\"claimant_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
+            .append("\"claimant_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
+            .append("\"claimant_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"claimant_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"claimant_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"claimant_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE);
-        sb.append("\"claimant_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE);
-        sb.append("\"claimant_or_rep_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE);
-        sb.append("\"claimant_or_rep_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE);
-        sb.append("\"claimant_or_rep_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE);
-        sb.append("\"claimant_or_rep_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder()
+            .append("\"claimant_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1()))
+            .append(NEW_LINE)
+            .append("\"claimant_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
+            .append(NEW_LINE)
+            .append("\"claimant_or_rep_addressLine3\":\"").append(nullCheck(address.getAddressLine3()))
+            .append(NEW_LINE)
+            .append("\"claimant_or_rep_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"claimant_or_rep_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"claimant_or_rep_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getClaimantData(CaseData caseData) {

@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -90,8 +91,7 @@ class TseAdmReplyServiceTest {
         tseAdmReplyService = new TseAdmReplyService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
-        when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");
-
+        when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
         caseData = CaseDataBuilder.builder().build();
     }
 

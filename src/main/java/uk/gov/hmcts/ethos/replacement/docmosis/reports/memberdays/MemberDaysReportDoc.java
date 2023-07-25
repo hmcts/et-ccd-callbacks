@@ -25,32 +25,20 @@ public class MemberDaysReportDoc {
 
         MemberDaysReportData reportData = (MemberDaysReportData) listingData;
         StringBuilder sb = ListingHelper.getListingDate(reportData);
-        sb.append(REPORT_OFFICE).append(nullCheck(reportData.getOffice())).append(NEW_LINE);
-        sb.append(addMemberDaysReportSummaryHeader(reportData));
-        sb.append("\"memberDaySummaryItems\":[\n");
-        sb.append(addMemberDaysReportSummary(reportData.getMemberDaySummaryItems()));
-        sb.append("],\n");
-        sb.append("\"reportDetails\":[\n");
-        sb.append(addMemberDaysReportDetails(reportData.getReportDetails()));
-        sb.append("],\n");
+        sb.append(REPORT_OFFICE).append(nullCheck(reportData.getOffice())).append(NEW_LINE)
+            .append(addMemberDaysReportSummaryHeader(reportData)).append("\"memberDaySummaryItems\":[\n")
+            .append(addMemberDaysReportSummary(reportData.getMemberDaySummaryItems()))
+            .append("],\n\"reportDetails\":[\n").append(addMemberDaysReportDetails(reportData.getReportDetails()))
+            .append("],\n");
         return sb;
     }
 
     private static StringBuilder addMemberDaysReportSummaryHeader(MemberDaysReportData reportData) {
-        StringBuilder summaryHeaderContent = new StringBuilder();
 
-        if (reportData == null) {
-            return summaryHeaderContent;
-        }
-
-        summaryHeaderContent.append("\"Total_Full_Days\":\"")
-            .append(nullCheck(reportData.getFullDaysTotal())).append(NEW_LINE);
-        summaryHeaderContent.append("\"Total_Half_Days\":\"")
-            .append(nullCheck(reportData.getHalfDaysTotal())).append(NEW_LINE);
-        summaryHeaderContent.append("\"Total_Days\":\"")
-            .append(nullCheck(reportData.getTotalDays())).append(NEW_LINE);
-
-        return summaryHeaderContent;
+        return new StringBuilder ().append("\"Total_Full_Days\":\"")
+                .append(nullCheck(reportData.getFullDaysTotal())).append(NEW_LINE).append("\"Total_Half_Days\":\"")
+                .append(nullCheck(reportData.getHalfDaysTotal())).append(NEW_LINE).append("\"Total_Days\":\"")
+                .append(nullCheck(reportData.getTotalDays())).append(NEW_LINE);
     }
 
     private static StringBuilder addMemberDaysReportSummary(List<MemberDaySummaryItem> memberDaySummaryItems) {
@@ -71,17 +59,13 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder getMemberDaySummaryRow(MemberDaySummaryItem summaryItem) {
-        StringBuilder summaryRowContent = new StringBuilder();
-        summaryRowContent.append("{\n\"Hearing_Date\":\"").append(
-            nullCheck(summaryItem.getHearingDate())).append(NEW_LINE);
-        summaryRowContent.append("\"Full_Days\":\"").append(
-            nullCheck(summaryItem.getFullDays())).append(NEW_LINE);
-        summaryRowContent.append("\"Half_Days\":\"").append(
-            nullCheck(summaryItem.getHalfDays())).append(NEW_LINE);
-        summaryRowContent.append("\"Total_Days\":\"").append(nullCheck(summaryItem.getTotalDays()))
-            .append("\"\n}");
 
-        return summaryRowContent;
+        return new StringBuilder().append("{\n\"Hearing_Date\":\"")
+            .append(nullCheck(summaryItem.getHearingDate())).append(NEW_LINE).append("\"Full_Days\":\"")
+            .append(nullCheck(summaryItem.getFullDays())).append(NEW_LINE)
+            .append("\"Half_Days\":\"").append(nullCheck(summaryItem.getHalfDays())).append(NEW_LINE)
+            .append("\"Total_Days\":\"").append(nullCheck(summaryItem.getTotalDays()))
+            .append("\"\n}");
     }
 
     private static StringBuilder addMemberDaysReportDetails(List<MemberDaysReportDetail> reportDetails) {
@@ -103,32 +87,18 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder getMemberDayReportDetailRow(MemberDaysReportDetail reportDetail) {
-        StringBuilder detailRowContent = new StringBuilder();
-        detailRowContent.append("{\n\"Detail_Hearing_Date\":\"")
-            .append(nullCheck(reportDetail.getHearingDate()))
-            .append(NEW_LINE);
-        detailRowContent.append("\"Employee_Member\":\"")
-            .append(nullCheck(reportDetail.getEmployeeMember()))
-            .append(NEW_LINE);
-        detailRowContent.append("\"Employer_Member\":\"")
-            .append(nullCheck(reportDetail.getEmployerMember()))
-            .append(NEW_LINE);
-        detailRowContent.append("\"Case_Reference\":\"")
-            .append(nullCheck(reportDetail.getCaseReference()))
-            .append(NEW_LINE);
-        detailRowContent.append("\"Hearing_Number\":\"")
-            .append(nullCheck(reportDetail.getHearingNumber()))
-            .append(NEW_LINE);
-        detailRowContent.append("\"Hearing_Type\":\"")
-            .append(nullCheck(reportDetail.getHearingType()))
-            .append(NEW_LINE);
-        detailRowContent.append("\"Hearing_Clerk\":\"")
-            .append(nullCheck(reportDetail.getHearingClerk()))
-            .append(NEW_LINE);
         double durationInMinutes = Double.parseDouble(reportDetail.getHearingDuration());
-        detailRowContent.append("\"Hearing_Duration\":\"")
+
+        return new StringBuilder().append("{\n\"Detail_Hearing_Date\":\"")
+            .append(nullCheck(reportDetail.getHearingDate()))
+            .append(NEW_LINE).append("\"Employee_Member\":\"").append(nullCheck(reportDetail.getEmployeeMember()))
+            .append(NEW_LINE).append("\"Employer_Member\":\"").append(nullCheck(reportDetail.getEmployerMember()))
+            .append(NEW_LINE).append("\"Case_Reference\":\"").append(nullCheck(reportDetail.getCaseReference()))
+            .append(NEW_LINE).append("\"Hearing_Number\":\"").append(nullCheck(reportDetail.getHearingNumber()))
+            .append(NEW_LINE).append("\"Hearing_Type\":\"").append(nullCheck(reportDetail.getHearingType()))
+            .append(NEW_LINE).append("\"Hearing_Clerk\":\"").append(nullCheck(reportDetail.getHearingClerk()))
+            .append(NEW_LINE).append("\"Hearing_Duration\":\"")
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n}");
-        return detailRowContent;
     }
 }

@@ -298,14 +298,14 @@ class TseServiceTest {
         @Test
         void withNoApplications() {
             CaseData caseData = new CaseData();
-            assertThatThrownBy(() -> tseService.formatViewApplication(caseData, AUTH_TOKEN))
+            assertThatThrownBy(() -> tseService.formatViewApplication(caseData, AUTH_TOKEN, false))
                 .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         void withNoSelectedApplication() {
             CaseData caseData = setupCaseDataWithAnApplication();
-            assertThatThrownBy(() -> tseService.formatViewApplication(caseData, AUTH_TOKEN))
+            assertThatThrownBy(() -> tseService.formatViewApplication(caseData, AUTH_TOKEN, false))
                 .isInstanceOf(IllegalStateException.class);
         }
 
@@ -349,7 +349,7 @@ class TseServiceTest {
                 |Sent to|Respondent|\r
                 """;
 
-            assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN)).isEqualTo(expected);
+            assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN, false)).isEqualTo(expected);
         }
 
         @Test
@@ -456,7 +456,7 @@ class TseServiceTest {
                 |Sent to|Respondent|\r
                 """;
 
-            assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN)).isEqualTo(expected);
+            assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN, false)).isEqualTo(expected);
         }
     }
 

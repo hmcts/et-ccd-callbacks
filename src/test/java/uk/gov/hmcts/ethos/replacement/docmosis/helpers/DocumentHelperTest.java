@@ -1860,7 +1860,7 @@ class DocumentHelperTest {
     void buildDocumentContentScot4() throws URISyntaxException, IOException {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
 
-        String expectedResult = getExpectedResult("expectedDocumentContentScot4.json");
+        String expectedResult = getExpectedResult();
         expectedResult = expectedResult.replace("current-date", UtilHelper.formatCurrentDate(LocalDate.now()));
         expectedResult = expectedResult.replace("plus28",
                 UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28));
@@ -2180,9 +2180,9 @@ class DocumentHelperTest {
                         correspondenceHearingNumber).getHearingVenue().getSelectedLabel());
     }
 
-    private String getExpectedResult(String resourceFileName) throws URISyntaxException, IOException {
+    private String getExpectedResult() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(resourceFileName)).toURI()))).replace("\r\n", "\n");
+                .getResource("expectedDocumentContentScot4.json")).toURI()))).replace("\r\n", "\n");
         LocalDate currentLocalDate = LocalDate.now();
         LocalDate currentLocalDatePlus28Days = currentLocalDate.plusDays(28);
         return expectedJson.replace("current-date-placeholder",
@@ -2217,7 +2217,8 @@ class DocumentHelperTest {
                 getDocumentTypeItem("Hidden", "Tribunal case file"),
                 getDocumentTypeItem("Hidden", "Other"),
                 getDocumentTypeItem("Hidden", "Referral/Judicial direction"),
-                getDocumentTypeItem("Visible", null)));
+                getDocumentTypeItem("Visible", null))
+            );
 
             DocumentHelper.setLegalRepVisibleDocuments(caseData);
 

@@ -227,28 +227,25 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"respondent_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE);
-        sb.append("\"respondent_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE);
-        sb.append("\"respondent_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE);
-        sb.append("\"respondent_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE);
-        sb.append("\"respondent_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE);
-        sb.append("\"respondent_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder().append("\"respondent_addressLine1\":\"")
+            .append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
+            .append("\"respondent_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
+            .append("\"respondent_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
+            .append("\"respondent_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"respondent_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"respondent_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getRespondentOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"respondent_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1()))
-                .append(NEW_LINE);
-        sb.append("\"respondent_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
-                .append(NEW_LINE);
-        sb.append("\"respondent_or_rep_addressLine3\":\"").append(nullCheck(address.getAddressLine3()))
-                .append(NEW_LINE);
-        sb.append("\"respondent_or_rep_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE);
-        sb.append("\"respondent_or_rep_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE);
-        sb.append("\"respondent_or_rep_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder().append("\"respondent_or_rep_addressLine1\":\"")
+            .append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
+            .append("\"respondent_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
+            .append(NEW_LINE)
+            .append("\"respondent_or_rep_addressLine3\":\"").append(nullCheck(address.getAddressLine3()))
+            .append(NEW_LINE)
+            .append("\"respondent_or_rep_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"respondent_or_rep_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"respondent_or_rep_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getRespondentData(CaseData caseData) {
@@ -817,18 +814,17 @@ public final class DocumentHelper {
 
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
                                                  String labelNumber, String showTelFax) {
-        StringBuilder sb = new StringBuilder();
-        sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
-                .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE);
-        sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
-                .append(nullCheck(addressLabelType.getLabelEntityName02())).append(NEW_LINE);
-        sb.append(getAddressLines(addressLabelType, labelNumber));
-        sb.append(getTelFaxLine(addressLabelType, labelNumber, showTelFax));
-        sb.append('"').append(LBL).append(labelNumber).append("_Eef\":\"")
-                .append(nullCheck(addressLabelType.getLabelEntityReference())).append(NEW_LINE);
-        sb.append('"').append(LBL).append(labelNumber).append("_Cef\":\"")
-                .append(nullCheck(addressLabelType.getLabelCaseReference())).append('"');
-        return sb;
+        return new StringBuilder().append('"').append(LABEL).append(labelNumber)
+            .append("_Entity_Name_01\":\"")
+            .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE)
+            .append('"').append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
+            .append(nullCheck(addressLabelType.getLabelEntityName02())).append(NEW_LINE)
+            .append(getAddressLines(addressLabelType, labelNumber))
+            .append(getTelFaxLine(addressLabelType, labelNumber, showTelFax))
+            .append('"').append(LBL).append(labelNumber).append("_Eef\":\"")
+            .append(nullCheck(addressLabelType.getLabelEntityReference())).append(NEW_LINE)
+            .append('"').append(LBL).append(labelNumber).append("_Cef\":\"")
+            .append(nullCheck(addressLabelType.getLabelCaseReference())).append('"');
     }
 
     private static StringBuilder getAddressLines(AddressLabelType addressLabelType, String labelNumber) {

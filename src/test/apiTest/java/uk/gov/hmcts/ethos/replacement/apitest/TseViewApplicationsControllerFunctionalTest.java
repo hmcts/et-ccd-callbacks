@@ -23,17 +23,14 @@ import java.util.UUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
-public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
-
+public class TseViewApplicationsControllerFunctionalTest extends BaseFunctionalTest  {
     private static final String AUTHORIZATION = "Authorization";
-    private static final String MID_DETAILS_TABLE = "/tseAdmReply/midDetailsTable";
-    private static final String MID_VALIDATE_INPUT = "/tseAdmReply/midValidateInput";
-    private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmReply/aboutToSubmit";
-    private static final String SUBMITTED_URL = "/tseAdmReply/submitted";
-
-    private static final String APPLICATION_CODE = "1";
     private static final String APPLICATION_LABEL = "1 - Amend response";
-
+    private static final String ABOUT_TO_START_URL = "/viewRespondentTSEApplications/aboutToStart";
+    private static final String POPULATE_APP_URL = "/viewRespondentTSEApplications/midPopulateChooseApplication";
+    private static final String POPULATE_APP_DATA_URL =
+            "/viewRespondentTSEApplications/midPopulateSelectedApplicationData";
+    private static final String APPLICATION_CODE = "1";
     private CCDRequest ccdRequest;
 
     @BeforeAll
@@ -43,41 +40,13 @@ public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
         caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
         caseData.setTseAdminSelectApplication(
-            DynamicFixedListType.of(
-                DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));
+                DynamicFixedListType.of(
+                        DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));
 
         ccdRequest = CCDRequestBuilder.builder()
-            .withCaseData(caseData)
-            .withCaseId("123")
-            .build();
-    }
-
-    @Test
-    void midDetailsTableSuccessResponse() {
-        RestAssured.given()
-                .spec(spec)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(ccdRequest)
-                .post(MID_DETAILS_TABLE)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log()
-                .all(true);
-    }
-
-    @Test
-    void midValidateInputSuccessResponse() {
-        RestAssured.given()
-                .spec(spec)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(ccdRequest)
-                .post(MID_VALIDATE_INPUT)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log()
-                .all(true);
+                .withCaseData(caseData)
+                .withCaseId("123")
+                .build();
     }
 
     @Test
@@ -87,7 +56,7 @@ public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
                 .contentType(ContentType.JSON)
                 .header(new Header(AUTHORIZATION, userToken))
                 .body(ccdRequest)
-                .post(ABOUT_TO_SUBMIT_URL)
+                .post(ABOUT_TO_START_URL)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log()
@@ -95,17 +64,31 @@ public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
     }
 
     @Test
-    void submittedSuccessResponse() {
+    void populateChooseApplicationSuccessResponse() {
         RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post(SUBMITTED_URL)
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log()
-            .all(true);
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(ccdRequest)
+                .post(POPULATE_APP_URL)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
+    }
+
+    @Test
+    void populateSelectedApplicationDataSuccessResponse() {
+        RestAssured.given()
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(ccdRequest)
+                .post(POPULATE_APP_DATA_URL)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
     }
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {

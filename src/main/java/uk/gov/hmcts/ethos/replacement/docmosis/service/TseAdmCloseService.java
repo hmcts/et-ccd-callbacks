@@ -20,7 +20,7 @@ public class TseAdmCloseService {
         if (getAdminSelectedApplicationType(caseData) == null) {
             return null;
         }
-        return tseService.formatViewApplication(caseData, authToken);
+        return tseService.formatViewApplication(caseData, authToken, false);
     }
 
     /**

@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
+public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
     private static final String YES_COPY = "I confirm I want to copy";
     private CCDRequest ccdRequest;
@@ -70,6 +70,8 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
                             .copyToOtherParty(YES)
                             .build()
                     ).build()));
+
+        caseData.setManagingOffice("Manchester");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)

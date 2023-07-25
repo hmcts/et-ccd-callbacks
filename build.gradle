@@ -65,11 +65,20 @@ sourceSets {
     functional {
         java {
             srcDir 'src/test/functional/java'
-            srcDir 'src/test/apiTest/java'
             srcDir 'src/test/utils/java'
         }
         resources {
             srcDir 'src/test/functional/resources'
+        }
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+    apiTest {
+        java {
+            srcDir 'src/test/apiTest/java'
+            srcDir 'src/test/utils/java'
+        }
+        resources {
             srcDir 'src/test/apiTest/resources'
         }
         compileClasspath += main.output + test.output
@@ -101,6 +110,8 @@ configurations {
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    apiTestImplementation.extendsFrom testImplementation
+    apiTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -108,7 +119,8 @@ test {
     useJUnitPlatform()
 }
 
-task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification', dependsOn: ':codeceptSmoke') {
+tasks.register('smoke', Test) {
+    dependsOn ':codeceptSmoke'
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
@@ -118,58 +130,64 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
 }
 
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification', dependsOn: ':codeceptFunctional') {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
+tasks.register('functional', Test) {
+    testClassesDirs = sourceSets.apiTest.output.classesDirs
+    classpath = sourceSets.apiTest.runtimeClasspath
 
-    useJUnit {
-        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
-    }
+    useJUnitPlatform()
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'
 }
 
-task yarnInstall(type: Exec) {
+tasks.register('yarnInstall', Exec) {
     workingDir '.'
     commandLine 'yarn', 'install'
 }
 
-task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
+tasks.register('yarnAudit', Exec) {
+    dependsOn ':yarnInstall'
     workingDir '.'
     commandLine 'yarn', 'npm', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
 }
 
-task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
+tasks.register('codeceptSmoke', Exec) {
+    dependsOn ':yarnInstall'
     commandLine 'yarn', 'test:smoke'
 }
 
-task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
+tasks.register('codeceptFunctional', Exec) {
+    dependsOn 'yarnInstall'
+    dependsOn 'functional'
     commandLine 'yarn', 'test:functional'
 }
 
-task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
+tasks.register('crossbrowser') {
+    dependsOn ':codeceptFunctionalSauce'
     group = 'Delivery pipeline'
     description = 'Execute cross browser tests on saucelabs'
 }
 
-task nightlyFunctional(dependsOn: ':codeceptFunctionalNightly') {
+tasks.register('nightlyFunctional') {
+    dependsOn ':codeceptFunctionalNightly'
     group = 'Delivery pipeline'
     description = 'Execute Functional Tests on nightly pipeline'
 }
 
-task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
+tasks.register('codeceptFunctionalSauce', Exec) {
+    dependsOn ':yarnInstall'
     //IGNORE_SESSION_VALIDATION=true NODE_ENV=testing LOG_LEVEL=OFF NODE_PATH=. node_modules/.bin/codeceptjs run-multiple  ${BROWSER_GROUP:-'--all'} -c src/test/end-to-end/saucelabs.conf.js --grep @RET-XB --steps --reporter mocha-multi
     workingDir '.'
     commandLine './bin/run-crossbrowser-tests.sh'
     commandLine 'yarn', 'test:crossbrowser'
 }
 
-task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
+tasks.register('codeceptFunctionalNightly', Exec) {
+    dependsOn 'yarnInstall'
     commandLine 'yarn', 'test:fullfunctional'
 }
 
-task integration(type: Test) {
+tasks.register('integration', Test) {
     description = "Runs integration tests"
     group = "Verification"
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -192,7 +210,7 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --shirt HEAD'.execute().text.trim()
 }
 
-task runContractTests(type: Test, description: 'Runs contract tests.', group: 'Verification') {
+tasks.register('runContractTests', Test) {
     onlyIf {
         return System.env.SKIP_CONTRACT_TESTS == null || System.env.SKIP_CONTRACT_TESTS == 'false'
     }
@@ -203,7 +221,7 @@ task runContractTests(type: Test, description: 'Runs contract tests.', group: 'V
     testLogging.showStandardStreams = true
 }
 
-task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
+tasks.register('runAndPublishConsumerPactTests', Test) {
     logger.lifecycle("Runs pact consumer Tests")
 
     testClassesDirs = sourceSets.contractTest.output.classesDirs
@@ -231,7 +249,7 @@ pact {
     }
 }
 
-task fortifyScan(type: JavaExec)  {
+tasks.register('fortifyScan', JavaExec) {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -317,7 +335,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.23'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.2.13'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.3.2'
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -385,7 +403,7 @@ dependencies {
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
-    testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitJupiterVersion
+    testImplementation(platform('org.junit:junit-bom:5.9.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.18.0'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'

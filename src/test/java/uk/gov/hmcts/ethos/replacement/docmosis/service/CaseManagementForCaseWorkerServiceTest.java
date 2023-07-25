@@ -27,6 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -53,6 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -1019,6 +1021,30 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
         assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE, caseData.getPublicCaseName());
+    }
+
+    @Test
+    void testCaseLinksAreInitialised() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+
+        assertNotNull(caseData.getCaseLinks());
+    }
+
+    @Test
+    void testCaseLinksAreNotSetToEmptyList() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        List<CaseLink> caseLinks = new ArrayList<>() {
+            {
+                add(new CaseLink());
+            }
+        };
+        caseData.setCaseLinks(caseLinks);
+
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+
+        assertEquals(caseData.getCaseLinks().size(), 1);
     }
 
     @Test

@@ -67,7 +67,7 @@ public class TseAdmReplyService {
      */
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
         if (getAdminSelectedApplicationType(caseData) != null) {
-            return tseService.formatViewApplication(caseData, authToken);
+            return tseService.formatViewApplication(caseData, authToken, false);
         }
         throw new NotFoundException("No selected application type item found.");
     }

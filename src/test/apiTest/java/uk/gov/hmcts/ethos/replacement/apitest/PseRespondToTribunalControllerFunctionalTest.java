@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
@@ -19,11 +21,13 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
+public class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
 
     private static final String ABOUT_TO_START_URL = "/pseRespondToTribunal/aboutToStart";
@@ -38,6 +42,8 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     public void setUpCaseData() {
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("testCaseReference")
+            .withClaimant("claimant")
+            .withManagingOffice("Manchester")
             .build();
 
         caseData.setSendNotificationCollection(List.of(
@@ -53,6 +59,28 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
                         .build()))
                     .build())
                 .build()
+        ));
+
+        caseData.setPseRespondentSelectOrderOrRequest(
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .date("5 Aug 2022")
+                                .sendNotificationTitle("View notice of hearing")
+                                .sendNotificationLetter(NO)
+                                .sendNotificationSubject(List.of("Case management orders / requests"))
+                                .sendNotificationCaseManagement("Request")
+                                .sendNotificationResponseTribunal("No")
+                                .sendNotificationRequestMadeBy("Judge")
+                                .sendNotificationFullName("Mr Lee Gal Officer")
+                                .sendNotificationNotify(BOTH_PARTIES)
+                                .build())
+                        .build()
         ));
 
         ccdRequest = CCDRequestBuilder.builder()

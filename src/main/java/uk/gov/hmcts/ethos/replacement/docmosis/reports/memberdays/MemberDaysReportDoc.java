@@ -19,11 +19,10 @@ public class MemberDaysReportDoc {
     }
 
     private StringBuilder getMemberDaysReport(ListingData listingData) {
-        if (!(listingData instanceof MemberDaysReportData)) {
+        if (!(listingData instanceof MemberDaysReportData reportData)) {
             throw new IllegalStateException("ListingData is not instance of MemberDaysReportData");
         }
 
-        MemberDaysReportData reportData = (MemberDaysReportData) listingData;
         StringBuilder sb = ListingHelper.getListingDate(reportData);
         sb.append(REPORT_OFFICE).append(nullCheck(reportData.getOffice())).append(NEW_LINE)
             .append(addMemberDaysReportSummaryHeader(reportData)).append("\"memberDaySummaryItems\":[\n")
@@ -35,10 +34,10 @@ public class MemberDaysReportDoc {
 
     private static StringBuilder addMemberDaysReportSummaryHeader(MemberDaysReportData reportData) {
 
-        return new StringBuilder ().append("\"Total_Full_Days\":\"")
-                .append(nullCheck(reportData.getFullDaysTotal())).append(NEW_LINE).append("\"Total_Half_Days\":\"")
-                .append(nullCheck(reportData.getHalfDaysTotal())).append(NEW_LINE).append("\"Total_Days\":\"")
-                .append(nullCheck(reportData.getTotalDays())).append(NEW_LINE);
+        return new StringBuilder().append("\"Total_Full_Days\":\"")
+            .append(nullCheck(reportData.getFullDaysTotal())).append(NEW_LINE).append("\"Total_Half_Days\":\"")
+            .append(nullCheck(reportData.getHalfDaysTotal())).append(NEW_LINE).append("\"Total_Days\":\"")
+            .append(nullCheck(reportData.getTotalDays())).append(NEW_LINE);
     }
 
     private static StringBuilder addMemberDaysReportSummary(List<MemberDaySummaryItem> memberDaySummaryItems) {

@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -11,9 +13,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -25,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -41,6 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -990,10 +997,14 @@ public final class DocumentHelper {
         if (caseData.getDocumentCollection() == null) {
             return;
         }
+
         List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
-                .toList());
+            .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
+            .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
+                d.getValue().getUploadedDocument().getDocumentBinaryUrl())
+            )
+            .toList());
     }
 
     private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
@@ -1003,5 +1014,35 @@ public final class DocumentHelper {
         }
 
         return types.contains(typeOfDocument);
+    }
+
+    @NotNull
+    private static List<String> getClaimantRule92NoDocumentBinaryUrls(CaseData caseData) {
+        List<Optional<UploadedDocumentType>> claimantRule92NoDocuments = new ArrayList<>();
+
+        // Get all documents with claimant rule 92 no - whether on application creation or in any subsequent response
+        for (GenericTseApplicationTypeItem app : ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
+            GenericTseApplicationType appType = app.getValue();
+            if (CLAIMANT_TITLE.equals(appType.getApplicant()) && NO.equals(appType.getCopyToOtherPartyYesOrNo())) {
+                claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));
+            }
+
+            for (TseRespondTypeItem response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
+                TseRespondType respondType = response.getValue();
+                if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
+                    claimantRule92NoDocuments.addAll(
+                        respondType.getSupportingMaterial().stream()
+                            .map(documentType -> Optional.ofNullable(documentType.getValue().getUploadedDocument()))
+                            .toList()
+                    );
+                }
+            }
+        }
+
+        // Get document binary urls of non-null documents
+        return claimantRule92NoDocuments.stream()
+            .filter(Optional::isPresent)
+            .map(optional -> optional.get().getDocumentBinaryUrl())
+            .toList();
     }
 }

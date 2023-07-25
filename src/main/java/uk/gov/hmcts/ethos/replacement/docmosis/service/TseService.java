@@ -188,9 +188,10 @@ public class TseService {
      * Builds a two column Markdown table with both application details and all responses.
      * @param caseData parent object for all case data
      * @param authToken user token for getting document metadata
+     * @param isRespondentView is respondent or their representatives viewing this application
      * @return two column Markdown table string
      */
-    public String formatViewApplication(CaseData caseData, String authToken) {
+    public String formatViewApplication(CaseData caseData, String authToken, boolean isRespondentView) {
         GenericTseApplicationType application;
         if (caseData.getTseAdminSelectApplication() != null) {
             application = TseHelper.getAdminSelectedApplicationType(caseData);
@@ -201,7 +202,7 @@ public class TseService {
         }
 
         String applicationTable = formatApplicationDetails(application, authToken, true);
-        String responses = formatApplicationResponses(application, authToken, false);
+        String responses = formatApplicationResponses(application, authToken, isRespondentView);
         String decisions = formatApplicationDecisions(application, authToken);
         return applicationTable + "\r\n" + responses + "\r\n" +  decisions;
     }

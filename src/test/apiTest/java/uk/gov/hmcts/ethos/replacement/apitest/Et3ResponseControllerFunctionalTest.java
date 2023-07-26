@@ -102,6 +102,7 @@ public class Et3ResponseControllerFunctionalTest extends BaseFunctionalTest {
         respondentSumType.setResponseRespondentAddress(respondentET3Address);
         respondentSumType.setEt3ResponseHearingRespondent(List.of("Phone hearings"));
         respondentSumType.setEt3ResponseHearingRepresentative(List.of("rep"));
+        respondentSumType.setResponseReceived(NO);
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);

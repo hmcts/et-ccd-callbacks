@@ -13,4 +13,4 @@ Scenario('Generate a Report', async ({I}) => {
     I.click(caseListLink);
     await generateReport(I, commonConfig.jurisdictionType, commonConfig.caseType, eventNames.CREATE_REPORT);
     
-}).tag('@RET-BAT1').tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

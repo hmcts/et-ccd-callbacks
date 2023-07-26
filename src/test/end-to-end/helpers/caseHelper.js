@@ -18,78 +18,66 @@ async function submittedState(I, caseId) {
 
 async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, suggestedHearingVenue) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.amendTheCaseDetails(clerkResponsible, physicalLocation, suggestedHearingVenue);
 }
 
 async function caseDetailsEvent(I, caseId, eventName, clerkResponsible, currentPosition, physicalLocation, conciliationTrack) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.amendCaseDetailsWithCaseCurrentPosition(clerkResponsible, currentPosition, physicalLocation, conciliationTrack);
 }
 
 async function claimantDetails(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.executeClaimantDetails();
 }
 
 async function claimantRepresentative(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.executeClaimantRepresentative();
 }
 
 async function claimantRespondentDetails(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.executeRespondentDetails();
 }
 
 async function respondentRepresentative(I, eventName, myHMCTSFlag) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
+
     await I.executeRespondentRepresentative(myHMCTSFlag);
 }
 
 async function jurisdiction(I, eventName, jurisdictionOutcome) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.executeAddAmendJurisdiction(jurisdictionOutcome);
 }
 
 async function enterDisposalDateJurisdiction(I, hearingDisposalDate) {
-    await I.wait(2);
     await I.enterDisposalDate(hearingDisposalDate);
 }
 
 async function closeCase(I, eventName, clerkResponsible, physicalLocation) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.executeCloseCase(clerkResponsible, physicalLocation);
 }
 
 async function letters(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.executeLettersEvent();
 }
 
 async function restrictedReporting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.setRestrictedReporting();
 }
 
 async function fixCaseAPI(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.executeFixCaseAPI();
 }
 
 async function bfAction(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.executeBFAction();
 }
 
@@ -100,37 +88,31 @@ async function bfActionsOutstanding(I, eventName) {
 
 async function listHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(5);
     await I.executeListHearing(jurisdiction);
 }
 
 async function allocateHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(5);
     await I.executeAllocateHearing(jurisdiction);
 }
 
 async function hearingDetails(I, eventName, caseDisposed) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(5);
     await I.executeHearingDetails(caseDisposed);
 }
 
 async function updateHearingDetails(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     await I.amendHearingDetails();
 }
 
 async function printHearingLists(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.executePrintHearingLists(jurisdiction);
 }
 
 async function caseTransfer(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
     switch (eventName){
         case "Case Transfer (Eng/Wales)":
             await I.executeCaseTransferEngWales();
@@ -148,7 +130,6 @@ async function caseTransfer(I, eventName) {
 
 async function judgment(I, eventName , hearingRequired) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     if (hearingRequired) {
         await I.executeJudgmentForHearingCases();
     } else {
@@ -157,7 +138,6 @@ async function judgment(I, eventName , hearingRequired) {
 }
 
 async function generateReport(I, jurisdiction, caseType, eventName, userName, password) {
-    I.wait(2);
     await I.executeCreateReport(jurisdiction, caseType, eventName);
 }
 
@@ -173,7 +153,6 @@ async function uploadDocumentEvent(I, eventName) {
 
 async function initialConsideration(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.startInitialConsideration();
     await I.initialConsiderationRule26();
     await I.initialConsiderationCheckYourAnswers();
@@ -181,31 +160,26 @@ async function initialConsideration(I, eventName) {
 
 async function et1Serving(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.et1ServingProcess();
 }
 
 async function et3Notification(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.et3NotificationProcess
 }
 
 async function et3ProcessingPage(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.et3Processing();
 }
 
 async function et3Response(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.et3ResponseProcess();
 }
 
 async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
     await I.et1VettingJourney();
 }
 
@@ -225,7 +199,6 @@ async function createLegalRepReferral(emailAddress, details) {
 }
 
 async function clickCreateCase(I) {
-    I.wait(3);
     await I.caseListForCreateCase();
     I.wait(2);
     await I.caseJurisdictionForCreateCase();

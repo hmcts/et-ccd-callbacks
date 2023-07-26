@@ -8,9 +8,7 @@ module.exports = async function (userName, password) {
     I.fillField('username', userName);
     I.fillField('password', password);
     I.wait(3);
-    I.wait(3);
-    I.click('[type="submit"]');
-    I.wait(3);
-    I.refreshPage();
+    I.forceClick('[name="save"]');
+    I.wait(10);
     I.see('Sign out');
 };

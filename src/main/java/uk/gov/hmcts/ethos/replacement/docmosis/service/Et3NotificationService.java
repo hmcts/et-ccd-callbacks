@@ -22,9 +22,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 public class Et3NotificationService {
     public static final String EMAIL_ADDRESS = "emailAddress";
     private final EmailService emailService;
-    @Value("${et3Notification.template.myhmcts.id}")
+    @Value("${template.et3Notification.myhmcts}")
     private String et3MyHmctsTemplateId;
-    @Value("${et3Notification.template.citizen.id}")
+    @Value("${template.et3Notification.citizen}")
     private String et3CitizenTemplateId;
 
     /**

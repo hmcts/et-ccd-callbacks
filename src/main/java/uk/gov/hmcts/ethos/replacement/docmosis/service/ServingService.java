@@ -55,10 +55,10 @@ public class ServingService {
     private static final String SERVING_DOC_7_8 = "7.8";
     private static final String SERVING_DOC_7_8A = "7.8a";
 
-    @Value("${et1Serving.template.id}")
+    @Value("${template.et1Serving.claimant}")
     private String claimantTemplateId;
 
-    @Value("${et1Serving.respondent.template.id}")
+    @Value("${template.et1Serving.respondent}")
     private String respondentTemplateId;
 
     private final EmailService emailService;

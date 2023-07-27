@@ -59,13 +59,13 @@ public class RespondentTellSomethingElseService {
     private final TornadoService tornadoService;
     private final DocumentManagementService documentManagementService;
 
-    @Value("${tse.respondent.application.acknowledgement.template.id}")
+    @Value("${template.tse.respondent.application.respondent}")
     private String tseRespondentAcknowledgeTemplateId;
-    @Value("${tse.respondent.application.acknowledgement.type.c.template.id}")
+    @Value("${template.tse.respondent.application.respondent-type-c}")
     private String tseRespondentAcknowledgeTypeCTemplateId;
-    @Value("${tse.respondent.application.notify.claimant.template.id}")
+    @Value("${template.tse.respondent.application.claimant}")
     private String tseRespondentToClaimantTemplateId;
-    @Value("${tse.respondent.application.tribunal.template.id}")
+    @Value("${template.tse.respondent.application.tribunal}")
     private String tseNewApplicationAdminTemplateId;
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
     private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,

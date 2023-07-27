@@ -20,7 +20,7 @@ public class ReferralService {
     private final UserService userService;
     private final TornadoService tornadoService;
 
-    @Value("${referral.template.id}")
+    @Value("${template.referral}")
     private String referralTemplateId;
 
     /**

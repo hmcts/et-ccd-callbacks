@@ -13,6 +13,8 @@ def secrets = [
         'et-cos-${env}': [
                 secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
                 secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
+                secret('et-ccd-api-user-name', 'ET_CCD_API_USER_NAME'),
+                secret('et-ccd-api-password', 'ET_CCD_API_PASSWORD'),
                 secret('et-caseworker-username', 'ET_CASEWORKER_USER_NAME'),
                 secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
                 secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
@@ -59,6 +61,8 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#et-builds')
 
   afterAlways('test') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/integration/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/integration/index.html'
 
     publishHTML target: [
@@ -69,6 +73,11 @@ withPipeline(type, product, component) {
             reportFiles : "index.html",
             reportName : "Integration test report"
     ]
+  }
+
+  before('smoketest:preview') {
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.TEST_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   }
 
   afterAlways('smoketest:preview') {
@@ -86,6 +95,7 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
 
     publishHTML target: [
             allowMissing : true,
@@ -95,6 +105,11 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET E2E test report"
     ]
+  }
+
+  before('smoketest:aat') {
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.TEST_URL = "https://et-cos-staging.aat.platform.hmcts.net/"
   }
 
   afterAlways('smoketest:aat') {
@@ -112,6 +127,7 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
 
     publishHTML target: [
             allowMissing : true,

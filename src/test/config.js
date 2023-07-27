@@ -11,6 +11,8 @@ module.exports = {
     TestTimeToWaitForText: parseInt(process.env.E2E_TEST_TIME_TO_WAIT_FOR_TEXT || 30),
     TestEnvCWUser: process.env.ET_CCD_CASEWORKER_USER_NAME || '',
     TestEnvCWPassword: process.env.ET_CCD_CASEWORKER_PASSWORD || '',
+    TestEnvApiUser: process.env.ET_CCD_API_USER_NAME || '',
+    TestEnvApiPassword: process.env.ET_CCD_API_PASSWORD || '',
     TestEnvEtCWUser: process.env.ET_CASEWORKER_USER_NAME || '',
     TestEnvEtCWPwd: process.env.ET_CASEWORKER_PASSWORD || '',
     TestEnvEtJudgeUser: process.env.ET_JUDGE_4_USER_NAME || '',

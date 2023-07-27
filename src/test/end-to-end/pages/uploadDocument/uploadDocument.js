@@ -24,6 +24,8 @@ module.exports = async function () {
 
     I.click(commonConfig.submit);
 
+    I.click(commonConfig.submit);
+
     //Wait for Case Details to correctly load
     I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
     I.waitForElement('#case-viewer-control-print', testConfig.TestTimeToWaitForText);
@@ -31,6 +33,7 @@ module.exports = async function () {
 
     //Document Upload Confirmation
     I.click("//div[text()='Documents']");
+
     I.waitForText('Upload Document Check', testConfig.TestTimeToWaitForText);
     I.see('Case documentation 1');
     I.see('Document');

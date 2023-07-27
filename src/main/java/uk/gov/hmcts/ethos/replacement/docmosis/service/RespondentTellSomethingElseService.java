@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
@@ -45,7 +46,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_FILE_NAME;
 
 @Slf4j
 @Service
@@ -56,6 +59,8 @@ public class RespondentTellSomethingElseService {
     private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
     private final NotificationProperties notificationProperties;
+    private final DocumentManagementService documentManagementService;
+
     @Value("${tse.respondent.application.acknowledgement.template.id}")
     private String tseRespondentAcknowledgeTemplateId;
     @Value("${tse.respondent.application.acknowledgement.type.c.template.id}")
@@ -80,7 +85,6 @@ public class RespondentTellSomethingElseService {
             + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
     private static final String CLAIMANT_EMAIL_GROUP_A = "You should respond as soon as possible, and in any "
             + "event by %s.";
-    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
 
     private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String TABLE_COLUMNS_MARKDOWN =
@@ -176,12 +180,10 @@ public class RespondentTellSomethingElseService {
             instructions = String.format(CLAIMANT_EMAIL_GROUP_A, dueDate);
         }
 
-        byte[] bytes;
         try {
-            bytes = tornadoService.generateEventDocumentBytes(caseData, "", RES_TSE_FILE_NAME);
+            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", TSE_FILE_NAME);
             Map<String, Object> personalisation = claimantPersonalisation(caseDetails, instructions, bytes);
-            emailService.sendEmail(tseRespondentToClaimantTemplateId,
-                    claimantEmail, personalisation);
+            emailService.sendEmail(tseRespondentToClaimantTemplateId, claimantEmail, personalisation);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
@@ -287,5 +289,31 @@ public class RespondentTellSomethingElseService {
         personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("url", notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId()));
         return personalisation;
+    }
+
+    /**
+     * Generates and adds a pdf to summarise the respondent's TSE application to the document collection. Sets type
+     * of document to Respondent correspondence and sets the short description to a description of the application
+     * type.
+     *
+     * @param caseData contains all the case data
+     * @param userToken token used for authorisation
+     * @param caseTypeId reference which casetype the document will be uploaded to
+     */
+    public void generateAndAddTsePdf(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            if (isEmpty(caseData.getDocumentCollection())) {
+                caseData.setDocumentCollection(new ArrayList<>());
+            }
+            caseData.getDocumentCollection().add(createDocumentTypeItem(
+                documentManagementService.addDocumentToDocumentField(
+                    tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_FILE_NAME)
+                ),
+                "Respondent correspondence",
+                caseData.getResTseSelectApplication()
+            ));
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 }

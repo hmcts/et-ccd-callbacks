@@ -45,6 +45,8 @@ module.exports = async function () {
     I.fillField('#restrictedReporting_excludedNames', 'Not for Public Release')
 
     I.click(commonConfig.submit);
+    I.wait(2);
+    I.click(commonConfig.submit);
 
     I.waitForText('has been updated with event: Restricted Reporting', testConfig.TestTimeToWaitForText);
     I.see('RULE 50(3)b');

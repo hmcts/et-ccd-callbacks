@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -121,14 +121,15 @@ public class TseService {
 
     private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application) {
         if (application.getDocumentUpload() != null) {
-            DocumentTypeItem documentTypeItem = DocumentTypeItem.fromUploadedDocument(application.getDocumentUpload());
-            documentTypeItem.getValue().setTypeOfDocument("Respondent correspondence");
-            documentTypeItem.getValue().setShortDescription("Application supporting material");
-
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
-            caseData.getDocumentCollection().add(documentTypeItem);
+
+            caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItem(
+                application.getDocumentUpload(),
+                "Respondent correspondence",
+                application.getType()
+            ));
         }
     }
 
@@ -187,9 +188,10 @@ public class TseService {
      * Builds a two column Markdown table with both application details and all responses.
      * @param caseData parent object for all case data
      * @param authToken user token for getting document metadata
+     * @param isRespondentView is respondent or their representatives viewing this application
      * @return two column Markdown table string
      */
-    public String formatViewApplication(CaseData caseData, String authToken) {
+    public String formatViewApplication(CaseData caseData, String authToken, boolean isRespondentView) {
         GenericTseApplicationType application;
         if (caseData.getTseAdminSelectApplication() != null) {
             application = TseHelper.getAdminSelectedApplicationType(caseData);
@@ -200,7 +202,7 @@ public class TseService {
         }
 
         String applicationTable = formatApplicationDetails(application, authToken, true);
-        String responses = formatApplicationResponses(application, authToken, false);
+        String responses = formatApplicationResponses(application, authToken, isRespondentView);
         String decisions = formatApplicationDecisions(application, authToken);
         return applicationTable + "\r\n" + responses + "\r\n" +  decisions;
     }

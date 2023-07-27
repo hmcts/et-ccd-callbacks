@@ -219,11 +219,14 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void clearRespondentTypeFields(RespondentSumTypeItem respondentSumTypeItem) {
-        if (respondentSumTypeItem.getValue().getRespondentType().equals(ORGANISATION)) {
-            respondentSumTypeItem.getValue().setRespondentFirstName("");
-            respondentSumTypeItem.getValue().setRespondentLastName("");
-        } else {
-            respondentSumTypeItem.getValue().setRespondentOrganisation("");
+        RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+        if (respondentSumType != null && respondentSumType.getRespondentType() != null) {
+            if (respondentSumType.getRespondentType().equals(ORGANISATION)) {
+                respondentSumType.setRespondentFirstName("");
+                respondentSumType.setRespondentLastName("");
+            } else {
+                respondentSumType.setRespondentOrganisation("");
+            }
         }
     }
 

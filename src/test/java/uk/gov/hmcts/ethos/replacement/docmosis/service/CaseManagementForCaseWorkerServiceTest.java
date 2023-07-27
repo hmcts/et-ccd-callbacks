@@ -79,6 +79,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -100,6 +101,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest ccdRequest14;
     private CCDRequest ccdRequest15;
     private CCDRequest ccdRequest21;
+    private CCDRequest ccdRequest22;
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
@@ -160,6 +162,10 @@ class CaseManagementForCaseWorkerServiceTest {
         ccdRequest21 = new CCDRequest();
         CaseDetails caseDetails21 = generateCaseDetails("caseDetailsTest21.json");
         ccdRequest21.setCaseDetails(caseDetails21);
+
+        ccdRequest22 = new CCDRequest();
+        CaseDetails caseDetails22 = generateCaseDetails("caseDetailsTest22.json");
+        ccdRequest22.setCaseDetails(caseDetails22);
 
         manchesterCcdRequest = new CCDRequest();
         CaseData caseData = new CaseData();
@@ -248,6 +254,19 @@ class CaseManagementForCaseWorkerServiceTest {
             assertEquals("", respondentSumTypeItem.getValue().getResponseRespondentAddress().getCounty());
             assertEquals("", respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostCode());
             assertEquals("", respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown());
+        }
+    }
+
+    @Test void caseDataDefaultsClearRespondentTypeFields() {
+        CaseData caseData = ccdRequest22.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+            if (respondentSumTypeItem.getValue().getRespondentType().equals(ORGANISATION)) {
+                assertEquals("", respondentSumTypeItem.getValue().getRespondentFirstName());
+                assertEquals("", respondentSumTypeItem.getValue().getRespondentLastName());
+            } else {
+                assertEquals("", respondentSumTypeItem.getValue().getRespondentOrganisation());
+            }
         }
     }
 

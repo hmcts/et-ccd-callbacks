@@ -29,8 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @Service
 public class CaseFlagsService {
-
-    public static final String GRANTED = "Granted";
+    private static final String GRANTED = "Granted";
 
     /**
      * Setup case flags for Claimant, Respondent and Case level.

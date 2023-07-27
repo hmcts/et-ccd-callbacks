@@ -38,10 +38,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class CaseFlagsServiceTest {
-    public static final String CLAIMANT_NAME = "Claimant Name";
-    public static final String RESPONDENT_NAME = "Respondent Name";
-    public static final String GRANTED = "Granted";
-    public static final String REFUSED = "Refused";
+    private static final String CLAIMANT_NAME = "Claimant Name";
+    private static final String RESPONDENT_NAME = "Respondent Name";
+    private static final String GRANTED = "Granted";
+    private static final String REFUSED = "Refused";
+
     private CaseFlagsService caseFlagsService;
     private CaseData caseData;
 

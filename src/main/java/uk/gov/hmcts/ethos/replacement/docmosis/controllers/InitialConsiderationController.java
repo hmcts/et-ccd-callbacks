@@ -36,12 +36,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 @RestController
 public class InitialConsiderationController {
-
     private final VerifyTokenService verifyTokenService;
     private final InitialConsiderationService initialConsiderationService;
     private final DocumentManagementService documentManagementService;
     private final ReportDataService reportDataService;
     private final CaseFlagsService caseFlagsService;
+
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
 

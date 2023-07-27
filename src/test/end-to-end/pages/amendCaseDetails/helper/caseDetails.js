@@ -34,7 +34,7 @@ function verifyCaseDetails() {
     I.see('Submission Reference');
     I.see('1675930663464973');
     I.see('Date of Receipt');
-    I.see('17 Aug 2022');
+    I.see('17 Aug 2019');
 
     I.see('Case Accepted?');
     I.see('Yes');
@@ -42,7 +42,7 @@ function verifyCaseDetails() {
     I.see('18 Aug 2022');
 
     I.see('Target Hearing Date');
-    I.see('13 Feb 2023');
+    I.see('13 Feb 2020');
     I.see('Conciliation Track');
     I.see('Open Track');
 

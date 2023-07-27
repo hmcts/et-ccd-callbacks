@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions;
 /**
  * Is thrown when email service failed to send email.
  */
-@SuppressWarnings({"PMD.MissingSerialVersionUID"})
 public class EmailServiceException extends RuntimeException {
     /**
      * Creates a {@link EmailServiceException} with a message and a cause.

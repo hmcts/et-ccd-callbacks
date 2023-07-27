@@ -53,10 +53,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesSer
 
 @Slf4j
 @Service("caseManagementForCaseWorkerService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.TooManyMethods",
-    "PMD.UnnecessaryFullyQualifiedName", "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.ExcessiveImports",
-    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.ImplicitSwitchFallThrough",
-    "PMD.LawOfDemeter", "PMD.PreserveStackTrace", "PMD.CyclomaticComplexity"})
 public class CaseManagementForCaseWorkerService {
 
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -386,6 +382,7 @@ public class CaseManagementForCaseWorkerService {
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
                                 String.valueOf(submitEvent.getCaseId()));
+                        break;
                 }
             }
         } else {

@@ -27,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class AcasController {
     private final VerifyTokenService verifyTokenService;
 
@@ -38,7 +37,7 @@ public class AcasController {
      * @param dateTime used for querying when a case was last updated
      * @return a list of case ids
      */
-    @GetMapping(value = "/getLastModifiedCaseList")
+    @GetMapping("/getLastModifiedCaseList")
     @Operation(summary = "Return a list of CCD case IDs from a provided date")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
@@ -46,7 +45,7 @@ public class AcasController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<Object> getLastModifiedCaseList(
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestParam(name = "datetime")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -69,7 +68,7 @@ public class AcasController {
      * @param caseIds list of case IDs to find
      * @return a list of cases in JSON format
      */
-    @GetMapping(value = "/getCaseData")
+    @GetMapping("/getCaseData")
     @Operation(summary = "Return case data from a list of provided IDs")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
@@ -77,7 +76,7 @@ public class AcasController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<Object> getCaseData(
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestParam(name = "caseIds") List<String> caseIds) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

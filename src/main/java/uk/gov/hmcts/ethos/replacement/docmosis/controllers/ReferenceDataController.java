@@ -25,7 +25,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ReferenceDataController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
@@ -45,7 +44,7 @@ public class ReferenceDataController {
     })
     public ResponseEntity<CCDCallbackResponse> hearingVenueReferenceData(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("HEARING VENUE REFERENCE DATA ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -70,7 +69,7 @@ public class ReferenceDataController {
     })
     public ResponseEntity<CCDCallbackResponse> dateListedReferenceData(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("DATE LISTED REFERENCE DATA ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

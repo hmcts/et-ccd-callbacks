@@ -1,26 +1,29 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 
 import java.text.DecimalFormat;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
-@SuppressWarnings({"PMD.ConsecutiveAppendsShouldReuse", "PMD.ConsecutiveLiteralAppends"})
-public class MemberDaysReportDocTest {
+@ExtendWith(SpringExtension.class)
+class MemberDaysReportDocTest {
 
     MemberDaysReportDoc memberDaysReportDoc;
     MemberDaysReportData listingData;
     MemberDaysReport memberDaysReport;
     MemberDaysReportDetail detailItem;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         memberDaysReport = new MemberDaysReport();
         detailItem = new MemberDaysReportDetail();
@@ -28,14 +31,16 @@ public class MemberDaysReportDocTest {
         memberDaysReportDoc = new MemberDaysReportDoc();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowException() {
+    @Test
+    void shouldThrowException() {
         ListingData nonMemberDaysReportDocListingData = new ListingData();
-        memberDaysReportDoc.getReportDocPart(nonMemberDaysReportDocListingData);
+        assertThrows(IllegalStateException.class, () ->
+                memberDaysReportDoc.getReportDocPart(nonMemberDaysReportDocListingData)
+        );
     }
 
     @Test
-    public void shouldReturnCorrectReportPartialWithDetails() {
+    void shouldReturnCorrectReportPartialWithDetails() {
 
         detailItem = new MemberDaysReportDetail();
         detailItem.setHearingDate("15 September 2021");
@@ -85,7 +90,7 @@ public class MemberDaysReportDocTest {
     }
 
     @Test
-    public void shouldReturnCorrectReportPartialWithSummary() {
+    void shouldReturnCorrectReportPartialWithSummary() {
 
         detailItem = new MemberDaysReportDetail();
         detailItem.setHearingDate("15 September 2021");
@@ -149,7 +154,7 @@ public class MemberDaysReportDocTest {
     }
 
     @Test
-    public void shouldReturnCorrectReportPartialWithSummaryHeader() {
+    void shouldReturnCorrectReportPartialWithSummaryHeader() {
         detailItem = new MemberDaysReportDetail();
         detailItem.setHearingDate("15 September 2021");
         detailItem.setEmployeeMember("EE Member");

@@ -22,7 +22,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ConfusingTernary"})
 public final class DynamicListHelper {
 
     /** Format for the label property of a Hearing DynamicList item. */

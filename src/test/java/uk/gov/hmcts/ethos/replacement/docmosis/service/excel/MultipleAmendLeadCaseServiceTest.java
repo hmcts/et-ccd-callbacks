@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
@@ -14,15 +14,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_IS_NOT_IN_MULTIPLE_ERROR;
 
-@SuppressWarnings({"PMD.LooseCoupling"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleAmendLeadCaseServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleAmendLeadCaseServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -33,7 +32,7 @@ public class MultipleAmendLeadCaseServiceTest {
     private MultipleDetails multipleDetails;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
         multipleDetails = new MultipleDetails();
@@ -42,7 +41,7 @@ public class MultipleAmendLeadCaseServiceTest {
     }
 
     @Test
-    public void bulkAmendLeadCaseLogicDoesNotExist() {
+    void bulkAmendLeadCaseLogicDoesNotExist() {
         List<String> errors = new ArrayList<>();
         multipleDetails.getCaseData().setAmendLeadCase("245020/2020");
         multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(userToken,
@@ -54,7 +53,7 @@ public class MultipleAmendLeadCaseServiceTest {
     }
 
     @Test
-    public void bulkAmendLeadCaseLogicDifferentLead() {
+    void bulkAmendLeadCaseLogicDifferentLead() {
         String amendLeadCase = "245000/2020";
         multipleDetails.getCaseData().setAmendLeadCase(amendLeadCase);
         multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(userToken,

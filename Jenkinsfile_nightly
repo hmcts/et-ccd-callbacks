@@ -67,6 +67,7 @@ withNightlyPipeline(type, product, component) {
 
     afterAlways('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
 
         publishHTML target: [
                 allowMissing : true,

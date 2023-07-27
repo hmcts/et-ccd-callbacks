@@ -28,8 +28,8 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     private static final String RESPONDENT_ET3_POSTCODE_HEADER = "Respondent ET3 Postcode";
     private final ExcelCreationService excelCreationService;
     private static final List<String> HEADERS = new ArrayList<>(List.of(
-        CASE_NUMBER_HEADER, DATE_OF_RECEIPT_HEADER, CLAIMANT_POSTCODE_HEADER,
-        CLAIMANT_WORK_POSTCODE_HEADER, RESPONDENT_POSTCODE_HEADER, RESPONDENT_ET3_POSTCODE_HEADER));
+            CASE_NUMBER_HEADER, DATE_OF_RECEIPT_HEADER, CLAIMANT_POSTCODE_HEADER,
+            CLAIMANT_WORK_POSTCODE_HEADER, RESPONDENT_POSTCODE_HEADER, RESPONDENT_ET3_POSTCODE_HEADER));
 
     public byte[] getReportExcelFile(ClaimsByHearingVenueReportData reportData) {
         if (reportData == null) {

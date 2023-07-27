@@ -54,6 +54,7 @@ public class ReportDataService {
     private final ListingService listingService;
     private final JudgeService judgeService;
     private final UserService userService;
+
     private static final String REPORT_DATA_GENERATION_FAILED_ERROR = "Failed to generate report data for case id : ";
 
     public ListingData generateReportData(ListingDetails listingDetails, String authToken) {

@@ -21,11 +21,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-@SpringBootTest(classes = {
-    VenueAddressesService.class,
-})
-@EnableConfigurationProperties({VenueAddressesConfiguration.class})
-@SuppressWarnings({"PMD.UseShortArrayInitializer"})
+@SpringBootTest(classes = { VenueAddressesService.class })
+@EnableConfigurationProperties({ VenueAddressesConfiguration.class })
 public class VenueAddressesServiceTest {
 
     @ClassRule
@@ -39,12 +36,12 @@ public class VenueAddressesServiceTest {
     private static final Object[][] TEST_CASES = new Object[][] {
             { TribunalOffice.BRISTOL.getOfficeName(), "Barnstaple" },
             { TribunalOffice.MANCHESTER.getOfficeName(), "Barrow Magistrates Court, "
-                    + "Abbey Road, Barrow in Furness, Cumbria, LA14 5QX"},
-            { TribunalOffice.WALES.getOfficeName(), "Abergele"},
+                    + "Abbey Road, Barrow in Furness, Cumbria, LA14 5QX" },
+            { TribunalOffice.WALES.getOfficeName(), "Abergele" },
             { TribunalOffice.GLASGOW.getOfficeName(), "Campbeltown HC, Sheriff Court House, "
                     + "Castle Hill, Campbeltown, PA28 6AN" },
             { TribunalOffice.ABERDEEN.getOfficeName(), "Ground Floor,"
-                    + " AB1, 48 Huntly Street, Aberdeen, AB10 1SH"},
+                    + " AB1, 48 Huntly Street, Aberdeen, AB10 1SH" },
             { TribunalOffice.DUNDEE.getOfficeName(), "Ground Floor, "
                     + "Block C, Caledonian House, Greenmarket, Dundee, DD1 4QG" },
             { TribunalOffice.EDINBURGH.getOfficeName(), "54-56 Melville Street, Edinburgh, EH3 7HF" },

@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeS
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.SAVE_ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class JudgeServiceTest {
     private JudgeRepository judgeRepository;
     private static final String TEST_CODE = "testCode";

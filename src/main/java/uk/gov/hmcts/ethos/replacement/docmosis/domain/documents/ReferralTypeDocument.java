@@ -9,7 +9,6 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @Data
-@SuppressWarnings({"PMD.LinguisticNaming", "PMD.TooManyFields"})
 public class ReferralTypeDocument {
     @JsonProperty("accessKey")
     private String accessKey;

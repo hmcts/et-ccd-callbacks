@@ -10,7 +10,6 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ConfusingTernary"})
 public final class DynamicRestrictedReporting {
     private DynamicRestrictedReporting() {
     }

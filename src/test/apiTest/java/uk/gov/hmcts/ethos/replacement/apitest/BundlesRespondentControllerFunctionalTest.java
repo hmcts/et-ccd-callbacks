@@ -7,9 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 class BundlesRespondentControllerFunctionalTest extends BaseFunctionalTest {
@@ -24,6 +28,11 @@ class BundlesRespondentControllerFunctionalTest extends BaseFunctionalTest {
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(CaseDataBuilder.builder().build())
             .build();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setBundlesRespondentAgreedDocWith(YES);
+        caseData.setBundlesRespondentSelectHearing(DynamicFixedListType.from("hearing 1", "1", true));
+        caseData.setBundlesRespondentWhatDocuments(YES);
+        caseData.setBundlesRespondentWhoseDocuments(YES);
     }
 
     @Test

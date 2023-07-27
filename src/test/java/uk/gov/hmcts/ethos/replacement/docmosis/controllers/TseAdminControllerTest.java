@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmCloseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -26,7 +27,9 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,6 +57,8 @@ class TseAdminControllerTest {
     private TseAdminService tseAdminService;
     @MockBean
     private TseAdmCloseService tseAdmCloseService;
+    @MockBean
+    private CaseFlagsService caseFlagsService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -174,6 +179,7 @@ class TseAdminControllerTest {
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService).clearTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
+        verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
     }
 
     @Test

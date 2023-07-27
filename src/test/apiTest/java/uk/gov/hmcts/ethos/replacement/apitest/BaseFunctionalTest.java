@@ -33,6 +33,8 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public abstract class BaseFunctionalTest {
+    static final String AUTHORIZATION = "Authorization";
+
     protected String userToken;
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;

@@ -631,6 +631,7 @@ public class CaseActionsForCaseWorkerController {
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         eventValidationService.validateRestrictedReportingNames(caseData);
         caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+        caseFlagsService.setPrivateHearingFlag(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

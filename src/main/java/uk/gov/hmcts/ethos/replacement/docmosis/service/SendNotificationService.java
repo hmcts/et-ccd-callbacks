@@ -246,9 +246,6 @@ public class SendNotificationService {
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {
-        return Map.of(
-                CASE_NUMBER, caseDetails.getCaseData().getEthosCaseReference(),
-            "environmentUrl", envUrl
-        );
+        return Map.of(CASE_NUMBER, caseDetails.getCaseData().getEthosCaseReference(), "environmentUrl", envUrl);
     }
 }

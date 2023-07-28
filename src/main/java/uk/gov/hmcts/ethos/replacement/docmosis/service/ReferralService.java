@@ -40,11 +40,12 @@ public class ReferralService {
     }
 
     public void sendEmail(CaseDetails caseDetails, String referralNumber, boolean isNew, String userToken) {
+        CaseData caseData = caseDetails.getCaseData();
         emailService.sendEmail(
             referralTemplateId,
-            caseDetails.getCaseData().getReferentEmail(),
+            caseData.getReferentEmail(),
             ReferralHelper.buildPersonalisation(
-                caseDetails,
+                caseData,
                 referralNumber,
                 isNew,
                 userService.getUserDetails(userToken).getName(),

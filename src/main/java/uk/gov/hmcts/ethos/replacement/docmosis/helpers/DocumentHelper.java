@@ -94,32 +94,25 @@ public final class DocumentHelper {
                 .append(getCourtData(caseData, allocatedCourtAddress));
         }
 
-        sb.append("\"i").append(getEWSectionName(correspondenceType)
-            .replace(".", "_"))
+        sb.append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
             .append("_enhmcts\":\"[userImage:enhmcts.png]").append(NEW_LINE)
-            .append("\"i").append(getEWSectionName(correspondenceType)
-            .replace(".", "_"))
+            .append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
             .append("_enhmcts1\":\"[userImage:enhmcts.png]").append(NEW_LINE)
-            .append("\"i").append(getEWSectionName(correspondenceType)
-            .replace(".", "_"))
+            .append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
             .append("_enhmcts2\":\"[userImage:enhmcts.png]").append(NEW_LINE)
-            .append("\"iScot").append(getScotSectionName(correspondenceScotType)
-            .replace(".", "_"))
-            .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE)
-            .append("\"iScot").append(getScotSectionName(correspondenceScotType)
-            .replace(".", "_"))
+            .append("\"iScot").append(getScotSectionName(correspondenceScotType).replace(".", "_"))
+            .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE).append("\"iScot")
+            .append(getScotSectionName(correspondenceScotType).replace(".", "_"))
             .append("_schmcts1\":\"[userImage:schmcts.png]").append(NEW_LINE)
-            .append("\"iScot").append(getScotSectionName(correspondenceScotType)
-            .replace(".", "_"))
+            .append("\"iScot").append(getScotSectionName(correspondenceScotType).replace(".", "_"))
             .append("_schmcts2\":\"[userImage:schmcts.png]").append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
         sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE)
-                .append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE)
-                .append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
-                .append(NEW_LINE)
-                .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
-                .append("}\n}\n");
+            .append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE)
+            .append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
+            .append(NEW_LINE).append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference()))
+            .append(NEW_LINE).append("}\n}\n");
 
         return sb;
     }

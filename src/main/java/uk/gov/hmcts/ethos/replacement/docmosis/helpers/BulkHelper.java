@@ -405,8 +405,7 @@ public final class BulkHelper {
     }
 
     private static StringBuilder getMultipleTypeRow(SearchType searchType) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"Claimant\":\"").append(
+        return new StringBuilder().append("{\"Claimant\":\"").append(
             nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
             .append("\"Current_position\":\"").append(nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE)
             .append("\"Case_No\":\"").append(nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE)
@@ -418,7 +417,6 @@ public final class BulkHelper {
             .append("\"respondent_addressLine1\":\"").append(nullCheck(searchType.getRespondentAddressLine1S()))
             .append(NEW_LINE).append("\"respondent_postCode\":\"")
             .append(nullCheck(searchType.getRespondentPostCodeS())).append("\"}");
-        return sb;
     }
 
     private static StringBuilder getScheduleBySubMultipleData(BulkData bulkData) {

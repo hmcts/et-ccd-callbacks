@@ -18,9 +18,10 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.UK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 
 @Slf4j
-@SuppressWarnings({"PMD.AvoidCatchingNPE"})
 public final class NocNotificationHelper {
 
     public static final String UNKNOWN = "Unknown";
@@ -106,7 +107,7 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());
 
@@ -114,7 +115,7 @@ public final class NocNotificationHelper {
     }
 
     private static void addCommonValues(CaseData caseData, Map<String, String> personalisation) {
-        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put("list_of_respondents", getListOfRespondents(caseData));
         personalisation.put("case_number", caseData.getEthosCaseReference());
     }

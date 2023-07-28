@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
@@ -30,9 +30,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LawOfDemeter"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class SingleCasesReadingServiceTest {
+@ExtendWith(SpringExtension.class)
+class SingleCasesReadingServiceTest {
 
     @Mock
     private CcdClient ccdClient;
@@ -45,7 +44,7 @@ public class SingleCasesReadingServiceTest {
     private HashSet<SchedulePayloadEvent> schedulePayloadEvents;
     private List<LabelPayloadEvent> labelPayloadEvents;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -57,7 +56,7 @@ public class SingleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveSingleCase() throws IOException {
+    void retrieveSingleCase() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchForCreation(userToken,
                 multipleDetails.getCaseTypeId(),
                 new ArrayList<>(Collections.singletonList("240001/2020")),
@@ -75,7 +74,7 @@ public class SingleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveSingleCaseException() throws IOException {
+    void retrieveSingleCaseException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchForCreation(anyString(),
                 anyString(),
                 anyList(),
@@ -89,7 +88,7 @@ public class SingleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveScheduleCases() throws IOException {
+    void retrieveScheduleCases() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchSchedule(userToken,
                 multipleDetails.getCaseTypeId(),
                 new ArrayList<>(Collections.singletonList("240001/2020"))))
@@ -104,7 +103,7 @@ public class SingleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveScheduleCasesException() throws IOException {
+    void retrieveScheduleCasesException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchSchedule(anyString(),
                 anyString(),
                 anyList()))
@@ -117,7 +116,7 @@ public class SingleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveLabelCases() throws IOException {
+    void retrieveLabelCases() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchLabels(userToken,
                 multipleDetails.getCaseTypeId(),
                 new ArrayList<>(Collections.singletonList("240001/2020"))))
@@ -132,7 +131,7 @@ public class SingleCasesReadingServiceTest {
     }
 
     @Test
-    public void retrieveLabelCasesException() throws IOException {
+    void retrieveLabelCasesException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchLabels(anyString(),
                 anyString(),
                 anyList()))

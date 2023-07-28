@@ -14,7 +14,6 @@ import java.util.Comparator;
 import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
 public final class ClaimsByHearingVenueReport {
     private static final String NULL_STRING_VALUE = "Null";
     private final ClaimsByHearingVenueReportDataSource dataSource;

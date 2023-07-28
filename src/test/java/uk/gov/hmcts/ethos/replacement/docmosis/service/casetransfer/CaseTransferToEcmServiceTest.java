@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService.NO_CASES_FOUND;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
 @ExtendWith(SpringExtension.class)
 class CaseTransferToEcmServiceTest {
 

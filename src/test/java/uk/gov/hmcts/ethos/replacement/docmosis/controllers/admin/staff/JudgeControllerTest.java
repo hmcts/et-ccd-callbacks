@@ -35,7 +35,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeS
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({JudgeController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class JudgeControllerTest {
 
     private static final String INIT_ADD_JUDGE_URL = "/admin/staff/initAddJudge";
@@ -77,9 +76,9 @@ class JudgeControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1)).initAddJudge(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -102,9 +101,9 @@ class JudgeControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1)).saveJudge(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -150,9 +149,9 @@ class JudgeControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1))
                 .updateJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -177,9 +176,9 @@ class JudgeControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1))
                 .updateJudgeMidEventSelectJudge(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -204,9 +203,9 @@ class JudgeControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1)).updateJudge(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -229,9 +228,9 @@ class JudgeControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()))
-            .andExpect(jsonPath("$.errors", hasSize(0)));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
         verify(judgeService, times(1)).deleteJudge(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -254,9 +253,9 @@ class JudgeControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", hasSize(0)))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1))
             .deleteJudgeMidEventSelectJudge(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -280,9 +279,9 @@ class JudgeControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", hasSize(0)))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(judgeService, times(1))
             .deleteJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }

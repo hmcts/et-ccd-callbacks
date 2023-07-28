@@ -29,7 +29,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("multipleBatchUpdate3Service")
-@SuppressWarnings({"PMD.UselessParentheses", "PMD.PreserveStackTrace"})
 public class MultipleBatchUpdate3Service {
 
     private final MultipleHelperService multipleHelperService;

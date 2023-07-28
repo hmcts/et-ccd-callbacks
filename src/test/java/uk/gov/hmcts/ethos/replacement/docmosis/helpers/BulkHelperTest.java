@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -28,15 +30,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.PENDING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UseProperClassLoader",
-    "PMD.LinguisticNaming", "PMD.ExcessiveImports"})
-public class BulkHelperTest {
+@ExtendWith(SpringExtension.class)
+class BulkHelperTest {
 
     private List<SubmitEvent> submitEvents;
     private MultipleType multipleType;
@@ -51,7 +52,7 @@ public class BulkHelperTest {
         return mapper.readValue(json, BulkDetails.class);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         bulkDetailsListCases = generateBulkDetails("bulkDetailsTest1.json");
         bulkDetailsScheduleDetailed = generateBulkDetails("bulkDetailsTest2.json");
@@ -92,7 +93,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getMultipleTypeListBySubmitEventList() {
+    void getMultipleTypeListBySubmitEventList() {
         String result = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222,"
                 + " leadClaimantM=No, multipleReferenceM=1234, " + "clerkRespM=JuanFran, claimantSurnameM=Mike, "
                 + "respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , fileLocM=Manchester, "
@@ -112,7 +113,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getMultipleTypeListBySubmitEventListWithStates() {
+    void getMultipleTypeListBySubmitEventListWithStates() {
         submitEvents.get(0).setState(SUBMITTED_STATE);
         submitEvents.get(1).setState(PENDING_STATE);
         String result = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, "
@@ -136,14 +137,14 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getMultipleTypeListEmptyBySubmitEventList() {
+    void getMultipleTypeListEmptyBySubmitEventList() {
         String result = "[]";
         assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(
                 new ArrayList<>(), "1234").toString());
     }
 
     @Test
-    public void getSearchTypeFromMultipleType() {
+    void getSearchTypeFromMultipleType() {
         SearchType searchType = new SearchType();
         searchType.setClaimantSurnameS("Mike");
         searchType.setFileLocS("Manchester");
@@ -164,7 +165,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getMultipleTypeFromSubmitEvent() {
+    void getMultipleTypeFromSubmitEvent() {
         String result = "MultipleType(caseIDM=0, ethosCaseReferenceM= , leadClaimantM=No, "
                 + "multipleReferenceM= , clerkRespM= , claimantSurnameM=Mike,"
                 + " respondentSurnameM=Juan Pedro, claimantRepM= , respondentRepM= , fileLocM=Manchester, "
@@ -218,7 +219,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void containsAllJurCodes() {
+    void containsAllJurCodes() {
         List<JurCodesTypeItem> jurCodesTypeItemsInput = getJurCodesTypeItems("A", "B", "C");
         List<JurCodesTypeItem> jurCodesTypeItems2 = getJurCodesTypeItems("A", "B", "C");
         assertTrue(BulkHelper.containsAllJurCodes(jurCodesTypeItemsInput, jurCodesTypeItems2));
@@ -232,7 +233,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getJurCodesListFromString() {
+    void getJurCodesListFromString() {
         List<JurCodesTypeItem> jurCodesTypeItems1 = getJurCodesTypeItems("A", "B", "C");
         List<JurCodesTypeItem> jurCodesTypeItems2 = getJurCodesTypeItems("A", "B", "C");
         String jurCodes = BulkHelper.getJurCodesCollection(jurCodesTypeItems2);
@@ -255,7 +256,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getJurCodesCollectionWithHide_ListFromString() {
+    void getJurCodesCollectionWithHide_ListFromString() {
         List<JurCodesTypeItem> jurCodesTypeItems1 = getJurCodesTypeItems("A", "B", "C");
         List<JurCodesTypeItem> jurCodesTypeItems2 = getJurCodesTypeItems("A", "B", "C");
         String jurCodes = BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems2);
@@ -281,7 +282,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getJurCodesCollectionWithHide_AllJurCodesAreFiltered_ReturnsEmptyString() {
+    void getJurCodesCollectionWithHide_AllJurCodesAreFiltered_ReturnsEmptyString() {
         JurCodesTypeItem jurCodesTypeItem1 = getJurCodesWithOutcome(
                 "A", "Acas conciliated settlement");
         JurCodesTypeItem jurCodesTypeItem2 = getJurCodesWithOutcome(
@@ -294,7 +295,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getJurCodesCollectionWithHide_NoJurCodeFiltered_ReturnsAllOutputs() {
+    void getJurCodesCollectionWithHide_NoJurCodeFiltered_ReturnsAllOutputs() {
         JurCodesTypeItem jurCodesTypeItem1 = getJurCodesWithOutcome(
                 "A", "Successful at hearing");
         JurCodesTypeItem jurCodesTypeItem2 = getJurCodesWithOutcome(
@@ -307,7 +308,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void getJurCodesCollectionWithHide_PartJurCodesFiltered_ReturnsSomeOutputs() {
+    void getJurCodesCollectionWithHide_PartJurCodesFiltered_ReturnsSomeOutputs() {
         JurCodesTypeItem jurCodesTypeItem1 = getJurCodesWithOutcome(
                 "A", "Acas conciliated settlement");
         JurCodesTypeItem jurCodesTypeItem2 = getJurCodesWithOutcome(
@@ -320,7 +321,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void buildScheduleDocumentContentListCases() {
+    void buildScheduleDocumentContentListCases() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SUM-ENG-00220.docx\",\n"
@@ -372,7 +373,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void buildScheduleDocumentContentMultipleScheduleDetailed() {
+    void buildScheduleDocumentContentMultipleScheduleDetailed() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SUM-ENG-00222.docx\",\n"
@@ -424,7 +425,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void calculateLeadCase() {
+    void calculateLeadCase() {
         List<SubmitEvent> submitEventList = new ArrayList<>(Arrays.asList(createSubmitEvent("1"),
                 createSubmitEvent("2"),
                 createSubmitEvent("3"),
@@ -437,7 +438,7 @@ public class BulkHelperTest {
     }
 
     @Test
-    public void calculateLeadCase2() {
+    void calculateLeadCase2() {
         List<SubmitEvent> submitEventList = new ArrayList<>(Arrays.asList(createSubmitEvent("1"),
                 createSubmitEvent("2"),
                 createSubmitEvent("3"),

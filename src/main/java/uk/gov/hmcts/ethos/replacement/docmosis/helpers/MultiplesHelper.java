@@ -39,8 +39,6 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_6;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.GodClass", "PMD.TooManyMethods", "PMD.UseIndexOfChar",
-    "PMD.ExcessiveImports"})
 public final class MultiplesHelper {
 
     public static final List<String> HEADERS = new ArrayList<>(Arrays.asList(

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
@@ -11,19 +13,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("PMD.LawOfDemeter")
-public class NoPositionChangeCcdDataSourceTests {
+@ExtendWith(SpringExtension.class)
+class NoPositionChangeCcdDataSourceTests {
 
     @Test
-    public void shouldReturnSearchResults() throws IOException {
+    void shouldReturnSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -42,7 +44,7 @@ public class NoPositionChangeCcdDataSourceTests {
     }
 
     @Test
-    public void shouldReturnEmptyListForNullSearchResults() throws IOException {
+    void shouldReturnEmptyListForNullSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -58,8 +60,8 @@ public class NoPositionChangeCcdDataSourceTests {
         assertEquals(0, results.size());
     }
 
-    @Test(expected = ReportException.class)
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    @Test
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -69,12 +71,14 @@ public class NoPositionChangeCcdDataSourceTests {
                 .thenThrow(new IOException());
 
         NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
-        fail("Should throw exception instead");
+
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice)
+        );
     }
 
     @Test
-    public void shouldReturnMultipleSearchResults() throws IOException {
+    void shouldReturnMultipleSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);
@@ -90,7 +94,7 @@ public class NoPositionChangeCcdDataSourceTests {
     }
 
     @Test
-    public void shouldReturnEmptyListForNullMultipleSearchResults() throws IOException {
+    void shouldReturnEmptyListForNullMultipleSearchResults() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);
@@ -104,8 +108,8 @@ public class NoPositionChangeCcdDataSourceTests {
         assertEquals(0, results.size());
     }
 
-    @Test(expected = ReportException.class)
-    public void shouldThrowReportExceptionWhenMultipleSearchFails() throws IOException {
+    @Test
+    void shouldThrowReportExceptionWhenMultipleSearchFails() throws IOException {
         String authToken = "A test token";
         String caseTypeId = "A test case type";
         CcdClient ccdClient = mock(CcdClient.class);
@@ -113,7 +117,9 @@ public class NoPositionChangeCcdDataSourceTests {
                 .thenThrow(new IOException());
 
         NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>());
-        fail("Should throw exception instead");
+
+        assertThrows(ReportException.class, () ->
+                ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>())
+        );
     }
 }

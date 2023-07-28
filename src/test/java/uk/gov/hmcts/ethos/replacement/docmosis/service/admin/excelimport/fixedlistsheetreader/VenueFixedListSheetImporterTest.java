@@ -44,7 +44,6 @@ class VenueFixedListSheetImporterTest {
     @MockBean
     private RoomRepository roomRepository;
 
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     @Autowired
     private FixedListMappings fixedListMappings;
 
@@ -61,7 +60,6 @@ class VenueFixedListSheetImporterTest {
         workbook.close();
     }
 
-    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource
     void testImportSheet(TribunalOffice tribunalOffice, String sheetName, int expectedVenues, int expectedRooms) {

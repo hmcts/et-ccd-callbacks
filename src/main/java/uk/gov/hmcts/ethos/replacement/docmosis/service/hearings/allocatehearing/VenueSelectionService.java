@@ -17,7 +17,6 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
 public class VenueSelectionService {
     private final VenueService venueService;
 

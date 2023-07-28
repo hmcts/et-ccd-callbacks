@@ -15,7 +15,6 @@ import java.util.List;
 
 @Service
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary"})
 public class JudgeService {
 
     private final JudgeRepository judgeRepository;

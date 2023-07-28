@@ -34,7 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class InitialConsiderationController {
 
     private final VerifyTokenService verifyTokenService;
@@ -51,7 +50,7 @@ public class InitialConsiderationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                            @RequestHeader(value = "Authorization")
+                                                                            @RequestHeader("Authorization")
                                                                                 String userToken) {
         log.info("Initial consideration complete requested for case reference ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
@@ -79,7 +78,7 @@ public class InitialConsiderationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> submitInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                          @RequestHeader(value = "Authorization")
+                                                                          @RequestHeader("Authorization")
                                                                                   String userToken) {
         log.info("INITIAL CONSIDERATION ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
 
@@ -105,7 +104,7 @@ public class InitialConsiderationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                         @RequestHeader(value = "Authorization")
+                                                                         @RequestHeader("Authorization")
                                                                              String userToken) {
         log.info("START OF INITIAL CONSIDERATION FOR CASE ---> {}", ccdRequest.getCaseDetails().getCaseId());
 

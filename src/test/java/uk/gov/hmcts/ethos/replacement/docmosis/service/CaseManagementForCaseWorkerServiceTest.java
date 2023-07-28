@@ -35,6 +35,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -68,9 +70,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
-                   "PMD.TooManyFields", "PMD.CyclomaticComplexity"})
 @ExtendWith(SpringExtension.class)
 class CaseManagementForCaseWorkerServiceTest {
 
@@ -510,8 +509,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 + "<font color='Olive' size='5'> ECC </font>"
                 + "<font size='5'> - </font>"
                 + "<font color='SlateGray' size='5'> DIGITAL FILE </font>"
-                + "<font size='5'> - </font>"
-                + "<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
+                + "<font size='5'> - </font><font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
         assertEquals(expected, caseDetails.getCaseData().getFlagsImageAltText());
         //assertEquals("EMP-TRIB-01111111110.jpg", caseDetails.getCaseData().getFlagsImageFileName());
     }
@@ -644,7 +642,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @ParameterizedTest
     @CsvSource({"Listed, Yes", " , Yes"})
-     void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
+    void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         DateListedType dateListedType = caseData.getHearingCollection().get(0)
@@ -990,8 +988,8 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private RepresentedTypeRItem createRepresentedTypeR(String respondentName, String representativeName) {
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .respRepName(respondentName)
-            .nameOfRepresentative(representativeName).build();
+                .respRepName(respondentName)
+                .nameOfRepresentative(representativeName).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("111");
         representedTypeRItem.setValue(representedTypeR);
@@ -1006,5 +1004,4 @@ class CaseManagementForCaseWorkerServiceTest {
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
     }
-
 }

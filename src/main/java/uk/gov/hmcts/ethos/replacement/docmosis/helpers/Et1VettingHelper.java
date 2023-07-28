@@ -18,7 +18,6 @@ import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSe
 /**
  * ET1 Vetting Helper provides methods to assist with the ET1 vetting event.
  */
-@SuppressWarnings({"PMD.LinguisticNaming", "PDM.TooManyFields", "PMD.ConfusingTernary", "PMD.ExcessiveMethodLength"})
 public final class Et1VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

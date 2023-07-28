@@ -2,15 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -22,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleDocGenerati
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleLetterService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,12 +41,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(MultipleDocGenerationController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField", "PMD.TooManyMethods",
-    "PMD.ExcessiveImports"})
-public class MultipleDocGenerationControllerTest {
+class MultipleDocGenerationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String PRINT_SCHEDULE_URL = "/printSchedule";
@@ -80,7 +79,7 @@ public class MultipleDocGenerationControllerTest {
                 .getResource("/exampleV1.json").toURI()));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -89,7 +88,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printSchedule() throws Exception {
+    void printSchedule() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         when(multipleScheduleService.bulkScheduleLogic(eq(AUTH_TOKEN), isA(MultipleDetails.class),
                 isA(List.class))).thenReturn(documentInfo);
@@ -98,13 +97,13 @@ public class MultipleDocGenerationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void printLetter() throws Exception {
+    void printLetter() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         when(multipleLetterService.bulkLetterLogic(eq(AUTH_TOKEN), isA(MultipleDetails.class),
                 isA(List.class), isA(Boolean.class))).thenReturn(documentInfo);
@@ -113,52 +112,52 @@ public class MultipleDocGenerationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void printDocumentConfirmation() throws Exception {
+    void printDocumentConfirmation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(PRINT_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void midSelectedAddressLabelsMultiple() throws Exception {
+    void midSelectedAddressLabelsMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void midValidateAddressLabelsMultiple() throws Exception {
+    void midValidateAddressLabelsMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void printScheduleError400() throws Exception {
+    void printScheduleError400() throws Exception {
         mvc.perform(post(PRINT_SCHEDULE_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -167,7 +166,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printLetterError400() throws Exception {
+    void printLetterError400() throws Exception {
         mvc.perform(post(PRINT_LETTER_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -176,7 +175,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printDocumentConfirmationError400() throws Exception {
+    void printDocumentConfirmationError400() throws Exception {
         mvc.perform(post(PRINT_DOCUMENT_CONFIRMATION_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -185,7 +184,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void midSelectedAddressLabelsMultiple400() throws Exception {
+    void midSelectedAddressLabelsMultiple400() throws Exception {
         mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_MULTIPLE_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -194,7 +193,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void midValidateAddressLabelsMultiple400() throws Exception {
+    void midValidateAddressLabelsMultiple400() throws Exception {
         mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_MULTIPLE_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -203,7 +202,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printScheduleError500() throws Exception {
+    void printScheduleError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleScheduleService).bulkScheduleLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), isA(List.class));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
@@ -215,7 +214,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printLetterError500() throws Exception {
+    void printLetterError500() throws Exception {
         when(multipleLetterService.bulkLetterLogic(eq(AUTH_TOKEN), isA(MultipleDetails.class),
                 isA(List.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
@@ -227,7 +226,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printScheduleForbidden() throws Exception {
+    void printScheduleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(PRINT_SCHEDULE_URL)
                 .content(requestContent.toString())
@@ -237,7 +236,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printLetterForbidden() throws Exception {
+    void printLetterForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(PRINT_LETTER_URL)
                 .content(requestContent.toString())
@@ -247,7 +246,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void printDocumentConfirmationForbidden() throws Exception {
+    void printDocumentConfirmationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(PRINT_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -257,7 +256,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void midSelectedAddressLabelsMultipleForbidden() throws Exception {
+    void midSelectedAddressLabelsMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -267,7 +266,7 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void midValidateAddressLabelsMultipleForbidden() throws Exception {
+    void midValidateAddressLabelsMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -277,20 +276,20 @@ public class MultipleDocGenerationControllerTest {
     }
 
     @Test
-    public void dynamicMultipleLetters() throws Exception {
+    void dynamicMultipleLetters() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(DYNAMIC_MULTIPLE_LETTERS)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void dynamicMultipleLettersForbidden() throws Exception {
+    void dynamicMultipleLettersForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(DYNAMIC_MULTIPLE_LETTERS)
                 .content(requestContent.toString())

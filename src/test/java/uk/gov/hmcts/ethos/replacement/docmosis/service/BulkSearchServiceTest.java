@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
 import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
@@ -33,16 +33,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class BulkSearchServiceTest {
+@ExtendWith(SpringExtension.class)
+class BulkSearchServiceTest {
 
     @InjectMocks
     private BulkSearchService bulkSearchService;
@@ -54,7 +54,7 @@ public class BulkSearchServiceTest {
     private BulkDetails bulkDetails;
     private SubmitEvent submitEvent;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         bulkRequest = new BulkRequest();
         bulkDetails = new BulkDetails();
@@ -90,7 +90,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void bulkSearchLogic() {
+    void bulkSearchLogic() {
         String result = "[SearchTypeItem(id=2222, value=SearchType(caseIDS=null, ethosCaseReferenceS=2222, "
                 + "leadClaimantS=null, clerkRespS=null, " + "claimantSurnameS=null, respondentSurnameS=null, "
                 + "claimantRepS=null, respondentRepS=JuanPedro, fileLocS=null, receiptDateS=null, "
@@ -104,7 +104,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void bulkSearchLogicWithErrors() {
+    void bulkSearchLogicWithErrors() {
         String result = "[No cases have been found]";
         bulkDetails.getCaseData().setMidSearchCollection(null);
         BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkSearchLogic(bulkDetails);
@@ -112,7 +112,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void bulkMidSearchLogic() {
+    void bulkMidSearchLogic() {
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null,"
                 + " caseTypeId=Manchester_Multiple, createdDate=null, " + "lastModified=null, "
                 + "dataClassification=null), "
@@ -147,7 +147,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void bulkMidSearchLogicWithSelectAll() {
+    void bulkMidSearchLogicWithSelectAll() {
         bulkDetails.getCaseData().setRespondentRep("JuanPedro");
         bulkDetails.getCaseData().setSelectAll(YES);
         BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(bulkDetails, false);
@@ -187,7 +187,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void bulkMidSearchLogicWithErrors() {
+    void bulkMidSearchLogicWithErrors() {
         String result = "[No cases have been found in this multiple]";
         bulkDetails.getCaseData().setMultipleCollection(null);
         BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(bulkDetails, false);
@@ -195,7 +195,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void bulkMidSearchSubMultipleLogic() {
+    void bulkMidSearchSubMultipleLogic() {
         bulkDetails.getCaseData().setRespondentRep("JuanPedro");
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
@@ -240,7 +240,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void midCreateSubMultiple() {
+    void midCreateSubMultiple() {
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null, "
                 + "caseTypeId=Manchester_Multiple, createdDate=null, "
                 + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, "
@@ -282,7 +282,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void midCreateSubMultipleCaseBelongsToOtherSubMultiple() {
+    void midCreateSubMultipleCaseBelongsToOtherSubMultiple() {
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null, "
                 + "caseTypeId=Manchester_Multiple, createdDate=null, "
                 + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, "
@@ -319,17 +319,15 @@ public class BulkSearchServiceTest {
         assertEquals(result, bulkRequestPayload.getBulkDetails().toString());
     }
 
-    @Test(expected = Exception.class)
-    public void searchCasesByFieldsRequestException() {
-        List<MidSearchTypeItem> midSearchedListExpected = new ArrayList<>();
-        List<MultipleTypeItem> multipleTypeItemToSearchBy = new ArrayList<>();
-        List<MidSearchTypeItem> midSearchedList = bulkSearchService.midSearchCasesByFieldsRequest(
-                multipleTypeItemToSearchBy, new BulkDetails(), false);
-        assertEquals(midSearchedListExpected, midSearchedList);
+    @Test
+    void searchCasesByFieldsRequestException() {
+        assertThrows(Exception.class, () ->
+                bulkSearchService.midSearchCasesByFieldsRequest(new ArrayList<>(), new BulkDetails(), false)
+        );
     }
 
     @Test
-    public void searchCasesByFieldsNoMatchesCompleteRequest() {
+    void searchCasesByFieldsNoMatchesCompleteRequest() {
         bulkRequest.getCaseDetails().getCaseData().setMultipleCollection(getMultipleTypeItemList());
         BulkData bulkData = bulkDetails.getCaseData();
         bulkData.setRespondentSurname("Antonio");
@@ -420,7 +418,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void caseUpdateRequestElasticSearch() throws IOException {
+    void caseUpdateRequestElasticSearch() throws IOException {
         List<SubmitEvent> submitEventList = new ArrayList<>(Collections.singletonList(submitEvent));
         when(ccdClient.retrieveCasesElasticSearchForCreation(anyString(), anyString(), anyList(),
                 anyString())).thenReturn(submitEventList);
@@ -431,7 +429,7 @@ public class BulkSearchServiceTest {
     }
 
     @Test
-    public void caseUpdateRequestElasticSearchNoFiltered() throws IOException {
+    void caseUpdateRequestElasticSearchNoFiltered() throws IOException {
         List<SubmitEvent> submitEventList = new ArrayList<>(Collections.singletonList(submitEvent));
         when(ccdClient.retrieveCasesElasticSearchForCreation(anyString(), anyString(), anyList(), anyString()))
                 .thenReturn(submitEventList);

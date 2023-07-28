@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -21,9 +21,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_DETAILED_CONFIG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper.NOT_ALLOCATED;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LawOfDemeter"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ScheduleCreationServiceTest {
+@ExtendWith(SpringExtension.class)
+class ScheduleCreationServiceTest {
 
     @InjectMocks
     private ScheduleCreationService scheduleCreationService;
@@ -33,7 +32,7 @@ public class ScheduleCreationServiceTest {
     private MultipleDetails multipleDetails;
     private List<SchedulePayload> schedulePayloads;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleObjectsSubMultiple = MultipleUtil.getMultipleObjectsSubMultiple();
@@ -43,7 +42,7 @@ public class ScheduleCreationServiceTest {
     }
 
     @Test
-    public void writeSchedule() {
+    void writeSchedule() {
         multipleDetails.getCaseData().setScheduleDocName(MULTIPLE_SCHEDULE_CONFIG);
         assertNotNull(scheduleCreationService.writeSchedule(
                 multipleDetails.getCaseData(),
@@ -52,7 +51,7 @@ public class ScheduleCreationServiceTest {
     }
 
     @Test
-    public void writeScheduleDetailed() {
+    void writeScheduleDetailed() {
         multipleDetails.getCaseData().setScheduleDocName(MULTIPLE_SCHEDULE_DETAILED_CONFIG);
         assertNotNull(scheduleCreationService.writeSchedule(
                 multipleDetails.getCaseData(),
@@ -61,7 +60,7 @@ public class ScheduleCreationServiceTest {
     }
 
     @Test
-    public void writeScheduleSubMultiplesNoAllocated() {
+    void writeScheduleSubMultiplesNoAllocated() {
         multipleObjectsSubMultiple.put(NOT_ALLOCATED, new ArrayList<>(Collections.singletonList("245002/2020")));
         multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
         assertNotNull(scheduleCreationService.writeSchedule(

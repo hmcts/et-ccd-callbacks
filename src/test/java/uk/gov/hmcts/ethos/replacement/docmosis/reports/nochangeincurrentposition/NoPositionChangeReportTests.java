@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class NoPositionChangeReportTests {
 
     NoPositionChangeDataSource noPositionChangeDataSource;

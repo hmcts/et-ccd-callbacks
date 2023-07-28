@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -57,8 +57,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -84,10 +84,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ECC_REPO
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.ExcessiveImports", "PMD.NcssCount",
-    "PMD.ExcessiveMethodLength"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ReportDataServiceTest {
+@ExtendWith(SpringExtension.class)
+class ReportDataServiceTest {
 
     @InjectMocks
     private ReportDataService reportDataService;
@@ -97,7 +95,7 @@ public class ReportDataServiceTest {
     @Mock
     private UserService userService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         listingDetails = new ListingDetails();
         ListingData listingData = new ListingData();
@@ -243,7 +241,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateCasesAwaitingJudgmentsReportData() throws IOException {
+    void generateCasesAwaitingJudgmentsReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
         listingDetails.getCaseData().setReportType(CASES_AWAITING_JUDGMENT_REPORT);
@@ -260,7 +258,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateNoPositionChangeReportData() throws IOException {
+    void generateNoPositionChangeReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(NO_CHANGE_IN_CURRENT_POSITION_REPORT);
         listingDetails.getCaseData().setDocumentName("name");
@@ -284,7 +282,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateNoPositionChangeReportDataWithMultiple() throws IOException {
+    void generateNoPositionChangeReportDataWithMultiple() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
         listingDetails.getCaseData().setReportType(NO_CHANGE_IN_CURRENT_POSITION_REPORT);
@@ -315,7 +313,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateHearingToJudgmentsReportData() throws IOException {
+    void generateHearingToJudgmentsReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.getCaseData().setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
@@ -338,7 +336,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateRespondentsReportData() throws IOException {
+    void generateRespondentsReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.getCaseData().setReportType(RESPONDENTS_REPORT);
@@ -361,7 +359,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateClaimsByHearingVenueReport() throws IOException {
+    void generateClaimsByHearingVenueReport() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseId("caseId");
@@ -391,7 +389,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateSessionDaysReportData() throws IOException {
+    void generateSessionDaysReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseId("caseId");
@@ -416,7 +414,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateEccReportData() throws IOException {
+    void generateEccReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseId("caseId");
@@ -441,7 +439,7 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateHearingsByHearingTypeReportData() throws IOException {
+    void generateHearingsByHearingTypeReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseId("caseId");

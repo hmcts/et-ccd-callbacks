@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 public class BFHelperTest {
@@ -21,14 +21,14 @@ public class BFHelperTest {
     private CaseData caseData;
     private List<BFActionTypeItem> bfActionTypeItemList;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseData = MultipleUtil.getCaseData("245000/2021");
         bfActionTypeItemList = generateBFActionTypeItems();
     }
 
     @Test
-    public void updateBfActionItems() {
+    void updateBfActionItems() {
         bfActionTypeItemList.get(0).getValue().setDateEntered(null);
         caseData.setBfActions(bfActionTypeItemList);
         BFHelper.updateBfActionItems(caseData);
@@ -37,14 +37,14 @@ public class BFHelperTest {
     }
 
     @Test
-    public void populateDynamicListBfActions() {
+    void populateDynamicListBfActions() {
         caseData.setBfActions(bfActionTypeItemList);
         BFHelper.populateDynamicListBfActions(caseData);
         assertEquals(1, caseData.getBfActions().size());
     }
 
     @Test
-    public void populateDynamicListBfActionsEmpty() {
+    void populateDynamicListBfActionsEmpty() {
         caseData.setBfActions(null);
         BFHelper.populateDynamicListBfActions(caseData);
         assertEquals(1, caseData.getBfActions().size());

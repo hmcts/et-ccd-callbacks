@@ -12,7 +12,6 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -524,15 +523,14 @@ public final class ReferralHelper {
     /**
      * Generates a map of personalised information that will be used for the
      * placeholder fields in the Referral email template.
-     * @param details Contains all the case details.
+     * @param caseData Contains all the case data.
      * @param referralNumber The number of the referral.
      * @param username Name of the user making or replying to this referral.
      * @param linkToExui link to Exui with the caseId as a parameter
      * @param isNew Flag for if this is a new referral.
      */
-    public static Map<String, String> buildPersonalisation(CaseDetails details, String referralNumber, boolean isNew,
+    public static Map<String, String> buildPersonalisation(CaseData caseData, String referralNumber, boolean isNew,
                                                            String username, String linkToExui) {
-        CaseData caseData = details.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put(EMAIL_FLAG, getEmailFlag(isNew ? caseData.getIsUrgent() : caseData.getIsUrgentReply()));

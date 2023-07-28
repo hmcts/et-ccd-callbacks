@@ -374,8 +374,9 @@ class ReferralHelperTest {
         caseDetails.setCaseId("123");
         caseDetails.setCaseData(caseData);
 
-        Map<String, String> actual = ReferralHelper.buildPersonalisation(caseDetails, "1", true, "First Last",
-            "linkToExui");
+        Map<String, String> actual = ReferralHelper.buildPersonalisation(
+            caseDetails.getCaseData(), "1", true, "First Last", "linkToExui"
+        );
 
         assertEquals(getExpectedPersonalisation(), actual);
     }

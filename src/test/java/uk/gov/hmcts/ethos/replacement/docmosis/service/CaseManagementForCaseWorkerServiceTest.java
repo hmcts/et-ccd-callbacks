@@ -993,7 +993,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
-        assertEquals("claimant vs respondent", caseData.getHmctsInternalCaseName());
+        assertEquals("claimant vs respondent", caseData.getCaseNameHmctsInternal());
     }
 
     @Test

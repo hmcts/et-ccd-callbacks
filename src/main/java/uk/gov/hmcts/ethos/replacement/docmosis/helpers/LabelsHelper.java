@@ -314,9 +314,7 @@ public final class LabelsHelper {
             labelTypeItemList.add(addressLabelTypeItem);
 
         }
-
         return labelTypeItemList;
-
     }
 
     private static void getEntityAddress(AddressLabelType addressLabelType, Address entityAddress) {
@@ -329,7 +327,6 @@ public final class LabelsHelper {
             addressLabelType.setFullAddress("");
             addressLabelType.setLabelEntityAddress(new Address());
         }
-
     }
 
     private static void getEntityTelephone(AddressLabelType addressLabelType, String telephone) {
@@ -340,7 +337,6 @@ public final class LabelsHelper {
         } else {
             addressLabelType.setLabelEntityTelephone("");
         }
-
     }
 
     private static void getEntityFax(AddressLabelType addressLabelType, String fax) {
@@ -351,7 +347,6 @@ public final class LabelsHelper {
         } else {
             addressLabelType.setLabelEntityFax("");
         }
-
     }
 
     private static StringBuilder getFullAddressOneLine(Address address) {
@@ -372,7 +367,6 @@ public final class LabelsHelper {
             .append(nullCheck(address.getCountry())).append(sb.length() > 0  ? "." : "");
 
         return sb;
-
     }
 
     public static List<AddressLabelTypeItem> customiseSelectedAddressesMultiples(

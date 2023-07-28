@@ -407,23 +407,17 @@ public final class BulkHelper {
     private static StringBuilder getMultipleTypeRow(SearchType searchType) {
         StringBuilder sb = new StringBuilder();
         sb.append("{\"Claimant\":\"").append(
-                nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
-                .append("\"Current_position\":\"").append(
-                nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE)
-                .append("\"Case_No\":\"").append(
-                nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE)
-                .append("\"claimant_full_name\":\"").append(
-                nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
-                .append("\"claimant_addressLine1\":\"").append(
-                nullCheck(searchType.getClaimantAddressLine1S())).append(NEW_LINE)
-                .append("\"claimant_postCode\":\"").append(
-                nullCheck(searchType.getClaimantPostCodeS())).append(NEW_LINE)
-                .append("\"respondent_full_name\":\"").append(
-                nullCheck(searchType.getRespondentSurnameS())).append(NEW_LINE)
-                .append("\"respondent_addressLine1\":\"").append(
-                nullCheck(searchType.getRespondentAddressLine1S())).append(NEW_LINE)
-                .append("\"respondent_postCode\":\"").append(
-                nullCheck(searchType.getRespondentPostCodeS())).append("\"}");
+            nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
+            .append("\"Current_position\":\"").append(nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE)
+            .append("\"Case_No\":\"").append(nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE)
+            .append("\"claimant_full_name\":\"").append(nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
+            .append("\"claimant_addressLine1\":\"").append(nullCheck(searchType.getClaimantAddressLine1S()))
+            .append(NEW_LINE).append("\"claimant_postCode\":\"").append(nullCheck(searchType.getClaimantPostCodeS()))
+            .append(NEW_LINE).append("\"respondent_full_name\":\"")
+            .append(nullCheck(searchType.getRespondentSurnameS())).append(NEW_LINE)
+            .append("\"respondent_addressLine1\":\"").append(nullCheck(searchType.getRespondentAddressLine1S()))
+            .append(NEW_LINE).append("\"respondent_postCode\":\"")
+            .append(nullCheck(searchType.getRespondentPostCodeS())).append("\"}");
         return sb;
     }
 

@@ -21,9 +21,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationServi
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -40,7 +40,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({InitialConsiderationController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.UnusedPrivateField", "PMD.ExcessiveImports"})
 class InitialConsiderationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String COMPLETE_INITIAL_CONSIDERATION_URL = "/completeInitialConsideration";
@@ -130,9 +129,9 @@ class InitialConsiderationControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -165,6 +164,6 @@ class InitialConsiderationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()));
     }
 }

@@ -15,7 +15,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
 
 @Service("conciliationTrackService")
-@SuppressWarnings({"PMD.ImplicitSwitchFallThrough", "PMD.CyclomaticComplexity"})
 public class ConciliationTrackService {
     public void populateConciliationTrackForJurisdiction(CaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
@@ -34,6 +33,7 @@ public class ConciliationTrackService {
                     break;
                 default:
                     caseData.setConciliationTrack(null);
+                    break;
             }
         } else {
             caseData.setConciliationTrack(null);

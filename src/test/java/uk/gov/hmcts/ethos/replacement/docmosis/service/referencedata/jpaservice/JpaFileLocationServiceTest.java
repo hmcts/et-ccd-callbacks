@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.FileLocation;
@@ -8,14 +10,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRep
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class JpaFileLocationServiceTest {
+@ExtendWith(SpringExtension.class)
+class JpaFileLocationServiceTest {
 
     @Test
-    public void testGetFileLocations() {
+    void testGetFileLocations() {
         TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
         List<FileLocation> fileLocations = List.of(
                 createFileLocation("fileLocation1", "FileLocation 1"),

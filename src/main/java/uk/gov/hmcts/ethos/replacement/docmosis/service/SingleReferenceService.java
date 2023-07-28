@@ -14,7 +14,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 @Slf4j
 @RequiredArgsConstructor
 @Service("singleReferenceService")
-@SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel"})
 public class SingleReferenceService {
 
     private final SingleRefScotlandRepository singleRefScotlandRepository;

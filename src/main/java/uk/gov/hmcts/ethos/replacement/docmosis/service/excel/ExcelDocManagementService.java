@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.DATE_TIME_USER_FRIE
 @Slf4j
 @RequiredArgsConstructor
 @Service("excelDocManagementService")
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public class ExcelDocManagementService {
 
     public static final String APPLICATION_EXCEL_VALUE =

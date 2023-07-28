@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferDifferentCountryService.CASE_TRANSFERRED_POSITION_TYPE;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
 @ExtendWith(SpringExtension.class)
 class MultipleTransferDifferentCountryServiceTest {
 

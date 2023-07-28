@@ -26,7 +26,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @RestController
 @Slf4j
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.UnnecessaryAnnotationValueElement"})
 public class BulkAddSinglesController {
     private final BulkAddSinglesValidator bulkAddSinglesValidator;
     private final BulkAddSinglesService bulkAddSinglesService;
@@ -54,7 +53,7 @@ public class BulkAddSinglesController {
     })
     public ResponseEntity<MultipleCallbackResponse> bulkAddSingleCasesImportFileMidEventValidation(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -79,7 +78,7 @@ public class BulkAddSinglesController {
     })
     public ResponseEntity<MultipleCallbackResponse> bulkAddSingleCasesToMultiple(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

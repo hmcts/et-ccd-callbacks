@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.utils;
+package uk.gov.hmcts.ethos.utils;
 
 import com.google.common.base.Strings;
 import org.springframework.util.CollectionUtils;
@@ -43,7 +43,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();
@@ -214,6 +213,11 @@ public class CaseDataBuilder {
         eccCaseItem.setValue(eccCase);
         eccCases.add(eccCaseItem);
 
+        return this;
+    }
+
+    public CaseDataBuilder withClaimant(String claimant) {
+        caseData.setClaimant(claimant);
         return this;
     }
 

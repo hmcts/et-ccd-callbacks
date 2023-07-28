@@ -10,7 +10,6 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
 public final class ClaimsByHearingVenueESQuery {
     private ClaimsByHearingVenueESQuery() {
         // Access through static methods

@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 
 @Slf4j
 public final class NotificationHelper {
@@ -36,9 +40,9 @@ public final class NotificationHelper {
 
     public static Map<String, String> buildMapForClaimant(CaseData caseData, String caseId) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put("emailAddress", getEmailAddressForClaimant(caseData));
-        personalisation.put("ccdId", caseId);
+        personalisation.put(CCD_ID, caseId);
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
         String initialTitle;
@@ -50,15 +54,17 @@ public final class NotificationHelper {
                 throw new NotFoundException("Could not find claimant");
             }
 
-            if (!isNullOrEmpty(caseData.getClaimantIndType().getClaimantTitle())) {
-                initialTitle = caseData.getClaimantIndType().getClaimantTitle();
-            } else if (!isNullOrEmpty(caseData.getClaimantIndType().getClaimantPreferredTitle())) {
-                initialTitle = caseData.getClaimantIndType().getClaimantPreferredTitle();
+            ClaimantIndType claimantIndType = caseData.getClaimantIndType();
+
+            if (StringUtils.isNotEmpty(claimantIndType.getClaimantTitle())) {
+                initialTitle = claimantIndType.getClaimantTitle();
+            } else if (StringUtils.isNotEmpty(claimantIndType.getClaimantPreferredTitle())) {
+                initialTitle = claimantIndType.getClaimantPreferredTitle();
             } else {
                 initialTitle = caseData.getClaimant().substring(0, 1).toUpperCase(Locale.ROOT);
             }
 
-            personalisation.put("name", buildName(initialTitle, caseData.getClaimantIndType().getClaimantLastName()));
+            personalisation.put("name", buildName(initialTitle, claimantIndType.getClaimantLastName()));
             return personalisation;
         }
 
@@ -84,9 +90,9 @@ public final class NotificationHelper {
     public static Map<String, String> buildMapForRespondent(CaseDetails caseDetails, RespondentSumType respondent) {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put("emailAddress", getEmailAddressForRespondent(caseData, respondent));
-        personalisation.put("ccdId", caseDetails.getCaseId());
+        personalisation.put(CCD_ID, caseDetails.getCaseId());
         RepresentedTypeR respondentRepresentative = getRespondentRepresentative(caseData, respondent);
 
         if (respondentRepresentative == null) {
@@ -143,7 +149,10 @@ public final class NotificationHelper {
             .collect(Collectors.joining(", "));
     }
 
-    private static String getEmailAddressForRespondent(CaseData caseData, RespondentSumType respondent) {
+    /**
+     * Gets the email address for the respondent's legal rep (if available) or their own email address.
+     */
+    public static String getEmailAddressForRespondent(CaseData caseData, RespondentSumType respondent) {
         RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
         if (representative != null) {
             String email = representative.getRepresentativeEmailAddress();

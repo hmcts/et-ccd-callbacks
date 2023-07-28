@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-@SuppressWarnings({"PMD.TooManyFields"})
 class ReportHeaderValues {
 
     int casesCompletedHearingTotal;

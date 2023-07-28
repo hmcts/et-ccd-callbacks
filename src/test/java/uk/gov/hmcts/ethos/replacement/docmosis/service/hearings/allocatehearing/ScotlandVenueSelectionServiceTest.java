@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -14,16 +16,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueServic
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
-public class ScotlandVenueSelectionServiceTest {
+@ExtendWith(SpringExtension.class)
+class ScotlandVenueSelectionServiceTest {
 
     @Test
-    public void testInitHearingCollectionNoHearings() {
+    void testInitHearingCollectionNoHearings() {
         VenueService venueService = mockVenueService();
         CaseData caseData = new CaseData();
 
@@ -36,7 +38,7 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     @Test
-    public void testInitHearingCollectionWithHearings() {
+    void testInitHearingCollectionWithHearings() {
         VenueService venueService = mockVenueService();
         CaseData caseData = createCaseDataWithHearings();
 
@@ -49,7 +51,7 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     @Test
-    public void testInitHearingCollectionWithHearingsAndSelectedVenue() {
+    void testInitHearingCollectionWithHearingsAndSelectedVenue() {
         VenueService venueService = mockVenueService();
         DynamicValueType selectedAberdeenVenue = createWithSelectedIndex(TribunalOffice.ABERDEEN, 1);
         DynamicValueType selectedDundeeVenue = createWithSelectedIndex(TribunalOffice.DUNDEE, 2);
@@ -68,7 +70,7 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     @Test
-    public void testCreateVenueSelectionNoSelectedVenue() {
+    void testCreateVenueSelectionNoSelectedVenue() {
         VenueService venueService = mockVenueService();
 
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
@@ -83,7 +85,7 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     @Test
-    public void testCreateVenueSelectionWithSelectedVenue() {
+    void testCreateVenueSelectionWithSelectedVenue() {
         VenueService venueService = mockVenueService();
 
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {

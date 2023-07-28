@@ -36,7 +36,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 public class MultipleDocGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for multiple reference : ";
@@ -61,7 +60,7 @@ public class MultipleDocGenerationController {
     })
     public ResponseEntity<MultipleCallbackResponse> printSchedule(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("PRINT SCHEDULE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -90,7 +89,7 @@ public class MultipleDocGenerationController {
     })
     public ResponseEntity<MultipleCallbackResponse> printLetter(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("PRINT LETTER ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -120,7 +119,7 @@ public class MultipleDocGenerationController {
     })
     public ResponseEntity<MultipleCallbackResponse> printDocumentConfirmation(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("PRINT DOCUMENT CONFIRMATION ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -149,7 +148,7 @@ public class MultipleDocGenerationController {
     })
     public ResponseEntity<MultipleCallbackResponse> midSelectedAddressLabelsMultiple(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("MID SELECTED ADDRESS LABELS MULTIPLE ---> "
                 + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
@@ -179,7 +178,7 @@ public class MultipleDocGenerationController {
     })
     public ResponseEntity<MultipleCallbackResponse> midValidateAddressLabelsMultiple(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("MID VALIDATE ADDRESS LABELS MULTIPLE ---> "
                 + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
@@ -207,7 +206,7 @@ public class MultipleDocGenerationController {
     })
     public ResponseEntity<MultipleCallbackResponse> dynamicMultipleLetters(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("DYNAMIC MULTIPLE LETTERS ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

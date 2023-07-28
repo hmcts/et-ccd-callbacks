@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -13,7 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -22,8 +22,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_PO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultiplePreAcceptServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultiplePreAcceptServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
@@ -34,7 +34,7 @@ public class MultiplePreAcceptServiceTest {
     private String userToken;
     private List<String> errors;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -47,7 +47,7 @@ public class MultiplePreAcceptServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicETOnline() {
+    void bulkPreAcceptLogicETOnline() {
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multiplePreAcceptService.bulkPreAcceptLogic(userToken,
                 multipleDetails,
@@ -59,7 +59,7 @@ public class MultiplePreAcceptServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicAllAccepted() {
+    void bulkPreAcceptLogicAllAccepted() {
         multipleDetails.getCaseData().setMultipleSource(MANUALLY_CREATED_POSITION);
         multiplePreAcceptService.bulkPreAcceptLogic(userToken,
                 multipleDetails,
@@ -69,7 +69,7 @@ public class MultiplePreAcceptServiceTest {
     }
 
     @Test
-    public void bulkPreAcceptLogicRejected() {
+    void bulkPreAcceptLogicRejected() {
         multipleDetails.getCaseData().getPreAcceptCase().setCaseAccepted(NO);
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multiplePreAcceptService.bulkPreAcceptLogic(userToken,

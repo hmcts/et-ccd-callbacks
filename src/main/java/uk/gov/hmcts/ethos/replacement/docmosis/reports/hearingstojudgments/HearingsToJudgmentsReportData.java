@@ -16,9 +16,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_O
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 
 @Getter
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.GodClass", "PMD.ConsecutiveAppendsShouldReuse", "PMD.InsufficientStringBufferDeclaration",
-    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
 public final class HearingsToJudgmentsReportData extends ListingData {
     // JsonIgnore is required on properties so that the report data is not
     // returned to CCD in any callback response.

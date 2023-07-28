@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
@@ -41,10 +41,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LinguisticNaming", "PMD.TooManyMethods",
-    "PMD.ExcessiveImports"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleHelperServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleHelperServiceTest {
 
     @Mock
     private SingleCasesReadingService singleCasesReadingService;
@@ -70,7 +68,7 @@ public class MultipleHelperServiceTest {
     private TreeMap<String, Object> multipleObjects;
     private String gatewayURL;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         gatewayURL = "https://manage-case.test.platform.hmcts.net";
         ReflectionTestUtils.setField(multipleHelperService, "ccdGatewayBaseUrl", gatewayURL);
@@ -87,7 +85,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void addLeadMarkUp() {
+    void addLeadMarkUp() {
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getLeadCase(),
@@ -103,7 +101,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void addLeadMarkUpWithCaseId() {
+    void addLeadMarkUpWithCaseId() {
         submitEventList.get(0).setCaseId(12_345L);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
@@ -120,7 +118,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void addLeadMarkUpEmptyCase() {
+    void addLeadMarkUpEmptyCase() {
 
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
@@ -137,7 +135,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicMultipleAndSubExist() {
+    void multipleValidationLogicMultipleAndSubExist() {
 
         List<String> errors = new ArrayList<>();
 
@@ -160,7 +158,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicSubMultipleDoesNotExist() {
+    void multipleValidationLogicSubMultipleDoesNotExist() {
 
         List<String> errors = new ArrayList<>();
 
@@ -183,7 +181,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicSubMultipleNull() {
+    void multipleValidationLogicSubMultipleNull() {
 
         List<String> errors = new ArrayList<>();
 
@@ -208,7 +206,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicMultipleDoesNotExist() {
+    void multipleValidationLogicMultipleDoesNotExist() {
 
         List<String> errors = new ArrayList<>();
 
@@ -231,7 +229,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void multipleValidationLogicMultipleTransferred() {
+    void multipleValidationLogicMultipleTransferred() {
 
         List<String> errors = new ArrayList<>();
 
@@ -257,7 +255,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void moveCasesAndSendUpdateToMultiple() {
+    void moveCasesAndSendUpdateToMultiple() {
 
         String subMultipleName = "SubMultiple3";
 
@@ -290,7 +288,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void moveCasesAndSendUpdateToMultipleWithoutSubMultiple() {
+    void moveCasesAndSendUpdateToMultipleWithoutSubMultiple() {
 
         String subMultipleName = "";
 
@@ -323,7 +321,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendCreationUpdatesToSinglesWithoutConfirmation() {
+    void sendCreationUpdatesToSinglesWithoutConfirmation() {
 
         multipleHelperService.sendCreationUpdatesToSinglesWithoutConfirmation(
                 userToken,
@@ -342,7 +340,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendDetachUpdatesToSinglesWithoutConfirmation() {
+    void sendDetachUpdatesToSinglesWithoutConfirmation() {
 
         multipleHelperService.sendDetachUpdatesToSinglesWithoutConfirmation(
                 userToken,
@@ -357,7 +355,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendResetMultipleStateWithoutConfirmation() {
+    void sendResetMultipleStateWithoutConfirmation() {
 
         multipleHelperService.sendResetMultipleStateWithoutConfirmation(
                 userToken,
@@ -374,7 +372,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendUpdatesToSinglesWithConfirmationNullCaseData() {
+    void sendUpdatesToSinglesWithConfirmationNullCaseData() {
 
         multipleHelperService.sendUpdatesToSinglesWithConfirmation(
                 userToken,
@@ -390,7 +388,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendUpdatesToSinglesWithConfirmation() {
+    void sendUpdatesToSinglesWithConfirmation() {
 
         RepresentedTypeC representedTypeC = new RepresentedTypeC();
         representedTypeC.setNameOfRepresentative("Rep");
@@ -432,7 +430,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendPreAcceptToSinglesWithConfirmation() {
+    void sendPreAcceptToSinglesWithConfirmation() {
 
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setCaseAccepted(YES);
@@ -451,7 +449,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendPreAcceptRejectedToSinglesWithConfirmation() {
+    void sendPreAcceptRejectedToSinglesWithConfirmation() {
 
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setCaseAccepted(NO);
@@ -471,7 +469,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendCloseToSinglesWithConfirmation() {
+    void sendCloseToSinglesWithConfirmation() {
         multipleDetails.getCaseData().setClerkResponsible(new DynamicFixedListType("Clerk"));
         multipleDetails.getCaseData().setFileLocation(new DynamicFixedListType("FileLocation"));
         multipleDetails.getCaseData().setNotes("Notes");
@@ -487,7 +485,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void getLeadCaseFromExcel() {
+    void getLeadCaseFromExcel() {
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
@@ -500,7 +498,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void getEmptyLeadCaseFromExcel() {
+    void getEmptyLeadCaseFromExcel() {
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());
@@ -513,7 +511,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendUpdatesToSinglesLogicCheckingLead() {
+    void sendUpdatesToSinglesLogicCheckingLead() {
 
         String leadLink = "<a target=\"_blank\" "
                 + "href=\"https://www-ccd.perftest.platform.hmcts.net/v2/case/1604313560561842\">245007/2020</a>";
@@ -539,7 +537,7 @@ public class MultipleHelperServiceTest {
     }
 
     @Test
-    public void sendUpdatesToSinglesLogicCheckingSameLead() {
+    void sendUpdatesToSinglesLogicCheckingSameLead() {
 
         String leadLink = "<a target=\"_blank\" href=\"https://www-ccd.perftest.platform.hmcts.net/v2/case/1604313560561842\">245007/2020</a>";
         multipleDetails.getCaseData().setLeadCase(leadLink);

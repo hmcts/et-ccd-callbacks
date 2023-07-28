@@ -15,7 +15,6 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.ConfusingTernary"})
 public final class DynamicLetters {
     private DynamicLetters() {
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.Strings;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -27,6 +29,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_LISTED;
@@ -49,10 +54,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
-    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter",
-    "PMD.SimpleDateFormatNeedsLocale", "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public final class Helper {
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
@@ -284,5 +285,58 @@ public final class Helper {
      */
     public static String getCurrentDate() {
         return new SimpleDateFormat("dd MMM yyyy").format(new Date());
+    }
+
+    public static String getRespondentNames(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return "";
+        }
+        return caseData.getRespondentCollection().stream()
+            .filter(o -> o.getValue() != null && o.getValue().getRespondentName() != null)
+            .map(o -> o.getValue().getRespondentName())
+            .collect(Collectors.joining(", "));
+    }
+
+    public static Matcher getDocumentMatcher(String url) {
+        Pattern pattern = Pattern.compile("^.+?/documents/");
+        return pattern.matcher(url);
+    }
+
+    /**
+     * Generates and returns a link for an UploadedDocumentType.
+     * Creates an HTML anchor element link to an uploaded document which will open in a new tab.
+     * @return a string anchor tag linking to the document
+     */
+    public static String createLinkForUploadedDocument(UploadedDocumentType document) {
+        if (document == null) {
+            return "";
+        }
+        Matcher matcher = Helper.getDocumentMatcher(document.getDocumentBinaryUrl());
+        String documentLink = matcher.replaceFirst("");
+        String documentName = document.getDocumentFilename();
+        return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
+    }
+
+    public static String extractLink(String input) {
+        Pattern pattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/binary");
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null; // No UUID found
+    }
+
+    /**
+     * Validate if the other party (Claimant/Citizen) is a system user.
+     * Non system user Claimant refers to the cases that have been transferred from legacy ECM or a paper based claim
+     * which a caseworker would manually create in ExUI.
+     * @param caseData in which the case details are extracted from
+     * @return errors Error message
+     */
+    public static boolean isClaimantNonSystemUser(CaseData caseData) {
+        if (caseData != null) {
+            return caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null;
+        }
+        return true;
     }
 }

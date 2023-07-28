@@ -113,7 +113,6 @@ public final class DocumentHelper {
             .append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
             .append(NEW_LINE).append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference()))
             .append(NEW_LINE).append("}\n}\n");
-
         return sb;
     }
 
@@ -669,8 +668,8 @@ public final class DocumentHelper {
         String sectionName = getEWSectionName(correspondence);
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append("\"t").append(sectionName.replace(".", "_"))
-                    .append("\":\"true").append(NEW_LINE);
+            sb.append("\"t").append(sectionName.replace(".", "_")).append("\":\"true")
+            .append(NEW_LINE);
         }
         return sb;
     }

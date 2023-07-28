@@ -140,6 +140,16 @@ tasks.register('functional', Test) {
     maxHeapSize = '1G'
 }
 
+tasks.register('apiGateway', Test) {
+    testClassesDirs = sourceSets.apiTest.output.classesDirs
+    classpath = sourceSets.apiTest.runtimeClasspath
+
+    useJUnitPlatform()
+
+    systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
+    maxHeapSize = '1G'
+}
+
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
     commandLine 'yarn', 'install'

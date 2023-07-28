@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
@@ -21,9 +21,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleCreationServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleCreationServiceTest {
 
     @Mock
     private ExcelDocManagementService excelDocManagementService;
@@ -43,7 +42,7 @@ public class MultipleCreationServiceTest {
     private List<String> ethosCaseRefCollection;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -54,7 +53,7 @@ public class MultipleCreationServiceTest {
     }
 
     @Test
-    public void bulkCreationLogic() {
+    void bulkCreationLogic() {
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
@@ -65,7 +64,7 @@ public class MultipleCreationServiceTest {
     }
 
     @Test
-    public void bulkCreationLogicWithMultipleReference() {
+    void bulkCreationLogicWithMultipleReference() {
         multipleDetails.getCaseData().setMultipleReference("2100001");
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
@@ -77,7 +76,7 @@ public class MultipleCreationServiceTest {
     }
 
     @Test
-    public void bulkCreationLogicETOnline() {
+    void bulkCreationLogicETOnline() {
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
@@ -90,7 +89,7 @@ public class MultipleCreationServiceTest {
     }
 
     @Test
-    public void bulkCreationLogicMigration() {
+    void bulkCreationLogicMigration() {
         multipleDetails.getCaseData().setLeadCase("");
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
         multipleDetails.getCaseData().setMultipleSource(MIGRATION_CASE_SOURCE);
@@ -107,7 +106,7 @@ public class MultipleCreationServiceTest {
     }
 
     @Test
-    public void bulkCreationLogicMigrationEmptyCaseMultipleCollection() {
+    void bulkCreationLogicMigrationEmptyCaseMultipleCollection() {
         multipleDetails.getCaseData().setLeadCase("");
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
         multipleDetails.getCaseData().setMultipleSource(MIGRATION_CASE_SOURCE);
@@ -124,7 +123,7 @@ public class MultipleCreationServiceTest {
     }
 
     @Test
-    public void bulkCreationLogicEmptyCaseIdCollection() {
+    void bulkCreationLogicEmptyCaseIdCollection() {
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
         multipleDetails.getCaseData().setLeadCase(null);
         multipleCreationService.bulkCreationLogic(userToken,
@@ -137,7 +136,7 @@ public class MultipleCreationServiceTest {
     }
 
     @Test
-    public void bulkCreationLogicWithNullMultipleRef() {
+    void bulkCreationLogicWithNullMultipleRef() {
         multipleDetails.getCaseData().setMultipleReference(null);
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,

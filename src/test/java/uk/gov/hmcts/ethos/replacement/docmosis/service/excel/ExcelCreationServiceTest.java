@@ -9,23 +9,25 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
-import static org.junit.Assert.assertEquals;
+
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ExcelCreationServiceTest {
+@ExtendWith(SpringExtension.class)
+class ExcelCreationServiceTest {
 
     @InjectMocks
     private ExcelCreationService excelCreationService;
@@ -34,13 +36,13 @@ public class ExcelCreationServiceTest {
 
     private TreeMap<String, Object> multipleObjects;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
     }
 
     @Test
-    public void writeExcelObjects() {
+    void writeExcelObjects() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(multipleObjects.values()),
                 new ArrayList<>(Arrays.asList("245000/1", "245000/1")),
@@ -48,7 +50,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void writeExcelObjectsEmptySubMultiples() {
+    void writeExcelObjectsEmptySubMultiples() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(multipleObjects.values()),
                 new ArrayList<>(),
@@ -56,7 +58,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void writeExcelString() {
+    void writeExcelString() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(Arrays.asList("245000/2020", "245001/2020", "245002/2020")),
                 new ArrayList<>(),
@@ -64,7 +66,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void writeExcelStringEmpty() {
+    void writeExcelStringEmpty() {
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(),
                 new ArrayList<>(),
@@ -72,7 +74,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void reportTitleCellStyleTest() throws IOException {
+    void reportTitleCellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getReportTitleCellStyle(workbook);
             assertEquals(IndexedColors.BLUE_GREY.getIndex(), actualCellStyle.getFillBackgroundColor());
@@ -84,7 +86,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void headerCellStyleTest() throws IOException {
+    void headerCellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getHeaderCellStyle(workbook);
             assertEquals(BorderStyle.THIN, actualCellStyle.getBorderBottom());
@@ -100,7 +102,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void reportSubTitleCellStyleTest() throws IOException {
+    void reportSubTitleCellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getReportSubTitleCellStyle(workbook);
             assertEquals(IndexedColors.LIGHT_GREEN.getIndex(), actualCellStyle.getFillForegroundColor());
@@ -111,7 +113,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void addReportAdminDetailsTest() throws IOException {
+    void addReportAdminDetailsTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             XSSFSheet sheet = workbook.getSheetAt(0);
             excelCreationService.addReportAdminDetails(workbook,
@@ -124,7 +126,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void cellStyleTest() throws IOException {
+    void cellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             CellStyle actualCellStyle = excelCreationService.getCellStyle(workbook);
             assertEquals(VerticalAlignment.CENTER, actualCellStyle.getVerticalAlignment());
@@ -140,7 +142,7 @@ public class ExcelCreationServiceTest {
     }
 
     @Test
-    public void initializeReportHeadersTest() throws IOException {
+    void initializeReportHeadersTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
             Sheet sheet = workbook.getSheetAt(0);
             excelCreationService.initializeReportHeaders("document1",

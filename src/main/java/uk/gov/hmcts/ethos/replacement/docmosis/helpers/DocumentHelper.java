@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -11,9 +13,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -25,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -36,12 +42,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -55,16 +61,7 @@ import static uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem.fromUpload
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
-    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.LinguisticNaming",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
-    "PMD.ConsecutiveAppendsShouldReuse", "PMD.ExcessiveMethodLength", "PMD.NcssCount",
-    "PMD.UnnecessaryFullyQualifiedName", "PMD.AvoidLiteralsInIfCondition", "PMD.LiteralsFirstInComparisons",
-    "PMD.AppendCharacterWithChar", "PMD.CyclomaticComplexity", "PMD.CyclomaticComplexity"})
-public class DocumentHelper {
+public final class DocumentHelper {
     private DocumentHelper() {
     }
 
@@ -689,7 +686,7 @@ public class DocumentHelper {
         String sectionName = getEWSectionName(correspondence);
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append("\"").append("t").append(sectionName.replace(".", "_"))
+            sb.append('"').append('t').append(sectionName.replace(".", "_"))
                     .append("\":\"").append("true").append(NEW_LINE);
         }
         return sb;
@@ -700,7 +697,7 @@ public class DocumentHelper {
         String scotSectionName = getScotSectionName(correspondenceScotType);
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.equals("")) {
-            sb.append("\"").append("t_Scot_").append(scotSectionName.replace(".", "_"))
+            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
                     .append("\":\"").append("true").append(NEW_LINE);
         }
         return sb;
@@ -806,7 +803,7 @@ public class DocumentHelper {
 
             if (pageLabelNumber == 1 || startingLabelAboveOne) {
                 startingLabelAboveOne = false;
-                sb.append("{");
+                sb.append('{');
             }
 
             String templateLabelNumber = pageLabelNumber < 10
@@ -814,7 +811,7 @@ public class DocumentHelper {
             sb.append(getAddressLabel(copiedAddressLabelCollection.get(i).getValue(), templateLabelNumber, showTelFax));
 
             if (pageLabelNumber == ADDRESS_LABELS_PAGE_SIZE || i == copiedAddressLabelCollection.size() - 1) {
-                sb.append("}");
+                sb.append('}');
             }
 
             if (i != copiedAddressLabelCollection.size() - 1) {
@@ -828,16 +825,16 @@ public class DocumentHelper {
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
                                                  String labelNumber, String showTelFax) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\"").append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
+        sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE);
-        sb.append("\"").append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
+        sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityName02())).append(NEW_LINE);
         sb.append(getAddressLines(addressLabelType, labelNumber));
         sb.append(getTelFaxLine(addressLabelType, labelNumber, showTelFax));
-        sb.append("\"").append(LBL).append(labelNumber).append("_Eef\":\"")
+        sb.append('"').append(LBL).append(labelNumber).append("_Eef\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityReference())).append(NEW_LINE);
-        sb.append("\"").append(LBL).append(labelNumber).append("_Cef\":\"")
-                .append(nullCheck(addressLabelType.getLabelCaseReference())).append("\"");
+        sb.append('"').append(LBL).append(labelNumber).append("_Cef\":\"")
+                .append(nullCheck(addressLabelType.getLabelCaseReference())).append('"');
         return sb;
     }
 
@@ -894,7 +891,7 @@ public class DocumentHelper {
     private static StringBuilder getAddressLine(String addressLine, String labelNumber, int lineNum) {
         StringBuilder sb = new StringBuilder();
         String lineNumber = "0" + lineNum;
-        sb.append("\"").append(LABEL).append(labelNumber).append("_Address_Line_").append(lineNumber)
+        sb.append('"').append(LABEL).append(labelNumber).append("_Address_Line_").append(lineNumber)
                 .append("\":\"").append(addressLine).append(NEW_LINE);
         return sb;
     }
@@ -920,8 +917,8 @@ public class DocumentHelper {
                 }
             }
 
-            sb.append("\"").append(LABEL).append(labelNumber).append("_Telephone\":\"").append(tel).append(NEW_LINE);
-            sb.append("\"").append(LABEL).append(labelNumber).append("_Fax\":\"").append(fax).append(NEW_LINE);
+            sb.append('"').append(LABEL).append(labelNumber).append("_Telephone\":\"").append(tel).append(NEW_LINE);
+            sb.append('"').append(LABEL).append(labelNumber).append("_Fax\":\"").append(fax).append(NEW_LINE);
         }
         return sb;
     }
@@ -978,21 +975,30 @@ public class DocumentHelper {
     }
 
     /**
-     * Create a documentTypeItem.
-     * @param uploadedDocument document uploaded to DM store
-     * @param typeOfDocument type of document
-     * @return a document to be added to the doc collection
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param typeOfDocument String to update TypeOfDocument
+     * @param shortDescription short description of the document
+     * @return DocumentTypeItem
      */
-    public static DocumentTypeItem createDocumenTypeItem(UploadedDocumentType uploadedDocument, String typeOfDocument) {
-        DocumentType documentType = DocumentType.builder()
-                .typeOfDocument(typeOfDocument)
-                .uploadedDocument(uploadedDocument)
-                .build();
-
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setValue(documentType);
-        documentTypeItem.setId(UUID.randomUUID().toString());
+    public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
+                                                          String typeOfDocument, String shortDescription) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setTypeOfDocument(typeOfDocument);
+        documentType.setShortDescription(shortDescription);
         return documentTypeItem;
+    }
+
+    /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param typeOfDocument String to update TypeOfDocument
+     * @return DocumentTypeItem
+     */
+    public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
+                                                          String typeOfDocument) {
+        return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
     }
 
     /**
@@ -1002,10 +1008,14 @@ public class DocumentHelper {
         if (caseData.getDocumentCollection() == null) {
             return;
         }
+
         List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
-                .toList());
+            .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
+            .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
+                d.getValue().getUploadedDocument().getDocumentBinaryUrl())
+            )
+            .toList());
     }
 
     private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
@@ -1017,16 +1027,33 @@ public class DocumentHelper {
         return types.contains(typeOfDocument);
     }
 
-    /**
-     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
-     * @param uploadedDocumentType UploadedDocumentType to be added
-     * @param typeOfDocument String to update TypeOfDocument
-     * @return DocumentTypeItem
-     */
-    public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
-                                                          String typeOfDocument) {
-        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
-        documentTypeItem.getValue().setTypeOfDocument(typeOfDocument);
-        return documentTypeItem;
+    @NotNull
+    private static List<String> getClaimantRule92NoDocumentBinaryUrls(CaseData caseData) {
+        List<Optional<UploadedDocumentType>> claimantRule92NoDocuments = new ArrayList<>();
+
+        // Get all documents with claimant rule 92 no - whether on application creation or in any subsequent response
+        for (GenericTseApplicationTypeItem app : ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
+            GenericTseApplicationType appType = app.getValue();
+            if (CLAIMANT_TITLE.equals(appType.getApplicant()) && NO.equals(appType.getCopyToOtherPartyYesOrNo())) {
+                claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));
+            }
+
+            for (TseRespondTypeItem response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
+                TseRespondType respondType = response.getValue();
+                if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
+                    claimantRule92NoDocuments.addAll(
+                        respondType.getSupportingMaterial().stream()
+                            .map(documentType -> Optional.ofNullable(documentType.getValue().getUploadedDocument()))
+                            .toList()
+                    );
+                }
+            }
+        }
+
+        // Get document binary urls of non-null documents
+        return claimantRule92NoDocuments.stream()
+            .filter(Optional::isPresent)
+            .map(optional -> optional.get().getDocumentBinaryUrl())
+            .toList();
     }
 }

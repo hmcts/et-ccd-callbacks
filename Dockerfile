@@ -5,7 +5,6 @@ LABEL maintainer="https://github.com/hmcts/et-ccd-callbacks"
 COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
 
-
 FROM debian:11 AS builder
 
 USER root

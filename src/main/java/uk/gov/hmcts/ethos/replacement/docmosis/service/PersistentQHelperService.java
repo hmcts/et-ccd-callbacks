@@ -13,7 +13,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service("persistentQHelperService")
-@SuppressWarnings({"PMD.ExcessiveParameterList"})
 public class PersistentQHelperService {
 
     private final CreateUpdatesBusSender createUpdatesBusSender;

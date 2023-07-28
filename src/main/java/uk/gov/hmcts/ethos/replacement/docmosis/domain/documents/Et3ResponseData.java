@@ -10,7 +10,6 @@ import java.util.List;
  */
 @Data
 @SuperBuilder
-@SuppressWarnings({"PMD.LinguisticNaming", "PMD.TooManyFields"})
 public class Et3ResponseData {
     private String ethosCaseReference;
     private String et3ResponseClaimantName;

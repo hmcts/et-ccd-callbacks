@@ -16,9 +16,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({UploadDocumentController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.UnusedPrivateField"})
 class UploadDocumentControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -76,9 +75,9 @@ class UploadDocumentControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test

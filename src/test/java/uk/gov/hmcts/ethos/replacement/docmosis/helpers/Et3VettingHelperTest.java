@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
 
@@ -26,8 +26,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.N
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_ET3_RESPONSE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_RESPONDENTS_FOUND_ERROR;
 
-@SuppressWarnings({"PMD.ExcessiveClassLength", "PMD.LawOfDemeter", "PMD.UseProperClassLoader",
-    "PMD.UnusedPrivateMethod", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveMethodLength", "PMD.TooManyMethods"})
 class Et3VettingHelperTest {
     private static final String CASE_NOT_LISTED = "<h2>Hearing details</h2>The case has not been listed<hr>";
     private List<String> errors;

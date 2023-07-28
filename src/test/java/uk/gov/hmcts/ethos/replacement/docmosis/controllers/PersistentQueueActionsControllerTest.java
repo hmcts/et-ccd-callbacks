@@ -2,15 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,6 +32,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkSearchService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkUpdateService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,11 +53,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(PersistentQueueActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
-public class PersistentQueueActionsControllerTest {
+class PersistentQueueActionsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String AFTER_SUBMITTED_PQ_BULK_URL = "/afterSubmittedBulkPQ";
@@ -89,7 +89,7 @@ public class PersistentQueueActionsControllerTest {
                 .getResource("/exampleBulkV1.json").toURI()));
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -127,7 +127,7 @@ public class PersistentQueueActionsControllerTest {
     }
 
     @Test
-    public void afterSubmittedBulkPQ() throws Exception {
+    void afterSubmittedBulkPQ() throws Exception {
         when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
                 isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class)))
                 .thenReturn(bulkCasesPayload);
@@ -141,13 +141,13 @@ public class PersistentQueueActionsControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void preAcceptBulkPq() throws Exception {
+    void preAcceptBulkPq() throws Exception {
         when(bulkSearchService.retrievalCasesForPreAcceptRequest(
                 isA(BulkDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(bulkCasesPayload.getSubmitEvents());
@@ -160,13 +160,13 @@ public class PersistentQueueActionsControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void updateBulkCasePq() throws Exception {
+    void updateBulkCasePq() throws Exception {
         when(bulkCreationService.bulkUpdateCaseIdsLogic(
                 isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
                 .thenReturn(bulkRequestPayload);
@@ -177,13 +177,13 @@ public class PersistentQueueActionsControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    public void preAcceptBulkPqError400() throws Exception {
+    void preAcceptBulkPqError400() throws Exception {
         mvc.perform(post(PRE_ACCEPT_PQ_BULK_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -192,7 +192,7 @@ public class PersistentQueueActionsControllerTest {
     }
 
     @Test
-    public void updateBulkCasePqError400() throws Exception {
+    void updateBulkCasePqError400() throws Exception {
         mvc.perform(post(UPDATE_BULK_CASE_PQ_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -201,7 +201,7 @@ public class PersistentQueueActionsControllerTest {
     }
 
     @Test
-    public void preAcceptBulkPqError500() throws Exception {
+    void preAcceptBulkPqError500() throws Exception {
         when(bulkSearchService.retrievalCasesForPreAcceptRequest(
                 isA(BulkDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -214,7 +214,7 @@ public class PersistentQueueActionsControllerTest {
     }
 
     @Test
-    public void updateBulkCasePqError500() throws Exception {
+    void updateBulkCasePqError500() throws Exception {
         when(bulkCreationService.bulkUpdateCaseIdsLogic(
                 isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -227,7 +227,7 @@ public class PersistentQueueActionsControllerTest {
     }
 
     @Test
-    public void afterSubmittedPqBulkForbidden() throws Exception {
+    void afterSubmittedPqBulkForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(AFTER_SUBMITTED_PQ_BULK_URL)
                 .content(requestContent.toString())
@@ -237,7 +237,7 @@ public class PersistentQueueActionsControllerTest {
     }
 
     @Test
-    public void preAcceptBulkPqForbidden() throws Exception {
+    void preAcceptBulkPqForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(PRE_ACCEPT_PQ_BULK_URL)
                 .content(requestContent.toString())
@@ -247,7 +247,7 @@ public class PersistentQueueActionsControllerTest {
     }
 
     @Test
-    public void updateBulkCasePqForbidden() throws Exception {
+    void updateBulkCasePqForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
         mvc.perform(post(UPDATE_BULK_CASE_PQ_URL)
                 .content(requestContent.toString())

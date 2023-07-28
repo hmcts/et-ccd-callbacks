@@ -36,7 +36,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.CreateCo
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CreateController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports"})
 class CreateControllerTest {
 
     private String token;
@@ -68,9 +67,9 @@ class CreateControllerTest {
                 .header("Authorization", token)
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         MvcResult result = resultActions.andReturn();
         String contentAsString = result.getResponse().getContentAsString();

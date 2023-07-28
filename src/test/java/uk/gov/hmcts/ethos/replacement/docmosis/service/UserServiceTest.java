@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
@@ -14,12 +14,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class UserServiceTest {
+@ExtendWith(SpringExtension.class)
+class UserServiceTest {
     @InjectMocks
     private UserService userService;
     private UserDetails userDetails;
@@ -27,7 +27,7 @@ public class UserServiceTest {
     private TokenResponse tokenResponse;
     private OAuth2Configuration oauth2Configuration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         userDetails = HelperTest.getUserDetails();
         tokenResponse = HelperTest.getUserToken();
@@ -54,12 +54,12 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldHaveUserDetails() {
+    void shouldHaveUserDetails() {
         assertEquals(userService.getUserDetails("TOKEN"), userDetails);
     }
 
     @Test
-    public void shouldCheckAllUserDetails() {
+    void shouldCheckAllUserDetails() {
         assertEquals(userDetails, userService.getUserDetails("TOKEN"));
         assertEquals("mail@mail.com", userService.getUserDetails("TOKEN").getEmail());
         assertEquals("Mike", userService.getUserDetails("TOKEN").getFirstName());
@@ -69,17 +69,17 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldGetUserById() {
+    void shouldGetUserById() {
         assertEquals(userDetails, userService.getUserDetailsById("TOKEN", "id"));
     }
 
     @Test
-    public void shouldGetAccessToken() {
+    void shouldGetAccessToken() {
         assertEquals("abcefg", userService.getAccessToken("John@email.com", "abc123"));
     }
 
     @Test
-    public void shouldReturnAccessTokenResponse() {
+    void shouldReturnAccessTokenResponse() {
         assertEquals(tokenResponse, userService.getAccessTokenResponse("John@email.com", "abc123"));
     }
 

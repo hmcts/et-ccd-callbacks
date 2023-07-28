@@ -14,9 +14,9 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferSameCountryService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.MultipleDataBuilder;
+import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseTransferMultiplesController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods"})
 class CaseTransferMultiplesControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -134,9 +133,9 @@ class CaseTransferMultiplesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(multipleTransferSameCountryService, times(1)).transferMultiple(multipleRequest.getCaseDetails(),
                 AUTH_TOKEN);
@@ -177,9 +176,9 @@ class CaseTransferMultiplesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(multipleTransferDifferentCountryService, times(1)).transferMultiple(multipleRequest.getCaseDetails(),
                 AUTH_TOKEN);

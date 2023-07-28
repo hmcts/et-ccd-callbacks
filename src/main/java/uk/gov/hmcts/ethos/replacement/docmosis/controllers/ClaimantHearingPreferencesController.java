@@ -30,7 +30,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ClaimantHearingPreferencesController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
@@ -53,7 +52,7 @@ public class ClaimantHearingPreferencesController {
     })
     public ResponseEntity<CCDCallbackResponse> validateHearingPreferences(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

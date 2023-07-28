@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 
@@ -9,13 +11,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 
-public class BulkAddSinglesValidatorTest {
+@ExtendWith(SpringExtension.class)
+class BulkAddSinglesValidatorTest {
     private BulkAddSinglesValidator bulkAddSinglesValidator;
     private SingleCasesImporter singleCasesImporter;
     private SingleCasesValidator singleCasesValidator;
@@ -25,7 +28,7 @@ public class BulkAddSinglesValidatorTest {
     private List<String> ethosCaseReferences;
     private List<ValidatedSingleCase> validatedSingleCases;
 
-    @Before
+    @BeforeEach
     public void setup() throws ImportException, IOException {
         multipleDetails = createMultipleDetails();
         ethosCaseReferences = new ArrayList<>();
@@ -42,7 +45,7 @@ public class BulkAddSinglesValidatorTest {
     }
 
     @Test
-    public void shouldReturnImportError() {
+    void shouldReturnImportError() {
         List<String> errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
@@ -50,7 +53,7 @@ public class BulkAddSinglesValidatorTest {
     }
 
     @Test
-    public void shouldReturnInvalidCaseErrors() {
+    void shouldReturnInvalidCaseErrors() {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createInvalidCase("case1", "Case not found"));
 
@@ -61,7 +64,7 @@ public class BulkAddSinglesValidatorTest {
     }
 
     @Test
-    public void shouldReturnNoInvalidCases() {
+    void shouldReturnNoInvalidCases() {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createValidCase("case1"));
 
@@ -71,7 +74,7 @@ public class BulkAddSinglesValidatorTest {
     }
 
     @Test
-    public void shouldReturnErrorWhenImportCasesFails() throws ImportException {
+    void shouldReturnErrorWhenImportCasesFails() throws ImportException {
         when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
                 .thenThrow(ImportException.class);
 
@@ -82,7 +85,7 @@ public class BulkAddSinglesValidatorTest {
     }
 
     @Test
-    public void shouldReturnErrorWhenValidationThrowsException() throws IOException {
+    void shouldReturnErrorWhenValidationThrowsException() throws IOException {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createValidCase("case1"));
         when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, AUTH_TOKEN))

@@ -8,13 +8,18 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -23,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_2;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
@@ -36,18 +40,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleH
 
 @Slf4j
 @Service("excelReadingService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter",
-    "PMD.LinguisticNaming", "PMD.ExcessiveImports"})
 public class ExcelReadingService {
 
     private static final String ERROR_SHEET_NAME_NOT_FOUND = "Worksheet name not found";
     private static final String ERROR_DOCUMENT_NOT_VALID = "Document uploaded not valid";
 
     private final ExcelDocManagementService excelDocManagementService;
+    private final CcdClient ccdClient;
 
     @Autowired
-    public ExcelReadingService(ExcelDocManagementService excelDocManagementService) {
+    public ExcelReadingService(ExcelDocManagementService excelDocManagementService, CcdClient ccdClient) {
         this.excelDocManagementService = excelDocManagementService;
+        this.ccdClient = ccdClient;
     }
 
     public XSSFWorkbook readWorkbook(String userToken, String documentBinaryUrl) throws IOException {
@@ -74,6 +78,29 @@ public class ExcelReadingService {
 
         return multipleObjects;
 
+    }
+
+    /**
+     * Given a case number and subMultiple name, case is found and its subMultiple property is populated.
+     * @param userToken used for IDAM Authentication
+     * @param multipleDetails multipleDetails to get caseTypeId, jurisdiction
+     * @param ethosRef case number
+     * @param subMultiple subMultiple name to be assigned to single case
+     */
+    public void setSubMultipleFieldInSingleCaseData(String userToken,
+                                                    MultipleDetails multipleDetails,
+                                                    String ethosRef,
+                                                    String subMultiple) throws IOException {
+        List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
+                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()), List.of(ethosRef));
+        submitEvents.get(0).getCaseData().setSubMultipleName(Strings.isNullOrEmpty(subMultiple) ? " " : subMultiple);
+        CCDRequest returnedRequest = ccdClient.startEventForCase(userToken,
+                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
+                multipleDetails.getJurisdiction(), String.valueOf(submitEvents.get(0).getCaseId()));
+        ccdClient.submitEventForCase(userToken,
+                submitEvents.get(0).getCaseData(),
+                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
+                multipleDetails.getJurisdiction(), returnedRequest, String.valueOf(submitEvents.get(0).getCaseId()));
     }
 
     public XSSFSheet checkExcelErrors(String userToken, String documentBinaryUrl, List<String> errors)
@@ -115,7 +142,9 @@ public class ExcelReadingService {
 
     }
 
-    private void populateTreeMapWithSet(SortedMap<String, Object> multipleObjects, String key, String value) {
+    private void populateTreeMapWithSet(SortedMap<String, Object> multipleObjects,
+                                        String key,
+                                        String value) {
 
         if (multipleObjects.containsKey(key)) {
             HashSet<String> set = (HashSet<String>) multipleObjects.get(key);
@@ -143,8 +172,10 @@ public class ExcelReadingService {
         }
     }
 
-    private void populateMultipleObjects(SortedMap<String, Object> multipleObjects, XSSFSheet datatypeSheet,
-                                         MultipleData multipleData, FilterExcelType filter) {
+    private void populateMultipleObjects(SortedMap<String, Object> multipleObjects,
+                                         XSSFSheet datatypeSheet,
+                                         MultipleData multipleData,
+                                         FilterExcelType filter) {
 
         for (Row currentRow : datatypeSheet) {
 

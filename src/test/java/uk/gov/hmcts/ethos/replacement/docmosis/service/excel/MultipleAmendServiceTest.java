@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -25,15 +25,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADD_CASES_TO_MULTIPLE_AMENDMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LEAD_CASE_AMENDMENT;
 
-@SuppressWarnings({"PMD.LooseCoupling"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleAmendServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleAmendServiceTest {
 
     @Mock
     private ExcelReadingService excelReadingService;
     @Mock
     private ExcelDocManagementService excelDocManagementService;
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     @Mock
     private MultipleAmendLeadCaseService multipleAmendLeadCaseService;
     @Mock
@@ -46,7 +44,7 @@ public class MultipleAmendServiceTest {
     private String userToken;
     private List<String> typeOfAmendmentMSL;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         typeOfAmendmentMSL = new ArrayList<>(Arrays.asList(LEAD_CASE_AMENDMENT, ADD_CASES_TO_MULTIPLE_AMENDMENT));
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
@@ -56,7 +54,7 @@ public class MultipleAmendServiceTest {
     }
 
     @Test
-    public void bulkAmendMultipleLogic() {
+    void bulkAmendMultipleLogic() {
         multipleDetails.getCaseData().setTypeOfAmendmentMSL(typeOfAmendmentMSL);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);

@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -18,12 +20,12 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
-public class UpdateDataModelBuilderTest {
+@ExtendWith(SpringExtension.class)
+class UpdateDataModelBuilderTest {
     CaseData caseData;
 
     private static final String CLAIMANT_REPRESENTATIVE_NAME = "Ruth Powers";
@@ -35,7 +37,7 @@ public class UpdateDataModelBuilderTest {
     private static final String RESPONDENT_REPRESENTATIVE_NAME = "Lionel Hutz";
     private static final String UNKNOWN_VALUE = "Unknown";
 
-    @Before
+    @BeforeEach
     public void setup() {
         caseData = new CaseData();
 
@@ -81,7 +83,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testNoClaimantRepresentativeSelected() {
+    void testNoClaimantRepresentativeSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -89,7 +91,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testClaimantRepresentativeSelected() {
+    void testClaimantRepresentativeSelected() {
         MultipleData multipleData = createMultipleData(
                 CLAIMANT_REPRESENTATIVE_NAME, SELECT_NONE_VALUE,
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
@@ -99,7 +101,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testUnknownSelectedClaimantRepresentativeIsIgnored() {
+    void testUnknownSelectedClaimantRepresentativeIsIgnored() {
         MultipleData multipleData = createMultipleData(
                 UNKNOWN_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -107,7 +109,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testNoJurisdictionSelected() {
+    void testNoJurisdictionSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -115,7 +117,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testJurisdictionSelected() {
+    void testJurisdictionSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, JURISDICTION, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -123,7 +125,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testUnknownSelectedJurisdictionIsIgnored() {
+    void testUnknownSelectedJurisdictionIsIgnored() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, UNKNOWN_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -131,7 +133,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testNoRespondentSelected() {
+    void testNoRespondentSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -139,7 +141,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testRespondentSelected() {
+    void testRespondentSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, RESPONDENT_NAME, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -147,7 +149,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testUnknownSelectedRespondentIsIgnored() {
+    void testUnknownSelectedRespondentIsIgnored() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, UNKNOWN_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -155,7 +157,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testNoJudgementSelected() {
+    void testNoJudgementSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -163,7 +165,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testJudgementSelected() {
+    void testJudgementSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, JUDGEMENT_ID, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -171,7 +173,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testUnknownSelectedJudgementIsIgnored() {
+    void testUnknownSelectedJudgementIsIgnored() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, UNKNOWN_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -179,7 +181,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testNoRespondentRepresentativeSelected() {
+    void testNoRespondentRepresentativeSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
@@ -187,7 +189,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testRespondentRepresentativeSelected() {
+    void testRespondentRepresentativeSelected() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE,
                 SELECT_NONE_VALUE, RESPONDENT_REPRESENTATIVE_ID);
@@ -196,7 +198,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testUnknownSelectedRespondentRepresentativeIsIgnored() {
+    void testUnknownSelectedRespondentRepresentativeIsIgnored() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE,
                 SELECT_NONE_VALUE, UNKNOWN_VALUE);
@@ -220,7 +222,7 @@ public class UpdateDataModelBuilderTest {
     }
 
     @Test
-    public void testSubMultiple() {
+    void testSubMultiple() {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, JUDGEMENT_ID, SELECT_NONE_VALUE);
         caseData.setSubMultipleName("SubMultiple");

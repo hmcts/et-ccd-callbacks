@@ -1,13 +1,17 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
+
 import java.util.List;
 import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -15,13 +19,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-public class BfExcelReportServiceTest {
+@ExtendWith(SpringExtension.class)
+class BfExcelReportServiceTest {
     @Mock
     BfExcelReportService service;
     BfActionReportData reportData;
     ExcelCreationService excelCreationService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         reportData = new BfActionReportData();
         reportData.setReportPeriodDescription("Period description");
@@ -49,12 +54,12 @@ public class BfExcelReportServiceTest {
     }
 
     @Test
-    public void shouldReturnReportExcelFileDocumentInfo() {
+    void shouldReturnReportExcelFileDocumentInfo() {
         assertNotNull(service.getReportExcelFile(reportData));
     }
 
     @Test
-    public void shouldReturnReportExcelFileEmptyByteArray() {
+    void shouldReturnReportExcelFileEmptyByteArray() {
         assertNotNull(service.getReportExcelFile(
                 new BfActionReportData()));
     }

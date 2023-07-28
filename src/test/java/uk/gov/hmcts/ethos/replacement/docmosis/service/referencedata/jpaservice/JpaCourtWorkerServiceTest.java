@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
@@ -9,13 +11,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepo
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class JpaCourtWorkerServiceTest {
+@ExtendWith(SpringExtension.class)
+class JpaCourtWorkerServiceTest {
     @Test
-    public void testGetCourtWorkerByTribunalOffice() {
+    void testGetCourtWorkerByTribunalOffice() {
         TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
         CourtWorkerType courtWorkerType = CourtWorkerType.CLERK;
         List<CourtWorker> courtWorkers = List.of(

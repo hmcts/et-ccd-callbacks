@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -11,7 +13,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-public class RespondentsReportCaseDataBuilder {
+@ExtendWith(SpringExtension.class)
+class RespondentsReportCaseDataBuilder {
     private final RespondentsReportCaseData caseData = new RespondentsReportCaseData();
 
     public void withNoRespondents() {

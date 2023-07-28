@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
@@ -22,8 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,8 +31,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ExcelDocManagementServiceTest {
+@ExtendWith(SpringExtension.class)
+class ExcelDocManagementServiceTest {
 
     @Mock
     private DocumentManagementService documentManagementService;
@@ -49,7 +49,7 @@ public class ExcelDocManagementServiceTest {
     private String userToken;
     private byte[] bytes;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -60,7 +60,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void uploadExcelDocument() {
+    void uploadExcelDocument() {
         URI uri = URI.create("http://google.com");
         when(documentManagementService.uploadDocument(userToken,
                 bytes,
@@ -78,7 +78,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void downloadExcelDocument() throws IOException {
+    void downloadExcelDocument() throws IOException {
         String binaryUrl = "http://127.0.0.1:3453/documents/20d8a494-4232-480a-aac3-23ad0746c07b/binary";
         when(documentManagementService.downloadFile(userToken,
                 binaryUrl))
@@ -87,7 +87,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void generateAndUploadExcel() {
+    void generateAndUploadExcel() {
         URI uri = URI.create("http://google.com");
         List<String> multipleCollection = new ArrayList<>(
                 Arrays.asList("245000/2020", "245001/2020", "245002/2020"));
@@ -117,7 +117,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void generateAndUploadExcelEmptySubMultipleCollection() {
+    void generateAndUploadExcelEmptySubMultipleCollection() {
         URI uri = URI.create("http://google.com");
         List<String> multipleCollection = new ArrayList<>(
                 Arrays.asList("245000/2020", "245001/2020", "245002/2020"));
@@ -148,7 +148,7 @@ public class ExcelDocManagementServiceTest {
     }
 
     @Test
-    public void writeAndUploadScheduleDocument() {
+    void writeAndUploadScheduleDocument() {
         URI uri = URI.create("http://google.com");
         when(scheduleCreationService.writeSchedule(multipleDetails.getCaseData(),
                 new ArrayList<>(),

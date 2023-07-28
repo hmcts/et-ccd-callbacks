@@ -11,7 +11,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocatio
 import java.util.List;
 
 @Service
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public class ScotlandFileLocationSelectionService {
     private final FileLocationService fileLocationService;
 

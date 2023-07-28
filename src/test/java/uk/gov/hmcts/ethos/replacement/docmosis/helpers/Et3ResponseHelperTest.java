@@ -15,7 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -40,7 +40,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_EMPLOYMENT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class Et3ResponseHelperTest {
 
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";

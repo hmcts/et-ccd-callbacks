@@ -66,6 +66,26 @@ To run all unit tests:
 ```bash
 ./gradlew test
 ```
+### Functional API Tests
+To run all Functional API tests against local instances:
+Ensure your local environment is up and running (see instructions in ecm-ccd-docker), Callback and SYA API instances are started in separate terminals.
+Then run
+```bash
+./gradlew functional
+```
+
+To run all Functional API tests against AAT instances:
+Ensure F5 VPN is on.
+These three variables need to be set in your WSL:
+```bash
+IDAM_API_URL=https://idam-api.aat.platform.hmcts.net
+ET_COS_URL=http://et-cos.service.core-compute-aat.internal
+FT_SYA_URL=http://et-sya-api-aat.service.core-compute-aat.internal
+```
+Then run
+```bash
+./gradlew functional
+```
 
 ### UI Functional Tests
 To run all UI functional test :

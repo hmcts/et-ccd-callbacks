@@ -37,9 +37,9 @@ public abstract class BaseFunctionalTest {
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;
 
-    @Value("${test.url}")
+    @Value("${ft.base.url}")
     protected String baseUrl;
-    @Value("${idam.url}")
+    @Value("${ft.idam.url}")
     private String idamApiUrl;
     @Value("${et-sya-api.url}")
     protected String syaApiUrl;
@@ -51,8 +51,7 @@ public abstract class BaseFunctionalTest {
         client = buildClient();
         idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
         CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
-        userToken = baseUrl.contains("localhost") ? idamTestApiRequests.getLocalAccessToken()
-                : idamTestApiRequests.getAccessToken(user.getEmail());
+        userToken = idamTestApiRequests.getAccessToken(user.getEmail());
         useRelaxedHTTPSValidation();
         spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
         log.info("BaseFunctionalTest setup completed.");

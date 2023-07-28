@@ -381,6 +381,8 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.94.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'
 
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.4.0'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

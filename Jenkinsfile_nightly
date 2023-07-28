@@ -64,6 +64,7 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest()
     enableCrossBrowserTest()
     enableFortifyScan()
+    enableApiGatewayTest()
 
     afterAlways('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'

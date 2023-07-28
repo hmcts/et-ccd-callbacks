@@ -51,7 +51,8 @@ public abstract class BaseFunctionalTest {
         client = buildClient();
         idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
         CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
-        userToken = idamTestApiRequests.getAccessToken(user.getEmail());
+        userToken = baseUrl.contains("localhost") ? idamTestApiRequests.getLocalAccessToken()
+                : idamTestApiRequests.getAccessToken(user.getEmail());
         useRelaxedHTTPSValidation();
         spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
         log.info("BaseFunctionalTest setup completed.");

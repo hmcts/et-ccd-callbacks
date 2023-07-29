@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +18,9 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import java.util.ArrayList;
@@ -36,14 +40,19 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class UpdateReferralController {
     private final VerifyTokenService verifyTokenService;
+    private final String referralTemplateId;
     private final UserService userService;
+    private final EmailService emailService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
-    public UpdateReferralController(VerifyTokenService verifyTokenService,
-                                    UserService userService) {
+    public UpdateReferralController(@Value("${referral.template.id}") String referralTemplateId,
+                                    VerifyTokenService verifyTokenService,
+                                    UserService userService, EmailService emailService) {
         this.verifyTokenService = verifyTokenService;
         this.userService = userService;
+        this.emailService = emailService;
+        this.referralTemplateId = referralTemplateId;
     }
 
     /**
@@ -153,6 +162,23 @@ public class UpdateReferralController {
         ReferralHelper.updateReferral(
                 caseData,
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        ReferralType referral = caseData.getReferralCollection()
+                .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(referral.getUpdateReferralCollection()));
+        emailService.sendEmail(
+                referralTemplateId,
+                caseData.getReferentEmail(),
+                ReferralHelper.buildPersonalisation(
+                        ccdRequest.getCaseDetails(),
+                        referralNumber,
+                        true,
+                        userDetails.getName()
+                )
+        );
+        log.info("Event: Update Referral Email sent. "
+                + ". EventId: " + ccdRequest.getEventId()
+                + ". Update Referral number: " + referralNumber
+                + ". Emailed at: " + DateTime.now());
         clearUpdateReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

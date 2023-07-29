@@ -131,6 +131,7 @@ public final class ReferralHelper {
         caseData.setUpdateReferCaseTo(referral.getReferCaseTo());
         caseData.setUpdateReferralSubject(referral.getReferralSubject());
         caseData.setUpdateReferralDetails(referral.getReferralDetails());
+        caseData.setUpdateReferentEmail(referral.getReferentEmail());
         caseData.setUpdateIsUrgent(referral.getIsUrgent());
         caseData.setUpdateReferralInstruction(referral.getReferralInstruction());
         caseData.setUpdateReferralSubjectSpecify(referral.getReferralSubjectSpecify());
@@ -357,6 +358,7 @@ public final class ReferralHelper {
         updateReferralType.setUpdateReferralInstruction(caseData.getUpdateReferralInstruction());
         updateReferralType.setUpdateReferralDate(Helper.getCurrentDate());
         updateReferralType.setUpdateReferredBy(userFullName);
+        updateReferralType.setUpdateReferentEmail(caseData.getUpdateReferentEmail());
         updateReferralType.setUpdateReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
         ListTypeItem<UpdateReferralType> updateReferralCollection = referral.getUpdateReferralCollection();
         updateReferralCollection.add(GenericTypeItem.from(UUID.randomUUID().toString(), updateReferralType));
@@ -376,6 +378,7 @@ public final class ReferralHelper {
         referral.setReferralDocument(caseData.getUpdateReferralDocument());
         referral.setReferralInstruction(caseData.getUpdateReferralInstruction());
         referral.setReferralDate(Helper.getCurrentDate());
+        referral.setReferentEmail(caseData.getUpdateReferentEmail());
         referral.setReferredBy(userFullName);
     }
 

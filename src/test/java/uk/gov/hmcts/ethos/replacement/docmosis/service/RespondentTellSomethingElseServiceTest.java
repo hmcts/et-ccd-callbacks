@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -46,6 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,8 +72,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
     private TseService tseService;
-
-    @MockBean
     private EmailService emailService;
 
     @MockBean
@@ -117,6 +117,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @BeforeEach
     void setUp() {
+        emailService = spy(new TestEmailService());
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
                         tornadoService, documentManagementService);
@@ -126,9 +127,6 @@ class RespondentTellSomethingElseServiceTest {
                 "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
-
-        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
-        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);

@@ -6,13 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
@@ -42,7 +42,6 @@ class SendNotificationServiceTest {
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
-    @MockBean
     private EmailService emailService;
     @Captor
     ArgumentCaptor<Map<String, String>> personalisationCaptor;
@@ -51,12 +50,10 @@ class SendNotificationServiceTest {
 
     @BeforeEach
     public void setUp() {
+        emailService = spy(new TestEmailService());
         sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
         ReflectionTestUtils.setField(sendNotificationService,
                 SEND_NOTIFICATION_TEMPLATE_ID, "sendNotificationTemplateId");
-
-        when(emailService.getExuiCaseLink(any())).thenAnswer(answer -> "exuiUrl" + answer.getArgument(0));
-        when(emailService.getCitizenCaseLink(any())).thenAnswer(answer -> "citizenUrl" + answer.getArgument(0));
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
             .withClaimantType("claimant@email.com")

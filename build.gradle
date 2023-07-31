@@ -377,6 +377,14 @@ dependencies {
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '5.1.6'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
+    constraints {
+        implementation('com.squareup.okio:okio-jvm:3.4.0') {
+            because 'previous version 2.8.0 is vulnerable'
+        }
+        implementation('com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11') {
+            because 'previous version 4.9.3 is vulnerable'
+        }
+    }
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.94.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.94.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'

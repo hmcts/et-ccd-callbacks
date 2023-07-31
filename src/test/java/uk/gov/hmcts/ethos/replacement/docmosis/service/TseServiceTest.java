@@ -148,9 +148,6 @@ class TseServiceTest {
                 new String[] {"Sent to", "Respondent"}
             );
 
-            actual.forEach(s -> System.out.println(String.join(", ", s)));
-            expected.forEach(s -> System.out.println(String.join(", ", s)));
-
             assertTrue(deepEquals(actual.toArray(), expected.toArray()));
         }
     }
@@ -159,18 +156,7 @@ class TseServiceTest {
     class FormatApplicationResponses {
         @Test
         void withFullData() {
-            GenericTseApplicationType application = GenericTseApplicationType.builder()
-                .applicant(RESPONDENT_TITLE)
-                .respondCollection(List.of(
-                    TseRespondTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(setupAdminTseRespondType())
-                        .build(),
-                    TseRespondTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(setupNonAdminTseRespondType())
-                        .build())
-                ).build();
+            GenericTseApplicationType application = getRespondentAppWithClaimantAndAdminRule92NoResponse();
 
             List<String[]> actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, false);
 
@@ -212,18 +198,7 @@ class TseServiceTest {
 
         @Test
         void respondentView() {
-            GenericTseApplicationType application = GenericTseApplicationType.builder()
-                .applicant(RESPONDENT_TITLE)
-                .respondCollection(List.of(
-                    TseRespondTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(setupAdminTseRespondType())
-                        .build(),
-                    TseRespondTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(setupNonAdminTseRespondType())
-                        .build())
-                ).build();
+            GenericTseApplicationType application = getRespondentAppWithClaimantAndAdminRule92NoResponse();
 
             List<String[]> actual = tseService.formatApplicationResponses(application, AUTH_TOKEN, true);
 
@@ -248,11 +223,24 @@ class TseServiceTest {
                 new String[] {"Sent to", "Respondent"}
             );
 
-            actual.forEach(s -> System.out.println(String.join(", ", s)));
-            expected.forEach(s -> System.out.println(String.join(", ", s)));
-
             assertTrue(deepEquals(actual.toArray(), expected.toArray()));
         }
+    }
+
+    private GenericTseApplicationType getRespondentAppWithClaimantAndAdminRule92NoResponse() {
+        return GenericTseApplicationType.builder()
+            .applicant(RESPONDENT_TITLE)
+            .number("1")
+            .respondCollection(List.of(
+                TseRespondTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(setupAdminTseRespondType())
+                    .build(),
+                TseRespondTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(setupNonAdminTseRespondType())
+                    .build())
+            ).build();
     }
 
     @Test
@@ -350,6 +338,51 @@ class TseServiceTest {
                 """;
 
             assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN, false)).isEqualTo(expected);
+        }
+
+        @Test
+        void withRule92NoResponseAsLegalRep() {
+            CaseData caseData = new CaseData();
+
+            caseData.setGenericTseApplicationCollection(List.of(
+                GenericTseApplicationTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(getRespondentAppWithClaimantAndAdminRule92NoResponse())
+                    .build())
+            );
+
+            DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
+            listType.setValue(listType.getListItems().get(0));
+            caseData.setTseViewApplicationSelect(listType);
+
+            String expected = """
+                |Application||\r
+                |--|--|\r
+                |||\r
+                |||\r
+                |Applicant|Respondent|\r
+                |Supporting material|Document (txt, 1MB)|\r
+                |||\r
+                |||\r
+                |Response 1||\r
+                |Response|Title|\r
+                |Date|2000-01-01|\r
+                |Sent by|Tribunal|\r
+                |Case management order or request?|Request|\r
+                |Is a response required?|No|\r
+                |Party or parties to respond|Both parties|\r
+                |Additional information|More data|\r
+                |Document|Document (txt, 1MB)|\r
+                |Description|Description1|\r
+                |Document|Document (txt, 1MB)|\r
+                |Description|Description2|\r
+                |Case management order made by|Legal officer|\r
+                |Request made by|Caseworker|\r
+                |Full name|Mr Lee Gal Officer|\r
+                |Sent to|Respondent|\r
+                """;
+
+            assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN, true)).isEqualTo(expected);
         }
 
         @Test

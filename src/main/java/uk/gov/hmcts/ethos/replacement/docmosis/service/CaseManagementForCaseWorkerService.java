@@ -143,7 +143,7 @@ public class CaseManagementForCaseWorkerService {
             respondentDefaults(caseData);
         }
         
-        caseData.setHmctsInternalCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
+        caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
     }
 
     public void setCaseDeepLink(CaseData caseData, String caseId) {

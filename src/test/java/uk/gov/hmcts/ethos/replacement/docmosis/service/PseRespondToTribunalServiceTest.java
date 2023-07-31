@@ -68,9 +68,10 @@ class PseRespondToTribunalServiceTest {
     private static final String RESPONSE = "Some Response";
 
     private static final String RULE92_NO_DETAILS = "Rule 92 Reasons";
-    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n"
-        + "%s"
-        + "The tribunal will consider all correspondence and let you know what happens next.";
+    private static final String SUBMITTED_BODY = """
+        ### What happens next\r
+        \r
+        %sThe tribunal will consider all correspondence and let you know what happens next.""";
     private static final String RULE92_ANSWERED_YES =
             "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
     private static final String LINK_TO_CITIZEN_HUB = "linkToCitizenHub";
@@ -230,28 +231,30 @@ class PseRespondToTribunalServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        String expected = "|View Application||\r\n"
-            + "|--|--|\r\n"
-            + "|Notification|View notice of hearing|\r\n"
-            + "|Hearing|3: Hearing - Leeds - 14 Aug 2022|\r\n"
-            + "|Date sent|5 Aug 2022|\r\n"
-            + "|Sent by|Tribunal|\r\n"
-            + "|Case management order or request?|Case management order|\r\n"
-            + "|Is a response required?|Yes - view document for details|\r\n"
-            + "|Party or parties to respond|Both parties|\r\n"
-            + "|Additional information|Additional Info|\r\n"
-            + "|Document|<a href=\"/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary\" target=\"_blank\">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r\n"
-            + "|Description|Notice of Hearing and Submit Hearing Agenda document|\r\n"
-            + "|Request made by|Legal Officer|\r\n"
-            + "|Name|Mr Lee Gal Officer|\r\n"
-            + "|Sent to|Both parties|\r\n"
-            + "|Response 1 | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | Claimant|\r\n"
-            + "|Response date | 10 Aug 2022|\r\n"
-            + "|What's your response to the tribunal? | Response text entered|\r\n"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? |"
-            + " Yes|\r\n\r\n";
+        String expected = """
+            |View Application||\r
+            |--|--|\r
+            |Notification|View notice of hearing|\r
+            |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Case management order or request?|Case management order|\r
+            |Is a response required?|Yes - view document for details|\r
+            |Party or parties to respond|Both parties|\r
+            |Additional information|Additional Info|\r
+            |Document|<a href="/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary" target="_blank">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r
+            |Description|Notice of Hearing and Submit Hearing Agenda document|\r
+            |Request made by|Legal Officer|\r
+            |Name|Mr Lee Gal Officer|\r
+            |Sent to|Both parties|\r
+            |Response 1 | |\r
+            |--|--|\r
+            |Response from | Claimant|\r
+            |Response date | 10 Aug 2022|\r
+            |What's your response to the tribunal? | Response text entered|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | Yes|\r
+            \r
+            """;
 
         assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
             is(expected));
@@ -304,30 +307,32 @@ class PseRespondToTribunalServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        String expected = "|View Application||\r\n"
-            + "|--|--|\r\n"
-            + "|Notification|View notice of hearing|\r\n"
-            + "|Hearing|3: Hearing - Leeds - 14 Aug 2022|\r\n"
-            + "|Date sent|5 Aug 2022|\r\n"
-            + "|Sent by|Tribunal|\r\n"
-            + "|Case management order or request?|Case management order|\r\n"
-            + "|Is a response required?|Yes - view document for details|\r\n"
-            + "|Party or parties to respond|Both parties|\r\n"
-            + "|Additional information|Additional Info|\r\n"
-            + "|Document|<a href=\"/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary\" target=\"_blank\">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r\n"
-            + "|Description|Notice of Hearing and Submit Hearing Agenda document|\r\n"
-            + "|Request made by|Legal Officer|\r\n"
-            + "|Name|Mr Lee Gal Officer|\r\n"
-            + "|Sent to|Both parties|\r\n"
-            + "|Response 1 | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | Claimant|\r\n"
-            + "|Response date | 10 Aug 2022|\r\n"
-            + "|What's your response to the tribunal? | Response text entered|\r\n"
-            + "|Supporting material | <a href=\"/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary\" "
-            + "target=\"_blank\">My claimant hearing agenda.pdf</a>\r\n|\r\n"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | "
-            + "Yes|\r\n\r\n";
+        String expected = """
+            |View Application||\r
+            |--|--|\r
+            |Notification|View notice of hearing|\r
+            |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Case management order or request?|Case management order|\r
+            |Is a response required?|Yes - view document for details|\r
+            |Party or parties to respond|Both parties|\r
+            |Additional information|Additional Info|\r
+            |Document|<a href="/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary" target="_blank">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r
+            |Description|Notice of Hearing and Submit Hearing Agenda document|\r
+            |Request made by|Legal Officer|\r
+            |Name|Mr Lee Gal Officer|\r
+            |Sent to|Both parties|\r
+            |Response 1 | |\r
+            |--|--|\r
+            |Response from | Claimant|\r
+            |Response date | 10 Aug 2022|\r
+            |What's your response to the tribunal? | Response text entered|\r
+            |Supporting material | <a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>\r
+            |\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | Yes|\r
+            \r
+            """;
 
         assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
             is(expected));
@@ -354,7 +359,6 @@ class PseRespondToTribunalServiceTest {
 
     @Test
     void initialOrdReqDetailsTableMarkUp_NoHearing() {
-
         caseData.setSendNotificationCollection(List.of(
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
@@ -377,19 +381,21 @@ class PseRespondToTribunalServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        String expected = "|View Application||\r\n"
-            + "|--|--|\r\n"
-            + "|Notification|View notice of hearing|\r\n"
-            + "|Date sent|5 Aug 2022|\r\n"
-            + "|Sent by|Tribunal|\r\n"
-            + "|Case management order or request?|Request|\r\n"
-            + "|Is a response required?|No|\r\n"
-            + "|Request made by|Judge|\r\n"
-            + "|Name|Mr Lee Gal Officer|\r\n"
-            + "|Sent to|Both parties|\r\n";
+        String expected = """
+            |View Application||\r
+            |--|--|\r
+            |Notification|View notice of hearing|\r
+            |Hearing||\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Case management order or request?|Request|\r
+            |Is a response required?|No|\r
+            |Request made by|Judge|\r
+            |Name|Mr Lee Gal Officer|\r
+            |Sent to|Both parties|\r
+            """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
-            is(expected));
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData), is(expected));
     }
 
     @ParameterizedTest

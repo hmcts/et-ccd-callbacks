@@ -164,7 +164,8 @@ public class UpdateReferralController {
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
-        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(referral.getUpdateReferralCollection()));
+        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(
+                referral.getUpdateReferralCollection()));
         emailService.sendEmail(
                 referralTemplateId,
                 caseData.getReferentEmail(),

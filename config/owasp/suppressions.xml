@@ -50,4 +50,26 @@
         <packageUrl regex="true">^pkg:maven/com\.squareup\.okio/okio@.*$</packageUrl>
         <cpe>cpe:/a:squareup:okio</cpe>
     </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+   file name: logging-interceptor-4.9.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com.squareup.okhttp3/logging-interceptor@.*$</packageUrl>
+        <cve>CVE-2023-3782</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: okhttp-urlconnection-4.9.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com.squareup.okhttp3/okhttp-urlconnection@.*$</packageUrl>
+        <cve>CVE-2023-3782</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: okhttp-4.9.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com.squareup.okhttp3/okhttp@.*$</packageUrl>
+        <cve>CVE-2023-3782</cve>
+    </suppress>
 </suppressions>

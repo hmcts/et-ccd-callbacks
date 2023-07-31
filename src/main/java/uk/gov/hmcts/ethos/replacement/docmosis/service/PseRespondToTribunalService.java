@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -67,9 +66,10 @@ public class PseRespondToTribunalService {
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
 
-    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n"
-        + "%s"
-        + "The tribunal will consider all correspondence and let you know what happens next.";
+    private static final String SUBMITTED_BODY = """
+        ### What happens next\r
+        \r
+        %sThe tribunal will consider all correspondence and let you know what happens next.""";
 
     private static final String RULE92_ANSWERED_YES =
         "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
@@ -95,7 +95,7 @@ public class PseRespondToTribunalService {
                     r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
                 )
             )
-            .collect(Collectors.toList()));
+            .toList());
     }
 
     private boolean isNotifyRespondent(SendNotificationTypeItem sendNotificationTypeItem) {
@@ -113,10 +113,8 @@ public class PseRespondToTribunalService {
      * @param caseData contains all the case data
      */
     public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
-        SendNotificationType sendNotificationType =
-            getSelectedSendNotificationTypeItem(caseData).getValue();
-        return formatOrdReqDetails(sendNotificationType)
-            + formatRespondDetails(sendNotificationType);
+        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        return formatOrdReqDetails(sendNotificationType) + formatRespondDetails(sendNotificationType);
     }
 
     /**

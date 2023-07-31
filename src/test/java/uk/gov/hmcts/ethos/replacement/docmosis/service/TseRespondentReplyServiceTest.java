@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -322,12 +323,19 @@ class TseRespondentReplyServiceTest {
 
     @Test
     void initialResReplyToTribunalTableMarkUp() {
-        when(tseService.formatApplicationDetails(any(), any(), anyBoolean())).thenReturn("applicationDetails");
-        when(tseService.formatApplicationResponses(any(), any(), anyBoolean())).thenReturn("responses");
+        List<String[]> strings = new ArrayList<>();
+        strings.add(new String[] {"applicationDetails", ""});
+        when(tseService.getApplicationDetailsRows(any(), any(), anyBoolean())).thenReturn(strings);
+
+        List<String[]> formattedApplicationResponses = new ArrayList<>();
+        formattedApplicationResponses.add(new String[] {"responses", ""});
+        when(tseService.formatApplicationResponses(any(), any(), anyBoolean()))
+            .thenReturn(formattedApplicationResponses);
 
         tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, "token");
-        String expectedResponseTables = "applicationDetails" + "\r\n" + "responses";
-        assertThat(caseData.getTseResponseTable(), is(expectedResponseTables));
+
+        assertThat(caseData.getTseResponseTable(),
+            is("|Application||\r\n|--|--|\r\n|applicationDetails||\r\n|responses||\r\n"));
         assertThat(caseData.getTseRespondingToTribunal(), is(YES));
     }
 

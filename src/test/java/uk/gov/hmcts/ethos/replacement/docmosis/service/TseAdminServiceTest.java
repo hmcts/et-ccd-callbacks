@@ -116,14 +116,26 @@ class TseAdminServiceTest {
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
 
-        when(tseService.formatApplicationDetails(application, AUTH_TOKEN, false)).thenReturn("Application Details");
-        when(tseService.formatApplicationResponses(any(), any(), anyBoolean())).thenReturn("Responses");
+        List<String[]> applicationDetailsRows = new ArrayList<>();
+        applicationDetailsRows.add(new String[] {"details", ""});
+        when(tseService.getApplicationDetailsRows(application, AUTH_TOKEN, true))
+            .thenReturn(applicationDetailsRows);
 
-        String expected = "Application Details\r\nResponses";
+        List<String[]> formattedApplicationResponses = new ArrayList<>();
+        formattedApplicationResponses.add(new String[] {"responses", ""});
+        when(tseService.formatApplicationResponses(any(), any(), anyBoolean()))
+            .thenReturn(formattedApplicationResponses);
+
+        String expected = """
+            |Application||\r
+            |--|--|\r
+            |details||\r
+            |responses||\r
+            """;
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
-        assertThat(caseData.getTseAdminTableMarkUp())
-            .isEqualTo(expected);
+
+        assertThat(caseData.getTseAdminTableMarkUp()).isEqualTo(expected);
     }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {

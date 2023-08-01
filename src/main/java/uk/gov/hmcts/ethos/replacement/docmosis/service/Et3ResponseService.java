@@ -160,6 +160,8 @@ public class Et3ResponseService {
         personalisation.put("list_of_respondents", getRespondentNames(caseData));
         personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        // TODO: Current templates in environments expect a ccdId - this should be removed later
+        personalisation.put("ccdId", caseDetails.getCaseId());
         return personalisation;
     }
 

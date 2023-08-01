@@ -157,7 +157,8 @@ class Et3ResponseServiceTest {
             "claimant", "Claimant LastName",
             "list_of_respondents", "Respondent",
             "date", "25 Nov 2099",
-            "linkToExUI", "exuiUrl1683646754393041"
+            "linkToExUI", "exuiUrl1683646754393041",
+            "ccdId", "1683646754393041"
         );
         verify(emailService, times(1)).sendEmail(any(), eq("tribunal@email.com"), eq(expected));
     }

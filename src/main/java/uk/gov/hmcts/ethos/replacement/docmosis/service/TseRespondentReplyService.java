@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.time.LocalDate;
@@ -45,7 +44,6 @@ public class TseRespondentReplyService {
     private final TornadoService tornadoService;
     private final EmailService emailService;
     private final UserService userService;
-    private final NotificationProperties notificationProperties;
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
 
@@ -193,8 +191,8 @@ public class TseRespondentReplyService {
      */
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        if (StringUtils.isEmpty(caseData.getTseResponseText())
-                && StringUtils.isEmpty(caseData.getTseRespondingToTribunalText())
+        if (ObjectUtils.isEmpty(caseData.getTseResponseText())
+                && ObjectUtils.isEmpty(caseData.getTseRespondingToTribunalText())
                 && NO.equals(caseData.getTseResponseHasSupportingMaterial())) {
             errors.add(GIVE_MISSING_DETAIL);
         }
@@ -220,7 +218,7 @@ public class TseRespondentReplyService {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, notificationProperties.getCitizenUrl());
+                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
             emailService.sendEmail(tseRespondentResponseTemplateId,
                     claimantEmail, personalisation);
         } catch (Exception e) {
@@ -231,11 +229,11 @@ public class TseRespondentReplyService {
 
     private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken,
                                               boolean isRespondingToTribunal) {
-        String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-                getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
-                legalRepEmail,
-                TseHelper.getPersonalisationForAcknowledgement(caseDetails, notificationProperties.getExuiUrl()));
+            getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
+            userService.getUserDetails(userToken).getEmail(),
+            TseHelper.getPersonalisationForAcknowledgement(
+                caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId())));
     }
 
     private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {
@@ -273,7 +271,7 @@ public class TseRespondentReplyService {
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 APPLICATION_TYPE, selectedApplication.getType(),
-                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId()));
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
         emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 
@@ -292,7 +290,7 @@ public class TseRespondentReplyService {
 
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId()));
+                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
         emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, claimantEmail, personalisation);
     }
 

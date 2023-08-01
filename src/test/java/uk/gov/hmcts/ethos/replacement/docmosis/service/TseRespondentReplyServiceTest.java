@@ -23,10 +23,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -49,6 +49,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -70,11 +71,7 @@ class TseRespondentReplyServiceTest {
     @MockBean
     private TornadoService tornadoService;
     @MockBean
-    private EmailService emailService;
-    @MockBean
     private UserService userService;
-    @MockBean
-    private NotificationProperties notificationProperties;
     @MockBean
     private TseService tseService;
     @MockBean
@@ -85,11 +82,12 @@ class TseRespondentReplyServiceTest {
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_NO = "replyToTribAckTemplateNo";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_YES = "replyToAppAckTemplateYes";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_NO = "replyToAppAckTemplateNo";
-    public static final String TEST_XUI_URL = "test.xui.com";
-    public static final String TEST_CUI_URL = "test.cui.com";
-    public static final String CASE_NUMBER = "9876";
-    public static final String WITHDRAW_MY_CLAIM = "Withdraw my claim";
+    private static final String TEST_XUI_URL = "exuiUrl";
+    private static final String TEST_CUI_URL = "citizenUrl";
+    private static final String CASE_NUMBER = "9876";
+    private static final String WITHDRAW_MY_CLAIM = "Withdraw my claim";
 
+    private EmailService emailService;
     private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
     private CaseData caseData;
@@ -98,8 +96,9 @@ class TseRespondentReplyServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        emailService = spy(new TestEmailService());
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-                notificationProperties, respondentTellSomethingElseService, tseService);
+                respondentTellSomethingElseService, tseService);
 
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -258,10 +257,7 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn("link");
         when(respondentTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
-        when(notificationProperties.getExuiLinkWithCaseId(any())).thenReturn(TEST_XUI_URL);
-        when(notificationProperties.getCitizenLinkWithCaseId(any())).thenReturn(TEST_CUI_URL);
 
         ReflectionTestUtils.setField(tseRespondentReplyService,
                 "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);
@@ -271,11 +267,11 @@ class TseRespondentReplyServiceTest {
         Map<String, String> tribunlPersonalisation = Map.of(
                 NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
                 APPLICATION_TYPE, WITHDRAW_MY_CLAIM,
-                LINK_TO_EXUI, TEST_XUI_URL);
+                LINK_TO_EXUI, TEST_XUI_URL + "caseId");
 
         Map<String, String> claimantPersonalisation = Map.of(
                 NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
-                LINK_TO_CITIZEN_HUB, TEST_CUI_URL);
+                LINK_TO_CITIZEN_HUB, TEST_CUI_URL + "caseId");
 
         tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
 

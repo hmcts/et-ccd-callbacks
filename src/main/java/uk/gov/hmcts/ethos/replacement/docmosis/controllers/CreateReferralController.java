@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,11 +19,11 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -39,14 +39,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
  */
 @Slf4j
 @RequestMapping("/createReferral")
+@RequiredArgsConstructor
 @RestController
 public class CreateReferralController {
 
-    private final String referralTemplateId;
     private final VerifyTokenService verifyTokenService;
-    private final EmailService emailService;
+    private final ReferralService referralService;
     private final UserService userService;
-    private final CreateReferralService createReferralService;
     private final DocumentManagementService documentManagementService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -54,19 +53,6 @@ public class CreateReferralController {
         + "<h3>What happens next</h3>"
         + "<p>Your referral has been sent. Replies and instructions will appear in the "
         + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
-
-    public CreateReferralController(@Value("${referral.template.id}") String referralTemplateId,
-                                    VerifyTokenService verifyTokenService,
-                                    EmailService emailService, UserService userService,
-                                    CreateReferralService createReferralService,
-                                    DocumentManagementService documentManagementService) {
-        this.referralTemplateId = referralTemplateId;
-        this.emailService = emailService;
-        this.verifyTokenService = verifyTokenService;
-        this.userService = userService;
-        this.createReferralService = createReferralService;
-        this.documentManagementService = documentManagementService;
-    }
 
     /**
      * Called for the first page of the Create Referral event.
@@ -162,22 +148,14 @@ public class CreateReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
             caseData.setReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userService.getUserDetails(userToken);
         String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData));
-        emailService.sendEmail(
-            referralTemplateId,
-            caseData.getReferentEmail(),
-            ReferralHelper.buildPersonalisation(
-                ccdRequest.getCaseDetails(),
-                referralNumber,
-                true,
-                userDetails.getName()
-            )
-        );
+        referralService.sendEmail(caseDetails, referralNumber, true, userToken);
 
         log.info("Event: Referral Email sent. "
             + ". EventId: " + ccdRequest.getEventId()
@@ -185,8 +163,8 @@ public class CreateReferralController {
             + ". Emailed at: " + DateTime.now());
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
-        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
-            userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+        DocumentInfo documentInfo = referralService.generateCRDocument(caseData,
+            userToken, caseDetails.getCaseTypeId());
 
         ReferralHelper.createReferral(
             caseData,

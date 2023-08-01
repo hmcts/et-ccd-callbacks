@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -26,8 +25,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -48,6 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,8 +72,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
     private TseService tseService;
-
-    @MockBean
     private EmailService emailService;
 
     @MockBean
@@ -84,9 +82,6 @@ class RespondentTellSomethingElseServiceTest {
 
     @MockBean
     private TornadoService tornadoService;
-
-    @SpyBean
-    private NotificationProperties notificationProperties;
 
     @MockBean
     private DocumentManagementService documentManagementService;
@@ -122,17 +117,16 @@ class RespondentTellSomethingElseServiceTest {
 
     @BeforeEach
     void setUp() {
+        emailService = spy(new TestEmailService());
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
-                        tornadoService, notificationProperties, documentManagementService);
+                        tornadoService, documentManagementService);
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -544,7 +538,7 @@ class RespondentTellSomethingElseServiceTest {
         CaseData caseData = createCaseData("", YES);
         caseData.setManagingOffice(BRISTOL_OFFICE);
 
-        when(tribunalOfficesService.getTribunalOffice(eq(BRISTOL_OFFICE))).thenReturn(TribunalOffice.BRISTOL);
+        when(tribunalOfficesService.getTribunalOffice(BRISTOL_OFFICE)).thenReturn(TribunalOffice.BRISTOL);
 
         assertThat(respondentTellSomethingElseService.getTribunalEmail(caseData),
                 is(TribunalOffice.BRISTOL.getOfficeEmail()));

@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.time.LocalDate;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.UUID.randomUUID;
@@ -41,26 +39,26 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
 @RequiredArgsConstructor
 @Slf4j
 public class RespondNotificationService {
+    private static final String UPLOAD_DOCUMENT_IS_REQUIRED = "Upload document is required";
+    private static final String SUPPORTING_MATERIAL = "| Supporting material | |";
+    private static final String RESPONSE_DETAILS = """
+        |  | |\r
+        | --- | --- |\r
+        | Response %1$S | |\r
+        | Response from | %2$s |\r
+        | Response date | %3$s |\r
+         %4$s\r
+        | What's your response to the tribunal? | %5$s\r
+        | Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | %6$s |\r
+        """;
 
     private final EmailService emailService;
     private final SendNotificationService sendNotificationService;
-    private final NotificationProperties notificationProperties;
+
     @Value("${sendNotification.template.id}")
     private String responseTemplateId;
     @Value("${respondNotification.noResponseTemplate.id}")
     private String noResponseTemplateId;
-    private static final String RESPONSE_DETAILS = "|  | |\r\n"
-        + "| --- | --- |\r\n"
-        + "| Response %1$S | |\r\n"
-        + "| Response from | %2$s |\r\n"
-        + "| Response date | %3$s |\r\n"
-        + " %4$s\r\n"
-        + "| What's your response to the tribunal? | %5$s\r\n"
-        + "| Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | %6$s |\r\n";
-
-    private static final String UPLOAD_DOCUMENT_IS_REQUIRED = "Upload document is required";
-
-    private static final String SUPPORTING_MATERIAL = "| Supporting material | |";
 
     public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -140,7 +138,7 @@ public class RespondNotificationService {
         List<String> documents = respondNotificationType.getRespondNotificationUploadDocument().stream()
             .map(documentTypeItem ->
                 getRespondNotificationSingleDocumentMarkdown(documentTypeItem.getValue().getUploadedDocument()))
-            .collect(Collectors.toList());
+            .toList();
         return String.join("\r\n", documents);
     }
 
@@ -149,7 +147,7 @@ public class RespondNotificationService {
      * @param sendNotificationType notification
      * @return markdown of responses
      */
-    public String getRespondNotificationMarkdown(SendNotificationType sendNotificationType) {
+    private String getRespondNotificationMarkdown(SendNotificationType sendNotificationType) {
         var respondNotificationTypeCollection = sendNotificationType.getRespondNotificationTypeCollection();
         if (respondNotificationTypeCollection == null) {
             return "";
@@ -171,7 +169,7 @@ public class RespondNotificationService {
                         YES
                     );
                 }
-            ).collect(Collectors.toList());
+            ).toList();
         return String.join("\r\n", respondNotificationMarkdownList);
     }
 
@@ -191,7 +189,7 @@ public class RespondNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
             "caseNumber", caseData.getEthosCaseReference(),
-            "environmentUrl", envUrl + caseDetails.getCaseId(),
+            "environmentUrl", envUrl,
             "claimant", caseData.getClaimant(),
             "respondents", getRespondentNames(caseData),
             "notificationTitle", sendNotificationTitle
@@ -209,7 +207,7 @@ public class RespondNotificationService {
 
     /**
      * Sends notification emails for the claimant and/or respondent(s) based on the radio list from the
-     * respond to a notification event.
+     * "respond to a notification" event.
      * @param caseDetails - caseDetails
      * @param sendNotificationType - the notification containing the details of the response
      */
@@ -225,14 +223,18 @@ public class RespondNotificationService {
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
 
         String sendNotificationTitle = sendNotificationType.getSendNotificationTitle();
+        String caseId = caseDetails.getCaseId();
         if (!RESPONDENT_ONLY.equals(caseData.getRespondNotificationPartyToNotify()) && !isNullOrEmpty(claimantEmail)) {
-            emailService.sendEmail(templateId, claimantEmail,
-                buildPersonalisation(caseDetails, notificationProperties.getCitizenUrl(), sendNotificationTitle));
+            emailService.sendEmail(
+                templateId,
+                claimantEmail,
+                buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId), sendNotificationTitle)
+            );
         }
 
         if (!CLAIMANT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
             Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                    notificationProperties.getExuiUrl(), sendNotificationTitle);
+                    emailService.getExuiCaseLink(caseId), sendNotificationTitle);
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue(), templateId));
         }

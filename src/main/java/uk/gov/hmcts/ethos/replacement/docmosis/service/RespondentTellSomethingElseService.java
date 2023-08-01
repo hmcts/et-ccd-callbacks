@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
@@ -58,7 +57,6 @@ public class RespondentTellSomethingElseService {
     private final UserService userService;
     private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
-    private final NotificationProperties notificationProperties;
     private final DocumentManagementService documentManagementService;
 
     @Value("${tse.respondent.application.acknowledgement.template.id}")
@@ -152,7 +150,7 @@ public class RespondentTellSomethingElseService {
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, getRespondentNames(caseData),
-                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -197,7 +195,7 @@ public class RespondentTellSomethingElseService {
         personalisation.put(RESPONDENTS, getRespondentNames(caseData));
         personalisation.put("customisedText", customisedText);
         personalisation.put("shortText", caseData.getResTseSelectApplication());
-        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(detail.getCaseId()));
+        personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(detail.getCaseId()));
         return personalisation;
     }
 
@@ -217,7 +215,7 @@ public class RespondentTellSomethingElseService {
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
-                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId()),
+                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()),
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 APPLICATION_TYPE, caseData.getResTseSelectApplication(),
                 "instructions", instructions,
@@ -287,7 +285,7 @@ public class RespondentTellSomethingElseService {
         personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put(RESPONDENTS, getRespondentNames(caseData));
         personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put("url", notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId()));
+        personalisation.put("url", emailService.getExuiCaseLink(caseDetails.getCaseId()));
         return personalisation;
     }
 

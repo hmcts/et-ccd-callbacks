@@ -13,18 +13,23 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.buildPersonalisation;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -137,10 +142,33 @@ public class Et3ResponseService {
      * @param caseDetails Contains details about the case.
      */
     public void sendNotifications(CaseDetails caseDetails) {
-        emailService.sendEmail(et3EmailTribunalTemplateId,
+        emailService.sendEmail(
+            et3EmailTribunalTemplateId,
             caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
             buildPersonalisation(caseDetails)
         );
     }
 
+    // todo group all personalisation methods and NotificationServiceConstants to EmailService or to a
+    // PersonalisationService. Might even be able to join into one single method that prepares all the data for all
+    // emails (unless some of it is expensive / bespoke / overrides in which case send a map parameter of overrides)
+    private Map<String, String> buildPersonalisation(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("case_number", caseData.getEthosCaseReference());
+        personalisation.put(CLAIMANT, caseData.getClaimant());
+        personalisation.put("list_of_respondents", getRespondentNames(caseData));
+        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        // TODO: Current templates in environments expect a ccdId - this should be removed later
+        personalisation.put("ccdId", caseDetails.getCaseId());
+        return personalisation;
+    }
+
+    // todo probably should be replaced with Helper.getRespondentNames
+    private static String getRespondentNames(CaseData caseData) {
+        return caseData.getRespondentCollection().stream()
+            .map(o -> o.getValue().getRespondentName())
+            .collect(Collectors.joining(", "));
+    }
 }

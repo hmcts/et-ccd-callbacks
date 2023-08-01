@@ -21,9 +21,9 @@ import java.util.UUID;
 public class EmailService {
     private final NotificationClient emailClient;
 
-    @Value("${url.exui.case-details}")
+    @Value("${case-details-url.exui}")
     private String exuiUrl;
-    @Value("${url.citizen.case-details}")
+    @Value("${case-details-url.citizen}")
     private String citizenUrl;
 
     /**

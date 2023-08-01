@@ -55,9 +55,9 @@ public class RespondNotificationService {
     private final EmailService emailService;
     private final SendNotificationService sendNotificationService;
 
-    @Value("${sendNotification.template.id}")
+    @Value("${template.sendNotification}")
     private String responseTemplateId;
-    @Value("${respondNotification.noResponseTemplate.id}")
+    @Value("${template.respondNotification.noResponse}")
     private String noResponseTemplateId;
 
     public void populateSendNotificationSelection(CaseData caseData) {

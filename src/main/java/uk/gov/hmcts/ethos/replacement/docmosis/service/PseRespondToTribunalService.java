@@ -52,13 +52,13 @@ public class PseRespondToTribunalService {
     private final HearingSelectionService hearingSelectionService;
     private final TribunalOfficesService tribunalOfficesService;
 
-    @Value("${pse.respondent.acknowledgement.yes.template.id}")
+    @Value("${template.pse.respondent.rule-92-yes}")
     private String acknowledgeEmailYesTemplateId;
-    @Value("${pse.respondent.acknowledgement.no.template.id}")
+    @Value("${template.pse.respondent.rule-92-no}")
     private String acknowledgeEmailNoTemplateId;
-    @Value("${pse.respondent.notification.claimant.template.id}")
+    @Value("${template.pse.claimant}")
     private String notificationToClaimantTemplateId;
-    @Value("${pse.respondent.notification.admin.template.id}")
+    @Value("${template.pse.admin}")
     private String notificationToAdminTemplateId;
 
     private static final String GIVE_MISSING_DETAIL =

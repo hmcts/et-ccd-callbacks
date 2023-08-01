@@ -42,9 +42,9 @@ public class TseAdminService {
 
     private final EmailService emailService;
     private final TseService tseService;
-    @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
+    @Value("${template.tse.admin.record-a-decision.claimant}")
     private String tseAdminRecordClaimantTemplateId;
-    @Value("${tse.admin.record-a-decision.notify.respondent.template.id}")
+    @Value("${template.tse.admin.record-a-decision.respondent}")
     private String tseAdminRecordRespondentTemplateId;
 
     /**

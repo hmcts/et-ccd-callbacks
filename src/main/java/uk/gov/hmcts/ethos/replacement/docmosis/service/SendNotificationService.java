@@ -44,7 +44,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 public class SendNotificationService {
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
-    @Value("${sendNotification.template.id}")
+    @Value("${template.sendNotification}")
     private String sendNotificationTemplateId;
 
     private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";

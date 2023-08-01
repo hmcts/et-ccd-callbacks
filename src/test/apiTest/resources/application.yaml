@@ -1,90 +1,49 @@
-# GENERAL SPRING BOOT ACTUATOR CONFIG
-# Context path for Spring Boot Actuator endpoints
-management:
-  endpoints:
-    web:
-      base-path: /
-  endpoint:
-    health:
-      show-details: always
-
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          lob:
-            non_contextual_creation: 'true'
-  application:
-    name: et-cos
   datasource:
-    password: ${ET_COS_DB_PASSWORD:}
-    url: jdbc:postgresql://${ET_COS_DB_HOST:localhost}:${ET_COS_DB_PORT:5432}/${ET_COS_DB_NAME:et_cos}${ET_COS_DB_CONN_OPTIONS:}
-    username: ${ET_COS_DB_USER_NAME:et_cos}
-  config:
-    import: optional:configtree:/mnt/secrets/et-cos/,optional:configtree:/mnt/secrets/et/
+    url: jdbc:postgresql://localhost:5050/et_cos
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev
+  main:
+    lazy-initialization: true
 
-server:
-  port: '8081'
+ft:
+  base:
+    url: ${ET_COS_URL:http://localhost:8081}
+  et-sya-api:
+    url: ${FT_SYA_URL:http://localhost:4550}
+  idam:
+    url: ${IDAM_API_URL:http://localhost:5000}
 
-feign:
-  httpclient:
-    enabled: 'true'
+idam:
+  api:
+    url: http://localhost:5000
+    jwkUrl: http://localhost:5000/o/jwks
+  s2s-auth:
+    url: http://localhost:4502
+    totp_secret: AAAAAAAAAAAAAAAA
+    microservice: et_cos
 
-tornado:
-  accessKey: ${TORNADO_ACCESS_KEY}
-  url: ${TORNADO_URL:http://localhost:8090/rs/render}
-
-ccd:
-  client:
-    timeout: '60000'
-  data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
+et-sya-api:
+  url: http://et-sya-api-aat.service.core-compute-aat.internal
 
 document_management:
   ccdCaseDocument:
-    url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
-  url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
+    url: http://localhost:8080
+  url: http://localhost:4506
 
-idam:
-  s2s-auth:
-    # noinspection SpringBootApplicationYaml
-    url: ${SERVICE_AUTH_PROVIDER_URL:http://service-auth-provider-api:8080} # used in ServiceAuthorisationApi
-    totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
-    microservice: ${MICRO_SERVICE:ccd_gw}
-  api:
-    url: ${IDAM_API_URL:http://sidam-api:5000}
-    jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
+ccd:
   client:
-    scope: openid profile roles manage-user
-    secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
-    id: ${REFORM_SERVICE_NAME:et-cos}
+    timeout: 60000
+  data-store-api-url: http://localhost:4452
 
-ccd_gateway_base_url: ${CCD_GATEWAY_BASE_URL:http://127.0.0.1:3453}
+tornado:
+  accessKey: test
+  url: https://eu.dws3.docmosis.com/api/render
 
 case_document_am:
-  url: ${CASE_DOCUMENT_AM_URL:http://ccd-case-document-am-api:4455}
+  url: http://localhost:4455
 
-rd_professional-api-url: {RD_PROFESSIONAL_API_URL}
-
-feature:
-  secure-doc-store:
-    enabled: 'false'
-
-queue:
-  create-updates:
-    queue-name: create-updates
-    send:
-      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
-
-springdoc:
-  pre-loading-enabled: 'true'
-  packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
-  pathsToMatch: /**
-
-gov-notify-api-key: ${GOV_NOTIFY_API_KEY}
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY:test}
 
 template:
   referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
@@ -148,6 +107,15 @@ template:
   respondNotification:
     noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
 
+queue:
+  create-updates:
+    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
+    send:
+      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING:test}
+
+
+ccd_gateway_base_url: http://127.0.0.1:3453
+
 etcos:
   system:
     username: ${ET_COS_SYSTEM_USER}
@@ -157,9 +125,5 @@ assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
 
 case-details-url:
-  citizen: ${CITIZEN_CASE_DETAILS_URL}
-  exui: ${EXUI_CASE_DETAILS_URL}
-
-feature-flags:
-  # noinspection SpringBootApplicationYaml
-  hearings-api: ${HEARINGS_API_FLAG:true} # will be used in future releases, remove noinspection once in use
+  citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
+  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}

@@ -39,7 +39,7 @@ public class UploadDocumentController {
     private final VerifyTokenService verifyTokenService;
     private final EmailService emailService;
 
-    public UploadDocumentController(@Value("${rejected.template.id}") String templateId,
+    public UploadDocumentController(@Value("${template.rejected}") String templateId,
                                     VerifyTokenService verifyTokenService,
                                     EmailService emailService) {
         this.templateId = templateId;

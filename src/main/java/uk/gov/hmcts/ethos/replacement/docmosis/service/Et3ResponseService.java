@@ -44,7 +44,7 @@ public class Et3ResponseService {
     private final TornadoService tornadoService;
     private final EmailService emailService;
 
-    @Value("${et3Response.notification.tribunal.template.id}")
+    @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";

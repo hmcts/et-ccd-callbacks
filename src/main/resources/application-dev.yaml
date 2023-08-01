@@ -18,10 +18,7 @@ idam:
     jwkUrl: http://localhost:5000/o/jwks
 
 ccd:
-  data:
-    store:
-      api:
-        url: http://localhost:4452
+  data-store-api-url: http://localhost:4452
 
 tornado:
   accessKey: ${TORNADO_ACCESS_KEY:}
@@ -30,9 +27,7 @@ tornado:
 case_document_am:
   url: http://localhost:4455
 
-rd_professional:
-  api:
-    url: http://localhost:4507
+rd_professional-api-url: http://localhost:4507
 
 queue:
   create-updates:
@@ -43,8 +38,6 @@ queue:
 assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
 
-url:
-  exui:
-    case-details: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}
-  citizen:
-    case-details: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
+case-details-url:
+  citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
+  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}

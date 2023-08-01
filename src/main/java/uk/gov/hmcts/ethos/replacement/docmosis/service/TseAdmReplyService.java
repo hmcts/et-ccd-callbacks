@@ -49,9 +49,9 @@ public class TseAdmReplyService {
 
     private final TseService tseService;
 
-    @Value("${tse.admin.reply.notify.claimant.template.id}")
+    @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
-    @Value("${tse.admin.reply.notify.respondent.template.id}")
+    @Value("${template.tse.admin.reply.respondent}")
     private String tseAdminReplyRespondentTemplateId;
 
     private static final String RESPONSE_REQUIRED =

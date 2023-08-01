@@ -47,19 +47,19 @@ public class TseRespondentReplyService {
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
 
-    @Value("${tse.respondent.respond.notify.claimant.template.id}")
+    @Value("${template.tse.respondent.respond.claimant}")
     private String tseRespondentResponseTemplateId;
-    @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
+    @Value("${template.tse.respondent.respond.respondent.rule-92-no}")
     private String acknowledgementRule92NoEmailTemplateId;
-    @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
+    @Value("${template.tse.respondent.respond.respondent.rule-92-yes}")
     private String acknowledgementRule92YesEmailTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-tribunal}")
+    @Value("${template.tse.respondent.reply-to-tribunal.tribunal}")
     private String replyToTribunalEmailToTribunalTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-claimant}")
+    @Value("${template.tse.respondent.reply-to-tribunal.claimant}")
     private String replyToTribunalEmailToClaimantTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-yes}")
+    @Value("${template.tse.respondent.reply-to-tribunal.respondent.rule-92-yes}")
     private String replyToTribunalAckEmailToLRRule92YesTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-no}")
+    @Value("${template.tse.respondent.reply-to-tribunal.respondent.rule-92-no}")
     private String replyToTribunalAckEmailToLRRule92NoTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";

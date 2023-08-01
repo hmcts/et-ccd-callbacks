@@ -6,6 +6,14 @@ spring:
   main:
     lazy-initialization: true
 
+ft:
+  base:
+    url: ${ET_COS_URL:http://localhost:8081}
+  et-sya-api:
+    url: ${FT_SYA_URL:http://localhost:4550}
+  idam:
+    url: ${IDAM_API_URL:http://localhost:5000}
+
 idam:
   api:
     url: http://localhost:5000
@@ -14,10 +22,6 @@ idam:
     url: http://localhost:4502
     totp_secret: AAAAAAAAAAAAAAAA
     microservice: et_cos
-  url: https://idam-api.aat.platform.hmcts.net
-
-test:
-  url: http://et-cos.service.core-compute-aat.internal
 
 et-sya-api:
   url: http://et-sya-api-aat.service.core-compute-aat.internal

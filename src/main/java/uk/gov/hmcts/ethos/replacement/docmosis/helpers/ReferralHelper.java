@@ -627,6 +627,26 @@ public final class ReferralHelper {
         return personalisation;
     }
 
+    public static Map<String, String> buildPersonalisationUpdateReferral(CaseDetails detail,
+                                                                         String referralNumber,
+                                                                         String username) {
+        CaseData caseData = detail.getCaseData();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        personalisation.put(EMAIL_FLAG, caseData.getUpdateIsUrgent());
+        personalisation.put(CLAIMANT, caseData.getClaimant());
+        personalisation.put(RESPONDENTS, getRespondentNames(caseData));
+        personalisation.put(DATE, getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put("body",EMAIL_BODY_NEW);
+        personalisation.put("refNumber", referralNumber);
+        personalisation.put("subject", caseData.getUpdateReferralSubject());
+        personalisation.put("username", username);
+        personalisation.put("replyReferral", REPLY_REFERRAL_REF);
+        personalisation.put(CCD_ID, detail.getCaseId());
+        return personalisation;
+    }
+
+
     /**
      * Gets errors in document upload.
      * @param documentTypeItems - a list from which referral document items are extracted

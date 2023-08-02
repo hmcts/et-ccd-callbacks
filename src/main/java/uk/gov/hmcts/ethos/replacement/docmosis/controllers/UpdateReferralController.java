@@ -168,11 +168,10 @@ public class UpdateReferralController {
                 referral.getUpdateReferralCollection()));
         emailService.sendEmail(
                 referralTemplateId,
-                caseData.getReferentEmail(),
-                ReferralHelper.buildPersonalisation(
+                caseData.getUpdateReferentEmail(),
+                ReferralHelper.buildPersonalisationUpdateReferral(
                         ccdRequest.getCaseDetails(),
                         referralNumber,
-                        true,
                         userDetails.getName()
                 )
         );

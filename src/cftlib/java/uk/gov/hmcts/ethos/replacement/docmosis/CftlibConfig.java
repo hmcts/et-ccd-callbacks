@@ -171,6 +171,9 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER_EMPLOYMENT_API);
 
         lib.createIdamUser(SUPERUSER_EMAIL,
+            CASEWORKER,
+            CASEWORKER_EMPLOYMENT,
+            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
             CASEWORKER_CCA,
             PUI_CASE_MANAGER,
             PUI_ORGANISATION_MANAGER,

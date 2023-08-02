@@ -637,7 +637,7 @@ public final class ReferralHelper {
         personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put(RESPONDENTS, getRespondentNames(caseData));
         personalisation.put(DATE, getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put("body",EMAIL_BODY_NEW);
+        personalisation.put("body", EMAIL_BODY_NEW);
         personalisation.put("refNumber", referralNumber);
         personalisation.put("subject", caseData.getUpdateReferralSubject());
         personalisation.put("username", username);
@@ -645,7 +645,6 @@ public final class ReferralHelper {
         personalisation.put(CCD_ID, detail.getCaseId());
         return personalisation;
     }
-
 
     /**
      * Gets errors in document upload.

@@ -137,7 +137,12 @@ class UpdateReferralControllerTest {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("respondent Name");
         respondentSumTypeItem.setValue(respondentSumType);
-        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(List.of(respondentSumTypeItem));
+        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(
+                List.of(respondentSumTypeItem));
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setUpdateIsUrgent("Yes");
+        caseData.setUpdateReferentEmail("example@example.com");
+        caseData.setUpdateReferralSubject("subject");
         when(userService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)

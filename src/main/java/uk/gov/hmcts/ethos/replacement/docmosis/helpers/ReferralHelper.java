@@ -668,9 +668,7 @@ public final class ReferralHelper {
 
     private static String getReferralSubject(CaseData caseData, boolean isNew) {
         if (isNew) {
-            return Strings.isNullOrEmpty(caseData.getReferralSubject())
-                    ? " "
-                    : caseData.getReferralSubject();
+            return caseData.getReferralSubject();
         }
 
         ReferralType selectedReferral = getSelectedReferral(caseData);

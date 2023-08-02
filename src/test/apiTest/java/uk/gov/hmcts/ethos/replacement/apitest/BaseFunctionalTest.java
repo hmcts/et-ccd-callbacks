@@ -39,9 +39,9 @@ public abstract class BaseFunctionalTest {
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;
 
-    @Value("${test.url}")
+    @Value("${ft.base.url}")
     protected String baseUrl;
-    @Value("${idam.url}")
+    @Value("${ft.idam.url}")
     private String idamApiUrl;
     @Value("${et-sya-api.url}")
     protected String syaApiUrl;

@@ -29,8 +29,6 @@ public final class RolesConstants {
     public static final String PUI_USER_MANAGER = "pui-user-manager";
     public static final String PUI_CAA = "pui-caa";
     public static final String MANAGE_USER = "manage-user";
-    public static final String CASEWORKER_APPROVER = "caseworker-approver";
-
     public static final String PRD_AAC_SYSTEM = "prd-aac-system";
     public static final String PRD_ADMIN = "prd-admin";
 

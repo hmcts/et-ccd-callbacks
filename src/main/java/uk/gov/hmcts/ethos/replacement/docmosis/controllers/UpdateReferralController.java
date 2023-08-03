@@ -181,7 +181,6 @@ public class UpdateReferralController {
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
 
-
         emailService.sendEmail(
                 referralTemplateId,
                 caseData.getUpdateReferentEmail(),

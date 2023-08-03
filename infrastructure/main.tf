@@ -7,10 +7,14 @@ locals {
     tomap({
       "environment" = var.env,
       "managedBy" = var.team_name,
-      "Team Contact" = var.team_contact
+      "Team Contact" = var.team_contact,
+      "application" = "employment-tribunals",
+      "businessArea" = "CFT",
+      "builtFrom" = "et-ccd-callbacks"
     })
   )
 }
+
 
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"

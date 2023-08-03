@@ -334,8 +334,8 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.23'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.3.2'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.2.0'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.4.0'
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -381,6 +381,8 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.94.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.4.0'
+
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.4.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

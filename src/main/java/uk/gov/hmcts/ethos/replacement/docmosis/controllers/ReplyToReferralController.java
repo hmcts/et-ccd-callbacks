@@ -34,6 +34,8 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
+
 
 /**
  * REST controller for the Referral Reply event pages, formats data appropriately for rendering on the front end.
@@ -47,6 +49,7 @@ public class ReplyToReferralController {
     private final UserService userService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
+    private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -76,7 +79,7 @@ public class ReplyToReferralController {
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
+        log.info("ABOUT TO START REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -109,6 +112,7 @@ public class ReplyToReferralController {
     public ResponseEntity<CCDCallbackResponse> initHearingDetailsForReplyToReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
+        log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -140,7 +144,7 @@ public class ReplyToReferralController {
     public ResponseEntity<CCDCallbackResponse> validateReplyToEmail(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
+        log.info("VALIDATE REPLY TO EMAIL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -176,6 +180,7 @@ public class ReplyToReferralController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralReply(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
+        log.info("ABOUT TO SUBMIT REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -185,12 +190,6 @@ public class ReplyToReferralController {
         CaseData caseData = caseDetails.getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
         String referralCode = caseData.getSelectReferral().getValue().getCode();
-        referralService.sendEmail(caseDetails, referralCode, false, userToken);
-
-        log.info("Event: Referral Reply Email sent. "
-            + ". EventId: " + ccdRequest.getEventId()
-            + ". Referral code: " + referralCode
-            + ". Emailed at: " + DateTime.now());
 
         ReferralHelper.createReferralReply(
             caseData,
@@ -204,7 +203,22 @@ public class ReplyToReferralController {
             .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
+        emailService.sendEmail(
+                referralTemplateId,
+                caseData.getReplyToEmailAddress(),
+                ReferralHelper.buildPersonalisation(
+                        ccdRequest.getCaseDetails(),
+                        referralCode,
+                        false,
+                        userDetails.getName()
+                )
+        );
 
+        log.info("Event: Referral Reply Email sent. "
+                + ". EventId: " + ccdRequest.getEventId()
+                + ". Referral code: " + referralCode
+                + ". Emailed at: " + DateTime.now());
+        clearReferralReplyDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -224,7 +238,7 @@ public class ReplyToReferralController {
     public ResponseEntity<CCDCallbackResponse> completeReplyToReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
+        log.info("COMPLETE REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

@@ -39,7 +39,7 @@
         <notes><![CDATA[
    file name: logging-interceptor-4.9.3.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.squareup\.okhttp3/logging\-interceptor@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/com.squareup.okhttp3/logging-interceptor@.*$</packageUrl>
         <cve>CVE-2023-3782</cve>
     </suppress>
     <suppress>

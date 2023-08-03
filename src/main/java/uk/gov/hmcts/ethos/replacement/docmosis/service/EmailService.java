@@ -54,7 +54,7 @@ public class EmailService {
         return citizenUrl + caseId;
     }
 
-    protected String getExuiCaseLink(String caseId) {
+    public String getExuiCaseLink(String caseId) {
         return exuiUrl + caseId;
     }
 }

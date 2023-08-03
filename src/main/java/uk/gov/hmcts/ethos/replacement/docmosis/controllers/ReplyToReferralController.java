@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -49,6 +51,9 @@ public class ReplyToReferralController {
     private final UserService userService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
+    private final EmailService emailService;
+    @Value("${template.referral}")
+    private String referralTemplateId;
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -203,21 +208,18 @@ public class ReplyToReferralController {
             .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
+        String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
         emailService.sendEmail(
                 referralTemplateId,
                 caseData.getReplyToEmailAddress(),
-                ReferralHelper.buildPersonalisation(
-                        ccdRequest.getCaseDetails(),
-                        referralCode,
-                        false,
-                        userDetails.getName()
-                )
+                ReferralHelper.buildPersonalisation(caseData, referralCode, false, userDetails.getName(), caseLink)
         );
 
         log.info("Event: Referral Reply Email sent. "
                 + ". EventId: " + ccdRequest.getEventId()
                 + ". Referral code: " + referralCode
                 + ". Emailed at: " + DateTime.now());
+
         clearReferralReplyDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

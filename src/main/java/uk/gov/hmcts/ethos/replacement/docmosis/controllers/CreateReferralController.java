@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -48,6 +50,9 @@ public class CreateReferralController {
     private final ReferralService referralService;
     private final UserService userService;
     private final DocumentManagementService documentManagementService;
+    private final EmailService emailService;
+    @Value("${template.referral}")
+    private String referralTemplateId;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
@@ -162,28 +167,29 @@ public class CreateReferralController {
         String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData.getReferralCollection()));
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
-        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
+        DocumentInfo documentInfo = referralService.generateCRDocument(caseData,
                 userToken, ccdRequest.getCaseDetails().getCaseTypeId());
 
         ReferralHelper.createReferral(
                 caseData,
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                 this.documentManagementService.addDocumentToDocumentField(documentInfo));
+
+        String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
+
         emailService.sendEmail(
                 referralTemplateId,
                 caseData.getReferentEmail(),
-                ReferralHelper.buildPersonalisation(
-                        ccdRequest.getCaseDetails(),
-                        referralNumber,
-                        true,
-                        userDetails.getName()
-                )
+                ReferralHelper.buildPersonalisation(caseData, referralNumber, true, userDetails.getName(), caseLink)
         );
+
         log.info("Event: Referral Email sent. "
                 + ". EventId: " + ccdRequest.getEventId()
                 + ". Referral number: " + referralNumber
                 + ". Emailed at: " + DateTime.now());
+
         clearReferralDataFromCaseData(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

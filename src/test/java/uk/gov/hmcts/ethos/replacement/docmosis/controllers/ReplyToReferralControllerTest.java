@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -63,6 +64,8 @@ class ReplyToReferralControllerTest {
     private ReferralService referralService;
     @MockBean
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private EmailService emailService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -71,6 +74,7 @@ class ReplyToReferralControllerTest {
 
     @BeforeEach
     void setUp() {
+        when(emailService.getExuiCaseLink(any())).thenReturn("exui");
         CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
                 "length num", "type", "Yes")

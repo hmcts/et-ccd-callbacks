@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -57,6 +58,8 @@ class CreateReferralControllerTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private ReferralService referralService;
+    @MockBean
+    private EmailService emailService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -65,6 +68,7 @@ class CreateReferralControllerTest {
 
     @BeforeEach
     void setUp() {
+        when(emailService.getExuiCaseLink(any())).thenReturn("exui");
         CaseData caseData = CaseDataBuilder.builder()
             .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
                 TribunalOffice.ABERDEEN, "venue")

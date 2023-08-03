@@ -16,7 +16,7 @@ public class TestEmailService extends EmailService {
     }
 
     @Override
-    protected String getExuiCaseLink(String caseId) {
+    public String getExuiCaseLink(String caseId) {
         return "exuiUrl" + caseId;
     }
 }

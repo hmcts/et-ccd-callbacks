@@ -18,11 +18,10 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.*;
 import java.util.ArrayList;
 import java.util.List;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -44,15 +43,21 @@ public class UpdateReferralController {
     private final UserService userService;
     private final EmailService emailService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    private final CreateReferralService createReferralService;
+    private final DocumentManagementService documentManagementService;
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
     public UpdateReferralController(@Value("${referral.template.id}") String referralTemplateId,
                                     VerifyTokenService verifyTokenService,
-                                    UserService userService, EmailService emailService) {
+                                    UserService userService, EmailService emailService,
+                                    CreateReferralService createReferralService,
+                                    DocumentManagementService documentManagementService) {
         this.verifyTokenService = verifyTokenService;
         this.userService = userService;
         this.emailService = emailService;
         this.referralTemplateId = referralTemplateId;
+        this.createReferralService = createReferralService;
+        this.documentManagementService = documentManagementService;
     }
 
     /**
@@ -166,6 +171,13 @@ public class UpdateReferralController {
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
         String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(
                 referral.getUpdateReferralCollection()));
+
+        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
+                userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+
+        referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
+
+
         emailService.sendEmail(
                 referralTemplateId,
                 caseData.getUpdateReferentEmail(),

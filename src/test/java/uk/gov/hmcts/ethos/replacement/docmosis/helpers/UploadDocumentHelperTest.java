@@ -1,12 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -22,12 +20,13 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.CLAIM_ACCEPTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.CLAIM_REJECTED;
@@ -45,11 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RE
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 
 public class UploadDocumentHelperTest {
     CCDRequest ccdRequest;

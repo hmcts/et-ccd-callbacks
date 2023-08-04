@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.CLAIM_ACCEPTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.CLAIM_REJECTED;
@@ -33,8 +35,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RE
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 
 /**
  * Helper methods for the Upload Documents event.

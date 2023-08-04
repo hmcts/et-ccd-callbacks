@@ -29,7 +29,6 @@ public final class RolesConstants {
     public static final String PUI_USER_MANAGER = "pui-user-manager";
     public static final String PUI_CAA = "pui-caa";
     public static final String MANAGE_USER = "manage-user";
-
     public static final String PRD_AAC_SYSTEM = "prd-aac-system";
     public static final String PRD_ADMIN = "prd-admin";
 
@@ -57,8 +56,8 @@ public final class RolesConstants {
         CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_ETJUDGE, CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR, CITIZEN, ET_ACAS_API,
-        PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA, MANAGE_USER,
-        CASEWORKER_APPROVER};
+        PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA,
+        MANAGE_USER, CASEWORKER_APPROVER};
 
     private RolesConstants() {
     }

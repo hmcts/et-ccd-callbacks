@@ -226,7 +226,10 @@ class TseHelperTest {
             + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\"},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
+            + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
+            + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
+            + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null}}],\"copy\":\"Yes\","
             + "\"response\":\"response\"}}";
 
         assertThat(replyDocumentRequest, is(expected));

@@ -180,8 +180,9 @@ class ReferralHelperTest {
                 + "caseManagementDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, j"
                 + "udgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
                 + "documentType=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
-                + "referralDate=20 Jul 2023, referralStatus=Awaiting instructions, closeReferralGeneralNotes=null, "
-                + "referralReplyCollection=null, referralSummaryPdf=null)";
+                + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
+                + "closeReferralGeneralNotes=null, "
+                + "referralReplyCollection=null, updateReferralCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);

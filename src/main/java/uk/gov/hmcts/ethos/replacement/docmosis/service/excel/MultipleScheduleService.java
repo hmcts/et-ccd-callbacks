@@ -28,8 +28,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleScheduleService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.DoNotUseThreads"})
 public class MultipleScheduleService {
 
     private final ExcelReadingService excelReadingService;

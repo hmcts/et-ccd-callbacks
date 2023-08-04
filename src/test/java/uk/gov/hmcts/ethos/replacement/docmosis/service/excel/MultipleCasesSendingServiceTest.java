@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -14,14 +14,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleCasesSendingServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleCasesSendingServiceTest {
 
     @Mock
     private CcdClient ccdClient;
@@ -32,7 +33,7 @@ public class MultipleCasesSendingServiceTest {
     private String userToken;
     private CCDRequest ccdRequest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
@@ -42,7 +43,7 @@ public class MultipleCasesSendingServiceTest {
     }
 
     @Test
-    public void sendUpdateToMultiple() throws IOException {
+    void sendUpdateToMultiple() throws IOException {
         when(ccdClient.startBulkAmendEventForCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
@@ -66,23 +67,25 @@ public class MultipleCasesSendingServiceTest {
         verifyNoMoreInteractions(ccdClient);
     }
 
-    @Test(expected = Exception.class)
-    public void sendUpdateToMultipleException() throws IOException {
+    @Test
+    void sendUpdateToMultipleException() throws IOException {
         when(ccdClient.startBulkAmendEventForCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
                 multipleDetails.getCaseId()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        multipleCasesSendingService.sendUpdateToMultiple(userToken,
+
+        assertThrows(Exception.class, () -> multipleCasesSendingService.sendUpdateToMultiple(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
                 multipleDetails.getCaseData(),
-                multipleDetails.getCaseId());
+                multipleDetails.getCaseId())
+        );
+
         verify(ccdClient, times(1)).startBulkAmendEventForCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
                 multipleDetails.getCaseId());
         verifyNoMoreInteractions(ccdClient);
     }
-
 }

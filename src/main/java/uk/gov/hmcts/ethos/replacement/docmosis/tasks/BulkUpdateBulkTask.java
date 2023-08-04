@@ -11,7 +11,6 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import java.io.IOException;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary"})
 public class BulkUpdateBulkTask implements Runnable {
 
     private final BulkDetails bulkDetails;

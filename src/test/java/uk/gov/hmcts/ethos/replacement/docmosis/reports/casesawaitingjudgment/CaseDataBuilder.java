@@ -16,7 +16,6 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();

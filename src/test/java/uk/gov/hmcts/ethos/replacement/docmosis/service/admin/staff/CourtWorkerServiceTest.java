@@ -12,8 +12,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.AdminCourtWork
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
@@ -32,7 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtW
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NO_WORKER_CODE_FOUND_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.SAVE_ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class CourtWorkerServiceTest {
 
     private CourtWorkerRepository courtWorkerRepository;

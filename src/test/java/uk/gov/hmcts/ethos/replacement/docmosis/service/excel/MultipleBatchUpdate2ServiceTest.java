@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -26,9 +26,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.LooseCoupling"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MultipleBatchUpdate2ServiceTest {
+@ExtendWith(SpringExtension.class)
+class MultipleBatchUpdate2ServiceTest {
 
     @Mock
     private ExcelDocManagementService excelDocManagementService;
@@ -48,7 +47,7 @@ public class MultipleBatchUpdate2ServiceTest {
     private String userToken;
     private List<SubmitMultipleEvent> submitMultipleEvents;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
@@ -65,7 +64,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDetachCases() {
+    void batchUpdate2LogicDetachCases() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -82,7 +81,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDetachCasesEmptyNewLeadCase() {
+    void batchUpdate2LogicDetachCasesEmptyNewLeadCase() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -100,7 +99,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicSameMultipleEmptySubMultiple() {
+    void batchUpdate2LogicSameMultipleEmptySubMultiple() {
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
@@ -109,7 +108,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicSameMultipleWithSubMultiple() {
+    void batchUpdate2LogicSameMultipleWithSubMultiple() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
@@ -126,7 +125,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDifferentEmptyMultiple() {
+    void batchUpdate2LogicDifferentEmptyMultiple() {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -147,7 +146,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDifferentMultipleEmptySubMultiple() {
+    void batchUpdate2LogicDifferentMultipleEmptySubMultiple() {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -168,7 +167,7 @@ public class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    public void batchUpdate2LogicDifferentMultipleWithSubMultiple() {
+    void batchUpdate2LogicDifferentMultipleWithSubMultiple() {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")

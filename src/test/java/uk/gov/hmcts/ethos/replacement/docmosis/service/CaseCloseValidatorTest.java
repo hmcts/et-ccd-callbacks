@@ -17,7 +17,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITIO
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.REINSTATE_CANNOT_CASE_CLOSED_ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UseProperClassLoader"})
 class CaseCloseValidatorTest {
 
     private CaseCloseValidator caseCloseValidator;

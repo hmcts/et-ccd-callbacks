@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/uploadDocument")
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class UploadDocumentController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -92,7 +91,7 @@ public class UploadDocumentController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralReply(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

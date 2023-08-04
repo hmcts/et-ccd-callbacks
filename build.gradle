@@ -18,7 +18,7 @@ group = 'uk.gov.hmcts.et'
 version = '0.0.1'
 
 pmd {
-    toolVersion = "6.41.0"
+    toolVersion = "6.55.0"
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.cftlib]
     reportsDir = file("$project.buildDir/reports/pmd")
     // https://github.com/pmd/pmd/issues/876
@@ -57,11 +57,30 @@ sonarqube {
 
 sourceSets {
     test {
-        java.srcDir 'src/test/java'
+        java {
+            srcDir 'src/test/java'
+            srcDir 'src/test/utils/java'
+        }
     }
     functional {
-        java.srcDir 'src/test/functional/java'
-        resources.srcDir 'src/test/functional/resources'
+        java {
+            srcDir 'src/test/functional/java'
+            srcDir 'src/test/utils/java'
+        }
+        resources {
+            srcDir 'src/test/functional/resources'
+        }
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+    apiTest {
+        java {
+            srcDir 'src/test/apiTest/java'
+            srcDir 'src/test/utils/java'
+        }
+        resources {
+            srcDir 'src/test/apiTest/resources'
+        }
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
     }
@@ -91,6 +110,8 @@ configurations {
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    apiTestImplementation.extendsFrom testImplementation
+    apiTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -98,7 +119,8 @@ test {
     useJUnitPlatform()
 }
 
-task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification', dependsOn: ':codeceptSmoke') {
+tasks.register('smoke', Test) {
+    dependsOn ':codeceptSmoke'
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
@@ -108,58 +130,64 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
 }
 
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification', dependsOn: ':codeceptFunctional') {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
+tasks.register('functional', Test) {
+    testClassesDirs = sourceSets.apiTest.output.classesDirs
+    classpath = sourceSets.apiTest.runtimeClasspath
 
-    useJUnit {
-        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
-    }
+    useJUnitPlatform()
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'
 }
 
-task yarnInstall(type: Exec) {
+tasks.register('yarnInstall', Exec) {
     workingDir '.'
     commandLine 'yarn', 'install'
 }
 
-task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
+tasks.register('yarnAudit', Exec) {
+    dependsOn ':yarnInstall'
     workingDir '.'
     commandLine 'yarn', 'npm', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
 }
 
-task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
+tasks.register('codeceptSmoke', Exec) {
+    dependsOn ':yarnInstall'
     commandLine 'yarn', 'test:smoke'
 }
 
-task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
+tasks.register('codeceptFunctional', Exec) {
+    dependsOn 'yarnInstall'
+    dependsOn 'functional'
     commandLine 'yarn', 'test:functional'
 }
 
-task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
+tasks.register('crossbrowser') {
+    dependsOn ':codeceptFunctionalSauce'
     group = 'Delivery pipeline'
     description = 'Execute cross browser tests on saucelabs'
 }
 
-task nightlyFunctional(dependsOn: ':codeceptFunctionalNightly') {
+tasks.register('nightlyFunctional') {
+    dependsOn ':codeceptFunctionalNightly'
     group = 'Delivery pipeline'
     description = 'Execute Functional Tests on nightly pipeline'
 }
 
-task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
+tasks.register('codeceptFunctionalSauce', Exec) {
+    dependsOn ':yarnInstall'
     //IGNORE_SESSION_VALIDATION=true NODE_ENV=testing LOG_LEVEL=OFF NODE_PATH=. node_modules/.bin/codeceptjs run-multiple  ${BROWSER_GROUP:-'--all'} -c src/test/end-to-end/saucelabs.conf.js --grep @RET-XB --steps --reporter mocha-multi
     workingDir '.'
     commandLine './bin/run-crossbrowser-tests.sh'
     commandLine 'yarn', 'test:crossbrowser'
 }
 
-task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
+tasks.register('codeceptFunctionalNightly', Exec) {
+    dependsOn 'yarnInstall'
     commandLine 'yarn', 'test:fullfunctional'
 }
 
-task integration(type: Test) {
+tasks.register('integration', Test) {
     description = "Runs integration tests"
     group = "Verification"
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -182,7 +210,7 @@ def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --shirt HEAD'.execute().text.trim()
 }
 
-task runContractTests(type: Test, description: 'Runs contract tests.', group: 'Verification') {
+tasks.register('runContractTests', Test) {
     onlyIf {
         return System.env.SKIP_CONTRACT_TESTS == null || System.env.SKIP_CONTRACT_TESTS == 'false'
     }
@@ -193,7 +221,7 @@ task runContractTests(type: Test, description: 'Runs contract tests.', group: 'V
     testLogging.showStandardStreams = true
 }
 
-task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
+tasks.register('runAndPublishConsumerPactTests', Test) {
     logger.lifecycle("Runs pact consumer Tests")
 
     testClassesDirs = sourceSets.contractTest.output.classesDirs
@@ -201,6 +229,10 @@ task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test 
 }
 
 rootProject.tasks.named("processContractTestResources") {
+    duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named("processFunctionalResources") {
     duplicatesStrategy = 'include'
 }
 
@@ -217,7 +249,7 @@ pact {
     }
 }
 
-task fortifyScan(type: JavaExec)  {
+tasks.register('fortifyScan', JavaExec) {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -269,6 +301,7 @@ ext {
     junitJupiterVersion = '5.9.3'
     log4JVersion = '2.20.0'
     pact_version = '4.3.10'
+    reformLoggingVersion = '5.1.9'
     serenity = '3.7.1'
     tomcatEmbedVersion = '9.0.75'
 }
@@ -301,8 +334,9 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.14'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.2.0'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.3.4-RET3898'
+
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '5.1.9'
@@ -321,7 +355,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '3.0.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.8'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.10'
     //to remove CVEs
     implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.16', ext: 'pom'
     //To Remove vulnerability CVE-2020-11988
@@ -347,6 +381,8 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.94.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'
 
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.4.0'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
@@ -366,10 +402,11 @@ dependencies {
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
-    testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitJupiterVersion
+    testImplementation(platform('org.junit:junit-bom:5.9.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.18.0'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.0.0'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.5.6'
@@ -434,3 +471,8 @@ bootWithCCD {
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'
 }
+
+pmdMain.maxFailures = 695
+pmdTest.maxFailures = 269
+
+pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

@@ -10,7 +10,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public final class CaseTransferOfficeService {
 
     private CaseTransferOfficeService() {

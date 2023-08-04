@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public class VenueImportService {
 
     private final ExcelReadingService excelReadingService;

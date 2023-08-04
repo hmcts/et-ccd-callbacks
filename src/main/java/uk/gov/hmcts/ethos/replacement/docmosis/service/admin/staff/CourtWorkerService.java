@@ -17,7 +17,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LinguisticNaming"})
 public class CourtWorkerService {
 
     public static final String CODE_ERROR_MESSAGE = "The code %s already exists for the %s office";

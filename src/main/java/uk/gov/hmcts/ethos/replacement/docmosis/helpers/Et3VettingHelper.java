@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 /**
  * ET3 vetting helper provides methods to assist with the ET3 vetting pages
@@ -43,14 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
  * Docmosis in order to generate a document.
  */
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
-    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.GodClass", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ClassNamingConventions",
-    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity", "PMD.PrematureDeclaration",
-    "PMD.LinguisticNaming", "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
-    "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
-public class Et3VettingHelper {
+public final class Et3VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01145.docx";
@@ -61,7 +55,7 @@ public class Et3VettingHelper {
     static final String NO_ET3_RESPONSE = "Cannot process as there is no ET3 Response";
     static final String ET3_TABLE_DATA =
         "| <h2>Dates</h2>| |\r\n"
-        + "|--|--|\r\n"
+        + TABLE_STRING
         + "|ET1 served| %s|\r\n"
         + "|ET3 due| %s|\r\n"
         + "|Extension| %s|\r\n"
@@ -69,7 +63,7 @@ public class Et3VettingHelper {
 
     private static final String ET3_HEARING_TABLE =
         "| <h2>Hearing details</h2>| | \r\n"
-        + "|--|--|\r\n"
+        + TABLE_STRING
         + "|Date| %s|\r\n"
         + "|Hearing Type| %s|\r\n"
         + "|Hearing Length| %s|\r\n"
@@ -79,7 +73,7 @@ public class Et3VettingHelper {
 
     private static final String ET3_TRIBUNAL_TABLE =
         "| <h2>Tribunal location</h2>| | \r\n"
-            + "|--|--|\r\n"
+            + TABLE_STRING
             + "|Tribunal| %s|\r\n"
             + "|Office| %s|";
     private static final String RESPONDENT_DETAILS = "<h2>Respondent</h2>"

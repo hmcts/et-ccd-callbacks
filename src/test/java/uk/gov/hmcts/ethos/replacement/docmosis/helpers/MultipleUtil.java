@@ -67,8 +67,6 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.CloseResource", "PMD.ExcessiveImports",
-    "PMD.NPathComplexity"})
 public final class MultipleUtil {
 
     public static final String TESTING_FILE_NAME = "MyFirstExcel.xlsx";

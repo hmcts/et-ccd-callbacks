@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEPOSIT_REFUNDED_GREATER_DEPOSIT_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UNABLE_TO_FIND_PARTY;
 
-@SuppressWarnings({"PMD.UseProperClassLoader"})
 class DepositOrderValidationServiceTest {
 
     private DepositOrderValidationService depositOrderValidationService;

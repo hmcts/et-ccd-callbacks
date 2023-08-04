@@ -33,6 +33,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RE
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 
 /**
  * Helper methods for the Upload Documents event.
@@ -72,20 +74,24 @@ public final class UploadDocumentHelper {
     public static Map<String, String> buildPersonalisationForCaseRejection(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put("initialTitle", getClaimantTitleOrInitial(caseData));
         personalisation.put("lastName", getLastName(caseData.getClaimant()));
-        personalisation.put("ccdId", caseDetails.getCaseId());
+        personalisation.put(CCD_ID, caseDetails.getCaseId());
         return personalisation;
     }
 
     private static String getClaimantTitleOrInitial(CaseData caseData) {
         ClaimantIndType claimantIndType = caseData.getClaimantIndType();
+
         if (!isNullOrEmpty(claimantIndType.getClaimantPreferredTitle())) {
             return claimantIndType.getClaimantPreferredTitle();
-        } else if (!isNullOrEmpty(claimantIndType.getClaimantTitle())) {
+        }
+
+        if (!isNullOrEmpty(claimantIndType.getClaimantTitle())) {
             return claimantIndType.getClaimantTitle();
         }
+
         return caseData.getClaimant().substring(0, 1).toUpperCase(Locale.ROOT);
     }
 

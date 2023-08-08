@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
@@ -42,6 +42,7 @@ public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
         caseData.setEthosCaseReference("testCaseReference");
         caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
+        caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(
                 DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));

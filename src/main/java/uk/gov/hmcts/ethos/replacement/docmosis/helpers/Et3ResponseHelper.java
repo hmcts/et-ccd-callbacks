@@ -8,7 +8,6 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -22,12 +21,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -543,29 +539,6 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponsePensionCorrectDetails(caseData.getEt3ResponsePensionCorrectDetails());
         respondent.setEmploymentDetailsSection(YES);
         return respondent;
-    }
-
-    /**
-     * Sends notification emails to Tribunal.
-     *
-     * @param caseDetails Contains details about the case.
-     * @return Map of Personalisation
-     */
-    public static Map<String, String> buildPersonalisation(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("case_number", caseData.getEthosCaseReference());
-        personalisation.put("claimant", caseData.getClaimant());
-        personalisation.put("list_of_respondents", getRespondentNames(caseData));
-        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put("ccdId", caseDetails.getCaseId());
-        return personalisation;
-    }
-
-    private static String getRespondentNames(CaseData caseData) {
-        return caseData.getRespondentCollection().stream()
-                .map(o -> o.getValue().getRespondentName())
-                .collect(Collectors.joining(", "));
     }
 
     /**

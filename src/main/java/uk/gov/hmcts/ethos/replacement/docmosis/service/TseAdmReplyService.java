@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -50,10 +49,9 @@ public class TseAdmReplyService {
 
     private final TseService tseService;
 
-    private final NotificationProperties notificationProperties;
-    @Value("${tse.admin.reply.notify.claimant.template.id}")
+    @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
-    @Value("${tse.admin.reply.notify.respondent.template.id}")
+    @Value("${template.tse.admin.reply.respondent}")
     private String tseAdminReplyRespondentTemplateId;
 
     private static final String RESPONSE_REQUIRED =
@@ -69,7 +67,7 @@ public class TseAdmReplyService {
      */
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
         if (getAdminSelectedApplicationType(caseData) != null) {
-            return tseService.formatViewApplication(caseData, authToken);
+            return tseService.formatViewApplication(caseData, authToken, false);
         }
         throw new NotFoundException("No selected application type item found.");
     }
@@ -265,8 +263,8 @@ public class TseAdmReplyService {
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseNumber);
-        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseId));
-        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseId));
+        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
+        personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("customisedText", customText);
         return personalisation;
     }

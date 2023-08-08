@@ -23,7 +23,7 @@ import java.util.UUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
-class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
+public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
 
     private static final String AUTHORIZATION = "Authorization";
     private static final String MID_DETAILS_TABLE = "/tseAdmReply/midDetailsTable";

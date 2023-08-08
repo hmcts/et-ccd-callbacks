@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -44,7 +45,7 @@ class TseAdmCloseServiceTest {
     void setUp() {
         tseAdmCloseService = new TseAdmCloseService(tseService);
         caseData = CaseDataBuilder.builder().build();
-        when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");
+        when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
     }
 
     @Test
@@ -92,7 +93,7 @@ class TseAdmCloseServiceTest {
 
         String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
 
-        when(tseService.addDocumentRows(any(), any())).thenReturn(List.of(
+        when(tseService.addDocumentsRows(any(), any())).thenReturn(List.of(
                 new String[]{"Document", fileDisplay1},
                 new String[]{"Description", ""})
         );

@@ -8,7 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -24,7 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
@@ -39,7 +38,9 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -62,15 +63,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class TseAdmReplyServiceTest {
 
     private TseAdmReplyService tseAdmReplyService;
-
-    @MockBean
     private EmailService emailService;
 
     @MockBean
     private TseService tseService;
 
-    @SpyBean
-    private NotificationProperties notificationProperties;
     private CaseData caseData;
 
     private static final String FILE_NAME = "document.txt";
@@ -90,12 +87,11 @@ class TseAdmReplyServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdmReplyService = new TseAdmReplyService(emailService, tseService, notificationProperties);
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
+        emailService = spy(new TestEmailService());
+        tseAdmReplyService = new TseAdmReplyService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
-        when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");
+        when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
         caseData = CaseDataBuilder.builder().build();
     }
 

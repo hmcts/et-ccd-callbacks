@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -7,13 +8,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -118,27 +122,10 @@ public class TseAdminService {
      * @param caseId used in email link to case
      * @param caseData in which the case details are extracted from
      */
-    public void sendRecordADecisionEmails(String caseId, CaseData caseData) {
+    public void sendEmailToClaimant(String caseId, CaseData caseData) {
         String caseNumber = caseData.getEthosCaseReference();
 
         List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
-
-        // if respondent only or both parties: send Respondents Decision Emails
-        if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
-                || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
-            TSEAdminEmailRecipientsData respondentDetails;
-            for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
-                if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    respondentDetails =
-                        new TSEAdminEmailRecipientsData(
-                            tseAdminRecordRespondentTemplateId,
-                            respondentSumTypeItem.getValue().getRespondentEmail());
-                    respondentDetails.setRecipientName(respondentSumTypeItem.getValue().getRespondentName());
-
-                    emailsToSend.add(respondentDetails);
-                }
-            }
-        }
 
         // if claimant only or both parties: send Claimant Decision Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
@@ -162,6 +149,33 @@ public class TseAdminService {
                 emailRecipient.getRecipientEmail(),
                 buildPersonalisation(caseNumber, caseId, emailRecipient.getRecipientName()));
         }
+    }
+
+    /**
+     * Send notify emails to Respondents (or LR if they are assigned).
+     */
+    public void sendNotifyEmailsToRespondents(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            return;
+        }
+
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        respondents.forEach(obj -> sendRespondentEmail(caseDetails, obj.getValue()));
+    }
+
+    private void sendRespondentEmail(CaseDetails caseDetails, RespondentSumType respondent) {
+        CaseData caseData = caseDetails.getCaseData();
+
+        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
+        if (isNullOrEmpty(respondentEmail)) {
+            return;
+        }
+
+        Map<String, String> personalisation = buildPersonalisation(caseData.getEthosCaseReference(),
+                caseDetails.getCaseId(), respondent.getRespondentName());
+
+        emailService.sendEmail(tseAdminRecordRespondentTemplateId, respondentEmail, personalisation);
     }
 
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {

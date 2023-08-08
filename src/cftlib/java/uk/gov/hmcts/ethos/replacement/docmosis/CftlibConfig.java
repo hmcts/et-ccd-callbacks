@@ -204,7 +204,7 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser(MCA_NOC_APPROVER_EMAIL, CASEWORKER, CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN);
         lib.createIdamUser(MCA_SYSTEM_IDAM_ACC_EMAIL, CASEWORKER, CASEWORKER_CCA);
         lib.createIdamUser(ET_SYSTEM_EMAIL, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API);
-        lib.createIdamUser(ACAS_EMAIL, ACAS_API );
+        lib.createIdamUser(ACAS_EMAIL, ACAS_API);
 
     }
 

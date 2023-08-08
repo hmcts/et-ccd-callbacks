@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
@@ -28,7 +27,6 @@ public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
     private static final String AUTHORIZATION = "Authorization";
     private static final String MID_DETAILS_TABLE = "/tseAdmReply/midDetailsTable";
     private static final String MID_VALIDATE_INPUT = "/tseAdmReply/midValidateInput";
-    private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmReply/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmReply/submitted";
 
     private static final String APPLICATION_CODE = "1";
@@ -42,7 +40,6 @@ public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
         caseData.setEthosCaseReference("testCaseReference");
         caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
-        caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(
                 DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));
@@ -75,20 +72,6 @@ public class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
                 .header(new Header(AUTHORIZATION, userToken))
                 .body(ccdRequest)
                 .post(MID_VALIDATE_INPUT)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log()
-                .all(true);
-    }
-
-    @Test
-    void aboutToSubmitSuccessResponse() {
-        RestAssured.given()
-                .spec(spec)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(ccdRequest)
-                .post(ABOUT_TO_SUBMIT_URL)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log()

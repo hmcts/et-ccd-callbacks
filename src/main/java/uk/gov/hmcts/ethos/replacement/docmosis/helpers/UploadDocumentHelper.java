@@ -28,12 +28,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ET
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.LEGACY_DOCUMENT_NAMES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.MISC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.NOTICE_OF_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.NOTICE_OF_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.NOTICE_OF_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.REJECTION_OF_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.STARTING_A_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.TRIBUNAL_CASE_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
 
 /**
@@ -156,6 +158,10 @@ public final class UploadDocumentHelper {
             case NOTICE_OF_HEARING -> {
                 documentType.setTopLevelDocuments(HEARINGS);
                 documentType.setHearingsDocuments(NOTICE_OF_HEARING);
+            }
+            case TRIBUNAL_CASE_FILE -> {
+                documentType.setTopLevelDocuments(MISC);
+                documentType.setMiscDocuments(TRIBUNAL_CASE_FILE);
             }
             default -> documentType.setTopLevelDocuments(LEGACY_DOCUMENT_NAMES);
         }

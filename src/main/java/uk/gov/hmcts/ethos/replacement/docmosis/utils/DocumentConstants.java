@@ -79,7 +79,7 @@ public class DocumentConstants {
     public static final String APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C = "App for a judgment to be reconsidered - C";
     public static final String APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_R = "App for a judgment to be reconsidered - R";
     public static final String CERTIFICATE_OF_CORRECTION = "Certificate of Correction";
-    public static final String TRIBUNAL_CASE_FILE = "Tribunal Case file";
+    public static final String TRIBUNAL_CASE_FILE = "Tribunal case file";
     public static final String OTHER = "Other";
     public static final String NOTICE_OF_A_CLAIM = "Notice of a claim";
     public static final String TRIBUNAL_CORRESPONDENCE = "Tribunal Correspondence";

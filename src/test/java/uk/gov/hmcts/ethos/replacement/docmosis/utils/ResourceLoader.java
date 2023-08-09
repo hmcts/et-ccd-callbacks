@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import uk.gov.hmcts.et.common.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -41,6 +42,14 @@ public final class ResourceLoader {
     public static ListingDetails generateListingDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = getResource(jsonFileName);
         return JSON_MAPPER.fromJson(json, ListingDetails.class);
+    }
+
+    public static BundleCreateResponse createBundleServiceRequests() throws URISyntaxException, IOException {
+        return JSON_MAPPER.fromJson(getResource("createBundleServiceRequest.json"), BundleCreateResponse.class);
+    }
+
+    public static BundleCreateResponse stitchBundleRequest() throws URISyntaxException, IOException {
+        return JSON_MAPPER.fromJson(getResource("stitchBundleRequest.json"), BundleCreateResponse.class);
     }
 
     public static List<SubmitEvent> generateSubmitEventList(String jsonFileName)

@@ -335,7 +335,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version:'1.2.0'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.6.0-RET-3898-2'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.6.0-RET3898-bundle'
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -449,7 +449,7 @@ bootWithCCD {
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos'
 
     // ccd-data-store-api
-    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,aac_manage_case_assignment,ccd_case_document_am_api,am_role_assignment_service,et_cos,et_msg_handler,et_sya_api,ethos_repl_docmosis_service'
+    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,aac_manage_case_assignment,ccd_case_document_am_api,am_role_assignment_service,et_cos,et_msg_handler,et_sya_api,ethos_repl_docmosis_service,em_ccd_orchestrator,em_stitching_api'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
 
     // ccd-definition-store-api
@@ -457,7 +457,7 @@ bootWithCCD {
 
     // ccd-case-document-am-api
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
-    environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,et_cos,et_sya_api,ethos_repl_docmosis_service'
+    environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,et_cos,et_sya_api,ethos_repl_docmosis_service,em_ccd_orchestrator,em_stitching_api'
 
     // xui-manage-cases
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'

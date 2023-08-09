@@ -571,7 +571,8 @@ public class CaseDataBuilder {
         }
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentFilename("test.pdf");
-        uploadedDocumentType.setDocumentBinaryUrl("http://dummy.link");
+        uploadedDocumentType.setDocumentBinaryUrl("http://dummy.link/documents/11111111-1111-1111-1111-111111111111/binary");
+        uploadedDocumentType.setDocumentUrl("http://dummy.link/documents/11111111-1111-1111-1111-111111111111");
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(docType);
         documentType.setUploadedDocument(uploadedDocumentType);

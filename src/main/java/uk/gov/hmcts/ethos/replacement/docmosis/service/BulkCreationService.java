@@ -32,10 +32,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
 @Service("bulkCreationService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.DoNotUseThreads",
-    "PMD.GodClass", "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
-    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity",
-    "PMD.CloseResource"})
 public class BulkCreationService {
 
     public static final String BULK_CREATION_STEP = "BulkCreation";

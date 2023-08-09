@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
 public final class EccReport {
 
     private final EccReportDataSource reportDataSource;

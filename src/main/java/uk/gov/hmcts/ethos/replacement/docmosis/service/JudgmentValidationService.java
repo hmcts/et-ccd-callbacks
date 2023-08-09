@@ -14,7 +14,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
 @Service("judgmentValidationService")
-@SuppressWarnings({"PMD.SimpleDateFormatNeedsLocale"})
 public class JudgmentValidationService {
 
     public void validateJudgments(CaseData caseData) throws ParseException {

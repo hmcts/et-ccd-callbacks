@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleTransferService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
 public class MultipleTransferService {
 
     private final ExcelReadingService excelReadingService;

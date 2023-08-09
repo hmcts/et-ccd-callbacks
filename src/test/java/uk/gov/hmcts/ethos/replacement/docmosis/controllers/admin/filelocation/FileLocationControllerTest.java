@@ -15,9 +15,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLo
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.SaveFileLocationException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -38,7 +40,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({FileLocationController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class FileLocationControllerTest {
 
     @MockBean
@@ -68,9 +69,9 @@ class FileLocationControllerTest {
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1)).saveFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -130,9 +131,9 @@ class FileLocationControllerTest {
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(fileLocationService, times(1)).initAdminData(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -164,9 +165,9 @@ class FileLocationControllerTest {
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1)).updateFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -209,10 +210,10 @@ class FileLocationControllerTest {
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
                 .andExpect(jsonPath("$.errors[0]", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1)).updateFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -231,9 +232,9 @@ class FileLocationControllerTest {
                 .header("Authorization", token)
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1)).deleteFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -276,10 +277,10 @@ class FileLocationControllerTest {
                 .header("Authorization", token)
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
                 .andExpect(jsonPath("$.errors[0]", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1)).deleteFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
 
@@ -299,9 +300,9 @@ class FileLocationControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1))
                 .midEventSelectFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -346,10 +347,10 @@ class FileLocationControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
                 .andExpect(jsonPath("$.errors[0]", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1))
                 .midEventSelectFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -370,9 +371,9 @@ class FileLocationControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1))
                 .midEventSelectTribunalOffice(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -417,10 +418,10 @@ class FileLocationControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(1)))
                 .andExpect(jsonPath("$.errors[0]", notNullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(fileLocationService, times(1))
                 .midEventSelectTribunalOffice(ccdRequest.getCaseDetails().getAdminData());
     }

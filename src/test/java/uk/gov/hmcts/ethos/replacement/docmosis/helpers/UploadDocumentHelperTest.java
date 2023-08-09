@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -16,17 +16,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 
 public class UploadDocumentHelperTest {
     CCDRequest ccdRequest;
     CaseDetails caseDetails;
     CaseData caseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
@@ -45,25 +46,25 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenEmptyDocumentCollection_returnsFalse() {
+    void shouldSendRejectionEmail_givenEmptyDocumentCollection_returnsFalse() {
         assertFalse(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void shouldSendRejectionEmail_noRejectionDocumentPresent_returnsFalse() {
+    void shouldSendRejectionEmail_noRejectionDocumentPresent_returnsFalse() {
         attachDocumentToCollection(caseData, "Not a Rejection of claim");
         assertFalse(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenRejectionEmailFlagPresent_returnsFalse() {
+    void shouldSendRejectionEmail_givenRejectionEmailFlagPresent_returnsFalse() {
         attachDocumentToCollection(caseData, "Not a Rejection of claim");
         caseData.setCaseRejectedEmailSent(YES);
         assertFalse(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndEmailFlag_returnsFalse() {
+    void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndEmailFlag_returnsFalse() {
         attachDocumentToCollection(caseData, "Rejection of claim");
         ccdRequest.getCaseDetails().setState("Rejected");
         caseData.setCaseRejectedEmailSent(YES);
@@ -71,14 +72,14 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndNoEmailFlag_returnsTrue() {
+    void shouldSendRejectionEmail_givenCaseIsRejectedWithRejectionDocumentAndNoEmailFlag_returnsTrue() {
         attachDocumentToCollection(caseData, "Rejection of claim");
         ccdRequest.getCaseDetails().setState("Rejected");
         assertTrue(UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails()));
     }
 
     @Test
-    public void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
+    void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
         Map<String, String> expected = buildPersonalisation("F");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
 
@@ -86,7 +87,7 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void buildPersonalisationForCaseRejection_givenClaimantTitle_returnsWithTitleLastName() {
+    void buildPersonalisationForCaseRejection_givenClaimantTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantTitle("Mr");
         Map<String, String> expected = buildPersonalisation("Mr");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
@@ -95,7 +96,7 @@ public class UploadDocumentHelperTest {
     }
 
     @Test
-    public void buildPersonalisationForCaseRejection_givenClaimantPreferredTitle_returnsWithTitleLastName() {
+    void buildPersonalisationForCaseRejection_givenClaimantPreferredTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantPreferredTitle("Professor");
         Map<String, String> expected = buildPersonalisation("Professor");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
@@ -105,7 +106,7 @@ public class UploadDocumentHelperTest {
 
     private Map<String, String> buildPersonalisation(String initialTitle) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", "1234");
+        personalisation.put(CASE_NUMBER, "1234");
         personalisation.put("initialTitle", initialTitle);
         personalisation.put("lastName", "Last");
         personalisation.put("ccdId", "1234");

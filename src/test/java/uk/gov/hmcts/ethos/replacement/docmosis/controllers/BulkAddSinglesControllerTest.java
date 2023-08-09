@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
@@ -13,11 +15,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles.
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BulkAddSinglesControllerTest {
+@ExtendWith(SpringExtension.class)
+class BulkAddSinglesControllerTest {
     private BulkAddSinglesController bulkAddSinglesController;
     private VerifyTokenService verifyTokenService;
     private BulkAddSinglesValidator bulkAddSinglesValidator;
@@ -25,7 +28,7 @@ public class BulkAddSinglesControllerTest {
     private MultipleRequest multipleRequest;
     private String authToken;
 
-    @Before
+    @BeforeEach
     public void setup() {
         bulkAddSinglesValidator = mock(BulkAddSinglesValidator.class);
         bulkAddSinglesService = mock(BulkAddSinglesService.class);
@@ -37,7 +40,7 @@ public class BulkAddSinglesControllerTest {
     }
 
     @Test
-    public void shouldHandleInvalidTokenForValidation() {
+    void shouldHandleInvalidTokenForValidation() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(false);
         ResponseEntity<MultipleCallbackResponse> response =
                 bulkAddSinglesController.bulkAddSingleCasesImportFileMidEventValidation(multipleRequest,
@@ -46,7 +49,7 @@ public class BulkAddSinglesControllerTest {
     }
 
     @Test
-    public void shouldHandleInvalidTokenForCallback() {
+    void shouldHandleInvalidTokenForCallback() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(false);
         ResponseEntity<MultipleCallbackResponse> response =
                 bulkAddSinglesController.bulkAddSingleCasesToMultiple(multipleRequest, authToken);
@@ -54,7 +57,7 @@ public class BulkAddSinglesControllerTest {
     }
 
     @Test
-    public void shouldReturnValidationResponse() {
+    void shouldReturnValidationResponse() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(true);
         MultipleDetails multipleDetails = mock(MultipleDetails.class);
         when(multipleRequest.getCaseDetails()).thenReturn(multipleDetails);
@@ -67,7 +70,7 @@ public class BulkAddSinglesControllerTest {
     }
 
     @Test
-    public void shouldReturnCallbackResponse() {
+    void shouldReturnCallbackResponse() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(true);
         MultipleDetails multipleDetails = mock(MultipleDetails.class);
         when(multipleRequest.getCaseDetails()).thenReturn(multipleDetails);

@@ -5,7 +5,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 /**
  * Shared container for Postgres database testing.
  */
-public class EtCosPostgresqlContainer extends PostgreSQLContainer<EtCosPostgresqlContainer> {
+public final class EtCosPostgresqlContainer extends PostgreSQLContainer<EtCosPostgresqlContainer> {
     private static final String IMAGE_VERSION = "postgres:11.1";
     private static EtCosPostgresqlContainer container;
 

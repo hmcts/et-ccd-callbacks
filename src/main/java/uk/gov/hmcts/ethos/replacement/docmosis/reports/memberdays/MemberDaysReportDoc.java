@@ -11,9 +11,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LiteralsFirstInComparisons",
-    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.ConsecutiveAppendsShouldReuse",
-    "PMD.ConsecutiveLiteralAppends", "PMD.InsufficientStringBufferDeclaration"})
 public class MemberDaysReportDoc {
     private static final int ONE_REMAINING_ITEM = 1;
 

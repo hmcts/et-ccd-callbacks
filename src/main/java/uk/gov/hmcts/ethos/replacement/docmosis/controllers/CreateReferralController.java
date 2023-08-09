@@ -33,6 +33,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 
 /**
  * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
@@ -40,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/createReferral")
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class CreateReferralController {
 
     private final String referralTemplateId;
@@ -51,6 +51,8 @@ public class CreateReferralController {
     private final DocumentManagementService documentManagementService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    private static final String LOG_MESSAGE = "received notification request for case reference :    ";
+
     private static final String CREATE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>Your referral has been sent. Replies and instructions will appear in the "
@@ -89,8 +91,8 @@ public class CreateReferralController {
     })
     public ResponseEntity<CCDCallbackResponse> initReferralHearingDetails(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
-
+        @RequestHeader("Authorization") String userToken) {
+        log.info("ABOUT TO START CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -120,8 +122,9 @@ public class CreateReferralController {
     })
     public ResponseEntity<CCDCallbackResponse> validateReferentEmail(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
-
+        @RequestHeader("Authorization") String userToken) {
+        log.info("VALIDATE REFERENT EMAIL CREATE REFERRAL ---> " + LOG_MESSAGE
+                + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -156,7 +159,8 @@ public class CreateReferralController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralDetails(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
+        log.info("ABOUT TO SUBMIT CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -168,32 +172,31 @@ public class CreateReferralController {
             caseData.setReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userService.getUserDetails(userToken);
-        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData));
-        emailService.sendEmail(
-            referralTemplateId,
-            caseData.getReferentEmail(),
-            ReferralHelper.buildPersonalisation(
-                ccdRequest.getCaseDetails(),
-                referralNumber,
-                true,
-                userDetails.getName()
-            )
-        );
-
-        log.info("Event: Referral Email sent. "
-            + ". EventId: " + ccdRequest.getEventId()
-            + ". Referral number: " + referralNumber
-            + ". Emailed at: " + DateTime.now());
+        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData.getReferralCollection()));
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
-            userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+                userToken, ccdRequest.getCaseDetails().getCaseTypeId());
 
         ReferralHelper.createReferral(
-            caseData,
-            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
-            this.documentManagementService.addDocumentToDocumentField(documentInfo));
-
+                caseData,
+                String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
+                this.documentManagementService.addDocumentToDocumentField(documentInfo));
+        emailService.sendEmail(
+                referralTemplateId,
+                caseData.getReferentEmail(),
+                ReferralHelper.buildPersonalisation(
+                        ccdRequest.getCaseDetails(),
+                        referralNumber,
+                        true,
+                        userDetails.getName()
+                )
+        );
+        log.info("Event: Referral Email sent. "
+                + ". EventId: " + ccdRequest.getEventId()
+                + ". Referral number: " + referralNumber
+                + ". Emailed at: " + DateTime.now());
+        clearReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -212,8 +215,8 @@ public class CreateReferralController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeCreateReferral(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
-
+        @RequestHeader("Authorization") String userToken) {
+        log.info("COMPLETE CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

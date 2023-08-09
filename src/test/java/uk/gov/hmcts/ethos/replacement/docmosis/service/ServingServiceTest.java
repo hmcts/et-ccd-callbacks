@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,7 +31,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.UseProperClassLoader"})
 @ExtendWith(SpringExtension.class)
 class ServingServiceTest {
     private static CaseDetails caseDetails;

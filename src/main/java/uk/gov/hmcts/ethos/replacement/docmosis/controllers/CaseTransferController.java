@@ -38,7 +38,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequestMapping("/caseTransfer")
 @Slf4j
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 public class CaseTransferController {
 
     private static final String LOG_MESSAGE = "{} received notification request for case reference : {}";
@@ -74,7 +73,7 @@ public class CaseTransferController {
     })
     public ResponseEntity<CCDCallbackResponse> initTransferToScotland(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO SCOTLAND ---> ", ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -100,7 +99,7 @@ public class CaseTransferController {
     })
     public ResponseEntity<CCDCallbackResponse> initTransferToEnglandWales(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO ENGLAND/WALES---> ",
                 ccdRequest.getCaseDetails().getCaseId());
 
@@ -127,7 +126,7 @@ public class CaseTransferController {
     })
     public ResponseEntity<CCDCallbackResponse> transferSameCountry(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER SAME COUNTRY ---> ", ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -153,7 +152,7 @@ public class CaseTransferController {
     })
     public ResponseEntity<CCDCallbackResponse> transferSameCountryEccLinkedCase(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER SAME COUNTRY ECC LINKED CASE ---> ",
                 ccdRequest.getCaseDetails().getCaseId());
 
@@ -181,7 +180,7 @@ public class CaseTransferController {
     })
     public ResponseEntity<CCDCallbackResponse> transferDifferentCountry(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "CASE TRANSFER DIFFERENT COUNTRY ---> ", ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -203,7 +202,7 @@ public class CaseTransferController {
     })
     public ResponseEntity<CCDCallbackResponse> transferToEcm(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -223,7 +222,7 @@ public class CaseTransferController {
     })
     public ResponseEntity<CCDCallbackResponse> assignCase(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

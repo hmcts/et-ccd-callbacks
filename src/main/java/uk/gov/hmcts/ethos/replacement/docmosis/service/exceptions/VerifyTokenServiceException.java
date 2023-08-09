@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions;
 /**
  * Is thrown when verify token service fails to verify the JWT.
  */
-@SuppressWarnings({"PMD.MissingSerialVersionUID"})
 public class VerifyTokenServiceException extends RuntimeException {
     /**
      * Creates a {@link VerifyTokenServiceException} with only a message.

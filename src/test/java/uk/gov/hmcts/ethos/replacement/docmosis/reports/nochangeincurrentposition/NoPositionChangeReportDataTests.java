@@ -16,7 +16,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentp
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.TOTAL_MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.TOTAL_SINGLE;
 
-@SuppressWarnings({"PMD.ConsecutiveAppendsShouldReuse", "PMD.ConsecutiveLiteralAppends"})
 class NoPositionChangeReportDataTests {
 
     @Test

@@ -1,15 +1,17 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -18,14 +20,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class BulkAddSinglesServiceTest {
+@ExtendWith(SpringExtension.class)
+class BulkAddSinglesServiceTest {
     private BulkAddSinglesService bulkAddSinglesService;
     private SingleCasesImporter singleCasesImporter;
     private MultipleAmendService multipleAmendService;
     private MultipleDetails multipleDetails;
     private static final String AUTH_TOKEN = "some-token";
 
-    @Before
+    @BeforeEach
     public void setup() {
         multipleDetails = createMultipleDetails();
 
@@ -35,7 +38,7 @@ public class BulkAddSinglesServiceTest {
     }
 
     @Test
-    public void shouldSubmitCases() throws ImportException {
+    void shouldSubmitCases() throws ImportException {
         List<String> ethosCaseReferences = List.of("case1");
         when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
             .thenReturn(ethosCaseReferences);
@@ -49,7 +52,7 @@ public class BulkAddSinglesServiceTest {
     }
 
     @Test
-    public void shouldReturnErrorWhenImportCasesFails() throws ImportException {
+    void shouldReturnErrorWhenImportCasesFails() throws ImportException {
         when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
                 .thenThrow(ImportException.class);
 

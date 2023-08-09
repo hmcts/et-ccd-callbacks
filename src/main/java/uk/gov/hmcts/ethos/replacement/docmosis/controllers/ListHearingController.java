@@ -23,7 +23,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @RestController
 @Slf4j
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ListHearingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -39,7 +38,7 @@ public class ListHearingController {
         this.scotlandVenueSelectionService = scotlandVenueSelectionService;
     }
 
-    @PostMapping(value = "/initialiseHearings")
+    @PostMapping("/initialiseHearings")
     @Operation(summary = "Initialise data for Listing Hearings")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
@@ -48,7 +47,7 @@ public class ListHearingController {
     })
     public ResponseEntity<CCDCallbackResponse> initialiseHearings(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         log.info("/initialiseHearings");
 

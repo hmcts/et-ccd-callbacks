@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -27,9 +27,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-@SuppressWarnings({"PMD.UnusedPrivateField"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class PersistentQHelperServiceTest {
+@ExtendWith(SpringExtension.class)
+class PersistentQHelperServiceTest {
 
     @InjectMocks
     private PersistentQHelperService persistentQHelperService;
@@ -41,7 +40,7 @@ public class PersistentQHelperServiceTest {
     private CCDRequest ccdRequest;
     private String userToken;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdRequest = new CCDRequest();
         CaseData caseData = MultipleUtil.getCaseData("2123456/2020");
@@ -62,7 +61,7 @@ public class PersistentQHelperServiceTest {
     }
 
     @Test
-    public void sendCreationEventToSinglesWithoutConfirmation() {
+    void sendCreationEventToSinglesWithoutConfirmation() {
 
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         persistentQHelperService.sendCreationEventToSingles(userToken,
@@ -83,7 +82,7 @@ public class PersistentQHelperServiceTest {
     }
 
     @Test
-    public void sendTransferToEcmEvent() {
+    void sendTransferToEcmEvent() {
 
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         persistentQHelperService.sendTransferToEcmEvent(userToken,

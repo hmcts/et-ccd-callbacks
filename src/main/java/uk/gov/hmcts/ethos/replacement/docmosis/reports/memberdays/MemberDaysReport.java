@@ -26,8 +26,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 @Slf4j
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LiteralsFirstInComparisons",
-    "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
 public class MemberDaysReport {
     private static final int MINUTES = 60;
     private static final String FULL_PANEL = "Full Panel";

@@ -33,8 +33,7 @@ module.exports = async function (myHMMCTSOrganisation = false) {
         I.fillField('#repCollection_0_name_of_organisation', 'Tester Organisation');
         I.wait(2);
         I.fillField('#repCollection_0_representative_reference', 'Tester Reference');
-        I.selectOption('#repCollection_0_representative_occupation', 'Solicitor');
-        I.wait(2);
+        I.selectOption('Occupation (Optional)', 'Solicitor');
         I.fillField('#repCollection_0_representative_address_representative_address_postcodeInput', 'BR1 4NN');
         I.click('Find address');
         I.wait(15);

@@ -61,6 +61,8 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#et-builds')
 
   afterAlways('test') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/integration/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/integration/index.html'
 
     publishHTML target: [
@@ -71,6 +73,12 @@ withPipeline(type, product, component) {
             reportFiles : "index.html",
             reportName : "Integration test report"
     ]
+  }
+
+  before('smoketest:preview') {
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
   }
 
   afterAlways('smoketest:preview') {
@@ -88,6 +96,7 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
 
     publishHTML target: [
             allowMissing : true,
@@ -97,6 +106,12 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET E2E test report"
     ]
+  }
+
+  before('smoketest:aat') {
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.ET_COS_URL = "https://et-cos-staging.aat.platform.hmcts.net/"
+    env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
   }
 
   afterAlways('smoketest:aat') {
@@ -114,6 +129,7 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
 
     publishHTML target: [
             allowMissing : true,

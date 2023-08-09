@@ -25,7 +25,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @RequiredArgsConstructor
 @Service("NocNotificationService")
 @Slf4j
-@SuppressWarnings({"PMD.CognitiveComplexity", "PMD.LawOfDemeter"})
 public class NocNotificationService {
     private final EmailService emailService;
     private final NocRespondentHelper nocRespondentHelper;

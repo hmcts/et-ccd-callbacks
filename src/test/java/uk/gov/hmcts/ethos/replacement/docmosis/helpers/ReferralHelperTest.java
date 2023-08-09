@@ -510,6 +510,8 @@ class ReferralHelperTest {
     private ReferralReplyTypeItem createReferralReplyTypeItem(String id) {
         ReferralReplyType referralReplyType = new ReferralReplyType();
         referralReplyType.setReplyDate("replyDate");
+        referralReplyType.setReplyDateTime("replyDateTime");
+        referralReplyType.setParentSubject("Other");
         referralReplyType.setReplyBy("replyBy");
         referralReplyType.setReplyGeneralNotes("replyNotes");
         referralReplyType.setIsUrgentReply("isUrgent");
@@ -517,9 +519,11 @@ class ReferralHelperTest {
         referralReplyType.setReplyToEmailAddress("replyToEmail");
         referralReplyType.setDirectionTo("directionTo");
         referralReplyType.setReplyDocument(List.of(createDocumentType("1")));
+
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(id);
         referralReplyTypeItem.setValue(referralReplyType);
+
         return referralReplyTypeItem;
     }
 

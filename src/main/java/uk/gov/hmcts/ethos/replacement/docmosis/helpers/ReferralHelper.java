@@ -462,6 +462,10 @@ public final class ReferralHelper {
         referralReply.setDirectionDetails(caseData.getDirectionDetails() != null
                 ? caseData.getDirectionDetails() : caseData.getReplyDetails());
 
+        // for work allocation only
+        referralReply.setReplyDateTime(Helper.getCurrentDateTime());
+        referralReply.setParentSubject(referral.getReferralSubject());
+
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(UUID.randomUUID().toString());
         referralReplyTypeItem.setValue(referralReply);

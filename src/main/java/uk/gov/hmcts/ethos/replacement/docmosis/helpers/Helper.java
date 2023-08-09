@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -52,6 +53,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITIO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 
 @Slf4j
 public final class Helper {
@@ -285,6 +287,14 @@ public final class Helper {
      */
     public static String getCurrentDate() {
         return new SimpleDateFormat("dd MMM yyyy").format(new Date());
+    }
+
+    /**
+     * Gives current datetime in string format.
+     * @return current datetime in "yyyy-MM-dd'T'HH:mm:ss.SSS" format
+     */
+    public static String getCurrentDateTime() {
+        return LocalDateTime.now().format(OLD_DATE_TIME_PATTERN);
     }
 
     public static String getRespondentNames(CaseData caseData) {

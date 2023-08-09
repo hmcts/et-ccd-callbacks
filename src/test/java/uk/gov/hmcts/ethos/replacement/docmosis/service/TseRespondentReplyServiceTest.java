@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -180,7 +181,12 @@ class TseRespondentReplyServiceTest {
 
             String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
 
+            String dateTimeParsedForTesting = UtilHelper.formatCurrentDate(
+                    LocalDateTime.parse(replyType.getDateTime()).toLocalDate()
+            );
+
             assertThat(replyType.getDate()).isEqualTo(dateNow);
+            assertThat(dateTimeParsedForTesting).isEqualTo(dateNow);
             assertThat(replyType.getResponse()).isEqualTo("ResponseText");
             assertThat(replyType.getCopyNoGiveDetails()).isEqualTo("It's a secret");
             assertThat(replyType.getHasSupportingMaterial()).isEqualTo(YES);

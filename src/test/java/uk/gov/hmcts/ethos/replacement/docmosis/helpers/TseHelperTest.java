@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -210,6 +211,7 @@ class TseHelperTest {
                         TseRespondType.builder()
                             .from(CLAIMANT_TITLE)
                             .date("16-May-1996")
+                            .dateTime("1996-05-16T10:20:30.555")
                             .response("response")
                             .hasSupportingMaterial(YES)
                             .supportingMaterial(createSupportingMaterial())
@@ -300,5 +302,12 @@ class TseHelperTest {
 
             assertNull(getRespondentSelectedApplicationType(caseData));
         }
+    }
+
+    @Test
+    void formatDateTime_withResponse()  {
+        String actual = TseHelper.formatDateTime();
+        assertNotNull(actual);
+        assertEquals(23,actual.length());
     }
 }

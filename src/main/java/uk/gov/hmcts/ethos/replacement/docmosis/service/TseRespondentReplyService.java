@@ -139,6 +139,7 @@ public class TseRespondentReplyService {
                     .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                     .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
                     .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                    .dateTime(TseHelper.formatDateTime()) // for Work Allocation, doesn't appear on screen
                     .build()
             ).build());
 

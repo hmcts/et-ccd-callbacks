@@ -50,13 +50,15 @@ services:
 
   wiremock:
     container_name: wiremock
-    image: wiremock/wiremock
+    image: wiremock/wiremock:latest
     volumes:
       - ./mocks/wiremock:/home/wiremock:rw
+      - ./mocks/wiremock/mappings/prd:/home/wiremock/mappings/prd:rw
+      - ./mocks/wiremock/__files/prd:/home/wiremock/__files/prd:rw
     ports:
       - "8765:8080"
     command:
-      - -global-response-templating
+      --global-response-templating
 
 volumes:
   ccd-docker-azure-blob-data:

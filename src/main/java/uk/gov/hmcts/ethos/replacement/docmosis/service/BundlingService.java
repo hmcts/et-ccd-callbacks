@@ -20,17 +20,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Service
 public class BundlingService {
 
-    private BundleApiClient bundleApiClient;
-
-    private AuthTokenGenerator authTokenGenerator;
+    private final BundleApiClient bundleApiClient;
+    private final AuthTokenGenerator authTokenGenerator;
 
     @Value("${bundle.config.default}")
     private String defaultBundle;
 
-    public BundlingService(BundleApiClient bundleApiClient, AuthTokenGenerator authTokenGenerator) {
-        this.bundleApiClient = bundleApiClient;
-        this.authTokenGenerator = authTokenGenerator;
-    }
 
     public List<Bundle> createBundleRequest(CaseDetails caseDetails, String userToken) {
         setBundleConfig(caseDetails.getCaseData());

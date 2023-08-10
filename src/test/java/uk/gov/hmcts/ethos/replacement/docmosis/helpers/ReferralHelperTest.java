@@ -111,7 +111,8 @@ class ReferralHelperTest {
 
     private final String expectedCreatedReferralReply = "ReferralReplyType(directionTo=directionTo, replyToEmailAddre"
         + "ss=replyTo, isUrgentReply=isUrgent, directionDetails=directionDetails, replyDocument=null, replyGeneralNot"
-        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ")";
+        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ", replyDateTime="
+        + Helper.getCurrentDateTime().substring(0,11) + ", referralSubject=Other)";
 
     @BeforeEach
     void setUp() {
@@ -173,7 +174,8 @@ class ReferralHelperTest {
                 + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
                 + "shortDescription=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
-                + "closeReferralGeneralNotes=null, referralReplyCollection=null, referralSummaryPdf=null)";
+                + "closeReferralGeneralNotes=null, referralReplyCollection=null, "
+                + "updateReferralCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);
@@ -319,9 +321,13 @@ class ReferralHelperTest {
 
         ReferralHelper.createReferralReply(caseData, "Judge Alex");
 
-        assertEquals(expectedCreatedReferralReply,
-            caseData.getReferralCollection().get(0).getValue()
-                .getReferralReplyCollection().get(0).getValue().toString());
+        ReferralReplyType testReply = caseData.getReferralCollection()
+                .get(0).getValue().getReferralReplyCollection()
+                .get(0).getValue();
+        // test datetime
+        testReply.setReplyDateTime(testReply.getReplyDateTime().substring(0,11));
+
+        assertEquals(expectedCreatedReferralReply,testReply.toString());
     }
 
     @Test
@@ -430,7 +436,8 @@ class ReferralHelperTest {
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
-            + "\"replyBy\",\"replyDate\":\"replyDate\"}}]}}";
+            + "\"replyBy\",\"replyDate\":\"replyDate\",\"replyDateTime\":\"replyDateTime\","
+            + "\"referralSubject\":\"Other\"}}]}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);

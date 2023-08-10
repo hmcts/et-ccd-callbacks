@@ -26,7 +26,6 @@ public class BundlingService {
     @Value("${bundle.config.default}")
     private String defaultBundle;
 
-
     public List<Bundle> createBundleRequest(CaseDetails caseDetails, String userToken) {
         setBundleConfig(caseDetails.getCaseData());
         BundleCreateResponse bundleCreateResponse = createBundle(userToken, authTokenGenerator.generate(),

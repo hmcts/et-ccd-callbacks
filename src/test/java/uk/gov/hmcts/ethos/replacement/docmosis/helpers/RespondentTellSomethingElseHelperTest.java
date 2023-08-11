@@ -36,6 +36,7 @@ class RespondentTellSomethingElseHelperTest {
     void setUp() {
         caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("6000001/2022")
+            .withGenericTseApplicationTypeItem("Mr. Applicant", "2023-02-16")
             .build();
     }
 
@@ -50,8 +51,10 @@ class RespondentTellSomethingElseHelperTest {
             + "\"templateName\":\"" + RES_TSE_TEMPLATE_NAME + "\","
             + "\"outputName\":\"" + RES_TSE_FILE_NAME + "\","
             + "\"data\":{"
+                + "\"resTseApplicant\":\"Mr. Applicant\","
                 + "\"caseNumber\":\"" + caseData.getEthosCaseReference() + "\","
                 + "\"resTseSelectApplication\":\"" + selectedApplication + "\","
+                + "\"resTseApplicationDate\":\"16 February 2023\","
                 + "\"resTseDocument\":null,"
                 + "\"resTseTextBox\":\"Not Blank\""
                 + "}"
@@ -131,8 +134,10 @@ class RespondentTellSomethingElseHelperTest {
             + "\"templateName\":\"" + RES_TSE_TEMPLATE_NAME + "\","
             + "\"outputName\":\"" + RES_TSE_FILE_NAME + "\","
             + "\"data\":{"
+                + "\"resTseApplicant\":\"Mr. Applicant\","
                 + "\"caseNumber\":\"" + caseData.getEthosCaseReference() + "\","
                 + "\"resTseSelectApplication\":\"" + selectedApplication + "\","
+                + "\"resTseApplicationDate\":\"16 February 2023\","
                 + "\"resTseDocument\":\"DocName.txt\","
                 + "\"resTseTextBox\":null"
                 + "}"
@@ -205,8 +210,10 @@ class RespondentTellSomethingElseHelperTest {
             + "\"templateName\":\"" + RES_TSE_TEMPLATE_NAME + "\","
             + "\"outputName\":\"" + RES_TSE_FILE_NAME + "\","
             + "\"data\":{"
+                + "\"resTseApplicant\":\"Mr. Applicant\","
                 + "\"caseNumber\":\"" + caseData.getEthosCaseReference() + "\","
                 + "\"resTseSelectApplication\":\"" + selectedApplication + "\","
+                + "\"resTseApplicationDate\":\"16 February 2023\","
                 + "\"resTseDocument\":\"DocName.txt\","
                 + "\"resTseTextBox\":\"Not Blank\""
                 + "}"

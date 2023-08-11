@@ -2,7 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
@@ -35,13 +37,17 @@ public final class RespondentTellSomethingElseHelper {
             throws JsonProcessingException {
 
         RespondentTSEApplicationTypeData selectedAppData = getSelectedApplicationType(caseData);
+        GenericTseApplicationTypeItem lastApp = getCurrentGenericTseApplicationTypeItem(caseData);
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
-                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
-                .resTseDocument(getDocumentName(selectedAppData))
-                .resTseTextBox(getTextBoxDetails(selectedAppData))
-                .build();
+            .resTseApplicant(lastApp != null ? lastApp.getValue().getApplicant() : null)
+            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
+            .resTseApplicationDate(UtilHelper.listingFormatLocalDate(
+                lastApp != null ? lastApp.getValue().getDate() : null))
+            .resTseDocument(getDocumentName(selectedAppData))
+            .resTseTextBox(getTextBoxDetails(selectedAppData))
+            .build();
 
         RespondentTellSomethingElseDocument document = RespondentTellSomethingElseDocument.builder()
                 .accessKey(accessKey)
@@ -51,6 +57,15 @@ public final class RespondentTellSomethingElseHelper {
 
         return OBJECT_MAPPER.writeValueAsString(document);
 
+    }
+
+    private static GenericTseApplicationTypeItem getCurrentGenericTseApplicationTypeItem(CaseData caseData) {
+        if (caseData.getGenericTseApplicationCollection() == null) {
+            return null;
+        }
+
+        return caseData.getGenericTseApplicationCollection()
+            .get(caseData.getGenericTseApplicationCollection().size() - 1);
     }
 
     public static RespondentTSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {

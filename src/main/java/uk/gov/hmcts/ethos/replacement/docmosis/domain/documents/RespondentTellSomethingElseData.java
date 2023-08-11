@@ -7,14 +7,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class RespondentTellSomethingElseData {
-
+    @JsonProperty("resTseApplicant")
+    private String resTseApplicant;
     @JsonProperty("caseNumber")
     private String caseNumber;
     @JsonProperty("resTseSelectApplication")
     private String resTseSelectApplication;
+    @JsonProperty("resTseApplicationDate")
+    private String resTseApplicationDate;
     @JsonProperty("resTseDocument")
     private String resTseDocument;
     @JsonProperty("resTseTextBox")
     private String resTseTextBox;
-
 }

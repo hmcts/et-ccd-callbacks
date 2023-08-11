@@ -125,7 +125,8 @@ public class TseAdmReplyController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         tseAdmReplyService.updateApplicationState(caseData);
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
-        tseAdmReplyService.sendAdmReplyEmails(ccdRequest.getCaseDetails().getCaseId(), caseData);
+        tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
+        tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

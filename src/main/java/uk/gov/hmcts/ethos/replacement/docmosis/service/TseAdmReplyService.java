@@ -8,13 +8,16 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -23,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
@@ -33,7 +36,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -183,11 +185,10 @@ public class TseAdmReplyService {
      * @param caseId used in email link to case
      * @param caseData in which the case details are extracted from
      */
-    public void sendAdmReplyEmails(String caseId, CaseData caseData) {
+    public void sendNotifyEmailsToClaimant(String caseId, CaseData caseData) {
         String caseNumber = caseData.getEthosCaseReference();
 
         List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
-        collectRespondents(caseData, emailsToSend);
         collectClaimants(caseData, emailsToSend);
 
         for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
@@ -198,28 +199,31 @@ public class TseAdmReplyService {
         }
     }
 
-    private void collectRespondents(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
-        // if respondent only or both parties: send Respondents Reply Emails
-        if (RESPONDENT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
-            || BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyNotify())) {
-            TSEAdminEmailRecipientsData respondentDetails;
-            for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
-                if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    respondentDetails =
-                        new TSEAdminEmailRecipientsData(
-                            tseAdminReplyRespondentTemplateId,
-                            respondentSumTypeItem.getValue().getRespondentEmail());
-
-                    if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
-                        respondentDetails.setCustomisedText(RESPONSE_REQUIRED);
-                    } else {
-                        respondentDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);
-                    }
-
-                    emailsToSend.add(respondentDetails);
-                }
-            }
+    /**
+     * Send notify emails to Respondents (or LR if they are assigned).
+     */
+    public void sendNotifyEmailsToRespondents(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            return;
         }
+
+        String customisedText = isResponseRequired(caseData, RESPONDENT_TITLE)
+                ? RESPONSE_REQUIRED : RESPONSE_NOT_REQUIRED;
+
+        Map<String, String> personalisation = buildPersonalisation(caseData.getEthosCaseReference(),
+                caseDetails.getCaseId(), customisedText);
+
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue()));
+    }
+
+    private void sendRespondentEmail(CaseData caseData, Map<String, String> emailData, RespondentSumType respondent) {
+        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
+        if (isNullOrEmpty(respondentEmail)) {
+            return;
+        }
+        emailService.sendEmail(tseAdminReplyRespondentTemplateId, respondentEmail, emailData);
     }
 
     private void collectClaimants(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {

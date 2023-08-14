@@ -988,12 +988,12 @@ class CaseManagementForCaseWorkerServiceTest {
                 hmctsServiceId)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
         String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+        when(ccdClient.setSupplementaryData(token, payload, ccdRequest10.getCaseDetails().getCaseId()))
                 .thenReturn(ResponseEntity.ok().build());
 
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token);
-        verify(ccdClient, times(1)).setSupplementaryData(eq(token), eq(payload),
-                eq(ccdRequest10.getCaseDetails().getCaseId()));
+        verify(ccdClient, times(1)).setSupplementaryData(token, payload,
+                ccdRequest10.getCaseDetails().getCaseId());
     }
 
     @Test
@@ -1002,7 +1002,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 hmctsServiceId)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
         String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+        when(ccdClient.setSupplementaryData(token, payload, ccdRequest10.getCaseDetails().getCaseId()))
                 .thenReturn(null);
 
         Exception e = assertThrows(CaseCreationException.class,
@@ -1016,7 +1016,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 hmctsServiceId)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
         String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+        when(ccdClient.setSupplementaryData(token, payload, ccdRequest10.getCaseDetails().getCaseId()))
                 .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
 
         Exception e = assertThrows(CaseCreationException.class,
@@ -1025,7 +1025,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void testHmctsInternalCaseName() {
+    void testHmctsInternalCaseName() {
         CaseData caseData = new CaseData();
         caseData.setClaimant("claimant");
         caseData.setRespondent("respondent");
@@ -1061,7 +1061,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void testCaseDeepLink() {
+    void testCaseDeepLink() {
         when(notificationProperties.getExuiLinkWithCaseId("123"))
                 .thenReturn("http://domain/cases/case-details/123");
         CaseData caseData = new CaseData();

@@ -36,7 +36,7 @@ public class CaseLinksController {
     /**
      * Sends email confirmation of case linking.
      */
-    @PostMapping(value = "created/submitted", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "create/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Sends email confirmation.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Sent successfully",

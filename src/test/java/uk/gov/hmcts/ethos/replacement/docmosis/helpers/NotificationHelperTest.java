@@ -156,4 +156,23 @@ class NotificationHelperTest {
             .containsEntry("name", "Respondent Unrepresented")
             .containsEntry("caseNumber", "12345/6789");
     }
+
+    @Test
+    void shouldGetRespondentEmailAddressWhenUnrepresented() {
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
+        String result = NotificationHelper.getEmailAddressForUnrepresentedRespondent(caseData, unrepresentedRespondent);
+
+        assertThat(result).isEqualTo("respondent@unrepresented.com");
+    }
+
+    @Test
+    void shouldReturnNullWhenRepresented() {
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        RespondentSumType representedRespondent = respondents.get(0).getValue();
+        representedRespondent.setRespondentName("Respondent Represented");
+        String result = NotificationHelper.getEmailAddressForUnrepresentedRespondent(caseData, representedRespondent);
+
+        assertThat(result).isNull();
+    }
 }

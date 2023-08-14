@@ -26,6 +26,13 @@ public class CaseLinksEmailService {
     @Value("${caselinks.unlinked.template.id}")
     private String caseUnlinkedTemplateId;
 
+    /**
+     * Called after submitting case linking update.
+     * Sends email to relevant parties
+     *
+     * @param caseDetails holds the request and case data
+     * @param isLinking   determines if the case is being linked or unlinked
+     */
     public void sendCaseLinkingEmails(CaseDetails caseDetails, boolean isLinking) {
         CaseData caseData = caseDetails.getCaseData();
         String templateId = isLinking ? caseLinkedTemplateId : caseUnlinkedTemplateId;
@@ -33,13 +40,11 @@ public class CaseLinksEmailService {
         Map<String, Object> claimantPersonalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CASE_LINK, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
-
         );
 
         Map<String, Object> respondentPersonalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CASE_LINK, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
-
         );
 
         emailService.sendEmail(templateId,
@@ -48,8 +53,11 @@ public class CaseLinksEmailService {
 
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         for (RespondentSumTypeItem respondent : respondents) {
-            String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue());
-            emailService.sendEmail(templateId, respondentEmail, respondentPersonalisation);
+            String respondentEmail =
+                    NotificationHelper.getEmailAddressForUnrepresentedRespondent(caseData, respondent.getValue());
+            if (respondentEmail != null) {
+                emailService.sendEmail(templateId, respondentEmail, respondentPersonalisation);
+            }
         }
     }
 }

@@ -159,7 +159,8 @@ public class TseAdmReplyService {
                     .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
                         tseAdmReplyRequestSelectPartyRespond))
                     .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                    .dateTime(TseHelper.formatDateTime()) // for Work Allocation, doesn't appear on screen
+                    .dateTime(TseHelper.formatDateTime()) // for Work Allocation, shouldn't appear on screen
+                    .applicationType(applicationType.getType()) // for Work Allocation, shouldn't appear on screen
                     .build()
             ).build());
 

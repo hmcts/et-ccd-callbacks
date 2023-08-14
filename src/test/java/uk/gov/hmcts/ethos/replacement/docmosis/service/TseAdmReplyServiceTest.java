@@ -331,7 +331,6 @@ class TseAdmReplyServiceTest {
         GenericTseApplicationType application = caseData.getGenericTseApplicationCollection().get(0).getValue();
         assertThat(application.getRespondentResponseRequired()).isEqualTo(respondentResponseRequired);
         assertThat(application.getClaimantResponseRequired()).isEqualTo(claimantResponseRequired);
-
     }
 
     private static Stream<Arguments> saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields() {
@@ -373,8 +372,10 @@ class TseAdmReplyServiceTest {
             caseData.getGenericTseApplicationCollection().get(0).getValue()
                 .getRespondCollection().get(0).getValue();
 
+        String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
+
         assertThat(actual.getDate())
-            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+            .isEqualTo(dateNow);
         assertThat(actual.getEnterResponseTitle())
             .isNull();
         assertThat(actual.getAdditionalInformation())
@@ -395,6 +396,13 @@ class TseAdmReplyServiceTest {
             .isNull();
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(RESPONDENT_ONLY);
+
+        // WA properties
+        String dateTimeParsedForTesting = UtilHelper.formatCurrentDate(
+                LocalDateTime.parse(actual.getDateTime()).toLocalDate()
+        );
+        assertThat(dateTimeParsedForTesting).isEqualTo(dateNow);
+        assertThat(actual.getApplicationType()).isEqualTo("Claimant not complied");
     }
 
     @Test

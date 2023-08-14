@@ -181,12 +181,7 @@ class TseRespondentReplyServiceTest {
 
             String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
 
-            String dateTimeParsedForTesting = UtilHelper.formatCurrentDate(
-                    LocalDateTime.parse(replyType.getDateTime()).toLocalDate()
-            );
-
             assertThat(replyType.getDate()).isEqualTo(dateNow);
-            assertThat(dateTimeParsedForTesting).isEqualTo(dateNow);
             assertThat(replyType.getResponse()).isEqualTo("ResponseText");
             assertThat(replyType.getCopyNoGiveDetails()).isEqualTo("It's a secret");
             assertThat(replyType.getHasSupportingMaterial()).isEqualTo(YES);
@@ -194,6 +189,13 @@ class TseRespondentReplyServiceTest {
             assertThat(replyType.getFrom()).isEqualTo(RESPONDENT_TITLE);
             assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename())
                     .isEqualTo("image.png");
+
+            // WA properties
+            String dateTimeParsedForTesting = UtilHelper.formatCurrentDate(
+                    LocalDateTime.parse(replyType.getDateTime()).toLocalDate()
+            );
+            assertThat(dateTimeParsedForTesting).isEqualTo(dateNow);
+            assertThat(replyType.getApplicationType()).isEqualTo(WITHDRAW_MY_CLAIM);
         }
 
         @Test

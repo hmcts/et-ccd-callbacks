@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 class CaseLinksControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String CREATE_SUBMITTED_URL = "/caseLinks/created/submitted";
+    private static final String CREATE_SUBMITTED_URL = "/caseLinks/create/submitted";
 
     private static  final String MAINTAIN_SUBMITTED_URL = "/caseLinks/maintain/submitted";
 

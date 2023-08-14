@@ -385,7 +385,7 @@ public class CaseActionsForCaseWorkerController {
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
-
+            caseManagementForCaseWorkerService.setNextListedDate(caseData);
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
                     userToken, caseData, caseDetails.getCaseTypeId(),
@@ -569,7 +569,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseDetails.getCaseData());
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
@@ -594,8 +594,8 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Helper.updatePostponedDate(caseData);
-
+        HearingsHelper.updatePostponedDate(caseData);
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -674,7 +674,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

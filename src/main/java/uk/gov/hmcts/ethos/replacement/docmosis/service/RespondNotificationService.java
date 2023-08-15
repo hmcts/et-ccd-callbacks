@@ -10,7 +10,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -92,7 +92,7 @@ public class RespondNotificationService {
         respondNotificationType.setRespondNotificationFullName(caseData.getRespondNotificationFullName());
         respondNotificationType.setRespondNotificationPartyToNotify(caseData.getRespondNotificationPartyToNotify());
 
-        GenericTypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new GenericTypeItem<>();
+        TypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new TypeItem<>();
         respondNotificationTypeGenericTypeItem.setId(String.valueOf(randomUUID()));
         respondNotificationTypeGenericTypeItem.setValue(respondNotificationType);
         sendNotificationType.getRespondNotificationTypeCollection().add(respondNotificationTypeGenericTypeItem);

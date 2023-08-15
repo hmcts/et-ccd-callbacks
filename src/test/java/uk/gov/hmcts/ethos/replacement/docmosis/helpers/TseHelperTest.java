@@ -15,7 +15,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -48,7 +50,7 @@ class TseHelperTest {
     private static final DynamicValueType SELECT_APPLICATION = DynamicValueType.create("1", "");
 
     private CaseData caseData;
-    private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
+    private TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem;
 
     @BeforeEach
     public void setUp() {
@@ -64,10 +66,10 @@ class TseHelperTest {
             .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem = new TypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
     }
 
     @Test

@@ -5,11 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.*;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -70,7 +67,7 @@ public class TseService {
 
     public void createApplication(CaseData caseData, boolean isClaimant) {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
-            caseData.setGenericTseApplicationCollection(new ArrayList<>());
+            caseData.setGenericTseApplicationCollection(new ListTypeItem<>());
         }
 
         GenericTseApplicationType application = new GenericTseApplicationType();
@@ -87,11 +84,12 @@ public class TseService {
             addRespondentData(caseData, application);
         }
 
-        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> tseApplicationTypeItem = new TypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());
         tseApplicationTypeItem.setValue(application);
 
-        List<GenericTseApplicationTypeItem> tseApplicationCollection = caseData.getGenericTseApplicationCollection();
+        ListTypeItem<GenericTseApplicationType> tseApplicationCollection =
+                caseData.getGenericTseApplicationCollection();
         tseApplicationCollection.add(tseApplicationTypeItem);
 
         // todo implement try catch for concurrent modification
@@ -370,7 +368,7 @@ public class TseService {
      * Returns a list of rows for multiple documents for use in a two columned Markdown table.
      * @return A list of String arrays, one string array for each document's name and another for the short description
      */
-    List<String[]> addDocumentsRows(List<GenericTypeItem<DocumentType>> documents, String authToken) {
+    List<String[]> addDocumentsRows(List<TypeItem<DocumentType>> documents, String authToken) {
         if (isEmpty(documents)) {
             return Collections.emptyList();
         }

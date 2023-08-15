@@ -6,7 +6,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
+
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
@@ -45,7 +46,7 @@ public final class TseViewApplicationHelper {
      *
      * @param applicationTypeItem - generic application type
      */
-    public static boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem applicationTypeItem) {
+    public static boolean applicationsSharedWithRespondent(TypeItem<GenericTseApplicationType> applicationTypeItem) {
         String applicant = applicationTypeItem.getValue().getApplicant();
         String copyToRespondent = applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
         boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
@@ -54,8 +55,8 @@ public final class TseViewApplicationHelper {
         return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
     }
 
-    private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
-        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+    private static DynamicValueType formatDropdownOption(TypeItem<GenericTseApplicationType> applicationTypeItem) {
+        GenericTseApplicationType value = applicationTypeItem.getValue();
         return DynamicValueType.create(value.getNumber(), String.format("%s %s", value.getNumber(), value.getType()));
     }
 }

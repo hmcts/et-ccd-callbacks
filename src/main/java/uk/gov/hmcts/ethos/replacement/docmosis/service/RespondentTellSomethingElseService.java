@@ -12,7 +12,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
@@ -226,7 +226,7 @@ public class RespondentTellSomethingElseService {
     }
 
     public String generateTableMarkdown(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
+        List<TypeItem<GenericTseApplicationType>> genericApplicationList = caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(genericApplicationList)) {
             return EMPTY_TABLE_MESSAGE;
         }
@@ -241,7 +241,7 @@ public class RespondentTellSomethingElseService {
         return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
     }
 
-    private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
+    private String formatRow(TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem, AtomicInteger count) {
         GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
         int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
         String status = Optional.ofNullable(value.getStatus()).orElse(OPEN_STATE);

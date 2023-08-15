@@ -7,7 +7,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
@@ -43,10 +44,10 @@ class TseViewApplicationHelperTest {
             .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1").withResponsesCount("0")
             .withStatus(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<>();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
     }
 
     @Test
@@ -84,7 +85,7 @@ class TseViewApplicationHelperTest {
                 .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")
                 .withStatus(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<>();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
         assertFalse(TseViewApplicationHelper.applicationsSharedWithRespondent(genericTseApplicationTypeItem));
@@ -97,7 +98,7 @@ class TseViewApplicationHelperTest {
                 .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")
                 .withStatus(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<>();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
         assertTrue(TseViewApplicationHelper.applicationsSharedWithRespondent(genericTseApplicationTypeItem));

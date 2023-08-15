@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ public class TseApplicationUtil {
     }
 
     @NotNull
-    public static GenericTseApplicationTypeItem getGenericTseApplicationTypeItem(String respondentResponseRequired) {
+    public static TypeItem<GenericTseApplicationType> getGenericTseApplicationTypeItem(String respondentResponseRequired) {
         GenericTseApplicationType build = GenericTseApplicationType.builder()
             .applicant(CLAIMANT_TITLE)
             .date("13 December 2022").dueDate("20 December 2022").type("Withdraw my claim")
@@ -22,7 +22,7 @@ public class TseApplicationUtil {
             .responsesCount("0").status(OPEN_STATE)
             .respondentResponseRequired(respondentResponseRequired).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
         return genericTseApplicationTypeItem;

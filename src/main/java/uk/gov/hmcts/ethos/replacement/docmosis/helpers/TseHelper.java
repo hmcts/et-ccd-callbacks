@@ -12,7 +12,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
@@ -93,8 +93,8 @@ public final class TseHelper {
         return YES.equals(application.getRespondentResponseRequired());
     }
 
-    private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
-        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+    private static DynamicValueType formatDropdownOption(TypeItem<GenericTseApplicationType> applicationTypeItem) {
+        GenericTseApplicationType value = applicationTypeItem.getValue();
         return DynamicValueType.create(value.getNumber(), String.format("%s %s", value.getNumber(), value.getType()));
     }
 
@@ -177,7 +177,7 @@ public final class TseHelper {
         return caseData.getGenericTseApplicationCollection().stream()
             .filter(item -> item.getValue().getNumber().equals(selectedAppId))
             .findFirst()
-            .map(GenericTseApplicationTypeItem::getValue)
+            .map(TypeItem::getValue)
             .orElse(null);
     }
 

@@ -18,7 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
@@ -243,9 +244,9 @@ public class RespondentTellSomethingElseController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        List<GenericTseApplicationTypeItem> tseApplicationCollection =
+        List<TypeItem<GenericTseApplicationType>> tseApplicationCollection =
             ccdRequest.getCaseDetails().getCaseData().getGenericTseApplicationCollection();
-        GenericTseApplicationTypeItem latestTSEApplication =
+        TypeItem<GenericTseApplicationType> latestTSEApplication =
             tseApplicationCollection.get(tseApplicationCollection.size() - 1);
 
         String body;

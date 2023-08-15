@@ -9,7 +9,7 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
@@ -86,7 +86,7 @@ public class TseAdmReplyService {
     }
 
     private boolean addDocumentMissing(CaseData caseData) {
-        List<GenericTypeItem<DocumentType>> documents = caseData.getTseAdmReplyAddDocument();
+        List<TypeItem<DocumentType>> documents = caseData.getTseAdmReplyAddDocument();
         if (NEITHER.equals(caseData.getTseAdmReplyIsCmoOrRequest()) || isNotEmpty(documents)) {
             return false;
         }

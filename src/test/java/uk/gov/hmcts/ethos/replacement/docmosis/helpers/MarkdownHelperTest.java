@@ -11,7 +11,7 @@ class MarkdownHelperTest {
     @Test
     void createTwoColumnTable_hidesEmptyData() {
         String[] headers = {"Header 1", "Header 2"};
-        List<String[]> rows = List.of(new String[]{"Key", "Value"}, new String[]{"Key"});
+        List<String[]> rows = List.of(new String[]{"Key", "Value"}, new String[]{"Key", null});
         String actual = MarkdownHelper.createTwoColumnTable(headers, rows);
 
         assertThat(actual).isEqualTo("|Header 1|Header 2|\r\n|--|--|\r\n|Key|Value|\r\n");

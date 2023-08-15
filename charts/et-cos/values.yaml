@@ -54,3 +54,24 @@ java:
     SECURE_DOC_STORE_FEATURE: true
     EXUI_CASE_DETAILS_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net/cases/case-details/"
     CITIZEN_CASE_DETAILS_URL: "https://et-sya.{{ .Values.global.environment }}.platform.hmcts.net/citizen-hub/"
+
+et-sya:
+  enabled: false
+et-sya-api:
+  enabled: false
+et-hearings-api:
+  enabled: false
+idam-pr:
+  enabled: false
+xui-ao-webapp:
+  enabled: false
+xui-mo-webapp:
+  enabled: false
+xui-webapp:
+  enabled: false
+ccd:
+  enabled: false
+ccd-case-document-am-api:
+  enabled: false
+aac-manage-case-assignment:
+  enabled: false

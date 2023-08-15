@@ -1,7 +1,7 @@
 apiVersion: v2
 name: et-cos
 home: https://github.com/hmcts/et-ccd-callbacks
-version: 0.0.30
+version: 0.0.31
 description: HMCTS Employment Tribunals CCD Callbacks service
 maintainers:
   - name: HMCTS Employment Tribunals Team
@@ -9,3 +9,41 @@ dependencies:
   - name: java
     version: 4.1.5
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+  - name: et-sya
+    version: ~0.0.36
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: et-sya.enabled
+  - name: et-sya-api
+    version: ~0.0.31
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: et-sya-api.enabled
+  - name: et-hearings-api
+    version: ~0.0.4
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: et-hearings-api.enabled
+  - name: idam-pr
+    version: ~2.3.0
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: idam-pr.enabled
+  - name: xui-webapp
+    version: 1.0.8
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: xui-webapp.enabled
+  - name: ccd
+    version: 8.0.29
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: ccd.enabled
+    tags:
+      - et-ccd-stack
+  - name: aac-manage-case-assignment
+    version: ~0.2.11
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: aac-manage-case-assignment.enabled
+  - name: xui-mo-webapp
+    version: 1.1.11
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: xui-mo-webapp.enabled
+  - name: xui-ao-webapp
+    version: 0.2.24
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: xui-ao-webapp.enabled

@@ -110,3 +110,9 @@ apply_noc_access_api_assignments_path: /noc/apply-decision
 case-details-url:
   citizen: dummyUrl
   exui: dummyUrl
+
+bundle:
+  api:
+    url: http://localhost:8080
+  config:
+    default: et-dcf-2.yaml

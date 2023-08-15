@@ -163,3 +163,9 @@ case-details-url:
 feature-flags:
   # noinspection SpringBootApplicationYaml
   hearings-api: ${HEARINGS_API_FLAG:true} # will be used in future releases, remove noinspection once in use
+
+bundle:
+  api:
+    url: ${BUNDLE_URL:http://localhost:8080}
+  config:
+    default: et-dcf-2.yaml

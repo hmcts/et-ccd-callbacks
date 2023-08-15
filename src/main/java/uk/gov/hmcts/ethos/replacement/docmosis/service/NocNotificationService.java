@@ -32,15 +32,15 @@ public class NocNotificationService {
     private final OrganisationClient organisationClient;
     private final AdminUserService adminUserService;
     private final AuthTokenGenerator authTokenGenerator;
-    @Value("${nocNotification.template.respondent.id}")
+    @Value("${template.nocNotification.respondent}")
     private String respondentTemplateId;
-    @Value("${nocNotification.template.claimant.id}")
+    @Value("${template.nocNotification.claimant}")
     private String claimantTemplateId;
-    @Value("${nocNotification.template.previousrespondentsolicitor.id}")
+    @Value("${template.nocNotification.respondent-solicitor.previous}")
     private String previousRespondentSolicitorTemplateId;
-    @Value("${nocNotification.template.newrespondentsolicitor.id}")
+    @Value("${template.nocNotification.respondent-solicitor.new}")
     private String newRespondentSolicitorTemplateId;
-    @Value("${nocNotification.template.tribunal.id}")
+    @Value("${template.nocNotification.tribunal}")
     private String tribunalTemplateId;
 
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew,

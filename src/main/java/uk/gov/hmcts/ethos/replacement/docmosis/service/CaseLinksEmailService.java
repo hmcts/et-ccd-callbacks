@@ -13,6 +13,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class CaseLinksEmailService {
 
     /**
      * Called after submitting case linking update.
-     * Sends email to relevant parties
+     * Sends email to claimant and respondents that are unrepresented
      *
      * @param caseDetails holds the request and case data
      * @param isLinking   determines if the case is being linked or unlinked
@@ -37,19 +39,22 @@ public class CaseLinksEmailService {
         CaseData caseData = caseDetails.getCaseData();
         String templateId = isLinking ? caseLinkedTemplateId : caseUnlinkedTemplateId;
 
-        Map<String, Object> claimantPersonalisation = Map.of(
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                CASE_LINK, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
-        );
+        if (NO.equals(caseData.getClaimantRepresentedQuestion())) {
+            Map<String, Object> claimantPersonalisation = Map.of(
+                    CASE_NUMBER, caseData.getEthosCaseReference(),
+                    CASE_LINK, "To manage your case, go to "
+                            + notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
+            );
+
+            emailService.sendEmail(templateId,
+                    caseData.getClaimantType().getClaimantEmailAddress(),
+                    claimantPersonalisation);
+        }
 
         Map<String, Object> respondentPersonalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CASE_LINK, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
         );
-
-        emailService.sendEmail(templateId,
-                caseData.getClaimantType().getClaimantEmailAddress(),
-                claimantPersonalisation);
 
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         for (RespondentSumTypeItem respondent : respondents) {

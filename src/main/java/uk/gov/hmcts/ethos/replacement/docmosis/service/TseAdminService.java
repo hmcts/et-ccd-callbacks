@@ -15,16 +15,18 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -32,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
 
 @Slf4j
@@ -42,10 +45,9 @@ public class TseAdminService {
 
     private final EmailService emailService;
     private final TseService tseService;
-    private final NotificationProperties notificationProperties;
-    @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
+    @Value("${template.tse.admin.record-a-decision.claimant}")
     private String tseAdminRecordClaimantTemplateId;
-    @Value("${tse.admin.record-a-decision.notify.respondent.template.id}")
+    @Value("${template.tse.admin.record-a-decision.respondent}")
     private String tseAdminRecordRespondentTemplateId;
 
     /**
@@ -57,11 +59,10 @@ public class TseAdminService {
         if (applicationType == null) {
             return;
         }
-
-        caseData.setTseAdminTableMarkUp(String.format("%s\r%n%s",
-                tseService.formatApplicationDetails(applicationType, authToken, false),
-                tseService.formatApplicationResponses(applicationType, authToken, false)
-        ));
+        List<String[]> applicationTable = tseService.getApplicationDetailsRows(applicationType, authToken, true);
+        List<String[]> applicationResponses = tseService.formatApplicationResponses(applicationType, authToken, false);
+        caseData.setTseAdminTableMarkUp(createTwoColumnTable(new String[]{"Application", ""},
+            Stream.of(applicationTable, applicationResponses).flatMap(Collection::stream).toList()));
     }
 
     /**
@@ -179,8 +180,8 @@ public class TseAdminService {
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseNumber);
-        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseId));
-        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseId));
+        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
+        personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("name", recipientName);
         return personalisation;
     }

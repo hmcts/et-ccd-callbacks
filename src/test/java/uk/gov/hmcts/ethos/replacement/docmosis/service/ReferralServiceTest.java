@@ -19,9 +19,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class CreateReferralServiceTest {
-    private CreateReferralService createReferralService;
+class ReferralServiceTest {
+    private ReferralService referralService;
 
+    @MockBean
+    private EmailService emailService;
+    @MockBean
+    private UserService userService;
     @MockBean
     private TornadoService tornadoService;
 
@@ -29,7 +33,7 @@ class CreateReferralServiceTest {
 
     @BeforeEach
     void setUp() {
-        createReferralService = new CreateReferralService(tornadoService);
+        referralService = new ReferralService(emailService, userService, tornadoService);
 
         documentInfo = DocumentInfo.builder()
             .description("Referral Summary.pdf")
@@ -42,7 +46,7 @@ class CreateReferralServiceTest {
         when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
             anyString(), anyString())).thenReturn(documentInfo);
 
-        DocumentInfo responseDoc = createReferralService.generateCRDocument(new CaseData(), "", "");
+        DocumentInfo responseDoc = referralService.generateCRDocument(new CaseData(), "", "");
         assertThat(responseDoc, is(documentInfo));
     }
 
@@ -53,7 +57,7 @@ class CreateReferralServiceTest {
         when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
             anyString(), anyString())).thenThrow(ioException);
         assertThrows(DocumentManagementException.class,
-            () -> createReferralService.generateCRDocument(new CaseData(), "",
+            () -> referralService.generateCRDocument(new CaseData(), "",
             ""));
     }
 }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -29,8 +28,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -47,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
@@ -67,12 +67,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 class TseAdminServiceTest {
     private TseAdminService tseAdminService;
-
-    @MockBean
     private EmailService emailService;
-
-    @SpyBean
-    private NotificationProperties notificationProperties;
 
     @MockBean
     private TseService tseService;
@@ -101,11 +96,11 @@ class TseAdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdminService = new TseAdminService(emailService, tseService, notificationProperties);
+        emailService = spy(new TestEmailService());
+        tseAdminService = new TseAdminService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", XUI_URL);
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", CITIZEN_URL);
+
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -123,14 +118,26 @@ class TseAdminServiceTest {
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
 
-        when(tseService.formatApplicationDetails(application, AUTH_TOKEN, false)).thenReturn("Application Details");
-        when(tseService.formatApplicationResponses(any(), any(), anyBoolean())).thenReturn("Responses");
+        List<String[]> applicationDetailsRows = new ArrayList<>();
+        applicationDetailsRows.add(new String[] {"details", ""});
+        when(tseService.getApplicationDetailsRows(application, AUTH_TOKEN, true))
+            .thenReturn(applicationDetailsRows);
 
-        String expected = "Application Details\r\nResponses";
+        List<String[]> formattedApplicationResponses = new ArrayList<>();
+        formattedApplicationResponses.add(new String[] {"responses", ""});
+        when(tseService.formatApplicationResponses(any(), any(), anyBoolean()))
+            .thenReturn(formattedApplicationResponses);
+
+        String expected = """
+            |Application||\r
+            |--|--|\r
+            |details||\r
+            |responses||\r
+            """;
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
-        assertThat(caseData.getTseAdminTableMarkUp())
-            .isEqualTo(expected);
+
+        assertThat(caseData.getTseAdminTableMarkUp()).isEqualTo(expected);
     }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {

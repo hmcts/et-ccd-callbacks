@@ -192,6 +192,41 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setNextListedDate(CaseData caseData) {
+        List<String> dates = new ArrayList<>();
+        String nextListedDate = "";
+
+        if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
+            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+                dates.addAll(getListedDates(hearingTypeItem));
+            }
+            for (String date : dates) {
+                LocalDateTime parsedDate = LocalDateTime.parse(date);
+                if (nextListedDate.equals("") && parsedDate.isAfter(LocalDateTime.now())
+                        || parsedDate.isAfter(LocalDateTime.now())
+                        && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
+                    nextListedDate = date;
+                }
+            }
+            caseData.setNextListedDate(nextListedDate.split("T")[0]);
+        }
+    }
+
+    private List<String> getListedDates(HearingTypeItem hearingTypeItem) {
+        HearingType hearingType = hearingTypeItem.getValue();
+        List<String> dates = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
+            for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
+                DateListedType dateListedType = dateListedTypeItem.getValue();
+                if (HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
+                        && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
+                    dates.add(dateListedType.getListedDate());
+                }
+            }
+        }
+        return dates;
+    }
+
     public CaseData struckOutRespondents(CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {

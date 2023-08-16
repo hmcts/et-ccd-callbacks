@@ -102,6 +102,7 @@ withPipeline(type, product, component) {
       ./bin/preview/add-roles.sh
       ./bin/preview/pull-ccd-definitions.sh  ${ccdBranch}
       ./bin/preview/ccd-import-definitions.sh ./definitions/et-englandwales-ccd-config-aat.xlsx
+      ./bin/preview/ccd-import-definitions.sh ./definitions/et-scotland-ccd-config-aat.xlsx
     """
 
   }

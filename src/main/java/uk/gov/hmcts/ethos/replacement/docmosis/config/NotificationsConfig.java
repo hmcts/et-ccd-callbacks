@@ -11,7 +11,7 @@ import uk.gov.service.notify.NotificationClient;
 @Configuration
 public class NotificationsConfig {
 
-    @Value("${uk.gov.notify.api.key}")
+    @Value("${gov-notify-api-key}")
     private String apiKey;
 
     @Bean

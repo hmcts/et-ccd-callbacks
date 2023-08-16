@@ -340,7 +340,7 @@ public class TornadoService {
             }
             case ET3_RESPONSE_PDF -> {
                 dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
-                        caseData.getEt3ResponseRespondentLegalName());
+                        caseData.getSubmitEt3Respondent().getSelectedLabel());
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case "Initial Consideration.pdf" -> {

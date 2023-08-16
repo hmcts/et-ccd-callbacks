@@ -10,7 +10,7 @@
 USERNAME=${CCD_IMPORT_USERNAME}
 PASSWORD=${CCD_IMPORT_PASSWORD}
 
-curl --location "${IDAM_API_BASE_URL}"/loginUser \
+curl --silent --show-error --location "${IDAM_API_BASE_URL}"/loginUser \
 --header "Content-Type: application/x-www-form-urlencoded" \
 --data-urlencode "username=""${USERNAME}" \
 --data-urlencode "password=""${PASSWORD}"| jq -r .access_token

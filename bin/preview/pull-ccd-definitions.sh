@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [ -z $1 ];
-    branchName = master
+if [ -z "$1" ]; then
+    branchName=master
 else
   branchName=$1
 fi

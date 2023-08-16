@@ -13,6 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -558,6 +560,16 @@ public class CaseDataBuilder {
     public CaseDataBuilder withSubmitEt3Respondent(String respondent) {
         caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create(respondent, respondent)));
         caseData.getSubmitEt3Respondent().setValue(DynamicValueType.create(respondent, respondent));
+        return this;
+    }
+
+    public CaseDataBuilder withGenericTseApplicationTypeItem(String tseApplicant, String tseDate) {
+        GenericTseApplicationTypeItem item = new GenericTseApplicationTypeItem();
+        GenericTseApplicationType genericTseApplicationType = new GenericTseApplicationType();
+        genericTseApplicationType.setApplicant(tseApplicant);
+        genericTseApplicationType.setDate(tseDate);
+        item.setValue(genericTseApplicationType);
+        caseData.setGenericTseApplicationCollection(List.of(item));
         return this;
     }
 }

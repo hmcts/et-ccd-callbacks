@@ -13,7 +13,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -23,6 +25,8 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,12 +38,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 class CaseLinksControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String CREATE_SUBMITTED_URL = "/caseLinks/create/submitted";
+    private static final String CREATE_SUBMITTED_URL = "/caseLinks/create/aboutToSubmit";
 
-    private static  final String MAINTAIN_SUBMITTED_URL = "/caseLinks/maintain/submitted";
+    private static final String MAINTAIN_SUBMITTED_URL = "/caseLinks/maintain/aboutToSubmit";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
+    @MockBean
+    private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     @MockBean
     private CaseLinksEmailService caseLinksEmailService;
 
@@ -60,12 +66,18 @@ class CaseLinksControllerTest {
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
                 .build();
+
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseData(caseDetails.getCaseData());
+
+        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN), any(), any(), any()))
+                .thenReturn(submitEvent);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
     }
 
     @ParameterizedTest
     @MethodSource("requests")
     void submitted_tokenOk(String url) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(url)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -79,7 +91,6 @@ class CaseLinksControllerTest {
     @ParameterizedTest
     @MethodSource("requests")
     void aboutToSubmit_badRequest(String url) throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(url)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

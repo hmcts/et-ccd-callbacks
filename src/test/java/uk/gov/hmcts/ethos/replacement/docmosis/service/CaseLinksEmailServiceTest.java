@@ -9,6 +9,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
+import uk.gov.hmcts.et.common.model.ccd.types.LinkReason;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -47,19 +50,23 @@ class CaseLinksEmailServiceTest {
 
         claimantPersonalisation = Map.of(
                 "caseNumber", "12345/6789",
-                "linkToManageCase", "citizenUrl/1234");
+                "linkToManageCase", "To manage your case, go to citizenUrl/1234");
 
         respondentPersonalisation = Map.of(
                 "caseNumber", "12345/6789",
-                "linkToManageCase", "exuiUrl/1234");
+                "linkToManageCase", "");
 
         respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(RESPONDENT_NAME);
         respondentSumType.setRespondentEmail("res@rep.com");
 
+        CaseLink caseLink = getCaseLink("CLRC017");
+        ListTypeItem<CaseLink> caseLinks = ListTypeItem.from(caseLink);
+
         caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("12345/6789")
                 .withClaimantType("claimant@unrepresented.com")
+                .withClaimantRepresentedQuestion("No")
                 .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
                 .withClaimantIndType("Claimant", "LastName", "Mr", "Mr")
                 .withRespondent(respondentSumType)
@@ -80,31 +87,88 @@ class CaseLinksEmailServiceTest {
                         "2029-11-25T12:11:00.000",
                         Constants.HEARING_STATUS_LISTED,
                         true)
+                .withCaseLinks(caseLinks)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.setCaseId("1234");
     }
 
     @Test
-    void shouldSendCaseLinkingEmails() {
-        caseLinksEmailService.sendCaseLinkingEmails(caseDetails, true);
+    void shouldSendCaseLinkingEmailsWhenClaimantNotRepresented() {
+        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
+                caseDetails.getCaseData().getCaseLinks(),
+                null);
 
-        verify(emailService, times(4)).sendEmail(any(), any(), any());
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("1", "rep1@test.com", respondentPersonalisation);
         verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
     }
 
     @Test
-    void shouldSendCaseUnLinkingEmails() {
-        caseLinksEmailService.sendCaseLinkingEmails(caseDetails, false);
+    void shouldNotSendWhenClaimantRepresented() {
+        caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
+        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
+                caseDetails.getCaseData().getCaseLinks(),
+                null);
 
-        verify(emailService, times(4)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
+        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
+        verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
+    }
+
+    @Test
+    void shouldSendEmailsWhenExistingCaseLinksAndAddingCaseLink() {
+        CaseLink caseLink = getCaseLink("CLRC017");
+        CaseLink caseLink1 = getCaseLink("CLRC016");
+        ListTypeItem<CaseLink> caseLinksAfterSubmit = ListTypeItem.from(caseLink, caseLink1);
+        var caseLinksBeforeSubmit = ListTypeItem.from(caseLinksAfterSubmit.get(1));
+
+        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
+                caseLinksAfterSubmit,
+                caseLinksBeforeSubmit);
+
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
+        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
+        verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
+    }
+
+    @Test
+    void shouldSendCaseUnLinkingEmailsWhenExistingCaseLinks() {
+        CaseLink caseLink = getCaseLink("CLRC017");
+        CaseLink caseLink1 = getCaseLink("CLRC016");
+        ListTypeItem<CaseLink> caseLinksBeforeSubmit = ListTypeItem.from(caseLink, caseLink1);
+        var caseLinksAfterSubmit = ListTypeItem.from(caseLinksBeforeSubmit.get(1));
+        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
+                caseLinksAfterSubmit,
+                caseLinksBeforeSubmit);
+
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("2", "rep1@test.com", respondentPersonalisation);
         verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
+    }
+
+    @Test
+    void shouldSendCaseUnLinkingEmailsWhenRemovingLastCaseLink() {
+        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
+                null,
+                caseDetails.getCaseData().getCaseLinks());
+
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
+        verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
+        verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
+    }
+
+    private CaseLink getCaseLink(String linkReasonCode) {
+        LinkReason linkReason = new LinkReason();
+        linkReason.setReason(linkReasonCode);
+        ListTypeItem<LinkReason> linkReasons = ListTypeItem.from(linkReason, "1");
+
+        return CaseLink.builder().caseReference("1").caseType(ENGLANDWALES_CASE_TYPE_ID)
+                .reasonForLink(linkReasons).build();
     }
 
 }

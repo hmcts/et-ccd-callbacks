@@ -16,16 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseLinksHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -68,20 +63,11 @@ public class CaseLinksController {
         SubmitEvent currentCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
                 ccdRequest.getCaseDetails().getCaseId());
-        ListTypeItem<CaseLink> caseLinks = currentCase.getCaseData().getCaseLinks();
+        ListTypeItem<CaseLink> currentCaseLinks = currentCase.getCaseData().getCaseLinks();
         ListTypeItem<CaseLink> newCaseLinks = ccdRequest.getCaseDetails().getCaseData().getCaseLinks();
-        boolean isLinkedForHearing;
-        if (caseLinks == null  || caseLinks.isEmpty()) {
-            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(newCaseLinks);
-        } else {
-            List<GenericTypeItem<CaseLink>> addedCaseLinks = new ArrayList<>(newCaseLinks);
-            addedCaseLinks.remove(caseLinks);
-            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(addedCaseLinks);
-        }
-        if (isLinkedForHearing) {
-            caseLinksEmailService.sendCaseLinkingEmails(ccdRequest.getCaseDetails(), true);
-        }
-
+        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(ccdRequest.getCaseDetails(),
+                currentCaseLinks,
+                newCaseLinks);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .build());
@@ -112,20 +98,12 @@ public class CaseLinksController {
         SubmitEvent currentCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
                 ccdRequest.getCaseDetails().getCaseId());
-        ListTypeItem<CaseLink> caseLinks = currentCase.getCaseData().getCaseLinks();
+        ListTypeItem<CaseLink> currentCaseLinks = currentCase.getCaseData().getCaseLinks();
         ListTypeItem<CaseLink> newCaseLinks = ccdRequest.getCaseDetails().getCaseData().getCaseLinks();
-        boolean isLinkedForHearing;
-        if (newCaseLinks == null || newCaseLinks.isEmpty()) {
-            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(caseLinks);
-        } else {
-            List<GenericTypeItem<CaseLink>> removedCaseLinks = new ArrayList<>(caseLinks);
-            removedCaseLinks.remove(newCaseLinks);
-            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(removedCaseLinks);
-        }
-        if (isLinkedForHearing) {
-            caseLinksEmailService.sendCaseLinkingEmails(ccdRequest.getCaseDetails(), false);
-        }
-
+        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(ccdRequest.getCaseDetails(),
+                currentCaseLinks,
+                newCaseLinks
+        );
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .build());

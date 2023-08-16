@@ -12,7 +12,7 @@ filepath=${1}
 filename=$(basename ${filepath})
 uploadFilename="$(date +"%Y%m%d-%H%M%S")-${filename}"
 
-userToken=$(${dir}/idam-user-token.sh ${CCD_IMPORT_USERNAME:-servicesatcdm+ethos@gmail.com} ${CCD_IMPORT_PASSWORD:-Adventure2019})
+userToken=$(${dir}/idam-user-token.sh ${CCD_IMPORT_USERNAME} ${CCD_IMPORT_PASSWORD})
 serviceToken=$(${dir}/idam-service-token.sh)
 
 [ -z "$serviceToken" ] && >&2 echo "No service token" && exit

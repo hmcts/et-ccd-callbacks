@@ -11,6 +11,8 @@ def branchesToSync = ['demo', 'perftest', 'ithc']
 
 def secrets = [
         'et-cos-${env}': [
+                secret('ccd-import-username', 'CCD_IMPORT_USERNAME'),
+                secret('ccd-import-password', 'CCD_IMPORT_PASSWORD'),
                 secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
                 secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
                 secret('et-ccd-api-user-name', 'ET_CCD_API_USER_NAME'),
@@ -90,6 +92,13 @@ withPipeline(type, product, component) {
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
+
+    sh """
+      eval \$(./bin/preview/load-preview-environment-variables.sh ${CHANGE_ID})
+      ./bin/preview/add-roles.sh
+      ./bin/preview/pull-ccd-definitions.sh
+    """
+
   }
 
   afterAlways('smoketest:preview') {

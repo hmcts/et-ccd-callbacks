@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# User used during the CCD import and ccd-role creation
+./bin/preview/ccd-add-role.sh "caseworker-et-pcqextractor" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-caa" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment-api" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment-englandwales" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment-scotland" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment-etjudge" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment-etjudge-englandwales" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment-etjudge-scotland" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-employment-legalrep-solicitor" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "citizen" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "et-acas-api" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "pui-case-manager" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "pui-finance-manager" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "pui-organisation-manager" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "pui-user-manager" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "pui-caa" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "manage-user" "$USER_TOKEN" "$SERVICE_TOKEN"
+./bin/preview/ccd-add-role.sh "caseworker-approver" "$USER_TOKEN" "$SERVICE_TOKEN"

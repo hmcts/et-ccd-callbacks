@@ -8,6 +8,7 @@ def type = "java"
 def product = "et"
 def component = "cos"
 def branchesToSync = ['demo', 'perftest', 'ithc']
+def ccdBranch = env.BRANCH_NAME
 
 def secrets = [
         'et-cos-${env}': [
@@ -93,10 +94,11 @@ withPipeline(type, product, component) {
     env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
 
+
     sh """
       eval \$(./bin/preview/load-preview-environment-variables.sh ${CHANGE_ID})
       ./bin/preview/add-roles.sh
-      ./bin/preview/pull-ccd-definitions.sh
+      ./bin/preview/pull-ccd-definitions.sh  ${ccdBranch}
     """
 
   }

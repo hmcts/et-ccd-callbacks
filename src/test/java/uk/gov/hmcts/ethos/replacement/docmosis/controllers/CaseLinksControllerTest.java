@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -98,11 +99,36 @@ class CaseLinksControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @ParameterizedTest
+    @MethodSource("requests")
+    void testStatusForbidden(String url) throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        mockMvc.perform(post(url)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+    }
+
     private static Stream<Arguments> requests() {
         return Stream.of(
                 Arguments.of(CREATE_SUBMITTED_URL),
                 Arguments.of(MAINTAIN_SUBMITTED_URL)
         );
+    }
+
+    @Test
+    void testInitTransferToEnglandWalesForbidden() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        mockMvc.perform(post(CREATE_SUBMITTED_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
     }
 
 }

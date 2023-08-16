@@ -106,8 +106,36 @@ class CaseLinksEmailServiceTest {
     }
 
     @Test
+    void shouldSendCaseLinkingEmailsWhenClaimantNotRepresentedAndListCaseLinksEmpty() {
+        ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
+
+        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
+                caseDetails.getCaseData().getCaseLinks(),
+                caseLinkListTypeItem);
+
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
+        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
+        verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
+    }
+
+    @Test
+    void shouldNotSendCaseLinkingEmailsWhenNonHearingCaseLink() {
+        ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
+        CaseLink caseLink1 = getCaseLink("CLRC016");
+        ListTypeItem<CaseLink> caseLinks = ListTypeItem.from(caseLink1);
+
+        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
+                caseLinks,
+                caseLinkListTypeItem);
+
+        verify(emailService, times(0)).sendEmail(any(), any(), any());
+    }
+
+    @Test
     void shouldNotSendWhenClaimantRepresented() {
         caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
+
         caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
                 caseDetails.getCaseData().getCaseLinks(),
                 null);
@@ -140,6 +168,7 @@ class CaseLinksEmailServiceTest {
         CaseLink caseLink1 = getCaseLink("CLRC016");
         ListTypeItem<CaseLink> caseLinksBeforeSubmit = ListTypeItem.from(caseLink, caseLink1);
         var caseLinksAfterSubmit = ListTypeItem.from(caseLinksBeforeSubmit.get(1));
+
         caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
                 caseLinksAfterSubmit,
                 caseLinksBeforeSubmit);
@@ -160,6 +189,33 @@ class CaseLinksEmailServiceTest {
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
+    }
+
+    @Test
+    void shouldSendCaseUnLinkingEmailsWhenRemovingLastCaseLinkFromEmptyList() {
+        ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
+
+        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
+                caseLinkListTypeItem,
+                caseDetails.getCaseData().getCaseLinks());
+
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
+        verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
+        verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
+    }
+
+    @Test
+    void shouldNotSendCaseUnLinkingEmailsWhenRemovingNonHearingLink() {
+        ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
+        CaseLink caseLink1 = getCaseLink("CLRC016");
+        ListTypeItem<CaseLink> caseLinksBeforeSubmit = ListTypeItem.from(caseLink1);
+
+        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
+                caseLinkListTypeItem,
+                caseLinksBeforeSubmit);
+
+        verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 
     private CaseLink getCaseLink(String linkReasonCode) {

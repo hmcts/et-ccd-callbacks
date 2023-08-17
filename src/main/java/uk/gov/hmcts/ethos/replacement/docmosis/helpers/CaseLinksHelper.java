@@ -20,13 +20,9 @@ public final class CaseLinksHelper {
         if (caseLinks == null || caseLinks.isEmpty()) {
             return false;
         }
-        for (GenericTypeItem<CaseLink> link : caseLinks) {
-            for (GenericTypeItem<LinkReason> linkReason : link.getValue().getReasonForLink()) {
-                if (Objects.equals(linkReason.getValue().getReason(), LINKED_FOR_HEARING)) {
-                    return true;
-                }
-            }
-        }
+               return caseLinks.stream()
+                .flatMap(link -> link.getValue().getReasonForLink().stream())
+                .anyMatch(linkReason -> Objects.equals(linkReason.getValue().getReason(), LINKED_FOR_HEARING));
         return false;
     }
 }

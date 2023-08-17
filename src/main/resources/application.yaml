@@ -163,3 +163,5 @@ case-details-url:
 feature-flags:
   # noinspection SpringBootApplicationYaml
   hearings-api: ${HEARINGS_API_FLAG:true} # will be used in future releases, remove noinspection once in use
+
+hmcts_service_id: BHA1

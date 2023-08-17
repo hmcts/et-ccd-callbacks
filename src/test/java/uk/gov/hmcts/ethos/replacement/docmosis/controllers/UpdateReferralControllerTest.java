@@ -10,13 +10,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
@@ -30,12 +28,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,28 +39,29 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({ReplyToReferralController.class, JsonMapper.class})
-class ReplyToReferralControllerTest {
+@WebMvcTest({UpdateReferralController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.ExcessiveImports", "PMD.UnusedPrivateField"})
+class UpdateReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String START_REPLY_REFERRAL_URL = "/replyReferral/aboutToStart";
-    private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = "/replyReferral/initHearingAndReferralDetails";
-    private static final String ABOUT_TO_SUBMIT_URL = "/replyReferral/aboutToSubmit";
-    private static final String SUBMITTED_REFERRAL_URL = "/replyReferral/completeReplyToReferral";
-    private static final String VALIDATE_EMAIL_URL = "/replyReferral/validateReplyToEmail";
+    private static final String START_UPDATE_REFERRAL_URL = "/updateReferral/aboutToStart";
+    private static final String ABOUT_TO_SUBMIT_URL = "/updateReferral/aboutToSubmit";
+    private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = "/updateReferral/initHearingAndReferralDetails";
+    private static final String SUBMITTED_REFERRAL_URL = "/updateReferral/completeUpdateReferral";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private UserService userService;
     @MockBean
-    private ReferralService referralService;
-    @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private ReferralService referralService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -74,157 +70,29 @@ class ReplyToReferralControllerTest {
 
     @BeforeEach
     void setUp() {
-        when(emailService.getExuiCaseLink(any())).thenReturn("exui");
         CaseData caseData = CaseDataBuilder.builder()
-            .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
-                "length num", "type", "Yes")
             .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
                 TribunalOffice.ABERDEEN, "venue")
             .withHearingSession(
                 0,
                 "hearingNumber",
                 "2019-11-25T12:11:00.000",
-                Constants.HEARING_STATUS_HEARD,
+                HEARING_STATUS_HEARD,
                 true)
             .build();
-
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
+        caseData.setReferralSubject("ET1");
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
-
-        List<HearingTypeItem> hearings = new ArrayList<>();
-        caseData.setHearingCollection(hearings);
-        caseData.setIsJudge("Yes");
-        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
-        caseData.setEthosCaseReference("caseRef");
-        caseData.setClaimant("claimant");
-        caseData.setIsUrgent("Yes");
-        caseData.setReplyToEmailAddress("test@gmail.com");
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("123")
                 .build();
-
-        UserDetails userDetails = new UserDetails();
-        userDetails.setRoles(List.of("role1"));
-        when(userService.getUserDetails(any())).thenReturn(userDetails);
-    }
-
-    @Test
-    void aboutToStartReferralReply_Success() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(START_REPLY_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void initHearingAndReferralDetails_Success() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void aboutToSubmitReferralReply_Success() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        UserDetails details = new UserDetails();
-        details.setName("First Last");
-        when(userService.getUserDetails(any())).thenReturn(details);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    void aboutToStartReferralReply_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(START_REPLY_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void initHearingAndReferralDetails_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void aboutToSubmitReferralReply_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        when(userService.getUserDetails(any())).thenReturn(new UserDetails());
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void completeReplyToReferral_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.confirmation_body", notNullValue()));
-    }
-
-    @Test
-    void completeReplyToReferral_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void validateReplyToEmail_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(VALIDATE_EMAIL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
-    }
-
-    @Test
-    void validateReplyToEmail_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(VALIDATE_EMAIL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
     }
 
     private ReferralTypeItem createReferralTypeItem() {
@@ -237,12 +105,122 @@ class ReplyToReferralControllerTest {
         return referralTypeItem;
     }
 
-    private RespondentSumTypeItem createRespondentType() {
-        RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName("Andrew Smith");
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(respondentSumType);
-
-        return respondentSumTypeItem;
+    @Test
+    void startUpdate_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.data.referralHearingDetails", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
     }
+
+    @Test
+    void initReferralHearingDetails_invalidToken() throws Exception {
+
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToSubmit_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId(UUID.randomUUID().toString());
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("respondent Name");
+        respondentSumTypeItem.setValue(respondentSumType);
+        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(
+                List.of(respondentSumTypeItem));
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setUpdateIsUrgent("Yes");
+        caseData.setUpdateReferentEmail("example@example.com");
+        caseData.setUpdateReferralSubject("subject");
+        when(userService.getUserDetails(any())).thenReturn(details);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void referralStatusNotCorrect() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        ccdRequest.getCaseDetails().getCaseData().getReferralCollection().get(0).getValue().setReferralStatus("Closed");
+        when(userService.getUserDetails(any())).thenReturn(details);
+        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors").value(
+                        "Only referrals with status awaiting instructions can be updated."))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void referralStatusCorrect() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        ccdRequest.getCaseDetails().getCaseData().getReferralCollection()
+                .get(0).getValue().setReferralStatus("Awaiting instructions");
+        when(userService.getUserDetails(any())).thenReturn(details);
+        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors").isEmpty())
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void aboutToSubmit_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void completeUpdateReferral_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void completeUpdateReferral_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
 }

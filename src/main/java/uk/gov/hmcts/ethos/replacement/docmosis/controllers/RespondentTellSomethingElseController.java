@@ -85,45 +85,8 @@ public class RespondentTellSomethingElseController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (Helper.isClaimantNonSystemUser(caseData)) {
-            caseData.setResTseNotAvailableWarning(YES);
-        }
 
         return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    /**
-     * For displaying error and preventing user to proceed to the event, if
-     * the other party (Claimant) is a non-system user.
-     *
-     * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
-     * @return Callback response entity with confirmation header and body
-     */
-    @PostMapping(value = "/showError", consumes = APPLICATION_JSON_VALUE)
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> showError(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (Helper.isClaimantNonSystemUser(caseData)) {
-            errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
-        }
-
-        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**

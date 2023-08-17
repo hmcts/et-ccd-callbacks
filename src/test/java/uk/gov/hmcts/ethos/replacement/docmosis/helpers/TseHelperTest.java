@@ -220,14 +220,14 @@ class TseHelperTest {
         String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
-            + "\"type\":\"Withdraw my claim\",\"supportingYesNo\":\"Yes\","
+            + "\"type\":\"Withdraw my claim\",\"responseDate\":\"16-May-1996\",\"supportingYesNo\":\"Yes\","
             + "\"documentCollection\":[{\"id\":\"1234\","
             + "\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\"},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
-            + "\"response\":\"response\"}}";
+            + "\"response\":\"response\",\"respondent\":\"Claimant\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
     }

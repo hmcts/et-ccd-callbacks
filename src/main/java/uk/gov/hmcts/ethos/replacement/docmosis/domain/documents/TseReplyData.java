@@ -18,6 +18,8 @@ public class TseReplyData {
     private String caseNumber;
     @JsonProperty("type")
     private String type;
+    @JsonProperty("responseDate")
+    String responseDate;
     @JsonProperty("supportingYesNo")
     private String supportingYesNo;
     @JsonProperty("documentCollection")
@@ -26,4 +28,6 @@ public class TseReplyData {
     private String copy;
     @JsonProperty("response")
     private String response;
+    @JsonProperty("respondent")
+    private String respondent;
 }

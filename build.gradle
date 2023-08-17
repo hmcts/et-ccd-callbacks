@@ -387,8 +387,6 @@ dependencies {
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.4.0'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.4.0'
-
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

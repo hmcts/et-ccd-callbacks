@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -437,7 +436,9 @@ class ReferralHelperTest {
         caseDetails.setCaseId("123");
         caseDetails.setCaseData(caseData);
 
-        Map<String, String> actual = ReferralHelper.buildPersonalisation(caseDetails, "1", true, "First Last");
+        Map<String, String> actual = ReferralHelper.buildPersonalisation(
+            caseDetails.getCaseData(), "1", true, "First Last", "linkToExui"
+        );
 
         assertEquals(getExpectedPersonalisation(), actual);
     }
@@ -509,7 +510,7 @@ class ReferralHelperTest {
         caseData.setReferralDocument(List.of(documentTypeItem));
         List<String> errors = new ArrayList<>();
         ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);
-        Assert.assertEquals("Short description is added but document is not uploaded.", errors.get(0));
+        assertEquals("Short description is added but document is not uploaded.", errors.get(0));
     }
 
     private Map<String, String> getExpectedPersonalisation() {
@@ -524,7 +525,7 @@ class ReferralHelperTest {
         personalisation.put("subject", "ET1");
         personalisation.put("username", "First Last");
         personalisation.put("replyReferral", "Referred by");
-        personalisation.put("ccdId", "123");
+        personalisation.put("linkToExUI", "linkToExui");
         return personalisation;
     }
 

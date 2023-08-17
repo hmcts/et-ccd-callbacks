@@ -1,0 +1,131 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5050/et_cos
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev
+  main:
+    lazy-initialization: true
+
+ft:
+  base:
+    url: ${ET_COS_URL:http://localhost:8081}
+  et-sya-api:
+    url: ${FT_SYA_URL:http://localhost:4550}
+  idam:
+    url: ${IDAM_API_URL:http://localhost:5000}
+
+idam:
+  api:
+    url: http://localhost:5000
+    jwkUrl: http://localhost:5000/o/jwks
+  s2s-auth:
+    url: http://localhost:4502
+    totp_secret: AAAAAAAAAAAAAAAA
+    microservice: et_cos
+
+et-sya-api:
+  url: http://et-sya-api-aat.service.core-compute-aat.internal
+
+document_management:
+  ccdCaseDocument:
+    url: http://localhost:8080
+  url: http://localhost:4506
+
+ccd:
+  client:
+    timeout: 60000
+  data-store-api-url: http://localhost:4452
+
+tornado:
+  accessKey: test
+  url: https://eu.dws3.docmosis.com/api/render
+
+case_document_am:
+  url: http://localhost:4455
+
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY:test}
+
+template:
+  referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
+  rejected:  ${REJECTED_TEMPLATE_ID:e480e011-ffeb-4adc-9682-8758cf206375}
+
+  et1Serving:
+    claimant: ${ET1SERVING_TEMPLATE_ID:fa49291f-49cf-4330-8031-c05c101eb32a}
+    respondent: ${ET1SERVING_RESPONDENT_TEMPLATE_ID:05af8477-7313-4ef1-9a8e-6b2d9d128b50}
+
+  et3Response:
+    tribunal: ${ET3RESPONSE_NOTIFICATION_TRIBUNAL_TEMPLATE_ID:d4ced02e-f381-491a-855d-950a283315c0}
+
+  et3Notification:
+    myhmcts: ${ET3_NOTIFICATION_TEMPLATE_MYHMCTS_ID:c47c8dd1-8f36-41e8-a2cc-55e94b95b2d3}
+    citizen: ${ET3_NOTIFICATION_TEMPLATE_CITIZEN_ID:38b2a1e0-be26-47f6-a3a1-e8984a249b80}
+
+  tse:
+    respondent:
+      application:
+        claimant: ${TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID:5d014e5a-9528-4d02-bd31-8eca98cfba19}
+        respondent: ${TSE_RESPONDENT_TO_RESPONDENT_TEMPLATE_ID:c0b393f6-daf0-46fc-8995-d5e98149326f}
+        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:e60bc338-db48-4270-95b0-5e8f29e6ae0f}
+        tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
+      respond:
+        claimant: ${TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:dec79c11-2c02-481d-aed8-6f013667cdf5}
+        respondent:
+          rule-92-yes: ${TSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:232f1fbe-3a7f-44cd-926b-bfa192c25ac4}
+          rule-92-no: ${TSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:d647a4c5-5859-42f6-96a6-30d57c0e98c2}
+      reply-to-tribunal:
+        claimant: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_CLAIMANT:70aa4caa-f074-4abd-ab22-4f9fe570fb1e}
+        respondent:
+          rule-92-yes: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_RES_RULE92_YES:f75316e7-29b4-49e1-b04e-02241f69b649}
+          rule-92-no: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_RES_RULE92_NO:376fb37d-d563-42f2-89f0-3165a4777447}
+        tribunal: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_TRIB:c2f72be8-541c-4bcc-b213-42557976dc39}
+
+    admin:
+      reply:
+        claimant: ${TSE_ADMIN_REPLY_CLAIMANT_TEMPLATE_ID:52b14d5d-038e-48c7-8f9c-3f1193660608}
+        respondent: ${TSE_ADMIN_REPLY_RESPONDENT_TEMPLATE_ID:46872d50-cb92-4fee-a460-cc35bd836025}
+      record-a-decision:
+        claimant: ${TSE_ADMIN_RECORD_A_DECISION_CLAIMANT_TEMPLATE_ID:615827dc-d21b-46ae-8c66-91a635d82504}
+        respondent: ${TSE_ADMIN_RECORD_A_DECISION_RESPONDENT_TEMPLATE_ID:ca1a1dd2-13c9-435d-b63e-0ca07abe937d}
+
+  pse:
+    claimant: ${PSE_RESPONDENT_NOTIFICATION_CLAIMANT_TEMPLATE_ID:bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff}
+    respondent:
+      rule-92-yes: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:aa114479-e72b-4893-9024-c25aee1be6fc}
+      rule-92-no: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee}
+    admin: ${PSE_RESPONDENT_NOTIFICATION_ADMIN_TEMPLATE_ID:296d3c6e-00d7-4f43-a8bd-260d52b171a7}
+
+  nocNotification:
+    claimant: ${NOC_NOTIFICATION_TEMPLATE_CLAIMANT_ID:3d0c5784-0055-4863-9c03-7d37d9b2ad8d}
+    respondent: ${NOC_NOTIFICATION_TEMPLATE_RESPONDENT_ID:a3539d79-65c0-491c-b578-b58cf321f83e}
+    respondent-solicitor:
+      previous: ${NOC_NOTIFICATION_TEMPLATE_OLD_REP_ID:fe52b39f-852c-43ca-a42a-b9a27c43b130}
+      new: ${NOC_NOTIFICATION_TEMPLATE_NEW_REP_ID:8fe52f24-40b2-4986-8f86-4dd1af311cbd}
+    tribunal: ${NOC_NOTIFICATION_TEMPLATE_TRIBUNAL_ID:1d5efcbd-1971-4ebe-bfe8-72ba36b5abac}
+
+  sendNotification: ${SEND_NOTIFICATION_TEMPLATE_ID:1b8299d7-5051-4b78-a870-726b6384d8a8}
+
+  respondNotification:
+    noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
+
+queue:
+  create-updates:
+    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
+    send:
+      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING:test}
+
+
+ccd_gateway_base_url: http://127.0.0.1:3453
+
+etcos:
+  system:
+    username: ${ET_COS_SYSTEM_USER}
+    password: ${ET_COS_SYSTEM_USER_PASSWORD}
+
+assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
+apply_noc_access_api_assignments_path: /noc/apply-decision
+
+case-details-url:
+  citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
+  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}
+
+hmcts_service_id: BHA1

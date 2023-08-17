@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +22,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import java.util.ArrayList;
@@ -40,29 +41,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @Slf4j
 @RequestMapping("/updateReferral")
 @RestController
+@RequiredArgsConstructor
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class UpdateReferralController {
     private final VerifyTokenService verifyTokenService;
-    private final String referralTemplateId;
     private final UserService userService;
     private final EmailService emailService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final CreateReferralService createReferralService;
+    private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-
-    public UpdateReferralController(@Value("${referral.template.id}") String referralTemplateId,
-                                    VerifyTokenService verifyTokenService,
-                                    UserService userService, EmailService emailService,
-                                    CreateReferralService createReferralService,
-                                    DocumentManagementService documentManagementService) {
-        this.verifyTokenService = verifyTokenService;
-        this.userService = userService;
-        this.emailService = emailService;
-        this.referralTemplateId = referralTemplateId;
-        this.createReferralService = createReferralService;
-        this.documentManagementService = documentManagementService;
-    }
+    @Value("${template.referral}")
+    private String referralTemplateId;
 
     /**
      * Called for the first page of the Update Referral event.
@@ -176,7 +166,7 @@ public class UpdateReferralController {
         String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(
                 referral.getUpdateReferralCollection()));
 
-        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
+        DocumentInfo documentInfo = referralService.generateCRDocument(caseData,
                 userToken, ccdRequest.getCaseDetails().getCaseTypeId());
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));

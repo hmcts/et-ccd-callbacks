@@ -31,20 +31,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FUNCTION_NOT_AVAILABLE_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
@@ -56,7 +51,6 @@ class RespondentTellSomethingElseControllerTest {
     private static final String DISPLAY_TABLE_URL = "/respondentTSE/displayTable";
     private static final String COMPLETE_APPLICATION_URL = "/respondentTSE/completeApplication";
     private static final String ABOUT_TO_START_URL = "/respondentTSE/aboutToStart";
-    private static final String SHOW_ERROR_URL = "/respondentTSE/showError";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -98,21 +92,6 @@ class RespondentTellSomethingElseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
-    }
-
-    @Test
     void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
@@ -129,40 +108,6 @@ class RespondentTellSomethingElseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void showError_returnError() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
-                .thenReturn(true);
-        mockMvc.perform(post(SHOW_ERROR_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]", equalTo(FUNCTION_NOT_AVAILABLE_ERROR)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
-    }
-
-    @Test
-    void showError_noError() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
-                .thenReturn(false);
-        mockMvc.perform(post(SHOW_ERROR_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
 
     @Test

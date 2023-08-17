@@ -242,7 +242,7 @@ class TseHelperTest {
         caseDetails.setCaseId("CaseId");
         caseDetails.setCaseData(caseData);
         byte[] document = {};
-        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrl");
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
 
         Map<String, Object> expected = Map.of(
             "linkToCitizenHub", "citizenUrlCaseId",
@@ -266,7 +266,7 @@ class TseHelperTest {
         caseDetails.setCaseId("CaseId");
         caseDetails.setCaseData(caseData);
         byte[] document = {};
-        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrl");
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
 
         Map<String, Object> expected = Map.of(
             "linkToCitizenHub", "citizenUrlCaseId",

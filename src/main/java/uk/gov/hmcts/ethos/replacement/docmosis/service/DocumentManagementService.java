@@ -205,7 +205,7 @@ public class DocumentManagementService {
      */
     public String displayDocNameTypeSizeLink(UploadedDocumentType document, String authToken) {
         if (document == null) {
-            return "";
+            return null;
         }
 
         String documentLink = Helper.getDocumentMatcher(document.getDocumentBinaryUrl()).replaceFirst("");

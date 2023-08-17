@@ -2200,7 +2200,10 @@ class DocumentHelperTest {
         );
 
         DocumentType expected = DocumentType.builder().typeOfDocument("typeOfDocument")
-            .shortDescription("shortDescription").uploadedDocument(build).build();
+            .shortDescription("shortDescription")
+                .uploadedDocument(build)
+                .dateOfCorrespondence(LocalDate.now().toString())
+                .build();
 
         assertThat(actual.getId()).isNotEmpty();
         assertThat(actual.getValue()).isEqualTo(expected);

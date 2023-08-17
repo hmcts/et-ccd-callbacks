@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -26,8 +25,6 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,8 +42,6 @@ class CaseLinksControllerTest {
 
     @MockBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
-    private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     @MockBean
     private CaseLinksEmailService caseLinksEmailService;
 
@@ -71,8 +66,6 @@ class CaseLinksControllerTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseDetails.getCaseData());
 
-        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN), any(), any(), any()))
-                .thenReturn(submitEvent);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
     }
 

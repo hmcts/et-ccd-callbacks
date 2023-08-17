@@ -15,11 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -35,7 +31,6 @@ public class CaseLinksController {
 
     private final VerifyTokenService verifyTokenService;
     private final CaseLinksEmailService caseLinksEmailService;
-    private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
 
 
     /**
@@ -52,7 +47,7 @@ public class CaseLinksController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> createCaseLinkAbout(
+    public ResponseEntity<CCDCallbackResponse> createCaseLinkAboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
@@ -60,14 +55,7 @@ public class CaseLinksController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        SubmitEvent currentCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
-                ccdRequest.getCaseDetails().getCaseId());
-        ListTypeItem<CaseLink> currentCaseLinks = currentCase.getCaseData().getCaseLinks();
-        ListTypeItem<CaseLink> newCaseLinks = ccdRequest.getCaseDetails().getCaseData().getCaseLinks();
-        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(ccdRequest.getCaseDetails(),
-                currentCaseLinks,
-                newCaseLinks);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, true);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .build());
@@ -87,7 +75,7 @@ public class CaseLinksController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> unLinkCaseSubmitted(
+    public ResponseEntity<CCDCallbackResponse> maintainCaseLinkAboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
@@ -95,15 +83,7 @@ public class CaseLinksController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        SubmitEvent currentCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
-                ccdRequest.getCaseDetails().getCaseId());
-        ListTypeItem<CaseLink> currentCaseLinks = currentCase.getCaseData().getCaseLinks();
-        ListTypeItem<CaseLink> newCaseLinks = ccdRequest.getCaseDetails().getCaseData().getCaseLinks();
-        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(ccdRequest.getCaseDetails(),
-                currentCaseLinks,
-                newCaseLinks
-        );
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, false);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .build());

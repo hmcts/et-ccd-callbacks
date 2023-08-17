@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -26,6 +28,7 @@ public class CaseLinksEmailService {
     public static final String CASE_NUMBER = "caseNumber";
     public static final String CASE_LINK = "linkToManageCase";
     private final NotificationProperties notificationProperties;
+    private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final EmailService emailService;
     @Value("${caselinks.linked.template.id}")
     private String caseLinkedTemplateId;
@@ -36,55 +39,44 @@ public class CaseLinksEmailService {
      * Called on about to submit case linking update.
      * Sends email to claimant and respondents that are unrepresented
      *
-     * @param caseDetails           holds the request and case data
-     * @param caseLinksAfterSubmit  linked cases on ccd request
-     * @param caseLinksBeforeSubmit linked case before submit
+     * @param ccdRequest holds the request and case data
+     * @param userToken  auth token
+     * @param isLinking  determines if a case is being linked or unlinked
      */
-    public void sendMailWhenCaseLinkedForHearing(CaseDetails caseDetails,
-                                                 ListTypeItem<CaseLink> caseLinksAfterSubmit,
-                                                 ListTypeItem<CaseLink> caseLinksBeforeSubmit
-                                                 ) {
-        boolean isLinkedForHearing;
-        if (caseLinksBeforeSubmit == null || caseLinksBeforeSubmit.isEmpty()) {
-            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(caseLinksAfterSubmit);
+    public void sendMailWhenCaseLinkForHearing(CCDRequest ccdRequest, String userToken, boolean isLinking) {
+        SubmitEvent currentCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
+                ccdRequest.getCaseDetails().getCaseId());
+        ListTypeItem<CaseLink> caseLinksBeforeSubmit = currentCase.getCaseData().getCaseLinks();
+        ListTypeItem<CaseLink> caseLinksAfterSubmit = ccdRequest.getCaseDetails().getCaseData().getCaseLinks();
+
+        if (isLinking) {
+            sendCaseLinkingEmails(ccdRequest.getCaseDetails(), caseLinksBeforeSubmit, caseLinksAfterSubmit, true);
         } else {
-            List<GenericTypeItem<CaseLink>> diff = caseLinksAfterSubmit.stream()
-                    .filter(element -> !caseLinksBeforeSubmit.contains(element))
+            // When removing case links we reverse the order of the lists passed to this function
+            sendCaseLinkingEmails(ccdRequest.getCaseDetails(), caseLinksAfterSubmit, caseLinksBeforeSubmit, false);
+        }
+    }
+
+    private void sendCaseLinkingEmails(CaseDetails caseDetails,
+                                       ListTypeItem<CaseLink> list1,
+                                       ListTypeItem<CaseLink> list2,
+                                       Boolean isLinking) {
+        boolean isLinkedForHearing;
+        if (list1 == null || list1.isEmpty()) {
+            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(list2);
+        } else {
+            List<GenericTypeItem<CaseLink>> diff = list2.stream()
+                    .filter(element -> !list1.contains(element))
                     .toList();
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(diff);
         }
         if (isLinkedForHearing) {
-            sendCaseLinkingEmails(caseDetails, true);
+            sendEmails(caseDetails, isLinking);
         }
     }
 
-    /**
-     * Called on about to submit case unlinking update.
-     * Sends email to claimant and respondents that are unrepresented
-     *
-     * @param caseDetails           holds the request and case data
-     * @param caseLinksAfterSubmit  linked cases on ccd request
-     * @param caseLinksBeforeSubmit linked case before submit
-     */
-    public void sendMailWhenCaseUnLinkedForHearing(CaseDetails caseDetails,
-                                                   ListTypeItem<CaseLink> caseLinksAfterSubmit,
-                                                   ListTypeItem<CaseLink> caseLinksBeforeSubmit
-                                                   ) {
-        boolean isLinkedForHearing;
-        if (caseLinksAfterSubmit == null || caseLinksAfterSubmit.isEmpty()) {
-            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(caseLinksBeforeSubmit);
-        } else {
-            List<GenericTypeItem<CaseLink>> diff = caseLinksBeforeSubmit.stream()
-                    .filter(element -> !caseLinksAfterSubmit.contains(element))
-                    .toList();
-            isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(diff);
-        }
-        if (isLinkedForHearing) {
-            sendCaseLinkingEmails(caseDetails, false);
-        }
-    }
-
-    private void sendCaseLinkingEmails(CaseDetails caseDetails, boolean isLinking) {
+    private void sendEmails(CaseDetails caseDetails, boolean isLinking) {
         CaseData caseData = caseDetails.getCaseData();
         String templateId = isLinking ? caseLinkedTemplateId : caseUnlinkedTemplateId;
 

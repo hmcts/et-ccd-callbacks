@@ -8,7 +8,10 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.LinkReason;
@@ -20,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
@@ -29,12 +34,17 @@ class CaseLinksEmailServiceTest {
     private static final String RESPONDENT_NAME = "Respondent";
     private static final String REP_EMAIL = "rep1@test.com";
     private static final String LEGAL_REP = "legalRep";
+    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
 
     private CaseLinksEmailService caseLinksEmailService;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     @SpyBean
     private NotificationProperties notificationProperties;
+    private CCDRequest ccdRequest;
+    private SubmitEvent submitEvent;
     private CaseDetails caseDetails;
     private RespondentSumType respondentSumType;
     private Map<String, Object> claimantPersonalisation;
@@ -42,7 +52,9 @@ class CaseLinksEmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        caseLinksEmailService = new CaseLinksEmailService(notificationProperties, emailService);
+        caseLinksEmailService = new CaseLinksEmailService(notificationProperties,
+                caseRetrievalForCaseWorkerService,
+                emailService);
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl/");
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl/");
         ReflectionTestUtils.setField(caseLinksEmailService, "caseLinkedTemplateId", "1");
@@ -91,27 +103,19 @@ class CaseLinksEmailServiceTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.setCaseId("1234");
+        ccdRequest = new CCDRequest(caseDetails);
+
+        submitEvent = new SubmitEvent();
+        submitEvent.setCaseData(new CaseData());
+        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN), any(), any(), any()))
+                .thenReturn(submitEvent);
     }
 
     @Test
     void shouldSendCaseLinkingEmailsWhenClaimantNotRepresented() {
-        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
-                caseDetails.getCaseData().getCaseLinks(),
-                null);
-
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
-        verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
-    }
-
-    @Test
-    void shouldSendCaseLinkingEmailsWhenClaimantNotRepresentedAndListCaseLinksEmpty() {
-        ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
-
-        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
-                caseDetails.getCaseData().getCaseLinks(),
-                caseLinkListTypeItem);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                true);
 
         verify(emailService, times(3)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
@@ -121,13 +125,13 @@ class CaseLinksEmailServiceTest {
 
     @Test
     void shouldNotSendCaseLinkingEmailsWhenNonHearingCaseLink() {
-        ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
         CaseLink caseLink1 = getCaseLink("CLRC016");
         ListTypeItem<CaseLink> caseLinks = ListTypeItem.from(caseLink1);
+        ccdRequest.getCaseDetails().getCaseData().setCaseLinks(caseLinks);
 
-        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
-                caseLinks,
-                caseLinkListTypeItem);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                true);
 
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
@@ -136,9 +140,9 @@ class CaseLinksEmailServiceTest {
     void shouldNotSendWhenClaimantRepresented() {
         caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
 
-        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
-                caseDetails.getCaseData().getCaseLinks(),
-                null);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                true);
 
         verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
@@ -150,11 +154,13 @@ class CaseLinksEmailServiceTest {
         CaseLink caseLink = getCaseLink("CLRC017");
         CaseLink caseLink1 = getCaseLink("CLRC016");
         ListTypeItem<CaseLink> caseLinksAfterSubmit = ListTypeItem.from(caseLink, caseLink1);
+        caseDetails.getCaseData().setCaseLinks(caseLinksAfterSubmit);
         var caseLinksBeforeSubmit = ListTypeItem.from(caseLinksAfterSubmit.get(1));
+        submitEvent.getCaseData().setCaseLinks(caseLinksBeforeSubmit);
 
-        caseLinksEmailService.sendMailWhenCaseLinkedForHearing(caseDetails,
-                caseLinksAfterSubmit,
-                caseLinksBeforeSubmit);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                true);
 
         verify(emailService, times(3)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
@@ -168,10 +174,12 @@ class CaseLinksEmailServiceTest {
         CaseLink caseLink1 = getCaseLink("CLRC016");
         ListTypeItem<CaseLink> caseLinksBeforeSubmit = ListTypeItem.from(caseLink, caseLink1);
         var caseLinksAfterSubmit = ListTypeItem.from(caseLinksBeforeSubmit.get(1));
+        submitEvent.getCaseData().setCaseLinks(caseLinksBeforeSubmit);
+        caseDetails.getCaseData().setCaseLinks(caseLinksAfterSubmit);
 
-        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
-                caseLinksAfterSubmit,
-                caseLinksBeforeSubmit);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                false);
 
         verify(emailService, times(3)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
@@ -181,9 +189,15 @@ class CaseLinksEmailServiceTest {
 
     @Test
     void shouldSendCaseUnLinkingEmailsWhenRemovingLastCaseLink() {
-        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
-                null,
-                caseDetails.getCaseData().getCaseLinks());
+        CaseLink caseLink = getCaseLink("CLRC017");
+        ListTypeItem<CaseLink> caseLinksBeforeSubmit = ListTypeItem.from(caseLink);
+        submitEvent.getCaseData().setCaseLinks(caseLinksBeforeSubmit);
+
+        caseDetails.getCaseData().setCaseLinks(null);
+
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                false);
 
         verify(emailService, times(3)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
@@ -193,11 +207,15 @@ class CaseLinksEmailServiceTest {
 
     @Test
     void shouldSendCaseUnLinkingEmailsWhenRemovingLastCaseLinkFromEmptyList() {
+        CaseLink caseLink = getCaseLink("CLRC017");
+        ListTypeItem<CaseLink> caseLinksBeforeSubmit = ListTypeItem.from(caseLink);
+        submitEvent.getCaseData().setCaseLinks(caseLinksBeforeSubmit);
         ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
+        caseDetails.getCaseData().setCaseLinks(caseLinkListTypeItem);
 
-        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
-                caseLinkListTypeItem,
-                caseDetails.getCaseData().getCaseLinks());
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                false);
 
         verify(emailService, times(3)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
@@ -210,10 +228,12 @@ class CaseLinksEmailServiceTest {
         ListTypeItem<CaseLink> caseLinkListTypeItem = new ListTypeItem<>();
         CaseLink caseLink1 = getCaseLink("CLRC016");
         ListTypeItem<CaseLink> caseLinksBeforeSubmit = ListTypeItem.from(caseLink1);
+        submitEvent.getCaseData().setCaseLinks(caseLinksBeforeSubmit);
+        caseDetails.getCaseData().setCaseLinks(caseLinkListTypeItem);
 
-        caseLinksEmailService.sendMailWhenCaseUnLinkedForHearing(caseDetails,
-                caseLinkListTypeItem,
-                caseLinksBeforeSubmit);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                false);
 
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }

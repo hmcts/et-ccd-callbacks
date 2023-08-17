@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
-import uk.gov.hmcts.et.common.model.ccd.types.LinkReason;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,9 +19,8 @@ public final class CaseLinksHelper {
         if (caseLinks == null || caseLinks.isEmpty()) {
             return false;
         }
-               return caseLinks.stream()
+        return caseLinks.stream()
                 .flatMap(link -> link.getValue().getReasonForLink().stream())
                 .anyMatch(linkReason -> Objects.equals(linkReason.getValue().getReason(), LINKED_FOR_HEARING));
-        return false;
     }
 }

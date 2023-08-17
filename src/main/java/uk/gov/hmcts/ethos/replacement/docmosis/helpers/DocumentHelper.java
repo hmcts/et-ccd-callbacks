@@ -987,6 +987,7 @@ public final class DocumentHelper {
         DocumentType documentType = documentTypeItem.getValue();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setShortDescription(shortDescription);
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
         return documentTypeItem;
     }
 

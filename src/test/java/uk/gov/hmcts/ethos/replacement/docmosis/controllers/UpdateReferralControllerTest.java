@@ -147,6 +147,7 @@ class UpdateReferralControllerTest {
         caseData.setUpdateReferentEmail("example@example.com");
         caseData.setUpdateReferralSubject("subject");
         when(userService.getUserDetails(any())).thenReturn(details);
+        when(emailService.getExuiCaseLink(any())).thenReturn("dummyLink");
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

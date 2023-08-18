@@ -20,8 +20,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -180,44 +181,22 @@ class RespondentTellSomethingElseServiceTest {
 
     private void setDocForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseDocument1(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseDocument2(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseDocument3(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseDocument4(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseDocument5(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseDocument6(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                caseData.setResTseDocument7(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseDocument8(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseDocument9(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseDocument10(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                caseData.setResTseDocument11(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseDocument12(createDocumentType("documentUrl"));
-                break;
-            default:
-                break;
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseDocument1(createDocumentType("documentUrl"));
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseDocument2(createDocumentType("documentUrl"));
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseDocument3(createDocumentType("documentUrl"));
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseDocument4(createDocumentType("documentUrl"));
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseDocument5(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseDocument6(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE ->
+                    caseData.setResTseDocument7(createDocumentType("documentUrl"));
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseDocument8(createDocumentType("documentUrl"));
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseDocument9(createDocumentType("documentUrl"));
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseDocument10(createDocumentType("documentUrl"));
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM ->
+                    caseData.setResTseDocument11(createDocumentType("documentUrl"));
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseDocument12(createDocumentType("documentUrl"));
+            default -> {
+            }
         }
     }
 
@@ -231,44 +210,20 @@ class RespondentTellSomethingElseServiceTest {
 
     private void setTextBoxForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseTextBox1("Not Blank");
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseTextBox2("Not Blank");
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseTextBox3("Not Blank");
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseTextBox4("Not Blank");
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseTextBox5("Not Blank");
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseTextBox6("Not Blank");
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                caseData.setResTseTextBox7("Not Blank");
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseTextBox8("Not Blank");
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseTextBox9("Not Blank");
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseTextBox10("Not Blank");
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                caseData.setResTseTextBox11("Not Blank");
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseTextBox12("Not Blank");
-                break;
-            default:
-                break;
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseTextBox1("Not Blank");
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseTextBox2("Not Blank");
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseTextBox3("Not Blank");
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseTextBox4("Not Blank");
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseTextBox5("Not Blank");
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseTextBox6("Not Blank");
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> caseData.setResTseTextBox7("Not Blank");
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseTextBox8("Not Blank");
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseTextBox9("Not Blank");
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseTextBox10("Not Blank");
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> caseData.setResTseTextBox11("Not Blank");
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseTextBox12("Not Blank");
+            default -> {
+            }
         }
     }
 
@@ -544,7 +499,7 @@ class RespondentTellSomethingElseServiceTest {
                 is(TribunalOffice.BRISTOL.getOfficeEmail()));
     }
 
-    private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {
+    private ListTypeItem<GenericTseApplicationType> generateGenericTseApplicationList() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
 
         respondentTseType.setDate("testDate");
@@ -557,70 +512,67 @@ class RespondentTellSomethingElseServiceTest {
         respondentTseType.setCopyToOtherPartyText("text");
         respondentTseType.setDueDate("testDueDate");
 
-        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> tseApplicationTypeItem = new TypeItem();
         tseApplicationTypeItem.setId("id");
         tseApplicationTypeItem.setValue(respondentTseType);
 
-        List<GenericTseApplicationTypeItem> tseApplicationCollection = new ArrayList<>();
-        tseApplicationCollection.add(tseApplicationTypeItem);
-
-        return tseApplicationCollection;
+        return ListTypeItem.from(tseApplicationTypeItem);
     }
 
     private void setDocAndTextForSelectedApplication(CaseData caseData,
                                                      String textBoxData,
                                                      String documentUrl) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
+            case TSE_APP_AMEND_RESPONSE -> {
                 caseData.setResTseTextBox1(textBoxData);
                 caseData.setResTseDocument1(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
+            }
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> {
                 caseData.setResTseTextBox2(textBoxData);
                 caseData.setResTseDocument2(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
+            }
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> {
                 caseData.setResTseTextBox3(textBoxData);
                 caseData.setResTseDocument3(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
+            }
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> {
                 caseData.setResTseTextBox4(textBoxData);
                 caseData.setResTseDocument4(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
+            }
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> {
                 caseData.setResTseTextBox5(textBoxData);
                 caseData.setResTseDocument5(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
+            }
+            case TSE_APP_ORDER_OTHER_PARTY -> {
                 caseData.setResTseTextBox6(textBoxData);
                 caseData.setResTseDocument6(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            }
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> {
                 caseData.setResTseTextBox7(textBoxData);
                 caseData.setResTseDocument7(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
+            }
+            case TSE_APP_POSTPONE_A_HEARING -> {
                 caseData.setResTseTextBox8(textBoxData);
                 caseData.setResTseDocument8(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
+            }
+            case TSE_APP_RECONSIDER_JUDGEMENT -> {
                 caseData.setResTseTextBox9(textBoxData);
                 caseData.setResTseDocument9(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
+            }
+            case TSE_APP_RESTRICT_PUBLICITY -> {
                 caseData.setResTseTextBox10(textBoxData);
                 caseData.setResTseDocument10(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            }
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> {
                 caseData.setResTseTextBox11(textBoxData);
                 caseData.setResTseDocument11(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
+            }
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> {
                 caseData.setResTseTextBox12(textBoxData);
                 caseData.setResTseDocument12(createDocumentType(documentUrl));
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
     }
 

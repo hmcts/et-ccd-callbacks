@@ -11,7 +11,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
@@ -204,9 +204,9 @@ class RespondNotificationServiceTest {
         respondNotificationType.setRespondNotificationFullName("John Doe");
         respondNotificationType.setRespondNotificationPartyToNotify(BOTH_PARTIES);
 
-        var respondNotificationTypeItem = new GenericTypeItem<RespondNotificationType>();
+        var respondNotificationTypeItem = new TypeItem<RespondNotificationType>();
         respondNotificationTypeItem.setValue(respondNotificationType);
-        var respondNotificationTypeItemList = new ArrayList<GenericTypeItem<RespondNotificationType>>();
+        var respondNotificationTypeItemList = new ArrayList<TypeItem<RespondNotificationType>>();
         respondNotificationTypeItemList.add(respondNotificationTypeItem);
 
         SendNotificationType notificationType = new SendNotificationType();

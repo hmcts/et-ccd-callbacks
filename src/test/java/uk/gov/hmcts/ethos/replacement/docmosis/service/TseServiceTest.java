@@ -10,10 +10,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -83,7 +83,7 @@ class TseServiceTest {
         when(documentManagementService.displayDocNameTypeSizeLink(documentTwo.getUploadedDocument(), AUTH_TOKEN))
             .thenReturn("File2 (txt, 1MB)");
 
-        var documents = List.of(GenericTypeItem.from(document), GenericTypeItem.from(documentTwo));
+        var documents = List.of(TypeItem.from(document), TypeItem.from(documentTwo));
         List<String[]> actual = tseService.addDocumentsRows(documents, AUTH_TOKEN);
 
         assertThat(actual).hasSize(4);
@@ -344,8 +344,7 @@ class TseServiceTest {
         void withRule92NoResponseAsLegalRep() {
             CaseData caseData = new CaseData();
 
-            caseData.setGenericTseApplicationCollection(List.of(
-                GenericTseApplicationTypeItem.builder()
+            caseData.setGenericTseApplicationCollection(ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                     .id(UUID.randomUUID().toString())
                     .value(getRespondentAppWithClaimantAndAdminRule92NoResponse())
                     .build())
@@ -496,8 +495,7 @@ class TseServiceTest {
     private CaseData setupCaseDataWithAnApplication() {
         CaseData caseData = new CaseData();
 
-        caseData.setGenericTseApplicationCollection(List.of(
-            GenericTseApplicationTypeItem.builder()
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(setupTestApplication())
                 .build())
@@ -524,14 +522,14 @@ class TseServiceTest {
             ).build();
     }
 
-    private List<GenericTypeItem<DocumentType>> createDocumentList() {
+    private List<TypeItem<DocumentType>> createDocumentList() {
         DocumentType document = DocumentType.from(DocumentFixtures.getUploadedDocumentType("File1"));
         document.setShortDescription("Description1");
 
         DocumentType documentTwo = DocumentType.from(DocumentFixtures.getUploadedDocumentType("File2"));
         documentTwo.setShortDescription("Description2");
 
-        return List.of(GenericTypeItem.from(document), GenericTypeItem.from(documentTwo));
+        return List.of(TypeItem.from(document), TypeItem.from(documentTwo));
     }
 
     private TseRespondType setupAdminTseRespondType() {

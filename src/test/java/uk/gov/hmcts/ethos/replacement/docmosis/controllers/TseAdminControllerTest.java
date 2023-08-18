@@ -12,7 +12,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmCloseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -21,7 +23,6 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -70,7 +71,7 @@ class TseAdminControllerTest {
         caseDetails.setCaseId("4321");
         CaseData caseData = caseDetails.getCaseData();
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+            ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
             .id(UUID.randomUUID().toString())
             .value(TseApplicationBuilder.builder()
                 .withNumber("2")

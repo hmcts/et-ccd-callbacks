@@ -14,10 +14,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
@@ -102,7 +102,7 @@ class TseAdminServiceTest {
         GenericTseApplicationType application = getGenericTseApplicationTypeItemBuild();
 
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+            ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(application)
                 .build())
@@ -182,8 +182,8 @@ class TseAdminServiceTest {
             .build();
     }
 
-    private List<GenericTypeItem<DocumentType>> createDocumentList(String fileName) {
-        return List.of(GenericTypeItem.from(DocumentType.from(createUploadedDocumentType(fileName))));
+    private List<TypeItem<DocumentType>> createDocumentList(String fileName) {
+        return List.of(TypeItem.from(DocumentType.from(createUploadedDocumentType(fileName))));
     }
 
     private static UploadedDocumentType createUploadedDocumentType(String fileName) {
@@ -203,7 +203,7 @@ class TseAdminServiceTest {
     @Test
     void saveTseAdminDataFromCaseData_Judgment_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+            ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("2")
@@ -219,7 +219,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Granted");
         caseData.setTseAdminTypeOfDecision("Judgment");
         caseData.setTseAdminAdditionalInformation("Additional information");
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        List<TypeItem<DocumentType>> documentList = createDocumentList("document.txt");
         caseData.setTseAdminResponseRequiredNoDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Legal officer");
         caseData.setTseAdminDecisionMadeByFullName("Legal Officer Full Name");
@@ -262,7 +262,7 @@ class TseAdminServiceTest {
     @Test
     void saveTseAdminDataFromCaseData_CmoYes_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+            ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("3")
@@ -281,7 +281,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        List<TypeItem<DocumentType>> documentList = createDocumentList("document.txt");
         caseData.setTseAdminResponseRequiredYesDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
@@ -324,7 +324,7 @@ class TseAdminServiceTest {
     @Test
     void saveTseAdminDataFromCaseData_CmoNo_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+            ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("4")
@@ -339,7 +339,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Refused");
         caseData.setTseAdminTypeOfDecision(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdminIsResponseRequired(NO);
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        List<TypeItem<DocumentType>> documentList = createDocumentList("document.txt");
         caseData.setTseAdminResponseRequiredNoDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");

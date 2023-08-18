@@ -226,7 +226,8 @@ public class RespondentTellSomethingElseService {
     }
 
     public String generateTableMarkdown(CaseData caseData) {
-        List<TypeItem<GenericTseApplicationType>> genericApplicationList = caseData.getGenericTseApplicationCollection();
+        List<TypeItem<GenericTseApplicationType>> genericApplicationList =
+                caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(genericApplicationList)) {
             return EMPTY_TABLE_MESSAGE;
         }

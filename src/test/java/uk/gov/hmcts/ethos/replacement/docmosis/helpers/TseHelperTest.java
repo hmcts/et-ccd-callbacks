@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
@@ -90,9 +89,9 @@ class TseHelperTest {
     @MethodSource
     void populateSelectApplicationDropdown_hasTribunalResponse(String respondentResponseRequired,
                                                                int numberOfApplication) {
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
             respondentResponseRequired);
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
 
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
         assert actual != null;
@@ -121,10 +120,10 @@ class TseHelperTest {
             .withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<>();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
-        caseData1.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        caseData1.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
 
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData1);
         assert actual != null;

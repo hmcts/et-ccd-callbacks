@@ -12,7 +12,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -20,8 +20,6 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
@@ -154,14 +152,10 @@ public class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
         return respondentSumTypeItem;
     }
 
-    private List<GenericTseApplicationTypeItem> createApplicationCollection() {
+    private ListTypeItem<GenericTseApplicationType> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
         respondentTseType.setNumber(APPLICATION_CODE);
 
-        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
-        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        tseApplicationTypeItem.setValue(respondentTseType);
-
-        return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
+        return ListTypeItem.from(respondentTseType);
     }
 }

@@ -14,7 +14,9 @@ public class TseApplicationUtil {
     }
 
     @NotNull
-    public static TypeItem<GenericTseApplicationType> getGenericTseApplicationTypeItem(String respondentResponseRequired) {
+    public static TypeItem<GenericTseApplicationType>
+        getGenericTseApplicationTypeItem(String respondentResponseRequired) {
+
         GenericTseApplicationType build = GenericTseApplicationType.builder()
             .applicant(CLAIMANT_TITLE)
             .date("13 December 2022").dueDate("20 December 2022").type("Withdraw my claim")

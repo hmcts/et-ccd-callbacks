@@ -11,7 +11,11 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
@@ -2236,7 +2240,7 @@ class DocumentHelperTest {
             CaseData caseData = new CaseData();
             caseData.setDocumentCollection(List.of(doc1, doc2, doc3));
 
-            TypeItem<GenericTseApplicationType> claimantApp = GenericTseApplicationType.builder()
+            TypeItem<GenericTseApplicationType> claimantApp = TypeItem.<GenericTseApplicationType>builder()
                 .value(GenericTseApplicationType.builder()
                     .applicant(CLAIMANT_TITLE)
                     .copyToOtherPartyYesOrNo(NO)
@@ -2254,7 +2258,7 @@ class DocumentHelperTest {
                 .build()
             );
 
-            GenericTseApplicationTypeItem claimantResponses = GenericTseApplicationTypeItem.builder()
+            TypeItem<GenericTseApplicationType> claimantResponses = TypeItem.<GenericTseApplicationType>builder()
                 .value(GenericTseApplicationType.builder()
                     .documentUpload(doc1.getValue().getUploadedDocument())
                     .respondCollection(tseRespondTypeItems)

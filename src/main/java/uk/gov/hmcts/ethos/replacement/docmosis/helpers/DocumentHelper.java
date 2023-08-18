@@ -1033,7 +1033,8 @@ public final class DocumentHelper {
 
         // Get all documents with claimant rule 92 no - whether on application creation or in any subsequent response
         // These will only be supporting material as pdfs for rule 92 'no' aren't meant to be generated.
-        for (TypeItem<GenericTseApplicationType> app : ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
+        for (TypeItem<GenericTseApplicationType> app :
+                ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
             GenericTseApplicationType appType = app.getValue();
             if (CLAIMANT_TITLE.equals(appType.getApplicant()) && NO.equals(appType.getCopyToOtherPartyYesOrNo())) {
                 claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));

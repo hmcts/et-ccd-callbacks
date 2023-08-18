@@ -226,6 +226,7 @@ public class CaseManagementForCaseWorkerService {
         }
         return dates;
     }
+
     public CaseData struckOutRespondents(CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {

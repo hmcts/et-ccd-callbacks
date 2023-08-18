@@ -170,14 +170,15 @@ public class UpdateReferralController {
                 userToken, ccdRequest.getCaseDetails().getCaseTypeId());
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
-
+        String caseLink = emailService.getExuiCaseLink(ccdRequest.getCaseDetails().getCaseId());
         emailService.sendEmail(
                 referralTemplateId,
                 caseData.getUpdateReferentEmail(),
                 ReferralHelper.buildPersonalisationUpdateReferral(
                         ccdRequest.getCaseDetails(),
                         referralNumber,
-                        userDetails.getName()
+                        userDetails.getName(),
+                        caseLink
                 )
         );
         log.info("Event: Update Referral Email sent. "

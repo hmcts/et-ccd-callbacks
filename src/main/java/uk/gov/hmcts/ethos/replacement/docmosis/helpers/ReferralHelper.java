@@ -43,7 +43,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
@@ -628,9 +627,8 @@ public final class ReferralHelper {
         return personalisation;
     }
 
-    public static Map<String, String> buildPersonalisationUpdateReferral(CaseDetails detail,
-                                                                         String referralNumber,
-                                                                         String username) {
+    public static Map<String, String> buildPersonalisationUpdateReferral(CaseDetails detail, String referralNumber,
+                                                                         String username, String linkToExui) {
         CaseData caseData = detail.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
@@ -643,7 +641,7 @@ public final class ReferralHelper {
         personalisation.put("subject", caseData.getUpdateReferralSubject());
         personalisation.put("username", username);
         personalisation.put("replyReferral", REPLY_REFERRAL_REF);
-        personalisation.put(CCD_ID, detail.getCaseId());
+        personalisation.put(LINK_TO_EXUI, linkToExui);
         return personalisation;
     }
 

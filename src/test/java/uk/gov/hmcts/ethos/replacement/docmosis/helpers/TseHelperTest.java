@@ -227,7 +227,7 @@ class TseHelperTest {
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\"},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
-            + "\"response\":\"response\",\"respondent\":\"Claimant\"}}";
+            + "\"response\":\"response\",\"respondentParty\":\"Claimant\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
     }

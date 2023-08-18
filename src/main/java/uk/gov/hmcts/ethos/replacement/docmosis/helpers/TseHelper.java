@@ -247,7 +247,7 @@ public final class TseHelper {
         TseRespondType replyType = application.getRespondCollection().get(0).getValue();
         return TseReplyData.builder()
             .caseNumber(caseId)
-            .respondent(replyType.getFrom())
+            .respondentParty(replyType.getFrom())
             .type(application.getType())
             .responseDate(replyType.getDate())
             .response(replyType.getResponse())

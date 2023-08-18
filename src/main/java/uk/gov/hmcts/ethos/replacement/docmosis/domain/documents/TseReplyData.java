@@ -19,7 +19,7 @@ public class TseReplyData {
     @JsonProperty("type")
     private String type;
     @JsonProperty("responseDate")
-    String responseDate;
+    private String responseDate;
     @JsonProperty("supportingYesNo")
     private String supportingYesNo;
     @JsonProperty("documentCollection")
@@ -28,6 +28,6 @@ public class TseReplyData {
     private String copy;
     @JsonProperty("response")
     private String response;
-    @JsonProperty("respondent")
-    private String respondent;
+    @JsonProperty("respondentParty")
+    private String respondentParty;
 }

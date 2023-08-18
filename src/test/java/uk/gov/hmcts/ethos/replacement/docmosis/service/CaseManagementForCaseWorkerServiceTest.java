@@ -38,7 +38,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -115,7 +114,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @MockBean
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @MockBean
-    private NotificationProperties notificationProperties;
+    private EmailService emailService;
     private final String hmctsServiceId = "BHA1";
 
     @BeforeEach
@@ -212,7 +211,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                serviceAuthTokenGenerator, hmctsServiceId, notificationProperties);
+                emailService, hmctsServiceId);
     }
 
     @Test
@@ -258,7 +257,8 @@ class CaseManagementForCaseWorkerServiceTest {
         }
     }
 
-    @Test void caseDataDefaultsClearRespondentTypeFields() {
+    @Test
+    void caseDataDefaultsClearRespondentTypeFields() {
         CaseData caseData = ccdRequest22.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
@@ -338,9 +338,9 @@ class CaseManagementForCaseWorkerServiceTest {
         assertEquals(1, caseData.getRespondentCollection().size());
 
         assertEquals("Antonio Vazquez", caseData
-            .getRespondentCollection().get(0).getValue().getRespondentName());
+                .getRespondentCollection().get(0).getValue().getRespondentName());
         assertEquals(NO, caseData.getRespondentCollection()
-            .get(0).getValue().getResponseStruckOut());
+                .get(0).getValue().getResponseStruckOut());
     }
 
     @Test
@@ -405,54 +405,54 @@ class CaseManagementForCaseWorkerServiceTest {
         assertEquals(3, caseData.getRespondentCollection().size());
 
         assertEquals("Antonio Vazquez", caseData
-            .getRespondentCollection().get(0).getValue().getRespondentName());
+                .getRespondentCollection().get(0).getValue().getRespondentName());
         assertEquals(NO, caseData.getRespondentCollection()
-            .get(0).getValue().getResponseStruckOut());
+                .get(0).getValue().getResponseStruckOut());
         assertEquals("Roberto Dondini", caseData
-            .getRespondentCollection()
-            .get(1).getValue().getRespondentName());
+                .getRespondentCollection()
+                .get(1).getValue().getRespondentName());
         assertEquals(NO, caseData.getRespondentCollection()
-            .get(1).getValue().getResponseStruckOut());
+                .get(1).getValue().getResponseStruckOut());
         assertEquals("Juan Garcia", caseData.getRespondentCollection()
-            .get(2).getValue().getRespondentName());
+                .get(2).getValue().getRespondentName());
         assertEquals(YES, caseData.getRespondentCollection()
-            .get(2).getValue().getResponseStruckOut());
+                .get(2).getValue().getResponseStruckOut());
     }
 
     @Test
     void struckOutRespondentRespAddressLinesEmpty() {
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .setResponseRespondentAddress(new Address());
+                .setResponseRespondentAddress(new Address());
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .getResponseRespondentAddress().setAddressLine1("");
+                .getResponseRespondentAddress().setAddressLine1("");
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .getResponseRespondentAddress().setAddressLine2("");
+                .getResponseRespondentAddress().setAddressLine2("");
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .getResponseRespondentAddress().setAddressLine3("");
+                .getResponseRespondentAddress().setAddressLine3("");
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .getResponseRespondentAddress().setCountry("");
+                .getResponseRespondentAddress().setCountry("");
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .getResponseRespondentAddress().setCounty("");
+                .getResponseRespondentAddress().setCounty("");
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .getResponseRespondentAddress().setPostCode("");
+                .getResponseRespondentAddress().setPostCode("");
         scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
-            .getResponseRespondentAddress().setPostTown("");
+                .getResponseRespondentAddress().setPostTown("");
         CaseData caseData = caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest1);
         assertEquals(3, caseData.getRespondentCollection().size());
         assertEquals("", caseData
-            .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine1());
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine1());
         assertEquals("", caseData
-            .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine2());
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine2());
         assertEquals("", caseData
-            .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine3());
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine3());
         assertEquals("", caseData
-            .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCountry());
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCountry());
         assertEquals("", caseData
-            .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCounty());
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCounty());
         assertEquals("", caseData
-            .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostCode());
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostCode());
         assertEquals("", caseData
-            .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostTown());
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostTown());
     }
 
     @Test
@@ -462,7 +462,7 @@ class CaseManagementForCaseWorkerServiceTest {
         assertEquals(1, caseData.getRespondentCollection().size());
 
         assertEquals("Antonio Vazquez",
-            caseData.getRespondentCollection().get(0).getValue().getRespondentName());
+                caseData.getRespondentCollection().get(0).getValue().getRespondentName());
     }
 
     @Test
@@ -472,13 +472,13 @@ class CaseManagementForCaseWorkerServiceTest {
         assertEquals(3, caseData.getRespondentCollection().size());
 
         assertEquals("Antonio Vazquez",
-            caseData.getRespondentCollection().get(0).getValue().getRespondentName());
+                caseData.getRespondentCollection().get(0).getValue().getRespondentName());
         assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseContinue());
         assertEquals("Juan Garcia",
-            caseData.getRespondentCollection().get(1).getValue().getRespondentName());
+                caseData.getRespondentCollection().get(1).getValue().getRespondentName());
         assertEquals(YES, caseData.getRespondentCollection().get(1).getValue().getResponseContinue());
         assertEquals("Roberto Dondini",
-            caseData.getRespondentCollection().get(2).getValue().getRespondentName());
+                caseData.getRespondentCollection().get(2).getValue().getRespondentName());
         assertEquals(NO, caseData.getRespondentCollection().get(2).getValue().getResponseContinue());
     }
 
@@ -532,22 +532,22 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseDetails caseDetails = ccdRequest15.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
         String expected = "<font color='DarkRed' size='5'> DO NOT POSTPONE </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='Green' size='5'> LIVE APPEAL </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='Red' size='5'> RULE 50(3)b </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='LightBlack' size='5'> REPORTING </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='Orange' size='5'> SENSITIVE </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='Purple' size='5'> RESERVED </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='Olive' size='5'> ECC </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='SlateGray' size='5'> DIGITAL FILE </font>"
-            + "<font size='5'> - </font>"
-            + "<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
+                + "<font size='5'> - </font>"
+                + "<font color='Green' size='5'> LIVE APPEAL </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='Red' size='5'> RULE 50(3)b </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='LightBlack' size='5'> REPORTING </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='Orange' size='5'> SENSITIVE </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='Purple' size='5'> RESERVED </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='Olive' size='5'> ECC </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='SlateGray' size='5'> DIGITAL FILE </font>"
+                + "<font size='5'> - </font>"
+                + "<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
         assertEquals(expected, caseDetails.getCaseData().getFlagsImageAltText());
         //assertEquals("EMP-TRIB-01111111110.jpg", caseDetails.getCaseData().getFlagsImageFileName());
     }
@@ -563,7 +563,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource(jsonFileName)).toURI())));
+                .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
@@ -573,19 +573,19 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(HEARING_STATUS_LISTED, caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingStatus());
+                .getHearingDateCollection().get(0).getValue().getHearingStatus());
         assertEquals(HEARING_STATUS_LISTED, caseData.getHearingCollection().get(1).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingStatus());
+                .getHearingDateCollection().get(0).getValue().getHearingStatus());
         assertEquals(HEARING_STATUS_LISTED, caseData.getHearingCollection().get(2).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingStatus());
+                .getHearingDateCollection().get(0).getValue().getHearingStatus());
         assertEquals(HEARING_STATUS_LISTED, caseData.getHearingCollection().get(2).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingStatus());
+                .getHearingDateCollection().get(0).getValue().getHearingStatus());
         assertEquals("Manchester", caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingVenueDay().getSelectedLabel());
+                .getHearingDateCollection().get(0).getValue().getHearingVenueDay().getSelectedLabel());
         assertEquals("2019-11-01T12:11:00.000", caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingTimingStart());
+                .getHearingDateCollection().get(0).getValue().getHearingTimingStart());
         assertEquals("2019-11-01T12:11:00.000", caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingTimingFinish());
+                .getHearingDateCollection().get(0).getValue().getHearingTimingFinish());
     }
 
     @Test
@@ -670,8 +670,8 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         caseData.getHearingCollection().get(0)
-            .getValue().getHearingDateCollection()
-            .get(0).getValue().setListedDate("2022-03-19T12:11:00.000");
+                .getValue().getHearingDateCollection()
+                .get(0).getValue().setListedDate("2022-03-19T12:11:00.000");
         String hearingNumber = caseData.getHearingCollection().get(0).getValue().getHearingNumber();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
         assertFalse(errors.isEmpty());
@@ -684,8 +684,8 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         DateListedType dateListedType = caseData.getHearingCollection().get(0)
-            .getValue().getHearingDateCollection()
-            .get(0).getValue();
+                .getValue().getHearingDateCollection()
+                .get(0).getValue();
         dateListedType.setListedDate("2022-03-19T12:11:00.000");
         dateListedType.setHearingStatus(hearingStatus);
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
@@ -731,38 +731,38 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, SCOTLAND_CASE_TYPE_ID);
         assertEquals(HEARING_STATUS_LISTED, caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingStatus());
+                .getHearingDateCollection().get(0).getValue().getHearingStatus());
 
         assertEquals(TribunalOffice.ABERDEEN.getOfficeName(), caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingAberdeen().getSelectedLabel());
+                .getHearingDateCollection().get(0).getValue().getHearingAberdeen().getSelectedLabel());
         assertNull(caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
+                .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
 
         assertEquals(TribunalOffice.GLASGOW.getOfficeName(), caseData.getHearingCollection().get(1).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingGlasgow().getSelectedLabel());
+                .getHearingDateCollection().get(0).getValue().getHearingGlasgow().getSelectedLabel());
         assertNull(caseData.getHearingCollection().get(1).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingAberdeen());
+                .getHearingDateCollection().get(0).getValue().getHearingAberdeen());
 
         assertEquals(TribunalOffice.EDINBURGH.getOfficeName(), caseData.getHearingCollection().get(2).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingEdinburgh().getSelectedLabel());
+                .getHearingDateCollection().get(0).getValue().getHearingEdinburgh().getSelectedLabel());
         assertNull(caseData.getHearingCollection().get(0).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
+                .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
 
         final String dundee = TribunalOffice.DUNDEE.getOfficeName();
         assertEquals(dundee, caseData.getHearingCollection().get(3).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingDundee().getSelectedLabel());
+                .getHearingDateCollection().get(0).getValue().getHearingDundee().getSelectedLabel());
         assertEquals(dundee, caseData.getHearingCollection().get(3).getValue()
-            .getHearingDateCollection().get(0).getValue().getHearingVenueDayScotland());
+                .getHearingDateCollection().get(0).getValue().getHearingVenueDayScotland());
     }
 
     @Test
     void midRespondentECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         assertEquals(1, caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
     }
 
     @Test
@@ -771,67 +771,67 @@ class CaseManagementForCaseWorkerServiceTest {
         caseData.setRespondentCollection(createRespondentCollection(false));
         submitEvent.setCaseData(caseData);
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         assertEquals(2, caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
     }
 
     @Test
     void midRespondentECCEmpty() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(null);
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(null);
         List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN, errors, MID_EVENT_CALLBACK);
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN, errors, MID_EVENT_CALLBACK);
         assertEquals("[Case Reference Number not found.]", errors.toString());
     }
 
     @Test
     void midRespondentECCWithNoRespondentECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         manchesterCcdRequest.getCaseDetails().getCaseData().setRespondentECC(null);
         assertEquals(1, caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
     }
 
     @Test
     void createECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         CaseData casedata = caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), ABOUT_TO_SUBMIT_EVENT_CALLBACK);
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), ABOUT_TO_SUBMIT_EVENT_CALLBACK);
         assertEquals("11111", casedata.getCaseRefECC());
         assertEquals(FLAG_ECC, casedata.getCaseSource());
         assertTrue(casedata.getJurCodesCollection().get(0).getId().matches(
-            "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"));
+                "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"));
     }
 
     @Test
     void linkOriginalCaseECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         assertEquals("11111", caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), SUBMITTED_CALLBACK).getCaseRefECC());
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), SUBMITTED_CALLBACK).getCaseRefECC());
     }
 
     @Test
     void linkOriginalCaseECCCounterClaims() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         assertEquals("72632632", caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
         EccCounterClaimTypeItem c1 = new EccCounterClaimTypeItem();
         EccCounterClaimType counterClaimType1 = new EccCounterClaimType();
         EccCounterClaimType counterClaimType2 = new EccCounterClaimType();
@@ -844,27 +844,27 @@ class CaseManagementForCaseWorkerServiceTest {
         c2.setValue(counterClaimType2);
         manchesterCcdRequest.getCaseDetails().getCaseData().setEccCases(Arrays.asList(c1, c2));
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         assertEquals(c1.getValue().getCounterClaim(), caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
         assertEquals(c2.getValue().getCounterClaim(), caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-            new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(1).getValue().getCounterClaim());
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(1).getValue().getCounterClaim());
     }
 
     @Test
     void linkOriginalCaseECCException() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         when(ccdClient.submitEventForCase(
-            anyString(), any(), anyString(), anyString(), any(), anyString()))
-            .thenThrow(new InternalException(ERROR_MESSAGE));
+                anyString(), any(), anyString(), anyString(), any(), anyString()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () ->
-            caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-                new ArrayList<>(), SUBMITTED_CALLBACK)
+                caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                        new ArrayList<>(), SUBMITTED_CALLBACK)
         );
     }
 
@@ -873,11 +873,11 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setState("Closed");
         submitEvent.getCaseData().getRespondentCollection().get(0).getValue().setResponseReceived(NO);
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-            isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-            .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         List<String> errors = new ArrayList<>();
         CaseData caseData = caseManagementForCaseWorkerService.createECC(
-            manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN, errors, MID_EVENT_CALLBACK);
+                manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN, errors, MID_EVENT_CALLBACK);
         assertNull(caseData.getRespondentECC().getListItems());
         assertEquals(2, errors.size());
         submitEvent.setState("Accepted");
@@ -913,7 +913,7 @@ class CaseManagementForCaseWorkerServiceTest {
         dateListedTypeItem.setValue(dateListedType);
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         List<DateListedTypeItem> dateListedTypeItems =
-            caseData.getHearingCollection().get(0).getValue().getHearingDateCollection();
+                caseData.getHearingCollection().get(0).getValue().getHearingDateCollection();
         dateListedTypeItems.add(dateListedTypeItem);
         caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(dateListedTypeItems);
         String expectedNextListedDate = LocalDate.now().plusDays(2).toString();
@@ -1036,7 +1036,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-     void testPublicCaseName() {
+    void testPublicCaseName() {
         CaseData caseData = new CaseData();
         caseData.setClaimant("claimant");
         caseData.setRespondent("respondent");
@@ -1047,7 +1047,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-     void testPublicCaseNameWithRule50() {
+    void testPublicCaseNameWithRule50() {
         CaseData caseData = new CaseData();
         caseData.setClaimant("Person1");
         caseData.setRespondent("Person2");
@@ -1062,7 +1062,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void testCaseDeepLink() {
-        when(notificationProperties.getExuiLinkWithCaseId("123"))
+        when(emailService.getExuiCaseLink("123"))
                 .thenReturn("http://domain/cases/case-details/123");
         CaseData caseData = new CaseData();
         caseManagementForCaseWorkerService.setCaseDeepLink(caseData, "123");
@@ -1071,18 +1071,18 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {
         RespondentSumTypeItem respondentSumTypeItem1 = createRespondentSumType(
-            "RespondentName1", false);
+                "RespondentName1", false);
         if (single) {
             return new ArrayList<>(Collections.singletonList(respondentSumTypeItem1));
         }
 
         RespondentSumTypeItem respondentSumTypeItem2 = createRespondentSumType(
-            "RespondentName2", false);
+                "RespondentName2", false);
         RespondentSumTypeItem respondentSumTypeItem3 = createRespondentSumType(
-            "RespondentName3", true);
+                "RespondentName3", true);
 
         return new ArrayList<>(
-            Arrays.asList(respondentSumTypeItem1, respondentSumTypeItem2, respondentSumTypeItem3));
+                Arrays.asList(respondentSumTypeItem1, respondentSumTypeItem2, respondentSumTypeItem3));
     }
 
     private RespondentSumTypeItem createRespondentSumType(String respondentName, boolean struckOut) {
@@ -1116,16 +1116,16 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private List<RepresentedTypeRItem> createRepCollection(boolean single) {
         RepresentedTypeRItem representedTypeRItem1 = createRepresentedTypeR(
-            "", "RepresentativeNameAAA");
+                "", "RepresentativeNameAAA");
         RepresentedTypeRItem representedTypeRItem2 = createRepresentedTypeR(
-            "dummy", "RepresentativeNameBBB");
+                "dummy", "RepresentativeNameBBB");
         RepresentedTypeRItem representedTypeRItem3 = createRepresentedTypeR(
-            "RespondentName1", "RepresentativeNameCCC");
+                "RespondentName1", "RepresentativeNameCCC");
         if (single) {
             return new ArrayList<>(Collections.singletonList(representedTypeRItem1));
         } else {
             return new ArrayList<>(Arrays.asList(
-                representedTypeRItem1, representedTypeRItem2, representedTypeRItem3));
+                    representedTypeRItem1, representedTypeRItem2, representedTypeRItem3));
         }
     }
 

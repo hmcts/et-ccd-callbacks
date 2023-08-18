@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.LinkReason;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
@@ -41,24 +39,20 @@ class CaseLinksEmailServiceTest {
     private EmailService emailService;
     @MockBean
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
-    @SpyBean
-    private NotificationProperties notificationProperties;
     private CCDRequest ccdRequest;
     private SubmitEvent submitEvent;
     private CaseDetails caseDetails;
-    private RespondentSumType respondentSumType;
     private Map<String, Object> claimantPersonalisation;
     private Map<String, Object> respondentPersonalisation;
 
     @BeforeEach
     void setUp() {
-        caseLinksEmailService = new CaseLinksEmailService(notificationProperties,
+        caseLinksEmailService = new CaseLinksEmailService(
                 caseRetrievalForCaseWorkerService,
                 emailService);
-        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl/");
-        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl/");
         ReflectionTestUtils.setField(caseLinksEmailService, "caseLinkedTemplateId", "1");
         ReflectionTestUtils.setField(caseLinksEmailService, "caseUnlinkedTemplateId", "2");
+        when(emailService.getCitizenCaseLink("1234")).thenReturn("citizenUrl/1234");
 
         claimantPersonalisation = Map.of(
                 "caseNumber", "12345/6789",
@@ -68,7 +62,7 @@ class CaseLinksEmailServiceTest {
                 "caseNumber", "12345/6789",
                 "linkToManageCase", "");
 
-        respondentSumType = new RespondentSumType();
+        RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(RESPONDENT_NAME);
         respondentSumType.setRespondentEmail("res@rep.com");
 

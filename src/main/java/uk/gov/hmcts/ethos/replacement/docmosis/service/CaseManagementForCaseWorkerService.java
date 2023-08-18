@@ -24,11 +24,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -69,10 +67,8 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
-    private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final String hmctsServiceId;
-    private final NotificationProperties notificationProperties;
-
+    private final EmailService emailService;
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
@@ -81,21 +77,18 @@ public class CaseManagementForCaseWorkerService {
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
     public static final String DOCUMENTS_TAB = "#Documents";
-    public static final String INDIVIDUAL = "Individual";
     public static final String ORGANISATION = "Organisation";
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient, ClerkService clerkService,
-                                              AuthTokenGenerator serviceAuthTokenGenerator,
-                                              @Value("${hmcts_service_id}") String hmctsServiceId,
-                                              NotificationProperties notificationProperties) {
+                                              EmailService emailService,
+                                              @Value("${hmcts_service_id}") String hmctsServiceId) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
-        this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
+        this.emailService = emailService;
         this.hmctsServiceId = hmctsServiceId;
-        this.notificationProperties = notificationProperties;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -145,12 +138,12 @@ public class CaseManagementForCaseWorkerService {
         if (caseData.getRespondent() == null) {
             respondentDefaults(caseData);
         }
-        
+
         caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
     }
 
     public void setCaseDeepLink(CaseData caseData, String caseId) {
-        caseData.setCaseDeepLink(notificationProperties.getExuiLinkWithCaseId(caseId) + DOCUMENTS_TAB);
+        caseData.setCaseDeepLink(emailService.getExuiCaseLink(caseId) + DOCUMENTS_TAB);
     }
 
     public void setPublicCaseName(CaseData caseData) {

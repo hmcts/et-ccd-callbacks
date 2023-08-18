@@ -54,8 +54,3 @@ java:
     SECURE_DOC_STORE_FEATURE: true
     EXUI_CASE_DETAILS_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net/cases/case-details/"
     CITIZEN_CASE_DETAILS_URL: "https://et-sya.{{ .Values.global.environment }}.platform.hmcts.net/citizen-hub/"
-    TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID: bd7addc3-d1ea-47cf-9249-208a7033d454
-    SEND_NOTIFICATION_TEMPLATE_ID: 1b8299d7-5051-4b78-a870-726b6384d8a8
-    RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID: d2caad87-2bab-4bc0-b598-01f1a7341f9e
-    CASE_LINKED_TEMPLATE_ID: 7e8c6fc1-520a-41cd-a85c-9d3e0b22b282;
-    CASE_UNLINKED_TEMPLATE_ID: 8099d7b8-1703-40c3-95e6-464a3ac776cd;

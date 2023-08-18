@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseLinksHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
@@ -27,12 +26,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 public class CaseLinksEmailService {
     public static final String CASE_NUMBER = "caseNumber";
     public static final String CASE_LINK = "linkToManageCase";
-    private final NotificationProperties notificationProperties;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final EmailService emailService;
-    @Value("${caselinks.linked.template.id}")
+    @Value("${case-links.linked}")
     private String caseLinkedTemplateId;
-    @Value("${caselinks.unlinked.template.id}")
+    @Value("${case-links.unlinked}")
     private String caseUnlinkedTemplateId;
 
     /**
@@ -84,7 +82,7 @@ public class CaseLinksEmailService {
             Map<String, Object> claimantPersonalisation = Map.of(
                     CASE_NUMBER, caseData.getEthosCaseReference(),
                     CASE_LINK, "To manage your case, go to "
-                            + notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
+                            + emailService.getCitizenCaseLink(caseDetails.getCaseId())
             );
 
             emailService.sendEmail(templateId,

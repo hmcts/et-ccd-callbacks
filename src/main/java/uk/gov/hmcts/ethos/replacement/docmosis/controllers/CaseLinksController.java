@@ -55,6 +55,7 @@ public class CaseLinksController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+        log.info("Adding case links");
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, true);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
@@ -83,6 +84,7 @@ public class CaseLinksController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+        log.info("Removing case links");
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, false);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())

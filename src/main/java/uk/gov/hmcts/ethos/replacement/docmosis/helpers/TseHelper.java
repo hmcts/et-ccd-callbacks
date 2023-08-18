@@ -246,13 +246,15 @@ public final class TseHelper {
     private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {
         TseRespondType replyType = application.getRespondCollection().get(0).getValue();
         return TseReplyData.builder()
-                .copy(replyType.getCopyToOtherParty())
-                .caseNumber(caseId)
-                .supportingYesNo(replyType.getHasSupportingMaterial())
-                .type(application.getType())
-                .documentCollection(replyType.getSupportingMaterial())
-                .response(replyType.getResponse())
-                .build();
+            .caseNumber(caseId)
+            .respondentParty(replyType.getFrom())
+            .type(application.getType())
+            .responseDate(replyType.getDate())
+            .response(replyType.getResponse())
+            .supportingYesNo(replyType.getHasSupportingMaterial())
+            .documentCollection(replyType.getSupportingMaterial())
+            .copy(replyType.getCopyToOtherParty())
+            .build();
     }
 
 }

@@ -85,18 +85,28 @@ public class RespondentsReport {
             return false;
         }
 
+        int count = countRepresentedRespondents(rep, caseData);
+        return count > 1;
+    }
+
+    private int countRepresentedRespondents(String rep, RespondentsReportCaseData caseData) {
         int count = 0;
         for (RepresentedTypeRItem repItem : caseData.getRepCollection()) {
             if (repItem.getValue().getNameOfRepresentative().equals(rep)) {
-                for (RespondentSumTypeItem respItem : caseData.getRespondentCollection()) {
-                    if (respItem.getValue().getRespondentName().equals(repItem.getValue().getRespRepName())) {
-                        count++;
-                    }
-                }
+                count += countMatchingRespondents(repItem.getValue().getRespRepName(), caseData);
             }
         }
+        return count;
+    }
 
-        return count > 1;
+    private int countMatchingRespondents(String respRepName, RespondentsReportCaseData caseData) {
+        int count = 0;
+        for (RespondentSumTypeItem respItem : caseData.getRespondentCollection()) {
+            if (respItem.getValue().getRespondentName().equals(respRepName)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private String getRepresentative(String respName, RespondentsReportCaseData caseData) {

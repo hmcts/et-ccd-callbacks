@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -94,6 +95,35 @@ public class CaseManagementForCaseWorkerService {
             }
         } else {
             caseData.setClaimant(MISSING_CLAIMANT);
+        }
+        addClaimantDocuments(caseData);
+    }
+
+    private void addClaimantDocuments(CaseData caseData) {
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
+        if (documentCollection != null) {
+            List<DocumentTypeItem> et1 = documentCollection
+                    .stream()
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(Et1VettingService.ET1_DOC_TYPE)).toList();
+            if(CollectionUtils.isNotEmpty(et1)) {
+                claimantDocumentCollection.addAll(et1);
+            }
+            List<DocumentTypeItem> acasDocs = documentCollection
+                    .stream()
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(Et1VettingService.ACAS_DOC_TYPE)).toList();
+            if(CollectionUtils.isNotEmpty(acasDocs)) {
+                claimantDocumentCollection.addAll(acasDocs);
+            }
+            List<DocumentTypeItem> et1Attachment = documentCollection
+                    .stream()
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(Et1VettingService.ET1_ATTACHMENT_DOC_TYPE)).toList();
+            if(CollectionUtils.isNotEmpty(et1Attachment)) {
+                claimantDocumentCollection.addAll(et1Attachment);
+            }
+            if(CollectionUtils.isNotEmpty(claimantDocumentCollection)) {
+                caseData.setClaimantDocumentCollection(claimantDocumentCollection);
+            }
         }
     }
 

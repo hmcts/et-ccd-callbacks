@@ -15,11 +15,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.et.common.model.ccd.Address;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.*;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -197,6 +193,31 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertEquals("Anton Juliet Rodriguez", caseData.getClaimant());
+    }
+
+    @Test
+    void caseDataDefaultsClaimantDocs() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        DocumentInfo et1Doc = new DocumentInfo();
+        et1Doc.setDescription("et1Description");
+        et1Doc.setType("et1Type");
+        et1Doc.setUrl("et1URL");
+        et1Doc.setMarkUp("et1MarkUp");
+        DocumentInfo et1Attachment = new DocumentInfo();
+        et1Attachment.setDescription("et1AttachmentDesc");
+        et1Attachment.setType("et1AttachmentType");
+        et1Attachment.setUrl("et1AttachmentURL");
+        et1Attachment.setMarkUp("et1AttachmentMarkUp");
+        DocumentInfo acas = new DocumentInfo();
+        et1Attachment.setDescription("acasDesc");
+        et1Attachment.setType("acasType");
+        et1Attachment.setUrl("acasURL");
+        et1Attachment.setMarkUp("acasMarkUp");
+        caseData.setDocumentCollection(List.of(et1Doc, et1Attachment, acas));
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertEquals("et1Type", caseData.getClaimantDocumentCollection().get(0).getValue().getTypeOfDocument());
+        assertEquals("et1AttachmentType", caseData.getClaimantDocumentCollection().get(1).getValue().getTypeOfDocument());
+        assertEquals("acasType", caseData.getClaimantDocumentCollection().get(2).getValue().getTypeOfDocument());
     }
 
     @Test

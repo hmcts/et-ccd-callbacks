@@ -45,16 +45,16 @@ public class Et1VettingService {
 
     private final TornadoService tornadoService;
 
-    private static final String ET1_DOC_TYPE = "ET1";
-    private static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
-    private static final String COMPANY = "Company";
-    private static final String ACAS_DOC_TYPE = "ACAS Certificate";
-    private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";
-    private static final String BEFORE_LABEL_ET1 =
+   public static final String ET1_DOC_TYPE = "ET1";
+   public static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
+   private static final String COMPANY = "Company";
+   public static final String ACAS_DOC_TYPE = "ACAS Certificate";
+   private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";
+   public static final String BEFORE_LABEL_ET1 =
             "<br><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
-    private static final String BEFORE_LABEL_ACAS =
+    public static final String BEFORE_LABEL_ACAS =
             "<br><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
-    private static final String BEFORE_LABEL_ET1_ATTACHMENT =
+    public static final String BEFORE_LABEL_ET1_ATTACHMENT =
             "<br><a target=\"_blank\" href=\"%s\">%s (opens in new tab)</a>";
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
             "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"

@@ -28,9 +28,9 @@ public class CaseLinksEmailService {
     public static final String CASE_LINK = "linkToManageCase";
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final EmailService emailService;
-    @Value("${case-links.linked}")
+    @Value("${template.case-links.linked}")
     private String caseLinkedTemplateId;
-    @Value("${case-links.unlinked}")
+    @Value("${template.case-links.unlinked}")
     private String caseUnlinkedTemplateId;
 
     /**

@@ -213,6 +213,14 @@ respondNotification:
   noResponseTemplate:
     id: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
 
+claimantSendNotificationHearingOther:
+  template:
+    id: ${CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
+
+respondentSendNotificationHearingOther:
+  template:
+    id: ${RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
+
 etcos:
   system:
     username: ${ET_COS_SYSTEM_USER}

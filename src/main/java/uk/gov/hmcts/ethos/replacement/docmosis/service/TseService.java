@@ -107,6 +107,7 @@ public class TseService {
         application.setDocumentUpload(claimantTse.getContactApplicationFile());
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
+        application.setStoredPending(claimantTse.getStoredPending());
         application.setApplicationState(IN_PROGRESS);
 
         caseData.setClaimantTse(null);

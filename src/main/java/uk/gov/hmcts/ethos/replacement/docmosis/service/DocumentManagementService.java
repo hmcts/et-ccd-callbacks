@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -177,9 +179,9 @@ public class DocumentManagementService {
     }
 
     public String getDocumentUUID(String urlString) {
-        String documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
-        documentUUID = documentUUID.replace(BINARY, "");
-        return documentUUID;
+        Pattern pattern = Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+        Matcher matcher = pattern.matcher(urlString);
+        return matcher.group();
     }
 
     /**

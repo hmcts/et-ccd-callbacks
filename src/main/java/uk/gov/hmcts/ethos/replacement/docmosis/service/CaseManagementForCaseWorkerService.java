@@ -17,10 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -49,6 +46,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
@@ -102,24 +102,13 @@ public class CaseManagementForCaseWorkerService {
     private void addClaimantDocuments(CaseData caseData) {
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
+        List<String> claimantDocs = List.of(ET1_DOC_TYPE, ET1_ATTACHMENT_DOC_TYPE, ACAS_DOC_TYPE);
         if (documentCollection != null) {
-            List<DocumentTypeItem> et1 = documentCollection
-                    .stream()
-                    .filter(d -> d.getValue().getTypeOfDocument().equals(Et1VettingService.ET1_DOC_TYPE)).toList();
-            if(CollectionUtils.isNotEmpty(et1)) {
-                claimantDocumentCollection.addAll(et1);
-            }
-            List<DocumentTypeItem> acasDocs = documentCollection
-                    .stream()
-                    .filter(d -> d.getValue().getTypeOfDocument().equals(Et1VettingService.ACAS_DOC_TYPE)).toList();
-            if(CollectionUtils.isNotEmpty(acasDocs)) {
-                claimantDocumentCollection.addAll(acasDocs);
-            }
-            List<DocumentTypeItem> et1Attachment = documentCollection
-                    .stream()
-                    .filter(d -> d.getValue().getTypeOfDocument().equals(Et1VettingService.ET1_ATTACHMENT_DOC_TYPE)).toList();
-            if(CollectionUtils.isNotEmpty(et1Attachment)) {
-                claimantDocumentCollection.addAll(et1Attachment);
+            for(DocumentTypeItem documentTypeItem : documentCollection) {
+                DocumentType documentType = documentTypeItem.getValue();
+                if (claimantDocs.contains(documentType.getTypeOfDocument())) {
+                    claimantDocumentCollection.add(documentTypeItem);
+                }
             }
             if(CollectionUtils.isNotEmpty(claimantDocumentCollection)) {
                 caseData.setClaimantDocumentCollection(claimantDocumentCollection);

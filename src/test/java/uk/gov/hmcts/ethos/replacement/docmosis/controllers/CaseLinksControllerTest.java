@@ -14,7 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -62,9 +61,6 @@ class CaseLinksControllerTest {
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
                 .build();
-
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseData(caseDetails.getCaseData());
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
     }

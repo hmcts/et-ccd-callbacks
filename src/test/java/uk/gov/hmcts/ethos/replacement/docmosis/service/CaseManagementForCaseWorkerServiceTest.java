@@ -230,9 +230,9 @@ class CaseManagementForCaseWorkerServiceTest {
         acas.setValue(acasType);
         caseData.setDocumentCollection(List.of(et1Doc, et1Attachment, acas));
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals("et1Type", caseData.getClaimantDocumentCollection().get(0).getValue().getTypeOfDocument());
-        assertEquals("et1AttachmentType", caseData.getClaimantDocumentCollection().get(1).getValue().getTypeOfDocument());
-        assertEquals("acasType", caseData.getClaimantDocumentCollection().get(2).getValue().getTypeOfDocument());
+        assertEquals("et1Description", caseData.getClaimantDocumentCollection().get(0).getValue().getShortDescription());
+        assertEquals("et1AttachmentDesc", caseData.getClaimantDocumentCollection().get(1).getValue().getShortDescription());
+        assertEquals("acasDesc", caseData.getClaimantDocumentCollection().get(2).getValue().getShortDescription());
     }
 
     @Test

@@ -567,6 +567,11 @@ public class CaseDataBuilder {
         caseData.getSubmitEt3Respondent().setValue(DynamicValueType.create(respondent, respondent));
         return this;
     }
+  
+    public CaseDataBuilder withCaseSource(String caseSource) {
+        caseData.setCaseSource(caseSource);
+        return this;
+    }
 
     public CaseDataBuilder withCaseLinks(ListTypeItem<CaseLink> caseLinks) {
         caseData.setCaseLinks(caseLinks);

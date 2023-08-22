@@ -572,5 +572,10 @@ public class CaseDataBuilder {
         caseData.setGenericTseApplicationCollection(List.of(item));
         return this;
     }
+
+    public CaseDataBuilder withCaseSource(String caseSource) {
+        caseData.setCaseSource(caseSource);
+        return this;
+    }
 }
 

@@ -206,7 +206,6 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void caseDataDefaultsClaimantDocs() {
-        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         DocumentTypeItem et1Doc = new DocumentTypeItem();
         et1Doc.setId(UUID.randomUUID().toString());
         DocumentType et1DocType = new DocumentType();
@@ -228,11 +227,15 @@ class CaseManagementForCaseWorkerServiceTest {
         acasType.setTypeOfDocument(ACAS_DOC_TYPE);
         acasType.setCreationDate("creationDateAcas");
         acas.setValue(acasType);
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.setDocumentCollection(List.of(et1Doc, et1Attachment, acas));
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals("et1Description", caseData.getClaimantDocumentCollection().get(0).getValue().getShortDescription());
-        assertEquals("et1AttachmentDesc", caseData.getClaimantDocumentCollection().get(1).getValue().getShortDescription());
-        assertEquals("acasDesc", caseData.getClaimantDocumentCollection().get(2).getValue().getShortDescription());
+        assertEquals("et1Description", caseData.getClaimantDocumentCollection()
+                .get(0).getValue().getShortDescription());
+        assertEquals("et1AttachmentDesc", caseData.getClaimantDocumentCollection()
+                .get(1).getValue().getShortDescription());
+        assertEquals("acasDesc", caseData.getClaimantDocumentCollection().get(2)
+                .getValue().getShortDescription());
     }
 
     @Test

@@ -108,13 +108,13 @@ public class CaseManagementForCaseWorkerService {
         List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
         List<String> claimantDocs = List.of(ET1_DOC_TYPE, ET1_ATTACHMENT_DOC_TYPE, ACAS_DOC_TYPE);
         if (documentCollection != null) {
-            for(DocumentTypeItem documentTypeItem : documentCollection) {
+            for (DocumentTypeItem documentTypeItem : documentCollection) {
                 DocumentType documentType = documentTypeItem.getValue();
                 if (claimantDocs.contains(documentType.getTypeOfDocument())) {
                     claimantDocumentCollection.add(documentTypeItem);
                 }
             }
-            if(CollectionUtils.isNotEmpty(claimantDocumentCollection)) {
+            if (CollectionUtils.isNotEmpty(claimantDocumentCollection)) {
                 caseData.setClaimantDocumentCollection(claimantDocumentCollection);
             }
         }

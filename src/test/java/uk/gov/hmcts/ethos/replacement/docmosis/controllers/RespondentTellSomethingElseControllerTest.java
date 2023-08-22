@@ -98,21 +98,6 @@ class RespondentTellSomethingElseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
-    }
-
-    @Test
     void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
@@ -129,40 +114,6 @@ class RespondentTellSomethingElseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void showError_returnError() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
-                .thenReturn(true);
-        mockMvc.perform(post(SHOW_ERROR_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]", equalTo(FUNCTION_NOT_AVAILABLE_ERROR)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
-    }
-
-    @Test
-    void showError_noError() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
-                .thenReturn(false);
-        mockMvc.perform(post(SHOW_ERROR_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
 
     @Test

@@ -31,20 +31,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FUNCTION_NOT_AVAILABLE_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
@@ -56,7 +51,6 @@ class RespondentTellSomethingElseControllerTest {
     private static final String DISPLAY_TABLE_URL = "/respondentTSE/displayTable";
     private static final String COMPLETE_APPLICATION_URL = "/respondentTSE/completeApplication";
     private static final String ABOUT_TO_START_URL = "/respondentTSE/aboutToStart";
-    private static final String SHOW_ERROR_URL = "/respondentTSE/showError";
 
     @MockBean
     private VerifyTokenService verifyTokenService;

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -34,7 +35,8 @@ public class CaseLinksController {
 
 
     /**
-     * Sends email confirmation of case linking.
+     * Sends email confirmation of case linking
+     * and sets hearingIsLinkedFlag to true.
      */
     @PostMapping(value = "create/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Sends email confirmation.")
@@ -56,6 +58,8 @@ public class CaseLinksController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         log.info("Adding case links");
+        ccdRequest.getCaseDetails().getCaseData().setHearingIsLinkedFlag(Boolean.TRUE.toString());
+
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, true);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
@@ -63,7 +67,8 @@ public class CaseLinksController {
     }
 
     /**
-     * Sends email confirmation of case unlinking.
+     * Sends email confirmation of case unlinking
+     * and sets HearingIsLinkedFlag to false if no linked cases remain.
      */
     @PostMapping(value = "maintain/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Sends email confirmation.")
@@ -86,6 +91,11 @@ public class CaseLinksController {
         }
         log.info("Removing case links");
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, false);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        if (caseData.getCaseLinks() == null || caseData.getCaseLinks().isEmpty()) {
+            caseData.setHearingIsLinkedFlag(Boolean.FALSE.toString());
+        }
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .build());

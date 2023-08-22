@@ -1062,11 +1062,16 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void testCaseDeepLink() {
-        when(emailService.getExuiCaseLink("123"))
-                .thenReturn("http://domain/cases/case-details/123");
         CaseData caseData = new CaseData();
         caseManagementForCaseWorkerService.setCaseDeepLink(caseData, "123");
         assertEquals("http://domain/cases/case-details/123#Documents", caseData.getCaseDeepLink());
+    }
+
+    @Test
+    public void testHearingIsLinkedFlag() {
+        CaseData caseData = new CaseData();
+        caseManagementForCaseWorkerService.setHearingIsLinkedFlag(caseData);
+        assertEquals("false", caseData.getHearingIsLinkedFlag());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

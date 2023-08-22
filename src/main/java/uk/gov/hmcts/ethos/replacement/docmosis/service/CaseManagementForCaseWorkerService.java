@@ -162,6 +162,10 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setHearingIsLinkedFlag(CaseData caseData) {
+        caseData.setHearingIsLinkedFlag(Boolean.FALSE.toString());
+    }
+
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
         if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
             && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {

@@ -15,9 +15,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -218,6 +220,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withClaimant(String claimant) {
         caseData.setClaimant(claimant);
+        return this;
+    }
+
+    public CaseDataBuilder withClaimantRepresentedQuestion(String claimantRepresentedQuestion) {
+        caseData.setClaimantRepresentedQuestion(claimantRepresentedQuestion);
         return this;
     }
 
@@ -532,7 +539,7 @@ public class CaseDataBuilder {
         caseData.setChangeOrganisationRequestField(cor);
         return this;
     }
-        
+
     public CaseDataBuilder withAssignOffice(String selectedOffice) {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->
@@ -561,8 +568,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withCaseSource(String caseSource) {
-        caseData.setCaseSource(caseSource);
+    public CaseDataBuilder withCaseLinks(ListTypeItem<CaseLink> caseLinks) {
+        caseData.setCaseLinks(caseLinks);
         return this;
     }
 }

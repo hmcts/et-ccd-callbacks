@@ -27,7 +27,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -45,6 +44,7 @@ import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
@@ -54,6 +54,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
@@ -66,9 +67,8 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
-    private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final String hmctsServiceId;
-
+    private final EmailService emailService;
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
@@ -76,16 +76,18 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
+    public static final String DOCUMENTS_TAB = "#Documents";
+    public static final String ORGANISATION = "Organisation";
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient, ClerkService clerkService,
-                                              AuthTokenGenerator serviceAuthTokenGenerator,
+                                              EmailService emailService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
-        this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
+        this.emailService = emailService;
         this.hmctsServiceId = hmctsServiceId;
     }
 
@@ -121,9 +123,42 @@ public class CaseManagementForCaseWorkerService {
                 checkResponseReceived(respondentSumTypeItem);
                 checkResponseAddress(respondentSumTypeItem);
                 checkResponseContinue(respondentSumTypeItem);
+                clearRespondentTypeFields(respondentSumTypeItem);
             }
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
+        }
+    }
+
+    public void setHmctsInternalCaseName(CaseData caseData) {
+        if (caseData.getClaimant() == null) {
+            claimantDefaults(caseData);
+        }
+
+        if (caseData.getRespondent() == null) {
+            respondentDefaults(caseData);
+        }
+
+        caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
+    }
+
+    public void setCaseDeepLink(CaseData caseData, String caseId) {
+        caseData.setCaseDeepLink(emailService.getExuiCaseLink(caseId) + DOCUMENTS_TAB);
+    }
+
+    public void setPublicCaseName(CaseData caseData) {
+        if (caseData.getClaimant() == null) {
+            claimantDefaults(caseData);
+        }
+
+        if (caseData.getRespondent() == null) {
+            respondentDefaults(caseData);
+        }
+
+        if (caseData.getRestrictedReporting() == null) {
+            caseData.setPublicCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
+        } else {
+            caseData.setPublicCaseName(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE);
         }
     }
 
@@ -173,6 +208,18 @@ public class CaseManagementForCaseWorkerService {
         }
         if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("");
+        }
+    }
+
+    private void clearRespondentTypeFields(RespondentSumTypeItem respondentSumTypeItem) {
+        RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+        if (respondentSumType != null && respondentSumType.getRespondentType() != null) {
+            if (respondentSumType.getRespondentType().equals(ORGANISATION)) {
+                respondentSumType.setRespondentFirstName("");
+                respondentSumType.setRespondentLastName("");
+            } else {
+                respondentSumType.setRespondentOrganisation("");
+            }
         }
     }
 

@@ -415,7 +415,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = eventValidationService.validateActiveRespondents(caseData);
         if (errors.isEmpty()) {
             errors = eventValidationService.validateET3ResponseFields(caseData);
-            if(errors.isEmpty()) {
+            if (errors.isEmpty()) {
                 errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "respondent");
             }
             if (errors.isEmpty()) {

@@ -101,6 +101,10 @@ template:
     myhmcts: ${ET3_NOTIFICATION_TEMPLATE_MYHMCTS_ID:c47c8dd1-8f36-41e8-a2cc-55e94b95b2d3}
     citizen: ${ET3_NOTIFICATION_TEMPLATE_CITIZEN_ID:38b2a1e0-be26-47f6-a3a1-e8984a249b80}
 
+  case-links:
+    linked: ${CASE_LINKED_TEMPLATE_ID:7e8c6fc1-520a-41cd-a85c-9d3e0b22b282}
+    unlinked: ${CASE_UNLINKED_TEMPLATE_ID:8099d7b8-1703-40c3-95e6-464a3ac776cd}
+
   tse:
     respondent:
       application:

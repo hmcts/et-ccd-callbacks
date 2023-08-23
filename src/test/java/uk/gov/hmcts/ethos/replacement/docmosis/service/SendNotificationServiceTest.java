@@ -263,6 +263,7 @@ class SendNotificationServiceTest {
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
         assertEquals("1234", val.get("caseId"));
     }
+
     @Test
     void sendNotifyEmails_claimantOnly_hearing__multiple_notification_subject_selected() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);

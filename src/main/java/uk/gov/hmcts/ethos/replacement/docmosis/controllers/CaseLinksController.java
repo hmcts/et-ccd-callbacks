@@ -21,6 +21,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RestController
 @RequestMapping("/caseLinks")
@@ -58,7 +60,7 @@ public class CaseLinksController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         log.info("Adding case links");
-        ccdRequest.getCaseDetails().getCaseData().setHearingIsLinkedFlag(Boolean.TRUE.toString());
+        ccdRequest.getCaseDetails().getCaseData().setHearingIsLinkedFlag(YES);
 
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, true);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
@@ -94,7 +96,7 @@ public class CaseLinksController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         if (caseData.getCaseLinks() == null || caseData.getCaseLinks().isEmpty()) {
-            caseData.setHearingIsLinkedFlag(Boolean.FALSE.toString());
+            caseData.setHearingIsLinkedFlag(NO);
         }
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())

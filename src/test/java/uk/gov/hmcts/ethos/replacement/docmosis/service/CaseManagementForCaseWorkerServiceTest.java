@@ -1073,7 +1073,7 @@ class CaseManagementForCaseWorkerServiceTest {
     void testHearingIsLinkedFlag() {
         CaseData caseData = new CaseData();
         caseManagementForCaseWorkerService.setHearingIsLinkedFlag(caseData);
-        assertEquals(Boolean.FALSE.toString(), caseData.getHearingIsLinkedFlag());
+        assertEquals(NO, caseData.getHearingIsLinkedFlag());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

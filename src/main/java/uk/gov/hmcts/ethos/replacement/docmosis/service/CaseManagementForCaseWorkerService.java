@@ -163,7 +163,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setHearingIsLinkedFlag(CaseData caseData) {
-        caseData.setHearingIsLinkedFlag(Boolean.FALSE.toString());
+        caseData.setHearingIsLinkedFlag(NO);
     }
 
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {

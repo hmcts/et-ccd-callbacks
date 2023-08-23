@@ -32,6 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseLinksController.class, JsonMapper.class})
@@ -124,7 +126,7 @@ class CaseLinksControllerTest {
     }
 
     @Test
-    void testHearingIsLinkedFlagIsTrue() throws Exception {
+    void testHearingIsLinkedFlagIsYes() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CREATE_SUBMITTED_URL)
@@ -135,8 +137,7 @@ class CaseLinksControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()))
-                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(
-                "true"));
+                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(YES));
     }
 
     @Test
@@ -151,8 +152,7 @@ class CaseLinksControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()))
-                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(
-                        "false"));
+                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(NO));
     }
 
     @Test
@@ -164,7 +164,7 @@ class CaseLinksControllerTest {
         ListTypeItem<CaseLink> caseLinks = ListTypeItem.from(caseLink1, caseLink2);
 
         ccdRequest.getCaseDetails().getCaseData().setCaseLinks(caseLinks);
-        ccdRequest.getCaseDetails().getCaseData().setHearingIsLinkedFlag("true");
+        ccdRequest.getCaseDetails().getCaseData().setHearingIsLinkedFlag(YES);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -176,8 +176,7 @@ class CaseLinksControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()))
-                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(
-                        "true"));
+                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(YES));
     }
 
     private CaseLink getCaseLink(String linkReasonCode) {

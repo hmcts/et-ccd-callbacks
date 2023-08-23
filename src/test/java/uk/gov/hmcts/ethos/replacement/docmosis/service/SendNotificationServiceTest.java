@@ -48,19 +48,24 @@ class SendNotificationServiceTest {
     ArgumentCaptor<Map<String, String>> personalisationCaptor;
 
     private static final String SEND_NOTIFICATION_TEMPLATE_ID = "sendNotificationTemplateId";
-    private static final String CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID = "claimantSendNotificationHearingOtherTemplateId";
-    private static final String RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID = "claimantSendNotificationHearingOtherTemplateId";
+    private static final String CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID =
+            "claimantSendNotificationHearingOtherTemplateId";
+    private static final String RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID =
+            "claimantSendNotificationHearingOtherTemplateId";
 
     @BeforeEach
     public void setUp() {
         emailService = spy(new EmailUtils());
         sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
         ReflectionTestUtils.setField(sendNotificationService,
-                SEND_NOTIFICATION_TEMPLATE_ID, "sendNotificationTemplateId");
+                SEND_NOTIFICATION_TEMPLATE_ID,
+                "sendNotificationTemplateId");
         ReflectionTestUtils.setField(sendNotificationService,
-                RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID, "respondentSendNotificationHearingOtherTemplateId");
+                RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID,
+                "respondentSendNotificationHearingOtherTemplateId");
         ReflectionTestUtils.setField(sendNotificationService,
-                CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID, "claimantSendNotificationHearingOtherTemplateId");
+                CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID,
+                "claimantSendNotificationHearingOtherTemplateId");
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
             .withClaimantType("claimant@email.com")
@@ -204,13 +209,15 @@ class SendNotificationServiceTest {
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
     }
+
     @Test
     void sendNotifyEmails_claimantOnly_hearing() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         caseData.setSendNotificationSubject(List.of("Hearing"));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
-                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID), any(), personalisationCaptor.capture());
+                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("1234", val.get("caseNumber"));
         assertEquals("title", val.get("sendNotificationTitle"));
@@ -224,9 +231,11 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSubject(List.of("Hearing"));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
-                .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID), any(), personalisationCaptor.capture());
+                .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
         verify(emailService, times(1))
-                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID), any(), personalisationCaptor.capture());
+                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("1234", val.get("caseNumber"));
         assertEquals("title", val.get("sendNotificationTitle"));
@@ -240,11 +249,14 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
-                .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID), any(), personalisationCaptor.capture());
+                .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
         verify(emailService, times(1))
-                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID), any(), personalisationCaptor.capture());
+                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
         verify(emailService, times(2))
-                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("1234", val.get("caseNumber"));
         assertEquals("title", val.get("sendNotificationTitle"));
@@ -257,7 +269,8 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
-                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID), any(), personalisationCaptor.capture());
+                .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
         verify(emailService, times(1))
                 .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();

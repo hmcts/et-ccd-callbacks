@@ -41,6 +41,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.UNSUBMITTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 
 @Slf4j
@@ -108,6 +110,10 @@ public class TseService {
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
         application.setApplicationState(IN_PROGRESS);
+
+        if (YES.equals(claimantTse.getStoredPending())) {
+            application.setStatus(UNSUBMITTED_STATE);
+        }
 
         caseData.setClaimantTse(null);
     }

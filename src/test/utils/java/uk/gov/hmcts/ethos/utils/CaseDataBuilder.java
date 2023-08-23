@@ -581,5 +581,10 @@ public class CaseDataBuilder {
         caseData.getDocumentCollection().add(documentTypeItem);
         return this;
     }
+
+    public CaseDataBuilder withCaseSource(String caseSource) {
+        caseData.setCaseSource(caseSource);
+        return this;
+    }
 }
 

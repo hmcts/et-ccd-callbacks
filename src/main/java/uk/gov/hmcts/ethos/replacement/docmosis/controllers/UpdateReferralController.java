@@ -190,7 +190,7 @@ public class UpdateReferralController {
     }
 
     /**
-     * Called after submitting a update referral event.
+     * Called after submitting an update referral event.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization

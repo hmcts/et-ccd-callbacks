@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -38,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -177,9 +180,13 @@ public class DocumentManagementService {
     }
 
     public String getDocumentUUID(String urlString) {
-        String documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
-        documentUUID = documentUUID.replace(BINARY, "");
-        return documentUUID;
+        String regex = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(urlString);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        throw new NotFoundException("UUID not found in string " + urlString);
     }
 
     /**

@@ -13,7 +13,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";

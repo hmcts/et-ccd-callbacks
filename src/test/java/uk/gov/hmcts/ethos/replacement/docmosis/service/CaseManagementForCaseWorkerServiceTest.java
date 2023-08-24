@@ -115,7 +115,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @MockBean
     private EmailService emailService;
-    private final String hmctsServiceId = "BHA1";
+    private static final String hmctsServiceId = "BHA1";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -1067,6 +1067,13 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = new CaseData();
         caseManagementForCaseWorkerService.setCaseDeepLink(caseData, "123");
         assertEquals("http://domain/cases/case-details/123#Documents", caseData.getCaseDeepLink());
+    }
+
+    @Test
+    void testHearingIsLinkedFlag() {
+        CaseData caseData = new CaseData();
+        caseManagementForCaseWorkerService.setHearingIsLinkedFlag(caseData);
+        assertEquals(NO, caseData.getHearingIsLinkedFlag());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

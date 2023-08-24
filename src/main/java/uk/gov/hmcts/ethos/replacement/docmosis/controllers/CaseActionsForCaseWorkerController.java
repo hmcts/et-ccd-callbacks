@@ -282,7 +282,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
             caseManagementForCaseWorkerService.setCaseDeepLink(caseData, ccdRequest.getCaseDetails().getCaseId());
-
+            caseManagementForCaseWorkerService.setHearingIsLinkedFlag(caseData);
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),

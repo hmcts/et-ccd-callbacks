@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
- public class Constants {
-     private Constants() {
+public class Constants {
+    private Constants() {
 
-     }
+    }
+
     public static final String ET1_DOC_TYPE = "ET1";
     public static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
     public static final String COMPANY = "Company";
@@ -47,7 +48,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
             + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
     public static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
-
     public static final String TRACK_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
     public static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
             + "<a target=\"_blank\" href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"

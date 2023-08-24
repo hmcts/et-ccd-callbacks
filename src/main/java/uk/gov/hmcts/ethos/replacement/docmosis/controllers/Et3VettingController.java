@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -77,10 +78,12 @@ public class Et3VettingController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        et3VettingService.updateValuesOnObject(caseData, new Et3VettingType());
-        List<String> errors = Et3VettingHelper.populateRespondentDynamicList(caseData);
+        List<String> errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "respondent");
+        if (errors.isEmpty()) {
+            et3VettingService.updateValuesOnObject(caseData, new Et3VettingType());
+            errors = Et3VettingHelper.populateRespondentDynamicList(caseData);
+        }
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 

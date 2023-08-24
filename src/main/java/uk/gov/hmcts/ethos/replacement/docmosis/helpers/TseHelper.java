@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -246,14 +247,14 @@ public final class TseHelper {
     private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {
         TseRespondType replyType = application.getRespondCollection().get(0).getValue();
         return TseReplyData.builder()
-            .caseNumber(caseId)
-            .respondentParty(replyType.getFrom())
-            .type(application.getType())
-            .responseDate(replyType.getDate())
-            .response(replyType.getResponse())
-            .supportingYesNo(replyType.getHasSupportingMaterial())
-            .documentCollection(replyType.getSupportingMaterial())
-            .copy(replyType.getCopyToOtherParty())
+            .caseNumber(defaultIfEmpty(caseId, null))
+            .respondentParty(replyType != null ? replyType.getFrom() : null)
+            .type(defaultIfEmpty(application.getType(), null))
+            .responseDate(replyType != null ? replyType.getDate() : null)
+            .response(replyType != null ? replyType.getResponse() : null)
+            .supportingYesNo(replyType != null ? replyType.getHasSupportingMaterial() : null)
+            .documentCollection(replyType != null ? replyType.getSupportingMaterial() : null)
+            .copy(replyType != null ? replyType.getCopyToOtherParty() : null)
             .build();
     }
 

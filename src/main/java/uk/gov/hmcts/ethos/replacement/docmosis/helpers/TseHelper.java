@@ -43,7 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
 @Slf4j
 public final class TseHelper {
 
-    public static final String INTRO = """
+    private static final String INTRO = """
             <p>The %s has applied to <strong>%s</strong>.</p>
             %s
             <p>If you have any objections or responses to their application you must send them to the tribunal as soon
@@ -52,13 +52,13 @@ public final class TseHelper {
             If you need more time to respond, you may request more time from the tribunal. If you do not respond or
             request more time to respond, the tribunal will consider the application without your response.</p>
             """;
-    public static final String TSE_RESPONSE_TABLE = "| | |\r\n"
+    private static final String TSE_RESPONSE_TABLE = "| | |\r\n"
             + TABLE_STRING
             + "|Application date | %s\r\n"
             + "|Details of the application | %s\r\n"
             + "Application file upload | %s";
-    public static final String GROUP_B = "<p>You do not need to respond to this application.</p>";
-    public static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
+    private static final String GROUP_B = "<p>You do not need to respond to this application.</p>";
+    private static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
             + "afresh", "Reconsider a judgment", "Withdraw my claim");
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";

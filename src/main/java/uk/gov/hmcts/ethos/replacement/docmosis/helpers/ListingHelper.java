@@ -629,10 +629,10 @@ public final class ListingHelper {
                 }
             }
             default -> {
+                return " ";
             }
         }
-
-        return " ";
+        return hearingVenueScotland;
     }
 
     /**
@@ -672,6 +672,7 @@ public final class ListingHelper {
                 }
             }
             default -> {
+                log.info("Could not get venue code for " + tribunalOffice);
             }
         }
         throw new IllegalStateException();

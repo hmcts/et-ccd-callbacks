@@ -62,6 +62,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 public final class DocumentHelper {
+
+    public static final String I_SCOT = "\"iScot";
+
     private DocumentHelper() {
     }
 
@@ -100,11 +103,11 @@ public final class DocumentHelper {
             .append("_enhmcts1\":\"[userImage:enhmcts.png]").append(NEW_LINE)
             .append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
             .append("_enhmcts2\":\"[userImage:enhmcts.png]").append(NEW_LINE)
-            .append("\"iScot").append(getScotSectionName(correspondenceScotType).replace(".", "_"))
-            .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE).append("\"iScot")
+            .append(I_SCOT).append(getScotSectionName(correspondenceScotType).replace(".", "_"))
+            .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE).append(I_SCOT)
             .append(getScotSectionName(correspondenceScotType).replace(".", "_"))
             .append("_schmcts1\":\"[userImage:schmcts.png]").append(NEW_LINE)
-            .append("\"iScot").append(getScotSectionName(correspondenceScotType).replace(".", "_"))
+            .append(I_SCOT).append(getScotSectionName(correspondenceScotType).replace(".", "_"))
             .append("_schmcts2\":\"[userImage:schmcts.png]").append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());

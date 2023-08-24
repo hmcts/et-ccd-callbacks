@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -865,6 +866,35 @@ class CaseManagementForCaseWorkerServiceTest {
         caseData.setClaimServedDate(localDate.toString());
         caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
         assertEquals(expectedEt3DueDate, caseData.getEt3DueDate());
+    }
+
+    @Test
+    void setNextListedDate() {
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(LocalDateTime.now().plusDays(2).toDateTime().toLocalDateTime().toString());
+        dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+        dateListedTypeItem.setValue(dateListedType);
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        List<DateListedTypeItem> dateListedTypeItems =
+                caseData.getHearingCollection().get(0).getValue().getHearingDateCollection();
+        dateListedTypeItems.add(dateListedTypeItem);
+        caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(dateListedTypeItems);
+        String expectedNextListedDate = LocalDate.now().plusDays(2).toString();
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        assertEquals(expectedNextListedDate, caseData.getNextListedDate());
+    }
+
+    @Test
+    void setEt3ResponseDueDate_doesNotOverideExistingValue() {
+
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        LocalDate localDate = LocalDate.now();
+        caseData.setClaimServedDate(localDate.toString());
+        caseData.setEt3DueDate("12/06/2023");
+        caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
+        assertEquals("12/06/2023", caseData.getEt3DueDate());
     }
 
     @Test

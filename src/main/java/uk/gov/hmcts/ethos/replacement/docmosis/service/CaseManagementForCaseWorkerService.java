@@ -186,7 +186,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setEt3ResponseDueDate(CaseData caseData) {
-        if (!isNullOrEmpty(caseData.getClaimServedDate())) {
+        if (!isNullOrEmpty(caseData.getClaimServedDate()) && isNullOrEmpty(caseData.getEt3DueDate())) {
             caseData.setEt3DueDate(LocalDate.parse(
                 caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }
@@ -281,16 +281,26 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-    caseData.getHearingCollection().stream()
-            .map(HearingTypeItem::getValue)
-            .flatMap(hearingType -> hearingType.getHearingDateCollection().stream())
-            .map(DateListedTypeItem::getValue)
-            .forEach(dateListedType -> {
+        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return;
+        }
+
+        for (HearingTypeItem hearingTypeItem : hearingCollection) {
+            HearingType hearingType = hearingTypeItem.getValue();
+            List<DateListedTypeItem> hearingDateCollection = hearingType.getHearingDateCollection();
+            if (CollectionUtils.isEmpty(hearingDateCollection)) {
+                continue;
+            }
+
+            for (DateListedTypeItem dateListedTypeItem : hearingDateCollection) {
+                DateListedType dateListedType = dateListedTypeItem.getValue();
                 if (dateListedType.getHearingStatus() == null) {
                     initializeHearingStatus(dateListedType);
                 }
                 populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
-            });
+            }
+        }
     }
 
     private void initializeHearingStatus(DateListedType dateListedType) {

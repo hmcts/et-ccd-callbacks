@@ -96,11 +96,11 @@ public class RespondentsReport {
                 .sum();
     }
 
-private int countMatchingRespondents(String respRepName, RespondentsReportCaseData caseData) {
-    return (int) caseData.getRespondentCollection().stream()
+    private int countMatchingRespondents(String respRepName, RespondentsReportCaseData caseData) {
+        return (int) caseData.getRespondentCollection().stream()
             .filter(respItem -> respItem.getValue().getRespondentName().equals(respRepName))
             .count();
-}
+    }
 
     private String getRepresentative(String respName, RespondentsReportCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getRepCollection())) {

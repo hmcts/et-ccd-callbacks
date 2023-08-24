@@ -90,13 +90,10 @@ public class RespondentsReport {
     }
 
     private int countRepresentedRespondents(String rep, RespondentsReportCaseData caseData) {
-        int count = 0;
-        for (RepresentedTypeRItem repItem : caseData.getRepCollection()) {
-            if (repItem.getValue().getNameOfRepresentative().equals(rep)) {
-                count += countMatchingRespondents(repItem.getValue().getRespRepName(), caseData);
-            }
-        }
-        return count;
+        return caseData.getRepCollection().stream()
+                .filter(repItem -> repItem.getValue().getNameOfRepresentative().equals(rep))
+                .mapToInt(repItem -> countMatchingRespondents(repItem.getValue().getRespRepName(), caseData))
+                .sum();
     }
 
 private int countMatchingRespondents(String respRepName, RespondentsReportCaseData caseData) {

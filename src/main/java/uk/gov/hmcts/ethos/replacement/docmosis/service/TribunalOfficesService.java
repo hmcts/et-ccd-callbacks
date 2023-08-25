@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 
 @Service
 @Slf4j
@@ -41,6 +42,23 @@ public class TribunalOfficesService {
         contactDetails.setTown("");
         contactDetails.setTelephone("");
         return contactDetails;
+    }
+
+    public CourtLocations getTribunalLocations(String officeName) {
+        if (officeName == null || UNASSIGNED_OFFICE.equals(officeName)) {
+            return createUnassignedTribunalLocations();
+        }
+        var tribunalName = getTribunalOffice(officeName);
+        return config.getCourtLocations().get(tribunalName);
+    }
+
+    private CourtLocations createUnassignedTribunalLocations() {
+        CourtLocations courtLocations = new CourtLocations();
+        courtLocations.setName(UNASSIGNED_OFFICE);
+        courtLocations.setEpimmsId("");
+        courtLocations.setRegion("");
+        courtLocations.setRegionId("");
+        return courtLocations;
     }
 }
 

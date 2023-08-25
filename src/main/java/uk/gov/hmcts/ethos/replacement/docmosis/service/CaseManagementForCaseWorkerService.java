@@ -12,6 +12,7 @@ import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -20,10 +21,12 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -67,6 +70,7 @@ public class CaseManagementForCaseWorkerService {
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
+    private final TribunalOfficesService tribunalOfficesService;
     private final String hmctsServiceId;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
@@ -81,11 +85,13 @@ public class CaseManagementForCaseWorkerService {
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient, ClerkService clerkService,
                                               AuthTokenGenerator serviceAuthTokenGenerator,
+                                              TribunalOfficesService tribunalOfficesService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
+        this.tribunalOfficesService = tribunalOfficesService;
         this.hmctsServiceId = hmctsServiceId;
     }
 
@@ -95,6 +101,9 @@ public class CaseManagementForCaseWorkerService {
         struckOutDefaults(caseData);
         dateToCurrentPosition(caseData);
         flagsImageFileNameDefaults(caseData);
+        setCaseNameHmctsInternal(caseData);
+        setCaseManagementLocation(caseData);
+        setCaseManagementCategory(caseData);
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -461,6 +470,41 @@ public class CaseManagementForCaseWorkerService {
             log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
+        }
+    }
+
+    private void setCaseNameHmctsInternal(CaseData caseData) {
+        if (caseData.getClaimant() == null) {
+            claimantDefaults(caseData);
+        }
+
+        if (caseData.getRespondent() == null) {
+            respondentDefaults(caseData);
+        }
+
+        caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
+    }
+
+    private void setCaseManagementCategory(CaseData caseData) {
+        caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
+    }
+
+    private void setCaseManagementLocation(CaseData caseData) {
+        if (caseData.getManagingOffice() != null) {
+            String managingOfficeName = caseData.getManagingOffice();
+            CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
+            if (!tribunalLocations.getName().equals(UNASSIGNED_OFFICE)) {
+                caseData.setCaseManagementLocation(CaseLocation.builder()
+                        .baseLocation(tribunalLocations.getEpimmsId())
+                        .region(tribunalLocations.getRegion())
+                        .build());
+            } else{
+                log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
+
+            }
+
+        } else {
+            log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
         }
     }
 }

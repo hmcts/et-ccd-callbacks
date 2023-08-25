@@ -9,6 +9,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDeta
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 
 @Configuration
 @ConfigurationProperties("tribunal-offices")
@@ -16,4 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class TribunalOfficesConfiguration {
     private Map<TribunalOffice, ContactDetails> contactDetails = new ConcurrentHashMap<>();
+
+    private Map<TribunalOffice, CourtLocations> courtLocations = new ConcurrentHashMap<>();
 }

@@ -62,7 +62,6 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 ### Environment Variables for CFTLIB
 | Variable                       | Purpose                                                                               |
 |--------------------------------|---------------------------------------------------------------------------------------|
-| ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                  |
 | SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                      |
 | ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       |     
 | SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           | 

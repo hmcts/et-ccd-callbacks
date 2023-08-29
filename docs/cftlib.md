@@ -35,16 +35,59 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 
 ## Setup
 
-### Environment Variables
+### Default Environment Variables
+
+| Variable                                      | Purpose                                                                                  |
+|-----------------------------------------------|------------------------------------------------------------------------------------------|
+| JAVA_HOME                                     | Directory of your locally installed JDK (/Library/Java/jdk-17.0.4.jdk/Contents/Home)     |
+| XUI_LD_ID                                     | XUI                                                                                      |
+| DB_URL                                        | Postgresql Localhost DB URL                                                              |
+| IDAM_WEB_URL                                  | Local IDAM SIMULATOR WEB URL                                                             |
+| IDAM_API_URL                                  | Local IDAM SIMULATOR API URL                                                             |
+
+### Environment Variables for Notice of Change
+
+| Variable                                      | Purpose                                                                  |
+|-----------------------------------------------|--------------------------------------------------------------------------|
+| NOTIFY_MCA_API_KEY                            |                                                                          |
+| MCA_DS_PROXY_URLS_ALLOWED_LIST                | Manage Case Assignment Allowed Proxy URLs                                |
+| MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIS          | Manage Case Assignment Allowed Definition Store Proxy URLs               |
+| MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED | Manage Case Assignment Conditional APIs Case Assignments Enabling Status |
+| IDAM_CAA_USERNAME                             | IDAM Caseworker Approver Username                                        |
+| IDAM_CAA_PASSWORD                             | IDAM Caseworker Approver Password                                        |
+| PRD_HOST                                      | Professional Reference Data Host                                         |
+| IDAM_NOC_APPROVER_USERNAME                    | Notice of Change Approver Username                                       |
+| IDAM_NOC_APPROVER_PASSWORD                    | Notice of Change Approver Password                                       |
+
+### Environment Variables for CFTLIB
 | Variable                       | Purpose                                                                               |
 |--------------------------------|---------------------------------------------------------------------------------------|
 | ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                  |
 | XUI_LD_ID                      | Launch Darkly Client Id                                                               |
 | SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                      |
-| ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       
-| SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           
-| ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository              
-| CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup 
+| ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       |     
+| SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           | 
+| ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository              |
+| CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup |
+
+### Variables to be updated on application.yaml for CFTLIB
+
+| Variable                                    | Purpose                                                              |
+|---------------------------------------------|----------------------------------------------------------------------|
+| ET_COS_DB_PASSWORD                          | Your local DB ET_COS schema password                                 |
+| TORNADO_ACCESS_KEY                          | Docmosis Tornado Access Key                                          |
+| CREATE_UPDATES_QUEUE_NAME                   | Queue name that you created on Azure                                 |
+| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Queue Connection String value of the queue that you created on Azure |     
+| GOV_NOTIFY_API_KEY                          | API key that you created on GOV NOTIFICATION TOOL                    | 
+| ET_COS_SYSTEM_USER                          | Employment Tribunals Case Orchestration Service System User          |
+| ET_COS_SYSTEM_USER_PASSWORD                 | Employment Tribunals Case Orchestration Service System User Password |
+
+### Variables to be updated on application-cftlib.yaml
+
+| Variable                                    | Purpose                                                              |
+|---------------------------------------------|----------------------------------------------------------------------|
+| ET_COS_CFTLIB_DB_PASSWORD                   | Employment Tribunals Case Orchestration Service Database Password    |
+
 
 ### Azure Service Bus
 You must either provide a connection string in an environment variable to a queue in Azure or
@@ -52,9 +95,9 @@ configure a fake service bus.
 
 If you require a real Azure queue then ask one of the team to set this up.
 
-| Variable | Purpose                                              |
-| -------- |------------------------------------------------------|
-| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Connection string for create-updates queue in Azure  |
+| Variable                                    | Purpose                                             |
+|---------------------------------------------|-----------------------------------------------------|
+| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Connection string for create-updates queue in Azure |
 
 Or, if no development queue is available, set the following environment variable to use the fake.
 
@@ -82,14 +125,14 @@ http://localhost:3000
 
 All logins use a password of `password`.
 
-| Username                       | Roles                                                                        | Purpose
-|--------------------------------|------------------------------------------------------------------------------| --- 
-| englandwales@hmcts.net         | caseworker, caseworker-employment, caseworker-employment-englandwales        | Caseworker access to England/Wales cases
-| scotland@hmcts.net             | caseworker, caseworker-employment, caseworker-employment-scotland            | Caseworker access to Scotland cases
-| admin@hmcts.net                | caseworker, caseworker-employment, caseworker-employment-api                 | Admin account with access to all cases
-| solicitor1@etorganisation1.com | caseworker-employment-legalrep-solicitor                                     | Solicitor account |
-| superuser@etorganisation1.com  | caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager | Organisation admin account
-| citizen@gmail.com              | citizen                                                                      | Citizen account
+| Username                       | Roles                                                                        | Purpose                                  |
+|--------------------------------|------------------------------------------------------------------------------|------------------------------------------|
+| englandwales@hmcts.net         | caseworker, caseworker-employment, caseworker-employment-englandwales        | Caseworker access to England/Wales cases |
+| scotland@hmcts.net             | caseworker, caseworker-employment, caseworker-employment-scotland            | Caseworker access to Scotland cases      |
+| admin@hmcts.net                | caseworker, caseworker-employment, caseworker-employment-api                 | Admin account with access to all cases   |
+| solicitor1@etorganisation1.com | caseworker-employment-legalrep-solicitor                                     | Solicitor account                        |
+| superuser@etorganisation1.com  | caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager | Organisation admin account               |
+| citizen@gmail.com              | citizen                                                                      | Citizen account                          |
 
 ## Importing CCD Definitions
 
@@ -108,11 +151,11 @@ necessary to
 ### Configure local CCD Definition locations
 The following environment variables must be set to point to the local directory of the repository:
 
-| Repository                      | Environment Variable 
-|---------------------------------| --- 
-| et-ccd-definitions-englandwales | ENGLANDWALES_CCD_CONFIG_PATH
-| et-ccd-definitions-scotland     | SCOTLAND_CCD_CONFIG_PATH
-| et-ccd-definitions-admin        | ADMIN_CCD_CONFIG_PATH
+| Repository                      | Environment Variable         |
+|---------------------------------|------------------------------|
+| et-ccd-definitions-englandwales | ENGLANDWALES_CCD_CONFIG_PATH |
+| et-ccd-definitions-scotland     | SCOTLAND_CCD_CONFIG_PATH     |
+| et-ccd-definitions-admin        | ADMIN_CCD_CONFIG_PATH        |
 
 ### Generate cftlib CCD definitions
 From each of the CCD definition repositories execute:

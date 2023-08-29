@@ -314,9 +314,7 @@ public final class LabelsHelper {
             labelTypeItemList.add(addressLabelTypeItem);
 
         }
-
         return labelTypeItemList;
-
     }
 
     private static void getEntityAddress(AddressLabelType addressLabelType, Address entityAddress) {
@@ -329,7 +327,6 @@ public final class LabelsHelper {
             addressLabelType.setFullAddress("");
             addressLabelType.setLabelEntityAddress(new Address());
         }
-
     }
 
     private static void getEntityTelephone(AddressLabelType addressLabelType, String telephone) {
@@ -340,7 +337,6 @@ public final class LabelsHelper {
         } else {
             addressLabelType.setLabelEntityTelephone("");
         }
-
     }
 
     private static void getEntityFax(AddressLabelType addressLabelType, String fax) {
@@ -351,29 +347,26 @@ public final class LabelsHelper {
         } else {
             addressLabelType.setLabelEntityFax("");
         }
-
     }
 
     private static StringBuilder getFullAddressOneLine(Address address) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(nullCheck(address.getAddressLine1()));
-        sb.append(!isNullOrEmpty(nullCheck(address.getAddressLine2())) && sb.length() > 0  ? ", " : "");
-        sb.append(nullCheck(address.getAddressLine2()));
-        sb.append(!isNullOrEmpty(nullCheck(address.getAddressLine3())) && sb.length() > 0  ? ", " : "");
-        sb.append(nullCheck(address.getAddressLine3()));
-        sb.append(!isNullOrEmpty(nullCheck(address.getPostTown())) && sb.length() > 0  ? ", " : "");
-        sb.append(nullCheck(address.getPostTown()));
-        sb.append(!isNullOrEmpty(nullCheck(address.getCounty())) && sb.length() > 0  ? ", " : "");
-        sb.append(nullCheck(address.getCounty()));
-        sb.append(!isNullOrEmpty(nullCheck(address.getPostCode())) && sb.length() > 0  ? ", " : "");
-        sb.append(nullCheck(address.getPostCode()));
-        sb.append(!isNullOrEmpty(nullCheck(address.getCountry())) && sb.length() > 0  ? ", " : "");
-        sb.append(nullCheck(address.getCountry()));
-        sb.append(sb.length() > 0  ? "." : "");
+        sb.append(nullCheck(address.getAddressLine1()))
+            .append(!isNullOrEmpty(nullCheck(address.getAddressLine2())) && sb.length() > 0  ? ", " : "")
+            .append(nullCheck(address.getAddressLine2()))
+            .append(!isNullOrEmpty(nullCheck(address.getAddressLine3())) && sb.length() > 0  ? ", " : "")
+            .append(nullCheck(address.getAddressLine3()))
+            .append(!isNullOrEmpty(nullCheck(address.getPostTown())) && sb.length() > 0  ? ", " : "")
+            .append(nullCheck(address.getPostTown()))
+            .append(!isNullOrEmpty(nullCheck(address.getCounty())) && sb.length() > 0  ? ", " : "")
+            .append(nullCheck(address.getCounty()))
+            .append(!isNullOrEmpty(nullCheck(address.getPostCode())) && sb.length() > 0  ? ", " : "")
+            .append(nullCheck(address.getPostCode()))
+            .append(!isNullOrEmpty(nullCheck(address.getCountry())) && sb.length() > 0  ? ", " : "")
+            .append(nullCheck(address.getCountry())).append(sb.length() > 0  ? "." : "");
 
         return sb;
-
     }
 
     public static List<AddressLabelTypeItem> customiseSelectedAddressesMultiples(

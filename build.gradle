@@ -427,6 +427,7 @@ dependencies {
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.3.1'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-xml', version: '1.17'
 }
 
 bootJar {

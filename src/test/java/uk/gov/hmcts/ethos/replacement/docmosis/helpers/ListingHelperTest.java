@@ -1389,6 +1389,35 @@ class ListingHelperTest {
                 .isEqualTo(office);
     }
 
+    @Test
+    public void getVenueFromDateListedTypeTest() {
+        DateListedType dateListedType = new DateListedType();
+
+        dateListedType.setHearingVenueDayScotland("Glasgow");
+        dateListedType.setHearingGlasgow(new DynamicFixedListType("Glasgow"));
+        String resultGlasgow = ListingHelper.getVenueFromDateListedType(dateListedType);
+        assertEquals("Glasgow", resultGlasgow);
+
+        dateListedType.setHearingVenueDayScotland("Aberdeen");
+        dateListedType.setHearingAberdeen(new DynamicFixedListType("Aberdeen"));
+        String resultAberdeen = ListingHelper.getVenueFromDateListedType(dateListedType);
+        assertEquals("Aberdeen", resultAberdeen);
+
+        dateListedType.setHearingVenueDayScotland("Dundee");
+        dateListedType.setHearingDundee(new DynamicFixedListType("Dundee"));
+        String resultDundee = ListingHelper.getVenueFromDateListedType(dateListedType);
+        assertEquals("Dundee", resultDundee);
+
+        dateListedType.setHearingVenueDayScotland("Edinburgh");
+        dateListedType.setHearingEdinburgh(new DynamicFixedListType("Edinburgh"));
+        String resultEdinburgh = ListingHelper.getVenueFromDateListedType(dateListedType);
+        assertEquals("Edinburgh", resultEdinburgh);
+
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(" "));
+        String resultDefault = ListingHelper.getVenueFromDateListedType(dateListedType);
+        assertEquals(" ", resultDefault);
+    }
+
     private DateListedTypeItem setDateListedTimeItem(boolean scotland, String office) {
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId(UUID.randomUUID().toString());
@@ -1399,20 +1428,12 @@ class ListingHelperTest {
             dateListedType.setHearingVenueDayScotland(office);
             final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(office);
             switch (tribunalOffice) {
-                case GLASGOW:
-                    dateListedType.setHearingGlasgow(new DynamicFixedListType("Glasgow"));
-                    break;
-                case ABERDEEN:
-                    dateListedType.setHearingAberdeen(new DynamicFixedListType("Aberdeen"));
-                    break;
-                case DUNDEE:
-                    dateListedType.setHearingDundee(new DynamicFixedListType("Dundee"));
-                    break;
-                case EDINBURGH:
-                    dateListedType.setHearingEdinburgh(new DynamicFixedListType("Edinburgh"));
-                    break;
-                default:
-                    break;
+                case GLASGOW -> dateListedType.setHearingGlasgow(new DynamicFixedListType("Glasgow"));
+                case ABERDEEN -> dateListedType.setHearingAberdeen(new DynamicFixedListType("Aberdeen"));
+                case DUNDEE -> dateListedType.setHearingDundee(new DynamicFixedListType("Dundee"));
+                case EDINBURGH -> dateListedType.setHearingEdinburgh(new DynamicFixedListType("Edinburgh"));
+                default -> {
+                }
             }
         }
         dateListedTypeItem.setValue(dateListedType);

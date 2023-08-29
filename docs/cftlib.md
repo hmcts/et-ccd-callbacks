@@ -37,13 +37,13 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 
 ### Default Environment Variables
 
-| Variable                                      | Purpose                                                                                  |
-|-----------------------------------------------|------------------------------------------------------------------------------------------|
-| JAVA_HOME                                     | Directory of your locally installed JDK (/Library/Java/jdk-17.0.4.jdk/Contents/Home)     |
-| XUI_LD_ID                                     | XUI                                                                                      |
-| DB_URL                                        | Postgresql Localhost DB URL                                                              |
-| IDAM_WEB_URL                                  | Local IDAM SIMULATOR WEB URL                                                             |
-| IDAM_API_URL                                  | Local IDAM SIMULATOR API URL                                                             |
+| Variable                         | Purpose                                                                              |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| JAVA_HOME                        | Directory of your locally installed JDK (/Library/Java/jdk-17.0.4.jdk/Contents/Home) |
+| XUI_LD_ID                        | Launch Darkly Client Id                                                              |
+| DB_URL                           | Postgresql Localhost DB URL                                                          |
+| IDAM_WEB_URL                     | Local IDAM SIMULATOR WEB URL                                                         |
+| IDAM_API_URL                     | Local IDAM SIMULATOR API URL                                                         |
 
 ### Environment Variables for Notice of Change
 
@@ -63,7 +63,6 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 | Variable                       | Purpose                                                                               |
 |--------------------------------|---------------------------------------------------------------------------------------|
 | ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                  |
-| XUI_LD_ID                      | Launch Darkly Client Id                                                               |
 | SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                      |
 | ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       |     
 | SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           | 

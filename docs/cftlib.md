@@ -76,8 +76,7 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 |---------------------------------------------|----------------------------------------------------------------------|
 | ET_COS_DB_PASSWORD                          | Your local DB ET_COS schema password                                 |
 | TORNADO_ACCESS_KEY                          | Docmosis Tornado Access Key                                          |
-| CREATE_UPDATES_QUEUE_NAME                   | Queue name that you created on Azure                                 |
-| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Queue Connection String value of the queue that you created on Azure |     
+| CREATE_UPDATES_QUEUE_NAME                   | Queue name that you created on Azure                                 | 
 | GOV_NOTIFY_API_KEY                          | API key that you created on GOV NOTIFICATION TOOL                    | 
 | ET_COS_SYSTEM_USER                          | Employment Tribunals Case Orchestration Service System User          |
 | ET_COS_SYSTEM_USER_PASSWORD                 | Employment Tribunals Case Orchestration Service System User Password |

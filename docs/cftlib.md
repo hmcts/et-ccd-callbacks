@@ -62,7 +62,6 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 ### Environment Variables for CFTLIB
 | Variable                       | Purpose                                                                               |
 |--------------------------------|---------------------------------------------------------------------------------------|
-| ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                  |
 | SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                      |
 | ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       |     
 | SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           | 
@@ -79,6 +78,13 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 | GOV_NOTIFY_API_KEY                          | API key that you created on GOV NOTIFICATION TOOL                    | 
 | ET_COS_SYSTEM_USER                          | Employment Tribunals Case Orchestration Service System User          |
 | ET_COS_SYSTEM_USER_PASSWORD                 | Employment Tribunals Case Orchestration Service System User Password |
+
+### Variables to be updated on application-cftlib.yaml
+
+| Variable                                    | Purpose                                                              |
+|---------------------------------------------|----------------------------------------------------------------------|
+| ET_COS_CFTLIB_DB_PASSWORD                   | Employment Tribunals Case Orchestration Service Database Password    |
+
 
 ### Azure Service Bus
 You must either provide a connection string in an environment variable to a queue in Azure or

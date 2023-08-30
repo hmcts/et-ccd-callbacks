@@ -149,3 +149,64 @@ tribunal-offices:
       fax: 01264 887 302
       dx: DX 155650 Watford 3
       email: watfordet@justice.gov.uk
+  court-locations:
+    aberdeen:
+      region: Scotland,
+      epimmsId: 219164,
+      regionId: 11
+    bristol:
+      region: South West,
+      epimmsId: 819890,
+      regionId: 6
+    dundee:
+      region: Scotland,
+      epimmsId: 367564,
+      regionId: 11
+    edinburgh:
+      region: Scotland,
+      epimmsId: 368308,
+      regionId: 11
+    glasgow:
+      region: Scotland,
+      epimmsId: 366559,
+      regionId: 11
+    leeds:
+      region: North East,
+      epimmsId: 36313,
+      regionId: 3
+    london_central:
+      region: London,
+      epimmsId: 21153,
+      regionId: 1
+    london_east:
+      region: London,
+      epimmsId: 816964,
+      regionId: 1
+    london_south:
+      region: London,
+      epimmsId: 227942,
+      regionId: 1
+    manchester:
+      region: North West,
+      epimmsId: 301017,
+      regionId: 4
+    midlands_east:
+      region: Midlands,
+      epimmsId: 618632,
+      regionId: 2
+    midlands_west:
+      region: Midlands,
+      epimmsId: 877347,
+      regionId: 2
+    newcastle:
+      region: North East,
+      epimmsId: 366796,
+      regionId: 3
+    wales:
+      region: Wales,
+      epimmsId: 779109,
+      regionId: 7
+    watford:
+      region: South East,
+      epimmsId: 685391,
+      regionId: 5

@@ -12,3 +12,4 @@ idam:
 docmosis:
   api:
     url: ${DOCMOSIS_API_URL:https://ethos-repl-docmosis-backend-demo.service.core-compute-demo.internal}
+hmcts_service_id: BHA1

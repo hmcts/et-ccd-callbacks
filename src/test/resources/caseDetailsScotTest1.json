@@ -195,6 +195,7 @@
     "responseReceived": "none",
     "userLocation": "Liverpool",
     "hearingNumbers" : "2",
+    "managingOffice" : "Manchester",
     "hearingTypes" : "Preliminary Hearing",
     "hearingPublicPrivate" : "Public",
     "hearingVenue" : "Crown Court",

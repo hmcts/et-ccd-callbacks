@@ -47,3 +47,4 @@ ccd:
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
 document_management:
   url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
+hmcts_service_id: BHA1

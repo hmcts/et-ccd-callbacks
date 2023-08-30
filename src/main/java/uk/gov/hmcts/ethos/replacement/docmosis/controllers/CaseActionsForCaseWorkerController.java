@@ -283,6 +283,30 @@ public class CaseActionsForCaseWorkerController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add HMCTSServiceId to supplementary_data on a case.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> addServiceId(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) throws IOException {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails(), userToken);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
     @PostMapping(value = "/initialiseAmendCaseDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case data for amendCaseDetails and amendCaseDetailsClosed events")
     @ApiResponses(value = {

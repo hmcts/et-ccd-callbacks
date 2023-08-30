@@ -155,11 +155,15 @@ class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
-        String expected = "The respondent has applied to <b>Withdraw my claim</b>.</br>You do not need to respond to "
-            + "this application.<br></br> If you have any objections or responses to their application you must send "
-            + "them to the tribunal as soon as possible and by 20 December 2022 at the latest.</br></br>If you need "
-            + "more time to respond, you may request more time from the tribunal. If you do not respond or request more"
-            + " time to respond, the tribunal will consider the application without your response.";
+        String expected = """
+            <p>The claimant has applied to <strong>Withdraw my claim</strong>.</p>
+            <p>You do not need to respond to this application.</p>
+            <p>If you have any objections or responses to their application you must send them to the tribunal as soon
+            as possible and by <strong>20 December 2022</strong> at the latest.
+            
+            If you need more time to respond, you may request more time from the tribunal. If you do not respond or
+            request more time to respond, the tribunal will consider the application without your response.</p>
+            """;
 
         assertThat(caseData.getTseResponseIntro(), is(expected));
     }
@@ -170,11 +174,15 @@ class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
-        String expected = "The respondent has applied to <b>Postpone a hearing</b>.</br></br> If you have any "
-            + "objections or responses to their application you must send them to the tribunal as soon as possible and "
-            + "by 20 December 2022 at the latest.</br></br>If you need more time to respond, you may request more time "
-            + "from the tribunal. If you do not respond or request more time to respond, the tribunal will consider the"
-            + " application without your response.";
+        String expected = """
+            <p>The claimant has applied to <strong>Postpone a hearing</strong>.</p>
+            
+            <p>If you have any objections or responses to their application you must send them to the tribunal as soon
+            as possible and by <strong>20 December 2022</strong> at the latest.
+            
+            If you need more time to respond, you may request more time from the tribunal. If you do not respond or
+            request more time to respond, the tribunal will consider the application without your response.</p>
+            """;
 
         assertThat(caseData.getTseResponseIntro(), is(expected));
     }

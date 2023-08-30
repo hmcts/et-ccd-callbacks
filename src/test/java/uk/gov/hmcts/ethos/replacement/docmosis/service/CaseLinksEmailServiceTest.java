@@ -44,6 +44,7 @@ class CaseLinksEmailServiceTest {
     private CaseDetails caseDetails;
     private Map<String, Object> claimantPersonalisation;
     private Map<String, Object> respondentPersonalisation;
+    private Map<String, Object> repPersonalisation;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +53,10 @@ class CaseLinksEmailServiceTest {
                 emailService);
         ReflectionTestUtils.setField(caseLinksEmailService, "caseLinkedTemplateId", "1");
         ReflectionTestUtils.setField(caseLinksEmailService, "caseUnlinkedTemplateId", "2");
+        ReflectionTestUtils.setField(caseLinksEmailService, "caseLinkedLegalRepTemplateId", "3");
+        ReflectionTestUtils.setField(caseLinksEmailService, "caseUnlinkedLegalRepTemplateId", "4");
         when(emailService.getCitizenCaseLink("1234")).thenReturn("citizenUrl/1234");
+        when(emailService.getExuiCaseLink("1234")).thenReturn("manageCase/1234");
 
         claimantPersonalisation = Map.of(
                 "caseNumber", "12345/6789",
@@ -61,6 +65,11 @@ class CaseLinksEmailServiceTest {
         respondentPersonalisation = Map.of(
                 "caseNumber", "12345/6789",
                 "linkToManageCase", "");
+
+        repPersonalisation = Map.of(
+                "caseTitle", "Claimant LastName vs Respondent, Respondent Unrepresented, Respondent Represented",
+                "caseNumber", "12345/6789",
+                "linkToManageCase", "manageCase/1234");
 
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(RESPONDENT_NAME);
@@ -106,15 +115,16 @@ class CaseLinksEmailServiceTest {
     }
 
     @Test
-    void shouldSendCaseLinkingEmailsWhenClaimantNotRepresented() {
+    void shouldSendCaseLinkingEmailsToAllParties() {
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
                 AUTH_TOKEN,
                 true);
 
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(4)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
+        verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
     }
 
     @Test
@@ -131,19 +141,6 @@ class CaseLinksEmailServiceTest {
     }
 
     @Test
-    void shouldNotSendWhenClaimantRepresented() {
-        caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
-
-        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
-                AUTH_TOKEN,
-                true);
-
-        verify(emailService, times(2)).sendEmail(any(), any(), any());
-        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
-    }
-
-    @Test
     void shouldSendEmailsWhenExistingCaseLinksAndAddingCaseLink() {
         CaseLink caseLink = getCaseLink("CLRC017");
         CaseLink caseLink1 = getCaseLink("CLRC016");
@@ -156,10 +153,11 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 true);
 
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(4)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
+        verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
     }
 
     @Test
@@ -175,10 +173,11 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 false);
 
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(4)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
+        verify(emailService).sendEmail("4", "rep1@test.com", repPersonalisation);
     }
 
     @Test
@@ -193,10 +192,11 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 false);
 
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(4)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
+        verify(emailService).sendEmail("4", "rep1@test.com", repPersonalisation);
     }
 
     @Test
@@ -211,10 +211,11 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 false);
 
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(4)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
         verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
+        verify(emailService).sendEmail("4", "rep1@test.com", repPersonalisation);
     }
 
     @Test

@@ -181,7 +181,10 @@ public final class NotificationHelper {
         return respondent.getRespondentName();
     }
 
-    private static RepresentedTypeR getRespondentRepresentative(CaseData caseData, RespondentSumType respondent) {
+    /**
+     * Gets the representative for the respondent if present.
+     */
+    public static RepresentedTypeR getRespondentRepresentative(CaseData caseData, RespondentSumType respondent) {
         List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
 
         if (CollectionUtils.isEmpty(repCollection)) {

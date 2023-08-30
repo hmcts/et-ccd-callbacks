@@ -301,7 +301,7 @@ ext {
     junitJupiterVersion = '5.9.3'
     log4JVersion = '2.20.0'
     pact_version = '4.3.10'
-    reformLoggingVersion = '5.1.9'
+    reformLoggingVersion = '6.0.1'
     serenity = '3.7.1'
     tomcatEmbedVersion = '9.0.75'
 }
@@ -334,7 +334,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.2.0'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.2.2'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.4.0'
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
@@ -356,8 +356,6 @@ dependencies {
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.10'
-    //to remove CVEs
-    implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.17', ext: 'pom'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.8'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.17.0'
@@ -371,7 +369,7 @@ dependencies {
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.7'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.3'
     // CVE-2022-25857
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.2'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.1-RELEASE'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
     // 1084765

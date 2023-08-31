@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -52,6 +53,8 @@ class GlobalSearchDataMigrationControllerTest {
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockBean
     private VerifyTokenService verifyTokenService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -64,6 +67,7 @@ class GlobalSearchDataMigrationControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/exampleV2.json")).toURI()));
+        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
     }
 
     @Test

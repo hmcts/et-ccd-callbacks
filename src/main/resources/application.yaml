@@ -165,3 +165,7 @@ feature-flags:
   hearings-api: ${HEARINGS_API_FLAG:true} # will be used in future releases, remove noinspection once in use
 
 hmcts_service_id: BHA1
+
+launchDarkly:
+  sdkKey: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  env: ${LAUNCH_DARKLY_ENV:default}

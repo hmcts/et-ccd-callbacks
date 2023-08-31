@@ -508,7 +508,7 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    private void setCaseNameHmctsInternal(CaseData caseData) {
+    public void setCaseNameHmctsInternal(CaseData caseData) {
         if (caseData.getClaimant() == null) {
             claimantDefaults(caseData);
         }
@@ -520,11 +520,11 @@ public class CaseManagementForCaseWorkerService {
         caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
     }
 
-    private void setCaseManagementCategory(CaseData caseData) {
+    public void setCaseManagementCategory(CaseData caseData) {
         caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
     }
 
-    private void setCaseManagementLocation(CaseData caseData) {
+    public void setCaseManagementLocation(CaseData caseData) {
         if (caseData.getManagingOffice() != null) {
             String managingOfficeName = caseData.getManagingOffice();
             CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);

@@ -138,7 +138,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
         if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
-            && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
+                && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
             resetResponseRespondentAddress(respondentSumTypeItem);
         }
     }
@@ -211,7 +211,7 @@ public class CaseManagementForCaseWorkerService {
     public void setEt3ResponseDueDate(CaseData caseData) {
         if (!isNullOrEmpty(caseData.getClaimServedDate()) && isNullOrEmpty(caseData.getEt3DueDate())) {
             caseData.setEt3DueDate(LocalDate.parse(
-                caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
+                    caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }
     }
 
@@ -226,8 +226,8 @@ public class CaseManagementForCaseWorkerService {
             for (String date : dates) {
                 LocalDateTime parsedDate = LocalDateTime.parse(date);
                 if (nextListedDate.equals("") && parsedDate.isAfter(LocalDateTime.now())
-                    || parsedDate.isAfter(LocalDateTime.now())
-                    && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
+                        || parsedDate.isAfter(LocalDateTime.now())
+                        && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
                     nextListedDate = date;
                 }
             }
@@ -242,7 +242,7 @@ public class CaseManagementForCaseWorkerService {
             for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
                 DateListedType dateListedType = dateListedTypeItem.getValue();
                 if (HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
-                    && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
+                        && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
                     dates.add(dateListedType.getListedDate());
                 }
             }
@@ -269,7 +269,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(activeRespondent.stream(),
-                struckRespondent.stream()).toList());
+                    struckRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;
@@ -292,7 +292,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
-                notContinuingRespondent.stream()).toList());
+                    notContinuingRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;
@@ -300,7 +300,7 @@ public class CaseManagementForCaseWorkerService {
 
     private boolean positionChanged(CaseData caseData) {
         return isNullOrEmpty(caseData.getCurrentPosition())
-            || !caseData.getPositionType().equals(caseData.getCurrentPosition());
+                || !caseData.getPositionType().equals(caseData.getCurrentPosition());
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
@@ -309,7 +309,7 @@ public class CaseManagementForCaseWorkerService {
                 HearingType hearingType = hearingTypeItem.getValue();
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
-                        : hearingTypeItem.getValue().getHearingDateCollection()) {
+                            : hearingTypeItem.getValue().getHearingDateCollection()) {
                         DateListedType dateListedType = dateListedTypeItem.getValue();
                         if (dateListedType.getHearingStatus() == null) {
                             dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
@@ -329,9 +329,9 @@ public class CaseManagementForCaseWorkerService {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
-                        : hearingTypeItem.getValue().getHearingDateCollection()) {
+                            : hearingTypeItem.getValue().getHearingDateCollection()) {
                         addHearingsOnWeekendError(dateListedTypeItem, errors,
-                            hearingTypeItem.getValue().getHearingNumber());
+                                hearingTypeItem.getValue().getHearingNumber());
                         addHearingsInPastWarning(dateListedTypeItem, caseData);
                     }
                 }
@@ -352,20 +352,20 @@ public class CaseManagementForCaseWorkerService {
     private void addHearingsOnWeekendError(DateListedTypeItem dateListedTypeItem, List<String> errors,
                                            String hearingNumber) {
         LocalDate date = LocalDateTime.parse(
-            dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         if (SUNDAY.equals(dayOfWeek)
-            || SATURDAY.equals(dayOfWeek)) {
+                || SATURDAY.equals(dayOfWeek)) {
             errors.add(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber);
         }
     }
 
     private void addHearingsInPastWarning(DateListedTypeItem dateListedTypeItem, CaseData caseData) {
         LocalDate date = LocalDateTime.parse(
-            dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
         if ((Strings.isNullOrEmpty(dateListedTypeItem.getValue().getHearingStatus())
-            || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
-            && date.isBefore(LocalDate.now())) {
+                || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
+                && date.isBefore(LocalDate.now())) {
             caseData.setListedDateInPastWarning(YES);
         }
     }
@@ -440,7 +440,7 @@ public class CaseManagementForCaseWorkerService {
                         break;
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
-                            String.valueOf(submitEvent.getCaseId()));
+                                String.valueOf(submitEvent.getCaseId()));
                         break;
                 }
             }
@@ -455,8 +455,8 @@ public class CaseManagementForCaseWorkerService {
 
     private List<SubmitEvent> getCasesES(CaseDetails caseDetails, String authToken) {
         return caseRetrievalForCaseWorkerService.casesRetrievalESRequest(caseDetails.getCaseId(), authToken,
-            caseDetails.getCaseTypeId(),
-            new ArrayList<>(Collections.singleton(caseDetails.getCaseData().getCaseRefECC())));
+                caseDetails.getCaseTypeId(),
+                new ArrayList<>(Collections.singleton(caseDetails.getCaseData().getCaseRefECC())));
     }
 
     private void sendUpdateSingleCaseECC(String authToken, CaseDetails currentCaseDetails,
@@ -471,13 +471,13 @@ public class CaseManagementForCaseWorkerService {
                 originalCaseData.getEccCases().add(eccCounterClaimTypeItem);
             } else {
                 originalCaseData.setEccCases(
-                    new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
+                        new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
             }
             FlagsImageHelper.buildFlagsImageFileName(currentCaseDetails.getCaseTypeId(), originalCaseData);
             CCDRequest returnedRequest = ccdClient.startEventForCase(authToken, currentCaseDetails.getCaseTypeId(),
-                currentCaseDetails.getJurisdiction(), caseIdToLink);
+                    currentCaseDetails.getJurisdiction(), caseIdToLink);
             ccdClient.submitEventForCase(authToken, originalCaseData, currentCaseDetails.getCaseTypeId(),
-                currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
+                    currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
         } catch (Exception e) {
             throw new CaseCreationException(MESSAGE + caseIdToLink + e.getMessage());
         }
@@ -485,6 +485,7 @@ public class CaseManagementForCaseWorkerService {
 
     /**
      * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
+     *
      * @param caseDetails Details on the case
      * @param accessToken authorisation token for reference data api
      */
@@ -525,21 +526,17 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setCaseManagementLocation(CaseData caseData) {
-        if (caseData.getManagingOffice() != null) {
-            String managingOfficeName = caseData.getManagingOffice();
-            CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
-            if (!tribunalLocations.getName().equals(UNASSIGNED_OFFICE)) {
-                caseData.setCaseManagementLocation(CaseLocation.builder()
-                        .baseLocation(tribunalLocations.getEpimmsId())
-                        .region(tribunalLocations.getRegion())
-                        .build());
-            } else {
-                log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
-
-            }
-
-        } else {
+        String managingOfficeName = caseData.getManagingOffice();
+        if (Strings.isNullOrEmpty(managingOfficeName)) {
             log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
+        } else {
+            CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
+            if (tribunalLocations.getName().equals(UNASSIGNED_OFFICE)) {
+                log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
+            } else {
+                caseData.setCaseManagementLocation(CaseLocation.builder()
+                        .baseLocation(tribunalLocations.getEpimmsId()).region(tribunalLocations.getRegion()).build());
+            }
         }
     }
 }

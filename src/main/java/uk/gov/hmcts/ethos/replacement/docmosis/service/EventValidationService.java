@@ -30,6 +30,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -199,42 +200,54 @@ public class EventValidationService {
 
     public List<String> validateRespRepNames(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
-            && CollectionUtils.isNotEmpty(caseData.getRepCollection())) {
-            List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
-            List<RepresentedTypeRItem> updatedRepList = new ArrayList<>();
-            int repCollectionSize = caseData.getRepCollection().size();
+        List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
 
-            //reverse update it - from the last to the first element by removing repetition
-            for (int index = repCollectionSize - 1;  index > -1; index--) {
-                String tempCollCurrentName = repCollection.get(index).getValue()
-                    .getDynamicRespRepName().getValue().getLabel();
-                if (isValidRespondentName(caseData, tempCollCurrentName)) {
-                    if (!repCollection.isEmpty()
-                        && updatedRepList.stream()
-                        .noneMatch(r -> r.getValue().getDynamicRespRepName().getValue().getLabel()
-                            .equals(tempCollCurrentName))) {
-                        repCollection.get(index).getValue().setRespRepName(tempCollCurrentName);
-                        updatedRepList.add(repCollection.get(index));
-                    }
-                } else {
-                    errors.add(RESP_REP_NAME_MISMATCH_ERROR_MESSAGE + " - " + tempCollCurrentName);
-                    return errors;
-                }
-            }
-
-            //clear the old rep collection
-            if (repCollectionSize > 0) {
-                caseData.getRepCollection().subList(0, repCollectionSize).clear();
-            }
-
-            //populate the rep collection with the new & updated rep entries and
-            //sort the collection by respondent name
-            updatedRepList.sort((o1, o2) -> o1.getValue().getRespRepName().compareTo(o2.getValue().getRespRepName()));
-            caseData.setRepCollection(updatedRepList);
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection()) || CollectionUtils.isEmpty(repCollection)) {
+            return errors;
         }
 
+        List<RepresentedTypeRItem> updatedRepList = new ArrayList<>();
+        List<String> repNames = new ArrayList<>();
+        int repCollectionSize = repCollection.size();
+
+        for (int index = repCollectionSize - 1; index > -1; index--) {
+            String tempCollCurrentName = getDynamicRespRepName(repCollection.get(index));
+            if (!isValidRespondentName(caseData, tempCollCurrentName)) {
+                errors.add(RESP_REP_NAME_MISMATCH_ERROR_MESSAGE + " - " + tempCollCurrentName);
+                return errors;
+            }
+
+            if (!repNames.contains(tempCollCurrentName)) {
+                updateAndAddRepEntry(repCollection.get(index), tempCollCurrentName, updatedRepList, repNames);
+            }
+        }
+
+        clearOldRepCollection(repCollection, repCollectionSize);
+        sortAndUpdateRepCollection(caseData, updatedRepList);
+
         return errors;
+    }
+
+    private String getDynamicRespRepName(RepresentedTypeRItem item) {
+        return item.getValue().getDynamicRespRepName().getValue().getLabel();
+    }
+
+    private void updateAndAddRepEntry(RepresentedTypeRItem item, String name, List<RepresentedTypeRItem> updatedList,
+                                      List<String> repNames) {
+        item.getValue().setRespRepName(name);
+        updatedList.add(item);
+        repNames.add(name);
+    }
+
+    private void clearOldRepCollection(List<RepresentedTypeRItem> repCollection, int repCollectionSize) {
+        if (repCollectionSize > 0) {
+            repCollection.subList(0, repCollectionSize).clear();
+        }
+    }
+
+    private void sortAndUpdateRepCollection(CaseData caseData, List<RepresentedTypeRItem> updatedRepList) {
+        updatedRepList.sort(Comparator.comparing(o -> o.getValue().getRespRepName()));
+        caseData.setRepCollection(updatedRepList);
     }
 
     private boolean isValidRespondentName(CaseData caseData, String tempCollCurrentName) {
@@ -243,7 +256,7 @@ public class EventValidationService {
             var respRepNames = caseData.getRespondentCollection()
                 .stream()
                 .map(e -> e.getValue().getRespondentName())
-                .collect(Collectors.toList());
+                .toList();
 
             if (!respRepNames.isEmpty()) {
                 isValidName = respRepNames.contains(tempCollCurrentName);
@@ -544,7 +557,7 @@ public class EventValidationService {
                 log.info("Check if jurCodes collection within judgement exist in jurCodesCollection");
                 jurCodesDoesNotExist.addAll(jurCodesCollectionWithinJudgement.stream()
                         .filter(element -> !jurCodesCollection.contains(element))
-                        .collect(Collectors.toList()));
+                        .toList());
 
                 log.info("Check if jurCodes collection has duplicates");
                 populateJurCodesDuplicatedWithinJudgement(jurCodesCollectionWithinJudgement,

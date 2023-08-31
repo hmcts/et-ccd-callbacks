@@ -44,7 +44,6 @@ import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
@@ -54,7 +53,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
@@ -68,7 +66,6 @@ public class CaseManagementForCaseWorkerService {
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
     private final String hmctsServiceId;
-    private final EmailService emailService;
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
@@ -87,7 +84,6 @@ public class CaseManagementForCaseWorkerService {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
-        this.emailService = emailService;
         this.hmctsServiceId = hmctsServiceId;
     }
 
@@ -123,7 +119,6 @@ public class CaseManagementForCaseWorkerService {
                 checkResponseReceived(respondentSumTypeItem);
                 checkResponseAddress(respondentSumTypeItem);
                 checkResponseContinue(respondentSumTypeItem);
-                clearRespondentTypeFields(respondentSumTypeItem);
             }
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
@@ -140,26 +135,6 @@ public class CaseManagementForCaseWorkerService {
         }
 
         caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
-    }
-
-    public void setCaseDeepLink(CaseData caseData, String caseId) {
-        caseData.setCaseDeepLink(emailService.getExuiCaseLink(caseId) + DOCUMENTS_TAB);
-    }
-
-    public void setPublicCaseName(CaseData caseData) {
-        if (caseData.getClaimant() == null) {
-            claimantDefaults(caseData);
-        }
-
-        if (caseData.getRespondent() == null) {
-            respondentDefaults(caseData);
-        }
-
-        if (caseData.getRestrictedReporting() == null) {
-            caseData.setPublicCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
-        } else {
-            caseData.setPublicCaseName(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE);
-        }
     }
 
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
@@ -208,18 +183,6 @@ public class CaseManagementForCaseWorkerService {
         }
         if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("");
-        }
-    }
-
-    private void clearRespondentTypeFields(RespondentSumTypeItem respondentSumTypeItem) {
-        RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
-        if (respondentSumType != null && respondentSumType.getRespondentType() != null) {
-            if (respondentSumType.getRespondentType().equals(ORGANISATION)) {
-                respondentSumType.setRespondentFirstName("");
-                respondentSumType.setRespondentLastName("");
-            } else {
-                respondentSumType.setRespondentOrganisation("");
-            }
         }
     }
 

@@ -42,12 +42,11 @@ public class GlobalSearchDataMigrationController {
     @PostMapping(value = "/global-search-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update the old cases with some default values of Global search fields.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addGlobalSearchFieldsInCaseData(
             @RequestBody CCDRequest ccdRequest,
@@ -61,14 +60,9 @@ public class GlobalSearchDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
-
-        if (errors.isEmpty()) {
-            caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
-            caseManagementForCaseWorkerService.setCaseManagementCategory(caseData);
-            caseManagementForCaseWorkerService.setCaseManagementLocation(caseData);
-        }
+        caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
+        caseManagementForCaseWorkerService.setCaseManagementCategory(caseData);
+        caseManagementForCaseWorkerService.setCaseManagementLocation(caseData);
 
         log.info("Migrating existing case: {} for caseManagementCategory: {},  caseNameHmctsInternal: {},"
                         + "  caseManagementLocation: {}",
@@ -77,18 +71,17 @@ public class GlobalSearchDataMigrationController {
                 caseData.getCaseNameHmctsInternal(),
                 caseData.getCaseManagementLocation());
 
-        return getCallbackRespEntityErrors(errors, caseData);
+        return getCallbackRespEntityErrors(List.of(), caseData);
     }
 
     @PostMapping(value = "/global-search-migration/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add HMCTSServiceId to supplementary_data on exiting case.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addServiceIdForGlobalSearchInCaseData(
             @RequestBody CCDRequest ccdRequest,

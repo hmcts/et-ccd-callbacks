@@ -13,10 +13,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -48,6 +50,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
@@ -94,6 +99,24 @@ public class CaseManagementForCaseWorkerService {
             }
         } else {
             caseData.setClaimant(MISSING_CLAIMANT);
+        }
+        addClaimantDocuments(caseData);
+    }
+
+    private void addClaimantDocuments(CaseData caseData) {
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
+        List<String> claimantDocs = List.of(ET1_DOC_TYPE, ET1_ATTACHMENT_DOC_TYPE, ACAS_DOC_TYPE);
+        if (documentCollection != null) {
+            for (DocumentTypeItem documentTypeItem : documentCollection) {
+                DocumentType documentType = documentTypeItem.getValue();
+                if (claimantDocs.contains(documentType.getTypeOfDocument())) {
+                    claimantDocumentCollection.add(documentTypeItem);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(claimantDocumentCollection)) {
+                caseData.setClaimantDocumentCollection(claimantDocumentCollection);
+            }
         }
     }
 

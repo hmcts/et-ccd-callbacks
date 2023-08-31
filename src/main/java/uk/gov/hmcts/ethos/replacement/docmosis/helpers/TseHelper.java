@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -40,18 +42,23 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
 
 @Slf4j
 public final class TseHelper {
-    public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any "
-        + "objections or responses to their application you must send them to the tribunal as soon as possible and by "
-        + "%s at the latest.</br></br>If you need more time to respond, you may request more time from the tribunal. If"
-        + " you do not respond or request more time to respond, the tribunal will consider the application without your"
-        + " response.";
-    public static final String TSE_RESPONSE_TABLE = "| | |\r\n"
+
+    private static final String INTRO = """
+            <p>The %s has applied to <strong>%s</strong>.</p>
+            %s
+            <p>If you have any objections or responses to their application you must send them to the tribunal as soon
+            as possible and by <strong>%s</strong> at the latest.
+            
+            If you need more time to respond, you may request more time from the tribunal. If you do not respond or
+            request more time to respond, the tribunal will consider the application without your response.</p>
+            """;
+    private static final String TSE_RESPONSE_TABLE = "| | |\r\n"
             + TABLE_STRING
             + "|Application date | %s\r\n"
             + "|Details of the application | %s\r\n"
             + "Application file upload | %s";
-    public static final String GROUP_B = "You do not need to respond to this application.<br>";
-    public static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
+    private static final String GROUP_B = "<p>You do not need to respond to this application.</p>";
+    private static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
             + "afresh", "Reconsider a judgment", "Withdraw my claim");
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
@@ -116,6 +123,7 @@ public final class TseHelper {
         caseData.setTseResponseIntro(
                 String.format(
                         INTRO,
+                        StringUtils.lowerCase(genericTseApplicationType.getApplicant()),
                         genericTseApplicationType.getType(),
                         GROUP_B_TYPES.contains(genericTseApplicationType.getType()) ? GROUP_B : "",
                         UtilHelper.formatCurrentDatePlusDays(date, 7)
@@ -246,14 +254,14 @@ public final class TseHelper {
     private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {
         TseRespondType replyType = application.getRespondCollection().get(0).getValue();
         return TseReplyData.builder()
-            .caseNumber(caseId)
-            .respondentParty(replyType.getFrom())
-            .type(application.getType())
-            .responseDate(replyType.getDate())
-            .response(replyType.getResponse())
-            .supportingYesNo(replyType.getHasSupportingMaterial())
-            .documentCollection(replyType.getSupportingMaterial())
-            .copy(replyType.getCopyToOtherParty())
+            .caseNumber(defaultIfEmpty(caseId, null))
+            .respondentParty(replyType != null ? replyType.getFrom() : null)
+            .type(defaultIfEmpty(application.getType(), null))
+            .responseDate(replyType != null ? replyType.getDate() : null)
+            .response(replyType != null ? replyType.getResponse() : null)
+            .supportingYesNo(replyType != null ? replyType.getHasSupportingMaterial() : null)
+            .documentCollection(replyType != null ? replyType.getSupportingMaterial() : null)
+            .copy(replyType != null ? replyType.getCopyToOtherParty() : null)
             .build();
     }
 

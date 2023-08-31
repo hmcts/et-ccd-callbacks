@@ -68,7 +68,12 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 | ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository              |
 | CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup |
 
+
+
 ### Variables to be updated on application.yaml
+
+## Please note that the following variables can also be defined as environment variables inorder to not change any local files
+
 
 | Variable                                    | Purpose                                                              |
 |---------------------------------------------|----------------------------------------------------------------------|

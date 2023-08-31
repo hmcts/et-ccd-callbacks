@@ -11,12 +11,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ACAS_API;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ACAS_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_APPROVER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_CAA;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_DIVORCE_SOLICITOR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_API;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_ENGLANDWALES;
@@ -178,9 +179,6 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER_EMPLOYMENT_API);
 
         lib.createIdamUser(SUPERUSER_EMAIL,
-            CASEWORKER,
-            CASEWORKER_EMPLOYMENT,
-            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
             CASEWORKER_CAA,
             PUI_CASE_MANAGER,
             PUI_ORGANISATION_MANAGER,
@@ -190,9 +188,12 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser(SOLICITOR_1_EMAIL,
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,
-            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
-            CASEWORKER_DIVORCE_SOLICITOR,
-            PUI_CASE_MANAGER);
+            CASEWORKER_CAA,
+            PUI_CASE_MANAGER,
+            PUI_ORGANISATION_MANAGER,
+            PUI_USER_MANAGER,
+            PUI_CAA,
+            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
 
         lib.createIdamUser(CITIZEN_EMAIL, CITIZEN);
 
@@ -202,10 +203,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         // Required for Share a Case
         lib.createIdamUser(MCA_NOC_APPROVER_EMAIL, CASEWORKER, CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN);
         lib.createIdamUser(MCA_SYSTEM_IDAM_ACC_EMAIL, CASEWORKER, CASEWORKER_CAA);
-        lib.createIdamUser(ET_SYSTEM_EMAIL, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API,
-            PUI_USER_MANAGER, PRD_ADMIN, CASEWORKER_CAA);
-
-        lib.createIdamUser("et@acas.com", "et-acas-api");
+        lib.createIdamUser(ET_SYSTEM_EMAIL, CASEWORKER, CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API);
+        lib.createIdamUser(ACAS_EMAIL, ACAS_API);
 
     }
 

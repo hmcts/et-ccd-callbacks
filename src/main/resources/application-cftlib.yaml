@@ -1,0 +1,35 @@
+cftlib:
+  scotland-ccd-config-path: ${SCOTLAND_CCD_CONFIG_PATH}
+  import-ccd-defs-on-boot: ${CFTLIB_IMPORT_CCD_DEFS_ON_BOOT:true}
+  admin-ccd-config-path: ${ADMIN_CCD_CONFIG_PATH}
+  englandwales-ccd-config-path: ${ENGLANDWALES_CCD_CONFIG_PATH}
+
+idam:
+  api:
+    jwkUrl: http://localhost:5000/o/jwks
+    url: http://localhost:5000
+  s2s-auth:
+    url: http://localhost:8489
+    totp_secret: AAAAAAAAAAAAAAAA
+    microservice: et_cos
+
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev
+  datasource:
+    password: ${ET_COS_CFTLIB_DB_PASSWORD}
+    username: postgres
+    url: jdbc:postgresql://localhost:6432/et_cos
+
+ccd:
+  data-store-api-url: http://localhost:4452
+
+case_document_am:
+  url: http://localhost:4455
+
+feature:
+  secure-doc-store:
+    enabled: ${SECURE_DOC_STORE_FEATURE:false}
+
+document_management:
+  url: http://localhost:5005

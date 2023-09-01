@@ -82,7 +82,6 @@ public class RespondentTellSomethingElseController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

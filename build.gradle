@@ -317,6 +317,11 @@ ext {
 }
 
 ext["rest-assured.version"] = '5.1.0'
+configurations.all {
+    resolutionStrategy {
+        force 'com.squareup.okio.okio:3.5.0'
+    }
+}
 
 dependencyManagement {
     dependencies {
@@ -365,9 +370,9 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '3.0.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.8'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.10'
     //to remove CVEs
-    implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.16', ext: 'pom'
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.17', ext: 'pom'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.8'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.17.0'

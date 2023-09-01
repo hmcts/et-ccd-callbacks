@@ -319,7 +319,7 @@ ext {
 ext["rest-assured.version"] = '5.1.0'
 configurations.all {
     resolutionStrategy {
-        force 'com.squareup.okio.okio:3.5.0'
+        force 'com.squareup.okio:okio:3.5.0'
     }
 }
 

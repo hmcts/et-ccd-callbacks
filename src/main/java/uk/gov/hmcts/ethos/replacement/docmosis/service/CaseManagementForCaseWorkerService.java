@@ -71,6 +71,7 @@ public class CaseManagementForCaseWorkerService {
     private final ClerkService clerkService;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final TribunalOfficesService tribunalOfficesService;
+    private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
@@ -86,12 +87,14 @@ public class CaseManagementForCaseWorkerService {
                                               CcdClient ccdClient, ClerkService clerkService,
                                               AuthTokenGenerator serviceAuthTokenGenerator,
                                               TribunalOfficesService tribunalOfficesService,
+                                              FeatureToggleService featureToggleService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
         this.tribunalOfficesService = tribunalOfficesService;
+        this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
     }
 
@@ -101,9 +104,15 @@ public class CaseManagementForCaseWorkerService {
         struckOutDefaults(caseData);
         dateToCurrentPosition(caseData);
         flagsImageFileNameDefaults(caseData);
-        setCaseNameHmctsInternal(caseData);
-        setCaseManagementLocation(caseData);
-        setCaseManagementCategory(caseData);
+        setGlobalSearchDefaults(caseData);
+    }
+
+    public void setGlobalSearchDefaults(CaseData caseData) {
+        if (featureToggleService.isGlobalSearchEnabled()) {
+            setCaseNameHmctsInternal(caseData);
+            setCaseManagementLocation(caseData);
+            setCaseManagementCategory(caseData);
+        }
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -490,26 +499,29 @@ public class CaseManagementForCaseWorkerService {
      * @param accessToken authorisation token for reference data api
      */
     public void setHmctsServiceIdSupplementary(CaseDetails caseDetails, String accessToken) throws IOException {
-        Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
-        payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
+        if (featureToggleService.isGlobalSearchEnabled()) {
+            Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
+            payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
 
-        Map<String, Object> payload = Maps.newHashMap();
-        payload.put("supplementary_data_updates", payloadData);
-        String errorMessage = String.format("Call to Supplementary Data API failed for %s", caseDetails.getCaseId());
+            Map<String, Object> payload = Maps.newHashMap();
+            payload.put("supplementary_data_updates", payloadData);
+            String errorMessage = String.format("Call to Supplementary Data API failed for %s",
+                    caseDetails.getCaseId());
 
-        try {
-            ResponseEntity<Object> response =
-                    ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
-            if (response == null) {
-                throw new CaseCreationException(errorMessage);
+            try {
+                ResponseEntity<Object> response =
+                        ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
+                if (response == null) {
+                    throw new CaseCreationException(errorMessage);
+                }
+                log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+            } catch (RestClientResponseException e) {
+                throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
             }
-            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
-        } catch (RestClientResponseException e) {
-            throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
     }
 
-    public void setCaseNameHmctsInternal(CaseData caseData) {
+    private void setCaseNameHmctsInternal(CaseData caseData) {
         if (caseData.getClaimant() == null) {
             claimantDefaults(caseData);
         }
@@ -521,11 +533,11 @@ public class CaseManagementForCaseWorkerService {
         caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
     }
 
-    public void setCaseManagementCategory(CaseData caseData) {
+    private void setCaseManagementCategory(CaseData caseData) {
         caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
     }
 
-    public void setCaseManagementLocation(CaseData caseData) {
+    private void setCaseManagementLocation(CaseData caseData) {
         String managingOfficeName = caseData.getManagingOffice();
         if (Strings.isNullOrEmpty(managingOfficeName)) {
             log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");

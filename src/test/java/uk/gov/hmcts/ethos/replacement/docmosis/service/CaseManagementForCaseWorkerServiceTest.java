@@ -112,6 +112,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @MockBean
     private TribunalOfficesService tribunalOfficesService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     private final String hmctsServiceId = "BHA1";
 
     @BeforeEach
@@ -210,9 +212,10 @@ class CaseManagementForCaseWorkerServiceTest {
         manchesterLocation.setRegion("North West");
         manchesterLocation.setRegionId("4");
         when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(manchesterLocation);
+        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                serviceAuthTokenGenerator, tribunalOfficesService, hmctsServiceId);
+                serviceAuthTokenGenerator, tribunalOfficesService, featureToggleService, hmctsServiceId);
     }
 
     @Test

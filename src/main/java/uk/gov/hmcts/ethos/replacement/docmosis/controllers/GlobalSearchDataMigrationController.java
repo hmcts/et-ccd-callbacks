@@ -16,8 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
@@ -37,9 +35,7 @@ public class GlobalSearchDataMigrationController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final VerifyTokenService verifyTokenService;
-    private final EventValidationService eventValidationService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private final FeatureToggleService featureToggleService;
 
     @PostMapping(value = "/global-search-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update the old cases with some default values of Global search fields.")
@@ -63,11 +59,7 @@ public class GlobalSearchDataMigrationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        if (featureToggleService.isGlobalSearchEnabled()) {
-            caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
-            caseManagementForCaseWorkerService.setCaseManagementCategory(caseData);
-            caseManagementForCaseWorkerService.setCaseManagementLocation(caseData);
-        }
+        caseManagementForCaseWorkerService.setGlobalSearchDefaults(caseData);
 
         log.info("Migrating existing case: {} for caseManagementCategory: {},  caseNameHmctsInternal: {},"
                         + "  caseManagementLocation: {}",
@@ -97,10 +89,7 @@ public class GlobalSearchDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        if (featureToggleService.isGlobalSearchEnabled()) {
-            caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails(), userToken);
-        }
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails(), userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

@@ -15,11 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -29,7 +26,6 @@ import java.util.Objects;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,13 +44,9 @@ class GlobalSearchDataMigrationControllerTest {
     public static final String AUTHORIZATION = "Authorization";
 
     @MockBean
-    private EventValidationService eventValidationService;
-    @MockBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -67,13 +59,11 @@ class GlobalSearchDataMigrationControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/exampleV2.json")).toURI()));
-        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
     }
 
     @Test
     void shouldMigrateCaseDetails() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_ABOUT_TO_SUBMIT)
                         .content(requestContent.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -83,9 +73,7 @@ class GlobalSearchDataMigrationControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseManagementForCaseWorkerService).setCaseManagementLocation(any(CaseData.class));
-        verify(caseManagementForCaseWorkerService).setCaseNameHmctsInternal(any(CaseData.class));
-        verify(caseManagementForCaseWorkerService).setCaseManagementCategory(any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setGlobalSearchDefaults(any(CaseData.class));
     }
 
     @Test

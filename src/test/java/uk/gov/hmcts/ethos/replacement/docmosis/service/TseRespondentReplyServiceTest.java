@@ -76,6 +76,8 @@ class TseRespondentReplyServiceTest {
     private TseService tseService;
     @MockBean
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
+    @MockBean
+    private DocumentManagementService documentManagementService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
@@ -98,7 +100,7 @@ class TseRespondentReplyServiceTest {
     void setUp() throws Exception {
         emailService = spy(new TestEmailService());
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-                respondentTellSomethingElseService, tseService);
+                respondentTellSomethingElseService, tseService, documentManagementService);
 
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);

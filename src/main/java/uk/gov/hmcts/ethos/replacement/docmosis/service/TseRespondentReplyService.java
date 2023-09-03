@@ -97,7 +97,7 @@ public class TseRespondentReplyService {
      *
      * @param caseData details of the case from which required fields are extracted
      * @param userToken autherisation token to use for generating an event document
-     * @param caseTypeId case reference number  to be added in the pdf file
+     * @param caseTypeId case type to use for generating an event document
      */
     public void addTseRespondentReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
         try {

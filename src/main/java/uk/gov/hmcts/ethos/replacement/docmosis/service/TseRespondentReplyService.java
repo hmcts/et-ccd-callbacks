@@ -92,6 +92,13 @@ public class TseRespondentReplyService {
         resetReplyToApplicationPage(caseData);
     }
 
+    /**
+     * Creates a pdf copy of the TSE application Response from Respondent and adds it to the case doc collection.
+     *
+     * @param caseData details of the case from which required fields are extracted
+     * @param userToken autherisation token to use for generating an event document
+     * @param caseTypeId case reference number  to be added in the pdf file
+     */
     public void addTseRespondentReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
         try {
             if (isEmpty(caseData.getDocumentCollection())) {
@@ -99,8 +106,8 @@ public class TseRespondentReplyService {
             }
 
             DocumentTypeItem docItem = createDocumentTypeItem(
-                    documentManagementService.addDocumentToDocumentField(tornadoService.generateEventDocument(
-                            caseData, userToken, caseTypeId, TSE_REPLY)),
+                    documentManagementService.addDocumentToDocumentField(
+                            tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_REPLY)),
                     "Respondent correspondence",
                     caseData.getResTseSelectApplication()
             );

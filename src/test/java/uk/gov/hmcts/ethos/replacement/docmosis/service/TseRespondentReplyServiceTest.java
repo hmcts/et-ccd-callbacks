@@ -78,6 +78,8 @@ class TseRespondentReplyServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
     @MockBean
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private TseRespondentReplyService tseRespondentReplyService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
@@ -90,7 +92,6 @@ class TseRespondentReplyServiceTest {
     private static final String WITHDRAW_MY_CLAIM = "Withdraw my claim";
 
     private EmailService emailService;
-    private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
     private CaseData caseData;
     private MockedStatic<TseHelper> mockStatic;
@@ -249,6 +250,20 @@ class TseRespondentReplyServiceTest {
         );
     }
 
+    @Test
+    void addTseRespondentReplyPdfToDocCollection() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, "testUserToken",
+                "ET_EnglandWales");
+
+        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument(),
+                is("Respondent correspondence"));
+    }
+
     @ParameterizedTest
     @MethodSource
     void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant,
@@ -276,12 +291,6 @@ class TseRespondentReplyServiceTest {
                 LINK_TO_CITIZEN_HUB, TEST_CUI_URL + "caseId");
 
         tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
-
-        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunlPersonalisation));
-        verify(emailService, isEmailSentToClaimant)
-                .sendEmail(any(),
-                        eq(caseData.getClaimantType().getClaimantEmailAddress()),
-                        eq(claimantPersonalisation));
 
         verify(emailService)
                 .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());

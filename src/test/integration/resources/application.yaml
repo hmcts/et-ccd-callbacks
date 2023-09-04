@@ -52,6 +52,12 @@ template:
     myhmcts: c47c8dd1-8f36-41e8-a2cc-55e94b95b2d3
     citizen: 38b2a1e0-be26-47f6-a3a1-e8984a249b80
 
+  case-links:
+    linked: ${CASE_LINKED_TEMPLATE_ID:7e8c6fc1-520a-41cd-a85c-9d3e0b22b282}
+    unlinked: ${CASE_UNLINKED_TEMPLATE_ID:8099d7b8-1703-40c3-95e6-464a3ac776cd}
+    linked-rep: ${CASE_LINKED_LEGAL_REP_TEMPLATE_ID:2d125a77-17b7-48c5-b220-78b2440eb049}
+    unlinked-rep: ${CASE_UNLINKED_LEGAL_REP_TEMPLATE_ID:63e550c3-6977-4687-b26d-72b61a266085}
+
   tse:
     respondent:
       application:

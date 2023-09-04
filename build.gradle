@@ -303,7 +303,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '5.1.9'
     serenity = '3.7.1'
-    tomcatEmbedVersion = '10.1.13'
+    tomcatEmbedVersion = '9.0.75'
 }
 
 ext["rest-assured.version"] = '5.1.0'

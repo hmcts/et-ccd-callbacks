@@ -98,24 +98,15 @@ public class NocRespondentHelper {
                 .orElse(new RespondentSumType());
     }
 
-    public Optional<RespondentSumTypeItem> getRespondentSumTypeItem(CaseData caseData,
-                                                                    RepresentedTypeRItem respondentRep) {
-        final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-        return respondentCollection.stream()
-                .filter(resp ->
-                        resp.getValue().getRespondentName()
-                                .equals(respondentRep.getValue().getRespRepName())).findFirst();
-    }
-
-    public List<RepresentedTypeRItem> updateWithRespondentIds(CaseData caseData) {
-        List<RepresentedTypeRItem> repList = new ArrayList<>();
+    public void updateWithRespondentIds(CaseData caseData) {
         for (RepresentedTypeRItem respondentRep : caseData.getRepCollection()) {
-            getRespondentSumTypeItem(caseData, respondentRep)
-                    .ifPresent(respondent ->
-                            respondentRep.getValue().setRespondentId(respondent.getId()));
-            repList.add(respondentRep);
+            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                if (respondentRep.getValue().getRespRepName()
+                        .equals(respondentSumTypeItem.getValue().getRespondentName())) {
+                    respondentRep.getValue().setRespondentId(respondentSumTypeItem.getId());
+                }
+            }
         }
-        return repList;
     }
 
     public void amendRespondentNameRepresentativeNames(CaseData caseData) {

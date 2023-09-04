@@ -1658,7 +1658,7 @@ class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void addServiceIdUrl_tokenOk() throws Exception {
+    void addServiceIdUrl_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ADD_SERVICE_ID_URL)
                 .content(requestContent2.toString())
@@ -1673,7 +1673,7 @@ class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void addServiceIdUrl_tokenFail() throws Exception {
+    void addServiceIdUrl_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ADD_SERVICE_ID_URL)
                 .content(requestContent2.toString())
@@ -1683,7 +1683,7 @@ class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void addServiceIdUrl_badRequest() throws Exception {
+    void addServiceIdUrl_badRequest() throws Exception {
         mvc.perform(post(ADD_SERVICE_ID_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)

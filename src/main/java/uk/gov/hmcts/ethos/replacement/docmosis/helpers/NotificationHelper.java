@@ -162,6 +162,17 @@ public final class NotificationHelper {
         return isNullOrEmpty(respondent.getRespondentEmail()) ? "" : respondent.getRespondentEmail();
     }
 
+    /**
+     * Gets the email address for the respondent if unrepresented.
+     */
+    public static String getEmailAddressForUnrepresentedRespondent(CaseData caseData, RespondentSumType respondent) {
+        RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
+        if (representative == null) {
+            return respondent.getRespondentEmail();
+        }
+        return null;
+    }
+
     private static String getNameForRespondent(CaseData caseData, RespondentSumType respondent) {
         RepresentedTypeR respondentRepresentative = getRespondentRepresentative(caseData, respondent);
         if (respondentRepresentative != null) {
@@ -170,7 +181,10 @@ public final class NotificationHelper {
         return respondent.getRespondentName();
     }
 
-    private static RepresentedTypeR getRespondentRepresentative(CaseData caseData, RespondentSumType respondent) {
+    /**
+     * Gets the representative for the respondent if present.
+     */
+    public static RepresentedTypeR getRespondentRepresentative(CaseData caseData, RespondentSumType respondent) {
         List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
 
         if (CollectionUtils.isEmpty(repCollection)) {

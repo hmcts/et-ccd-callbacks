@@ -158,7 +158,7 @@ class TseHelperTest {
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = """
-            <p>The claimant has applied to <strong>Withdraw my claim</strong>.</p>
+            <p>The respondent has applied to <strong>Withdraw my claim</strong>.</p>
             <p>You do not need to respond to this application.</p>
             <p>If you have any objections or responses to their application you must send them to the tribunal as soon
             as possible and by <strong>20 December 2022</strong> at the latest.
@@ -177,7 +177,7 @@ class TseHelperTest {
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = """
-            <p>The claimant has applied to <strong>Postpone a hearing</strong>.</p>
+            <p>The respondent has applied to <strong>Postpone a hearing</strong>.</p>
             
             <p>If you have any objections or responses to their application you must send them to the tribunal as soon
             as possible and by <strong>20 December 2022</strong> at the latest.

@@ -83,10 +83,6 @@ public class TseRespondentReplyController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
 
-        if (Helper.isClaimantNonSystemUser(caseData)) {
-            caseData.setTseRespondNotAvailableWarning(YES);
-        }
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

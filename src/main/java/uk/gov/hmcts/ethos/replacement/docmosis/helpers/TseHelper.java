@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
@@ -79,6 +80,14 @@ public final class TseHelper {
                 )
                 .map(TseHelper::formatDropdownOption)
                 .toList());
+    }
+
+    public static void setSystemUserYesOrNoField(CaseData caseData) {
+        if (Helper.isClaimantNonSystemUser(caseData)) {
+            caseData.setSystemUserYesOrNo(NO);
+        } else {
+            caseData.setSystemUserYesOrNo(YES);
+        }
     }
 
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {

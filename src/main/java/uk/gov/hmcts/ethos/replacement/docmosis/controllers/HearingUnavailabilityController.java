@@ -62,9 +62,8 @@ public class HearingUnavailabilityController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
-        // helper.updateCase(ccdRequest.getCaseDetails());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setPartySelection(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -98,11 +97,10 @@ public class HearingUnavailabilityController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+        String header = "<h1>Unavailability dates added</h1>";
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-                .confirmation_header("<h1>Unavailability dates added</h1>")
+                .confirmation_header(header)
                 .build());
     }
 }
-
-

@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Service("tornadoService")
 public class TornadoService {
     public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
+    public static final String TSE_REPLY = "TSE Reply.pdf";
 
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";

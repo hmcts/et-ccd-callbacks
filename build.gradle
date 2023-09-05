@@ -358,7 +358,7 @@ dependencies {
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.10'
     //To Remove vulnerability CVE-2020-11988
-    implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.8'
+    implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.17.0'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.7'

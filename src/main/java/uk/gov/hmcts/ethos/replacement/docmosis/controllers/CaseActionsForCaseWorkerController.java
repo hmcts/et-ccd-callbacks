@@ -465,7 +465,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             // add org policy and NOC elements
-            caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
+            nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
         }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.elasticsearch.common.Strings;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -101,13 +100,13 @@ public class NocRespondentHelper {
 
     public void updateWithRespondentIds(CaseData caseData) {
         for (RepresentedTypeRItem respondentRep : caseData.getRepCollection()) {
-            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                if (!Strings.isNullOrEmpty(respondentRep.getValue().getRespRepName())
-                        && respondentRep.getValue().getRespRepName()
-                        .equals(respondentSumTypeItem.getValue().getRespondentName())) {
-                    respondentRep.getValue().setRespondentId(respondentSumTypeItem.getId());
-                }
-            }
+            Optional<RespondentSumTypeItem> respondentSumTypeItem = caseData.getRespondentCollection().stream()
+                    .filter(i -> i.getValue()
+                            .getRespondentName()
+                            .equals(respondentRep.getValue().getRespRepName()))
+                    .findFirst();
+            respondentSumTypeItem.ifPresent(
+                    sumTypeItem -> respondentRep.getValue().setRespondentId(sumTypeItem.getId()));
         }
     }
 

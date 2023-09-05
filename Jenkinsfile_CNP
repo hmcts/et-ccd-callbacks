@@ -103,9 +103,9 @@ withPipeline(type, product, component) {
     sh """
       eval \$(./bin/preview/load-preview-environment-variables.sh ${CHANGE_ID})
       ./bin/preview/add-roles.sh
-      ./bin/preview/pull-ccd-definitions.sh  ${ccdBranch}
-      ./bin/preview/ccd-import-definitions.sh ./definitions/et-englandwales-ccd-config-aat.xlsx
-      ./bin/preview/ccd-import-definitions.sh ./definitions/et-scotland-ccd-config-aat.xlsx
+      ./bin/preview/pull-ccd-definitions.sh  ${ccdBranch} ${CHANGE_ID}
+      ./bin/preview/ccd-import-definitions.sh ./definitions/et-englandwales-ccd-config-preview.xlsx
+      ./bin/preview/ccd-import-definitions.sh ./definitions/et-scotland-ccd-config-preview.xlsx
     """
 
   }

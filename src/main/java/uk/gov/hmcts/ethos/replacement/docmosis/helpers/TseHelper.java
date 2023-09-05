@@ -14,16 +14,19 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -182,6 +185,7 @@ public final class TseHelper {
 
     @Nullable
     private static GenericTseApplicationType getTseApplication(CaseData caseData, String selectedAppId) {
+
         return caseData.getGenericTseApplicationCollection().stream()
             .filter(item -> item.getValue().getNumber().equals(selectedAppId))
             .findFirst()
@@ -200,7 +204,7 @@ public final class TseHelper {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -251,18 +255,40 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {
-        TseRespondType replyType = application.getRespondCollection().get(0).getValue();
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+
         return TseReplyData.builder()
-            .caseNumber(defaultIfEmpty(caseId, null))
-            .respondentParty(replyType != null ? replyType.getFrom() : null)
+            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .respondentParty(RESPONDENT_TITLE)
             .type(defaultIfEmpty(application.getType(), null))
-            .responseDate(replyType != null ? replyType.getDate() : null)
-            .response(replyType != null ? replyType.getResponse() : null)
-            .supportingYesNo(replyType != null ? replyType.getHasSupportingMaterial() : null)
-            .documentCollection(replyType != null ? replyType.getSupportingMaterial() : null)
-            .copy(replyType != null ? replyType.getCopyToOtherParty() : null)
+            .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
+            .response(defaultIfEmpty(application.getDetails(), null))
+            .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
+            .documentCollection(getUploadedDocList(caseData))
+            .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
             .build();
     }
 
+    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
+        if (caseData.getTseResponseSupportingMaterial() == null) {
+            return null;
+        }
+
+        List<GenericTypeItem<DocumentType>> genericDocTypeList = new ArrayList<>();
+
+        caseData.getTseResponseSupportingMaterial().forEach(doc -> {
+            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
+            DocumentType docType = new DocumentType();
+            docType.setUploadedDocument(doc.getValue().getUploadedDocument());
+            genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
+            genTypeItems.setValue(docType);
+            genericDocTypeList.add(genTypeItems);
+        });
+
+        return genericDocTypeList;
+    }
+
+    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+    }
 }

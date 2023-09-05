@@ -9,13 +9,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,14 +37,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
 @ExtendWith(SpringExtension.class)
@@ -59,7 +61,7 @@ class TseHelperTest {
             .withRespondent("Respondent Name", YES, "13 December 2022", false)
             .build();
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
             .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
@@ -114,7 +116,7 @@ class TseHelperTest {
             .withRespondent("Respondent Name", YES, "13 December 2022", false)
             .build();
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Order a witness to attend")
             .withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
@@ -156,7 +158,7 @@ class TseHelperTest {
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = """
-            <p>The claimant has applied to <strong>Withdraw my claim</strong>.</p>
+            <p>The respondent has applied to <strong>Withdraw my claim</strong>.</p>
             <p>You do not need to respond to this application.</p>
             <p>If you have any objections or responses to their application you must send them to the tribunal as soon
             as possible and by <strong>20 December 2022</strong> at the latest.
@@ -175,7 +177,7 @@ class TseHelperTest {
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = """
-            <p>The claimant has applied to <strong>Postpone a hearing</strong>.</p>
+            <p>The respondent has applied to <strong>Postpone a hearing</strong>.</p>
             
             <p>If you have any objections or responses to their application you must send them to the tribunal as soon
             as possible and by <strong>20 December 2022</strong> at the latest.
@@ -210,32 +212,28 @@ class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
 
-        caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondCollection(List.of(
-                TseRespondTypeItem.builder()
-                    .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
-                    .value(
-                        TseRespondType.builder()
-                            .from(CLAIMANT_TITLE)
-                            .date("16-May-1996")
-                            .response("response")
-                            .hasSupportingMaterial(YES)
-                            .supportingMaterial(createSupportingMaterial())
-                            .copyToOtherParty(YES)
-                            .build()
-                    ).build()));
-
+        UploadedDocumentType docType = new UploadedDocumentType();
+        docType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
+        docType.setDocumentFilename("image.png");
+        docType.setDocumentUrl("http://dm-store:8080/documents/1234");
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(docType);
+        GenericTypeItem<DocumentType> item = new GenericTypeItem<>();
+        item.setValue(documentType);
+        item.setId("78910");
+        caseData.setTseResponseSupportingMaterial(List.of(item));
+        String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
         String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
-            + "\"type\":\"Withdraw my claim\",\"responseDate\":\"16-May-1996\",\"supportingYesNo\":\"Yes\","
-            + "\"documentCollection\":[{\"id\":\"1234\","
+            + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
+            + "\"documentCollection\":[{\"id\":\"78910\","
             + "\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\"},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
-            + "\"response\":\"response\",\"respondentParty\":\"Claimant\"}}";
+            + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
     }

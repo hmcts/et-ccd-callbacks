@@ -61,7 +61,8 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#et-builds')
 
   afterAlways('test') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/integration/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/integration/index.html'
 

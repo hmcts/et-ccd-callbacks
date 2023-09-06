@@ -34,6 +34,15 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isGlobalSearchEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenAnyFeatureIsEnabled(Boolean toggleStat) {
+        var caseFileKey = "any-feature";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isFeatureEnabled(caseFileKey)).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
                 .thenReturn(state);

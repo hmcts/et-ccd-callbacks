@@ -103,7 +103,7 @@ public class CaseManagementForCaseWorkerService {
         addClaimantDocuments(caseData);
     }
 
-    private void addClaimantDocuments(CaseData caseData) {
+    public void addClaimantDocuments(CaseData caseData) {
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
         List<String> claimantDocs = List.of(ET1_DOC_TYPE, ET1_ATTACHMENT_DOC_TYPE, ACAS_DOC_TYPE);

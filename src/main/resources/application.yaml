@@ -166,6 +166,7 @@ feature-flags:
 
 hmcts_service_id: BHA1
 
-launchDarkly:
-  sdkKey: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+launchdarkly:
+  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}

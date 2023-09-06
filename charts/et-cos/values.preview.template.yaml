@@ -29,5 +29,7 @@ java:
           alias: TORNADO_ACCESS_KEY
         - name: gov-notify-api-key
           alias: GOV_NOTIFY_API_KEY
+        - name: launch-darkly-sdk-key
+          alias: LAUNCH_DARKLY_SDK_KEY
   postgresql:
     enabled: true

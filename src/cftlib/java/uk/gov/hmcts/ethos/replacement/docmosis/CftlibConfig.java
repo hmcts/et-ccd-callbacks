@@ -176,6 +176,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser(ADMIN_EMAIL,
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,
+            CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+            CASEWORKER_EMPLOYMENT_SCOTLAND,
             CASEWORKER_EMPLOYMENT_API);
 
         lib.createIdamUser(SUPERUSER_EMAIL,

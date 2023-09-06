@@ -114,7 +114,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private TribunalOfficesService tribunalOfficesService;
     @MockBean
     private FeatureToggleService featureToggleService;
-    private final String hmctsServiceId = "BHA1";
+    private static final String hmctsServiceId = "BHA1";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -191,6 +191,31 @@ class CaseManagementForCaseWorkerServiceTest {
         submitCaseData.setRepresentativeClaimantType(createRepresentedTypeC());
         submitCaseData.setRepCollection(createRepCollection(false));
         submitCaseData.setClaimantRepresentedQuestion(YES);
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantAddressUK(getAddress());
+        submitCaseData.setClaimantType(claimantType);
+        submitEvent.setState("Accepted");
+        submitEvent.setCaseId(123);
+        submitEvent.setCaseData(submitCaseData);
+        when(tribunalOfficesService.getTribunalOffice(any()))
+                .thenReturn(TribunalOffice.valueOfOfficeName("Manchester"));
+        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getManchesterCourtLocations());
+        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
+                serviceAuthTokenGenerator, tribunalOfficesService, featureToggleService, hmctsServiceId);
+    }
+
+    private static CourtLocations getManchesterCourtLocations() {
+        CourtLocations manchesterLocation = new CourtLocations();
+        manchesterLocation.setName("Manchester");
+        manchesterLocation.setEpimmsId("301017");
+        manchesterLocation.setRegion("North West");
+        manchesterLocation.setRegionId("4");
+        return manchesterLocation;
+    }
+
+    private static Address getAddress() {
         Address address = new Address();
         address.setAddressLine1("AddressLine1");
         address.setAddressLine2("AddressLine2");
@@ -198,24 +223,7 @@ class CaseManagementForCaseWorkerServiceTest {
         address.setPostTown("Manchester");
         address.setCountry("UK");
         address.setPostCode("L1 122");
-        ClaimantType claimantType = new ClaimantType();
-        claimantType.setClaimantAddressUK(address);
-        submitCaseData.setClaimantType(claimantType);
-        submitEvent.setState("Accepted");
-        submitEvent.setCaseId(123);
-        submitEvent.setCaseData(submitCaseData);
-        when(tribunalOfficesService.getTribunalOffice(any()))
-                .thenReturn(TribunalOffice.valueOfOfficeName("Manchester"));
-        CourtLocations manchesterLocation = new CourtLocations();
-        manchesterLocation.setName("Manchester");
-        manchesterLocation.setEpimmsId("301017");
-        manchesterLocation.setRegion("North West");
-        manchesterLocation.setRegionId("4");
-        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(manchesterLocation);
-        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
-        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                serviceAuthTokenGenerator, tribunalOfficesService, featureToggleService, hmctsServiceId);
+        return address;
     }
 
     @Test
@@ -260,9 +268,10 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void caseDataDefaultsResetResponseRespondentAddress() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        Address responseRespondentAddress = new Address();
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             respondentSumTypeItem.getValue().setResponseReceived(null);
-            respondentSumTypeItem.getValue().setResponseRespondentAddress(new Address());
+            respondentSumTypeItem.getValue().setResponseRespondentAddress(responseRespondentAddress);
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine1("Address1");
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine2("Address2");
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine3("Address3");
@@ -1018,9 +1027,9 @@ class CaseManagementForCaseWorkerServiceTest {
         when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
                 .thenReturn(null);
 
-        Exception e = assertThrows(CaseCreationException.class,
+        Exception exception = assertThrows(CaseCreationException.class,
                 () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
-        assertEquals("Call to Supplementary Data API failed for 123456789", e.getMessage());
+        assertEquals("Call to Supplementary Data API failed for 123456789", exception.getMessage());
     }
 
     @Test
@@ -1032,9 +1041,9 @@ class CaseManagementForCaseWorkerServiceTest {
         when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
                 .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
 
-        Exception e = assertThrows(CaseCreationException.class,
+        Exception exception = assertThrows(CaseCreationException.class,
                 () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
-        assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", e.getMessage());
+        assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", exception.getMessage());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

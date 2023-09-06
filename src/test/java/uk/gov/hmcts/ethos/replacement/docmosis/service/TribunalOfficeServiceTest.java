@@ -47,7 +47,7 @@ public class TribunalOfficeServiceTest {
             {TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB", "367564", "11"},
             {TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF", "368308", "11"},
             {UNASSIGNED_OFFICE, "", "", ""},
-            {null, ""},
+            {null, "", "", ""},
     };
 
     private final String managingOffice;

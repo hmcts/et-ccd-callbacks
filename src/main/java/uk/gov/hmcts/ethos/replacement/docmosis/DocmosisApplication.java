@@ -4,10 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@SpringBootApplication(scanBasePackages = {"uk.gov.hmcts.ethos.replacement",
-        "uk.gov.hmcts.ecm.common"})
+@SpringBootApplication(scanBasePackages = {"uk.gov.hmcts.ethos.replacement", "uk.gov.hmcts.ecm.common"})
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.ethos.replacement"
-    }
+}
 )
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, this is not a utility class
 public class DocmosisApplication {

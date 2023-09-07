@@ -42,7 +42,7 @@ public class HearingUnavailabilityController {
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "About to Submit for bundles respondent")
+    @Operation(summary = "About to Submit for Hearing Unavailability")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {

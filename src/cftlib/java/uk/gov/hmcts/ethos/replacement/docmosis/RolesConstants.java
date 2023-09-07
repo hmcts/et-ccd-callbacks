@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis;
 public final class RolesConstants {
     public static final String CASEWORKER = "caseworker";
     public static final String CASEWORKER_ET_PCQEXTRACTOR = CASEWORKER.concat("-et-pcqextractor");
-    public static final String CASEWORKER_CCA = CASEWORKER.concat("-caa");
+    public static final String CASEWORKER_CAA = CASEWORKER.concat("-caa");
     public static final String CASEWORKER_EMPLOYMENT = CASEWORKER.concat("-employment");
     public static final String CASEWORKER_EMPLOYMENT_API = CASEWORKER_EMPLOYMENT.concat("-api");
     public static final String CASEWORKER_EMPLOYMENT_ENGLANDWALES = CASEWORKER_EMPLOYMENT.concat("-englandwales");

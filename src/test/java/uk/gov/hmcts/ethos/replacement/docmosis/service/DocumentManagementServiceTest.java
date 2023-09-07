@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -167,6 +168,15 @@ class DocumentManagementServiceTest {
     void getDocumentUUID() {
         String urlString = "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary";
         assertEquals("85d97996-22a5-40d7-882e-3a382c8ae1b4", documentManagementService.getDocumentUUID(urlString));
+    }
+
+    @Test
+    void getDocumentUUID_throwsOnInvalidUUID() {
+        String urlString = "http://dm-store:8080/documents/not-a-uuid/binary";
+        assertThrows(NotFoundException.class,
+                () -> documentManagementService.getDocumentUUID(urlString),
+                "UUID not found in string " + urlString
+        );
     }
 
     @Test

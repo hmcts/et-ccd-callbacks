@@ -115,6 +115,7 @@ public class TseService {
         if (YES.equals(claimantTse.getStoredPending())) {
             application.setStatus(STORED_STATE);
             application.setApplicationState(STORED);
+            application.setDueDate(null);
         }
 
         caseData.setClaimantTse(null);

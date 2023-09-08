@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -107,9 +108,12 @@ public class CaseLinksEmailService {
                     CASE_LINK, "To manage your case, go to "
                             + emailService.getCitizenCaseLink(caseId)
             );
-            emailService.sendEmail(templateId,
-                    caseData.getClaimantType().getClaimantEmailAddress(),
-                    claimantPersonalisation);
+            String emailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+            if (StringUtils.isNotEmpty(emailAddress)) {
+                emailService.sendEmail(templateId,
+                        emailAddress,
+                        claimantPersonalisation);
+            }
         }
     }
 
@@ -122,7 +126,7 @@ public class CaseLinksEmailService {
                 + " "
                 + caseData.getClaimantIndType().getClaimantLastName();
         String respondents = Helper.getRespondentNames(caseData);
-        if (legalRepEmail != null) {
+        if (StringUtils.isNotEmpty(legalRepEmail)) {
             String repEmailTemplateId = isLinking ? caseLinkedLegalRepTemplateId : caseUnlinkedLegalRepTemplateId;
             Map<String, Object> repPersonalisation = Map.of(
                     CASE_TITLE, claimant + " vs " + respondents,
@@ -138,7 +142,7 @@ public class CaseLinksEmailService {
                                                     String templateId) {
         String respondentEmail =
                 NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue());
-        if (respondentEmail != null) {
+        if (StringUtils.isNotEmpty(respondentEmail)) {
             Map<String, Object> respondentPersonalisation = Map.of(
                     CASE_NUMBER, caseData.getEthosCaseReference(),
                     CASE_LINK, ""

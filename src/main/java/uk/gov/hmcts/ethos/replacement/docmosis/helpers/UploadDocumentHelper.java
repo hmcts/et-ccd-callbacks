@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -17,26 +18,26 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIM_ACCEPTED;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIM_REJECTED;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.HEARINGS;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.MISC;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_OF_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ACAS_CERTIFICATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.CLAIM_ACCEPTED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.CLAIM_REJECTED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ET1;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ET1_ATTACHMENT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ET3;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.ET3_ATTACHMENT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.HEARINGS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.LEGACY_DOCUMENT_NAMES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.MISC;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.NOTICE_OF_A_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.NOTICE_OF_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.NOTICE_OF_HEARING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.REJECTION_OF_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.RESPONSE_TO_A_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.STARTING_A_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.TRIBUNAL_CASE_FILE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
 
 /**
  * Helper methods for the Upload Documents event.
@@ -170,34 +171,9 @@ public final class UploadDocumentHelper {
     public static void setDocumentTypeForDocumentCollection(CaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
-                setDocumentTypeForDocument(documentTypeItem.getValue());
+                DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
             }
         }
     }
 
-    private static void setDocumentTypeForDocument(DocumentType documentType) {
-        if (!isNullOrEmpty(documentType.getTopLevelDocuments()) || !isNullOrEmpty(documentType.getTypeOfDocument())) {
-            if (!isNullOrEmpty(documentType.getStartingClaimDocuments())) {
-                documentType.setDocumentType(documentType.getStartingClaimDocuments());
-            } else if (!isNullOrEmpty(documentType.getResponseClaimDocuments())) {
-                documentType.setDocumentType(documentType.getResponseClaimDocuments());
-            } else if (!isNullOrEmpty(documentType.getInitialConsiderationDocuments())) {
-                documentType.setDocumentType(documentType.getInitialConsiderationDocuments());
-            } else if (!isNullOrEmpty(documentType.getCaseManagementDocuments())) {
-                documentType.setDocumentType(documentType.getCaseManagementDocuments());
-            } else if (!isNullOrEmpty(documentType.getWithdrawalSettledDocuments())) {
-                documentType.setDocumentType(documentType.getWithdrawalSettledDocuments());
-            } else if (!isNullOrEmpty(documentType.getHearingsDocuments())) {
-                documentType.setDocumentType(documentType.getHearingsDocuments());
-            } else if (!isNullOrEmpty(documentType.getJudgmentAndReasonsDocuments())) {
-                documentType.setDocumentType(documentType.getJudgmentAndReasonsDocuments());
-            } else if (!isNullOrEmpty(documentType.getReconsiderationDocuments())) {
-                documentType.setDocumentType(documentType.getReconsiderationDocuments());
-            } else if (!isNullOrEmpty(documentType.getMiscDocuments())) {
-                documentType.setDocumentType(documentType.getMiscDocuments());
-            } else {
-                documentType.setDocumentType(documentType.getTypeOfDocument());
-            }
-        }
-    }
 }

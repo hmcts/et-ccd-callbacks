@@ -68,7 +68,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class TseAdminServiceTest {
     private TseAdminService tseAdminService;
     private EmailService emailService;
-
+    private DocumentManagementService documentManagementService;
+    private TornadoService tornadoService;
     @MockBean
     private TseService tseService;
 
@@ -97,7 +98,7 @@ class TseAdminServiceTest {
     @BeforeEach
     void setUp() {
         emailService = spy(new TestEmailService());
-        tseAdminService = new TseAdminService(emailService, tseService);
+        tseAdminService = new TseAdminService(emailService, tseService, documentManagementService, tornadoService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
 

@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -51,6 +52,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 public class TornadoService {
     public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
     public static final String TSE_REPLY = "TSE Reply.pdf";
+    public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
+    public static final String TSE_ADMIN_DECISION = "TSE Admin Decision.pdf";
 
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
@@ -356,6 +359,12 @@ public class TornadoService {
             }
             case "TSE Reply.pdf" -> {
                 return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            }
+            case "TSE Admin Reply.pdf" -> {
+                return TseAdminHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            }
+            case "TSE Admin Decision.pdf" -> {
+                return TseAdminHelper.getAdminDecisionDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

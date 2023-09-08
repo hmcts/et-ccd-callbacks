@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -122,13 +123,18 @@ public class TseAdmReplyController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
         tseAdmReplyService.updateApplicationState(caseData);
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
+
+        // 1 - make pdf capture of the application
+        tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, userToken);
+        // 2 - share pdf to claimant
         tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
+        // 3 - share pdf to respondent
         tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

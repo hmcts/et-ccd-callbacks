@@ -64,7 +64,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class TseAdmReplyServiceTest {
-
+    private DocumentManagementService documentManagementService;
+    private TornadoService tornadoService;
     private TseAdmReplyService tseAdmReplyService;
     private EmailService emailService;
 
@@ -94,7 +95,8 @@ class TseAdmReplyServiceTest {
     @BeforeEach
     void setUp() {
         emailService = spy(new TestEmailService());
-        tseAdmReplyService = new TseAdmReplyService(emailService, tseService);
+        tseAdmReplyService = new TseAdmReplyService(documentManagementService, emailService,
+                tornadoService, tseService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");

@@ -14,6 +14,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
@@ -295,5 +296,26 @@ class DefaultValuesReaderServiceTest {
         assertEquals("TestAddress3", address.getAddressLine3());
         assertEquals("TestTown", address.getPostTown());
         assertEquals("TestPostcode", address.getPostCode());
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void setSubmissionReference(String submissionReference, String caseId) {
+        CaseData caseData = new CaseData();
+        caseData.setFeeGroupReference(submissionReference);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(caseId);
+        caseDetails.setCaseData(caseData);
+
+        defaultValuesReaderService.setSubmissionReference(caseDetails);
+        assertEquals(caseData.getFeeGroupReference(), caseId);
+    }
+
+    public static Stream<Arguments> setSubmissionReference() {
+        return Stream.of(
+                Arguments.of(null, "1234567890123456"),
+                Arguments.of("", "1234567890123456"),
+                Arguments.of("1111222233334444", "1111222233334444")
+        );
     }
 }

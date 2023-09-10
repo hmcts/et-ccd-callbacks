@@ -33,7 +33,7 @@ else
     echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-admin"
     exit 1
   fi
-  importFile="${ADMIN_CCD_CONFIG_PATH}/definitions/xlsx/et-admin-ccd-config-local.xlsx"
+  importFile="${ADMIN_CCD_CONFIG_PATH}/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx"
 fi
 
 echo "Using CCD definition file ${importFile}"

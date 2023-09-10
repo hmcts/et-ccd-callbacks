@@ -169,7 +169,7 @@ class TseAdminControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService).sendRecordADecisionEmails(
+        verify(tseAdminService).sendEmailToClaimant(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService).clearTseAdminDataFromCaseData(
@@ -186,7 +186,7 @@ class TseAdminControllerTest {
             .andExpect(status().isForbidden());
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(
+        verify(tseAdminService, never()).sendEmailToClaimant(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
@@ -202,7 +202,7 @@ class TseAdminControllerTest {
             .andExpect(status().isBadRequest());
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(
+        verify(tseAdminService, never()).sendEmailToClaimant(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(

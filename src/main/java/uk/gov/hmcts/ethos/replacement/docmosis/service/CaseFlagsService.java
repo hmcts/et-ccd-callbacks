@@ -1,10 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+
+import java.util.UUID;
 
 @Slf4j
 @Service

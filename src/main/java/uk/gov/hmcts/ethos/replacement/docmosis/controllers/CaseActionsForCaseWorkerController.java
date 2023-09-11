@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepos
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
@@ -443,6 +444,9 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             errors = eventValidationService.validateET3ResponseFields(caseData);
             if (errors.isEmpty()) {
+                errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "respondent");
+            }
+            if (errors.isEmpty()) {
                 caseManagementForCaseWorkerService.continuingRespondent(ccdRequest);
                 caseManagementForCaseWorkerService.struckOutRespondents(ccdRequest);
             }
@@ -489,7 +493,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             // add org policy and NOC elements
-            caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
+            nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
         }

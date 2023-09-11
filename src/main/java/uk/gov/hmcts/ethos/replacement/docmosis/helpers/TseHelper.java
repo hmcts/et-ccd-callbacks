@@ -271,7 +271,7 @@ public final class TseHelper {
 
     private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
-            return new ArrayList<>();
+            return null;
         }
 
         List<GenericTypeItem<DocumentType>> genericDocTypeList = new ArrayList<>();

@@ -126,6 +126,7 @@ public final class DocumentHelper {
         sb.append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
                 .append(NEW_LINE);
         sb.append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE);
+        sb.append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference())).append(NEW_LINE);
         sb.append("}\n");
         sb.append("}\n");
 

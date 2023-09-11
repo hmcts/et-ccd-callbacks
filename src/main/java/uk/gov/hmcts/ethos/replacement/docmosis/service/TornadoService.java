@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Service("tornadoService")
 public class TornadoService {
     public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
+    public static final String TSE_REPLY = "TSE Reply.pdf";
 
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
@@ -340,7 +341,7 @@ public class TornadoService {
             }
             case ET3_RESPONSE_PDF -> {
                 dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
-                        caseData.getEt3ResponseRespondentLegalName());
+                        caseData.getSubmitEt3Respondent().getSelectedLabel());
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case "Initial Consideration.pdf" -> {

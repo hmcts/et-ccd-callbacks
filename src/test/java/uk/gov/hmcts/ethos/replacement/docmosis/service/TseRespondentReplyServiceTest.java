@@ -76,6 +76,10 @@ class TseRespondentReplyServiceTest {
     private TseService tseService;
     @MockBean
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @MockBean
+    private TseRespondentReplyService tseRespondentReplyService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
@@ -88,7 +92,6 @@ class TseRespondentReplyServiceTest {
     private static final String WITHDRAW_MY_CLAIM = "Withdraw my claim";
 
     private EmailService emailService;
-    private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
     private CaseData caseData;
     private MockedStatic<TseHelper> mockStatic;
@@ -98,7 +101,7 @@ class TseRespondentReplyServiceTest {
     void setUp() throws Exception {
         emailService = spy(new TestEmailService());
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-                respondentTellSomethingElseService, tseService);
+                respondentTellSomethingElseService, tseService, documentManagementService);
 
         userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -247,6 +250,20 @@ class TseRespondentReplyServiceTest {
         );
     }
 
+    @Test
+    void addTseRespondentReplyPdfToDocCollection() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, "testUserToken",
+                "ET_EnglandWales");
+
+        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument(),
+                is("Respondent correspondence"));
+    }
+
     @ParameterizedTest
     @MethodSource
     void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant,
@@ -264,7 +281,7 @@ class TseRespondentReplyServiceTest {
         ReflectionTestUtils.setField(tseRespondentReplyService,
                 "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
 
-        Map<String, String> tribunlPersonalisation = Map.of(
+        Map<String, String> tribunalPersonalisation = Map.of(
                 NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
                 APPLICATION_TYPE, WITHDRAW_MY_CLAIM,
                 LINK_TO_EXUI, TEST_XUI_URL + "caseId");
@@ -274,13 +291,11 @@ class TseRespondentReplyServiceTest {
                 LINK_TO_CITIZEN_HUB, TEST_CUI_URL + "caseId");
 
         tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
-
-        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunlPersonalisation));
+        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
         verify(emailService, isEmailSentToClaimant)
                 .sendEmail(any(),
                         eq(caseData.getClaimantType().getClaimantEmailAddress()),
                         eq(claimantPersonalisation));
-
         verify(emailService)
                 .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }

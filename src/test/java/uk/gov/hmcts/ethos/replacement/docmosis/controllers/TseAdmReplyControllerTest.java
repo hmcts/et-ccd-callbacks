@@ -156,7 +156,7 @@ class TseAdmReplyControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmReplyService).saveTseAdmReplyDataFromCaseData(
             ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdmReplyService).sendAdmReplyEmails(
+        verify(tseAdmReplyService).sendNotifyEmailsToClaimant(
             ccdRequest.getCaseDetails().getCaseId(), ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService).clearTseAdmReplyDataFromCaseData(
             ccdRequest.getCaseDetails().getCaseData());
@@ -172,7 +172,7 @@ class TseAdmReplyControllerTest {
                 .andExpect(status().isForbidden());
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdmReplyService, never()).sendAdmReplyEmails(
+        verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
             "4321", ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
@@ -187,7 +187,7 @@ class TseAdmReplyControllerTest {
                 .andExpect(status().isBadRequest());
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdmReplyService, never()).sendAdmReplyEmails(
+        verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
             "4321", ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());

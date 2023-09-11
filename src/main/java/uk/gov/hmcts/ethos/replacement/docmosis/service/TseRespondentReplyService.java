@@ -10,6 +10,7 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -24,6 +25,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -34,8 +36,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_REPLY;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +50,7 @@ public class TseRespondentReplyService {
     private final UserService userService;
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
+    private final DocumentManagementService documentManagementService;
 
     @Value("${template.tse.respondent.respond.claimant}")
     private String tseRespondentResponseTemplateId;
@@ -85,6 +90,33 @@ public class TseRespondentReplyService {
         }
 
         resetReplyToApplicationPage(caseData);
+    }
+
+    /**
+     * Creates a pdf copy of the TSE application Response from Respondent and adds it to the case doc collection.
+     *
+     * @param caseData details of the case from which required fields are extracted
+     * @param userToken autherisation token to use for generating an event document
+     * @param caseTypeId case type to use for generating an event document
+     */
+    public void addTseRespondentReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            if (isEmpty(caseData.getDocumentCollection())) {
+                caseData.setDocumentCollection(new ArrayList<>());
+            }
+
+            DocumentTypeItem docItem = createDocumentTypeItem(
+                    documentManagementService.addDocumentToDocumentField(
+                            tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_REPLY)),
+                    "Respondent correspondence",
+                    caseData.getResTseSelectApplication()
+            );
+
+            caseData.getDocumentCollection().add(docItem);
+
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 
     /**

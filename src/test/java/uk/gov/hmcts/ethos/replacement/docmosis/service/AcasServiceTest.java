@@ -51,7 +51,7 @@ class AcasServiceTest {
 
     private static final String ACAS_BASE_URL = "https://api-dev-acas-01.azure-api.net/ECCLUAT";
     private static final String ACAS_API_KEY = "dummyApiKey";
-    private final String AUTH_TOKEN = "authToken";
+    private static final String AUTH_TOKEN = "authToken";
     private static final String NOT_FOUND_OBJECT = "[{\"CertificateNumber\":\"A123456/12/12\","
                                                    + "\"CertificateDocument\":\"not found\"}]";
 
@@ -67,14 +67,14 @@ class AcasServiceTest {
                 .build();
         caseData.setAcasCertificate("R111111/11/11");
 
-        String ACAS_CERTIFICATE = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String acasCertificate = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("acasCertificate.json")).toURI()));
 
         getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(ACAS_CERTIFICATE));
+                        .body(acasCertificate));
         DocumentInfo documentInfo = DocumentInfo.builder()
                 .description("ACAS Certificate - R111111/11/11")
                 .url("http://test.com/documents/random-uuid")
@@ -100,7 +100,6 @@ class AcasServiceTest {
         assertEquals(1, errors.size());
     }
 
-
     @Test
     void unauthorisedResponseFromAcas() throws JsonProcessingException {
         getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
@@ -121,7 +120,6 @@ class AcasServiceTest {
         assertEquals("No ACAS Certificate found", errors.get(0));
 
     }
-
 
     private MockRestServiceServer getMockServer() {
         return MockRestServiceServer.createServer(restTemplate);

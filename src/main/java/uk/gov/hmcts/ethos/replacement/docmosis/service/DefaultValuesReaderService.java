@@ -156,7 +156,7 @@ public class DefaultValuesReaderService {
         }
     }
 
-    public void setSubmissionReference(CaseDetails caseDetails){
+    public void setSubmissionReference(CaseDetails caseDetails) {
         if (isNullOrEmpty(caseDetails.getCaseData().getFeeGroupReference())) {
             caseDetails.getCaseData().setFeeGroupReference(caseDetails.getCaseId());
         }

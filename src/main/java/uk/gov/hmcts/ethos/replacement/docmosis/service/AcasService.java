@@ -88,15 +88,16 @@ public class AcasService {
 
     private DocumentInfo convertCertificateToPdf(CaseData caseData, AcasCertificate acasCertificate, String authToken) {
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
-        .filter(r -> acasCertificate.getCertificateNumber().equals(defaultIfEmpty(r.getValue().getRespondentAcas(), "")))
-        .findFirst();
+            .filter(r -> acasCertificate.getCertificateNumber().equals(
+                    defaultIfEmpty(r.getValue().getRespondentAcas(), "")))
+            .findFirst();
         String acasName = "";
         if (respondent.isPresent()) {
             acasName = " - " + respondent.get().getValue().getRespondentName();
         }
         byte[] pdfData = Base64.getDecoder().decode(acasCertificate.getCertificateDocument());
         return tornadoService.createDocumentInfoFromBytes(authToken, pdfData,
-                "ACAS Certificate" + acasName + " - " +acasCertificate.getCertificateNumber() + ".pdf",
+                "ACAS Certificate" + acasName + " - " + acasCertificate.getCertificateNumber() + ".pdf",
                 TribunalOffice.getCaseTypeId(caseData.getManagingOffice()));
     }
 

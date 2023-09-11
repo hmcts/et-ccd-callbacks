@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -64,11 +65,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class TseAdmReplyServiceTest {
-    private DocumentManagementService documentManagementService;
-    private TornadoService tornadoService;
     private TseAdmReplyService tseAdmReplyService;
     private EmailService emailService;
-
+    @MockBean
+    public TseAdminHelper tseAdminHelper;
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @MockBean
+    private TornadoService tornadoService;
     @MockBean
     private TseService tseService;
 
@@ -620,13 +624,27 @@ class TseAdmReplyServiceTest {
         verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisation);
     }
 
+    @Test
+    void addTseAdmReplyPdfToDocCollection_addsPdfFile() {
+        caseData.setEthosCaseReference(CASE_NUMBER);
+        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+        caseData.setTseAdmReplyCmoIsResponseRequired("Yes");
+        caseData.setTseAdmReplyCmoSelectPartyRespond("Both");
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, "test token");
+
+        assertThat(caseData.getDocumentCollection()).isNotNull();
+    }
+
     private static Stream<Arguments> sendEmailsToRespondents() {
         return Stream.of(
                 Arguments.of(CASE_MANAGEMENT_ORDER, YES, RESPONDENT_TITLE, RESPONSE_REQUIRED),
                 Arguments.of(CASE_MANAGEMENT_ORDER, YES, BOTH_PARTIES, RESPONSE_REQUIRED),
                 Arguments.of(CASE_MANAGEMENT_ORDER, YES, CLAIMANT_TITLE, RESPONSE_NOT_REQUIRED),
                 Arguments.of(CASE_MANAGEMENT_ORDER, NO, RESPONDENT_TITLE, RESPONSE_NOT_REQUIRED)
-
         );
     }
 

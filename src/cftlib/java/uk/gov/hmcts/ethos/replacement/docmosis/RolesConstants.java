@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis;
 public final class RolesConstants {
     public static final String CASEWORKER = "caseworker";
     public static final String CASEWORKER_ET_PCQEXTRACTOR = CASEWORKER.concat("-et-pcqextractor");
-    public static final String CASEWORKER_CCA = CASEWORKER.concat("-caa");
+    public static final String CASEWORKER_CAA = CASEWORKER.concat("-caa");
     public static final String CASEWORKER_EMPLOYMENT = CASEWORKER.concat("-employment");
     public static final String CASEWORKER_EMPLOYMENT_API = CASEWORKER_EMPLOYMENT.concat("-api");
     public static final String CASEWORKER_EMPLOYMENT_ENGLANDWALES = CASEWORKER_EMPLOYMENT.concat("-englandwales");
@@ -51,7 +51,7 @@ public final class RolesConstants {
     public static final String SCOTLAND_CONFIG_FILE = "/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx";
     public static final String ADMIN_CONFIG_FILE = "/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx";
 
-    public static final String[] CASEWORKER_ROLES = {CASEWORKER_ET_PCQEXTRACTOR, CASEWORKER_CCA,
+    public static final String[] CASEWORKER_ROLES = {CASEWORKER_ET_PCQEXTRACTOR, CASEWORKER_CAA,
         CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_ETJUDGE, CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR, CITIZEN, ET_ACAS_API,

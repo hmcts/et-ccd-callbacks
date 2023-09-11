@@ -128,6 +128,32 @@ class CaseLinksEmailServiceTest {
     }
 
     @Test
+    void shouldNotSendCaseLinkingEmailWhenNoRespondentEmail() {
+        ccdRequest.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue().setRespondentEmail("");
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                true);
+
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
+        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
+        verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
+    }
+
+    @Test
+    void shouldNotSendCaseLinkingEmailWhenRespondentEmailNull() {
+        ccdRequest.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue().setRespondentEmail(null);
+        caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest,
+                AUTH_TOKEN,
+                true);
+
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
+        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
+        verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
+    }
+
+    @Test
     void shouldNotSendCaseLinkingEmailsWhenNonHearingCaseLink() {
         CaseLink caseLink1 = getCaseLink("CLRC016");
         ListTypeItem<CaseLink> caseLinks = ListTypeItem.from(caseLink1);

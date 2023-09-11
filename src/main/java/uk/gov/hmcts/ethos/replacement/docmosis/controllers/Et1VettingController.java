@@ -175,10 +175,6 @@ public class Et1VettingController {
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
         caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());
-        
-        //
-     //   caseData.setCaseManagementLocationCode();
-        // 
         return getCallbackRespEntityNoErrors(caseData);
     }
 

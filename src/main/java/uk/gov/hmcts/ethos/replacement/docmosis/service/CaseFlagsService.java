@@ -23,32 +23,32 @@ public class CaseFlagsService {
         caseData.setClaimantFlags(CaseFlagsType.builder()
                 .partyName(caseData.getClaimant())
                 .roleOnCase("claimant")
-                .groupId(claimantGroupId)
-                .visibility("Internal")
+                //.groupId(claimantGroupId)
+                //.visibility("Internal")
                 .build()
         );
 
         caseData.setRespondentFlags(CaseFlagsType.builder()
                 .partyName(caseData.getRespondent())
                 .roleOnCase("respondent")
-                .groupId(respondentGroupId)
-                .visibility("Internal")
+                //.groupId(respondentGroupId)
+                //.visibility("Internal")
                 .build()
         );
 
         caseData.setExternalClaimantFlags(CaseFlagsType.builder()
                 .partyName(caseData.getClaimant())
                 .roleOnCase("claimant")
-                .groupId(claimantGroupId)
-                .visibility("External")
+                //.groupId(claimantGroupId)
+                //.visibility("External")
                 .build()
         );
 
         caseData.setExternalRespondentFlags(CaseFlagsType.builder()
                 .partyName(caseData.getRespondent())
                 .roleOnCase("respondent")
-                .groupId(respondentGroupId)
-                .visibility("External")
+                //.groupId(respondentGroupId)
+                //.visibility("External")
                 .build()
         );
     }

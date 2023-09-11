@@ -53,14 +53,14 @@ public class AcasService {
             return List.of("ACAS Certificate cannot be null or empty");
         }
 
-        List<String> acasCertificates = List.of(caseData.getAcasCertificate());
         Object acasCertificateObject;
         try {
-            acasCertificateObject = fetchAcasCertificates(acasCertificates.toArray(new String[0])).getBody();
+            acasCertificateObject = fetchAcasCertificates(caseData.getAcasCertificate()).getBody();
             if (ObjectUtils.isEmpty(acasCertificateObject)) {
                 return List.of("Error reading ACAS Certificate");
             }
         } catch (HttpClientErrorException errorException) {
+            log.error("Error retrieving ACAS Certificate with exception : " + errorException.getMessage());
             return List.of("Error retrieving ACAS Certificate");
         }
 
@@ -69,10 +69,14 @@ public class AcasService {
             return List.of("No ACAS Certificate found");
         }
 
-        DocumentInfo documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken);
-        if (ObjectUtils.isEmpty(documentInfo)) {
+        DocumentInfo documentInfo;
+        try {
+            documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken);
+        } catch (Exception exception) {
+            log.error("Error converting ACAS Certificate with exception : " + exception.getMessage());
             return List.of("Error uploading ACAS Certificate");
         }
+
         documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document", documentInfo.getDescription()));
         caseData.setDocMarkUp(documentInfo.getMarkUp());
         caseData.setAcasCertificate(null);

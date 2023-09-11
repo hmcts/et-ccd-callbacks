@@ -209,9 +209,9 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseId(123);
         submitEvent.setCaseData(submitCaseData);
 
-        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                emailService, hmctsServiceId);
+//        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
+//                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
+//                emailService, hmctsServiceId);
     }
 
     @Test

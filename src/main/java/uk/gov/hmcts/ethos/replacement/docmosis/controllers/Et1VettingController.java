@@ -177,7 +177,7 @@ public class Et1VettingController {
         caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());
         
         //
-        caseData.setCaseManagementLocationCode();
+     //   caseData.setCaseManagementLocationCode();
         // 
         return getCallbackRespEntityNoErrors(caseData);
     }

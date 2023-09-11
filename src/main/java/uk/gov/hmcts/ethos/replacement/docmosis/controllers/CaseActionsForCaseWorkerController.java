@@ -283,6 +283,8 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
             caseManagementForCaseWorkerService.setCaseDeepLink(caseData, ccdRequest.getCaseDetails().getCaseId());
             caseManagementForCaseWorkerService.setHearingIsLinkedFlag(caseData);
+            caseManagementForCaseWorkerService.setCaseManagementLocationCode(caseData);
+
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),

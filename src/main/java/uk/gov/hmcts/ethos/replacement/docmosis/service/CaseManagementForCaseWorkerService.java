@@ -24,6 +24,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -69,6 +71,8 @@ public class CaseManagementForCaseWorkerService {
     private final ClerkService clerkService;
     private final String hmctsServiceId;
     private final EmailService emailService;
+
+    private final TribunalOfficesService tribunalOfficesService;
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
@@ -83,12 +87,15 @@ public class CaseManagementForCaseWorkerService {
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient, ClerkService clerkService,
                                               EmailService emailService,
-                                              @Value("${hmcts_service_id}") String hmctsServiceId) {
+                                              @Value("${hmcts_service_id}") String hmctsServiceId,
+                                              TribunalOfficesService tribunalOfficesService
+                                              ) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
         this.emailService = emailService;
         this.hmctsServiceId = hmctsServiceId;
+        this.tribunalOfficesService = tribunalOfficesService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -547,6 +554,20 @@ public class CaseManagementForCaseWorkerService {
             log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
+        }
+    }
+
+    public void setCaseManagementLocationCode(CaseData caseData) {
+        String managingOfficeName = caseData.getManagingOffice();
+        if (Strings.isNullOrEmpty(managingOfficeName)) {
+            log.debug("leave `CaseManagementLocationCode` blank as managing office isNullorEmpty");
+        } else {
+            // do we need a null check here
+            CourtLocations courtLocation = tribunalOfficesService.getTribunalLocations(managingOfficeName);
+            caseData.setCaseManagementLocationCode(courtLocation.getEpimmsId());
+            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
+            log.info("The court location " + courtLocation.getName() + " region " + courtLocation.getRegion());
+            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
         }
     }
 }

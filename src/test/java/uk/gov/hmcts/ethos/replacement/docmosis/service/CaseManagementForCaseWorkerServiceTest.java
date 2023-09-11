@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -68,6 +70,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -197,6 +202,40 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertEquals("Anton Juliet Rodriguez", caseData.getClaimant());
+    }
+
+    @Test
+    void caseDataDefaultsClaimantDocs() {
+        DocumentTypeItem et1Doc = new DocumentTypeItem();
+        et1Doc.setId(UUID.randomUUID().toString());
+        DocumentType et1DocType = new DocumentType();
+        et1DocType.setShortDescription("et1Description");
+        et1DocType.setTypeOfDocument(ET1_DOC_TYPE);
+        et1DocType.setCreationDate("creationDate");
+        et1Doc.setValue(et1DocType);
+        DocumentTypeItem et1Attachment = new DocumentTypeItem();
+        et1Attachment.setId(UUID.randomUUID().toString());
+        DocumentType et1AttachmentType = new DocumentType();
+        et1AttachmentType.setShortDescription("et1AttachmentDesc");
+        et1AttachmentType.setTypeOfDocument(ET1_ATTACHMENT_DOC_TYPE);
+        et1AttachmentType.setCreationDate("creationDateAttachment");
+        et1Attachment.setValue(et1AttachmentType);
+        DocumentTypeItem acas = new DocumentTypeItem();
+        acas.setId(UUID.randomUUID().toString());
+        DocumentType acasType = new DocumentType();
+        acasType.setShortDescription("acasDesc");
+        acasType.setTypeOfDocument(ACAS_DOC_TYPE);
+        acasType.setCreationDate("creationDateAcas");
+        acas.setValue(acasType);
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.setDocumentCollection(List.of(et1Doc, et1Attachment, acas));
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertEquals("et1Description", caseData.getClaimantDocumentCollection()
+                .get(0).getValue().getShortDescription());
+        assertEquals("et1AttachmentDesc", caseData.getClaimantDocumentCollection()
+                .get(1).getValue().getShortDescription());
+        assertEquals("acasDesc", caseData.getClaimantDocumentCollection().get(2)
+                .getValue().getShortDescription());
     }
 
     @Test

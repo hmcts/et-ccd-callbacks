@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -110,7 +111,7 @@ public class CaseManagementForCaseWorkerService {
         if (documentCollection != null) {
             for (DocumentTypeItem documentTypeItem : documentCollection) {
                 DocumentType documentType = documentTypeItem.getValue();
-                if (claimantDocs.contains(documentType.getTypeOfDocument())) {
+                if (claimantDocs.contains(defaultIfEmpty(documentType.getTypeOfDocument(), ""))) {
                     claimantDocumentCollection.add(documentTypeItem);
                 }
             }

@@ -42,7 +42,8 @@ def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
                        '**/uk/gov/hmcts/ethos/replacement/docmosis/model/**',
                        '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
                        '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**'
+                       '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
+                       '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
 ]
 
 sonarqube {
@@ -334,9 +335,9 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.2.2'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.6.1'
 
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'2.6.1'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.2.2'
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -469,9 +470,12 @@ bootWithCCD {
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
 
     // xui-manage-org
-    environment 'RD_PROFESSIONAL_API_URL', 'http://host.docker.internal:8765'
+    environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
+    environment 'RD_PROFESSIONAL_API_SERVICE', 'http://localhost:8765'
+    environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
+    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'
 }

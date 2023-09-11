@@ -61,4 +61,18 @@
         <packageUrl regex="true">^pkg:maven/com\.sun\.xml\.bind\.jaxb/isorelax@.*$</packageUrl>
         <cve>CVE-2023-34411</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.75.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+        <cve>CVE-2023-41080</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.75.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+        <cve>CVE-2023-41080</cve>
+    </suppress>
 </suppressions>

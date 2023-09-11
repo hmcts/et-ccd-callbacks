@@ -4,7 +4,7 @@ set -eu
 
 if [ -z "$1" ]
 then
-    echo "Usage: ./import-ccd-config.sh [e|s|a]"
+    echo "Usage: ./import-ccd-definition-zsh.sh [e|s|a]"
     exit 1
 fi
 

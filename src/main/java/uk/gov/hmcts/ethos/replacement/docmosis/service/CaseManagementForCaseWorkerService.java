@@ -18,11 +18,13 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -46,6 +48,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
@@ -59,6 +62,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
@@ -128,6 +134,24 @@ public class CaseManagementForCaseWorkerService {
         } else {
             caseData.setClaimant(MISSING_CLAIMANT);
         }
+        addClaimantDocuments(caseData);
+    }
+
+    public void addClaimantDocuments(CaseData caseData) {
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
+        List<String> claimantDocs = List.of(ET1_DOC_TYPE, ET1_ATTACHMENT_DOC_TYPE, ACAS_DOC_TYPE);
+        if (documentCollection != null) {
+            for (DocumentTypeItem documentTypeItem : documentCollection) {
+                DocumentType documentType = documentTypeItem.getValue();
+                if (claimantDocs.contains(defaultIfEmpty(documentType.getTypeOfDocument(), ""))) {
+                    claimantDocumentCollection.add(documentTypeItem);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(claimantDocumentCollection)) {
+                caseData.setClaimantDocumentCollection(claimantDocumentCollection);
+            }
+        }
     }
 
     private void respondentDefaults(CaseData caseData) {
@@ -147,7 +171,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
         if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
-                && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
+            && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
             resetResponseRespondentAddress(respondentSumTypeItem);
         }
     }
@@ -220,7 +244,7 @@ public class CaseManagementForCaseWorkerService {
     public void setEt3ResponseDueDate(CaseData caseData) {
         if (!isNullOrEmpty(caseData.getClaimServedDate()) && isNullOrEmpty(caseData.getEt3DueDate())) {
             caseData.setEt3DueDate(LocalDate.parse(
-                    caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
+                caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }
     }
 
@@ -235,8 +259,8 @@ public class CaseManagementForCaseWorkerService {
             for (String date : dates) {
                 LocalDateTime parsedDate = LocalDateTime.parse(date);
                 if (nextListedDate.equals("") && parsedDate.isAfter(LocalDateTime.now())
-                        || parsedDate.isAfter(LocalDateTime.now())
-                        && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
+                    || parsedDate.isAfter(LocalDateTime.now())
+                    && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
                     nextListedDate = date;
                 }
             }
@@ -251,7 +275,7 @@ public class CaseManagementForCaseWorkerService {
             for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
                 DateListedType dateListedType = dateListedTypeItem.getValue();
                 if (HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
-                        && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
+                    && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
                     dates.add(dateListedType.getListedDate());
                 }
             }
@@ -278,7 +302,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(activeRespondent.stream(),
-                    struckRespondent.stream()).toList());
+                struckRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;
@@ -301,7 +325,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
-                    notContinuingRespondent.stream()).toList());
+                notContinuingRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;
@@ -309,7 +333,7 @@ public class CaseManagementForCaseWorkerService {
 
     private boolean positionChanged(CaseData caseData) {
         return isNullOrEmpty(caseData.getCurrentPosition())
-                || !caseData.getPositionType().equals(caseData.getCurrentPosition());
+            || !caseData.getPositionType().equals(caseData.getCurrentPosition());
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
@@ -318,7 +342,7 @@ public class CaseManagementForCaseWorkerService {
                 HearingType hearingType = hearingTypeItem.getValue();
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
+                        : hearingTypeItem.getValue().getHearingDateCollection()) {
                         DateListedType dateListedType = dateListedTypeItem.getValue();
                         if (dateListedType.getHearingStatus() == null) {
                             dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
@@ -338,9 +362,9 @@ public class CaseManagementForCaseWorkerService {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
+                        : hearingTypeItem.getValue().getHearingDateCollection()) {
                         addHearingsOnWeekendError(dateListedTypeItem, errors,
-                                hearingTypeItem.getValue().getHearingNumber());
+                            hearingTypeItem.getValue().getHearingNumber());
                         addHearingsInPastWarning(dateListedTypeItem, caseData);
                     }
                 }
@@ -361,20 +385,20 @@ public class CaseManagementForCaseWorkerService {
     private void addHearingsOnWeekendError(DateListedTypeItem dateListedTypeItem, List<String> errors,
                                            String hearingNumber) {
         LocalDate date = LocalDateTime.parse(
-                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+            dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         if (SUNDAY.equals(dayOfWeek)
-                || SATURDAY.equals(dayOfWeek)) {
+            || SATURDAY.equals(dayOfWeek)) {
             errors.add(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber);
         }
     }
 
     private void addHearingsInPastWarning(DateListedTypeItem dateListedTypeItem, CaseData caseData) {
         LocalDate date = LocalDateTime.parse(
-                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+            dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
         if ((Strings.isNullOrEmpty(dateListedTypeItem.getValue().getHearingStatus())
-                || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
-                && date.isBefore(LocalDate.now())) {
+            || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
+            && date.isBefore(LocalDate.now())) {
             caseData.setListedDateInPastWarning(YES);
         }
     }
@@ -449,7 +473,7 @@ public class CaseManagementForCaseWorkerService {
                         break;
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
-                                String.valueOf(submitEvent.getCaseId()));
+                            String.valueOf(submitEvent.getCaseId()));
                         break;
                 }
             }
@@ -464,8 +488,8 @@ public class CaseManagementForCaseWorkerService {
 
     private List<SubmitEvent> getCasesES(CaseDetails caseDetails, String authToken) {
         return caseRetrievalForCaseWorkerService.casesRetrievalESRequest(caseDetails.getCaseId(), authToken,
-                caseDetails.getCaseTypeId(),
-                new ArrayList<>(Collections.singleton(caseDetails.getCaseData().getCaseRefECC())));
+            caseDetails.getCaseTypeId(),
+            new ArrayList<>(Collections.singleton(caseDetails.getCaseData().getCaseRefECC())));
     }
 
     private void sendUpdateSingleCaseECC(String authToken, CaseDetails currentCaseDetails,
@@ -480,13 +504,13 @@ public class CaseManagementForCaseWorkerService {
                 originalCaseData.getEccCases().add(eccCounterClaimTypeItem);
             } else {
                 originalCaseData.setEccCases(
-                        new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
+                    new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
             }
             FlagsImageHelper.buildFlagsImageFileName(currentCaseDetails.getCaseTypeId(), originalCaseData);
             CCDRequest returnedRequest = ccdClient.startEventForCase(authToken, currentCaseDetails.getCaseTypeId(),
-                    currentCaseDetails.getJurisdiction(), caseIdToLink);
+                currentCaseDetails.getJurisdiction(), caseIdToLink);
             ccdClient.submitEventForCase(authToken, originalCaseData, currentCaseDetails.getCaseTypeId(),
-                    currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
+                currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
         } catch (Exception e) {
             throw new CaseCreationException(MESSAGE + caseIdToLink + e.getMessage());
         }

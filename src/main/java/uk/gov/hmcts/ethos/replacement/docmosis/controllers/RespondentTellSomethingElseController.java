@@ -140,14 +140,12 @@ public class RespondentTellSomethingElseController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        resTseService.generateAndAddTsePdf(caseData, userToken, caseDetails.getCaseTypeId());
-
         resTseService.sendAcknowledgeEmail(caseDetails, userToken);
         resTseService.sendClaimantEmail(caseDetails);
         resTseService.sendAdminEmail(caseDetails);
 
+        resTseService.generateAndAddTsePdf(caseData, userToken, caseDetails.getCaseTypeId());
         tseService.createApplication(caseData, false);
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

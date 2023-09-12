@@ -156,9 +156,10 @@ public final class NotificationHelper {
         RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
         if (representative != null) {
             String email = representative.getRepresentativeEmailAddress();
-            return isNullOrEmpty(email) ? "" : email;
+            if (!isNullOrEmpty(email)) {
+                return email;
+            }
         }
-
         return isNullOrEmpty(respondent.getRespondentEmail()) ? "" : respondent.getRespondentEmail();
     }
 

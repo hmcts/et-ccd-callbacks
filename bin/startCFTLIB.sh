@@ -13,4 +13,5 @@ else
   echo "there is no process using port 4453"
 fi
 echo "running ccd callbacks with cftlib"
+
 ./gradlew bootWithCCD

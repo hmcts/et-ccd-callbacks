@@ -226,13 +226,17 @@ public class TornadoService {
 
     private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
         if (documentName.endsWith(".pdf")) {
-            String pdfFileName = documentName.contains("ET3") ? documentName : OUTPUT_FILE_NAME_PDF;
+            String pdfFileName = isCustomDocName(documentName) ? documentName : OUTPUT_FILE_NAME_PDF;
             return documentManagementService.uploadDocument(authToken, bytes, pdfFileName,
                     APPLICATION_PDF_VALUE, caseTypeId);
         } else {
             return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
                     APPLICATION_DOCX_VALUE, caseTypeId);
         }
+    }
+
+    private static boolean isCustomDocName(String documentName) {
+        return documentName.contains("ET3") || documentName.contains("ACAS");
     }
 
     private byte[] getBytesFromInputStream(ByteArrayOutputStream os, InputStream is) throws IOException {

@@ -119,3 +119,7 @@ case-details-url:
 
 hmcts_service_id: BHA1
 
+acas:
+  api:
+    url: ${ACAS_BASE_URL:https://api-dev-acas-01.azure-api.net/ECCLUAT}
+    key: ${ACAS_KEY:AAAAAAAAAAAAAAAAA}

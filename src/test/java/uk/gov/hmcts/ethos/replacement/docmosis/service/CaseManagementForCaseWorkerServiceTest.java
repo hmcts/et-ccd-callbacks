@@ -90,6 +90,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
+    private static final String HMCTS_SERVICE_ID = "BHA1";
 
     @InjectMocks
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -119,7 +120,6 @@ class CaseManagementForCaseWorkerServiceTest {
     private TribunalOfficesService tribunalOfficesService;
     @MockBean
     private FeatureToggleService featureToggleService;
-    private static final String hmctsServiceId = "BHA1";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -208,7 +208,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                serviceAuthTokenGenerator, tribunalOfficesService, featureToggleService, hmctsServiceId);
+                serviceAuthTokenGenerator, tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID);
     }
 
     private static CourtLocations getManchesterCourtLocations() {
@@ -1046,7 +1046,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void setHmctsServiceIdSupplementary_success() throws IOException {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
-                hmctsServiceId)));
+                HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
         String token = ccdRequest10.getToken();
         when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
@@ -1060,7 +1060,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void setHmctsServiceIdSupplementary_noResponse() throws IOException {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
-                hmctsServiceId)));
+                HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
         String token = ccdRequest10.getToken();
         when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
@@ -1074,7 +1074,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void setHmctsServiceIdSupplementary_failedResponse() throws IOException {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
-                hmctsServiceId)));
+                HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
         String token = ccdRequest10.getToken();
         when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))

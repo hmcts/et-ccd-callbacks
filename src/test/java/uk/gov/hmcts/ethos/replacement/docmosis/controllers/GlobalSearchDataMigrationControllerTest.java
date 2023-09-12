@@ -87,7 +87,7 @@ class GlobalSearchDataMigrationControllerTest {
     }
 
     @Test
-    public void addServiceIdUrl_tokenOk() throws Exception {
+    void addServiceIdUrl_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
                         .content(requestContent.toString())
@@ -102,7 +102,7 @@ class GlobalSearchDataMigrationControllerTest {
     }
 
     @Test
-    public void addServiceIdUrl_tokenFail() throws Exception {
+    void addServiceIdUrl_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
                         .content(requestContent.toString())
@@ -112,7 +112,7 @@ class GlobalSearchDataMigrationControllerTest {
     }
 
     @Test
-    public void addServiceIdUrl_badRequest() throws Exception {
+    void addServiceIdUrl_badRequest() throws Exception {
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
                         .content("garbage content")
                         .header(AUTHORIZATION, AUTH_TOKEN)

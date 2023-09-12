@@ -13,6 +13,8 @@ java:
   keyVaults:
     et-cos:
       secrets:
+        - name: Ocp-Apim-Subscription-Key
+          alias: ACAS_KEY
         - name: et-cos-s2s-secret
           alias: ET_COS_S2S_SECRET
         - name: cos-system-user

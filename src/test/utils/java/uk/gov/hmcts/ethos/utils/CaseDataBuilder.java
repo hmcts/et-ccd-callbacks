@@ -14,6 +14,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -580,6 +582,16 @@ public class CaseDataBuilder {
         documentTypeItem.setValue(documentType);
         documentTypeItem.setId(UUID.randomUUID().toString());
         caseData.getDocumentCollection().add(documentTypeItem);
+        return this;
+    }
+
+    public CaseDataBuilder withGenericTseApplicationTypeItem(String tseApplicant, String tseDate) {
+        GenericTseApplicationTypeItem item = new GenericTseApplicationTypeItem();
+        GenericTseApplicationType genericTseApplicationType = new GenericTseApplicationType();
+        genericTseApplicationType.setApplicant(tseApplicant);
+        genericTseApplicationType.setDate(tseDate);
+        item.setValue(genericTseApplicationType);
+        caseData.setGenericTseApplicationCollection(List.of(item));
         return this;
     }
 

@@ -169,3 +169,9 @@ bundle:
     url: ${BUNDLE_URL:http://localhost:8080}
   config:
     default: et-dcf-2.yaml
+
+acas:
+  api:
+    url: ${ACAS_BASE_URL:https://api-dev-acas-01.azure-api.net/ECCLUAT}
+    key: ${ACAS_KEY:AAAAAAAAAAAAAAAAA}
+    # This environment variable can be set in your local environment. Do not change this value.

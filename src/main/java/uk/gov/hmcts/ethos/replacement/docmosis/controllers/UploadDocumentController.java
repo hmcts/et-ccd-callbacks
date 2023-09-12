@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -38,13 +39,16 @@ public class UploadDocumentController {
     private final String templateId;
     private final VerifyTokenService verifyTokenService;
     private final EmailService emailService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     public UploadDocumentController(@Value("${template.rejected}") String templateId,
                                     VerifyTokenService verifyTokenService,
-                                    EmailService emailService) {
+                                    EmailService emailService,
+                                    CaseManagementForCaseWorkerService caseManagementForCaseWorkerService) {
         this.templateId = templateId;
         this.emailService = emailService;
         this.verifyTokenService = verifyTokenService;
+        this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
     }
 
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -103,6 +107,7 @@ public class UploadDocumentController {
         CaseData caseData = caseDetails.getCaseData();
 
         UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
+        caseManagementForCaseWorkerService.addClaimantDocuments(caseData);
         if (UploadDocumentHelper.shouldSendRejectionEmail(caseDetails)) {
             String citizenCaseLink = emailService.getCitizenCaseLink(caseDetails.getCaseId());
             emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),

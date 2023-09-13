@@ -84,7 +84,6 @@ public final class TseAdminHelper {
         }
     }
 
-    +
     public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getTseAdminSelectedApplicationType(caseData);
         assert selectedApplication != null;

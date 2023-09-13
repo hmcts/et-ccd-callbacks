@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
@@ -43,13 +45,6 @@ public class TribunalOfficesService {
         contactDetails.setTelephone("");
         return contactDetails;
     }
-    public CourtLocations getTribunalLocations(String officeName) {
-        if (officeName == null || UNASSIGNED_OFFICE.equals(officeName)) {
-            return createUnassignedTribunalLocations();
-        }
-        var tribunalName = getTribunalOffice(officeName);
-        return config.getCourtLocations().get(tribunalName);
-    }
 
     private CourtLocations createUnassignedTribunalLocations() {
         CourtLocations courtLocations = new CourtLocations();
@@ -58,6 +53,26 @@ public class TribunalOfficesService {
         courtLocations.setRegion("");
         courtLocations.setRegionId("");
         return courtLocations;
+    }
+    public void setCaseManagementLocationCode(CaseData caseData, String codePlace) {
+        logStuff(caseData,codePlace);
+        String managingOffice = caseData.getManagingOffice();
+        if (Strings.isNullOrEmpty(managingOffice) || UNASSIGNED_OFFICE.equals(managingOffice)) {
+            log.info("CaseManagementLocationCode set to blank as managing office isNullorEmpty");
+            caseData.setCaseManagementLocationCode("");
+        } else {
+            // do we need a null check here
+            TribunalOffice tribunalOffice = getTribunalOffice(managingOffice);
+            CourtLocations courtLocation = config.getCourtLocations().get(tribunalOffice);
+            caseData.setCaseManagementLocationCode(courtLocation.getEpimmsId());
+            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
+            log.info("The court location " + courtLocation.getName() + " region " + courtLocation.getRegion());
+            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
+        }
+    }
+
+    private void logStuff(CaseData caseData, String codePlace){
+        System.out.println(codePlace);
     }
 }
 

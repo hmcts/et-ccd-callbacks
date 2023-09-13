@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +21,8 @@ public class CaseTransferSameCountryService {
 
     private final CaseTransferUtils caseTransferUtils;
     private final CaseTransferEventService caseTransferEventService;
+    private final TribunalOfficesService tribunalOfficesService;
+
 
     public List<String> transferCase(CaseDetails caseDetails, String userToken) {
         List<CaseData> caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
@@ -86,6 +89,7 @@ public class CaseTransferSameCountryService {
         }
 
         sourceCaseData.setManagingOffice(newManagingOffice);
+        tribunalOfficesService.setCaseManagementLocationCode(sourceCaseData, "case transfer");
         sourceCaseData.setOfficeCT(null);
         sourceCaseData.setStateAPI(null);
 

@@ -481,11 +481,13 @@ public class CaseManagementForCaseWorkerService {
                         Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
                         currentCaseData.setManagingOffice(submitEvent.getCaseData().getManagingOffice());
                         clerkService.initialiseClerkResponsible(currentCaseData);
+                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData, "ecc mid");
                         break;
                     case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
                         ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
                         currentCaseData.setRespondentECC(null);
                         currentCaseData.setCaseSource(FLAG_ECC);
+                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData, "ecc about");
                         break;
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
@@ -558,16 +560,6 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setCaseManagementLocationCode(CaseData caseData) {
-        String managingOfficeName = caseData.getManagingOffice();
-        if (Strings.isNullOrEmpty(managingOfficeName)) {
-            log.debug("leave `CaseManagementLocationCode` blank as managing office isNullorEmpty");
-        } else {
-            // do we need a null check here
-            CourtLocations courtLocation = tribunalOfficesService.getTribunalLocations(managingOfficeName);
-            caseData.setCaseManagementLocationCode(courtLocation.getEpimmsId());
-            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
-            log.info("The court location " + courtLocation.getName() + " region " + courtLocation.getRegion());
-            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
-        }
+           tribunalOfficesService.setCaseManagementLocationCode(caseData, "case mangemenet for case worker");
     }
 }

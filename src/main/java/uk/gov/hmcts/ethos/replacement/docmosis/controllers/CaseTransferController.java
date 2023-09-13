@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
@@ -49,16 +50,20 @@ public class CaseTransferController {
     private final CaseTransferToEcmService caseTransferToEcmService;
     private final DefaultValuesReaderService defaultValuesReaderService;
 
+    private final TribunalOfficesService tribunalOfficesService;
+
     public CaseTransferController(VerifyTokenService verifyTokenService,
                                   CaseTransferSameCountryService caseTransferSameCountryService,
                                   CaseTransferDifferentCountryService caseTransferDifferentCountryService,
                                   CaseTransferToEcmService caseTransferToEcmService,
-                                  DefaultValuesReaderService defaultValuesReaderService) {
+                                  DefaultValuesReaderService defaultValuesReaderService,
+                                  TribunalOfficesService tribunalOfficesService) {
         this.verifyTokenService = verifyTokenService;
         this.caseTransferSameCountryService = caseTransferSameCountryService;
         this.caseTransferDifferentCountryService = caseTransferDifferentCountryService;
         this.caseTransferToEcmService = caseTransferToEcmService;
         this.defaultValuesReaderService = defaultValuesReaderService;
+        this.tribunalOfficesService = tribunalOfficesService;
     }
 
     @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
@@ -232,8 +237,10 @@ public class CaseTransferController {
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             caseData.setManagingOffice(caseData.getAssignOffice().getSelectedCode());
+            tribunalOfficesService.setCaseManagementLocationCode(caseData, "england wales, transfer");
         } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+            tribunalOfficesService.setCaseManagementLocationCode(caseData, "scotland, transfer");
             caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
         }
         DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());

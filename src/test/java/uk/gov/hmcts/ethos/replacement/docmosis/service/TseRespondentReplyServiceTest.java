@@ -256,8 +256,7 @@ class TseRespondentReplyServiceTest {
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
 
-        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, "testUserToken",
-                "ET_EnglandWales");
+        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseDetails, "testUserToken");
 
         assertThat(caseData.getDocumentCollection().size(), is(1));
         assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument(),

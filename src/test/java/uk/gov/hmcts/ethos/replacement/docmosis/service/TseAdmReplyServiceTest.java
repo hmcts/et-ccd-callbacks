@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -64,10 +65,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class TseAdmReplyServiceTest {
-
     private TseAdmReplyService tseAdmReplyService;
     private EmailService emailService;
 
+    @MockBean
+    public TseAdminHelper tseAdminHelper;
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @MockBean
+    private TornadoService tornadoService;
     @MockBean
     private TseService tseService;
 
@@ -94,7 +100,8 @@ class TseAdmReplyServiceTest {
     @BeforeEach
     void setUp() {
         emailService = spy(new TestEmailService());
-        tseAdmReplyService = new TseAdmReplyService(emailService, tseService);
+        tseAdmReplyService = new TseAdmReplyService(documentManagementService, emailService,
+                tornadoService, tseService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
@@ -616,6 +623,21 @@ class TseAdmReplyServiceTest {
         // if not then email will be sent to the Respondent instead.
         verify(emailService).sendEmail(TEMPLATE_ID, "rep@test.com", expectedPersonalisation);
         verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisation);
+    }
+
+    @Test
+    void addTseAdmReplyPdfToDocCollection_addsPdfFile() {
+        caseData.setEthosCaseReference(CASE_NUMBER);
+        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+        caseData.setTseAdmReplyCmoIsResponseRequired("Yes");
+        caseData.setTseAdmReplyCmoSelectPartyRespond("Both");
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, "test token");
+
+        assertThat(caseData.getDocumentCollection()).isNotNull();
     }
 
     private static Stream<Arguments> sendEmailsToRespondents() {

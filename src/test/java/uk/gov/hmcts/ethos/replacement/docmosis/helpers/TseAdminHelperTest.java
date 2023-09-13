@@ -78,11 +78,12 @@ class TseAdminHelperTest {
         assertThat(actual.getListItems().size(), is(1));
     }
 
-
     @Test
-    void getDocumentTypeItem_returns_null_for_emptyCaseDetails() {
+    void getDocumentTypeItem_returnsNullForEmptyCaseDetails() {
+        CaseDetails caseDetails = null;
         DocumentTypeItem actual  = TseAdminHelper.getDocumentTypeItem(documentManagementService, tornadoService,
-                null, "testToken", "docType", "correspondenceType");
+                caseDetails, "testToken", "docType",
+                "correspondenceType");
         assertNull(actual);
     }
 

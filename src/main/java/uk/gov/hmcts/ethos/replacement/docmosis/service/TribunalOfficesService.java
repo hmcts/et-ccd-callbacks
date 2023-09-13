@@ -54,7 +54,6 @@ public class TribunalOfficesService {
 
     private CourtLocations createUnassignedTribunalLocations() {
         CourtLocations courtLocations = new CourtLocations();
-        courtLocations.setName(UNASSIGNED_OFFICE);
         courtLocations.setEpimmsId("");
         courtLocations.setRegion("");
         courtLocations.setRegionId("");

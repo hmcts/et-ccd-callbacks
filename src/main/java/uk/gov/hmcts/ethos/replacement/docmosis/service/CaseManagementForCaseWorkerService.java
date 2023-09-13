@@ -567,7 +567,7 @@ public class CaseManagementForCaseWorkerService {
             log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
         } else {
             CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
-            if (tribunalLocations.getName().equals(UNASSIGNED_OFFICE)) {
+            if (tribunalLocations.getEpimmsId().isBlank()) {
                 log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
             } else {
                 caseData.setCaseManagementLocation(CaseLocation.builder()

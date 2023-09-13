@@ -213,7 +213,6 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private static CourtLocations getManchesterCourtLocations() {
         CourtLocations manchesterLocation = new CourtLocations();
-        manchesterLocation.setName("Manchester");
         manchesterLocation.setEpimmsId("301017");
         manchesterLocation.setRegion("North West");
         manchesterLocation.setRegionId("4");

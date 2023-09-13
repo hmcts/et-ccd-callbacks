@@ -2,12 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 /**
  * This object captures information related to the TseAdminReply object during
  * the document creation event for Docmosis.
  */
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @Data
 public class TseAdminReplyData extends TseReplyData {

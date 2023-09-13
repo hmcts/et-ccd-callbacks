@@ -46,15 +46,6 @@ public class TribunalOfficesService {
         return contactDetails;
     }
 
-    private CourtLocations createUnassignedTribunalLocations() {
-        CourtLocations courtLocations = new CourtLocations();
-        courtLocations.setName(UNASSIGNED_OFFICE);
-        courtLocations.setEpimmsId("");
-        courtLocations.setRegion("");
-        courtLocations.setRegionId("");
-        return courtLocations;
-    }
-
     public void setCaseManagementLocationCode(CaseData caseData) {
         String managingOffice = caseData.getManagingOffice();
         if (Strings.isNullOrEmpty(managingOffice) || UNASSIGNED_OFFICE.equals(managingOffice)) {

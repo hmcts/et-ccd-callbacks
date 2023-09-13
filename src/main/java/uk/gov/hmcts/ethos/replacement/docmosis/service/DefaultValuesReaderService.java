@@ -78,7 +78,6 @@ public class DefaultValuesReaderService {
         }
         if (defaultValues.getManagingOffice() != null) {
             caseData.setManagingOffice(defaultValues.getManagingOffice());
-            tribunalOfficesService.setCaseManagementLocationCode(caseData);
         }
         if (caseData.getEcmCaseType() == null) {
             caseData.setEcmCaseType(defaultValues.getCaseType());

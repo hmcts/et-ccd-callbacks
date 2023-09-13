@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
@@ -69,9 +68,6 @@ class CaseTransferControllerTest {
 
     @MockBean
     DefaultValuesReaderService defaultValuesReaderService;
-
-    @MockBean
-    TribunalOfficesService tribunalOfficesService;
 
     @Autowired
     JsonMapper jsonMapper;

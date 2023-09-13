@@ -479,13 +479,11 @@ public class CaseManagementForCaseWorkerService {
                         Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
                         currentCaseData.setManagingOffice(submitEvent.getCaseData().getManagingOffice());
                         clerkService.initialiseClerkResponsible(currentCaseData);
-                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData);
                         break;
                     case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
                         ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
                         currentCaseData.setRespondentECC(null);
                         currentCaseData.setCaseSource(FLAG_ECC);
-                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData);
                         break;
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),

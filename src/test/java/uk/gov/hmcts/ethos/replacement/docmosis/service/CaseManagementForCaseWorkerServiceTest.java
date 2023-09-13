@@ -115,6 +115,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private TribunalOfficesService tribunalOfficesService;
     private static final String hmctsServiceId = "BHA1";
 
     @BeforeEach
@@ -209,9 +211,9 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseId(123);
         submitEvent.setCaseData(submitCaseData);
 
-//        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-//                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-//                emailService, hmctsServiceId);
+        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
+                emailService, hmctsServiceId, tribunalOfficesService);
     }
 
     @Test

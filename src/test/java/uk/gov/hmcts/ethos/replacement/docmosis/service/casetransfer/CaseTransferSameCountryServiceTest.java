@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.Collections;
@@ -46,6 +47,9 @@ class CaseTransferSameCountryServiceTest {
 
     @Mock
     private CaseTransferEventService caseTransferEventService;
+
+    @Mock
+    private TribunalOfficesService tribunalOfficesService;
 
     @Captor
     private ArgumentCaptor<CaseTransferEventParams> caseTransferEventParamsArgumentCaptor;

@@ -23,7 +23,6 @@ public class CaseTransferSameCountryService {
     private final CaseTransferEventService caseTransferEventService;
     private final TribunalOfficesService tribunalOfficesService;
 
-
     public List<String> transferCase(CaseDetails caseDetails, String userToken) {
         List<CaseData> caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
         if (caseDataList.isEmpty()) {
@@ -89,7 +88,7 @@ public class CaseTransferSameCountryService {
         }
 
         sourceCaseData.setManagingOffice(newManagingOffice);
-        tribunalOfficesService.setCaseManagementLocationCode(sourceCaseData, "case transfer");
+        tribunalOfficesService.setCaseManagementLocationCode(sourceCaseData);
         sourceCaseData.setOfficeCT(null);
         sourceCaseData.setStateAPI(null);
 

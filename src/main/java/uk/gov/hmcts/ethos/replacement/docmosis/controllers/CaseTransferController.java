@@ -49,7 +49,6 @@ public class CaseTransferController {
     private final CaseTransferDifferentCountryService caseTransferDifferentCountryService;
     private final CaseTransferToEcmService caseTransferToEcmService;
     private final DefaultValuesReaderService defaultValuesReaderService;
-
     private final TribunalOfficesService tribunalOfficesService;
 
     public CaseTransferController(VerifyTokenService verifyTokenService,
@@ -237,10 +236,10 @@ public class CaseTransferController {
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             caseData.setManagingOffice(caseData.getAssignOffice().getSelectedCode());
-            tribunalOfficesService.setCaseManagementLocationCode(caseData, "england wales, transfer");
+            tribunalOfficesService.setCaseManagementLocationCode(caseData);
         } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-            tribunalOfficesService.setCaseManagementLocationCode(caseData, "scotland, transfer");
+            tribunalOfficesService.setCaseManagementLocationCode(caseData);
             caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
         }
         DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());

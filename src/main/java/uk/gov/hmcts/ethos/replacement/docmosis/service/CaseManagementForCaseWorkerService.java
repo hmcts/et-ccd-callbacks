@@ -24,8 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -481,13 +479,13 @@ public class CaseManagementForCaseWorkerService {
                         Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
                         currentCaseData.setManagingOffice(submitEvent.getCaseData().getManagingOffice());
                         clerkService.initialiseClerkResponsible(currentCaseData);
-                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData, "ecc mid");
+                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData);
                         break;
                     case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
                         ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
                         currentCaseData.setRespondentECC(null);
                         currentCaseData.setCaseSource(FLAG_ECC);
-                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData, "ecc about");
+                        tribunalOfficesService.setCaseManagementLocationCode(currentCaseData);
                         break;
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
@@ -560,6 +558,6 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setCaseManagementLocationCode(CaseData caseData) {
-           tribunalOfficesService.setCaseManagementLocationCode(caseData, "case mangemenet for case worker");
+        tribunalOfficesService.setCaseManagementLocationCode(caseData);
     }
 }

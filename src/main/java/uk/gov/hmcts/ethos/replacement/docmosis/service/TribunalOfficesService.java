@@ -54,8 +54,8 @@ public class TribunalOfficesService {
         courtLocations.setRegionId("");
         return courtLocations;
     }
-    public void setCaseManagementLocationCode(CaseData caseData, String codePlace) {
-        logStuff(caseData,codePlace);
+
+    public void setCaseManagementLocationCode(CaseData caseData) {
         String managingOffice = caseData.getManagingOffice();
         if (Strings.isNullOrEmpty(managingOffice) || UNASSIGNED_OFFICE.equals(managingOffice)) {
             log.info("CaseManagementLocationCode set to blank as managing office isNullorEmpty");
@@ -71,8 +71,8 @@ public class TribunalOfficesService {
         }
     }
 
-    private void logStuff(CaseData caseData, String codePlace){
-        System.out.println(codePlace);
+    public String tribunalOfficeToEpimmsId(TribunalOffice tribunalOffice) {
+        return config.getCourtLocations().get(tribunalOffice).getEpimmsId();
     }
 }
 

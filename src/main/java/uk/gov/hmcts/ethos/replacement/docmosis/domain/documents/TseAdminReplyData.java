@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
  * This object captures information related to the TseAdminReply object during
  * the document creation event for Docmosis.
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @SuperBuilder
 @Data
 public class TseAdminReplyData extends TseReplyData {

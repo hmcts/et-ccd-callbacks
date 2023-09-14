@@ -13,11 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -55,32 +52,10 @@ public class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
         caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
-
         DynamicValueType dvt = DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL);
         DynamicFixedListType dynamicFixedListType = DynamicFixedListType.of(dvt);
         dynamicFixedListType.setListItems(List.of(dvt));
         caseData.setTseAdminSelectApplication(dynamicFixedListType);
-
-        caseData.setTseAdminTableMarkUp("|Application||\r\n|--|--|\r\n|||\r\n|||\r\n|Applicant|Respondent");
-        caseData.setTseAdmReplyEnterResponseTitle("test title");
-        caseData.setTseAdminAdditionalInformation("test info");
-        caseData.setTseAdminDecision("Granted");
-        caseData.setTseAdminTypeOfDecision("Case management order");
-        caseData.setTseAdminIsResponseRequired("Yes");
-        caseData.setTseAdminSelectPartyRespond("Both parties");
-        GenericTypeItem<DocumentType> genericTypeItem = new GenericTypeItem<>();
-        genericTypeItem.setId("1");
-
-        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentFilename("test file name");
-        uploadedDocumentType.setDocumentBinaryUrl("");
-        uploadedDocumentType.setDocumentUrl("");
-
-        DocumentType documentType = new DocumentType();
-        documentType.setUploadedDocument(uploadedDocumentType);
-        documentType.setShortDescription("test description");
-        genericTypeItem.setValue(documentType);
-        caseData.setTseAdminResponseRequiredYesDoc(List.of(genericTypeItem));
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)

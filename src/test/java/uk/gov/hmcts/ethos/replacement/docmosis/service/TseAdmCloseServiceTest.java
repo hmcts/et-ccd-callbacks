@@ -10,7 +10,6 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -107,7 +106,7 @@ class TseAdmCloseServiceTest {
     }
 
     private static GenericTseApplicationType getTseAppType() {
-        TseAdminRecordDecisionTypeItem recordDecisionTypeItem = TseAdminRecordDecisionTypeItem.builder()
+        TypeItem<TseAdminRecordDecisionType> recordDecisionTypeItem = TypeItem.<TseAdminRecordDecisionType>builder()
             .id(UUID.randomUUID().toString())
             .value(
                 TseAdminRecordDecisionType.builder()
@@ -135,7 +134,7 @@ class TseAdmCloseServiceTest {
             .withDate("13 December 2022")
             .withDetails("Details Text")
             .withStatus(OPEN_STATE)
-            .withDecisionCollection(List.of(
+            .withDecisionCollection(ListTypeItem.from(
                 recordDecisionTypeItem
             ))
             .build();

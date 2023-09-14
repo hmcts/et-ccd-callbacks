@@ -867,6 +867,7 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
         assertEquals(expectedEt3DueDate, caseData.getEt3DueDate());
     }
+
     @Test
     void setNextListedDate() {
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();

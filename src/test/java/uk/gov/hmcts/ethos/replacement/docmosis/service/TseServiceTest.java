@@ -11,7 +11,6 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -393,7 +392,7 @@ class TseServiceTest {
             tseAdminRecordDecisionType1.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType1.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType1.setSelectPartyNotify("Respondent");
-            TseAdminRecordDecisionTypeItem decisionType1 = new TseAdminRecordDecisionTypeItem();
+            TypeItem<TseAdminRecordDecisionType> decisionType1 = new TypeItem<TseAdminRecordDecisionType>();
             decisionType1.setId("1");
             decisionType1.setValue(tseAdminRecordDecisionType1);
 
@@ -406,7 +405,7 @@ class TseServiceTest {
             tseAdminRecordDecisionType2.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType2.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType2.setSelectPartyNotify("Respondent");
-            TseAdminRecordDecisionTypeItem decisionType2 = new TseAdminRecordDecisionTypeItem();
+            TypeItem<TseAdminRecordDecisionType> decisionType2 = new TypeItem<TseAdminRecordDecisionType>();
             decisionType2.setId("2");
             decisionType2.setValue(tseAdminRecordDecisionType2);
 
@@ -419,14 +418,15 @@ class TseServiceTest {
             tseAdminRecordDecisionType3.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType3.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType3.setSelectPartyNotify("Respondent");
-            TseAdminRecordDecisionTypeItem decisionType3 = new TseAdminRecordDecisionTypeItem();
+            TypeItem<TseAdminRecordDecisionType> decisionType3 = new TypeItem<TseAdminRecordDecisionType>();
             decisionType3.setId("3");
             decisionType3.setValue(tseAdminRecordDecisionType3);
 
             CaseData caseData = setupCaseDataWithAnApplication();
-            caseData.getGenericTseApplicationCollection().get(0).getValue().setAdminDecision(List.of(decisionType1,
-                decisionType2, decisionType3));
-            DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                    .setAdminDecision(ListTypeItem.from(decisionType1, decisionType2, decisionType3));
+            DynamicFixedListType listType = DynamicFixedListType
+                    .from(List.of(DynamicValueType.create("1", "")));
             listType.setValue(listType.getListItems().get(0));
             caseData.setTseViewApplicationSelect(listType);
 

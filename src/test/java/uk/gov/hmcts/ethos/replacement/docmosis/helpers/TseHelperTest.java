@@ -47,7 +47,7 @@ class TseHelperTest {
     private static final DynamicValueType SELECT_APPLICATION = DynamicValueType.create("1", "");
 
     private CaseData caseData;
-    private TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem;
+    private TypeItem<GenericTseApplicationType> genericTseApplicationType;
 
     @BeforeEach
     public void setUp() {
@@ -63,10 +63,10 @@ class TseHelperTest {
             .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        genericTseApplicationTypeItem = new TypeItem();
-        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        genericTseApplicationTypeItem.setValue(build);
-        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
+        genericTseApplicationType = new TypeItem<>();
+        genericTseApplicationType.setId(UUID.randomUUID().toString());
+        genericTseApplicationType.setValue(build);
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationType));
     }
 
     @Test
@@ -87,9 +87,9 @@ class TseHelperTest {
     @MethodSource
     void populateSelectApplicationDropdown_hasTribunalResponse(String respondentResponseRequired,
                                                                int numberOfApplication) {
-        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
+        TypeItem<GenericTseApplicationType> genericTseApplicationType = getGenericTseApplicationTypeItem(
             respondentResponseRequired);
-        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationType));
 
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
         assert actual != null;
@@ -118,10 +118,10 @@ class TseHelperTest {
             .withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<>();
-        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        genericTseApplicationTypeItem.setValue(build);
-        caseData1.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
+        TypeItem<GenericTseApplicationType> genericTseApplicationType = new TypeItem<>();
+        genericTseApplicationType.setId(UUID.randomUUID().toString());
+        genericTseApplicationType.setValue(build);
+        caseData1.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationType));
 
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData1);
         assert actual != null;
@@ -288,7 +288,7 @@ class TseHelperTest {
 
             GenericTseApplicationType actualApplication = getRespondentSelectedApplicationType(caseData);
 
-            assertEquals(genericTseApplicationTypeItem.getValue(), actualApplication);
+            assertEquals(genericTseApplicationType.getValue(), actualApplication);
         }
 
         @Test

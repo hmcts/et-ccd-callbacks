@@ -7,7 +7,6 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -287,13 +286,13 @@ public class TseService {
     }
 
     private List<String[]> formatApplicationDecisions(GenericTseApplicationType application, String authToken) {
-        List<TseAdminRecordDecisionTypeItem> adminDecision = application.getAdminDecision();
+        ListTypeItem<TseAdminRecordDecisionType> adminDecision = application.getAdminDecision();
         if (adminDecision == null) {
             return Collections.emptyList();
         }
 
         return adminDecision.stream()
-            .sorted(Comparator.comparing((TseAdminRecordDecisionTypeItem d) -> d.getValue().getDate()).reversed())
+            .sorted(Comparator.comparing((TypeItem<TseAdminRecordDecisionType> d) -> d.getValue().getDate()).reversed())
             .limit(2)
             .map(d -> getSingleDecisionMarkdown(d.getValue(), authToken))
             .flatMap(Collection::stream)

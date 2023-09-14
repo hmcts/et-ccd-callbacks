@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -80,7 +80,7 @@ public class TseAdminService {
         applicationType.setApplicationState(NOT_VIEWED_YET);
 
         if (CollectionUtils.isEmpty(applicationType.getAdminDecision())) {
-            applicationType.setAdminDecision(new ArrayList<>());
+            applicationType.setAdminDecision(new ListTypeItem<TseAdminRecordDecisionType>());
         }
 
         TseAdminRecordDecisionType decision = TseAdminRecordDecisionType.builder()
@@ -99,7 +99,7 @@ public class TseAdminService {
             .build();
 
         applicationType.getAdminDecision().add(
-            TseAdminRecordDecisionTypeItem.builder()
+            TypeItem.<TseAdminRecordDecisionType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(decision)
                 .build()

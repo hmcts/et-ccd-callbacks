@@ -48,7 +48,7 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
             .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<GenericTseApplicationType>();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
         caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));

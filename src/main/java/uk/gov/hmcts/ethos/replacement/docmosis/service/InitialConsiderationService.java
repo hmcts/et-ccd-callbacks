@@ -158,7 +158,7 @@ public class InitialConsiderationService {
         List<String> validJurisdictionCodes = jurisdictionCodes.stream().map(JurCodesTypeItem::getValue)
             .map(JurCodesType::getJuridictionCodesList)
             .filter(code -> EnumUtils.isValidEnum(JurisdictionCode.class, code))
-            .collect(Collectors.toList());
+            .toList();
 
         if (validJurisdictionCodes.isEmpty()) {
             return  "";
@@ -171,8 +171,7 @@ public class InitialConsiderationService {
         validJurisdictionCodes
             .forEach(codeName -> sb.append("<strong>")
                 .append(codeName)
-                .append("</strong>")
-                .append(" - ")
+                .append("</strong> - ")
                 .append(JurisdictionCode.valueOf(codeName).getDescription())
                 .append("<br><br>"));
 

@@ -367,33 +367,28 @@ public final class BulkHelper {
     }
 
     public static StringBuilder buildScheduleDocumentContent(BulkData bulkData, String accessKey) {
-        StringBuilder sb = new StringBuilder();
-        // Start building the instruction
-        sb.append("{\n");
-        sb.append("\"accessKey\":\"").append(accessKey).append(NEW_LINE);
-        sb.append("\"templateName\":\"").append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName()))
-                .append(FILE_EXTENSION).append(NEW_LINE);
-        sb.append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
-        // Building the document data
-        sb.append("\"data\":{\n");
-        sb.append("\"Multiple_No\":\"").append(bulkData.getMultipleReference()).append(NEW_LINE);
-        sb.append("\"Multiple_title\":\"").append(bulkData.getBulkCaseTitle()).append(NEW_LINE);
-        sb.append(getDocumentData(bulkData));
-        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n");
-        sb.append("}\n");
-        sb.append("}\n");
-        return sb;
+        return new StringBuilder().append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+                .append("\"templateName\":\"")
+                .append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName()))
+                .append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
+                .append(OUTPUT_FILE_NAME).append(NEW_LINE)
+                .append("\"data\":{\n\"Multiple_No\":\"").append(bulkData.getMultipleReference()).append(NEW_LINE)
+                .append("\"Multiple_title\":\"").append(bulkData.getBulkCaseTitle()).append(NEW_LINE)
+                .append(getDocumentData(bulkData))
+                .append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
     }
 
     private static StringBuilder getDocumentData(BulkData bulkData) {
-        if (LIST_CASES_CONFIG.equals(bulkData.getScheduleDocName())) {
+        String scheduleDocName = bulkData.getScheduleDocName();
+        if (LIST_CASES_CONFIG.equals(scheduleDocName)) {
             return getScheduleBySubMultipleData(bulkData);
-        } else if (Arrays.asList(MULTIPLE_SCHEDULE_CONFIG, MULTIPLE_SCHEDULE_DETAILED_CONFIG)
-                .contains(bulkData.getScheduleDocName())) {
-            return getScheduleData(bulkData.getSearchCollection());
-        } else {
-            return new StringBuilder();
         }
+
+        if (List.of(MULTIPLE_SCHEDULE_CONFIG, MULTIPLE_SCHEDULE_DETAILED_CONFIG).contains(scheduleDocName)) {
+            return getScheduleData(bulkData.getSearchCollection());
+        }
+
+        return new StringBuilder();
     }
 
     private static StringBuilder getScheduleData(List<SearchTypeItem> searchTypeItems) {
@@ -410,26 +405,18 @@ public final class BulkHelper {
     }
 
     private static StringBuilder getMultipleTypeRow(SearchType searchType) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"Claimant\":\"").append(
-                nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE);
-        sb.append("\"Current_position\":\"").append(
-                nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE);
-        sb.append("\"Case_No\":\"").append(
-                nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE);
-        sb.append("\"claimant_full_name\":\"").append(
-                nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE);
-        sb.append("\"claimant_addressLine1\":\"").append(
-                nullCheck(searchType.getClaimantAddressLine1S())).append(NEW_LINE);
-        sb.append("\"claimant_postCode\":\"").append(
-                nullCheck(searchType.getClaimantPostCodeS())).append(NEW_LINE);
-        sb.append("\"respondent_full_name\":\"").append(
-                nullCheck(searchType.getRespondentSurnameS())).append(NEW_LINE);
-        sb.append("\"respondent_addressLine1\":\"").append(
-                nullCheck(searchType.getRespondentAddressLine1S())).append(NEW_LINE);
-        sb.append("\"respondent_postCode\":\"").append(
-                nullCheck(searchType.getRespondentPostCodeS())).append("\"}");
-        return sb;
+        return new StringBuilder().append("{\"Claimant\":\"").append(
+            nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
+            .append("\"Current_position\":\"").append(nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE)
+            .append("\"Case_No\":\"").append(nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE)
+            .append("\"claimant_full_name\":\"").append(nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
+            .append("\"claimant_addressLine1\":\"").append(nullCheck(searchType.getClaimantAddressLine1S()))
+            .append(NEW_LINE).append("\"claimant_postCode\":\"").append(nullCheck(searchType.getClaimantPostCodeS()))
+            .append(NEW_LINE).append("\"respondent_full_name\":\"")
+            .append(nullCheck(searchType.getRespondentSurnameS())).append(NEW_LINE)
+            .append("\"respondent_addressLine1\":\"").append(nullCheck(searchType.getRespondentAddressLine1S()))
+            .append(NEW_LINE).append("\"respondent_postCode\":\"")
+            .append(nullCheck(searchType.getRespondentPostCodeS())).append("\"}");
     }
 
     private static StringBuilder getScheduleBySubMultipleData(BulkData bulkData) {

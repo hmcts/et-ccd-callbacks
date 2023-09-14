@@ -6,8 +6,8 @@ cftlib:
 
 idam:
   api:
-    jwkUrl: http://localhost:5000/o/jwks
-    url: http://localhost:5000
+    jwkUrl: http://localhost:5062/o/jwks
+    url: http://localhost:5062
   s2s-auth:
     url: http://localhost:8489
     totp_secret: AAAAAAAAAAAAAAAA

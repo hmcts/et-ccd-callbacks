@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -13,22 +14,25 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
@@ -41,18 +45,23 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
 
 @Slf4j
 public final class TseHelper {
-    public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any "
-        + "objections or responses to their application you must send them to the tribunal as soon as possible and by "
-        + "%s at the latest.</br></br>If you need more time to respond, you may request more time from the tribunal. If"
-        + " you do not respond or request more time to respond, the tribunal will consider the application without your"
-        + " response.";
-    public static final String TSE_RESPONSE_TABLE = "| | |\r\n"
+
+    private static final String INTRO = """
+            <p>The %s has applied to <strong>%s</strong>.</p>
+            %s
+            <p>If you have any objections or responses to their application you must send them to the tribunal as soon
+            as possible and by <strong>%s</strong> at the latest.
+            
+            If you need more time to respond, you may request more time from the tribunal. If you do not respond or
+            request more time to respond, the tribunal will consider the application without your response.</p>
+            """;
+    private static final String TSE_RESPONSE_TABLE = "| | |\r\n"
             + TABLE_STRING
             + "|Application date | %s\r\n"
             + "|Details of the application | %s\r\n"
             + "Application file upload | %s";
-    public static final String GROUP_B = "You do not need to respond to this application.<br>";
-    public static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
+    private static final String GROUP_B = "<p>You do not need to respond to this application.</p>";
+    private static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
             + "afresh", "Reconsider a judgment", "Withdraw my claim");
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
@@ -80,14 +89,6 @@ public final class TseHelper {
                 )
                 .map(TseHelper::formatDropdownOption)
                 .toList());
-    }
-
-    public static void setSystemUserYesOrNoField(CaseData caseData) {
-        if (Helper.isClaimantNonSystemUser(caseData)) {
-            caseData.setSystemUserYesOrNo(NO);
-        } else {
-            caseData.setSystemUserYesOrNo(YES);
-        }
     }
 
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
@@ -125,6 +126,7 @@ public final class TseHelper {
         caseData.setTseResponseIntro(
                 String.format(
                         INTRO,
+                        StringUtils.lowerCase(genericTseApplicationType.getApplicant()),
                         genericTseApplicationType.getType(),
                         GROUP_B_TYPES.contains(genericTseApplicationType.getType()) ? GROUP_B : "",
                         UtilHelper.formatCurrentDatePlusDays(date, 7)
@@ -183,6 +185,7 @@ public final class TseHelper {
 
     @Nullable
     private static GenericTseApplicationType getTseApplication(CaseData caseData, String selectedAppId) {
+
         return caseData.getGenericTseApplicationCollection().stream()
             .filter(item -> item.getValue().getNumber().equals(selectedAppId))
             .findFirst()
@@ -201,7 +204,7 @@ public final class TseHelper {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -252,16 +255,40 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {
-        TseRespondType replyType = application.getRespondCollection().get(0).getValue();
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+
         return TseReplyData.builder()
-                .copy(replyType.getCopyToOtherParty())
-                .caseNumber(caseId)
-                .supportingYesNo(replyType.getHasSupportingMaterial())
-                .type(application.getType())
-                .documentCollection(replyType.getSupportingMaterial())
-                .response(replyType.getResponse())
-                .build();
+            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .respondentParty(RESPONDENT_TITLE)
+            .type(defaultIfEmpty(application.getType(), null))
+            .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
+            .response(defaultIfEmpty(application.getDetails(), null))
+            .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
+            .documentCollection(getUploadedDocList(caseData))
+            .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
+            .build();
     }
 
+    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
+        if (caseData.getTseResponseSupportingMaterial() == null) {
+            return null;
+        }
+
+        List<GenericTypeItem<DocumentType>> genericDocTypeList = new ArrayList<>();
+
+        caseData.getTseResponseSupportingMaterial().forEach(doc -> {
+            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
+            DocumentType docType = new DocumentType();
+            docType.setUploadedDocument(doc.getValue().getUploadedDocument());
+            genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
+            genTypeItems.setValue(docType);
+            genericDocTypeList.add(genTypeItems);
+        });
+
+        return genericDocTypeList;
+    }
+
+    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+    }
 }

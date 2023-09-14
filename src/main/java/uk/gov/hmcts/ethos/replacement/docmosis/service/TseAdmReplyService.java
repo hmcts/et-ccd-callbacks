@@ -9,8 +9,8 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -131,14 +131,14 @@ public class TseAdmReplyService {
         }
 
         if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
-            applicationType.setRespondCollection(new ArrayList<>());
+            applicationType.setRespondCollection(new ListTypeItem<TseRespondType>());
         }
 
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
         String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
 
         applicationType.getRespondCollection().add(
-            TseRespondTypeItem.builder()
+            TypeItem.<TseRespondType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseRespondType.builder()
                     .date(UtilHelper.formatCurrentDate(LocalDate.now()))

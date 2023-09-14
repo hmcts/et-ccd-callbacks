@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -1040,7 +1039,7 @@ public final class DocumentHelper {
                 claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));
             }
 
-            for (TseRespondTypeItem response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
+            for (TypeItem<TseRespondType> response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
                 TseRespondType respondType = response.getValue();
                 if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
                     claimantRule92NoDocuments.addAll(

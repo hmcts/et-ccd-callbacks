@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -134,7 +133,7 @@ class TseAdminServiceTest {
     }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {
-        TseRespondTypeItem claimantReply = TseRespondTypeItem.builder()
+        TypeItem<TseRespondType> claimantReply = TypeItem.<TseRespondType>builder()
             .id(UUID.randomUUID().toString())
             .value(
                 TseRespondType.builder()
@@ -149,7 +148,7 @@ class TseAdminServiceTest {
                     .build()
             ).build();
 
-        TseRespondTypeItem adminReply = TseRespondTypeItem.builder()
+        TypeItem<TseRespondType> adminReply = TypeItem.<TseRespondType>builder()
             .id(UUID.randomUUID().toString())
             .value(
                 TseRespondType.builder()
@@ -175,7 +174,7 @@ class TseAdminServiceTest {
             .withDate("13 December 2022")
             .withDocumentUpload(createUploadedDocumentType("document.txt"))
             .withStatus(OPEN_STATE)
-            .withRespondCollection(List.of(
+            .withRespondCollection(ListTypeItem.from(
                 claimantReply,
                 adminReply
             ))

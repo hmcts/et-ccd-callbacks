@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -2248,8 +2247,8 @@ class DocumentHelperTest {
                     .build())
                 .build();
 
-            List<TseRespondTypeItem> tseRespondTypeItems = List.of(
-                TseRespondTypeItem.builder()
+            ListTypeItem<TseRespondType> tseRespondTypeItems = ListTypeItem.from(
+                TypeItem.<TseRespondType>builder()
                     .value(TseRespondType.builder()
                         .from(CLAIMANT_TITLE)
                         .copyToOtherParty(NO)

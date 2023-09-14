@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -231,12 +230,11 @@ class TseServiceTest {
         return GenericTseApplicationType.builder()
             .applicant(RESPONDENT_TITLE)
             .number("1")
-            .respondCollection(List.of(
-                TseRespondTypeItem.builder()
+            .respondCollection(ListTypeItem.from(TypeItem.<TseRespondType>builder()
                     .id(UUID.randomUUID().toString())
                     .value(setupAdminTseRespondType())
                     .build(),
-                TseRespondTypeItem.builder()
+                TypeItem.<TseRespondType>builder()
                     .id(UUID.randomUUID().toString())
                     .value(setupNonAdminTseRespondType())
                     .build())
@@ -514,11 +512,7 @@ class TseServiceTest {
             .copyToOtherPartyYesOrNo(NO)
             .copyToOtherPartyText("Details")
             .documentUpload(DocumentFixtures.getUploadedDocumentType("application.docx"))
-            .respondCollection(List.of(
-                TseRespondTypeItem.builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(setupAdminTseRespondType())
-                    .build())
+            .respondCollection(ListTypeItem.from(setupAdminTseRespondType())
             ).build();
     }
 

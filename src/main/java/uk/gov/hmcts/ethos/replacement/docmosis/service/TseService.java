@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -246,7 +245,7 @@ public class TseService {
      */
     public List<String[]> formatApplicationResponses(GenericTseApplicationType application, String authToken,
                                              boolean isRespondentView) {
-        List<TseRespondTypeItem> respondCollection = application.getRespondCollection();
+        ListTypeItem<TseRespondType> respondCollection = application.getRespondCollection();
         if (isEmpty(respondCollection)) {
             return Collections.emptyList();
         }
@@ -255,7 +254,7 @@ public class TseService {
         String applicant = application.getApplicant().toLowerCase(Locale.ENGLISH);
 
         return respondCollection.stream()
-                .map(TseRespondTypeItem::getValue)
+                .map(TypeItem<TseRespondType>::getValue)
                 .map(o -> ADMIN.equals(o.getFrom())
                         ? formatAdminReply(o, respondCount.incrementAndReturnValue(), authToken)
                         : formatNonAdminReply(o, respondCount.incrementAndReturnValue(), applicant,

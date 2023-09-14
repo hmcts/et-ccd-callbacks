@@ -15,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -25,7 +24,6 @@ import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -133,7 +131,7 @@ class TseHelperTest {
     @Test
     void populateSelectApplicationDropdown_withRespondentReply_returnsNothing() {
         caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondCollection(List.of(TseRespondTypeItem.builder()
+            .setRespondCollection(ListTypeItem.from(TypeItem.<TseRespondType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseRespondType.builder()
                     .from(RESPONDENT_TITLE)
@@ -204,8 +202,7 @@ class TseHelperTest {
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondCollection(List.of(
-                TseRespondTypeItem.builder()
+            .setRespondCollection(ListTypeItem.from(TypeItem.<TseRespondType>builder()
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
                     .value(
                         TseRespondType.builder()

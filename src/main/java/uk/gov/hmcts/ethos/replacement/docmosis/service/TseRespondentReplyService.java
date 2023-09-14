@@ -11,7 +11,8 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
@@ -125,11 +126,11 @@ public class TseRespondentReplyService {
         GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
 
         if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            genericTseApplicationType.setRespondCollection(new ArrayList<>());
+            genericTseApplicationType.setRespondCollection(new ListTypeItem<TseRespondType>());
         }
-        List<TseRespondTypeItem> respondCollection = genericTseApplicationType.getRespondCollection();
+        ListTypeItem<TseRespondType> respondCollection = genericTseApplicationType.getRespondCollection();
 
-        respondCollection.add(TseRespondTypeItem.builder()
+        respondCollection.add(TypeItem.<TseRespondType>builder()
             .id(UUID.randomUUID().toString())
             .value(
                 TseRespondType.builder()

@@ -29,7 +29,6 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.empty;
@@ -273,7 +272,7 @@ class RespondentTellSomethingElseControllerTest {
         return respondentSumTypeItem;
     }
 
-    private List<TypeItem<GenericTseApplicationType>> createApplicationCollection() {
+    private ListTypeItem<GenericTseApplicationType> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
         respondentTseType.setCopyToOtherPartyYesOrNo(NO);
 
@@ -281,6 +280,6 @@ class RespondentTellSomethingElseControllerTest {
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());
         tseApplicationTypeItem.setValue(respondentTseType);
 
-        return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
+        return ListTypeItem.from(tseApplicationTypeItem);
     }
 }

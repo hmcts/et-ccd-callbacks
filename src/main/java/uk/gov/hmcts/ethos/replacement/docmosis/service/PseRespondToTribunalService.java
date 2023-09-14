@@ -12,7 +12,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
@@ -86,7 +87,7 @@ public class PseRespondToTribunalService {
 
         return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
             .filter(r -> isNotifyRespondent(r)
-                && isNoRespondentReply(r.getValue().getRespondCollection()))
+                && isNoRespondentReply((ListTypeItem<PseResponseType>) r.getValue().getRespondCollection()))
             .map(r ->
                 DynamicValueType.create(
                     r.getValue().getNumber(),
@@ -101,7 +102,7 @@ public class PseRespondToTribunalService {
             || BOTH_PARTIES.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify());
     }
 
-    private boolean isNoRespondentReply(List<PseResponseTypeItem> pseResponseTypeItems) {
+    private boolean isNoRespondentReply(ListTypeItem<PseResponseType> pseResponseTypeItems) {
         return CollectionUtils.isEmpty(pseResponseTypeItems)
             || pseResponseTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
     }
@@ -136,14 +137,14 @@ public class PseRespondToTribunalService {
      */
     public void addRespondentResponseToJON(CaseData caseData) {
         SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
-        List<PseResponseTypeItem> responses = sendNotificationType.getRespondCollection();
+        List<TypeItem<PseResponseType>> responses = sendNotificationType.getRespondCollection();
         if (CollectionUtils.isEmpty(responses)) {
             sendNotificationType.setRespondCollection(new ArrayList<>());
             responses = sendNotificationType.getRespondCollection();
         }
 
         responses.add(
-            PseResponseTypeItem.builder()
+            TypeItem.<PseResponseType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(
                     PseResponseType.builder()
@@ -287,7 +288,7 @@ public class PseRespondToTribunalService {
             return SUBMITTED_BODY;
         }
 
-        List<PseResponseTypeItem> respondCollection = sendNotificationType.getRespondCollection();
+        List<TypeItem<PseResponseType>> respondCollection = sendNotificationType.getRespondCollection();
 
         PseResponseType response = respondCollection.get(respondCollection.size() - 1).getValue();
         return String.format(SUBMITTED_BODY, YES.equals(response.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : "");

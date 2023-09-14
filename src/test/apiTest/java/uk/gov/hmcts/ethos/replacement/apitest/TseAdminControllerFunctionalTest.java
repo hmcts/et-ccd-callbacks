@@ -52,9 +52,10 @@ public class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
         caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
-        caseData.setTseAdminSelectApplication(
-            DynamicFixedListType.of(
-                DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));
+        DynamicValueType dvt = DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL);
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType.of(dvt);
+        dynamicFixedListType.setListItems(List.of(dvt));
+        caseData.setTseAdminSelectApplication(dynamicFixedListType);
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)

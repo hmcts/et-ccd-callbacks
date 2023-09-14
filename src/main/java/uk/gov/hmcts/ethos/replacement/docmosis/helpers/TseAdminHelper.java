@@ -35,8 +35,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 
 public final class TseAdminHelper {
     private static final String TSE_ADMIN_REPLY_OUTPUT_NAME = "%s Reply.pdf";
-    private static final String TSE_ADMIN_REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-Admin-Tse-Reply.docx";
-    private static final String TSE_ADMIN_DECISION_TEMPLATE_NAME = "EM-TRB-EGW-ENG-Admin-Tse-Decision.docx";
+    private static final String TSE_ADMIN_REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-000991.docx";
+    private static final String TSE_ADMIN_DECISION_TEMPLATE_NAME = "EM-TRB-EGW-ENG-000992.docx";
     private static final String CASE_MANAGEMENT_ORDER = "Case management order";
 
     private TseAdminHelper() {

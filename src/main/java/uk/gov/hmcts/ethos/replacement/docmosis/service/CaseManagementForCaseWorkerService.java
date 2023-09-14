@@ -556,6 +556,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setCaseManagementLocationCode(CaseData caseData) {
-        tribunalOfficesService.setCaseManagementLocationCode(caseData);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        caseData.setCaseManagementLocationCode(tribunalOfficesService.tribunalOfficeToEpimmsId(tribunalOffice));
     }
 }

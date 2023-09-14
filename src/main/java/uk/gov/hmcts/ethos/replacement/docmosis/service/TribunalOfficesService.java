@@ -46,24 +46,37 @@ public class TribunalOfficesService {
         return contactDetails;
     }
 
-    public void setCaseManagementLocationCode(CaseData caseData) {
-        String managingOffice = caseData.getManagingOffice();
-        if (Strings.isNullOrEmpty(managingOffice) || UNASSIGNED_OFFICE.equals(managingOffice)) {
-            log.info("CaseManagementLocationCode set to blank as managing office isNullorEmpty");
-            caseData.setCaseManagementLocationCode("");
-        } else {
-            // do we need a null check here
-            TribunalOffice tribunalOffice = getTribunalOffice(managingOffice);
-            CourtLocations courtLocation = config.getCourtLocations().get(tribunalOffice);
-            caseData.setCaseManagementLocationCode(courtLocation.getEpimmsId());
-            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
-            log.info("The court location " + courtLocation.getName() + " region " + courtLocation.getRegion());
-            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
-        }
-    }
+//    public void setCaseManagementLocationCode(CaseData caseData) {
+//        String managingOffice = caseData.getManagingOffice();
+//        if (Strings.isNullOrEmpty(managingOffice) || UNASSIGNED_OFFICE.equals(managingOffice)) {
+//            log.info("CaseManagementLocationCode set to blank as managing office isNullorEmpty");
+//            caseData.setCaseManagementLocationCode("");
+//        } else {
+//            // do we need a null check here
+//            TribunalOffice tribunalOffice = getTribunalOffice(managingOffice);
+//            CourtLocations courtLocation = config.getCourtLocations().get(tribunalOffice);
+//            caseData.setCaseManagementLocationCode(courtLocation.getEpimmsId());
+//            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
+//            log.info("The court location " + courtLocation.getName() + " region " + courtLocation.getRegion());
+//            log.info("The epimms id has been set to " + courtLocation.getEpimmsId());
+//        }
+//    }
 
     public String tribunalOfficeToEpimmsId(TribunalOffice tribunalOffice) {
         return config.getCourtLocations().get(tribunalOffice).getEpimmsId();
+    }
+
+    
+
+    public void setCaseManagementLocationCode(CaseData caseData) {
+        // will throw error if not found
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+
+        // if (Strings.isNullOrEmpty(tribunalOffice.valueOfOfficeName())) {
+        //    log.info("CaseManagementLocationCode set to blank as managing office isNullorEmpty");
+        //    return;
+        // }
+        caseData.setCaseManagementLocationCode(config.getCourtLocations().get(tribunalOffice).getEpimmsId());
     }
 }
 

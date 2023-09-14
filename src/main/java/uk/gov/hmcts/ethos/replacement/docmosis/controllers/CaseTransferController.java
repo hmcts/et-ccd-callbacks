@@ -141,6 +141,7 @@ public class CaseTransferController {
         List<String> errors = caseTransferSameCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
 
+        tribunalOfficesService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -168,7 +169,8 @@ public class CaseTransferController {
         List<String> errors = caseTransferSameCountryService.updateEccLinkedCase(ccdRequest.getCaseDetails(),
             userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
-
+        // should this be added here ?
+        tribunalOfficesService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -194,7 +196,7 @@ public class CaseTransferController {
 
         List<String> errors = caseTransferDifferentCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
-
+        tribunalOfficesService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -243,6 +245,7 @@ public class CaseTransferController {
         DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+        tribunalOfficesService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

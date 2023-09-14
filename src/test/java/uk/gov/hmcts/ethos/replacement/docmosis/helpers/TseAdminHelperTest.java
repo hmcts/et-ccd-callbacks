@@ -28,6 +28,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -113,7 +115,7 @@ class TseAdminHelperTest {
         String actual  = TseAdminHelper.getReplyDocumentRequest(caseData, "testAccessKey");
 
         assertNotNull(actual);
-        assertNotNull(actual.contains("EM-TRB-EGW-ENG-Admin-Tse-Reply.docx"));
+        assertThat(actual.contains("EM-TRB-EGW-ENG-000991.docx"), is(Boolean.TRUE));
     }
 
     @Test
@@ -122,7 +124,7 @@ class TseAdminHelperTest {
         String actual  = TseAdminHelper.getAdminDecisionDocumentRequest(caseData, "testAccessKey");
 
         assertNotNull(actual);
-        assertNotNull(actual.contains("EM-TRB-EGW-ENG-Admin-Tse-Decision.docx"));
+        assertThat(actual.contains("EM-TRB-EGW-ENG-000992.docx"), is(Boolean.TRUE));
     }
 
     @Test

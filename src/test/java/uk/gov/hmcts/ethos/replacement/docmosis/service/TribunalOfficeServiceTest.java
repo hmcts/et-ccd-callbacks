@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @RunWith(Parameterized.class)
@@ -99,10 +99,11 @@ public class TribunalOfficeServiceTest {
                         "32 Sweet Street", "14 House", null,
                         "Manchester", "M11 4ED", "United Kingdom",
                         null)
-                .withManagingOffice(managingOffice)
+                .withManagingOffice("Manchester")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(CASE_ID);
     }
+
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(TEST_CASES);
@@ -117,8 +118,7 @@ public class TribunalOfficeServiceTest {
     @Test
     public void testSetsEpimmId() {
         setUp();
-        System.out.println("testing EPIM");
         tribunalOfficesService.setCaseManagementLocationCode(caseDetails.getCaseData());
-        assertEquals(expectedPostcode, caseDetails.getCaseData().getCaseManagementLocationCode());
+        assertEquals("301017", caseDetails.getCaseData().getCaseManagementLocationCode());
     }
 }

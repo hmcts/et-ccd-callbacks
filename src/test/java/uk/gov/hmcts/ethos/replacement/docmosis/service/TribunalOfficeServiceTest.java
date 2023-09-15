@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
+@SuppressWarnings({"PMD.SingularField"})
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = { TribunalOfficesService.class })
 @EnableConfigurationProperties({ CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class })
@@ -35,6 +37,11 @@ public class TribunalOfficeServiceTest {
     TribunalOfficesService tribunalOfficesService;
 
     private CaseDetails caseDetails;
+    private final String managingOffice;
+    private final String expectedPostcode;
+    private final String epimmsId;
+    private final String region;
+    private static final String CASE_ID = "1655312312192821";
 
     private static final Object[][] TEST_CASES = {
             {TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA", "301017", "4"},
@@ -54,11 +61,6 @@ public class TribunalOfficeServiceTest {
             {null, "", "", ""},
     };
 
-    private final String managingOffice;
-    private final String expectedPostcode;
-    private final String epimmsId;
-    private final String region;
-
     public TribunalOfficeServiceTest(String officeName, String expectedPostcode, String epimmsId, String region) {
         this.managingOffice = officeName;
         this.expectedPostcode = expectedPostcode;
@@ -66,8 +68,7 @@ public class TribunalOfficeServiceTest {
         this.region = region;
     }
 
-    private static final String CASE_ID = "1655312312192821";
-
+    @Before
     void setUp() {
         caseDetails = CaseDataBuilder.builder()
                 .withClaimantIndType("Doris", "Johnson")

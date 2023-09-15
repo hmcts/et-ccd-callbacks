@@ -112,6 +112,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private ClerkService clerkService;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private AdminUserService adminUserService;
     private final String hmctsServiceId = "BHA1";
 
     @BeforeEach
@@ -204,7 +206,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                emailService, hmctsServiceId);
+                emailService, adminUserService, hmctsServiceId);
     }
 
     @Test
@@ -1004,7 +1006,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(ccdClient.setSupplementaryData(token, payload, ccdRequest10.getCaseDetails().getCaseId()))
                 .thenReturn(ResponseEntity.ok().build());
 
-        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token);
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails);
         verify(ccdClient, times(1)).setSupplementaryData(token, payload,
                 ccdRequest10.getCaseDetails().getCaseId());
     }
@@ -1019,7 +1021,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn(null);
 
         Exception e = assertThrows(CaseCreationException.class,
-                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
+                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails));
         assertEquals("Call to Supplementary Data API failed for 123456789", e.getMessage());
     }
 
@@ -1033,7 +1035,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
 
         Exception e = assertThrows(CaseCreationException.class,
-                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
+                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails));
         assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", e.getMessage());
     }
 

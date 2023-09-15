@@ -71,6 +71,7 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
+    private final AdminUserService adminUserService;
     private final String hmctsServiceId;
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -85,11 +86,12 @@ public class CaseManagementForCaseWorkerService {
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient, ClerkService clerkService,
-                                              EmailService emailService,
+                                              EmailService emailService, AdminUserService adminUserService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
+        this.adminUserService = adminUserService;
         this.hmctsServiceId = hmctsServiceId;
     }
 
@@ -511,16 +513,15 @@ public class CaseManagementForCaseWorkerService {
     /**
      * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
      * @param caseDetails Details on the case
-     * @param accessToken authorisation token for reference data api
      */
-    public void setHmctsServiceIdSupplementary(CaseDetails caseDetails, String accessToken) throws IOException {
+    public void setHmctsServiceIdSupplementary(CaseDetails caseDetails) throws IOException {
         Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
         payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
 
         Map<String, Object> payload = Maps.newHashMap();
         payload.put("supplementary_data_updates", payloadData);
         String errorMessage = String.format("Call to Supplementary Data API failed for %s", caseDetails.getCaseId());
-
+        String accessToken = adminUserService.getAdminUserToken();
         try {
             ResponseEntity<Object> response =
                     ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());

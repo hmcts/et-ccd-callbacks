@@ -120,6 +120,7 @@ public class TribunalOfficeServiceTest {
     public void testSetsEpimmId() {
         setUp();
         tribunalOfficesService.setCaseManagementLocationCode(caseDetails.getCaseData());
-        assertEquals("301017", caseDetails.getCaseData().getCaseManagementLocationCode());
+       // assertEquals("301017", caseDetails.getCaseData().getCaseManagementLocationCode());
+         assertEquals("test should fail", caseDetails.getCaseData().getCaseManagementLocationCode());
     }
 }

@@ -13,16 +13,23 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SearchCriteria;
+import uk.gov.hmcts.et.common.model.ccd.SearchParty;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
@@ -559,6 +566,44 @@ public class CaseManagementForCaseWorkerService {
 
     private void setCaseManagementCategory(CaseData caseData) {
         caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
+    }
+
+    public void setSearchCriteria(CaseData caseData) {
+
+        ListTypeItem<SearchParty> searchParties = new ListTypeItem<SearchParty>();
+        ClaimantIndType claimantIndType = caseData.getClaimantIndType();
+        ClaimantType claimantType = caseData.getClaimantType();
+
+        Address claimantAddressUK = claimantType.getClaimantAddressUK();
+        searchParties.add(GenericTypeItem.<SearchParty>from(SearchParty.builder()
+                .name(claimantIndType.claimantFullName())
+                .dateOfBirth(claimantIndType.getClaimantDateOfBirth())
+                .emailAddress(claimantType.getClaimantEmailAddress())
+                .addressLine1(claimantAddressUK.getAddressLine1())
+                .postCode(claimantAddressUK.getPostCode())
+                .build()));
+
+        caseData.getRespondentCollection().forEach(respondent -> {
+            RespondentSumType respondentValue = respondent.getValue();
+            Address respondentAddress = respondentValue.getResponseRespondentAddress();
+
+            SearchParty.SearchPartyBuilder searchPartyBuilder = SearchParty.builder()
+                    .name(respondentValue.getRespondentName())
+                    .emailAddress(respondentValue.getRespondentEmail());
+
+            if (respondentAddress != null) {
+                searchPartyBuilder
+                        .addressLine1(respondentAddress.getAddressLine1())
+                        .postCode(respondentAddress.getPostCode());
+            }
+            searchParties.add(GenericTypeItem.<SearchParty>from(searchPartyBuilder.build()));
+        });
+
+        SearchCriteria searchCriteria = SearchCriteria.builder()
+                .otherCaseReference(caseData.getEthosCaseReference())
+                .searchParties(searchParties)
+                .build();
+        caseData.setSearchCriteria(searchCriteria);
     }
 
     private void setCaseManagementLocation(CaseData caseData) {

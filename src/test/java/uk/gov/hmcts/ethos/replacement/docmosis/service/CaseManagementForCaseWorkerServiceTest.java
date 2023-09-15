@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SearchCriteria;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -58,6 +59,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -251,6 +253,15 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertEquals("Anton Juliet Rodriguez vs Antonio Vazquez", caseData.getCaseNameHmctsInternal());
+    }
+
+    @Test
+    void addSearchCriteriaInCaseData() {
+        CaseData caseData = ccdRequest10.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.setSearchCriteria(caseData);
+        SearchCriteria searchCriteria = caseData.getSearchCriteria();
+        assertNotNull(searchCriteria);
+        assertEquals("123456", searchCriteria.getOtherCaseReference());
     }
 
     @Test

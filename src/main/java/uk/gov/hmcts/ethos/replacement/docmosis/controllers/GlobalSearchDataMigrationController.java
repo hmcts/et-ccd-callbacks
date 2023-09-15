@@ -60,7 +60,7 @@ public class GlobalSearchDataMigrationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseManagementForCaseWorkerService.setGlobalSearchDefaults(caseData);
-
+        caseManagementForCaseWorkerService.setSearchCriteria(caseData);
         log.info("Migrating existing case: {} for caseManagementCategory: {},  caseNameHmctsInternal: {},"
                         + "  caseManagementLocation: {}",
                 ccdRequest.getCaseDetails().getCaseTypeId(),

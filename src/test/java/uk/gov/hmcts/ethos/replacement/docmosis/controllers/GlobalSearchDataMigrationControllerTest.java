@@ -74,6 +74,7 @@ class GlobalSearchDataMigrationControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseManagementForCaseWorkerService).setGlobalSearchDefaults(any(CaseData.class));
+        verify(caseManagementForCaseWorkerService).setSearchCriteria(any(CaseData.class));
     }
 
     @Test

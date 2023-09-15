@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
-@ConfigurationProperties("tribunal-offices")
+@ConfigurationProperties(prefix = "tribunal-offices")
 @PropertySource(value = "classpath:defaults.yml", factory = YamlPropertySourceFactory.class)
 @Getter
 public class TribunalOfficesConfiguration {

@@ -63,6 +63,7 @@ public class TribunalOfficesService {
 //    }
 
     public String tribunalOfficeToEpimmsId(TribunalOffice tribunalOffice) {
+        System.out.println(config.getCourtLocations().get(tribunalOffice).getEpimmsId());
         return config.getCourtLocations().get(tribunalOffice).getEpimmsId();
     }
 

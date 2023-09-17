@@ -169,6 +169,7 @@ public class CaseTransferController {
         List<String> errors = caseTransferSameCountryService.updateEccLinkedCase(ccdRequest.getCaseDetails(),
             userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
+
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -194,6 +195,7 @@ public class CaseTransferController {
 
         List<String> errors = caseTransferDifferentCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
+        
         caseManagementLocationCodeService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }

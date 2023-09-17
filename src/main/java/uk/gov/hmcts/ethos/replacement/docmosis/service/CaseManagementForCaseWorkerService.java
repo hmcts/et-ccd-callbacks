@@ -69,7 +69,6 @@ public class CaseManagementForCaseWorkerService {
     private final ClerkService clerkService;
     private final String hmctsServiceId;
     private final EmailService emailService;
-
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
@@ -84,8 +83,7 @@ public class CaseManagementForCaseWorkerService {
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient, ClerkService clerkService,
                                               EmailService emailService,
-                                              @Value("${hmcts_service_id}") String hmctsServiceId
-                                              ) {
+                                              @Value("${hmcts_service_id}") String hmctsServiceId) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
@@ -551,5 +549,4 @@ public class CaseManagementForCaseWorkerService {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
     }
-
 }

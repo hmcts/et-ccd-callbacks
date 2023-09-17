@@ -213,7 +213,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                emailService, hmctsServiceId, tribunalOfficesService);
+                emailService, hmctsServiceId);
     }
 
     @Test

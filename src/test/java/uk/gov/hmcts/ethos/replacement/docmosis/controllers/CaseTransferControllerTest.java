@@ -13,8 +13,8 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
@@ -71,7 +71,7 @@ class CaseTransferControllerTest {
     DefaultValuesReaderService defaultValuesReaderService;
 
     @MockBean
-    TribunalOfficesService tribunalOfficesService;
+    CaseManagementLocationCodeService caseManagementLocationCodeService;
 
     @Autowired
     JsonMapper jsonMapper;
@@ -359,5 +359,65 @@ class CaseTransferControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testTransferSameCountryAddsCaseMgtLocationCode() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseManagementLocationCodeService, times(1))
+                .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void testTransferDifferentCountryUpdatesCaseMgtLocation() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseManagementLocationCodeService, times(1))
+                .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+
+    }
+
+    @Test
+    void assignCaseEnglandWalesUpdatesCaseMgtLocation() throws Exception {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withManagingOffice(UNASSIGNED_OFFICE)
+                .withAssignOffice(TribunalOffice.LEEDS.getOfficeName())
+                .build();
+
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
+
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ASSIGN_CASE)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                        .andExpect(status().isOk());
+
+        verify(caseManagementLocationCodeService, times(1))
+                .setCaseManagementLocationCode(any());
     }
 }

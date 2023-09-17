@@ -3,9 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Service
 @Slf4j
@@ -44,9 +45,13 @@ public class TribunalOfficesService {
         return contactDetails;
     }
 
-    public void setCaseManagementLocationCode(CaseData caseData) {
-        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
-        caseData.setCaseManagementLocationCode(config.getCourtLocations().get(tribunalOffice).getEpimmsId());
+    /**
+     * Retrieves the case management location code ePIMMS id for a tribunal office.
+     * @return the ePIMMS id for an office location
+     */
+    public String getEpimmsIdLocationCode(TribunalOffice tribunalOffice) {
+        String epimmsId = config.getCourtLocations().get(tribunalOffice).getEpimmsId();
+        return isNullOrEmpty(epimmsId) ? "" : epimmsId;
     }
 }
 

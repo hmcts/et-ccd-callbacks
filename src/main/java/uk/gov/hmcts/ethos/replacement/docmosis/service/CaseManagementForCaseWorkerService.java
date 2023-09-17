@@ -70,7 +70,6 @@ public class CaseManagementForCaseWorkerService {
     private final String hmctsServiceId;
     private final EmailService emailService;
 
-    private final TribunalOfficesService tribunalOfficesService;
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
@@ -85,15 +84,13 @@ public class CaseManagementForCaseWorkerService {
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient, ClerkService clerkService,
                                               EmailService emailService,
-                                              @Value("${hmcts_service_id}") String hmctsServiceId,
-                                              TribunalOfficesService tribunalOfficesService
+                                              @Value("${hmcts_service_id}") String hmctsServiceId
                                               ) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
         this.emailService = emailService;
         this.hmctsServiceId = hmctsServiceId;
-        this.tribunalOfficesService = tribunalOfficesService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -555,7 +552,4 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    public void setCaseManagementLocationCode(CaseData caseData) {
-        tribunalOfficesService.setCaseManagementLocationCode(caseData);
-    }
 }

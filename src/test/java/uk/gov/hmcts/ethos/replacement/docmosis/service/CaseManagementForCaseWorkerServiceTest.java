@@ -115,8 +115,6 @@ class CaseManagementForCaseWorkerServiceTest {
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @MockBean
     private EmailService emailService;
-    @MockBean
-    private TribunalOfficesService tribunalOfficesService;
     private static final String hmctsServiceId = "BHA1";
 
     @BeforeEach

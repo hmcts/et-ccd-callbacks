@@ -86,6 +86,7 @@ public class CaseManagementForCaseWorkerService {
     private final TribunalOfficesService tribunalOfficesService;
     private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
+    private final AdminUserService adminUserService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -101,7 +102,8 @@ public class CaseManagementForCaseWorkerService {
                                               AuthTokenGenerator serviceAuthTokenGenerator,
                                               TribunalOfficesService tribunalOfficesService,
                                               FeatureToggleService featureToggleService,
-                                              @Value("${hmcts_service_id}") String hmctsServiceId) {
+                                              @Value("${hmcts_service_id}") String hmctsServiceId,
+                                              AdminUserService adminUserService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
@@ -109,6 +111,7 @@ public class CaseManagementForCaseWorkerService {
         this.tribunalOfficesService = tribunalOfficesService;
         this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
+        this.adminUserService = adminUserService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -527,9 +530,8 @@ public class CaseManagementForCaseWorkerService {
      * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
      *
      * @param caseDetails Details on the case
-     * @param accessToken authorisation token for reference data api
      */
-    public void setHmctsServiceIdSupplementary(CaseDetails caseDetails, String accessToken) throws IOException {
+    public void setHmctsServiceIdSupplementary(CaseDetails caseDetails) throws IOException {
         if (featureToggleService.isGlobalSearchEnabled()) {
             Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
             payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
@@ -540,8 +542,9 @@ public class CaseManagementForCaseWorkerService {
                     caseDetails.getCaseId());
 
             try {
+                String adminUserToken = adminUserService.getAdminUserToken();
                 ResponseEntity<Object> response =
-                        ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
+                        ccdClient.setSupplementaryData(adminUserToken, payload, caseDetails.getCaseId());
                 if (response == null) {
                     throw new CaseCreationException(errorMessage);
                 }
@@ -570,12 +573,12 @@ public class CaseManagementForCaseWorkerService {
 
     public void setSearchCriteria(CaseData caseData) {
 
-        ListTypeItem<SearchParty> searchParties = new ListTypeItem<SearchParty>();
+        ListTypeItem<SearchParty> searchParties = new ListTypeItem<>();
         ClaimantIndType claimantIndType = caseData.getClaimantIndType();
         ClaimantType claimantType = caseData.getClaimantType();
 
         Address claimantAddressUK = claimantType.getClaimantAddressUK();
-        searchParties.add(GenericTypeItem.<SearchParty>from(SearchParty.builder()
+        searchParties.add(GenericTypeItem.from(SearchParty.builder()
                 .name(claimantIndType.claimantFullName())
                 .dateOfBirth(claimantIndType.getClaimantDateOfBirth())
                 .emailAddress(claimantType.getClaimantEmailAddress())
@@ -596,11 +599,13 @@ public class CaseManagementForCaseWorkerService {
                         .addressLine1(respondentAddress.getAddressLine1())
                         .postCode(respondentAddress.getPostCode());
             }
-            searchParties.add(GenericTypeItem.<SearchParty>from(searchPartyBuilder.build()));
+            searchParties.add(GenericTypeItem.from(searchPartyBuilder.build()));
         });
 
+        ListTypeItem<String> otherCaseReferences = new ListTypeItem<>();
+        otherCaseReferences.add(GenericTypeItem.from(caseData.getEthosCaseReference()));
         SearchCriteria searchCriteria = SearchCriteria.builder()
-                .otherCaseReference(caseData.getEthosCaseReference())
+                .otherCaseReferences(otherCaseReferences)
                 .searchParties(searchParties)
                 .build();
         caseData.setSearchCriteria(searchCriteria);

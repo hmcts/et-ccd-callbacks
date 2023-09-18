@@ -89,7 +89,7 @@ public class GlobalSearchDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails(), userToken);
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

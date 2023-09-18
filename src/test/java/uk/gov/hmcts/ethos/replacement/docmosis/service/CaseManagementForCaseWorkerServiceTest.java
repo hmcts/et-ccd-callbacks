@@ -122,6 +122,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private TribunalOfficesService tribunalOfficesService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private AdminUserService adminUserService;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -208,9 +210,10 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn(TribunalOffice.valueOfOfficeName("Manchester"));
         when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getManchesterCourtLocations());
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                serviceAuthTokenGenerator, tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID);
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService, serviceAuthTokenGenerator,
+                tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID, adminUserService);
     }
 
     private static CourtLocations getManchesterCourtLocations() {
@@ -261,7 +264,7 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setSearchCriteria(caseData);
         SearchCriteria searchCriteria = caseData.getSearchCriteria();
         assertNotNull(searchCriteria);
-        assertEquals("123456", searchCriteria.getOtherCaseReference());
+        assertEquals("123456", searchCriteria.getOtherCaseReferences().get(0).getValue());
     }
 
     @Test
@@ -1058,12 +1061,11 @@ class CaseManagementForCaseWorkerServiceTest {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
                 HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
-        String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+        when(ccdClient.setSupplementaryData(eq(AUTH_TOKEN), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
                 .thenReturn(ResponseEntity.ok().build());
 
-        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token);
-        verify(ccdClient, times(1)).setSupplementaryData(eq(token), eq(payload),
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails);
+        verify(ccdClient, times(1)).setSupplementaryData(eq(AUTH_TOKEN), eq(payload),
                 eq(ccdRequest10.getCaseDetails().getCaseId()));
     }
 
@@ -1072,12 +1074,11 @@ class CaseManagementForCaseWorkerServiceTest {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
                 HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
-        String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+        when(ccdClient.setSupplementaryData(eq(AUTH_TOKEN), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
                 .thenReturn(null);
 
         Exception exception = assertThrows(CaseCreationException.class,
-                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
+                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails));
         assertEquals("Call to Supplementary Data API failed for 123456789", exception.getMessage());
     }
 
@@ -1086,12 +1087,11 @@ class CaseManagementForCaseWorkerServiceTest {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
                 HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
-        String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(eq(token), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
+        when(ccdClient.setSupplementaryData(eq(AUTH_TOKEN), eq(payload), eq(ccdRequest10.getCaseDetails().getCaseId())))
                 .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
 
         Exception exception = assertThrows(CaseCreationException.class,
-                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails, token));
+                () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails));
         assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", exception.getMessage());
     }
 

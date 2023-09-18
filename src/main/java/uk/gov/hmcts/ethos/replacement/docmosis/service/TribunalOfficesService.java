@@ -47,7 +47,8 @@ public class TribunalOfficesService {
 
     /**
      * Retrieves the case management location code ePIMMS id for a tribunal office.
-     * @return the ePIMMS id for an office location
+     * @param tribunalOffice managingOffice the case has been assigned
+     * @return Epimms location id for the managing office
      */
     public String getEpimmsIdLocationCode(TribunalOffice tribunalOffice) {
         String epimmsId = config.getCourtLocations().get(tribunalOffice).getEpimmsId();

@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -191,6 +192,9 @@ class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private CaseFlagsService caseFlagsService;
+
+    @MockBean
+    private CaseManagementLocationCodeService caseManagementLocationCodeService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -1690,5 +1694,24 @@ class CaseActionsForCaseWorkerControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void setPostDefaultValuesAddsCaseManagementLocationCode() throws Exception {
+        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(caseManagementLocationCodeService, times(1))
+                .setCaseManagementLocationCode(any());
     }
 }

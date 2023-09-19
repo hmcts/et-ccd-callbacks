@@ -35,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -105,6 +106,7 @@ public class CaseActionsForCaseWorkerController {
 
     private final NocRespondentHelper nocRespondentHelper;
     private final CaseFlagsService caseFlagsService;
+    private final CaseManagementLocationCodeService caseManagementLocationCodeService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -283,6 +285,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
             caseManagementForCaseWorkerService.setCaseDeepLink(caseData, ccdRequest.getCaseDetails().getCaseId());
             caseManagementForCaseWorkerService.setHearingIsLinkedFlag(caseData);
+            caseManagementLocationCodeService.setCaseManagementLocationCode(caseData);
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),

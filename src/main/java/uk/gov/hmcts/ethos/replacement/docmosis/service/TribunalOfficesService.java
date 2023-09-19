@@ -6,6 +6,8 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @Service
 @Slf4j
 public class TribunalOfficesService {
@@ -42,5 +44,16 @@ public class TribunalOfficesService {
         contactDetails.setTelephone("");
         return contactDetails;
     }
+
+    /**
+     * Retrieves the case management location code ePIMMS id for a tribunal office.
+     * @param tribunalOffice managingOffice the case has been assigned
+     * @return Epimms location id for the managing office
+     */
+    public String getEpimmsIdLocationCode(TribunalOffice tribunalOffice) {
+        String epimmsId = config.getCourtLocations().get(tribunalOffice).getEpimmsId();
+        return isNullOrEmpty(epimmsId) ? "" : epimmsId;
+    }
 }
+
 

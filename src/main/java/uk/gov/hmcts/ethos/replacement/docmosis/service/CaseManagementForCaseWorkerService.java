@@ -40,7 +40,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocati
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -83,7 +82,6 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
-    private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final TribunalOfficesService tribunalOfficesService;
     private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
@@ -99,8 +97,8 @@ public class CaseManagementForCaseWorkerService {
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
-                                              CcdClient ccdClient, ClerkService clerkService,
-                                              AuthTokenGenerator serviceAuthTokenGenerator,
+                                              CcdClient ccdClient,
+                                              ClerkService clerkService,
                                               TribunalOfficesService tribunalOfficesService,
                                               FeatureToggleService featureToggleService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
@@ -108,7 +106,6 @@ public class CaseManagementForCaseWorkerService {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
-        this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
         this.tribunalOfficesService = tribunalOfficesService;
         this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
@@ -536,6 +533,35 @@ public class CaseManagementForCaseWorkerService {
         if (featureToggleService.isGlobalSearchEnabled()) {
             Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
             payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
+
+            Map<String, Object> payload = Maps.newHashMap();
+            payload.put("supplementary_data_updates", payloadData);
+            String errorMessage = String.format("Call to Supplementary Data API failed for %s",
+                    caseDetails.getCaseId());
+
+            try {
+                String adminUserToken = adminUserService.getAdminUserToken();
+                ResponseEntity<Object> response =
+                        ccdClient.setSupplementaryData(adminUserToken, payload, caseDetails.getCaseId());
+                if (response == null) {
+                    throw new CaseCreationException(errorMessage);
+                }
+                log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+            } catch (RestClientResponseException e) {
+                throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
+            }
+        }
+    }
+
+    /**
+     * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
+     *
+     * @param caseDetails Details on the case
+     */
+    public void removeHmctsServiceIdSupplementary(CaseDetails caseDetails) throws IOException {
+        if (featureToggleService.isGlobalSearchEnabled()) {
+            Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
+            payloadData.put("$set", Map.of());
 
             Map<String, Object> payload = Maps.newHashMap();
             payload.put("supplementary_data_updates", payloadData);

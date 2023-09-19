@@ -92,4 +92,56 @@ public class GlobalSearchDataMigrationController {
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
     }
+
+    @PostMapping(value = "/global-search-rollback/about-to-submit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "update the old cases by removing default values for Global search fields.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {@Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> removeGlobalSearchFieldsFromCaseData(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        log.info("Migrating existing case Id by removing data of global search ---> "
+                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        caseData.setCaseNameHmctsInternal(null);
+        caseData.setCaseManagementLocation(null);
+        caseData.setCaseManagementCategory(null);
+        caseData.setSearchCriteria(null);
+
+        return getCallbackRespEntityErrors(List.of(), caseData);
+    }
+
+    @PostMapping(value = "/global-search-rollback/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Remove HMCTSServiceId from supplementary_data on exiting case.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {@Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> removeServiceIdForGlobalSearchFromCaseData(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) throws IOException {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+        return getCallbackRespEntityNoErrors(caseData);
+    }
 }

@@ -41,6 +41,8 @@ class GlobalSearchDataMigrationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String GLOBAL_SEARCH_MIGRATION_SUBMITTED = "/global-search-migration/submitted";
     private static final String GLOBAL_SEARCH_MIGRATION_ABOUT_TO_SUBMIT = "/global-search-migration/about-to-submit";
+    private static final String GLOBAL_SEARCH_ROLLBACK_SUBMITTED = "/global-search-rollback/submitted";
+    private static final String GLOBAL_SEARCH_ROLLBACK_ABOUT_TO_SUBMIT = "/global-search-rollback/about-to-submit";
     public static final String AUTHORIZATION = "Authorization";
 
     @MockBean
@@ -75,6 +77,20 @@ class GlobalSearchDataMigrationControllerTest {
 
         verify(caseManagementForCaseWorkerService).setGlobalSearchDefaults(any(CaseData.class));
         verify(caseManagementForCaseWorkerService).setSearchCriteria(any(CaseData.class));
+    }
+
+    @Test
+    void shouldRollbackGlobalSearchDataFromCaseDetails() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_ABOUT_TO_SUBMIT)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
     }
 
     @Test
@@ -115,6 +131,40 @@ class GlobalSearchDataMigrationControllerTest {
     @Test
     void addServiceIdUrl_badRequest() throws Exception {
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
+                        .content("garbage content")
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void removeServiceIdUrl_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_SUBMITTED)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(caseManagementForCaseWorkerService, times(1))
+                .removeHmctsServiceIdSupplementary(any());
+    }
+
+    @Test
+    void removeServiceIdUrl_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_SUBMITTED)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void removeServiceIdUrl_badRequest() throws Exception {
+        mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_SUBMITTED)
                         .content("garbage content")
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))

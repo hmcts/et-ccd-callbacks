@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +43,6 @@ class FeatureToggleServiceTest {
     }
 
     private void givenToggle(String feature, boolean state) {
-        when(featureToggleApi.isFeatureEnabled(eq(feature)))
-                .thenReturn(state);
+        when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }
 }

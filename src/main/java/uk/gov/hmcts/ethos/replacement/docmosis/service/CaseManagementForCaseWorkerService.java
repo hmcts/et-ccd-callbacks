@@ -88,7 +88,7 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
-    public static final String DOCUMENTS_TAB = "#Documents";
+    public static final String CASE_FILE_VIEW_TAB = "#Case%20File%20View";
     public static final String ORGANISATION = "Organisation";
 
     @Autowired
@@ -178,7 +178,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setCaseDeepLink(CaseData caseData, String caseId) {
-        caseData.setCaseDeepLink(emailService.getExuiCaseLink(caseId) + DOCUMENTS_TAB);
+        caseData.setCaseDeepLink(emailService.getExuiCaseLink(caseId) + CASE_FILE_VIEW_TAB);
     }
 
     public void setPublicCaseName(CaseData caseData) {

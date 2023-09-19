@@ -203,7 +203,7 @@ public class Et1VettingController {
         }
 
         String caseNumber = ccdRequest.getCaseDetails().getCaseId();
-
+        et1VettingService.clearEt1FieldsFromCaseData(ccdRequest.getCaseDetails().getCaseData());
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
             .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))

@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_CERT_LIST_DISPLAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
@@ -110,6 +111,114 @@ public class Et1VettingService {
         }
     }
 
+    public void clearEt1FieldsFromCaseData(CaseData caseData) {
+
+        caseData.setTrackType(null);
+        caseData.setEt1VettingDocument(null);
+        caseData.setEt1VettingBeforeYouStart(null);
+        caseData.setEt1VettingClaimantDetailsMarkUp(null);
+        caseData.setEt1VettingRespondentDetailsMarkUp(null);
+        caseData.setEt1VettingCanServeClaimYesOrNo(null);
+        caseData.setEt1VettingCanServeClaimNoReason(null);
+        caseData.setEt1VettingCanServeClaimGeneralNote(null);
+        caseData.setEt1VettingRespondentAcasDetails1(null);
+        caseData.setEt1VettingRespondentAcasDetails2(null);
+        caseData.setEt1VettingRespondentAcasDetails3(null);
+        caseData.setEt1VettingRespondentAcasDetails4(null);
+        caseData.setEt1VettingRespondentAcasDetails5(null);
+        caseData.setEt1VettingRespondentAcasDetails6(null);
+        caseData.setEt1VettingAcasCertIsYesOrNo1(null);
+        caseData.setEt1VettingAcasCertExemptYesOrNo1(null);
+        caseData.setEt1VettingAcasCertIsYesOrNo2(null);
+        caseData.setEt1VettingAcasCertExemptYesOrNo2(null);
+        caseData.setEt1VettingAcasCertIsYesOrNo3(null);
+        caseData.setEt1VettingAcasCertExemptYesOrNo3(null);
+        caseData.setEt1VettingRespondentAcasDetailsLabel4(null);
+        caseData.setEt1VettingAcasCertIsYesOrNo4(null);
+        caseData.setEt1VettingAcasCertExemptYesOrNo4(null);
+        caseData.setEt1VettingAcasCertIsYesOrNo5(null);
+        caseData.setEt1VettingAcasCertExemptYesOrNo5(null);
+        caseData.setEt1VettingAcasCertIsYesOrNo6(null);
+        caseData.setEt1VettingAcasCertExemptYesOrNo6(null);
+        caseData.setEt1VettingAcasCertGeneralNote(null);
+        caseData.setEt1VettingCompletedBy(null);
+        caseData.setEt1DateCompleted(null);
+        caseData.setIcCompletedBy(null);
+        caseData.setIcDateCompleted(null);
+        caseData.setSubstantiveDefectsList(null);
+        caseData.setRule121aTextArea(null);
+        caseData.setRule121bTextArea(null);
+        caseData.setRule121cTextArea(null);
+        caseData.setRule121dTextArea(null);
+        caseData.setRule121daTextArea(null);
+        caseData.setRule121eTextArea(null);
+        caseData.setRule121fTextArea(null);
+        caseData.setEt1SubstantiveDefectsGeneralNotes(null);
+
+        caseData.setAreTheseCodesCorrect(null);
+        caseData.setCodesCorrectGiveDetails(null);
+        caseData.setEt1JurisdictionCodeGeneralNotes(null);
+        caseData.setExistingJurisdictionCodes(null);
+        caseData.setVettingJurisdictionCodeCollection(null);
+
+        caseData.setIsTrackAllocationCorrect(null);
+        caseData.setSuggestAnotherTrack(null);
+        caseData.setWhyChangeTrackAllocation(null);
+        caseData.setTrackAllocationGeneralNotes(null);
+        caseData.setIsLocationCorrect(null);
+        caseData.setWhyChangeOffice(null);
+        caseData.setEt1LocationGeneralNotes(null);
+        caseData.setTrackAllocation(null);
+        caseData.setTribunalAndOfficeLocation(null);
+        caseData.setRegionalOffice(null);
+        caseData.setRegionalOfficeList(null);
+        caseData.setEt1AddressDetails(null);
+        caseData.setEt1TribunalRegion(null);
+        caseData.setEt1HearingVenues(null);
+        caseData.setEt1SuggestHearingVenue(null);
+        caseData.setEt1HearingVenueGeneralNotes(null);
+        caseData.setEt1GovOrMajorQuestion(null);
+
+        caseData.setEt1ReasonableAdjustmentsQuestion(null);
+        caseData.setEt1ReasonableAdjustmentsTextArea(null);
+        caseData.setEt1VideoHearingQuestion(null);
+        caseData.setEt1VideoHearingTextArea(null);
+        caseData.setEt1FurtherQuestionsGeneralNotes(null);
+
+        caseData.setReferralToJudgeOrLOList(null);
+        caseData.setAclaimOfInterimReliefTextArea(null);
+        caseData.setAstatutoryAppealTextArea(null);
+        caseData.setAnAllegationOfCommissionOfSexualOffenceTextArea(null);
+        caseData.setInsolvencyTextArea(null);
+        caseData.setJurisdictionsUnclearTextArea(null);
+        caseData.setLengthOfServiceTextArea(null);
+        caseData.setPotentiallyLinkedCasesInTheEcmTextArea(null);
+        caseData.setRule50IssuesTextArea(null);
+        caseData.setAnotherReasonForJudicialReferralTextArea(null);
+        caseData.setEt1JudgeReferralGeneralNotes(null);
+        caseData.setReferralToREJOrVPList(null);
+        caseData.setVexatiousLitigantOrderTextArea(null);
+        caseData.setAnationalSecurityIssueTextArea(null);
+        caseData.setNationalMultipleOrPresidentialOrderTextArea(null);
+        caseData.setTransferToOtherRegionTextArea(null);
+        caseData.setServiceAbroadTextArea(null);
+        caseData.setAsensitiveIssueTextArea(null);
+        caseData.setAnyPotentialConflictTextArea(null);
+        caseData.setAnotherReasonREJOrVPTextArea(null);
+        caseData.setEt1REJOrVPReferralGeneralNotes(null);
+        caseData.setOtherReferralList(null);
+
+        caseData.setClaimOutOfTimeTextArea(null);
+        caseData.setMultipleClaimTextArea(null);
+        caseData.setEmploymentStatusIssuesTextArea(null);
+        caseData.setPidJurisdictionRegulatorTextArea(null);
+        caseData.setVideoHearingPreferenceTextArea(null);
+        caseData.setRule50IssuesForOtherReferralTextArea(null);
+        caseData.setAnotherReasonForOtherReferralTextArea(null);
+        caseData.setEt1OtherReferralGeneralNotes(null);
+        caseData.setEt1VettingAdditionalInformationTextArea(null);
+    }
+
     /**
      * Populates hearing venues for suggestedHearingVenues from the managing office.
      * @param caseData data on the case.
@@ -147,7 +256,8 @@ public class Et1VettingService {
         if (documentCollection != null) {
             et1Display = documentCollection
                     .stream()
-                    .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_DOC_TYPE))
+                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "")
+                            .equals(ET1_DOC_TYPE))
                     .map(d -> String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d)))
                     .collect(Collectors.joining());
             acasDisplay = documentCollection

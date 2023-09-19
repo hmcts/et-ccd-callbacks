@@ -34,6 +34,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
@@ -600,6 +601,22 @@ public class CaseManagementForCaseWorkerService {
                         .postCode(respondentAddress.getPostCode());
             }
             searchParties.add(GenericTypeItem.from(searchPartyBuilder.build()));
+        });
+
+        caseData.getRepCollection().forEach(rep -> {
+            RepresentedTypeR repValue = rep.getValue();
+            Address representativeAddress = repValue.getRepresentativeAddress();
+
+            SearchParty.SearchPartyBuilder searchRepPartyBuilder = SearchParty.builder()
+                    .name(repValue.getRespRepName())
+                    .emailAddress(repValue.getRepresentativeEmailAddress());
+
+            if (representativeAddress != null) {
+                searchRepPartyBuilder
+                        .addressLine1(representativeAddress.getAddressLine1())
+                        .postCode(representativeAddress.getPostCode());
+            }
+            searchParties.add(GenericTypeItem.from(searchRepPartyBuilder.build()));
         });
 
         ListTypeItem<String> otherCaseReferences = new ListTypeItem<>();

@@ -106,6 +106,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest ccdRequest14;
     private CCDRequest ccdRequest15;
     private CCDRequest ccdRequest21;
+
+    private CCDRequest ccdRequest2;
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
@@ -167,6 +169,10 @@ class CaseManagementForCaseWorkerServiceTest {
         ccdRequest21 = new CCDRequest();
         CaseDetails caseDetails21 = generateCaseDetails("caseDetailsTest21.json");
         ccdRequest21.setCaseDetails(caseDetails21);
+
+        ccdRequest2 = new CCDRequest();
+        CaseDetails caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
+        ccdRequest2.setCaseDetails(caseDetails2);
 
         manchesterCcdRequest = new CCDRequest();
         CaseData caseData = new CaseData();
@@ -257,14 +263,14 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void addSearchCriteriaInCaseData() {
-        CaseData caseData = ccdRequest10.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest2.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.setSearchCriteria(caseData);
         SearchCriteria searchCriteria = caseData.getSearchCriteria();
         assertNotNull(searchCriteria);
         assertEquals("123456", searchCriteria.getOtherCaseReferences().get(0).getValue());
-        assertEquals("Mr A J Rodriguez", searchCriteria.getSearchParties().get(0).getValue().getName());
+        assertEquals("Mr A Rodriguez", searchCriteria.getSearchParties().get(0).getValue().getName());
         assertEquals("Antonio Vazquez", searchCriteria.getSearchParties().get(1).getValue().getName());
-        assertEquals("Juan Garcia", searchCriteria.getSearchParties().get(2).getValue().getName());
+        assertEquals("RepresentativeNameRespondent", searchCriteria.getSearchParties().get(2).getValue().getName());
     }
 
     @Test
@@ -1065,8 +1071,8 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn(ResponseEntity.ok().build());
 
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails);
-        verify(ccdClient, times(1)).setSupplementaryData(eq(AUTH_TOKEN), eq(payload),
-                eq(ccdRequest10.getCaseDetails().getCaseId()));
+        verify(ccdClient, times(1)).setSupplementaryData(AUTH_TOKEN, payload,
+                ccdRequest10.getCaseDetails().getCaseId());
     }
 
     @Test
@@ -1103,8 +1109,8 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn(ResponseEntity.ok().build());
 
         caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(caseDetails);
-        verify(ccdClient, times(1)).setSupplementaryData(eq(AUTH_TOKEN), eq(payload),
-                eq(ccdRequest10.getCaseDetails().getCaseId()));
+        verify(ccdClient, times(1)).setSupplementaryData(AUTH_TOKEN, payload,
+                ccdRequest10.getCaseDetails().getCaseId());
     }
 
     @Test

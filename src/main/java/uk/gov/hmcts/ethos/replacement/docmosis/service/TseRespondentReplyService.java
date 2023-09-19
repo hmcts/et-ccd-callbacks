@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.time.LocalDate;
@@ -105,7 +105,7 @@ public class TseRespondentReplyService {
             caseData.setDocumentCollection(new ArrayList<>());
         }
 
-        caseData.getDocumentCollection().add(TseAdminHelper.getDocumentTypeItem(documentManagementService,
+        caseData.getDocumentCollection().add(TseAdmReplyHelper.getDocumentTypeItem(documentManagementService,
                 tornadoService, caseDetails, userToken, TSE_REPLY, RESPONDENT_CORRESPONDENCE));
     }
 

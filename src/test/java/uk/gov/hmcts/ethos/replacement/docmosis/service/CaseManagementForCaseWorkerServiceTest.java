@@ -1063,7 +1063,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn("http://domain/cases/case-details/123");
         CaseData caseData = new CaseData();
         caseManagementForCaseWorkerService.setCaseDeepLink(caseData, "123");
-        assertEquals("http://domain/cases/case-details/123#Documents", caseData.getCaseDeepLink());
+        assertEquals("http://domain/cases/case-details/123#Case%20File%20View", caseData.getCaseDeepLink());
     }
 
     @Test

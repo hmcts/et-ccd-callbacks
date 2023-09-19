@@ -534,22 +534,7 @@ public class CaseManagementForCaseWorkerService {
             Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
             payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
 
-            Map<String, Object> payload = Maps.newHashMap();
-            payload.put("supplementary_data_updates", payloadData);
-            String errorMessage = String.format("Call to Supplementary Data API failed for %s",
-                    caseDetails.getCaseId());
-
-            try {
-                String adminUserToken = adminUserService.getAdminUserToken();
-                ResponseEntity<Object> response =
-                        ccdClient.setSupplementaryData(adminUserToken, payload, caseDetails.getCaseId());
-                if (response == null) {
-                    throw new CaseCreationException(errorMessage);
-                }
-                log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
-            } catch (RestClientResponseException e) {
-                throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
-            }
+            setSupplementaryData(caseDetails, payloadData);
         }
     }
 
@@ -563,22 +548,27 @@ public class CaseManagementForCaseWorkerService {
             Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
             payloadData.put("$set", Map.of());
 
-            Map<String, Object> payload = Maps.newHashMap();
-            payload.put("supplementary_data_updates", payloadData);
-            String errorMessage = String.format("Call to Supplementary Data API failed for %s",
-                    caseDetails.getCaseId());
+            setSupplementaryData(caseDetails, payloadData);
+        }
+    }
 
-            try {
-                String adminUserToken = adminUserService.getAdminUserToken();
-                ResponseEntity<Object> response =
-                        ccdClient.setSupplementaryData(adminUserToken, payload, caseDetails.getCaseId());
-                if (response == null) {
-                    throw new CaseCreationException(errorMessage);
-                }
-                log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
-            } catch (RestClientResponseException e) {
-                throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
+    private void setSupplementaryData(CaseDetails caseDetails,
+                                      Map<String, Map<String, Object>> payloadData) throws IOException {
+        Map<String, Object> payload = Maps.newHashMap();
+        payload.put("supplementary_data_updates", payloadData);
+        String errorMessage = String.format("Call to Supplementary Data API failed for %s",
+                caseDetails.getCaseId());
+
+        try {
+            String adminUserToken = adminUserService.getAdminUserToken();
+            ResponseEntity<Object> response =
+                    ccdClient.setSupplementaryData(adminUserToken, payload, caseDetails.getCaseId());
+            if (response == null) {
+                throw new CaseCreationException(errorMessage);
             }
+            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+        } catch (RestClientResponseException e) {
+            throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
     }
 

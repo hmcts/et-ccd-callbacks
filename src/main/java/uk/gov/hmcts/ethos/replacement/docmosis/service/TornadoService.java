@@ -362,7 +362,7 @@ public class TornadoService {
             case TSE_REPLY -> {
                 return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
-            case "TSE Admin Reply.pdf" -> {
+            case TSE_ADMIN_REPLY -> {
                 return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             default -> throw new IllegalArgumentException("Unexpected document name " + documentName);

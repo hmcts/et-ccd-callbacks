@@ -17,11 +17,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
@@ -112,20 +112,9 @@ public final class TseAdmReplyHelper {
     private static List<GenericTypeItem<DocumentType>> getUploadedDocList(
             List<GenericTypeItem<DocumentType>> docTypeList) {
         if (docTypeList == null) {
-            return null;
+            return new ArrayList<>();
         }
-
-        List<GenericTypeItem<DocumentType>> genericDocTypeList = new ArrayList<>();
-        docTypeList.forEach(doc -> {
-            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
-            DocumentType docType = new DocumentType();
-            docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-            genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
-            genTypeItems.setValue(docType);
-            genericDocTypeList.add(genTypeItems);
-        });
-
-        return genericDocTypeList;
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
     }
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {

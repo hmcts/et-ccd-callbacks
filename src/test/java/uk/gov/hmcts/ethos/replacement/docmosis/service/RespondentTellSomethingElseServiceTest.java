@@ -688,7 +688,7 @@ class RespondentTellSomethingElseServiceTest {
         DocumentType actual = documentCollection.get(0).getValue();
 
         DocumentType expected = DocumentType.builder().typeOfDocument("Respondent correspondence")
-            .shortDescription("Amend response").build();
+            .shortDescription("Amend response").dateOfCorrespondence(LocalDate.now().toString()).build();
 
         Assertions.assertThat(documentCollection).hasSize(1);
         Assertions.assertThat(actual).isEqualTo(expected);

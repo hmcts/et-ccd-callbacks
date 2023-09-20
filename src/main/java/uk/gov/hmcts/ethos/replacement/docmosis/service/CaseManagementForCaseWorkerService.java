@@ -122,11 +122,13 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setGlobalSearchDefaults(CaseData caseData) {
-        if (featureToggleService.isGlobalSearchEnabled()) {
-            setCaseNameHmctsInternal(caseData);
-            setCaseManagementLocation(caseData);
-            setCaseManagementCategory(caseData);
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
         }
+        setCaseNameHmctsInternal(caseData);
+        setCaseManagementLocation(caseData);
+        setCaseManagementCategory(caseData);
+
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -650,14 +652,15 @@ public class CaseManagementForCaseWorkerService {
         String managingOfficeName = caseData.getManagingOffice();
         if (Strings.isNullOrEmpty(managingOfficeName)) {
             log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
-        } else {
-            CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
-            if (tribunalLocations.getEpimmsId().isBlank()) {
-                log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
-            } else {
-                caseData.setCaseManagementLocation(CaseLocation.builder()
-                        .baseLocation(tribunalLocations.getEpimmsId()).region(tribunalLocations.getRegion()).build());
-            }
+            return;
         }
+
+        CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
+        if (tribunalLocations.getEpimmsId().isBlank()) {
+            log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
+            return;
+        }
+        caseData.setCaseManagementLocation(CaseLocation.builder()
+                .baseLocation(tribunalLocations.getEpimmsId()).region(tribunalLocations.getRegion()).build());
     }
 }

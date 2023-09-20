@@ -543,7 +543,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     /**
-     * Calls reference data API to remove HMCTSServiceId to supplementary_data to a case.
+     * Calls reference data API to remove HMCTSServiceId from a case's supplementary_data..
      *
      * @param caseDetails Details on the case
      */

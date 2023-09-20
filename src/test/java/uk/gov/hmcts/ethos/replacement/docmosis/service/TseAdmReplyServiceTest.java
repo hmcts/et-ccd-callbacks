@@ -521,6 +521,7 @@ class TseAdmReplyServiceTest {
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("linkToCitizenHub", "citizenUrlsomeCaseId");
         personalisation.put("linkToExUI", "exuiUrlsomeCaseId");
+        personalisation.put("linkToUploadedPdfDocumentBinary", "");
         if (expectedCustomText != null) {
             personalisation.put("customisedText", expectedCustomText);
         }

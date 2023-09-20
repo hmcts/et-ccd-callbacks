@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_CERT_LIST_DISPLAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
@@ -147,18 +149,18 @@ public class Et1VettingService {
         if (documentCollection != null) {
             et1Display = documentCollection
                     .stream()
-                    .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_DOC_TYPE))
+                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(ET1_DOC_TYPE))
                     .map(d -> String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d)))
                     .collect(Collectors.joining());
             acasDisplay = documentCollection
                     .stream()
-                    .filter(d -> d.getValue().getTypeOfDocument().equals(ACAS_DOC_TYPE))
+                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(ACAS_DOC_TYPE))
                     .map(d -> String.format(
                              BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount.incrementAndReturnValue()))
                     .collect(Collectors.joining());
             et1Attachment = documentCollection
                     .stream()
-                    .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_ATTACHMENT_DOC_TYPE))
+                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(ET1_ATTACHMENT_DOC_TYPE))
                     .map(d -> String.format(BEFORE_LABEL_ET1_ATTACHMENT,
                             createDocLinkBinary(d), d.getValue().getUploadedDocument().getDocumentFilename()))
                     .collect(Collectors.joining());

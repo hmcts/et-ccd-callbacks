@@ -5,14 +5,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocument;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
 
 /**
@@ -22,7 +26,7 @@ public final class Et1VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01140.docx";
-    private static final String OUTPUT_NAME = "ET1 Vetting.pdf";
+    public static final String ET1_VETTING_OUTPUT_NAME = "ET1 Vetting - %s.pdf";
 
     private Et1VettingHelper() {
         // Access through static methods
@@ -150,7 +154,7 @@ public final class Et1VettingHelper {
 
         Et1VettingDocument et1VettingDocument = Et1VettingDocument.builder()
                 .accessKey(userToken)
-                .outputName(OUTPUT_NAME)
+                .outputName(String.format(ET1_VETTING_OUTPUT_NAME, caseData.getClaimant()))
                 .templateName(TEMPLATE_NAME)
                 .et1VettingData(et1VettingData)
                 .build();
@@ -165,6 +169,19 @@ public final class Et1VettingHelper {
         return vettingJurisdictionCodeCollection.stream()
                 .map(j -> j.getValue().getEt1VettingJurCodeList())
                 .collect(Collectors.joining(", "));
+    }
+
+    public static void addEt1VettingToDocTab(CaseData caseData) {
+        if (caseData.getEt1VettingDocument() == null) {
+            return;
+        }
+        DocumentTypeItem documentTypeItem =
+                DocumentHelper.createDocumentTypeItemFromTopLevel(caseData.getEt1VettingDocument(), STARTING_A_CLAIM,
+                        ET1_VETTING);
+        if (caseData.getDocumentCollection() == null) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+        caseData.getDocumentCollection().add(documentTypeItem);
     }
 
 }

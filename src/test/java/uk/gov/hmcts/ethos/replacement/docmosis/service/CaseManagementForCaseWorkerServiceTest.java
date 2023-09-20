@@ -188,7 +188,6 @@ class CaseManagementForCaseWorkerServiceTest {
         eccCounterClaimTypeItem.setValue(counterClaimType);
         caseData.setEccCases(List.of(eccCounterClaimTypeItem));
         caseData.setRespondentECC(createRespondentECC());
-        caseData.setManagingOffice("Edinburgh");
         CaseDetails manchesterCaseDetails = new CaseDetails();
         manchesterCaseDetails.setCaseData(caseData);
         manchesterCaseDetails.setCaseId("123456");

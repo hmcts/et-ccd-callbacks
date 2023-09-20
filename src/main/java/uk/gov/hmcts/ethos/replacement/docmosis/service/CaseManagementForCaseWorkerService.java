@@ -532,26 +532,29 @@ public class CaseManagementForCaseWorkerService {
      * @param caseDetails Details on the case
      */
     public void setHmctsServiceIdSupplementary(CaseDetails caseDetails) throws IOException {
-        if (featureToggleService.isGlobalSearchEnabled()) {
-            Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
-            payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
-
-            setSupplementaryData(caseDetails, payloadData);
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
         }
+
+        Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
+        payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
+
+        setSupplementaryData(caseDetails, payloadData);
     }
 
     /**
-     * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
+     * Calls reference data API to remove HMCTSServiceId to supplementary_data to a case.
      *
      * @param caseDetails Details on the case
      */
     public void removeHmctsServiceIdSupplementary(CaseDetails caseDetails) throws IOException {
-        if (featureToggleService.isGlobalSearchEnabled()) {
-            Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
-            payloadData.put("$set", Map.of());
-
-            setSupplementaryData(caseDetails, payloadData);
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
         }
+        Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
+        payloadData.put("$set", Map.of());
+
+        setSupplementaryData(caseDetails, payloadData);
     }
 
     private void setSupplementaryData(CaseDetails caseDetails,
@@ -591,61 +594,63 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setSearchCriteria(CaseData caseData) {
-        if (featureToggleService.isGlobalSearchEnabled()) {
-
-            ListTypeItem<SearchParty> searchParties = new ListTypeItem<>();
-            ClaimantIndType claimantIndType = caseData.getClaimantIndType();
-            ClaimantType claimantType = caseData.getClaimantType();
-
-            Address claimantAddressUK = claimantType.getClaimantAddressUK();
-            searchParties.add(GenericTypeItem.from(SearchParty.builder()
-                    .name(claimantIndType.claimantFullName())
-                    .dateOfBirth(claimantIndType.getClaimantDateOfBirth())
-                    .emailAddress(claimantType.getClaimantEmailAddress())
-                    .addressLine1(claimantAddressUK.getAddressLine1())
-                    .postCode(claimantAddressUK.getPostCode())
-                    .build()));
-
-            caseData.getRespondentCollection().forEach(respondent -> {
-                RespondentSumType respondentValue = respondent.getValue();
-                Address respondentAddress = respondentValue.getResponseRespondentAddress();
-
-                SearchParty.SearchPartyBuilder searchPartyBuilder = SearchParty.builder()
-                        .name(respondentValue.getRespondentName())
-                        .emailAddress(respondentValue.getRespondentEmail());
-
-                if (respondentAddress != null) {
-                    searchPartyBuilder
-                            .addressLine1(respondentAddress.getAddressLine1())
-                            .postCode(respondentAddress.getPostCode());
-                }
-                searchParties.add(GenericTypeItem.from(searchPartyBuilder.build()));
-            });
-
-            caseData.getRepCollection().forEach(rep -> {
-                RepresentedTypeR repValue = rep.getValue();
-                Address representativeAddress = repValue.getRepresentativeAddress();
-
-                SearchParty.SearchPartyBuilder searchRepPartyBuilder = SearchParty.builder()
-                        .name(repValue.getRespRepName())
-                        .emailAddress(repValue.getRepresentativeEmailAddress());
-
-                if (representativeAddress != null) {
-                    searchRepPartyBuilder
-                            .addressLine1(representativeAddress.getAddressLine1())
-                            .postCode(representativeAddress.getPostCode());
-                }
-                searchParties.add(GenericTypeItem.from(searchRepPartyBuilder.build()));
-            });
-
-            ListTypeItem<String> otherCaseReferences = new ListTypeItem<>();
-            otherCaseReferences.add(GenericTypeItem.from(caseData.getEthosCaseReference()));
-            SearchCriteria searchCriteria = SearchCriteria.builder()
-                    .otherCaseReferences(otherCaseReferences)
-                    .searchParties(searchParties)
-                    .build();
-            caseData.setSearchCriteria(searchCriteria);
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
         }
+
+        ListTypeItem<SearchParty> searchParties = new ListTypeItem<>();
+        ClaimantIndType claimantIndType = caseData.getClaimantIndType();
+        ClaimantType claimantType = caseData.getClaimantType();
+
+        Address claimantAddressUK = claimantType.getClaimantAddressUK();
+        searchParties.add(GenericTypeItem.from(SearchParty.builder()
+                .name(claimantIndType.claimantFullName())
+                .dateOfBirth(claimantIndType.getClaimantDateOfBirth())
+                .emailAddress(claimantType.getClaimantEmailAddress())
+                .addressLine1(claimantAddressUK.getAddressLine1())
+                .postCode(claimantAddressUK.getPostCode())
+                .build()));
+
+        caseData.getRespondentCollection().forEach(respondent -> {
+            RespondentSumType respondentValue = respondent.getValue();
+            Address respondentAddress = respondentValue.getResponseRespondentAddress();
+
+            SearchParty.SearchPartyBuilder searchPartyBuilder = SearchParty.builder()
+                    .name(respondentValue.getRespondentName())
+                    .emailAddress(respondentValue.getRespondentEmail());
+
+            if (respondentAddress != null) {
+                searchPartyBuilder
+                        .addressLine1(respondentAddress.getAddressLine1())
+                        .postCode(respondentAddress.getPostCode());
+            }
+            searchParties.add(GenericTypeItem.from(searchPartyBuilder.build()));
+        });
+
+        caseData.getRepCollection().forEach(rep -> {
+            RepresentedTypeR repValue = rep.getValue();
+            Address representativeAddress = repValue.getRepresentativeAddress();
+
+            SearchParty.SearchPartyBuilder searchRepPartyBuilder = SearchParty.builder()
+                    .name(repValue.getRespRepName())
+                    .emailAddress(repValue.getRepresentativeEmailAddress());
+
+            if (representativeAddress != null) {
+                searchRepPartyBuilder
+                        .addressLine1(representativeAddress.getAddressLine1())
+                        .postCode(representativeAddress.getPostCode());
+            }
+            searchParties.add(GenericTypeItem.from(searchRepPartyBuilder.build()));
+        });
+
+        ListTypeItem<String> otherCaseReferences = new ListTypeItem<>();
+        otherCaseReferences.add(GenericTypeItem.from(caseData.getEthosCaseReference()));
+        SearchCriteria searchCriteria = SearchCriteria.builder()
+                .otherCaseReferences(otherCaseReferences)
+                .searchParties(searchParties)
+                .build();
+        caseData.setSearchCriteria(searchCriteria);
+
     }
 
     private void setCaseManagementLocation(CaseData caseData) {

@@ -188,7 +188,7 @@ class CaseManagementForCaseWorkerServiceTest {
         eccCounterClaimTypeItem.setValue(counterClaimType);
         caseData.setEccCases(List.of(eccCounterClaimTypeItem));
         caseData.setRespondentECC(createRespondentECC());
-        caseData.setManagingOffice("Manchester");
+        caseData.setManagingOffice("Edinburgh");
         CaseDetails manchesterCaseDetails = new CaseDetails();
         manchesterCaseDetails.setCaseData(caseData);
         manchesterCaseDetails.setCaseId("123456");
@@ -210,8 +210,8 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseId(123);
         submitEvent.setCaseData(submitCaseData);
         when(tribunalOfficesService.getTribunalOffice(any()))
-                .thenReturn(TribunalOffice.valueOfOfficeName("Manchester"));
-        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getManchesterCourtLocations());
+                .thenReturn(TribunalOffice.valueOfOfficeName("Edinburgh"));
+        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getEdinburghCourtLocations());
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
@@ -219,12 +219,12 @@ class CaseManagementForCaseWorkerServiceTest {
                 tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID, adminUserService);
     }
 
-    private static CourtLocations getManchesterCourtLocations() {
-        CourtLocations manchesterLocation = new CourtLocations();
-        manchesterLocation.setEpimmsId("301017");
-        manchesterLocation.setRegion("North West");
-        manchesterLocation.setRegionId("4");
-        return manchesterLocation;
+    private static CourtLocations getEdinburghCourtLocations() {
+        CourtLocations edinburghLocation = new CourtLocations();
+        edinburghLocation.setEpimmsId("301017");
+        edinburghLocation.setRegion("North West");
+        edinburghLocation.setRegionId("4");
+        return edinburghLocation;
     }
 
     private static Address getAddress() {

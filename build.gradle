@@ -330,6 +330,7 @@ dependencyManagement {
             entry 'netty-transport-classes-epoll'
             entry 'netty-transport-classes-kqueue'
         }
+        dependency group: 'apache', name: 'commons_compress', version: '1.24.0'
     }
 }
 

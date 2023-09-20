@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @RequiredArgsConstructor
 @Service("tornadoService")
 public class TornadoService {
+    //private final TseAdmReplyService tseAdmReplyService;
     public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
     public static final String TSE_REPLY = "TSE Reply.pdf";
     public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
@@ -284,8 +285,10 @@ public class TornadoService {
                     ? String.format("%s - " + ET3_RESPONSE_PDF, caseData.getSubmitEt3Respondent().getSelectedLabel())
                     : documentName;
             connection = createConnection();
-            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
+            String docContent = buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
+
             byte[] bytes = getDocumentByteArray(connection);
+
             return createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -293,6 +296,7 @@ public class TornadoService {
         } finally {
             closeConnection(connection);
         }
+
     }
 
     /**
@@ -321,7 +325,7 @@ public class TornadoService {
         }
     }
 
-    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
+    private String buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
                                           String caseTypeId)
             throws IOException {
         if (isNullOrEmpty(documentName)) {
@@ -329,11 +333,15 @@ public class TornadoService {
         }
         String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
 
+        //tseAdmReplyService.sendNotifyEmailsToClaimant(caseTypeId, caseData, documentContent);
+        String dataToReturn = documentContent;
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
             outputStreamWriter.write(documentContent);
             outputStreamWriter.flush();
         }
+
+        return dataToReturn;
     }
 
     private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)

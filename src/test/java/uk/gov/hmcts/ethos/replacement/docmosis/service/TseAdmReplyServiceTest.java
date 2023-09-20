@@ -15,6 +15,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -458,17 +460,29 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplySelectPartyNotify(admReplySelectPartyNotify);
         caseData.setTseAdmReplyRequestIsResponseRequired(admReplyIsResponseRequired);
         caseData.setTseAdmReplyRequestSelectPartyRespond(admReplySelectPartyRespond);
+        setDocCollection(caseData);
 
-        Map<String, String> expectedPersonalisationClaimant =
-            createPersonalisation(caseData, expectedClaimantCustomText);
-
-        tseAdmReplyService.sendNotifyEmailsToClaimant(CASE_ID, caseData);
+        Map<String, String> expectedPersonalisationClaimant = createPersonalisation(caseData,
+                expectedClaimantCustomText);
+        tseAdmReplyService.sendNotifyEmailsToClaimant(CASE_ID, caseData, "testToken");
 
         if (emailSentToClaimant) {
             verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
         } else {
             verify(emailService, never()).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
         }
+    }
+
+    private void setDocCollection(CaseData caseData) {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        DocumentType documentType = new DocumentType();
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentUrl("test url");
+        uploadedDocumentType.setDocumentFilename("test file name");
+        uploadedDocumentType.setDocumentBinaryUrl("test binary url");
+        documentType.setUploadedDocument(uploadedDocumentType);
+        documentTypeItem.setValue(documentType);
+        caseData.setDocumentCollection(List.of(documentTypeItem));
     }
 
     private static Stream<Arguments> sendEmails() {
@@ -590,7 +604,7 @@ class TseAdmReplyServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
 
-        tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails);
+        tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails, "testToken");
 
         verify(emailService, never()).sendEmail(any(), any(), any());
     }
@@ -617,7 +631,7 @@ class TseAdmReplyServiceTest {
         Map<String, String> expectedPersonalisation =
                 createPersonalisation(caseData, expectedCustomText);
 
-        tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails);
+        tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails, "testToken");
 
         // Email will be sent to the Representative if it exists,
         // if not then email will be sent to the Respondent instead.

@@ -157,7 +157,7 @@ class TseAdmReplyControllerTest {
         verify(tseAdmReplyService).saveTseAdmReplyDataFromCaseData(
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService).sendNotifyEmailsToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(), ccdRequest.getCaseDetails().getCaseData());
+            ccdRequest.getCaseDetails().getCaseId(), ccdRequest.getCaseDetails().getCaseData(), "testToken");
         verify(tseAdmReplyService).clearTseAdmReplyDataFromCaseData(
             ccdRequest.getCaseDetails().getCaseData());
     }
@@ -173,7 +173,7 @@ class TseAdmReplyControllerTest {
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
-            "4321", ccdRequest.getCaseDetails().getCaseData());
+            "4321", ccdRequest.getCaseDetails().getCaseData(), "testToken");
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
     }
@@ -188,7 +188,7 @@ class TseAdmReplyControllerTest {
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
-            "4321", ccdRequest.getCaseDetails().getCaseData());
+            "4321", ccdRequest.getCaseDetails().getCaseData(), "testToken");
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
     }

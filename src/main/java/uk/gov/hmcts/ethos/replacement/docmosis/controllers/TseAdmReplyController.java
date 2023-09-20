@@ -127,11 +127,10 @@ public class TseAdmReplyController {
         CaseData caseData = caseDetails.getCaseData();
         tseAdmReplyService.updateApplicationState(caseData);
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
-
         // Generate a pdf copy of the CYA page of the Tse Admin reply application
         tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, userToken);
-        tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
-        tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
+        tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData, userToken);
+        tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails(), userToken);
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

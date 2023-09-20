@@ -276,6 +276,7 @@ public class TseAdmReplyService {
         personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("customisedText", customText);
+        personalisation.put("linkToUploadedPdfDocumentBinary", "");
         return personalisation;
     }
 

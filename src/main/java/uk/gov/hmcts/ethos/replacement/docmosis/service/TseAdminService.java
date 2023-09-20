@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -30,17 +28,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TSE_ADMIN_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_DECISION;
 
 @Slf4j
 @Service
@@ -54,8 +49,6 @@ public class TseAdminService {
     private String tseAdminRecordClaimantTemplateId;
     @Value("${template.tse.admin.record-a-decision.respondent}")
     private String tseAdminRecordRespondentTemplateId;
-    private final DocumentManagementService documentManagementService;
-    private final TornadoService tornadoService;
 
     /**
      * Initial Application and Respond details table.
@@ -114,25 +107,6 @@ public class TseAdminService {
                 .value(decision)
                 .build()
         );
-    }
-
-    /**
-     * Creates a pdf copy of the decision an Admin/Caseworker makes on TSE application and
-     * adds it to the case doc collection.
-     *
-     * @param caseDetails details of the case from which required fields are extracted
-     * @param userToken autherisation token to use for generating an event document
-     */
-    public void addTseAdminDecisionPdfToDocCollection(CaseDetails caseDetails, String userToken) {
-        CaseData caseData = caseDetails.getCaseData();
-
-        if (isEmpty(caseData.getDocumentCollection())) {
-            caseData.setDocumentCollection(new ArrayList<>());
-        }
-
-        DocumentTypeItem docTypeItem = TseAdminHelper.getDocumentTypeItem(documentManagementService, tornadoService,
-                caseDetails, userToken, TSE_ADMIN_DECISION, TSE_ADMIN_CORRESPONDENCE);
-        caseData.getDocumentCollection().add(docTypeItem);
     }
 
     private List<GenericTypeItem<DocumentType>> getResponseRequiredDocYesOrNo(CaseData caseData) {

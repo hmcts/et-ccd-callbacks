@@ -32,8 +32,6 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -523,6 +521,7 @@ class TseAdmReplyServiceTest {
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("linkToCitizenHub", "citizenUrlsomeCaseId");
         personalisation.put("linkToExUI", "exuiUrlsomeCaseId");
+        personalisation.put("linkToUploadedPdfDocumentBinary", "");
         if (expectedCustomText != null) {
             personalisation.put("customisedText", expectedCustomText);
         }
@@ -571,17 +570,6 @@ class TseAdmReplyServiceTest {
         ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantEmailAddress(CLAIMANT_EMAIL);
         caseData.setClaimantType(claimantType);
-    }
-
-    private void createRespondent(CaseData caseData) {
-        RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
-        respondentSumType.setRespondentName(RESPONDENT_1);
-
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(respondentSumType);
-
-        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
     }
 
     @Test

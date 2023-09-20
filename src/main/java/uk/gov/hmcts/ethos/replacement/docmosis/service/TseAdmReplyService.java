@@ -18,7 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -276,6 +276,7 @@ public class TseAdmReplyService {
         personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("customisedText", customText);
+        personalisation.put("linkToUploadedPdfDocumentBinary", "");
         return personalisation;
     }
 
@@ -291,7 +292,7 @@ public class TseAdmReplyService {
         if (isEmpty(caseData.getDocumentCollection())) {
             caseData.setDocumentCollection(new ArrayList<>());
         }
-        DocumentTypeItem docItem = TseAdminHelper.getDocumentTypeItem(documentManagementService, tornadoService,
+        DocumentTypeItem docItem = TseAdmReplyHelper.getDocumentTypeItem(documentManagementService, tornadoService,
                 caseDetails, userToken, TSE_ADMIN_REPLY, TSE_ADMIN_CORRESPONDENCE);
         caseData.getDocumentCollection().add(docItem);
     }

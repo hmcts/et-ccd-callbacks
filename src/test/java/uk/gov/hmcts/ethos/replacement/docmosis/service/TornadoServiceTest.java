@@ -226,14 +226,6 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateAdminDecisionDocumentRequestDocument() throws IOException {
-        mockConnectionSuccess();
-        DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "TSE Admin Decision.pdf");
-        verifyDocumentInfo(documentInfo);
-    }
-
-    @Test
     void generateEt3VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(

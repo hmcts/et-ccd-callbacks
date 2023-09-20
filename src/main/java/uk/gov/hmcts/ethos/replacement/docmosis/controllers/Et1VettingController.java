@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
@@ -174,6 +175,7 @@ public class Et1VettingController {
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
+        Et1VettingHelper.addEt1VettingToDocTab(caseData);
         caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());
         return getCallbackRespEntityNoErrors(caseData);
     }

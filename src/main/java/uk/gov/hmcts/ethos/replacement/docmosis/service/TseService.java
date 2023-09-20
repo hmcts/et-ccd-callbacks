@@ -130,11 +130,19 @@ public class TseService {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
 
-            caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItem(
-                application.getDocumentUpload(),
-                "Respondent correspondence",
-                application.getType()
+            String applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
+                            application.getType());
+            String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(applicationDoc);
+
+            application.getDocumentUpload().setDocumentFilename("Application %s - %s - Attachment.pdf".formatted(
+                    application.getNumber(),
+                    applicationDoc
             ));
+
+            caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItemFromTopLevel(
+                    application.getDocumentUpload(), topLevel, applicationDoc
+            ));
+
         }
     }
 
@@ -182,7 +190,7 @@ public class TseService {
      *
      * @param caseData contains all the case data
      */
-    private static int getNextApplicationNumber(CaseData caseData) {
+    public static int getNextApplicationNumber(CaseData caseData) {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return 1;
         }
@@ -387,5 +395,11 @@ public class TseService {
         UploadedDocumentType uploadedDocument = document.getUploadedDocument();
         String nameTypeSizeLink = documentManagementService.displayDocNameTypeSizeLink(uploadedDocument, authToken);
         return MarkdownHelper.addRowsForDocument(document, nameTypeSizeLink);
+    }
+
+    public String getTseDocumentName(CaseData caseData) {
+        return String.format("Application %d - %s.pdf",
+                getNextApplicationNumber(caseData),
+                caseData.getResTseSelectApplication());
     }
 }

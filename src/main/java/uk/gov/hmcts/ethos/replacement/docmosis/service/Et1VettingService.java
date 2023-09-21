@@ -112,7 +112,7 @@ public class Et1VettingService {
     }
 
     public void clearEt1FieldsFromCaseData(CaseData caseData) {
-
+        caseData.setEt1VettingBeforeYouStart(null);
         caseData.setEt1VettingRespondentDetailsMarkUp(null);
         caseData.setEt1VettingRespondentAcasDetails1(null);
         caseData.setEt1VettingRespondentAcasDetails2(null);
@@ -123,8 +123,7 @@ public class Et1VettingService {
         caseData.setExistingJurisdictionCodes(null);
         caseData.setEt1VettingClaimantDetailsMarkUp(null);
         caseData.setTrackAllocation(null);
-
-
+        caseData.setEt1AddressDetails(null);
     }
 
     /**

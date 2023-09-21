@@ -167,10 +167,12 @@ class ReferralHelperTest {
                 + "referralSubjectSpecify=Custom subject line, referralDetails=This is an explanation, "
                 + "referralDocument=[GenericTypeItem(id=1, value=DocumentType(typeOfDocument=null, "
                 + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
-                + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
+                + "documentFilename=testFileName, documentUrl=null, categoryId=null, uploadTimestamp=null), "
+                + "ownerDocument=null, creationDate=null, "
                 + "shortDescription=null)), GenericTypeItem(id=2, value=DocumentType(typeOfDocument=null, "
                 + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
-                + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
+                + "documentFilename=testFileName, documentUrl=null, categoryId=null, uploadTimestamp=null), "
+                + "ownerDocument=null, creationDate=null, "
                 + "shortDescription=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
                 + "closeReferralGeneralNotes=null, referralReplyCollection=null, updateReferralCollection=null,"
@@ -393,7 +395,7 @@ class ReferralHelperTest {
         caseData.setCloseReferralGeneralNotes("generalNotes");
 
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
-        
+
         assertNull(caseData.getSelectReferral());
         assertNull(caseData.getCloseReferralHearingDetails());
         assertNull(caseData.getConfirmCloseReferral());
@@ -456,10 +458,12 @@ class ReferralHelperTest {
             + "\"referralSubject\":null,\"referralDetails\":null,"
             + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}},{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"referralInstruction\":null,"
             + "\"referralReplyCollection\":null}}";
 
@@ -491,7 +495,8 @@ class ReferralHelperTest {
             + "\"replyToEmailAddress\":\"replyToEmail\",\"isUrgentReply\":\"isUrgent\","
             + "\"directionDetails\":\"details\",\"replyDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
             + "\"replyBy\",\"replyDate\":\"replyDate\"}}]}}";
 
@@ -537,7 +542,7 @@ class ReferralHelperTest {
 
         return respondentSumTypeItem;
     }
-    
+
     private void setReferralReplyData() {
         caseData.setHearingAndReferralDetails("hearingDetails");
         caseData.setDirectionTo("directionTo");

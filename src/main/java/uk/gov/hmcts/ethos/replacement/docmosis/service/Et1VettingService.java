@@ -115,7 +115,15 @@ public class Et1VettingService {
 
         caseData.setEt1VettingRespondentDetailsMarkUp(null);
         caseData.setEt1VettingRespondentAcasDetails1(null);
+        caseData.setEt1VettingRespondentAcasDetails2(null);
+        caseData.setEt1VettingRespondentAcasDetails3(null);
+        caseData.setEt1VettingRespondentAcasDetails4(null);
+        caseData.setEt1VettingRespondentAcasDetails5(null);
+        caseData.setEt1VettingRespondentAcasDetails6(null);
         caseData.setExistingJurisdictionCodes(null);
+        caseData.setEt1VettingClaimantDetailsMarkUp(null);
+        caseData.setTrackAllocation(null);
+
 
     }
 

@@ -1007,6 +1007,13 @@ public final class DocumentHelper {
         return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
     }
 
+    /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param topLevel top level document
+     * @param secondLevel second level document
+     * @return DocumentTypeItem
+     */
     public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
                                                           String topLevel,
                                                           String secondLevel) {

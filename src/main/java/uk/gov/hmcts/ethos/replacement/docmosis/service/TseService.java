@@ -98,6 +98,18 @@ public class TseService {
         caseData.setGenericTseApplicationCollection(tseApplicationCollection);
     }
 
+    /**
+     * Clears the existing TSE data from CaseData to ensure fields will be empty when user
+     * starts a new application in the same case.
+     *
+     * @param caseData contains all the case data.
+     */
+    public void clearApplicationData(CaseData caseData) {
+        caseData.setClaimantTse(null);
+        clearRespondentTseDataFromCaseData(caseData);
+
+    }
+
     private void addClaimantData(CaseData caseData, GenericTseApplicationType application) {
         application.setApplicant(CLAIMANT_TITLE);
 
@@ -109,7 +121,6 @@ public class TseService {
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
         application.setApplicationState(IN_PROGRESS);
 
-        caseData.setClaimantTse(null);
     }
 
     private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {
@@ -121,7 +132,6 @@ public class TseService {
         application.setApplicationState(NOT_STARTED_YET);
         addSupportingMaterialToDocumentCollection(caseData, application);
 
-        clearRespondentTseDataFromCaseData(caseData);
     }
 
     private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application) {
@@ -397,9 +407,14 @@ public class TseService {
         return MarkdownHelper.addRowsForDocument(document, nameTypeSizeLink);
     }
 
+    /**
+     * Returns a formatted document name for a TSE application.
+     * @param caseData parent object for all case data
+     * @return formatted document name
+     */
     public String getTseDocumentName(CaseData caseData) {
         return String.format("Application %d - %s.pdf",
-                getNextApplicationNumber(caseData),
+                getNextApplicationNumber(caseData) - 1,
                 caseData.getResTseSelectApplication());
     }
 }

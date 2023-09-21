@@ -302,14 +302,14 @@ public class TseAdmReplyService {
     }
 
     private Map<String, Object> buildPersonalisation(String caseNumber, String caseId, String customText,
-                                                     byte[] et1Pdf) {
+                                                     byte[] adminReplyPdfDocContent) {
         Map<String, Object> personalisation = new ConcurrentHashMap<>();
         try {
             personalisation.put(CASE_NUMBER, caseNumber);
             personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
             personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
             personalisation.put("customisedText", customText);
-            personalisation.put("linkToUploadedPdfDocumentBinary", prepareUpload(et1Pdf));
+            personalisation.put("linkToUploadedPdfDocumentBinary", prepareUpload(adminReplyPdfDocContent));
         } catch (NotificationClientException notificationClientEx) {
             log.error("Attaching pdf content to email failed: " + notificationClientEx.getMessage());
         }

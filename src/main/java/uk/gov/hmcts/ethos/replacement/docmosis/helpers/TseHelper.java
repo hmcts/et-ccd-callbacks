@@ -19,14 +19,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -274,18 +273,7 @@ public final class TseHelper {
             return null;
         }
 
-        List<GenericTypeItem<DocumentType>> genericDocTypeList = new ArrayList<>();
-
-        caseData.getTseResponseSupportingMaterial().forEach(doc -> {
-            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
-            DocumentType docType = new DocumentType();
-            docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-            genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
-            genTypeItems.setValue(docType);
-            genericDocTypeList.add(genTypeItems);
-        });
-
-        return genericDocTypeList;
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {

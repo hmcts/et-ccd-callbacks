@@ -68,10 +68,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class TseAdminServiceTest {
     private TseAdminService tseAdminService;
     private EmailService emailService;
-    @MockBean
-    private DocumentManagementService documentManagementService;
-    @MockBean
-    private TornadoService tornadoService;
 
     @MockBean
     private TseService tseService;
@@ -101,25 +97,11 @@ class TseAdminServiceTest {
     @BeforeEach
     void setUp() {
         emailService = spy(new TestEmailService());
-        tseAdminService = new TseAdminService(emailService, tseService, documentManagementService, tornadoService);
+        tseAdminService = new TseAdminService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
 
         caseData = CaseDataBuilder.builder().build();
-    }
-
-    @Test
-    void addsTseAdminDecisionPdfToDocCollection() {
-        caseData.setEthosCaseReference(CASE_NUMBER);
-        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
-        caseData.setTseAdmReplyCmoIsResponseRequired("Yes");
-        caseData.setTseAdmReplyCmoSelectPartyRespond("Both");
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-
-        tseAdminService.addTseAdminDecisionPdfToDocCollection(caseDetails, "test token");
-        assertThat(caseData.getDocumentCollection()).isNotNull();
     }
 
     @Test
@@ -414,8 +396,6 @@ class TseAdminServiceTest {
 
         Map<String, String> expectedPersonalisationClaimant =
             createPersonalisation(caseData, CLAIMANT_FIRSTNAME + " " + CLAIMANT_LASTNAME);
-        Map<String, String> expectedPersonalisationRespondent =
-            createPersonalisation(caseData, RESPONDENT_TITLE);
 
         tseAdminService.sendEmailToClaimant(CASE_ID, caseData);
         if (!RESPONDENT_ONLY.equals(partyNotified)) {

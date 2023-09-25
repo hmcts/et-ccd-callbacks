@@ -20,15 +20,18 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +63,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_SETTLED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
@@ -89,7 +93,7 @@ class TseRespondentReplyServiceTest {
     private static final String TEST_XUI_URL = "exuiUrl";
     private static final String TEST_CUI_URL = "citizenUrl";
     private static final String CASE_NUMBER = "9876";
-    private static final String WITHDRAW_MY_CLAIM = "Withdraw my claim";
+    private static final String WITHDRAW_MY_CLAIM = "Withdraw all/part of claim";
 
     private EmailService emailService;
     private UserDetails userDetails;
@@ -251,7 +255,11 @@ class TseRespondentReplyServiceTest {
     }
 
     @Test
-    void addTseRespondentReplyPdfToDocCollection() {
+    void addTseRespondentReplyPdfToDocCollection() throws IOException {
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+                .thenReturn(new DocumentInfo());
+        when(documentManagementService.addDocumentToDocumentField(any()))
+                .thenReturn(DocumentFixtures.getUploadedDocumentType());
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
@@ -260,8 +268,7 @@ class TseRespondentReplyServiceTest {
                 "ET_EnglandWales");
 
         assertThat(caseData.getDocumentCollection().size(), is(1));
-        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument(),
-                is("Respondent correspondence"));
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getTopLevelDocuments(), is(WITHDRAWAL_SETTLED));
     }
 
     @ParameterizedTest

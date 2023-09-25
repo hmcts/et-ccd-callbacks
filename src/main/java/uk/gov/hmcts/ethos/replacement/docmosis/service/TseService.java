@@ -150,7 +150,7 @@ public class TseService {
             ));
 
             caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItemFromTopLevel(
-                    application.getDocumentUpload(), topLevel, applicationDoc
+                    application.getDocumentUpload(), topLevel, applicationDoc, application.getType()
             ));
 
         }

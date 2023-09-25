@@ -1016,9 +1016,11 @@ public final class DocumentHelper {
      */
     public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
                                                           String topLevel,
-                                                          String secondLevel) {
+                                                          String secondLevel,
+                                                          String shortDescription) {
         DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
         DocumentType documentType = documentTypeItem.getValue();
+        documentType.setShortDescription(shortDescription);
         documentType.setDateOfCorrespondence(LocalDate.now().toString());
         documentType.setTopLevelDocuments(topLevel);
         uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);

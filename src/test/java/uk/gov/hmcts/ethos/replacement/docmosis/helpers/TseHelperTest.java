@@ -237,7 +237,7 @@ class TseHelperTest {
             + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
             + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
             + "dateOfCorrespondence\":null}}],\"copy\":\"Yes\","
-            + "\"response\":\"response\",\"respondentParty\":\"Respondent\"}}";
+            + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
     }

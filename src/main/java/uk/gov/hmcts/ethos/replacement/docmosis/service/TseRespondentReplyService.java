@@ -118,10 +118,11 @@ public class TseRespondentReplyService {
             uploadedDocumentType.setDocumentFilename(documentName);
 
             String applicationDoc = getApplicationDoc(applicationType);
+            System.out.println("Main");
             String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(applicationDoc);
 
             DocumentTypeItem docItem = createDocumentTypeItemFromTopLevel(uploadedDocumentType, topLevel,
-                    applicationDoc);
+                    applicationDoc, applicationType.getType());
 
             caseData.getDocumentCollection().add(docItem);
 

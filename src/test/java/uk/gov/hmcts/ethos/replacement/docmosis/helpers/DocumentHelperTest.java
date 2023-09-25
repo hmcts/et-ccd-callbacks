@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures.getDocumentTypeItem;
 
 @ExtendWith(SpringExtension.class)
@@ -2223,10 +2224,13 @@ class DocumentHelperTest {
             build, "typeOfDocument", "shortDescription"
         );
 
-        DocumentType expected = DocumentType.builder().typeOfDocument("typeOfDocument")
-            .shortDescription("shortDescription")
+        DocumentType expected = DocumentType.builder()
+                .typeOfDocument("typeOfDocument")
+                .shortDescription("shortDescription")
                 .uploadedDocument(build)
                 .dateOfCorrespondence(LocalDate.now().toString())
+                .topLevelDocuments(LEGACY_DOCUMENT_NAMES)
+                .documentType("typeOfDocument")
                 .build();
 
         assertThat(actual.getId()).isNotEmpty();

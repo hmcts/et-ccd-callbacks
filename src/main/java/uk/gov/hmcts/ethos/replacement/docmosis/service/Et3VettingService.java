@@ -59,7 +59,7 @@ public class Et3VettingService {
             caseData.setDocumentCollection(new ArrayList<>());
         }
         DocumentTypeItem documentTypeItem = DocumentHelper.createDocumentTypeItemFromTopLevel(et3VettingDocument,
-                RESPONSE_TO_A_CLAIM, ET3_PROCESSING);
+                RESPONSE_TO_A_CLAIM, ET3_PROCESSING, null);
         caseData.getDocumentCollection().add(documentTypeItem);
     }
 

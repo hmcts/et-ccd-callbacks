@@ -12,8 +12,6 @@ public class PreHearingDepositData {
     private ImportFile preHearingDepositImportFile;
     @JsonProperty("payeeName")
     private String payeeName;
-
-    // For adding judge
     @JsonProperty("regionOffice")
     private String regionOffice;
     @JsonProperty("refundReference")
@@ -59,7 +57,6 @@ public class PreHearingDepositData {
     private String depositCovers;
     @JsonProperty("depositOrderSent")
     private String depositOrderSent;
-
     @JsonProperty("depositDue")
     private String depositDue;
     @JsonProperty("depositTimeExtension")
@@ -70,7 +67,6 @@ public class PreHearingDepositData {
     private String depositReceived;
     @JsonProperty("dateDepositReceived")
     private String dateDepositReceived;
-
     @JsonProperty("depositRefund")
     private String depositRefund;
     @JsonProperty("amountRefunded")
@@ -81,7 +77,4 @@ public class PreHearingDepositData {
     private String chequeOrPONumber;
     @JsonProperty("receivedBy")
     private String receivedBy;
-
-
-
 }

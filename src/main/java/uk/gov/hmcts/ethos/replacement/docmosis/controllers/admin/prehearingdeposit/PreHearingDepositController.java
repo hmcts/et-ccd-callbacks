@@ -52,7 +52,7 @@ public class PreHearingDepositController {
         try {
             preHearingDepositService.importData(preHearingDepositData, userToken);
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to import staff", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to import pre-hearing deposit data", e);
         }
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(preHearingDepositData);

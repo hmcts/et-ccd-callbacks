@@ -47,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -510,7 +509,8 @@ class RespondentTellSomethingElseServiceTest {
         var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
         assertThat(genericTseApplicationType.getStatus(), is(OPEN_STATE));
         assertThat(genericTseApplicationType.getApplicationState(), is(IN_PROGRESS));
-        assertThat(genericTseApplicationType.getDueDate(), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
+        assertThat(genericTseApplicationType.getDueDate(),
+            is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
     }
 
     @Test

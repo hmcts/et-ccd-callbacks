@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -28,14 +31,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_DECISION_FILE_NAME;
 
 @Slf4j
 @Service
@@ -44,11 +50,15 @@ public class TseAdminService {
     public static final String NOT_VIEWED_YET = "notViewedYet";
 
     private final EmailService emailService;
+    private final TornadoService tornadoService;
     private final TseService tseService;
+    private final DocumentManagementService documentManagementService;
     @Value("${template.tse.admin.record-a-decision.claimant}")
     private String tseAdminRecordClaimantTemplateId;
     @Value("${template.tse.admin.record-a-decision.respondent}")
     private String tseAdminRecordRespondentTemplateId;
+
+    private static final String DECISION_DOC_GEN_ERROR = "Failed to generate decision document for case id: %s";
 
     /**
      * Initial Application and Respond details table.
@@ -205,6 +215,42 @@ public class TseAdminService {
         caseData.setTseAdminDecisionMadeBy(null);
         caseData.setTseAdminDecisionMadeByFullName(null);
         caseData.setTseAdminSelectPartyNotify(null);
+    }
+
+    /**
+     * Creates a pdf copy of the Decision from Tribunal and adds it to the case doc collection.
+     *
+     * @param caseData details of the case from which required fields are extracted
+     * @param userToken autherisation token to use for generating an event document
+     * @param caseTypeId case type to use for generating an event document
+     */
+    public void addTseAdminDecisionPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            if (isEmpty(caseData.getDocumentCollection())) {
+                caseData.setDocumentCollection(new ArrayList<>());
+            }
+            if (isNullOrEmpty(caseTypeId)) {
+                log.error("Error while creating case document: Case Type ID can not be null or empty");
+                throw new DocumentManagementException(
+                        "Error while creating case document: Case Type ID can not be null or empty");
+            }
+
+            DocumentInfo document = tornadoService.generateEventDocument(caseData, userToken, caseTypeId,
+                    TSE_ADMIN_DECISION_FILE_NAME);
+
+            DocumentTypeItem docItem = createDocumentTypeItem(
+                    documentManagementService.addDocumentToDocumentField(
+                            document),
+                    "Respondent correspondence",
+                    caseData.getResTseSelectApplication()
+            );
+
+            caseData.getDocumentCollection().add(docItem);
+
+        } catch (Exception e) {
+            throw new DocumentManagementException(
+                    String.format(DECISION_DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 
 }

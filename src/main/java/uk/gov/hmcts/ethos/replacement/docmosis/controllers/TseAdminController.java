@@ -98,6 +98,8 @@ public class TseAdminController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
+        tseAdminService.addTseAdminDecisionPdfToDocCollection(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId());
         tseAdminService.sendEmailToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
         tseAdminService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
         tseAdminService.clearTseAdminDataFromCaseData(caseData);
@@ -166,9 +168,9 @@ public class TseAdminController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("### What happens next\r\n\r\nYou can view the decision in the <a " + "href"
-            + "=\"/cases/case-details/%s#Applications\" target=\"_blank\">Applications tab (opens in new tab)</a>",
-            ccdRequest.getCaseDetails().getCaseId());
+        String body = String.format("### What happens next\r%n\r%nYou can view the decision in the "
+                        + "<a href =\"/cases/case-details/%s#Applications\" target=\"_blank\">"
+                        + "Applications tab (opens in new tab)</a>", ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_body(body)
@@ -266,9 +268,9 @@ public class TseAdminController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("### What happens next\r\n\r\nYou can still view the application in the"
-                        + " <a href=\"/cases/case-details/%s#Applications\""
-                        + " target=\"_blank\">Applications tab (opens in a new tab)</a>",
+        String body = String.format("### What happens next\r%n\r%nYou can still view the application in the "
+                        + "<a href=\"/cases/case-details/%s#Applications\" target=\"_blank\">"
+                        + "Applications tab (opens in a new tab)</a>",
                 ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

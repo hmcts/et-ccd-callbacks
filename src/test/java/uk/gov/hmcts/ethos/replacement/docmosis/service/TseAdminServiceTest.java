@@ -71,6 +71,10 @@ class TseAdminServiceTest {
 
     @MockBean
     private TseService tseService;
+    @MockBean
+    private TornadoService tornadoService;
+    @MockBean
+    DocumentManagementService documentManagementService;
 
     private CaseData caseData;
 
@@ -97,7 +101,7 @@ class TseAdminServiceTest {
     @BeforeEach
     void setUp() {
         emailService = spy(new TestEmailService());
-        tseAdminService = new TseAdminService(emailService, tseService);
+        tseAdminService = new TseAdminService(emailService, tornadoService, tseService, documentManagementService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
 

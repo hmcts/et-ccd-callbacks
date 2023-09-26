@@ -61,7 +61,6 @@ public class CaseLinksController {
         }
         log.info("Adding case links");
         ccdRequest.getCaseDetails().getCaseData().setHearingIsLinkedFlag(YES);
-
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, true);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())

@@ -31,6 +31,7 @@ public final class RolesConstants {
     public static final String MANAGE_USER = "manage-user";
     public static final String PRD_AAC_SYSTEM = "prd-aac-system";
     public static final String PRD_ADMIN = "prd-admin";
+    public static final String ACAS_API = "et-acas-api";
 
     //Emails constants
     public static final String CCD_DOCKER_DEFAULT_EMAIL = "ccd.docker.default@hmcts.net";
@@ -44,7 +45,7 @@ public final class RolesConstants {
 
     public static final String MCA_SYSTEM_IDAM_ACC_EMAIL = "mca.system.idam.acc@gmail.com";
     public static final String MCA_NOC_APPROVER_EMAIL = "mca.noc.approver@gmail.com";
-
+    public static final String ACAS_EMAIL = "et@acas.com";
     public static final String ET_SYSTEM_EMAIL = "et.service@hmcts.net";
 
     //Paths to definition files
@@ -56,8 +57,8 @@ public final class RolesConstants {
         CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_ETJUDGE, CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR, CITIZEN, ET_ACAS_API,
-        PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA,
-        MANAGE_USER, CASEWORKER_APPROVER};
+        PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA, MANAGE_USER,
+        CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN, ACAS_API};
 
     private RolesConstants() {
     }

@@ -19,6 +19,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.STORED_STATE;
 
 @ExtendWith(SpringExtension.class)
 class TseAdminHelperTest {
@@ -58,6 +59,26 @@ class TseAdminHelperTest {
 
     @Test
     void populateSelectApplicationAdminDropdown_withAnApplication_returnsDynamicList() {
+        DynamicFixedListType actual = TseAdminHelper.populateSelectApplicationAdminDropdown(caseData);
+        assertThat(actual.getListItems().size(), is(1));
+    }
+
+    @Test
+    void populateSelectApplicationAdminDropdown_withStored_returnsNoStored() {
+        GenericTseApplicationTypeItem item1 = caseData.getGenericTseApplicationCollection().get(0);
+        GenericTseApplicationTypeItem item2 = new GenericTseApplicationTypeItem();
+        item2.setId(UUID.randomUUID().toString());
+        item2.setValue(TseApplicationBuilder.builder()
+            .withApplicant(CLAIMANT_TITLE)
+            .withDate("14 December 2022")
+            .withType("Withdraw my claim")
+            .withDetails("Text")
+            .withNumber("2")
+            .withResponsesCount("0")
+            .withStatus(STORED_STATE)
+            .build());
+        caseData.setGenericTseApplicationCollection(List.of(item1, item2));
+
         DynamicFixedListType actual = TseAdminHelper.populateSelectApplicationAdminDropdown(caseData);
         assertThat(actual.getListItems().size(), is(1));
     }

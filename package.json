@@ -124,5 +124,5 @@
         "qs": ">=6.10.3",
         "ua-parser-js": "^1.0.33"
     },
-    "packageManager": "yarn@3.6.0"
+    "packageManager": "yarn@3.6.3"
 }

@@ -55,7 +55,7 @@ public class PreHearingDepositService {
                 preHearingDepositData.setReceivedBy(row.getCell(9).getStringCellValue());
                 preHearingDepositData.setDepositReceivedFrom(row.getCell(10).getStringCellValue());
                 preHearingDepositData.setDepositComments(row.getCell(11).getStringCellValue());
-                preHearingDepositData.setPHRNumber(row.getCell(12).getStringCellValue());
+                preHearingDepositData.setPhrNumber(row.getCell(12).getStringCellValue());
                 preHearingDepositData.setMr1Reference(row.getCell(13).getStringCellValue());
                 preHearingDepositData.setBankingDate(row.getCell(14).getStringCellValue());
                 preHearingDepositData.setJournalConfirmedReceipt(row.getCell(15).getStringCellValue());

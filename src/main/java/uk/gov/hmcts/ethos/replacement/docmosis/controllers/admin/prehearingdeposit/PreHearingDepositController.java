@@ -24,7 +24,6 @@ import java.io.IOException;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -36,12 +35,11 @@ public class PreHearingDepositController {
     @PostMapping(value = "/importPHRDeposits", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Import Pre-Hearing deposit Data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @ApiResponse(responseCode = "200", description = "Accessed successfully",
+    content = {@Content(mediaType = "application/json", schema = @Schema(
+                    implementation = CCDCallbackResponse.class))}),
+    @ApiResponse(responseCode = "400", description = "Bad Request"),
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
 
     public ResponseEntity<CCDCallbackResponse> importFile(
@@ -54,7 +52,8 @@ public class PreHearingDepositController {
         try {
             preHearingDepositService.importData(preHearingDepositData, userToken);
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to import pre-hearing deposit data", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Unable to import pre-hearing deposit data", e);
         }
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(preHearingDepositData);

@@ -35,11 +35,11 @@ public class PreHearingDepositController {
     @PostMapping(value = "/importPHRDeposits", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Import Pre-Hearing deposit Data")
     @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Accessed successfully",
-    content = {@Content(mediaType = "application/json", schema = @Schema(
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {@Content(mediaType = "application/json", schema = @Schema(
                     implementation = CCDCallbackResponse.class))}),
-    @ApiResponse(responseCode = "400", description = "Bad Request"),
-    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
 
     public ResponseEntity<CCDCallbackResponse> importFile(

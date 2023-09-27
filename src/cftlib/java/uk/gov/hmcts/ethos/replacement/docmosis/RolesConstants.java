@@ -31,6 +31,7 @@ public final class RolesConstants {
     public static final String PRD_AAC_SYSTEM = "prd-aac-system";
     public static final String PRD_ADMIN = "prd-admin";
     public static final String ACAS_API = "et-acas-api";
+    public static final String GS_PROFILE = "GS_profile";
 
     //Emails constants
     public static final String CCD_DOCKER_DEFAULT_EMAIL = "ccd.docker.default@hmcts.net";
@@ -56,7 +57,7 @@ public final class RolesConstants {
         CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_ETJUDGE, CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR, CITIZEN, ET_ACAS_API,
         PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA, MANAGE_USER,
-        CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN, ACAS_API};
+        CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN, ACAS_API, GS_PROFILE};
 
     private RolesConstants() {
     }

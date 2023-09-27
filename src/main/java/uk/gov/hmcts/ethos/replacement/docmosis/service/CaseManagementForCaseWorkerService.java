@@ -12,20 +12,31 @@ import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SearchCriteria;
+import uk.gov.hmcts.et.common.model.ccd.SearchParty;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -71,8 +82,10 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
-    private final AdminUserService adminUserService;
+    private final TribunalOfficesService tribunalOfficesService;
+    private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
+    private final AdminUserService adminUserService;
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
@@ -85,14 +98,19 @@ public class CaseManagementForCaseWorkerService {
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
-                                              CcdClient ccdClient, ClerkService clerkService,
-                                              EmailService emailService, AdminUserService adminUserService,
-                                              @Value("${hmcts_service_id}") String hmctsServiceId) {
+                                              CcdClient ccdClient,
+                                              ClerkService clerkService,
+                                              TribunalOfficesService tribunalOfficesService,
+                                              FeatureToggleService featureToggleService,
+                                              @Value("${hmcts_service_id}") String hmctsServiceId,
+                                              AdminUserService adminUserService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
-        this.adminUserService = adminUserService;
+        this.tribunalOfficesService = tribunalOfficesService;
+        this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
+        this.adminUserService = adminUserService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -101,6 +119,17 @@ public class CaseManagementForCaseWorkerService {
         struckOutDefaults(caseData);
         dateToCurrentPosition(caseData);
         flagsImageFileNameDefaults(caseData);
+        setGlobalSearchDefaults(caseData);
+    }
+
+    public void setGlobalSearchDefaults(CaseData caseData) {
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
+        }
+        setCaseNameHmctsInternal(caseData);
+        setCaseManagementLocation(caseData);
+        setCaseManagementCategory(caseData);
+
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -165,7 +194,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
         if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
-            && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
+                && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
             resetResponseRespondentAddress(respondentSumTypeItem);
         }
     }
@@ -238,7 +267,7 @@ public class CaseManagementForCaseWorkerService {
     public void setEt3ResponseDueDate(CaseData caseData) {
         if (!isNullOrEmpty(caseData.getClaimServedDate()) && isNullOrEmpty(caseData.getEt3DueDate())) {
             caseData.setEt3DueDate(LocalDate.parse(
-                caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
+                    caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }
     }
 
@@ -253,8 +282,8 @@ public class CaseManagementForCaseWorkerService {
             for (String date : dates) {
                 LocalDateTime parsedDate = LocalDateTime.parse(date);
                 if (nextListedDate.equals("") && parsedDate.isAfter(LocalDateTime.now())
-                    || parsedDate.isAfter(LocalDateTime.now())
-                    && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
+                        || parsedDate.isAfter(LocalDateTime.now())
+                        && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
                     nextListedDate = date;
                 }
             }
@@ -269,7 +298,7 @@ public class CaseManagementForCaseWorkerService {
             for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
                 DateListedType dateListedType = dateListedTypeItem.getValue();
                 if (HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
-                    && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
+                        && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
                     dates.add(dateListedType.getListedDate());
                 }
             }
@@ -296,7 +325,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(activeRespondent.stream(),
-                struckRespondent.stream()).toList());
+                    struckRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;
@@ -319,7 +348,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
-                notContinuingRespondent.stream()).toList());
+                    notContinuingRespondent.stream()).toList());
             respondentDefaults(caseData);
         }
         return caseData;
@@ -327,7 +356,7 @@ public class CaseManagementForCaseWorkerService {
 
     private boolean positionChanged(CaseData caseData) {
         return isNullOrEmpty(caseData.getCurrentPosition())
-            || !caseData.getPositionType().equals(caseData.getCurrentPosition());
+                || !caseData.getPositionType().equals(caseData.getCurrentPosition());
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
@@ -336,7 +365,7 @@ public class CaseManagementForCaseWorkerService {
                 HearingType hearingType = hearingTypeItem.getValue();
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
-                        : hearingTypeItem.getValue().getHearingDateCollection()) {
+                            : hearingTypeItem.getValue().getHearingDateCollection()) {
                         DateListedType dateListedType = dateListedTypeItem.getValue();
                         if (dateListedType.getHearingStatus() == null) {
                             dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
@@ -356,9 +385,9 @@ public class CaseManagementForCaseWorkerService {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
-                        : hearingTypeItem.getValue().getHearingDateCollection()) {
+                            : hearingTypeItem.getValue().getHearingDateCollection()) {
                         addHearingsOnWeekendError(dateListedTypeItem, errors,
-                            hearingTypeItem.getValue().getHearingNumber());
+                                hearingTypeItem.getValue().getHearingNumber());
                         addHearingsInPastWarning(dateListedTypeItem, caseData);
                     }
                 }
@@ -379,20 +408,20 @@ public class CaseManagementForCaseWorkerService {
     private void addHearingsOnWeekendError(DateListedTypeItem dateListedTypeItem, List<String> errors,
                                            String hearingNumber) {
         LocalDate date = LocalDateTime.parse(
-            dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         if (SUNDAY.equals(dayOfWeek)
-            || SATURDAY.equals(dayOfWeek)) {
+                || SATURDAY.equals(dayOfWeek)) {
             errors.add(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber);
         }
     }
 
     private void addHearingsInPastWarning(DateListedTypeItem dateListedTypeItem, CaseData caseData) {
         LocalDate date = LocalDateTime.parse(
-            dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
         if ((Strings.isNullOrEmpty(dateListedTypeItem.getValue().getHearingStatus())
-            || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
-            && date.isBefore(LocalDate.now())) {
+                || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
+                && date.isBefore(LocalDate.now())) {
             caseData.setListedDateInPastWarning(YES);
         }
     }
@@ -467,7 +496,7 @@ public class CaseManagementForCaseWorkerService {
                         break;
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
-                            String.valueOf(submitEvent.getCaseId()));
+                                String.valueOf(submitEvent.getCaseId()));
                         break;
                 }
             }
@@ -482,8 +511,8 @@ public class CaseManagementForCaseWorkerService {
 
     private List<SubmitEvent> getCasesES(CaseDetails caseDetails, String authToken) {
         return caseRetrievalForCaseWorkerService.casesRetrievalESRequest(caseDetails.getCaseId(), authToken,
-            caseDetails.getCaseTypeId(),
-            new ArrayList<>(Collections.singleton(caseDetails.getCaseData().getCaseRefECC())));
+                caseDetails.getCaseTypeId(),
+                new ArrayList<>(Collections.singleton(caseDetails.getCaseData().getCaseRefECC())));
     }
 
     private void sendUpdateSingleCaseECC(String authToken, CaseDetails currentCaseDetails,
@@ -498,13 +527,13 @@ public class CaseManagementForCaseWorkerService {
                 originalCaseData.getEccCases().add(eccCounterClaimTypeItem);
             } else {
                 originalCaseData.setEccCases(
-                    new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
+                        new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
             }
             FlagsImageHelper.buildFlagsImageFileName(currentCaseDetails.getCaseTypeId(), originalCaseData);
             CCDRequest returnedRequest = ccdClient.startEventForCase(authToken, currentCaseDetails.getCaseTypeId(),
-                currentCaseDetails.getJurisdiction(), caseIdToLink);
+                    currentCaseDetails.getJurisdiction(), caseIdToLink);
             ccdClient.submitEventForCase(authToken, originalCaseData, currentCaseDetails.getCaseTypeId(),
-                currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
+                    currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
         } catch (Exception e) {
             throw new CaseCreationException(MESSAGE + caseIdToLink + e.getMessage());
         }
@@ -512,19 +541,46 @@ public class CaseManagementForCaseWorkerService {
 
     /**
      * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
+     *
      * @param caseDetails Details on the case
      */
     public void setHmctsServiceIdSupplementary(CaseDetails caseDetails) throws IOException {
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
+        }
+
         Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
         payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));
 
+        setSupplementaryData(caseDetails, payloadData);
+    }
+
+    /**
+     * Calls reference data API to remove HMCTSServiceId from a case's supplementary_data..
+     *
+     * @param caseDetails Details on the case
+     */
+    public void removeHmctsServiceIdSupplementary(CaseDetails caseDetails) throws IOException {
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
+        }
+        Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
+        payloadData.put("$set", Map.of());
+
+        setSupplementaryData(caseDetails, payloadData);
+    }
+
+    private void setSupplementaryData(CaseDetails caseDetails,
+                                      Map<String, Map<String, Object>> payloadData) throws IOException {
         Map<String, Object> payload = Maps.newHashMap();
         payload.put("supplementary_data_updates", payloadData);
-        String errorMessage = String.format("Call to Supplementary Data API failed for %s", caseDetails.getCaseId());
-        String accessToken = adminUserService.getAdminUserToken();
+        String errorMessage = String.format("Call to Supplementary Data API failed for %s",
+                caseDetails.getCaseId());
+
         try {
+            String adminUserToken = adminUserService.getAdminUserToken();
             ResponseEntity<Object> response =
-                    ccdClient.setSupplementaryData(accessToken, payload, caseDetails.getCaseId());
+                    ccdClient.setSupplementaryData(adminUserToken, payload, caseDetails.getCaseId());
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
@@ -532,5 +588,104 @@ public class CaseManagementForCaseWorkerService {
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
+    }
+
+    private void setCaseNameHmctsInternal(CaseData caseData) {
+        if (caseData.getClaimant() == null) {
+            claimantDefaults(caseData);
+        }
+
+        if (caseData.getRespondent() == null) {
+            respondentDefaults(caseData);
+        }
+
+        caseData.setCaseNameHmctsInternal(caseData.getClaimant() + " vs " + caseData.getRespondent());
+    }
+
+    private void setCaseManagementCategory(CaseData caseData) {
+        caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
+    }
+
+    public void setSearchCriteria(CaseData caseData) {
+        if (!featureToggleService.isGlobalSearchEnabled()) {
+            return;
+        }
+
+        ListTypeItem<SearchParty> searchParties = new ListTypeItem<>();
+        ClaimantIndType claimantIndType = caseData.getClaimantIndType();
+
+        if (claimantIndType != null) {
+            ClaimantType claimantType = caseData.getClaimantType();
+
+            Address claimantAddressUK = claimantType.getClaimantAddressUK();
+            searchParties.add(GenericTypeItem.from(SearchParty.builder()
+                    .name(claimantIndType.claimantFullName())
+                    .dateOfBirth(claimantIndType.getClaimantDateOfBirth())
+                    .emailAddress(claimantType.getClaimantEmailAddress())
+                    .addressLine1(claimantAddressUK.getAddressLine1())
+                    .postCode(claimantAddressUK.getPostCode())
+                    .build()));
+        }
+
+        if (caseData.getRespondentCollection() != null) {
+            caseData.getRespondentCollection().forEach(respondent -> {
+                RespondentSumType respondentValue = respondent.getValue();
+                Address respondentAddress = respondentValue.getResponseRespondentAddress();
+
+                SearchParty.SearchPartyBuilder searchPartyBuilder = SearchParty.builder()
+                        .name(respondentValue.getRespondentName())
+                        .emailAddress(respondentValue.getRespondentEmail());
+
+                if (respondentAddress != null) {
+                    searchPartyBuilder
+                            .addressLine1(respondentAddress.getAddressLine1())
+                            .postCode(respondentAddress.getPostCode());
+                }
+                searchParties.add(GenericTypeItem.from(searchPartyBuilder.build()));
+            });
+        }
+
+        if (caseData.getRepCollection() != null) {
+            caseData.getRepCollection().forEach(rep -> {
+                RepresentedTypeR repValue = rep.getValue();
+                Address representativeAddress = repValue.getRepresentativeAddress();
+
+                SearchParty.SearchPartyBuilder searchRepPartyBuilder = SearchParty.builder()
+                        .name(repValue.getRespRepName())
+                        .emailAddress(repValue.getRepresentativeEmailAddress());
+
+                if (representativeAddress != null) {
+                    searchRepPartyBuilder
+                            .addressLine1(representativeAddress.getAddressLine1())
+                            .postCode(representativeAddress.getPostCode());
+                }
+                searchParties.add(GenericTypeItem.from(searchRepPartyBuilder.build()));
+            });
+        }
+
+        ListTypeItem<String> otherCaseReferences = new ListTypeItem<>();
+        otherCaseReferences.add(GenericTypeItem.from(caseData.getEthosCaseReference()));
+        SearchCriteria searchCriteria = SearchCriteria.builder()
+                .otherCaseReferences(otherCaseReferences)
+                .searchParties(searchParties)
+                .build();
+        caseData.setSearchCriteria(searchCriteria);
+
+    }
+
+    private void setCaseManagementLocation(CaseData caseData) {
+        String managingOfficeName = caseData.getManagingOffice();
+        if (Strings.isNullOrEmpty(managingOfficeName)) {
+            log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
+            return;
+        }
+
+        CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
+        if (tribunalLocations.getEpimmsId().isBlank()) {
+            log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
+            return;
+        }
+        caseData.setCaseManagementLocation(CaseLocation.builder()
+                .baseLocation(tribunalLocations.getEpimmsId()).region(tribunalLocations.getRegion()).build());
     }
 }

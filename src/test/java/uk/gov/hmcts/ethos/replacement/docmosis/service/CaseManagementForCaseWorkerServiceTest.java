@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SearchCriteria;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
@@ -55,6 +58,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,6 +91,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
+    private static final String HMCTS_SERVICE_ID = "BHA1";
 
     @InjectMocks
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -101,6 +106,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest ccdRequest14;
     private CCDRequest ccdRequest15;
     private CCDRequest ccdRequest21;
+
+    private CCDRequest ccdRequest2;
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
@@ -112,9 +119,11 @@ class CaseManagementForCaseWorkerServiceTest {
     private ClerkService clerkService;
     @MockBean
     private EmailService emailService;
+    private TribunalOfficesService tribunalOfficesService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @MockBean
     private AdminUserService adminUserService;
-    private final String hmctsServiceId = "BHA1";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -162,6 +171,10 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseDetails caseDetails21 = generateCaseDetails("caseDetailsTest21.json");
         ccdRequest21.setCaseDetails(caseDetails21);
 
+        ccdRequest2 = new CCDRequest();
+        CaseDetails caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
+        ccdRequest2.setCaseDetails(caseDetails2);
+
         manchesterCcdRequest = new CCDRequest();
         CaseData caseData = new CaseData();
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
@@ -174,9 +187,9 @@ class CaseManagementForCaseWorkerServiceTest {
         counterClaimType.setCounterClaim("72632632");
         eccCounterClaimTypeItem.setId(UUID.randomUUID().toString());
         eccCounterClaimTypeItem.setValue(counterClaimType);
-        CaseDetails manchesterCaseDetails = new CaseDetails();
         caseData.setEccCases(List.of(eccCounterClaimTypeItem));
         caseData.setRespondentECC(createRespondentECC());
+        CaseDetails manchesterCaseDetails = new CaseDetails();
         manchesterCaseDetails.setCaseData(caseData);
         manchesterCaseDetails.setCaseId("123456");
         manchesterCaseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
@@ -190,6 +203,31 @@ class CaseManagementForCaseWorkerServiceTest {
         submitCaseData.setRepresentativeClaimantType(createRepresentedTypeC());
         submitCaseData.setRepCollection(createRepCollection(false));
         submitCaseData.setClaimantRepresentedQuestion(YES);
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantAddressUK(getAddress());
+        submitCaseData.setClaimantType(claimantType);
+        submitEvent.setState("Accepted");
+        submitEvent.setCaseId(123);
+        submitEvent.setCaseData(submitCaseData);
+        when(tribunalOfficesService.getTribunalOffice(any()))
+                .thenReturn(TribunalOffice.valueOfOfficeName("Edinburgh"));
+        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getEdinburghCourtLocations());
+        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
+                tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID, adminUserService);
+    }
+
+    private static CourtLocations getEdinburghCourtLocations() {
+        CourtLocations edinburghLocation = new CourtLocations();
+        edinburghLocation.setEpimmsId("301017");
+        edinburghLocation.setRegion("North West");
+        edinburghLocation.setRegionId("4");
+        return edinburghLocation;
+    }
+
+    private static Address getAddress() {
         Address address = new Address();
         address.setAddressLine1("AddressLine1");
         address.setAddressLine2("AddressLine2");
@@ -197,16 +235,42 @@ class CaseManagementForCaseWorkerServiceTest {
         address.setPostTown("Manchester");
         address.setCountry("UK");
         address.setPostCode("L1 122");
-        ClaimantType claimantType = new ClaimantType();
-        claimantType.setClaimantAddressUK(address);
-        submitCaseData.setClaimantType(claimantType);
-        submitEvent.setState("Accepted");
-        submitEvent.setCaseId(123);
-        submitEvent.setCaseData(submitCaseData);
+        return address;
+    }
 
-        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                emailService, adminUserService, hmctsServiceId);
+    @Test
+    void caseDataDefaultsCaseManagementLocation() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertEquals(CaseLocation.builder().baseLocation("301017").region("North West").build(),
+                caseData.getCaseManagementLocation());
+    }
+
+    @Test
+    void caseDataDefaultsCaseManagementCategory() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertEquals(DynamicFixedListType.from("Employment Tribunals", "Employment", true),
+                caseData.getCaseManagementCategory());
+    }
+
+    @Test
+    void caseDataDefaultsCaseNameHmctsInternal() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertEquals("Anton Juliet Rodriguez vs Antonio Vazquez", caseData.getCaseNameHmctsInternal());
+    }
+
+    @Test
+    void addSearchCriteriaInCaseData() {
+        CaseData caseData = ccdRequest2.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.setSearchCriteria(caseData);
+        SearchCriteria searchCriteria = caseData.getSearchCriteria();
+        assertNotNull(searchCriteria);
+        assertEquals("123456", searchCriteria.getOtherCaseReferences().get(0).getValue());
+        assertEquals("Mr A Rodriguez", searchCriteria.getSearchParties().get(0).getValue().getName());
+        assertEquals("Antonio Vazquez", searchCriteria.getSearchParties().get(1).getValue().getName());
+        assertEquals("RepresentativeNameRespondent", searchCriteria.getSearchParties().get(2).getValue().getName());
     }
 
     @Test
@@ -262,9 +326,10 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void caseDataDefaultsResetResponseRespondentAddress() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        Address responseRespondentAddress = new Address();
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             respondentSumTypeItem.getValue().setResponseReceived(null);
-            respondentSumTypeItem.getValue().setResponseRespondentAddress(new Address());
+            respondentSumTypeItem.getValue().setResponseRespondentAddress(responseRespondentAddress);
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine1("Address1");
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine2("Address2");
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine3("Address3");
@@ -1000,54 +1065,76 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void setHmctsServiceIdSupplementary_success() throws IOException {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
-                hmctsServiceId)));
+                HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
-        String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(token, payload, ccdRequest10.getCaseDetails().getCaseId()))
+        when(ccdClient.setSupplementaryData(AUTH_TOKEN, payload, ccdRequest10.getCaseDetails().getCaseId()))
                 .thenReturn(ResponseEntity.ok().build());
 
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails);
-        verify(ccdClient, times(1)).setSupplementaryData(token, payload,
+        verify(ccdClient, times(1)).setSupplementaryData(AUTH_TOKEN, payload,
                 ccdRequest10.getCaseDetails().getCaseId());
     }
 
     @Test
     void setHmctsServiceIdSupplementary_noResponse() throws IOException {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
-                hmctsServiceId)));
+                HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
-        String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(token, payload, ccdRequest10.getCaseDetails().getCaseId()))
+        when(ccdClient.setSupplementaryData(AUTH_TOKEN, payload, ccdRequest10.getCaseDetails().getCaseId()))
                 .thenReturn(null);
 
-        Exception e = assertThrows(CaseCreationException.class,
+        Exception exception = assertThrows(CaseCreationException.class,
                 () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails));
-        assertEquals("Call to Supplementary Data API failed for 123456789", e.getMessage());
+        assertEquals("Call to Supplementary Data API failed for 123456789", exception.getMessage());
     }
 
     @Test
     void setHmctsServiceIdSupplementary_failedResponse() throws IOException {
         Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of("HMCTSServiceId",
-                hmctsServiceId)));
+                HMCTS_SERVICE_ID)));
         CaseDetails caseDetails = ccdRequest10.getCaseDetails();
-        String token = ccdRequest10.getToken();
-        when(ccdClient.setSupplementaryData(token, payload, ccdRequest10.getCaseDetails().getCaseId()))
+        when(ccdClient.setSupplementaryData(AUTH_TOKEN, payload, ccdRequest10.getCaseDetails().getCaseId()))
                 .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
 
-        Exception e = assertThrows(CaseCreationException.class,
+        Exception exception = assertThrows(CaseCreationException.class,
                 () -> caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(caseDetails));
-        assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", e.getMessage());
+        assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", exception.getMessage());
     }
 
     @Test
-    void testHmctsInternalCaseName() {
-        CaseData caseData = new CaseData();
-        caseData.setClaimant("claimant");
-        caseData.setRespondent("respondent");
+    void removeHmctsServiceIdSupplementary_success() throws IOException {
+        Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of()));
+        CaseDetails caseDetails = ccdRequest10.getCaseDetails();
+        when(ccdClient.setSupplementaryData(AUTH_TOKEN, payload, ccdRequest10.getCaseDetails().getCaseId()))
+                .thenReturn(ResponseEntity.ok().build());
 
-        caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
+        caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(caseDetails);
+        verify(ccdClient, times(1)).setSupplementaryData(AUTH_TOKEN, payload,
+                ccdRequest10.getCaseDetails().getCaseId());
+    }
 
-        assertEquals("claimant vs respondent", caseData.getCaseNameHmctsInternal());
+    @Test
+    void removeHmctsServiceIdSupplementary_noResponse() throws IOException {
+        Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of()));
+        CaseDetails caseDetails = ccdRequest10.getCaseDetails();
+        when(ccdClient.setSupplementaryData(AUTH_TOKEN, payload, ccdRequest10.getCaseDetails().getCaseId()))
+                .thenReturn(null);
+
+        Exception exception = assertThrows(CaseCreationException.class,
+                () -> caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(caseDetails));
+        assertEquals("Call to Supplementary Data API failed for 123456789", exception.getMessage());
+    }
+
+    @Test
+    void removeHmctsServiceIdSupplementary_failedResponse() throws IOException {
+        Map<String, Object> payload = Map.of("supplementary_data_updates", Map.of("$set", Map.of()));
+        CaseDetails caseDetails = ccdRequest10.getCaseDetails();
+        when(ccdClient.setSupplementaryData(AUTH_TOKEN, payload, ccdRequest10.getCaseDetails().getCaseId()))
+                .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
+
+        Exception exception = assertThrows(CaseCreationException.class,
+                () -> caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(caseDetails));
+        assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", exception.getMessage());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

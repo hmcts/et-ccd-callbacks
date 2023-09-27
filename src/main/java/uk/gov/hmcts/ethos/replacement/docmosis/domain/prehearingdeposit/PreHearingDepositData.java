@@ -30,8 +30,8 @@ public class PreHearingDepositData {
     private String bankingDate;
     @JsonProperty("pHRNumber")
     private String pHRNumber;
-    @JsonProperty("mR1Reference")
-    private String mR1Reference;
+    @JsonProperty("mr1Reference")
+    private String mr1Reference;
 
     @JsonProperty("depositComments")
     private String depositComments;

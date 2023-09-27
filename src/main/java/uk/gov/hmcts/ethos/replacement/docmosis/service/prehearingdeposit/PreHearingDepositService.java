@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.prehearingdeposit;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Iterator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -13,6 +10,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.OfficeSheet;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.SimpleSheetHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Iterator;
 
 @Service
 public class PreHearingDepositService {
@@ -54,7 +54,7 @@ public class PreHearingDepositService {
                 preHearingDepositData.setDepositReceivedFrom(row.getCell(10).getStringCellValue());
                 preHearingDepositData.setDepositComments(row.getCell(11).getStringCellValue());
                 preHearingDepositData.setPHRNumber(row.getCell(12).getStringCellValue());
-                preHearingDepositData.setMR1Reference(row.getCell(13).getStringCellValue());
+                preHearingDepositData.setMr1Reference(row.getCell(13).getStringCellValue());
                 preHearingDepositData.setBankingDate(row.getCell(14).getStringCellValue());
                 preHearingDepositData.setJournalConfirmedReceipt(row.getCell(15).getStringCellValue());
                 preHearingDepositData.setComments(row.getCell(16).getStringCellValue());

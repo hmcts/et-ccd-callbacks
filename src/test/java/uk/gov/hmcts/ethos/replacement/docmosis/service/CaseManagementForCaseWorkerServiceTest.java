@@ -119,6 +119,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private ClerkService clerkService;
     @MockBean
     private EmailService emailService;
+    @MockBean
     private TribunalOfficesService tribunalOfficesService;
     @MockBean
     private FeatureToggleService featureToggleService;

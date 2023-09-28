@@ -130,7 +130,7 @@ class ReferralHelperTest {
             .build();
 
         assertThat(ReferralHelper.populateHearingDetails(caseData))
-            .isEqualTo(expectedSingleHearingDetails);
+                .isEqualTo(expectedSingleHearingDetails);
     }
 
     @Test
@@ -248,7 +248,7 @@ class ReferralHelperTest {
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
         assertEquals(expectedHearingReferralDetailsSingleReply,
-            ReferralHelper.populateHearingReferralDetails(caseData));
+                ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
@@ -256,7 +256,7 @@ class ReferralHelperTest {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1"),
-            createReferralReplyTypeItem("2")));
+                createReferralReplyTypeItem("2")));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
@@ -265,7 +265,7 @@ class ReferralHelperTest {
         caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
 
         assertEquals(expectedHearingReferralDetailsMultipleReplies,
-            ReferralHelper.populateHearingReferralDetails(caseData));
+                ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
@@ -360,7 +360,7 @@ class ReferralHelperTest {
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
         assertEquals(expectedHearingReferralDetailsSingleReply.replace(singleHearingDetailsNullDoc, ""),
-            ReferralHelper.populateHearingReferralDetails(caseData));
+                ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
@@ -390,8 +390,8 @@ class ReferralHelperTest {
         ReferralHelper.createReferralReply(caseData, "Judge Alex");
 
         assertEquals(expectedCreatedReferralReply,
-            caseData.getReferralCollection().get(0).getValue()
-                .getReferralReplyCollection().get(0).getValue().toString());
+                caseData.getReferralCollection().get(0).getValue()
+                        .getReferralReplyCollection().get(0).getValue().toString());
     }
 
     @Test
@@ -402,7 +402,7 @@ class ReferralHelperTest {
         caseData.setCloseReferralGeneralNotes("generalNotes");
 
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
-        
+
         assertNull(caseData.getSelectReferral());
         assertNull(caseData.getCloseReferralHearingDetails());
         assertNull(caseData.getConfirmCloseReferral());
@@ -446,7 +446,7 @@ class ReferralHelperTest {
         caseDetails.setCaseData(caseData);
 
         Map<String, String> actual = ReferralHelper.buildPersonalisation(
-            caseDetails.getCaseData(), "1", true, "First Last", "linkToExui"
+                caseDetails.getCaseData(), "1", true, "First Last", "linkToExui"
         );
 
         assertEquals(getExpectedPersonalisation(), actual);
@@ -488,7 +488,7 @@ class ReferralHelperTest {
 
     @Test
     void documentRequestExistingReferral() throws JsonProcessingException {
-        ReferralType referralType =  createReferralTypeItem().getValue();
+        ReferralType referralType = createReferralTypeItem().getValue();
         referralType.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setValue(referralType);
@@ -560,7 +560,7 @@ class ReferralHelperTest {
 
         return respondentSumTypeItem;
     }
-    
+
     private void setReferralReplyData() {
         caseData.setHearingAndReferralDetails("hearingDetails");
         caseData.setDirectionTo("directionTo");

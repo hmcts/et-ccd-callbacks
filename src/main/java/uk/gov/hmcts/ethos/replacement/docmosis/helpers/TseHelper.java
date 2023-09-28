@@ -282,7 +282,7 @@ public final class TseHelper {
         return TseDecisionData.builder()
             .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .notificationTitle(defaultIfEmpty(caseData.getTseAdminEnterNotificationTitle(), ""))
-                .decision(defaultIfEmpty(caseData.getTseAdminDecision(), "")
+                .decision(defaultIfEmpty(caseData.getTseAdminDecision(), ""))
                 .decisionDetails(defaultIfEmpty(caseData.getTseAdminDecisionDetails(), ""))
                 .typeOfDecision(defaultIfEmpty(caseData.getTseAdminTypeOfDecision(), ""))
                 .responseRequired(YES.equals(caseData.getTseAdminIsResponseRequired())

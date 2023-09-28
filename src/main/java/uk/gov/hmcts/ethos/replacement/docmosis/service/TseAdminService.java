@@ -241,7 +241,7 @@ public class TseAdminService {
             DocumentTypeItem docItem = createDocumentTypeItem(
                     documentManagementService.addDocumentToDocumentField(
                             document),
-                    "Respondent correspondence",
+                    "Referral/Judicial direction",
                     caseData.getResTseSelectApplication()
             );
 

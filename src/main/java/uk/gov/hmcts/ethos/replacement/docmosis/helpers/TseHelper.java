@@ -307,7 +307,7 @@ public final class TseHelper {
         List<DocumentType> documents = new ArrayList<>();
         for (GenericTypeItem<DocumentType> document : documentList) {
             DocumentType documentType = new DocumentType();
-            documentType.setShortDescription(document.getValue().getShortDescription());
+            documentType.setShortDescription(defaultIfEmpty(document.getValue().getShortDescription(), ""));
             UploadedDocumentType uploadedDocument = new UploadedDocumentType();
             documentType.setUploadedDocument(uploadedDocument);
             documentType.getUploadedDocument().setDocumentBinaryUrl(

@@ -7,7 +7,7 @@ import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
-import au.com.dius.pact.core.model.annotations.PactFolder;
+import au.com.dius.pact.core.model.annotations.PactDirectory;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
@@ -28,8 +28,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(PactConsumerTestExt.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PactFolder("pacts")
-@PactTestFor(providerName = "idamApi_oidc", port = "8889")
+@PactDirectory("pacts")
+@PactTestFor(providerName = "idamApi_oidc")
 @ContextConfiguration(classes = {IdamApiConsumerApplication.class})
 @TestPropertySource(locations = {"classpath:application.properties"}, properties = {"idam.api.url=localhost:8889"})
 @Import(HttpClientConfiguration.class)

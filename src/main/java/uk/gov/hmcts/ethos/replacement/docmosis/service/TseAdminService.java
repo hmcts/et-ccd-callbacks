@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -128,14 +130,11 @@ public class TseAdminService {
 
     /**
      * Uses {@link EmailService} to generate an email.
-     * @param caseId used in email link to case
-     * @param caseData in which the case details are extracted from
+     * @param caseDetails used to get case Id, case ethos reference number and decision pdf file binary URL
      */
-    public void sendEmailToClaimant(String caseId, CaseData caseData) {
-        String caseNumber = caseData.getEthosCaseReference();
-
+    public void sendEmailToClaimant(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
         List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
-
         // if claimant only or both parties: send Claimant Decision Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
                 || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
@@ -147,7 +146,6 @@ public class TseAdminService {
                     new TSEAdminEmailRecipientsData(tseAdminRecordClaimantTemplateId,
                             claimantEmail);
                 claimantDetails.setRecipientName(claimantName);
-
                 emailsToSend.add(claimantDetails);
             }
         }
@@ -156,7 +154,7 @@ public class TseAdminService {
             emailService.sendEmail(
                 emailRecipient.getRecipientTemplate(),
                 emailRecipient.getRecipientEmail(),
-                buildPersonalisation(caseNumber, caseId, emailRecipient.getRecipientName()));
+                buildPersonalisation(caseDetails.getCaseId(), caseData, emailRecipient.getRecipientName()));
         }
     }
 
@@ -181,18 +179,29 @@ public class TseAdminService {
             return;
         }
 
-        Map<String, String> personalisation = buildPersonalisation(caseData.getEthosCaseReference(),
-                caseDetails.getCaseId(), respondent.getRespondentName());
+        Map<String, String> personalisation = buildPersonalisation(caseDetails.getCaseId(),
+                caseData, respondent.getRespondentName());
 
         emailService.sendEmail(tseAdminRecordRespondentTemplateId, respondentEmail, personalisation);
     }
 
-    private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
+    private Map<String, String> buildPersonalisation(String caseId, CaseData caseData, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put(CASE_NUMBER, caseNumber);
+        personalisation.put(CASE_NUMBER, defaultIfEmpty(caseData.getEthosCaseReference(), ""));
         personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("name", recipientName);
+        String decisionDocumentURL = "";
+        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
+            DocumentTypeItem documentTypeItem =
+                    caseData.getDocumentCollection().get(caseData.getDocumentCollection().size() - 1);
+            if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())
+                    && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())) {
+                decisionDocumentURL = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+            }
+        }
+        personalisation.put("linkToDecisionFile", decisionDocumentURL);
+
         return personalisation;
     }
 

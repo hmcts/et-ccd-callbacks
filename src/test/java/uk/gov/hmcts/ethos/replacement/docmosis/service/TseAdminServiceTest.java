@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -77,6 +79,7 @@ class TseAdminServiceTest {
     DocumentManagementService documentManagementService;
 
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
@@ -106,6 +109,7 @@ class TseAdminServiceTest {
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
 
         caseData = CaseDataBuilder.builder().build();
+        caseDetails = new CaseDetails();
     }
 
     @Test
@@ -400,10 +404,9 @@ class TseAdminServiceTest {
 
         Map<String, String> expectedPersonalisationClaimant =
             createPersonalisation(caseData, CLAIMANT_FIRSTNAME + " " + CLAIMANT_LASTNAME);
-        Map<String, String> expectedPersonalisationRespondent =
-            createPersonalisation(caseData, RESPONDENT_TITLE);
-
-        tseAdminService.sendEmailToClaimant(CASE_ID, caseData);
+        caseDetails.setCaseId(CASE_ID);
+        caseDetails.setCaseData(caseData);
+        tseAdminService.sendEmailToClaimant(caseDetails);
         if (!RESPONDENT_ONLY.equals(partyNotified)) {
             verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
         }
@@ -439,6 +442,16 @@ class TseAdminServiceTest {
         personalisation.put("name", expectedName);
         personalisation.put("linkToExUI", XUI_URL + CASE_ID);
         personalisation.put("linkToCitizenHub", CITIZEN_URL + CASE_ID);
+        String decisionDocumentURL = "";
+        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
+            DocumentTypeItem documentTypeItem =
+                    caseData.getDocumentCollection().get(caseData.getDocumentCollection().size() - 1);
+            if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())
+                    && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())) {
+                decisionDocumentURL = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+            }
+        }
+        personalisation.put("linkToDecisionFile", decisionDocumentURL);
         return personalisation;
     }
 

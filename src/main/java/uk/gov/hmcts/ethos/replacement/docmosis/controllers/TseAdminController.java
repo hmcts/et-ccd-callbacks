@@ -100,7 +100,7 @@ public class TseAdminController {
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
         tseAdminService.addTseAdminDecisionPdfToDocCollection(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
-        tseAdminService.sendEmailToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
+        tseAdminService.sendEmailToClaimant(ccdRequest.getCaseDetails());
         tseAdminService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
         tseAdminService.clearTseAdminDataFromCaseData(caseData);
 

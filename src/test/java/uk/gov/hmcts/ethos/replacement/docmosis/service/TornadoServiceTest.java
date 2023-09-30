@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -76,6 +75,7 @@ class TornadoServiceTest {
     private MockHttpURLConnection mockConnection;
     private static final String AUTH_TOKEN = "a-test-auth-token";
     private static final String DOCUMENT_INFO_MARKUP = "<a>some test markup</a>";
+    private static final String DUMMY_PDF = "dummy.pdf";
     private OAuth2Configuration oauth2Configuration;
 
     @BeforeEach
@@ -301,12 +301,12 @@ class TornadoServiceTest {
             respondentTellSomethingElseHelperMockedStatic.when(() ->
                     RespondentTellSomethingElseHelper.getDocumentRequest(caseData,
                             tornadoConnection.getAccessKey())).thenReturn("");
-            if (!"dummy.pdf".equals(fileName)) {
-                byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, ENGLANDWALES_CASE_TYPE_ID, fileName);
-                assertThat(bytes.length, is(0));
-            } else {
+            if (DUMMY_PDF.equals(fileName)) {
                 assertThrows(IllegalArgumentException.class, () ->
                         tornadoService.generateEventDocumentBytes(caseData, ENGLANDWALES_CASE_TYPE_ID, fileName));
+            } else {
+                byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, ENGLANDWALES_CASE_TYPE_ID, fileName);
+                assertThat(bytes.length, is(0));
             }
 
         }
@@ -315,7 +315,7 @@ class TornadoServiceTest {
     @Test
     @SneakyThrows
     void generateDocumentAsBytesForTSEReply() {
-        try (MockedStatic<TseHelper> tseHelperMockedStatic = Mockito.mockStatic(TseHelper.class)) {
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class)) {
 
             mockConnectionSuccess();
             CaseData caseData = new CaseData();
@@ -385,6 +385,8 @@ class TornadoServiceTest {
         mockConnection.setInputStream(inputStream);
         mockConnection.setOutputStream(outputStream);
         mockConnection.setResponseCode(HTTP_OK);
+        inputStream.close();
+        outputStream.close();
     }
 
     private void mockConnectionError() throws IOException {
@@ -395,6 +397,8 @@ class TornadoServiceTest {
         mockConnection.setErrorStream(mockInputStream);
         mockConnection.setOutputStream(mockOutputStream);
         mockConnection.setResponseCode(HTTP_INTERNAL_ERROR);
+        mockInputStream.close();
+        mockOutputStream.close();
     }
 
     private ListingData createListingData() {

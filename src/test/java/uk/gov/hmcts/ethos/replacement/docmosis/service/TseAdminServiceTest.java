@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -498,7 +497,7 @@ class TseAdminServiceTest {
         caseDetails.setCaseId(CASE_ID);
         caseDetails.setCaseData(caseData);
         tseAdminService.sendEmailToClaimant(caseDetails);
-        if (!RESPONDENT_ONLY.equals(partyNotified) && StringUtils.isNotBlank(claimantEmailAddress)) {
+        if (!RESPONDENT_ONLY.equals(partyNotified) && isNotBlank(claimantEmailAddress)) {
             verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
         } else {
             verify(emailService, never()).sendEmail(anyString(), anyString(), any());

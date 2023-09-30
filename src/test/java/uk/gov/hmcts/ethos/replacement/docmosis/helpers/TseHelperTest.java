@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockedStatic;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -34,9 +37,11 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mockStatic;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -48,6 +53,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.g
 @ExtendWith(SpringExtension.class)
 class TseHelperTest {
     private static final DynamicValueType SELECT_APPLICATION = DynamicValueType.create("1", "");
+
+    private static final String ACCESS_KEY = "Test Access Key";
 
     private CaseData caseData;
     private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
@@ -306,6 +313,21 @@ class TseHelperTest {
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("2", ""));
 
             assertNull(getRespondentSelectedApplicationType(caseData));
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void getDecisionDocument() {
+
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
+                InvocationOnMock::callRealMethod);) {
+            tseHelperMockedStatic.when(() -> TseHelper.getAdminSelectedApplicationType(caseData))
+                    .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
+            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY);
+
+            assertThat(value, containsString("EM-TRB-EGW-ENG-03914.docx"));
+            assertThat(value, containsString("decision.pdf"));
         }
     }
 }

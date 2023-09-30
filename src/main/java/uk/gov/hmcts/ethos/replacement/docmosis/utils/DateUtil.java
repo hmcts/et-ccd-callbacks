@@ -9,7 +9,7 @@ public final class DateUtil {
         // Utility classes should not have a public or default constructor.
     }
 
-    public static String getCurrentDateFormatted_yyyyMMddHHmm() {
+    public static String getCurrentDateFormattedAsYearMonthDayHourMinute() {
         return new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
     }
 

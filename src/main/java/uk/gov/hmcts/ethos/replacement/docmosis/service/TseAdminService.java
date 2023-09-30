@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -141,7 +143,7 @@ public class TseAdminService {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             String claimantName = caseData.getClaimantIndType().claimantFullNames();
 
-            if (claimantEmail != null) {
+            if (StringUtils.isNotBlank(claimantEmail)) {
                 TSEAdminEmailRecipientsData claimantDetails =
                     new TSEAdminEmailRecipientsData(tseAdminRecordClaimantTemplateId,
                             claimantEmail);
@@ -196,7 +198,8 @@ public class TseAdminService {
             DocumentTypeItem documentTypeItem =
                     caseData.getDocumentCollection().get(caseData.getDocumentCollection().size() - 1);
             if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())
-                    && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())) {
+                    && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
+                    && isNotBlank(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
                 decisionDocumentURL = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
             }
         }

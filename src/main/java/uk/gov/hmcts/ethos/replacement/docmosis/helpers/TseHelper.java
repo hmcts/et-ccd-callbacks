@@ -358,7 +358,7 @@ public final class TseHelper {
         TseDecisionDocument document = TseDecisionDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(TSE_ADMIN_DECISION_OUTPUT_FILE_NAME,
-                        DateUtil.getCurrentDateFormatted_yyyyMMddHHmm(),
+                        DateUtil.getCurrentDateFormattedAsYearMonthDayHourMinute(),
                         selectedApplication.getType()))
                 .templateName(TSE_ADMIN_DECISION_TEMPLATE_NAME)
                 .data(data).build();

@@ -17,10 +17,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.*;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -31,6 +28,7 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +36,7 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -321,13 +320,59 @@ class TseHelperTest {
     void getDecisionDocument() {
 
         try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
-                InvocationOnMock::callRealMethod);) {
+                InvocationOnMock::callRealMethod)) {
             tseHelperMockedStatic.when(() -> TseHelper.getAdminSelectedApplicationType(caseData))
                     .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
             String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY);
 
             assertThat(value, containsString("EM-TRB-EGW-ENG-03914.docx"));
             assertThat(value, containsString("decision.pdf"));
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void getDecisionDocumentWithSupportedDocumentList() {
+
+        List<GenericTypeItem<DocumentType>> documentList1 = new ArrayList<>();
+        DocumentType documentType = new DocumentType();
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setCategoryId("Uploaded Document Type Category Id1");
+        uploadedDocumentType.setDocumentFilename("Uploaded Document File Name1");
+        uploadedDocumentType.setDocumentUrl("Uploaded Document Url1");
+        uploadedDocumentType.setDocumentBinaryUrl("Uploaded Document Binary Url1");
+        documentType.setUploadedDocument(uploadedDocumentType);
+        DocumentTypeItem uploadedDocumentTypeItem = new DocumentTypeItem();
+        uploadedDocumentTypeItem.setValue(documentType);
+        documentList1.add(uploadedDocumentTypeItem);
+        caseData.setTseAdminResponseRequiredYesDoc(documentList1);
+        caseData.setTseAdminResponseRequiredNoDoc(documentList1);
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
+                InvocationOnMock::callRealMethod)) {
+            tseHelperMockedStatic.when(() -> TseHelper.getAdminSelectedApplicationType(caseData))
+                    .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
+            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY);
+
+            assertThat(value, containsString("EM-TRB-EGW-ENG-03914.docx"));
+            assertThat(value, containsString("decision.pdf"));
+            assertThat(value, containsString("Uploaded Document Binary Url"));
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void getPersonalisationForAcknowledgement() {
+
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
+                InvocationOnMock::callRealMethod)) {
+            tseHelperMockedStatic.when(() -> TseHelper.getRespondentSelectedApplicationType(caseData))
+                    .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
+            CaseDetails caseDetails = new CaseDetails();
+            caseDetails.setCaseData(caseData);
+            Map<String, Object> value = TseHelper.getPersonalisationForAcknowledgement(caseDetails,
+                    "TestEXUO URL");
+
+            assertThat(value, aMapWithSize(5));
         }
     }
 }

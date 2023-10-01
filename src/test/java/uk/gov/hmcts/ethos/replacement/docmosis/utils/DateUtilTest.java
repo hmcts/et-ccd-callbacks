@@ -9,7 +9,7 @@ import java.util.Date;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-public class DateUtilTest {
+class DateUtilTest {
 
     @Test
     @SneakyThrows

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.prehearingdeposit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,6 +15,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PreHearingDepositService {
@@ -45,7 +45,7 @@ public class PreHearingDepositService {
         data.getPreHearingDepositImportFile().setLastImported(LocalDateTime.now().toString());
         List<PreHearingDepositTypeItem> preHearingDepositTypeItems = new ArrayList<>();
         for (Row row : officeSheet) {
-            if(row.getRowNum() > 0) {
+            if (row.getRowNum() > 0) {
                 PreHearingDepositTypeItem preHearingDepositTypeItem = new PreHearingDepositTypeItem();
                 preHearingDepositTypeItem.setId(UUID.randomUUID().toString());
                 PreHearingDepositType preHearingDepositType = new PreHearingDepositType();
@@ -62,7 +62,7 @@ public class PreHearingDepositService {
                 preHearingDepositType.setDepositComments(row.getCell(10).getStringCellValue());
                 preHearingDepositType.setPhrNumber(String.valueOf(row.getCell(11).getNumericCellValue()));
                 preHearingDepositType.setMr1Reference(row.getCell(12).getStringCellValue());
-                if(row.getCell(13).getDateCellValue() != null) {
+                if (row.getCell(13).getDateCellValue() != null) {
                     preHearingDepositType.setBankingDate(row.getCell(13).getDateCellValue().toString());
                 }
                 if (row.getCell(14).getDateCellValue() != null) {
@@ -77,7 +77,7 @@ public class PreHearingDepositService {
                 preHearingDepositType.setPayeeName(row.getCell(19).getStringCellValue());
                 preHearingDepositType.setRefundReference(row.getCell(20).getStringCellValue());
                 preHearingDepositType.setJournalConfirmedPaid(row.getCell(21).getDateCellValue().toString());
-                if(!row.getCell(25).getCellType().equals(CellType.ERROR)) {
+                if (!row.getCell(25).getCellType().equals(CellType.ERROR)) {
                     preHearingDepositType.setRegionOffice(row.getCell(25).getStringCellValue());
                 }
                 preHearingDepositTypeItem.setValue(preHearingDepositType);

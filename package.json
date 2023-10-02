@@ -76,7 +76,7 @@
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-mocha": "^10.1.0",
         "eslint-plugin-prettier": "^4.2.1",
-        "husky": "8.0.1",
+        "husky": "8.0.3",
         "istanbul": "1.1.0-alpha.1",
         "mocha": "10.2.0",
         "mocha-jenkins-reporter": "0.4.8",

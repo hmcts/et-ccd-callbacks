@@ -277,7 +277,7 @@ public final class TseHelper {
         );
     }
 
-    private static TseDecisionData createDataForTseDecision(CaseData caseData) {
+    private static TseDecisionData createDataForTseDecision(CaseData caseData, String ccdGatewayBaseUrl) {
 
         return TseDecisionData.builder()
             .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -289,14 +289,14 @@ public final class TseHelper {
                         ? TSE_ADMIN_DECISION_RESPONSE_REQUIRED_MESSAGE : NO)
                 .selectedRespondents(defaultIfEmpty(caseData.getTseAdminSelectPartyRespond(), ""))
                 .additionalInformation(defaultIfEmpty(caseData.getTseAdminAdditionalInformation(), ""))
-                .supportingMaterial(getSupportedDocumentsList(caseData))
+                .supportingMaterial(getSupportedDocumentsList(caseData, ccdGatewayBaseUrl))
                 .decisionMadeBy(defaultIfEmpty(caseData.getTseAdminDecisionMadeBy(), ""))
                 .decisionMakerFullName(defaultIfEmpty(caseData.getTseAdminDecisionMadeByFullName(), ""))
                 .notificationParties(defaultIfEmpty(caseData.getTseAdminSelectPartyNotify(), ""))
             .build();
     }
 
-    private static List<DocumentType> getSupportedDocumentsList(CaseData caseData) {
+    private static List<DocumentType> getSupportedDocumentsList(CaseData caseData, String ccdGatewayBaseUrl) {
         List<GenericTypeItem<DocumentType>> documentList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(caseData.getTseAdminResponseRequiredYesDoc())) {
             documentList.addAll(caseData.getTseAdminResponseRequiredYesDoc());
@@ -312,12 +312,19 @@ public final class TseHelper {
             documentType.setUploadedDocument(uploadedDocument);
             documentType.getUploadedDocument().setDocumentBinaryUrl(
                     document.getValue().getUploadedDocument().getDocumentFilename()
-                    + "|" + document.getValue().getUploadedDocument().getDocumentBinaryUrl()
+                    + "|" + ccdGatewayBaseUrl
+                            + "/documents/"
+                            + getDocumentUUIDByDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl())
+                            + "/binary"
             );
             documents.add(documentType);
         }
 
         return documents;
+    }
+
+    private static String getDocumentUUIDByDocumentURL(String documentURL) {
+        return documentURL.substring(documentURL.lastIndexOf('/') + 1);
     }
 
     private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
@@ -350,11 +357,12 @@ public final class TseHelper {
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
      */
-    public static String getDecisionDocument(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getDecisionDocument(CaseData caseData, String accessKey, String ccdGatewayBaseUrl)
+            throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getAdminSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseDecisionData data = createDataForTseDecision(caseData);
+        TseDecisionData data = createDataForTseDecision(caseData, ccdGatewayBaseUrl);
         TseDecisionDocument document = TseDecisionDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(TSE_ADMIN_DECISION_OUTPUT_FILE_NAME,

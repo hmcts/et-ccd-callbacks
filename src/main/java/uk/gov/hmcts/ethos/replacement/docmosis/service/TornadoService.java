@@ -364,7 +364,7 @@ public class TornadoService {
                 return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_ADMIN_DECISION_FILE_NAME -> {
-                return TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey());
+                return TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(), ccdGatewayBaseUrl);
             }
             default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

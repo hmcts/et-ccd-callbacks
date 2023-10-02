@@ -271,7 +271,7 @@ class TornadoServiceTest {
                             "Contact the tribunal.pdf", "Referral Summary.pdf", "TSE Reply.pdf", "decision.pdf",
                             "dummy.pdf"})
     @SneakyThrows
-    void generateDocumentAsBytesForTSEAdminDecision(String fileName) {
+    void generateDocumentAsBytesForTSE(String fileName) {
         try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class);
              MockedStatic<Et1VettingHelper> et1VettingHelperMockedStatic = mockStatic(Et1VettingHelper.class);
              MockedStatic<Et3VettingHelper> et3VettingHelperMockedStatic = mockStatic(Et3VettingHelper.class);
@@ -286,7 +286,8 @@ class TornadoServiceTest {
             dynamicValueType.setLabel("Test label");
             dynamicFixedListType.setValue(dynamicValueType);
             caseData.setSubmitEt3Respondent(dynamicFixedListType);
-            tseHelperMockedStatic.when(() -> TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey()))
+            tseHelperMockedStatic.when(() -> TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(),
+                            null))
                     .thenReturn("");
             tseHelperMockedStatic.when(() -> TseHelper.getReplyDocumentRequest(caseData,
                             tornadoConnection.getAccessKey())).thenReturn("");
@@ -324,7 +325,8 @@ class TornadoServiceTest {
             dynamicValueType.setCode("testCode");
             dynamicFixedListType.setValue(dynamicValueType);
             caseData.setTseAdminSelectApplication(dynamicFixedListType);
-            tseHelperMockedStatic.when(() -> TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey()))
+            tseHelperMockedStatic.when(() -> TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(),
+                            null))
                     .thenReturn("");
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, ENGLANDWALES_CASE_TYPE_ID,
                     "decision.pdf");

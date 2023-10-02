@@ -327,7 +327,7 @@ class TseHelperTest {
                 InvocationOnMock::callRealMethod)) {
             tseHelperMockedStatic.when(() -> TseHelper.getAdminSelectedApplicationType(caseData))
                     .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
-            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY);
+            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY, "TestUrl");
 
             assertThat(value, containsString("EM-TRB-EGW-ENG-03914.docx"));
             assertThat(value, containsString("decision.pdf"));
@@ -340,7 +340,8 @@ class TseHelperTest {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setCategoryId("Uploaded Document Type Category Id1");
         uploadedDocumentType.setDocumentFilename("Uploaded Document File Name1");
-        uploadedDocumentType.setDocumentUrl("Uploaded Document Url1");
+        uploadedDocumentType.setDocumentUrl(
+                "dm-store-aat.service.core-compute-aat.internal/documents/0de3d0d5-4fd2-4080-89b0-8830d8ad1056");
         uploadedDocumentType.setDocumentBinaryUrl("Uploaded Document Binary Url1");
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(uploadedDocumentType);
@@ -354,11 +355,11 @@ class TseHelperTest {
                 InvocationOnMock::callRealMethod)) {
             tseHelperMockedStatic.when(() -> TseHelper.getAdminSelectedApplicationType(caseData))
                     .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
-            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY);
+            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY, "TestUrl");
 
             assertThat(value, containsString("EM-TRB-EGW-ENG-03914.docx"));
             assertThat(value, containsString("decision.pdf"));
-            assertThat(value, containsString("Uploaded Document Binary Url"));
+            assertThat(value, containsString("0de3d0d5-4fd2-4080-89b0-8830d8ad1056"));
         }
     }
 

@@ -312,15 +312,17 @@ public final class TseHelper {
             documentType.setUploadedDocument(uploadedDocument);
             documentType.getUploadedDocument().setDocumentBinaryUrl(
                     document.getValue().getUploadedDocument().getDocumentFilename()
-                    + "|" + ccdGatewayBaseUrl
-                            + "/documents/"
-                            + getDocumentUUIDByDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl())
-                            + "/binary"
+                    + "|" + getDownloadableDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl(),
+                            ccdGatewayBaseUrl)
             );
             documents.add(documentType);
         }
 
         return documents;
+    }
+
+    public static String getDownloadableDocumentURL(String documentURL, String ccdGatewayBaseUrl) {
+        return ccdGatewayBaseUrl + "/documents/" + getDocumentUUIDByDocumentURL(documentURL) + "/binary";
     }
 
     private static String getDocumentUUIDByDocumentURL(String documentURL) {

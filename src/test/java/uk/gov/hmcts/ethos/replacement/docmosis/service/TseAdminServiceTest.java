@@ -35,6 +35,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -551,7 +552,7 @@ class TseAdminServiceTest {
         DocumentTypeItem documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument = new DocumentTypeItem();
         DocumentType documentTypeUploadedDocumentWithBinaryUrl = new DocumentType();
         UploadedDocumentType uploadedDocumentTypeWithBinaryUrl = new UploadedDocumentType();
-        uploadedDocumentTypeWithBinaryUrl.setDocumentBinaryUrl("test document binary url");
+        uploadedDocumentTypeWithBinaryUrl.setDocumentUrl("testDocumentUrl/12343452342sseellekjsdnflkd");
         documentTypeUploadedDocumentWithBinaryUrl.setUploadedDocument(uploadedDocumentTypeWithBinaryUrl);
         documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument
                 .setValue(documentTypeUploadedDocumentWithBinaryUrl);
@@ -626,7 +627,8 @@ class TseAdminServiceTest {
             if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())
                     && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
                     && isNotBlank(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
-                decisionDocumentURL = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+                decisionDocumentURL = TseHelper.getDownloadableDocumentURL(
+                        documentTypeItem.getValue().getUploadedDocument().getDocumentUrl(), null);
             }
         }
         personalisation.put("linkToDecisionFile", decisionDocumentURL);

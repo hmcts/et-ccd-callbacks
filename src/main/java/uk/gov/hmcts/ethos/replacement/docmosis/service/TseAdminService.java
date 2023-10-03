@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -61,6 +62,8 @@ public class TseAdminService {
     private String tseAdminRecordClaimantTemplateId;
     @Value("${template.tse.admin.record-a-decision.respondent}")
     private String tseAdminRecordRespondentTemplateId;
+    @Value("${ccd_gateway_base_url}")
+    private String ccdGatewayBaseUrl;
 
     private static final String DECISION_DOC_GEN_ERROR = "Failed to generate decision document for case id: %s";
 
@@ -200,7 +203,8 @@ public class TseAdminService {
             if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())
                     && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
                     && isNotBlank(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
-                decisionDocumentURL = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+                decisionDocumentURL = TseHelper.getDownloadableDocumentURL(
+                        documentTypeItem.getValue().getUploadedDocument().getDocumentUrl(), ccdGatewayBaseUrl);
             }
         }
         personalisation.put("linkToDecisionFile", decisionDocumentURL);

@@ -6,7 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -46,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -504,47 +507,9 @@ class TseAdminServiceTest {
         }
     }
 
-    @Test
-    void sendRecordADecisionEmailToClaimantWithDocumentCollection() {
-        caseData.setEthosCaseReference(CASE_NUMBER);
-        createClaimant(caseData, CLAIMANT_EMAIL);
-        caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
-        caseData.setDocumentCollection(new ArrayList<>());
-
-        caseData.getDocumentCollection().add(null);
-
-        DocumentTypeItem documentTypeItemWithoutValue = new DocumentTypeItem();
-        caseData.getDocumentCollection().add(documentTypeItemWithoutValue);
-
-        DocumentTypeItem documentTypeItemWithoutUploadedDocument = new DocumentTypeItem();
-        DocumentType documentTypeWithoutUploadedDocument = new DocumentType();
-        documentTypeItemWithoutUploadedDocument.setValue(documentTypeWithoutUploadedDocument);
-        caseData.getDocumentCollection().add(documentTypeItemWithoutUploadedDocument);
-
-        DocumentTypeItem documentTypeItemWithoutBinaryDocumentUrl = new DocumentTypeItem();
-        DocumentType documentTypeWithoutBinaryDocumentUrl = new DocumentType();
-        UploadedDocumentType uploadedDocumentWithoutBinaryDocumentUrl = new UploadedDocumentType();
-        uploadedDocumentWithoutBinaryDocumentUrl.setDocumentBinaryUrl(null);
-        documentTypeWithoutBinaryDocumentUrl.setUploadedDocument(uploadedDocumentWithoutBinaryDocumentUrl);
-        documentTypeItemWithoutBinaryDocumentUrl.setValue(documentTypeWithoutBinaryDocumentUrl);
-        caseData.getDocumentCollection().add(documentTypeItemWithoutBinaryDocumentUrl);
-
-        DocumentTypeItem documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument = new DocumentTypeItem();
-        DocumentType documentTypeUploadedDocumentWithBinaryUrl = new DocumentType();
-        UploadedDocumentType uploadedDocumentTypeWithBinaryUrl = new UploadedDocumentType();
-        uploadedDocumentTypeWithBinaryUrl.setDocumentBinaryUrl("test document binary url");
-        documentTypeUploadedDocumentWithBinaryUrl.setUploadedDocument(uploadedDocumentTypeWithBinaryUrl);
-        documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument
-                .setValue(documentTypeUploadedDocumentWithBinaryUrl);
-        caseData.getDocumentCollection().add(documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument);
-
-        DocumentTypeItem documentTypeItemWithValueAndUploadedDocumentWithoutBinaryDocument = new DocumentTypeItem();
-        DocumentType documentTypeUploadedDocumentWithoutBinaryUrl = new DocumentType();
-        UploadedDocumentType uploadedDocumentTypeWithoutBinaryUrl = new UploadedDocumentType();
-        documentTypeUploadedDocumentWithoutBinaryUrl.setUploadedDocument(uploadedDocumentTypeWithoutBinaryUrl);
-        documentTypeItemWithValueAndUploadedDocumentWithoutBinaryDocument
-                .setValue(documentTypeUploadedDocumentWithoutBinaryUrl);
-        caseData.getDocumentCollection().add(documentTypeItemWithValueAndUploadedDocumentWithoutBinaryDocument);
+    @ParameterizedTest
+    @MethodSource("generateCaseDataForSendEmailToClaimant")
+    void sendRecordADecisionEmailToClaimantWithDocumentCollection(CaseData caseData) {
 
         caseDetails.setCaseId(CASE_ID);
         caseDetails.setCaseData(caseData);
@@ -556,6 +521,60 @@ class TseAdminServiceTest {
         verify(emailService, times(1)).sendEmail(anyString(), anyString(),
                 eq(expectedPersonalisationClaimant));
 
+    }
+
+    private static Stream<Arguments> generateCaseDataForSendEmailToClaimant() {
+        CaseData caseDataWithoutValueDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithoutValueDocumentCollection.getDocumentCollection().add(null);
+
+        CaseData caseDataWithoutDocumentTypeItemDocumentCollection = generateCaseDataWithBasicInfo();
+        DocumentTypeItem documentTypeItemWithoutValue = new DocumentTypeItem();
+        caseDataWithoutDocumentTypeItemDocumentCollection.getDocumentCollection().add(documentTypeItemWithoutValue);
+
+        DocumentTypeItem documentTypeItemWithoutUploadedDocument = new DocumentTypeItem();
+        DocumentType documentTypeWithoutUploadedDocument = new DocumentType();
+        documentTypeItemWithoutUploadedDocument.setValue(documentTypeWithoutUploadedDocument);
+        CaseData caseDataWithoutUploadedDocumentTypeDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithoutUploadedDocumentTypeDocumentCollection.getDocumentCollection()
+                .add(documentTypeItemWithoutUploadedDocument);
+
+        DocumentTypeItem documentTypeItemWithoutBinaryDocumentUrl = new DocumentTypeItem();
+        DocumentType documentTypeWithoutBinaryDocumentUrl = new DocumentType();
+        UploadedDocumentType uploadedDocumentWithoutBinaryDocumentUrl = new UploadedDocumentType();
+        uploadedDocumentWithoutBinaryDocumentUrl.setDocumentBinaryUrl(null);
+        documentTypeWithoutBinaryDocumentUrl.setUploadedDocument(uploadedDocumentWithoutBinaryDocumentUrl);
+        documentTypeItemWithoutBinaryDocumentUrl.setValue(documentTypeWithoutBinaryDocumentUrl);
+        CaseData caseDataWithoutBinaryDocumentUrlDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithoutBinaryDocumentUrlDocumentCollection.getDocumentCollection()
+                .add(documentTypeItemWithoutBinaryDocumentUrl);
+
+        DocumentTypeItem documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument = new DocumentTypeItem();
+        DocumentType documentTypeUploadedDocumentWithBinaryUrl = new DocumentType();
+        UploadedDocumentType uploadedDocumentTypeWithBinaryUrl = new UploadedDocumentType();
+        uploadedDocumentTypeWithBinaryUrl.setDocumentBinaryUrl("test document binary url");
+        documentTypeUploadedDocumentWithBinaryUrl.setUploadedDocument(uploadedDocumentTypeWithBinaryUrl);
+        documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument
+                .setValue(documentTypeUploadedDocumentWithBinaryUrl);
+        CaseData caseDataWithBinaryDocumentUrlDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithBinaryDocumentUrlDocumentCollection.getDocumentCollection()
+                .add(documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument);
+
+        return Stream.of(
+                Arguments.of(caseDataWithoutValueDocumentCollection),
+                Arguments.of(caseDataWithoutDocumentTypeItemDocumentCollection),
+                Arguments.of(caseDataWithoutUploadedDocumentTypeDocumentCollection),
+                Arguments.of(caseDataWithoutBinaryDocumentUrlDocumentCollection),
+                Arguments.of(caseDataWithBinaryDocumentUrlDocumentCollection)
+        );
+    }
+
+    private static CaseData generateCaseDataWithBasicInfo() {
+        CaseData caseDataWithBasicInfo = new CaseData();
+        caseDataWithBasicInfo.setEthosCaseReference(CASE_NUMBER);
+        createClaimant(caseDataWithBasicInfo, CLAIMANT_EMAIL);
+        caseDataWithBasicInfo.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
+        caseDataWithBasicInfo.setDocumentCollection(new ArrayList<>());
+        return caseDataWithBasicInfo;
     }
 
     @ParameterizedTest
@@ -570,7 +589,7 @@ class TseAdminServiceTest {
 
     }
 
-    private void createClaimant(CaseData caseData, String claimantEmailAddress) {
+    private static void createClaimant(CaseData caseData, String claimantEmailAddress) {
         ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantEmailAddress(claimantEmailAddress);
 

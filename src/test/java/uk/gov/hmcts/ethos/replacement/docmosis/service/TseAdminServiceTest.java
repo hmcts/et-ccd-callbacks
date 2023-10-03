@@ -511,6 +511,24 @@ class TseAdminServiceTest {
         caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
         caseData.setDocumentCollection(new ArrayList<>());
 
+        caseData.getDocumentCollection().add(null);
+
+        DocumentTypeItem documentTypeItemWithoutValue = new DocumentTypeItem();
+        caseData.getDocumentCollection().add(documentTypeItemWithoutValue);
+
+        DocumentTypeItem documentTypeItemWithoutUploadedDocument = new DocumentTypeItem();
+        DocumentType documentTypeWithoutUploadedDocument = new DocumentType();
+        documentTypeItemWithoutUploadedDocument.setValue(documentTypeWithoutUploadedDocument);
+        caseData.getDocumentCollection().add(documentTypeItemWithoutUploadedDocument);
+
+        DocumentTypeItem documentTypeItemWithoutBinaryDocumentUrl = new DocumentTypeItem();
+        DocumentType documentTypeWithoutBinaryDocumentUrl = new DocumentType();
+        UploadedDocumentType uploadedDocumentWithoutBinaryDocumentUrl = new UploadedDocumentType();
+        uploadedDocumentWithoutBinaryDocumentUrl.setDocumentBinaryUrl(null);
+        documentTypeWithoutBinaryDocumentUrl.setUploadedDocument(uploadedDocumentWithoutBinaryDocumentUrl);
+        documentTypeItemWithoutBinaryDocumentUrl.setValue(documentTypeWithoutBinaryDocumentUrl);
+        caseData.getDocumentCollection().add(documentTypeItemWithoutBinaryDocumentUrl);
+
         DocumentTypeItem documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument = new DocumentTypeItem();
         DocumentType documentTypeUploadedDocumentWithBinaryUrl = new DocumentType();
         UploadedDocumentType uploadedDocumentTypeWithBinaryUrl = new UploadedDocumentType();
@@ -527,15 +545,6 @@ class TseAdminServiceTest {
         documentTypeItemWithValueAndUploadedDocumentWithoutBinaryDocument
                 .setValue(documentTypeUploadedDocumentWithoutBinaryUrl);
         caseData.getDocumentCollection().add(documentTypeItemWithValueAndUploadedDocumentWithoutBinaryDocument);
-
-        DocumentTypeItem documentTypeItemWithoutUploadedDocument = new DocumentTypeItem();
-        DocumentType documentTypeUploadedDocumentWithoutUploadedDocument = new DocumentType();
-        documentTypeItemWithoutUploadedDocument
-                .setValue(documentTypeUploadedDocumentWithoutUploadedDocument);
-        caseData.getDocumentCollection().add(documentTypeItemWithoutUploadedDocument);
-
-        DocumentTypeItem documentTypeItemWithoutDocumentType = new DocumentTypeItem();
-        caseData.getDocumentCollection().add(documentTypeItemWithoutDocumentType);
 
         caseDetails.setCaseId(CASE_ID);
         caseDetails.setCaseData(caseData);

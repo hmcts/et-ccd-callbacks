@@ -13,28 +13,20 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SearchCriteria;
-import uk.gov.hmcts.et.common.model.ccd.SearchParty;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
@@ -604,73 +596,6 @@ public class CaseManagementForCaseWorkerService {
 
     private void setCaseManagementCategory(CaseData caseData) {
         caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
-    }
-
-    public void setSearchCriteria(CaseData caseData) {
-        if (!featureToggleService.isGlobalSearchEnabled()) {
-            return;
-        }
-
-        ListTypeItem<SearchParty> searchParties = new ListTypeItem<>();
-        ClaimantIndType claimantIndType = caseData.getClaimantIndType();
-
-        if (claimantIndType != null) {
-            ClaimantType claimantType = caseData.getClaimantType();
-
-            Address claimantAddressUK = claimantType.getClaimantAddressUK();
-            searchParties.add(GenericTypeItem.from(SearchParty.builder()
-                    .name(claimantIndType.claimantFullName())
-                    .dateOfBirth(claimantIndType.getClaimantDateOfBirth())
-                    .emailAddress(claimantType.getClaimantEmailAddress())
-                    .addressLine1(claimantAddressUK.getAddressLine1())
-                    .postCode(claimantAddressUK.getPostCode())
-                    .build()));
-        }
-
-        if (caseData.getRespondentCollection() != null) {
-            caseData.getRespondentCollection().forEach(respondent -> {
-                RespondentSumType respondentValue = respondent.getValue();
-                Address respondentAddress = respondentValue.getResponseRespondentAddress();
-
-                SearchParty.SearchPartyBuilder searchPartyBuilder = SearchParty.builder()
-                        .name(respondentValue.getRespondentName())
-                        .emailAddress(respondentValue.getRespondentEmail());
-
-                if (respondentAddress != null) {
-                    searchPartyBuilder
-                            .addressLine1(respondentAddress.getAddressLine1())
-                            .postCode(respondentAddress.getPostCode());
-                }
-                searchParties.add(GenericTypeItem.from(searchPartyBuilder.build()));
-            });
-        }
-
-        if (caseData.getRepCollection() != null) {
-            caseData.getRepCollection().forEach(rep -> {
-                RepresentedTypeR repValue = rep.getValue();
-                Address representativeAddress = repValue.getRepresentativeAddress();
-
-                SearchParty.SearchPartyBuilder searchRepPartyBuilder = SearchParty.builder()
-                        .name(repValue.getRespRepName())
-                        .emailAddress(repValue.getRepresentativeEmailAddress());
-
-                if (representativeAddress != null) {
-                    searchRepPartyBuilder
-                            .addressLine1(representativeAddress.getAddressLine1())
-                            .postCode(representativeAddress.getPostCode());
-                }
-                searchParties.add(GenericTypeItem.from(searchRepPartyBuilder.build()));
-            });
-        }
-
-        ListTypeItem<String> otherCaseReferences = new ListTypeItem<>();
-        otherCaseReferences.add(GenericTypeItem.from(caseData.getEthosCaseReference()));
-        SearchCriteria searchCriteria = SearchCriteria.builder()
-                .otherCaseReferences(otherCaseReferences)
-                .searchParties(searchParties)
-                .build();
-        caseData.setSearchCriteria(searchCriteria);
-
     }
 
     private void setCaseManagementLocation(CaseData caseData) {

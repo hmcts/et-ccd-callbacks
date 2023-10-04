@@ -30,7 +30,7 @@
         "request": "2.88.2",
         "request-promise-native": "1.0.9",
         "require-directory": "2.1.1",
-        "totp-generator": "0.0.13"
+        "totp-generator": "0.0.14"
     },
     "scripts": {
         "test:local": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --steps --reporter mocha-multi --verbose",

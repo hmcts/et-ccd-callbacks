@@ -4519,7 +4519,7 @@ __metadata:
     sonarqube-scanner: 2.8.1
     superagent-proxy: 3.0.0
     supertest: 6.2.2
-    totp-generator: 0.0.13
+    totp-generator: 0.0.14
     unirest: 0.6.0
     uuid: 8.3.2
     watch: 1.0.2
@@ -11242,12 +11242,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"totp-generator@npm:0.0.13":
-  version: 0.0.13
-  resolution: "totp-generator@npm:0.0.13"
+"totp-generator@npm:0.0.14":
+  version: 0.0.14
+  resolution: "totp-generator@npm:0.0.14"
   dependencies:
     jssha: ^3.1.2
-  checksum: 562296b68580811d47e00c494f31cccaf5d071874f984e76ad30bbec4374b5f25ba8171ee09252d0ce61fdcb7cf83394defab9b427f8412d1fd8ef6a326a2a8c
+  checksum: e68c57849ca259a49a6470900e92a89f372de559c3c528f92e0e631655b17e8477a341ec1d870924235d59c249b7614bb01847f2e29118d52e241629cd230026
   languageName: node
   linkType: hard
 

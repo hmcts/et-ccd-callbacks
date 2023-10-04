@@ -111,8 +111,6 @@ class CaseManagementForCaseWorkerServiceTest {
     @MockBean
     private ClerkService clerkService;
     @MockBean
-    private AuthTokenGenerator serviceAuthTokenGenerator;
-    @MockBean
     private EmailService emailService;
     private static final String hmctsServiceId = "BHA1";
 

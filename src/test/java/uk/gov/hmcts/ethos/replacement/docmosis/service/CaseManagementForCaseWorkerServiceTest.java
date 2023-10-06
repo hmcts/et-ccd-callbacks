@@ -241,7 +241,10 @@ class CaseManagementForCaseWorkerServiceTest {
     void caseDataDefaultsCaseManagementLocation() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals(CaseLocation.builder().baseLocation("301017").region("North West").build(),
+        assertEquals(CaseLocation.builder()
+                        .baseLocation("301017")
+                        .region("4")
+                        .build(),
                 caseData.getCaseManagementLocation());
     }
 

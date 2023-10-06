@@ -10,30 +10,23 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelperTest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -41,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({AdrDocumentsController.class, JsonMapper.class})
@@ -109,13 +101,13 @@ class AdrDocumentsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))
                 .thenReturn(true);
 
-        DocumentTypeItem docTypeItem= new DocumentTypeItem();
-        DocumentType  documentType = new DocumentType();
-        UploadedDocumentType uploadedDocType= new UploadedDocumentType();
+        UploadedDocumentType uploadedDocType = new UploadedDocumentType();
         uploadedDocType.setDocumentBinaryUrl("test\\url");
         uploadedDocType.setDocumentBinaryUrl("test\\binary\\url");
         uploadedDocType.setDocumentFilename("test upload doc name");
+        DocumentType  documentType = new DocumentType();
         documentType.setUploadedDocument(uploadedDocType);
+        DocumentTypeItem docTypeItem = new DocumentTypeItem();
         docTypeItem.setValue(documentType);
         ccdRequest.getCaseDetails().getCaseData()
                 .setAdrDocumentCollection(List.of(docTypeItem));

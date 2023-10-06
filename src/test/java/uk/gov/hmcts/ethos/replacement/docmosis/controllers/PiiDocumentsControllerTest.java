@@ -100,13 +100,13 @@ class PiiDocumentsControllerTest {
     void submittedCallbackResponse_noError() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
-        DocumentTypeItem docTypeItem= new DocumentTypeItem();
-        DocumentType  documentType = new DocumentType();
-        UploadedDocumentType uploadedDocType= new UploadedDocumentType();
+        UploadedDocumentType uploadedDocType = new UploadedDocumentType();
         uploadedDocType.setDocumentBinaryUrl("test\\url");
         uploadedDocType.setDocumentBinaryUrl("test\\binary\\url");
         uploadedDocType.setDocumentFilename("test upload doc name");
+        DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(uploadedDocType);
+        DocumentTypeItem docTypeItem = new DocumentTypeItem();
         docTypeItem.setValue(documentType);
         ccdRequest.getCaseDetails().getCaseData()
                 .setAdrDocumentCollection(List.of(docTypeItem));

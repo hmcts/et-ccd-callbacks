@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
-import java.time.LocalDate;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -55,16 +52,6 @@ public class AppealDocumentsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if(caseData.getAppealDocumentCollection() != null) {
-            caseData.getAppealDocumentCollection().forEach(
-                    appeal -> {
-                        if(appeal.getValue().getCreationDate() == null) {
-                            appeal.getValue().setCreationDate(LocalDate.now().toString());
-                        }
-                    }
-            );
-        }
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 }

@@ -125,20 +125,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/ui@npm:0.4.7":
-  version: 0.4.7
-  resolution: "@codeceptjs/ui@npm:0.4.7"
+"@codeceptjs/ui@npm:0.7.0":
+  version: 0.7.0
+  resolution: "@codeceptjs/ui@npm:0.7.0"
   dependencies:
     "@codeceptjs/configure": ^0.8.0
     axios: ^0.24.0
-    body-parser: ^1.20.0
-    cheerio: ^1.0.0-rc.11
+    body-parser: ^1.20.1
+    cheerio: ^1.0.0-rc.12
     chokidar: ^3.5.3
     commander: ^8.3.0
     core-js: 2.6.12
     debug: ^4.3.4
     electron: ^15.5.5
-    express: ^4.18.1
+    express: ^4.18.2
     lodash.clonedeep: ^4.5.0
     nanoid: ^3.3.4
     socket.io: ^2.3.0
@@ -147,7 +147,7 @@ __metadata:
     codeceptjs: ^3.2.2
   bin:
     codecept-ui: bin/codecept-ui.js
-  checksum: b9471f4b6f8c1e6d11be823b0a36920d5b3d5734213f2758c4f029a3ba7079561b257b487777d0c93758ca520404260c31e7f4ee980df882c6407bcca58f5345
+  checksum: 915e3b68fce797b644a43bc3db8c2bdf4bdec08fa887a05b4c9774f07676acc43a25c9a0c893875fb73506a89e0dd120191d6e22e4ba1d87c5e8fb16c6874b04
   languageName: node
   linkType: hard
 
@@ -2082,7 +2082,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"body-parser@npm:^1.20.0":
+"body-parser@npm:^1.20.1":
   version: 1.20.2
   resolution: "body-parser@npm:1.20.2"
   dependencies:
@@ -2549,7 +2549,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:^1.0.0-rc.11":
+"cheerio@npm:^1.0.0-rc.12":
   version: 1.0.0-rc.12
   resolution: "cheerio@npm:1.0.0-rc.12"
   dependencies:
@@ -4454,7 +4454,7 @@ __metadata:
     "@babel/eslint-parser": ^7.17.0
     "@codeceptjs/configure": 0.10.0
     "@codeceptjs/examples": 1.2.1
-    "@codeceptjs/ui": 0.4.7
+    "@codeceptjs/ui": 0.7.0
     "@hmcts/nodejs-logging": 3.0.4
     "@types/archiver": ^5.3.1
     "@types/chai-as-promised": ^7.1.5
@@ -4627,7 +4627,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.18.1":
+"express@npm:^4.18.2":
   version: 4.18.2
   resolution: "express@npm:4.18.2"
   dependencies:

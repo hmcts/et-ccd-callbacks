@@ -127,3 +127,9 @@ apply_noc_access_api_assignments_path: /noc/apply-decision
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
   exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}
+
+hmcts_service_id: BHA1
+
+launchdarkly:
+  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  env: ${LAUNCH_DARKLY_ENV:default}

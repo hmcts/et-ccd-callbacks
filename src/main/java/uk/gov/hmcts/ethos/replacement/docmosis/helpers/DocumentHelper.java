@@ -685,9 +685,11 @@ public final class DocumentHelper {
     private static StringBuilder getCorrespondenceData(CorrespondenceType correspondence) {
         log.info("Correspondence data");
         String sectionName = getEWSectionName(correspondence);
+        sectionName = sectionName.replace(".", "_");
+        sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append('"').append('t').append(sectionName.replace(".", "_"))
+            sb.append('"').append('t').append(sectionName)
                     .append("\":\"").append("true").append(NEW_LINE);
         }
         return sb;

@@ -380,7 +380,7 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.99.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.99.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.1'
-    implementation group: 'com.squareup.okio', name: 'okio', version: '3.4.0'
+    implementation group: 'com.squareup.okio', name: 'okio', version: '3.6.0'
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
 

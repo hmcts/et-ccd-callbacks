@@ -344,7 +344,7 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.36'
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.14.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.62.Final'
 
@@ -384,7 +384,7 @@ dependencies {
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.4.0'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.6.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -424,7 +424,7 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.14.0'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.3.1'

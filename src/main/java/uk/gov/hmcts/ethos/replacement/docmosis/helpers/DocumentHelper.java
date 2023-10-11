@@ -111,11 +111,13 @@ public final class DocumentHelper {
             .append("_schmcts2\":\"[userImage:schmcts.png]").append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
-        sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE)
-            .append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE)
-            .append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
-            .append(NEW_LINE).append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference()))
-            .append(NEW_LINE).append("}\n}\n");
+        sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE).append("\"Today_date\":\"")
+        .append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE).append("\"TodayPlus28Days\":\"")
+        .append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
+        .append(NEW_LINE).append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
+        .append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference())).append(NEW_LINE)
+        .append("}\n").append("}\n");
+
         return sb;
     }
 
@@ -669,10 +671,12 @@ public final class DocumentHelper {
     private static StringBuilder getCorrespondenceData(CorrespondenceType correspondence) {
         log.info("Correspondence data");
         String sectionName = getEWSectionName(correspondence);
+        sectionName = sectionName.replace(".", "_");
+        sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append("\"t").append(sectionName.replace(".", "_")).append("\":\"true")
-            .append(NEW_LINE);
+            sb.append('"').append('t').append(sectionName)
+                    .append("\":\"").append("true").append(NEW_LINE);
         }
         return sb;
     }

@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepos
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
@@ -263,6 +264,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
 
         if (errors.isEmpty()) {
+            defaultValuesReaderService.setSubmissionReference(ccdRequest.getCaseDetails());
             DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
@@ -281,6 +283,30 @@ public class CaseActionsForCaseWorkerController {
                 caseData.getEthosCaseReference());
 
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add HMCTSServiceId to supplementary_data on a case.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> addServiceId(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) throws IOException {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/initialiseAmendCaseDetails", consumes = APPLICATION_JSON_VALUE)
@@ -415,6 +441,9 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             errors = eventValidationService.validateET3ResponseFields(caseData);
             if (errors.isEmpty()) {
+                errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "respondent");
+            }
+            if (errors.isEmpty()) {
                 caseManagementForCaseWorkerService.continuingRespondent(ccdRequest);
                 caseManagementForCaseWorkerService.struckOutRespondents(ccdRequest);
             }
@@ -461,7 +490,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             // add org policy and NOC elements
-            caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
+            nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
         }

@@ -100,8 +100,11 @@ class Et3ResponseServiceTest {
     @Test
     void assertThatEt3DocumentIsSaved() {
         et3ResponseService.saveEt3Response(caseData, documentInfo);
+
         assertThat(caseData.getDocumentCollection().size(), is(1));
         assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getCategoryId(),
+                is("C18"));
     }
 
     @Test

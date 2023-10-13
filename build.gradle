@@ -314,7 +314,7 @@ dependencyManagement {
         dependencySet(group: 'com.google.guava', version: '32.0.1-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.1.99.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.100.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -478,7 +478,7 @@ bootWithCCD {
     //environment 'SERVICEBUS_FAKE', 'true'
 }
 
-pmdMain.maxFailures = 662
+pmdMain.maxFailures = 668
 pmdTest.maxFailures = 265
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

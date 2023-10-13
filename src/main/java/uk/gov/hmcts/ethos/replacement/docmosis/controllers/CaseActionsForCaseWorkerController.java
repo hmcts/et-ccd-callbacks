@@ -281,9 +281,9 @@ public class CaseActionsForCaseWorkerController {
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
-            var enabled = featureToggleService.isCaseFlagsLinkingEnabled();
-            log.info("caseflags enabled flag is {}", enabled);
-            if (enabled) {
+            boolean caseFlagsToggle = featureToggleService.isCaseFlagsLinkingEnabled();
+            log.info("Caseflags feature flag is {}", caseFlagsToggle);
+            if (caseFlagsToggle) {
                 caseFlagsService.setupCaseFlags(caseData);
                 caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
             }

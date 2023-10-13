@@ -285,7 +285,6 @@ public class CaseActionsForCaseWorkerController {
             log.info("Caseflags feature flag is {}", caseFlagsToggle);
             if (caseFlagsToggle) {
                 caseFlagsService.setupCaseFlags(caseData);
-                caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
             }
         }
 

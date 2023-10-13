@@ -34,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterC
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -102,6 +104,8 @@ public class CaseActionsForCaseWorkerController {
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
 
     private final NocRespondentHelper nocRespondentHelper;
 
@@ -277,6 +281,12 @@ public class CaseActionsForCaseWorkerController {
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
+            var enabled = featureToggleService.isCaseFlagsLinkingEnabled();
+            log.info("caseflags enabled flag is {}", enabled);
+            if (enabled) {
+                caseFlagsService.setupCaseFlags(caseData);
+                caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
+            }
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),

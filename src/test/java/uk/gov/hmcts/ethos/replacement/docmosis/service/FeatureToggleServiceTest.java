@@ -42,6 +42,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isFeatureEnabled(caseFileKey)).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseFlagsLinkingIsEnabled(Boolean toggleStat) {
+        givenToggle("case-flags-linking-enabled", toggleStat);
+
+        assertThat(featureToggleService.isCaseFlagsLinkingEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

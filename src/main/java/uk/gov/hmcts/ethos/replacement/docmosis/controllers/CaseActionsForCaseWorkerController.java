@@ -283,7 +283,7 @@ public class CaseActionsForCaseWorkerController {
 
             boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
             log.info("Caseflags feature flag is {}", caseFlagsToggle);
-            if (caseFlagsToggle) {
+            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
                 caseFlagsService.setupCaseFlags(caseData);
             }
         }

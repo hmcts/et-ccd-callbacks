@@ -120,7 +120,6 @@ public class CaseManagementForCaseWorkerService {
         setCaseNameHmctsInternal(caseData);
         setCaseManagementLocation(caseData);
         setCaseManagementCategory(caseData);
-
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -405,7 +404,8 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    private void populateHearingVenueFromHearingLevelToDayLevel(DateListedType dateListedType, HearingType hearingType,
+    private void populateHearingVenueFromHearingLevelToDayLevel(DateListedType dateListedType,
+                                                                HearingType hearingType,
                                                                 String caseTypeId) {
         switch (caseTypeId) {
             case ENGLANDWALES_CASE_TYPE_ID:
@@ -598,6 +598,8 @@ public class CaseManagementForCaseWorkerService {
             return;
         }
         caseData.setCaseManagementLocation(CaseLocation.builder()
-                .baseLocation(tribunalLocations.getEpimmsId()).region(tribunalLocations.getRegion()).build());
+                .baseLocation(tribunalLocations.getEpimmsId())
+                .region(tribunalLocations.getRegionId())
+                .build());
     }
 }

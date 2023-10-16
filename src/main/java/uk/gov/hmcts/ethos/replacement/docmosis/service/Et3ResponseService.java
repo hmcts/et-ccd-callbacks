@@ -41,6 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 public class Et3ResponseService {
 
     public static final String ET3_ATTACHMENT = "ET3 Attachment";
+    public static final String ET3_CATEGORY_ID = "C18";
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
     private final EmailService emailService;
@@ -72,6 +73,7 @@ public class Et3ResponseService {
      */
     public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
+        uploadedDocument.setCategoryId(ET3_CATEGORY_ID);
         addDocumentToDocCollection(caseData, createDocumentTypeItem(uploadedDocument, ET3));
         saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }

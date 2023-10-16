@@ -278,10 +278,8 @@ public class TornadoService {
     public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
                                               String documentName)
         throws IOException {
-        System.out.println(1);
         HttpURLConnection connection = null;
         try {
-            System.out.println("Test");
             dmStoreDocumentName = ET3_RESPONSE_PDF.equals(documentName)
                     ? String.format("%s - " + ET3_RESPONSE_PDF, caseData.getSubmitEt3Respondent().getSelectedLabel())
                     : documentName;

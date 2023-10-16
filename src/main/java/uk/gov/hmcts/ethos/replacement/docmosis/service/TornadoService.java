@@ -284,6 +284,7 @@ public class TornadoService {
                     ? String.format("%s - " + ET3_RESPONSE_PDF, caseData.getSubmitEt3Respondent().getSelectedLabel())
                     : documentName;
             connection = createConnection();
+
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             byte[] bytes = getDocumentByteArray(connection);
             return createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);

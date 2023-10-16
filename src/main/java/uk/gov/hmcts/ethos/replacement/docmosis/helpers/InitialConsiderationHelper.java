@@ -202,7 +202,7 @@ public final class InitialConsiderationHelper {
 
         DocumentTypeItem documentTypeItem =
                 DocumentHelper.createDocumentTypeItemFromTopLevel(caseData.getEtInitialConsiderationDocument(),
-                        INITIAL_CONSIDERATION, INITIAL_CONSIDERATION);
+                        INITIAL_CONSIDERATION, INITIAL_CONSIDERATION, null);
         caseData.getDocumentCollection().add(documentTypeItem);
     }
 }

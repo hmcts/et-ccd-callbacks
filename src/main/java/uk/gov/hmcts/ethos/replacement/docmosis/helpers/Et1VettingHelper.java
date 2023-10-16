@@ -177,7 +177,7 @@ public final class Et1VettingHelper {
         }
         DocumentTypeItem documentTypeItem =
                 DocumentHelper.createDocumentTypeItemFromTopLevel(caseData.getEt1VettingDocument(), STARTING_A_CLAIM,
-                        ET1_VETTING);
+                        ET1_VETTING, null);
         if (caseData.getDocumentCollection() == null) {
             caseData.setDocumentCollection(new ArrayList<>());
         }

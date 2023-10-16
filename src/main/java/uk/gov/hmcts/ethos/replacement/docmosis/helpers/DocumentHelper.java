@@ -685,9 +685,11 @@ public final class DocumentHelper {
     private static StringBuilder getCorrespondenceData(CorrespondenceType correspondence) {
         log.info("Correspondence data");
         String sectionName = getEWSectionName(correspondence);
+        sectionName = sectionName.replace(".", "_");
+        sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append('"').append('t').append(sectionName.replace(".", "_"))
+            sb.append('"').append('t').append(sectionName)
                     .append("\":\"").append("true").append(NEW_LINE);
         }
         return sb;
@@ -1012,6 +1014,27 @@ public final class DocumentHelper {
                                                           String secondLevel) {
         DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
         DocumentType documentType = documentTypeItem.getValue();
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
+    }
+
+    /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param topLevel top level document
+     * @param secondLevel second level document
+     * @return DocumentTypeItem
+     */
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel,
+                                                          String shortDescription) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setShortDescription(shortDescription);
         documentType.setDateOfCorrespondence(LocalDate.now().toString());
         documentType.setTopLevelDocuments(topLevel);
         uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);

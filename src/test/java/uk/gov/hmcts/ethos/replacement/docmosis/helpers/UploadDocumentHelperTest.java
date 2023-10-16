@@ -35,6 +35,25 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.HEARINGS;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.MISC;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.OTHER;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_OF_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIM_ACCEPTED;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIM_REJECTED;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.HEARINGS;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_HEARING;
@@ -158,7 +177,8 @@ public class UploadDocumentHelperTest {
                 Arguments.of(ET3, RESPONSE_TO_A_CLAIM),
                 Arguments.of(ET3_ATTACHMENT, RESPONSE_TO_A_CLAIM),
                 Arguments.of(NOTICE_OF_HEARING, HEARINGS),
-                Arguments.of(OTHER, LEGACY_DOCUMENT_NAMES)
+                Arguments.of(OTHER, LEGACY_DOCUMENT_NAMES),
+                Arguments.of(TRIBUNAL_CASE_FILE, MISC)
         );
     }
 

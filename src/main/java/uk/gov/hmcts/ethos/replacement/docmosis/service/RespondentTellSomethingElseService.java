@@ -312,7 +312,8 @@ public class RespondentTellSomethingElseService {
                             tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_FILE_NAME)
                     ),
                     topLevel,
-                    applicationDocMapping
+                    applicationDocMapping,
+                    caseData.getResTseSelectApplication()
             ));
 
         } catch (Exception e) {

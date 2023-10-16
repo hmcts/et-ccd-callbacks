@@ -94,7 +94,6 @@ public class MultipleBatchUpdate3Service {
 
     }
 
-
     private void submitEventForCase(String userToken, String caseTypeId, long caseId, CaseData caseData,
                                     String jurisdiction) {
         try {

@@ -97,7 +97,8 @@ class TseAdmReplyHelperTest {
     @Test
     void getReplyDocumentRequest_Returns_doc_as_String() throws JsonProcessingException {
         caseData.setTseAdminSelectApplication(getTseAdminSelectApp());
-        String actual  = TseAdmReplyHelper.getReplyDocumentRequest(caseData, "testAccessKey");
+        String actual  = TseAdmReplyHelper.getReplyDocumentRequest(caseData, "testAccessKey",
+                "testBinaryUrl");
 
         assertNotNull(actual);
         assertThat(actual.contains("EM-TRB-EGW-ENG-000991.docx"), is(Boolean.TRUE));

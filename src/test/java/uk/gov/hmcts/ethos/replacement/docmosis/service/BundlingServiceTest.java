@@ -64,7 +64,7 @@ class BundlingServiceTest {
     void createBundleRequest() {
         caseDetails.getCaseData().setCaseBundles(bundlingService.createBundleRequest(caseDetails, authToken));
         assertNotNull(caseDetails.getCaseData().getCaseBundles());
-        assertEquals(YES, caseDetails.getCaseData().getCaseBundles().get(0).getValue().getEligibleForStitching());
+        assertEquals(YES, caseDetails.getCaseData().getCaseBundles().get(0).value().getEligibleForStitching());
     }
 
     @Test
@@ -72,7 +72,7 @@ class BundlingServiceTest {
         caseDetails.getCaseData().setCaseBundles(bundlingService.stitchBundle(caseDetails, authToken));
         assertNotNull(caseDetails.getCaseData().getCaseBundles());
         System.out.println(caseDetails.getCaseData().getCaseBundles());
-        assertNotNull(caseDetails.getCaseData().getCaseBundles().get(0).getValue().getStitchedDocument());
+        assertNotNull(caseDetails.getCaseData().getCaseBundles().get(0).value().getStitchedDocument());
     }
 
     @ParameterizedTest

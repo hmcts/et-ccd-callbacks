@@ -36,8 +36,8 @@ public class BundlingService {
 
     private static void setCustomBundleValues(CaseDetails caseDetails, BundleCreateResponse bundleCreateResponse) {
         for (Bundle bundle : bundleCreateResponse.getData().getCaseBundles()) {
-            bundle.getValue().setEligibleForStitching(YES);
-            bundle.getValue().setFileName(
+            bundle.value().setEligibleForStitching(YES);
+            bundle.value().setFileName(
                     caseDetails.getCaseData().getEthosCaseReference().replace("/", "-") + "-DCF");
         }
     }

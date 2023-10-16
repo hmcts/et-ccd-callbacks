@@ -27,13 +27,13 @@ public class BundlingHelper {
      */
     public static void addBundleToDocumentCollection(CaseData caseData) {
         Optional<Bundle> stitchedBundle = caseData.getCaseBundles().stream()
-                .filter(bundle -> bundle.getValue().getStitchedDocument() != null)
+                .filter(bundle -> bundle.value().getStitchedDocument() != null)
                 .findFirst();
         if (stitchedBundle.isEmpty()) {
             return;
         }
 
-        DocumentLink documentLink = stitchedBundle.get().getValue().getStitchedDocument();
+        DocumentLink documentLink = stitchedBundle.get().value().getStitchedDocument();
         if (CollectionUtils.isEmpty(caseData.getDigitalCaseFile())) {
             caseData.setDocumentCollection(new ArrayList<>());
         }

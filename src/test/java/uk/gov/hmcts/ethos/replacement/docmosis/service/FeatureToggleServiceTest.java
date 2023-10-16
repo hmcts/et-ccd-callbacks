@@ -47,7 +47,7 @@ class FeatureToggleServiceTest {
     void shouldReturnCorrectValue_whenCaseFlagsLinkingIsEnabled(Boolean toggleStat) {
         givenToggle("case-flags-linking-enabled", toggleStat);
 
-        assertThat(featureToggleService.isCaseFlagsLinkingEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

@@ -99,6 +99,8 @@ public class MultipleBatchUpdate3Service {
         try {
             CCDRequest returnedRequest = ccdClient.startEventForCase(userToken, caseTypeId,
                    jurisdiction, String.valueOf(caseId));
+            // NOTE TO DEV IN THE FUTURE: THE BELOW LINE IS VULNERABLE TO CONCURRENCY BUGS.
+            // PLEASE AMEND IT WHEN YOU ARE IMPLEMENTING MULTIPLES.
             ccdClient.submitEventForCase(userToken, caseData, caseTypeId,
                    jurisdiction, returnedRequest, String.valueOf(caseId));
         } catch (Exception e) {

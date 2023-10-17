@@ -407,7 +407,7 @@ dependencies {
     }
     testImplementation(platform('org.junit:junit-bom:5.9.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.18.0'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.1'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.0.0'
 

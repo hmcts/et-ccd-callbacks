@@ -471,7 +471,7 @@ class DocumentGenerationServiceTest {
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects
-                .requireNonNull(getClass().getClassLoader()
+                .requireNonNull(Thread.currentThread().getContextClassLoader()
                         .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);

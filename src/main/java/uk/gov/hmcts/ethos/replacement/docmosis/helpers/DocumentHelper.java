@@ -85,13 +85,10 @@ public final class DocumentHelper {
         sb.append("\"data\":{\n");
 
         if (templateName.equals(ADDRESS_LABELS_TEMPLATE) && multipleData == null) {
-            log.info("Getting address labels data for single case:" + caseData.getEthosCaseReference());
             sb.append(getAddressLabelsDataSingleCase(caseData));
         } else if (templateName.equals(ADDRESS_LABELS_TEMPLATE)) {
-            log.info("Getting address labels data for multiple reference:" + multipleData.getMultipleReference());
             sb.append(getAddressLabelsDataMultipleCase(multipleData));
         } else {
-            log.info("Getting data for single template for case:" + caseData.getEthosCaseReference());
             sb.append(getClaimantData(caseData));
             sb.append(getRespondentData(caseData));
             sb.append(getHearingData(caseData, caseTypeId, correspondenceType,
@@ -156,13 +153,11 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getClaimantData(CaseData caseData) {
-        log.info("Getting Claimant Data for case: " + caseData.getEthosCaseReference());
         StringBuilder sb = new StringBuilder();
         RepresentedTypeC representedTypeC = caseData.getRepresentativeClaimantType();
         Optional<ClaimantIndType> claimantIndType = Optional.ofNullable(caseData.getClaimantIndType());
         if (representedTypeC != null && caseData.getClaimantRepresentedQuestion() != null &&  caseData
                 .getClaimantRepresentedQuestion().equals(YES)) {
-            log.info("Claimant is represented for case reference: " + caseData.getEthosCaseReference());
             sb.append("\"claimant_or_rep_full_name\":\"").append(nullCheck(representedTypeC.getNameOfRepresentative()))
                     .append(NEW_LINE);
             sb.append("\"claimant_rep_organisation\":\"").append(nullCheck(representedTypeC.getNameOfOrganisation()))
@@ -177,7 +172,6 @@ public final class DocumentHelper {
             Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
             if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
                     .equals(COMPANY_TYPE_CLAIMANT)) {
-                log.info("Claimant is a company for case reference: " + caseData.getEthosCaseReference());
                 sb.append("\"claimant_full_name\":\"").append(nullCheck(caseData.getClaimantCompany()))
                         .append(NEW_LINE);
                 sb.append("\"Claimant\":\"").append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
@@ -191,18 +185,15 @@ public final class DocumentHelper {
                 sb.append("\"Claimant\":\"").append(NEW_LINE);
             }
         } else {
-            log.info("Claimant is not represented for case: " + caseData.getEthosCaseReference());
             Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
             if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
                     .equals(COMPANY_TYPE_CLAIMANT)) {
-                log.info("Claimant Company");
                 sb.append("\"claimant_or_rep_full_name\":\"").append(nullCheck(caseData.getClaimantCompany()))
                         .append(NEW_LINE);
                 sb.append("\"claimant_full_name\":\"").append(nullCheck(caseData.getClaimantCompany()))
                         .append(NEW_LINE);
                 sb.append("\"Claimant\":\"").append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
             } else {
-                log.info("Claimant data");
                 if (claimantIndType.isPresent()) {
                     sb.append("\"claimant_or_rep_full_name\":\"").append(nullCheck(claimantIndType.get()
                             .claimantFullName())).append(NEW_LINE);
@@ -224,7 +215,6 @@ public final class DocumentHelper {
                 sb.append(getClaimantOrRepAddressUK(new Address()));
             }
         }
-        log.info("Claimant address UK");
         Optional<ClaimantType> claimantType = Optional.ofNullable(caseData.getClaimantType());
         if (claimantType.isPresent()) {
             sb.append(getClaimantAddressUK(claimantType.get().getClaimantAddressUK()));
@@ -260,7 +250,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentData(CaseData caseData) {
-        log.info("Respondent Data");
         StringBuilder sb = new StringBuilder();
         List<RespondentSumTypeItem> respondentSumTypeItemList = CollectionUtils.isNotEmpty(
                 caseData.getRespondentCollection())
@@ -282,7 +271,6 @@ public final class DocumentHelper {
                     || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO);
 
             if (responseContinue && responseNotStruckOut) {
-                log.info("Response is continuing and not struck out for case: " + caseData.getEthosCaseReference());
                 respondentToBeShown = respondentSumTypeItem.getValue();
                 break;
             }
@@ -315,7 +303,6 @@ public final class DocumentHelper {
         }
 
         if (representedTypeRItem.isPresent()) {
-            log.info("Respondent represented");
             RepresentedTypeR representedTypeR = representedTypeRItem.get().getValue();
             sb.append("\"respondent_or_rep_full_name\":\"").append(nullCheck(representedTypeR
                     .getNameOfRepresentative())).append(NEW_LINE);
@@ -330,7 +317,6 @@ public final class DocumentHelper {
                     .append(NEW_LINE);
 
         } else {
-            log.info("Respondent not represented");
             if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
                     && responseNotStruckOut && responseContinue
                     && !finalRespondentToBeShown.equals(new RespondentSumType())) {
@@ -344,7 +330,6 @@ public final class DocumentHelper {
             }
         }
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
-            log.info("Respondent collection");
             sb.append("\"respondent_full_name\":\"").append(
                     nullCheck(Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
                             || YES.equals(finalRespondentToBeShown.getResponseContinue())
@@ -376,7 +361,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {
-        log.info("Respondent Others Name");
         StringBuilder sb = new StringBuilder();
         AtomicInteger atomicInteger = new AtomicInteger(2);
         List<String> respOthers = caseData.getRespondentCollection()
@@ -394,7 +378,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespAddress(CaseData caseData) {
-        log.info("Get Resp address");
         StringBuilder sb = new StringBuilder();
         AtomicInteger atomicInteger = new AtomicInteger(1);
         int size = caseData.getRespondentCollection().size();
@@ -416,17 +399,13 @@ public final class DocumentHelper {
                                                 CorrespondenceType correspondenceType,
                                                 CorrespondenceScotType correspondenceScotType,
                                                 VenueAddressReaderService venueAddressReaderService) {
-        log.info("Hearing Data");
         StringBuilder sb = new StringBuilder();
         //Currently checking collection not the HearingType
         if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
             String correspondenceHearingNumber = getCorrespondenceHearingNumber(
                     correspondenceType, correspondenceScotType);
-            log.info("Hearing Number: " + correspondenceHearingNumber);
             HearingType hearingType = getHearingByNumber(caseData.getHearingCollection(), correspondenceHearingNumber);
-            log.info("Hearing type info by number");
             if (hearingType.getHearingDateCollection() != null && !hearingType.getHearingDateCollection().isEmpty()) {
-                log.info("Hearing dates collection");
                 sb.append("\"Hearing_date\":\"").append(nullCheck(getHearingDates(hearingType
                         .getHearingDateCollection()))).append(NEW_LINE);
                 String hearingDateAndTime = nullCheck(getHearingDatesAndTime(hearingType.getHearingDateCollection()));
@@ -437,7 +416,6 @@ public final class DocumentHelper {
                 sb.append("\"Hearing_date_time\":\"").append(NEW_LINE);
                 sb.append("\"Hearing_time\":\"").append(NEW_LINE);
             }
-            log.info("Checking hearing venue and duration");
             sb.append("\"Hearing_venue\":\"").append(nullCheck(venueAddressReaderService.getVenueAddress(
                     hearingType, caseTypeId, caseData.getManagingOffice()))).append(NEW_LINE);
             sb.append("\"Hearing_duration\":\"").append(nullCheck(getHearingDuration(hearingType))).append(NEW_LINE);
@@ -479,7 +457,7 @@ public final class DocumentHelper {
     }
 
     private static String getHearingTime(String dateTime) {
-        return !dateTime.isEmpty() ? dateTime.substring(dateTime.indexOf("at") + 3) : "";
+        return dateTime.isEmpty() ? "" : dateTime.substring(dateTime.indexOf("at") + 3);
     }
 
     private static String getHearingDates(List<DateListedTypeItem> hearingDateCollection) {
@@ -696,7 +674,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getCorrespondenceScotData(CorrespondenceScotType correspondenceScotType) {
-        log.info("Correspondence scot data");
         String scotSectionName = getScotSectionName(correspondenceScotType);
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.equals("")) {
@@ -708,7 +685,6 @@ public final class DocumentHelper {
 
     private static StringBuilder getCourtData(CaseData caseData, DefaultValues allocatedCourtAddress) {
         StringBuilder sb = new StringBuilder();
-        log.info("Court data");
         if (allocatedCourtAddress != null) {
             sb.append("\"Court_addressLine1\":\"").append(nullCheck(allocatedCourtAddress
                     .getTribunalCorrespondenceAddressLine1())).append(NEW_LINE);
@@ -966,9 +942,6 @@ public final class DocumentHelper {
     }
 
     public static Address getRespondentAddressET3(RespondentSumType respondentSumType) {
-
-        log.info("Get respondent address ET3");
-
         return YES.equals(respondentSumType.getResponseReceived())
                 && respondentSumType.getResponseRespondentAddress() != null
                 && !Strings.isNullOrEmpty(respondentSumType.getResponseRespondentAddress().toString())

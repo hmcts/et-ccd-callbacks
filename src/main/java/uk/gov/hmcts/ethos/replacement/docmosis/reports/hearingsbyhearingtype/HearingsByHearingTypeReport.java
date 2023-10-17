@@ -430,8 +430,8 @@ public final class HearingsByHearingTypeReport {
                 dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate().toString());
         detail.setHearingType(hearingTypeItem.getValue().getHearingType());
         detail.setHearingNo(hearingTypeItem.getValue().getHearingNumber());
-        String mulRef = StringUtils.defaultString(caseData.getMultipleReference(), "0 -  Not Allocated");
-        String subMul = StringUtils.defaultString(caseData.getSubMultipleName(), "0 -  Not Allocated");
+        String mulRef = StringUtils.defaultIfEmpty(caseData.getMultipleReference(), "0 -  Not Allocated");
+        String subMul = StringUtils.defaultIfEmpty(caseData.getSubMultipleName(), "0 -  Not Allocated");
         detail.setMultiSub(mulRef + ", " + subMul);
         detail.setCaseReference(caseData.getEthosCaseReference());
         detail.setLead(YES.equals(caseData.getLeadClaimant()) ? "Y" : "N");

@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
@@ -48,7 +47,7 @@ class SessionDays {
         List<HearingSession> hearingSessions = getHearingSessions();
         return hearingSessions.stream()
                 .filter(h -> HEARING_STATUS_HEARD.equals(h.getDateListedType().getHearingStatus()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<HearingSession> getDisposedOfSessions(List<HearingSession> hearingSessions) {
@@ -58,7 +57,7 @@ class SessionDays {
                     String listingDate = h.getDateListedType().getListedDate().substring(0, 10);
                     return ReportHelper.validateMatchingDate(listingData, listingDate);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private long getSessionDays(List<HearingSession> heardSessions, String listedDate) {
@@ -83,14 +82,14 @@ class SessionDays {
                 .filter(this::isValidHearing)
                 .map(this::mapToHearingSessions)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<HearingSession> mapToHearingSessions(HearingTypeItem hearingTypeItem) {
         HearingType hearingType = hearingTypeItem.getValue();
         return hearingTypeItem.getValue().getHearingDateCollection().stream()
                 .map(h -> new HearingSession(hearingType, h.getValue()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private boolean isValidHearing(HearingTypeItem hearingTypeItem) {

@@ -16,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.groupingBy;
@@ -76,7 +75,7 @@ public class MemberDaysReport {
         }
 
         List<MemberDaysReportDetail> sortedReportDetails = interimReportDetails.stream()
-            .sorted(MemberDaysReportDetail::comparedTo).collect(Collectors.toList());
+            .sorted(MemberDaysReportDetail::comparedTo).toList();
         reportData.getReportDetails().clear();
         sortedReportDetails.forEach(d -> reportData.getReportDetails().add(d));
     }
@@ -85,7 +84,7 @@ public class MemberDaysReport {
                                                  List<MemberDaysReportDetail> reportDetails,
                                                  ListingData listingData) {
         List<HearingTypeItem> fullPanelHearings = caseData.getHearingCollection().stream()
-            .filter(this::isFullPanelHearing).collect(Collectors.toList());
+            .filter(this::isFullPanelHearing).toList();
 
         if (!CollectionUtils.isEmpty(fullPanelHearings)) {
             for (HearingTypeItem hearing : fullPanelHearings) {
@@ -106,7 +105,7 @@ public class MemberDaysReport {
                                                  List<MemberDaysReportDetail> interimReportDetails,
                                                  ListingData listingData, String ethosCaseReference) {
         List<DateListedTypeItem> hearingDatesWithHeardStatus = hearing.getValue().getHearingDateCollection().stream()
-            .filter(this::isHeardHearingDate).collect(Collectors.toList());
+            .filter(this::isHeardHearingDate).toList();
 
         for (DateListedTypeItem hearingDate : hearingDatesWithHeardStatus) {
             String currentHearingDate = ReportHelper.getFormattedLocalDate(hearingDate.getValue().getListedDate());
@@ -156,7 +155,7 @@ public class MemberDaysReport {
         Map<String, List<MemberDaysReportDetail>> groupedByDate = reportData.getReportDetails()
                 .stream().distinct().collect(groupingBy(MemberDaysReportDetail::getSortingHearingDate));
         List<String> uniqueDatesList = groupedByDate.keySet().stream().sorted()
-            .collect(Collectors.toList());
+            .toList();
 
         for (String listingDate : uniqueDatesList) {
             MemberDaySummaryItem memberDaySummaryItem = new MemberDaySummaryItem();

@@ -10,7 +10,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,6 +27,6 @@ public class JpaJudgeService implements JudgeService {
     public List<DynamicValueType> getJudgesDynamicList(TribunalOffice tribunalOffice) {
         return judgeRepository.findByTribunalOffice(tribunalOffice).stream()
                 .map(j -> DynamicValueType.create(j.getCode(), j.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

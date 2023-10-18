@@ -14,6 +14,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,29 +33,33 @@ public class TribunalOfficeServiceTest {
     TribunalOfficesService tribunalOfficesService;
 
     private static final Object[][] TEST_CASES = {
-            { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
-            { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
-            { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
-            { TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT" },
-            { TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT" },
-            { TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT" },
-            { TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH" },
-            { TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH" },
-            { TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH" },
-            { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
-            { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
-            { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
-            { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" },
-            { UNASSIGNED_OFFICE, "" },
-            { null, "" },
+            {TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA", "301017", "4"},
+            {TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA", "301017", "4"},
+            {TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA", "301017", "4"},
+            {TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT", "366559", "11"},
+            {TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT", "366559", "11"},
+            {TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT", "366559", "11"},
+            {TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH", "219164", "11"},
+            {TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH", "219164", "11"},
+            {TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH", "219164", "11"},
+            {TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB", "367564", "11"},
+            {TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB", "367564", "11"},
+            {TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB", "367564", "11"},
+            {TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF", "368308", "11"},
+            {UNASSIGNED_OFFICE, "", "", ""},
+            {null, "", "", ""},
     };
 
     private final String managingOffice;
     private final String expectedPostcode;
+    private final String epimmsId;
+    private final String region;
 
-    public TribunalOfficeServiceTest(String officeName, String expectedPostcode) {
+    public TribunalOfficeServiceTest(String officeName, String expectedPostcode, String epimmsId, String region) {
         this.managingOffice = officeName;
         this.expectedPostcode = expectedPostcode;
+        this.epimmsId = epimmsId;
+        this.region = region;
     }
 
     @Parameterized.Parameters
@@ -66,5 +71,12 @@ public class TribunalOfficeServiceTest {
     public void testGetsCorrectTribunalContactDetails() {
         ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(managingOffice);
         assertEquals(expectedPostcode, contactDetails.getPostcode());
+    }
+
+    @Test
+    public void testGetsCorrectTribunalLocationDetails() {
+        CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOffice);
+        assertEquals(epimmsId, tribunalLocations.getEpimmsId());
+        assertEquals(region, tribunalLocations.getRegion());
     }
 }

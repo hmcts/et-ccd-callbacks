@@ -695,7 +695,7 @@ public final class ListingHelper {
                     .skip(1)
                     .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO))
                     .map(respondentSumTypeItem -> respondentSumTypeItem.getValue().getRespondentName())
-                    .collect(toList());
+                    .toList();
             return String.join(", ", respOthers);
         }
         return " ";

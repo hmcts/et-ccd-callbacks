@@ -120,6 +120,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private FeatureToggleService featureToggleService;
     @MockBean
     private AdminUserService adminUserService;
+    @MockBean
+    private EmailService emailService;
 
     @BeforeEach
     void setUp() throws Exception {

@@ -54,11 +54,11 @@ public class NoPositionChangeReportData extends ListingData {
         StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportSummary.getOffice()).append(NEW_LINE);
         sb.append(REPORT_DATE).append(UtilHelper.listingFormatLocalDate(getReportDate())).append(NEW_LINE);
-        sb.append(TOTAL_CASES).append(StringUtils.defaultString(reportSummary.getTotalCases(), "0"))
+        sb.append(TOTAL_CASES).append(StringUtils.defaultIfEmpty(reportSummary.getTotalCases(), "0"))
                 .append(NEW_LINE);
-        sb.append(TOTAL_SINGLE).append(StringUtils.defaultString(reportSummary.getTotalSingleCases(), "0"))
+        sb.append(TOTAL_SINGLE).append(StringUtils.defaultIfEmpty(reportSummary.getTotalSingleCases(), "0"))
                 .append(NEW_LINE);
-        sb.append(TOTAL_MULTIPLE).append(StringUtils.defaultString(reportSummary.getTotalMultipleCases(), "0"))
+        sb.append(TOTAL_MULTIPLE).append(StringUtils.defaultIfEmpty(reportSummary.getTotalMultipleCases(), "0"))
                 .append(NEW_LINE);
         addJsonCollection(REPORT_DETAILS_SINGLE, reportDetailsSingle.iterator(), sb);
         addJsonCollection(REPORT_DETAILS_MULTIPLE, reportDetailsMultiple.iterator(), sb);

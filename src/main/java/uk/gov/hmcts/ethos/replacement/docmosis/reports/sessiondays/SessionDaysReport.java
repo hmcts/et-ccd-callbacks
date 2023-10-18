@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.Math.round;
@@ -73,7 +72,7 @@ public final class SessionDaysReport {
     public List<DateListedTypeItem> filterValidHearingDates(List<DateListedTypeItem> dateListedTypeItems) {
         return dateListedTypeItems.stream()
                 .filter(x -> isHearingDateInRange(x.getValue().getListedDate()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private boolean isHearingDateInRange(String dateListed) {

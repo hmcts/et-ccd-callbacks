@@ -244,9 +244,9 @@ public final class BulkHelper {
         CaseData caseData = submitEvent.getCaseData();
         MultipleType multipleType = getMultipleTypeFromCaseData(caseData);
         multipleType.setCaseIDM(String.valueOf(submitEvent.getCaseId()));
-        multipleType.setMultipleReferenceM(!isNullOrEmpty(
-                caseData.getMultipleReference()) ? caseData.getMultipleReference() : " ");
-        multipleType.setStateM(!isNullOrEmpty(submitEvent.getState()) ? submitEvent.getState() : " ");
+        multipleType.setMultipleReferenceM(isNullOrEmpty(
+                caseData.getMultipleReference()) ? " " : caseData.getMultipleReference());
+        multipleType.setStateM(isNullOrEmpty(submitEvent.getState()) ? " " : submitEvent.getState());
         return multipleType;
     }
 

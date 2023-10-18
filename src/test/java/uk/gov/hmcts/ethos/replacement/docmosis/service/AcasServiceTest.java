@@ -67,8 +67,8 @@ class AcasServiceTest {
                 .build();
         caseData.setAcasCertificate("R111111/11/11");
 
-        String acasCertificate = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("acasCertificate.json")).toURI()));
+        String acasCertificate = Files.readString(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource("acasCertificate.json")).toURI()));
 
         getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
                 .andExpect(method(HttpMethod.POST))

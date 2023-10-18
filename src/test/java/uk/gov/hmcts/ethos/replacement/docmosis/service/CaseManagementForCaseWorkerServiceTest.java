@@ -105,7 +105,6 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest ccdRequest15;
     private CCDRequest ccdRequest21;
 
-    private CCDRequest ccdRequest2;
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
@@ -170,7 +169,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseDetails caseDetails21 = generateCaseDetails("caseDetailsTest21.json");
         ccdRequest21.setCaseDetails(caseDetails21);
 
-        ccdRequest2 = new CCDRequest();
+        CCDRequest ccdRequest2 = new CCDRequest();
         CaseDetails caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         ccdRequest2.setCaseDetails(caseDetails2);
 
@@ -632,8 +631,8 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(jsonFileName)).toURI())));
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }

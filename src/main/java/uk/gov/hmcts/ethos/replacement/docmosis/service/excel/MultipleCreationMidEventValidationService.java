@@ -11,7 +11,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -131,7 +130,7 @@ public class MultipleCreationMidEventValidationService {
                             submitEvents.stream()
                                     .noneMatch(submitEvent ->
                                             submitEvent.getCaseData().getEthosCaseReference().equals(caseRef)))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (!listCasesDoNotExistError.isEmpty()) {
 
@@ -149,54 +148,43 @@ public class MultipleCreationMidEventValidationService {
                                           String managingOffice, boolean isScotland) {
 
         List<String> listCasesStateError = new ArrayList<>();
-
         List<String> listCasesMultipleError = new ArrayList<>();
 
         for (SubmitEvent submitEvent : submitEvents) {
-
             if (!submitEvent.getState().equals(ACCEPTED_STATE)) {
-
                 log.info("VALIDATION ERROR: state of single case not Accepted");
-
                 listCasesStateError.add(submitEvent.getCaseData().getEthosCaseReference());
-
             }
 
             if (submitEvent.getCaseData().getMultipleReference() != null
                     && !submitEvent.getCaseData().getMultipleReference().trim().isEmpty()) {
-
                 log.info("VALIDATION ERROR: already another multiple");
-
                 listCasesMultipleError.add(submitEvent.getCaseData().getEthosCaseReference());
-
             }
 
-            if (!isScotland && !isNullOrEmpty(submitEvent.getCaseData().getManagingOffice())
-                    && !managingOffice.equals(submitEvent.getCaseData().getManagingOffice())) {
-                String errorMessage = isLead ? LEAD_CASE_BELONGS_DIFFERENT_OFFICE : CASE_BELONGS_DIFFERENT_OFFICE;
-                errors.add(String.format(errorMessage,
-                        submitEvent.getCaseData().getEthosCaseReference(),
-                        submitEvent.getCaseData().getManagingOffice()));
-            }
-
+            addManagingOfficeErrors(errors, isLead, managingOffice, isScotland, submitEvent);
         }
 
         if (!listCasesStateError.isEmpty()) {
-
             String errorMessage = isLead ? LEAD_STATE_ERROR : CASE_STATE_ERROR;
-
             errors.add(listCasesStateError + errorMessage);
-
         }
 
         if (!listCasesMultipleError.isEmpty()) {
-
             String errorMessage = isLead ? LEAD_BELONG_MULTIPLE_ERROR : CASE_BELONG_MULTIPLE_ERROR;
-
             errors.add(listCasesMultipleError + errorMessage);
-
         }
-
     }
 
+    private void addManagingOfficeErrors(List<String> errors, boolean isLead, String managingOffice,
+                                         boolean isScotland, SubmitEvent submitEvent) {
+        String submitEventManagingOffice = submitEvent.getCaseData().getManagingOffice();
+        if (!isScotland && !isNullOrEmpty(submitEventManagingOffice)
+                && !managingOffice.equals(submitEventManagingOffice)) {
+            String errorMessage = isLead ? LEAD_CASE_BELONGS_DIFFERENT_OFFICE : CASE_BELONGS_DIFFERENT_OFFICE;
+            errors.add(String.format(errorMessage,
+                    submitEvent.getCaseData().getEthosCaseReference(),
+                    submitEventManagingOffice));
+        }
+    }
 }

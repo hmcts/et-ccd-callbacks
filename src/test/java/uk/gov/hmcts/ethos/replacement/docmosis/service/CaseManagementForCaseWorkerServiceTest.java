@@ -55,6 +55,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -123,7 +125,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private AdminUserService adminUserService;
 
     @BeforeEach
-    void setUp() throws Exception {
+    public void setUp() throws Exception {
         scotlandCcdRequest1 = new CCDRequest();
         CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
@@ -614,8 +616,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 + "<font color='Olive' size='5'> ECC </font>"
                 + "<font size='5'> - </font>"
                 + "<font color='SlateGray' size='5'> DIGITAL FILE </font>"
-                + "<font size='5'> - </font>"
-                + "<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
+                + "<font size='5'> - </font><font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
         assertEquals(expected, caseDetails.getCaseData().getFlagsImageAltText());
         //assertEquals("EMP-TRIB-01111111110.jpg", caseDetails.getCaseData().getFlagsImageFileName());
     }
@@ -667,9 +668,8 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void amendHearingCaseTypeIdSingle() {
         CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            caseManagementForCaseWorkerService.amendHearing(caseData, SINGLE_CASE_TYPE);
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                caseManagementForCaseWorkerService.amendHearing(caseData, SINGLE_CASE_TYPE));
         assertEquals("Unexpected case type id " + SINGLE_CASE_TYPE, exception.getMessage());
     }
 
@@ -957,7 +957,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            assertEquals(NO, respondentSumTypeItem.getValue().getExtensionRequested());
+            assertThat(respondentSumTypeItem.getValue().getExtensionRequested(), is(NO));
         }
     }
 
@@ -991,6 +991,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void setEt3ResponseDueDate_doesNotOverideExistingValue() {
+
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         LocalDate localDate = LocalDate.now();
         caseData.setClaimServedDate(localDate.toString());
@@ -1012,7 +1013,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setExtensionRequested(YES);
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getExtensionRequested());
+        assertThat(caseData.getRespondentCollection().get(0).getValue().getExtensionRequested(), is(YES));
     }
 
     @Test
@@ -1187,8 +1188,8 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private RepresentedTypeRItem createRepresentedTypeR(String respondentName, String representativeName) {
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-                .respRepName(respondentName)
-                .nameOfRepresentative(representativeName).build();
+            .respRepName(respondentName)
+            .nameOfRepresentative(representativeName).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("111");
         representedTypeRItem.setValue(representedTypeR);
@@ -1203,4 +1204,5 @@ class CaseManagementForCaseWorkerServiceTest {
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
     }
+
 }

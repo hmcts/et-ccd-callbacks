@@ -79,59 +79,58 @@ public final class FlagsImageHelper {
         String flagColor;
 
         switch (flagName) {
-            case FLAG_WITH_OUTSTATION:
+            case FLAG_WITH_OUTSTATION -> {
                 flagRequired = withOutstation(caseData, caseTypeId);
                 flagColor = COLOR_DEEP_PINK;
-                break;
-            case FLAG_DO_NOT_POSTPONE:
+            }
+            case FLAG_DO_NOT_POSTPONE -> {
                 flagRequired = doNotPostpone(caseData);
                 flagColor = COLOR_DARK_RED;
-                break;
-            case FLAG_LIVE_APPEAL:
+            }
+            case FLAG_LIVE_APPEAL -> {
                 flagRequired = liveAppeal(caseData);
                 flagColor = COLOR_GREEN;
-                break;
-            case FLAG_RULE_503B:
+            }
+            case FLAG_RULE_503B -> {
                 flagRequired = rule503bApplies(caseData);
                 flagColor = COLOR_RED;
-                break;
-            case FLAG_REPORTING:
+            }
+            case FLAG_REPORTING -> {
                 flagRequired = rule503dApplies(caseData);
                 flagColor = COLOR_LIGHT_BLACK;
-                break;
-            case FLAG_SENSITIVE:
+            }
+            case FLAG_SENSITIVE -> {
                 flagRequired = sensitiveCase(caseData);
                 flagColor = COLOR_ORANGE;
-                break;
-            case FLAG_RESERVED:
+            }
+            case FLAG_RESERVED -> {
                 flagRequired = reservedJudgement(caseData);
                 flagColor = COLOR_PURPLE;
-                break;
-            case FLAG_ECC:
+            }
+            case FLAG_ECC -> {
                 flagRequired = counterClaimMade(caseData);
                 flagColor = COLOR_OLIVE;
-                break;
-            case FLAG_DIGITAL_FILE:
+            }
+            case FLAG_DIGITAL_FILE -> {
                 flagRequired = digitalFile(caseData);
                 flagColor = COLOR_SLATE_GRAY;
-                break;
-            case FLAG_REASONABLE_ADJUSTMENT:
+            }
+            case FLAG_REASONABLE_ADJUSTMENT -> {
                 flagRequired = reasonableAdjustment(caseData);
                 flagColor = COLOR_DARK_SLATE_BLUE;
-                break;
-            case FLAG_WELSH_LANGUAGE:
+            }
+            case FLAG_WELSH_LANGUAGE -> {
                 flagRequired = welshColor(caseData);
                 flagColor = COLOR_RED;
-                break;
-            default:
+            }
+            default -> {
                 flagRequired = false;
                 flagColor = COLOR_WHITE;
-                break;
+            }
         }
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
-        flagsImageAltText.append(flagRequired && flagsImageAltText.length() > 0 ? "<font size='5'> - </font>" : "");
-        flagsImageAltText.append(flagRequired ? "<font color='"
-                + flagColor + "' size='5'> " + flagName + " </font>" : "");
+        flagsImageAltText.append(flagRequired && flagsImageAltText.length() > 0 ? "<font size='5'> - </font>" : "")
+            .append(flagRequired ? "<font color='" + flagColor + "' size='5'> " + flagName + " </font>" : "");
     }
 
     private static boolean sensitiveCase(CaseData caseData) {

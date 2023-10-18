@@ -196,9 +196,6 @@ class CaseActionsForCaseWorkerControllerTest {
     @MockBean
     private NocRespondentHelper nocRespondentHelper;
 
-    @MockBean
-    private CaseFlagsService caseFlagsService;
-
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent2;

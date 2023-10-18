@@ -108,7 +108,6 @@ public class CaseActionsForCaseWorkerController {
     private final CaseFlagsService caseFlagsService;
 
     private final NocRespondentHelper nocRespondentHelper;
-    private final CaseFlagsService caseFlagsService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -281,7 +280,7 @@ public class CaseActionsForCaseWorkerController {
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
-          
+
             caseFlagsService.setupCaseFlags(caseData);
             caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 

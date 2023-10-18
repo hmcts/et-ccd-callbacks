@@ -198,4 +198,15 @@ public final class NotificationHelper {
 
         return respondentRep.map(RepresentedTypeRItem::getValue).orElse(null);
     }
+
+    /**
+     * Gets the email address for the respondent if unrepresented.
+     */
+    public static String getEmailAddressForUnrepresentedRespondent(CaseData caseData, RespondentSumType respondent) {
+        RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
+        if (representative == null) {
+            return respondent.getRespondentEmail();
+        }
+        return null;
+    }
 }

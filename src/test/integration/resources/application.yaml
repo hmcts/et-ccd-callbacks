@@ -41,6 +41,12 @@ template:
   referral: f975c1cc-e102-472a-a6cb-84dffa0a6d42
   rejected:  e480e011-ffeb-4adc-9682-8758cf206375
 
+  case-links:
+    linked: ${CASE_LINKED_TEMPLATE_ID:7e8c6fc1-520a-41cd-a85c-9d3e0b22b282}
+    unlinked: ${CASE_UNLINKED_TEMPLATE_ID:8099d7b8-1703-40c3-95e6-464a3ac776cd}
+    linked-rep: ${CASE_LINKED_LEGAL_REP_TEMPLATE_ID:2d125a77-17b7-48c5-b220-78b2440eb049}
+    unlinked-rep: ${CASE_UNLINKED_LEGAL_REP_TEMPLATE_ID:63e550c3-6977-4687-b26d-72b61a266085}
+
   et1Serving:
     claimant: fa49291f-49cf-4330-8031-c05c101eb32a
     respondent: 05af8477-7313-4ef1-9a8e-6b2d9d128b50

@@ -220,6 +220,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withClaimantRepresentedQuestion(String claimantRepresentedQuestion) {
+        caseData.setClaimantRepresentedQuestion(claimantRepresentedQuestion);
+        return this;
+    }
+
     public CaseDataBuilder withClaimant(String claimant) {
         caseData.setClaimant(claimant);
         return this;
@@ -234,6 +239,11 @@ public class CaseDataBuilder {
         caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(officeCT, officeCT)));
         caseData.setReasonForCT(reasonForCT);
 
+        return this;
+    }
+
+    public CaseDataBuilder withCaseLinks(ListTypeItem<CaseLink> caseLinks) {
+        caseData.setCaseLinks(caseLinks);
         return this;
     }
 

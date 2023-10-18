@@ -35,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -185,6 +186,12 @@ class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
+
+    @MockBean
+    private CaseFlagsService caseFlagsService;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @MockBean
     private NocRespondentHelper nocRespondentHelper;

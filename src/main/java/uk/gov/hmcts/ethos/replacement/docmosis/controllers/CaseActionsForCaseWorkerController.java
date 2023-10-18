@@ -44,6 +44,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -103,6 +104,8 @@ public class CaseActionsForCaseWorkerController {
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
 
     private final NocRespondentHelper nocRespondentHelper;
     private final CaseFlagsService caseFlagsService;
@@ -282,6 +285,11 @@ public class CaseActionsForCaseWorkerController {
             caseFlagsService.setupCaseFlags(caseData);
             caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
+            boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
+            log.info("Caseflags feature flag is {}", caseFlagsToggle);
+            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+                caseFlagsService.setupCaseFlags(caseData);
+            }
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),

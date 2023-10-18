@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepos
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -102,9 +104,10 @@ public class CaseActionsForCaseWorkerController {
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
 
     private final NocRespondentHelper nocRespondentHelper;
-    private final CaseFlagsService caseFlagsService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -252,7 +255,7 @@ public class CaseActionsForCaseWorkerController {
     })
     public ResponseEntity<CCDCallbackResponse> postDefaultValues(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) throws IOException {
+            @RequestHeader("Authorization") String userToken) {
         log.info("POST DEFAULT VALUES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -265,6 +268,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
 
         if (errors.isEmpty()) {
+            defaultValuesReaderService.setSubmissionReference(ccdRequest.getCaseDetails());
             DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
@@ -276,10 +280,12 @@ public class CaseActionsForCaseWorkerController {
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
-          
-            caseFlagsService.setupCaseFlags(caseData);
-            caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
 
+            boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
+            log.info("Caseflags feature flag is {}", caseFlagsToggle);
+            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+                caseFlagsService.setupCaseFlags(caseData);
+            }
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -308,7 +314,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails(), userToken);
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -415,7 +421,7 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
-        caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
+        caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -445,6 +451,9 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             errors = eventValidationService.validateET3ResponseFields(caseData);
             if (errors.isEmpty()) {
+                errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "respondent");
+            }
+            if (errors.isEmpty()) {
                 caseManagementForCaseWorkerService.continuingRespondent(ccdRequest);
                 caseManagementForCaseWorkerService.struckOutRespondents(ccdRequest);
             }
@@ -459,8 +468,8 @@ public class CaseActionsForCaseWorkerController {
             }
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         }
+        caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
 
-        caseManagementForCaseWorkerService.setHmctsInternalCaseName(caseData);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -492,7 +501,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             // add org policy and NOC elements
-            caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
+            nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
         }

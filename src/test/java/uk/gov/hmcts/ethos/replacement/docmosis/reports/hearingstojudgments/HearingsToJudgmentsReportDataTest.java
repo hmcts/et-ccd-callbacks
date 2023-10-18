@@ -103,13 +103,13 @@ class HearingsToJudgmentsReportDataTest {
                                                  String total4WkPercent, String totalX4Wk, String totalX4WkPercent) {
         StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(office).append(NEW_LINE);
-        sb.append(TOTAL_CASES).append(StringUtils.defaultString(totalCases, "0")).append(NEW_LINE);
-        sb.append(TOTAL_WITHIN_4WEEKS).append(StringUtils.defaultString(total4Wk, "0")).append(NEW_LINE);
-        sb.append(TOTAL_PERCENT_WITHIN_4WEEKS).append(StringUtils.defaultString(
+        sb.append(TOTAL_CASES).append(StringUtils.defaultIfEmpty(totalCases, "0")).append(NEW_LINE);
+        sb.append(TOTAL_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(total4Wk, "0")).append(NEW_LINE);
+        sb.append(TOTAL_PERCENT_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(
                 total4WkPercent, "0.00")).append(NEW_LINE);
-        sb.append(TOTAL_NOT_WITHIN_4WEEKS).append(StringUtils.defaultString(
+        sb.append(TOTAL_NOT_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(
                 totalX4Wk, "0")).append(NEW_LINE);
-        sb.append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS).append(StringUtils.defaultString(
+        sb.append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(
                 totalX4WkPercent, "0.00")).append(NEW_LINE);
         return sb;
     }

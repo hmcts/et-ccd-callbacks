@@ -35,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -187,11 +188,13 @@ class CaseActionsForCaseWorkerControllerTest {
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @MockBean
-    private NocRespondentHelper nocRespondentHelper;
-
-    @MockBean
     private CaseFlagsService caseFlagsService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private NocRespondentHelper nocRespondentHelper;
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent2;
@@ -1669,7 +1672,7 @@ class CaseActionsForCaseWorkerControllerTest {
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(caseManagementForCaseWorkerService, times(1))
-                .setHmctsServiceIdSupplementary(any(), any());
+                .setHmctsServiceIdSupplementary(any());
     }
 
     @Test

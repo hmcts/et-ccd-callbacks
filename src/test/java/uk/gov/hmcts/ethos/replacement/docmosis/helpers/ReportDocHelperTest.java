@@ -94,8 +94,8 @@ class ReportDocHelperTest {
     }
 
     private ListingDetails generateReportDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(jsonFileName)).toURI())));
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, ListingDetails.class);
     }
@@ -238,8 +238,9 @@ class ReportDocHelperTest {
 
     @Test
     void buildCasesAwaitingJudgmentReport() throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("casesAwaitingJudgmentExpected.json")).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("casesAwaitingJudgmentExpected.json")).toURI())))
+                .replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
         CasesAwaitingJudgmentReportData reportData = getCasesAwaitingJudgementReportData();
@@ -533,8 +534,9 @@ class ReportDocHelperTest {
 
     @Test
     void buildHearingsToJudgmentsReport() throws URISyntaxException, IOException {
-        String expectedJson = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("hearingsToJudgmentsExpected.json")).toURI())).replace("\r\n", "\n");
+        String expectedJson = Files.readString(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("hearingsToJudgmentsExpected.json"))
+                                                                 .toURI())).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
         HearingsToJudgmentsReportData reportData = getHearingsToJudgmentsReportData();
@@ -545,8 +547,9 @@ class ReportDocHelperTest {
 
     @Test
     void buildRespondentsReport() throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("respondentsReportExpected.json")).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("respondentsReportExpected.json")).toURI())))
+                .replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date", today);
         RespondentsReportData reportData = getRespondentsReportData();
@@ -557,8 +560,9 @@ class ReportDocHelperTest {
 
     @Test
     void buildSessionDaysReport() throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("sessionDaysExpected.json")).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("sessionDaysExpected.json")).toURI())))
+                .replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date", today);
         SessionDaysReportData reportData = getSessionDaysReportData();
@@ -569,8 +573,8 @@ class ReportDocHelperTest {
 
     @Test
     void buildEccReport() throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("eccExpected.json")).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("eccExpected.json")).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date", today);
         EccReportData reportData = getEccReportData();
@@ -829,8 +833,9 @@ class ReportDocHelperTest {
 
     @Test
     void buildHearingsByHearingTypeReport() throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("hearingsByHearingTypeExpected.json")).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("hearingsByHearingTypeExpected.json")).toURI())))
+                .replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
         HearingsByHearingTypeReportData reportData = getHearingsByHearingTypeReportData();
@@ -841,8 +846,9 @@ class ReportDocHelperTest {
 
     @Test
     void buildNoPositionChangeReport() throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("noChangeInCurrentPositionExpected.json")).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("noChangeInCurrentPositionExpected.json")).toURI())))
+                .replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
         NoPositionChangeReportData reportData = getNoPositionChangeReportData();
@@ -889,8 +895,8 @@ class ReportDocHelperTest {
     }
 
     private String getExpectedResult(String resourceFileName) throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(resourceFileName)).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource(resourceFileName)).toURI()))).replace("\r\n", "\n");
         String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date-placeholder", today);
         return expectedJson;

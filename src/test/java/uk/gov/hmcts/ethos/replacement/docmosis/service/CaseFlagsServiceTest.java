@@ -11,6 +11,8 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 class CaseFlagsServiceTest {
@@ -25,6 +27,13 @@ class CaseFlagsServiceTest {
         caseData = CaseDataBuilder.builder().build();
         caseData.setClaimant(CLAIMANT_NAME);
         caseData.setRespondent(RESPONDENT_NAME);
+    }
+
+    @Test
+    void caseFlagsSetupRequired() {
+        assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
+        caseFlagsService.setupCaseFlags(caseData);
+        assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData));
     }
 
     @Test

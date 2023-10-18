@@ -22,7 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 
 @Slf4j
@@ -93,7 +92,7 @@ public class MultipleScheduleService {
                 .stream()
                 .sorted(Comparator.comparing(ethosCaseRef -> ethosCaseRef,
                         Comparator.nullsLast(Comparator.naturalOrder())))
-                .collect(toList());
+                .toList();
     }
 
     private List<String> getCaseIdCollectionFromFilter(SortedMap<String, Object> multipleObjects,

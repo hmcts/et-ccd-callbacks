@@ -86,6 +86,8 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
+    public static final String DOCUMENTS_TAB = "#Documents";
+    public static final String ORGANISATION = "Organisation";
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -569,7 +571,7 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    private void setCaseNameHmctsInternal(CaseData caseData) {
+    public void setCaseNameHmctsInternal(CaseData caseData) {
         if (caseData.getClaimant() == null) {
             claimantDefaults(caseData);
         }

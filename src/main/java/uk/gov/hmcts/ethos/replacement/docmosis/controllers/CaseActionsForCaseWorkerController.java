@@ -421,7 +421,6 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
-        caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -468,7 +467,6 @@ public class CaseActionsForCaseWorkerController {
             }
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         }
-        caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 

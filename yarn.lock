@@ -748,11 +748,11 @@ __metadata:
   linkType: hard
 
 "@types/lodash.isobject@npm:^3.0.7":
-  version: 3.0.7
-  resolution: "@types/lodash.isobject@npm:3.0.7"
+  version: 3.0.8
+  resolution: "@types/lodash.isobject@npm:3.0.8"
   dependencies:
     "@types/lodash": "*"
-  checksum: 0ee50208a4bc641172d4e79f497c8cd59e437ad6109f2118bfe45c4e8815ecd0e5ea563fb04f307580a1e8f34e6e364b45eac8097db0448f521c78a50a2ce0ab
+  checksum: dd270da1271b3230074b90f7adb2a56b40d1a5b767e35a5aaba221966b57e3245996aabc25dd67b5227f1acf28c8fe5746c128f562fa49418d4a48e69d9b125d
   languageName: node
   linkType: hard
 

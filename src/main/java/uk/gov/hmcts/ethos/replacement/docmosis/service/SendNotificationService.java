@@ -43,12 +43,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
-    public static final List<String> SendNotificationSubjects = List.of("Claimant / Respondent details",
+    public static final List<String>
+            SEND_NOTIFICATION_SUBJECTS = List.of("Claimant / Respondent details",
             "Judgment", "Claim (ET1)",
             "Response (ET3)",
             "Employer Contract Claim",
             "Case management orders / requests");
-    public static final List<String> SendNotificationSubjectsHearingOther = List.of("Other (General correspondence)",
+    public static final List<String>
+            SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER = List.of("Other (General correspondence)",
             "Hearing");
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
@@ -190,14 +192,14 @@ public class SendNotificationService {
 
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
 
-            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SendNotificationSubjects)) {
+            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
                 emailService.sendEmail(sendNotificationTemplateId,
                         claimantEmailAddress,
                         buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
             }
 
             if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(),
-                    SendNotificationSubjectsHearingOther)) {
+                    SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER)) {
                 emailService.sendEmail(claimantSendNotificationHearingOtherTemplateId, claimantEmailAddress,
                         buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
             }
@@ -205,7 +207,7 @@ public class SendNotificationService {
 
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
 
-            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SendNotificationSubjects)) {
+            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
                 Map<String, String> personalisation = buildPersonalisation(caseDetails,
                         emailService.getExuiCaseLink(caseId));
                 List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
@@ -213,7 +215,7 @@ public class SendNotificationService {
             }
 
             if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(),
-                    SendNotificationSubjectsHearingOther)) {
+                        SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER)) {
                 Map<String, String> personalisation = buildPersonalisation(caseDetails,
                         emailService.getExuiCaseLink(caseId));
                 List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();

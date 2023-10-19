@@ -420,6 +420,9 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+        if (featureToggleService.isGlobalSearchEnabled()) {
+            caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
+        }
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -466,6 +469,9 @@ public class CaseActionsForCaseWorkerController {
                 nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
             }
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+        }
+        if (featureToggleService.isGlobalSearchEnabled()) {
+            caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);

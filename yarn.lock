@@ -757,11 +757,11 @@ __metadata:
   linkType: hard
 
 "@types/lodash.isplainobject@npm:^4.0.7":
-  version: 4.0.7
-  resolution: "@types/lodash.isplainobject@npm:4.0.7"
+  version: 4.0.8
+  resolution: "@types/lodash.isplainobject@npm:4.0.8"
   dependencies:
     "@types/lodash": "*"
-  checksum: a3946dbcef66c5931073c0c8a0ecc2bd38a6bf808daa018d1af7db5e980fdb4bc03664ffe3c583c6a8e0a082bbcfba8328b32b96a5a955569ee5704e92bf0b3a
+  checksum: f0b8a6bbcfb93fd60fb6142af7c533d4a006461cc9eb6ff18d7952dd20f2f4f5915470700efeb38afa79f045567c6a97985ca2a4e61dfadc9875285eb68c2010
   languageName: node
   linkType: hard
 

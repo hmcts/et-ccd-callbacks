@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
@@ -143,7 +142,7 @@ public class BulkCreationService {
         List<String> multipleCaseIds = BulkHelper.getMultipleCaseIds(bulkDetails);
         try {
             List<String> unionLists = Stream.concat(caseIds.stream(), multipleCaseIds.stream())
-                    .distinct().collect(Collectors.toList());
+                    .distinct().toList();
             bulkCasesPayload = bulkSearchService.filterSubmitEventsElasticSearch(
                     ccdClient.retrieveCasesElasticSearch(authToken,
                             UtilHelper.getCaseTypeId(bulkDetails.getCaseTypeId()), unionLists),

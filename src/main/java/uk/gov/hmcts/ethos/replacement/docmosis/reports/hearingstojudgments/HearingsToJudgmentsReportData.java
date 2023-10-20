@@ -53,15 +53,15 @@ public final class HearingsToJudgmentsReportData extends ListingData {
         StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportSummary.getOffice()).append(NEW_LINE);
         sb.append(TOTAL_CASES).append(
-                StringUtils.defaultString(reportSummary.getTotalCases(), "0")).append(NEW_LINE);
+                StringUtils.defaultIfEmpty(reportSummary.getTotalCases(), "0")).append(NEW_LINE);
         sb.append(TOTAL_WITHIN_4WEEKS).append(
-                StringUtils.defaultString(reportSummary.getTotal4Wk(), "0")).append(NEW_LINE);
+                StringUtils.defaultIfEmpty(reportSummary.getTotal4Wk(), "0")).append(NEW_LINE);
         sb.append(TOTAL_PERCENT_WITHIN_4WEEKS).append(
-                StringUtils.defaultString(reportSummary.getTotal4WkPercent(), "0.00")).append(NEW_LINE);
+                StringUtils.defaultIfEmpty(reportSummary.getTotal4WkPercent(), "0.00")).append(NEW_LINE);
         sb.append(TOTAL_NOT_WITHIN_4WEEKS).append(
-                StringUtils.defaultString(reportSummary.getTotalX4Wk(), "0")).append(NEW_LINE);
+                StringUtils.defaultIfEmpty(reportSummary.getTotalX4Wk(), "0")).append(NEW_LINE);
         sb.append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS).append(
-                StringUtils.defaultString(reportSummary.getTotalX4WkPercent(), "0.00")).append(NEW_LINE);
+                StringUtils.defaultIfEmpty(reportSummary.getTotalX4WkPercent(), "0.00")).append(NEW_LINE);
         addJsonCollection(REPORT_DETAILS, reportDetails.iterator(), sb);
         return sb;
     }

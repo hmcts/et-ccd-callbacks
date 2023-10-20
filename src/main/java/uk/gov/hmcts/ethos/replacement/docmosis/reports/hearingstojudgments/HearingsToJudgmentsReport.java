@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
@@ -164,7 +163,7 @@ public final class HearingsToJudgmentsReport {
             LocalDate hearingListedDate = LocalDate.parse(dateListedType.getListedDate(), OLD_DATE_TIME_PATTERN);
             List<JudgementTypeItem> judgements = judgmentsCollection.stream()
                                 .filter(j -> judgmentHearingDateMatchHearingListedDate(j, hearingListedDate))
-                                .collect(Collectors.toList());
+                                .toList();
 
             if (judgements.isEmpty()
                     || !isWithinDateRange(hearingListedDate)

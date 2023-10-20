@@ -457,8 +457,8 @@ class InitialConsiderationServiceTest {
     }
 
     private CaseData generateCaseData(String fileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource(fileName)).toURI())));
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource(fileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseData.class);
     }

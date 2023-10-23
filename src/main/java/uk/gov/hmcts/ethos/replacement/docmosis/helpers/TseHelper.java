@@ -23,6 +23,7 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
@@ -290,5 +292,13 @@ public final class TseHelper {
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
         return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+    }
+
+    /**
+     * Gives current datetime in string format.
+     * @return current datetime in "yyyy-MM-dd'T'HH:mm:ss.SSS" format
+     */
+    public static String getCurrentDateTime() {
+        return LocalDateTime.now().format(OLD_DATE_TIME_PATTERN);
     }
 }

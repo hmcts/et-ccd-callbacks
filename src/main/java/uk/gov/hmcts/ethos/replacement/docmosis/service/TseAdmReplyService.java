@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -158,6 +159,8 @@ public class TseAdmReplyService {
                     .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
                         tseAdmReplyRequestSelectPartyRespond))
                     .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                    .dateTime(TseHelper.getCurrentDateTime()) // for Work Allocation DMNs
+                    .applicationType(applicationType.getType()) // for Work Allocation DMNs
                     .build()
             ).build());
 

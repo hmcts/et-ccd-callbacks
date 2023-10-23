@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -191,6 +192,13 @@ class TseRespondentReplyServiceTest {
             assertThat(replyType.getFrom()).isEqualTo(RESPONDENT_TITLE);
             assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename())
                     .isEqualTo("image.png");
+
+            // WA properties
+            String dateTimeParsedForTesting = UtilHelper.formatCurrentDate(
+                LocalDateTime.parse(replyType.getDateTime()).toLocalDate()
+            );
+            assertThat(dateTimeParsedForTesting).isEqualTo(dateNow);
+            assertThat(replyType.getApplicationType()).isEqualTo(WITHDRAW_MY_CLAIM);
         }
 
         @Test

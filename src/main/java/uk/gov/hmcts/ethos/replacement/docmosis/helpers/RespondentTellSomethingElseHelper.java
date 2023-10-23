@@ -64,7 +64,7 @@ public final class RespondentTellSomethingElseHelper {
     }
 
     private static GenericTseApplicationTypeItem getCurrentGenericTseApplicationTypeItem(CaseData caseData) {
-        if (caseData.getGenericTseApplicationCollection() == null) {
+        if (caseData.getGenericTseApplicationCollection() == null || caseData.getGenericTseApplicationCollection().isEmpty()) {
             return null;
         }
 

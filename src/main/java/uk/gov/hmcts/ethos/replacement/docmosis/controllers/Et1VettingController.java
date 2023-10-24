@@ -24,9 +24,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -175,6 +177,7 @@ public class Et1VettingController {
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
         caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());
+        et1VettingService.clearEt1FieldsFromCaseData(ccdRequest.getCaseDetails().getCaseData());
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -203,7 +206,6 @@ public class Et1VettingController {
         }
 
         String caseNumber = ccdRequest.getCaseDetails().getCaseId();
-        et1VettingService.clearEt1FieldsFromCaseData(ccdRequest.getCaseDetails().getCaseData());
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
             .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))

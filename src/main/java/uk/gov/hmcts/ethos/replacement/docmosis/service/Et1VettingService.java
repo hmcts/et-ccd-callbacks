@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_CERT_LIST_DISPLAY;
@@ -124,6 +125,8 @@ public class Et1VettingService {
         caseData.setEt1VettingClaimantDetailsMarkUp(null);
         caseData.setTrackAllocation(null);
         caseData.setEt1AddressDetails(null);
+        caseData.setTribunalCorrespondenceAddress(null);
+        caseData.setRegionalOffice(null);
     }
 
     /**

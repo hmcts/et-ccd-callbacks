@@ -25,6 +25,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.INACTIVE;
@@ -55,6 +57,13 @@ class CaseFlagsServiceTest {
 
         caseData.setClaimantFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
         caseData.setRespondentFlags(CaseFlagsType.builder().details(ListTypeItem.from()).build());
+    }
+
+    @Test
+    void caseFlagsSetupRequired() {
+        assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
+        caseFlagsService.setupCaseFlags(caseData);
+        assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData));
     }
 
     @Test

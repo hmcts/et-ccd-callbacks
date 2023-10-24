@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
@@ -30,6 +31,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Service
 public class CaseFlagsService {
     private static final String GRANTED = "Granted";
+
+    public boolean caseFlagsSetupRequired(CaseData caseData) {
+        return caseData.getClaimantFlags() == null
+                || StringUtils.isEmpty(caseData.getClaimantFlags().getRoleOnCase())
+                || caseData.getRespondentFlags() == null
+                || StringUtils.isEmpty(caseData.getRespondentFlags().getRoleOnCase());
+    }
 
     /**
      * Setup case flags for Claimant, Respondent and Case level.

@@ -11,7 +11,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -131,7 +130,7 @@ public class MultipleCreationMidEventValidationService {
                             submitEvents.stream()
                                     .noneMatch(submitEvent ->
                                             submitEvent.getCaseData().getEthosCaseReference().equals(caseRef)))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (!listCasesDoNotExistError.isEmpty()) {
 

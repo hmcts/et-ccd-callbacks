@@ -83,14 +83,19 @@ public class RespondNotificationService {
         respondNotificationType.setRespondNotificationAdditionalInfo(caseData.getRespondNotificationAdditionalInfo());
         respondNotificationType.setRespondNotificationUploadDocument(caseData.getRespondNotificationUploadDocument());
         respondNotificationType.setRespondNotificationCmoOrRequest(caseData.getRespondNotificationCmoOrRequest());
-        respondNotificationType.setRespondNotificationResponseRequired(
-            caseData.getRespondNotificationResponseRequired());
-        respondNotificationType.setRespondNotificationWhoRespond(caseData.getRespondNotificationWhoRespond());
+        String responseRequired = caseData.getRespondNotificationResponseRequired();
+        respondNotificationType.setRespondNotificationResponseRequired(responseRequired);
+        String whoRespond = caseData.getRespondNotificationWhoRespond();
+        respondNotificationType.setRespondNotificationWhoRespond(whoRespond);
         respondNotificationType.setRespondNotificationCaseManagementMadeBy(
             caseData.getRespondNotificationCaseManagementMadeBy());
         respondNotificationType.setRespondNotificationRequestMadeBy(caseData.getRespondNotificationRequestMadeBy());
         respondNotificationType.setRespondNotificationFullName(caseData.getRespondNotificationFullName());
         respondNotificationType.setRespondNotificationPartyToNotify(caseData.getRespondNotificationPartyToNotify());
+
+        if (YES.equals(responseRequired) && whoRespond != null && !RESPONDENT_ONLY.equals(whoRespond)) {
+            respondNotificationType.setIsClaimantResponseDue(YES);
+        }
 
         GenericTypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new GenericTypeItem<>();
         respondNotificationTypeGenericTypeItem.setId(String.valueOf(randomUUID()));

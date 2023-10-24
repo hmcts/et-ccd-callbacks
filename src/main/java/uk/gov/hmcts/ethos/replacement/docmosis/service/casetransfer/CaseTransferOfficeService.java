@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class CaseTransferOfficeService {
 
@@ -41,7 +40,7 @@ public final class CaseTransferOfficeService {
         List<DynamicValueType> tribunalOffices = TribunalOffice.SCOTLAND_OFFICES.stream()
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                .collect(Collectors.toList());
+                .toList();
 
         DynamicFixedListType officeCT = DynamicFixedListType.from(tribunalOffices);
         String defaultSelectedOffice = TribunalOffice.GLASGOW.getOfficeName();
@@ -53,7 +52,7 @@ public final class CaseTransferOfficeService {
         List<DynamicValueType> tribunalOffices = TribunalOffice.SCOTLAND_OFFICES.stream()
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                .collect(Collectors.toList());
+                .toList();
 
         DynamicFixedListType officeCT = DynamicFixedListType.from(tribunalOffices);
         String defaultSelectedOffice = TribunalOffice.GLASGOW.getOfficeName();
@@ -66,7 +65,7 @@ public final class CaseTransferOfficeService {
                 .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                .collect(Collectors.toList());
+                .toList();
         return DynamicFixedListType.from(tribunalOffices);
     }
 }

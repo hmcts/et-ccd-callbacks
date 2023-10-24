@@ -145,8 +145,8 @@ public final class NotificationHelper {
 
     private static String getNameOfRespondents(CaseData caseData) {
         return caseData.getRespondentCollection().stream()
-            .map(o -> getNameForRespondent(caseData, o.getValue()))
-            .collect(Collectors.joining(", "));
+                .map(o -> getNameForRespondent(caseData, o.getValue()))
+                .collect(Collectors.joining(", "));
     }
 
     /**
@@ -156,21 +156,11 @@ public final class NotificationHelper {
         RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
         if (representative != null) {
             String email = representative.getRepresentativeEmailAddress();
-            return isNullOrEmpty(email) ? "" : email;
+            if (!isNullOrEmpty(email)) {
+                return email;
+            }
         }
-
         return isNullOrEmpty(respondent.getRespondentEmail()) ? "" : respondent.getRespondentEmail();
-    }
-
-    /**
-     * Gets the email address for the respondent if unrepresented.
-     */
-    public static String getEmailAddressForUnrepresentedRespondent(CaseData caseData, RespondentSumType respondent) {
-        RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
-        if (representative == null) {
-            return respondent.getRespondentEmail();
-        }
-        return null;
     }
 
     private static String getNameForRespondent(CaseData caseData, RespondentSumType respondent) {
@@ -192,9 +182,20 @@ public final class NotificationHelper {
         }
 
         Optional<RepresentedTypeRItem> respondentRep = repCollection.stream()
-            .filter(o -> respondent.getRespondentName().equals(o.getValue().getRespRepName()))
-            .findFirst();
+                .filter(o -> respondent.getRespondentName().equals(o.getValue().getRespRepName()))
+                .findFirst();
 
         return respondentRep.map(RepresentedTypeRItem::getValue).orElse(null);
+    }
+
+    /**
+     * Gets the email address for the respondent if unrepresented.
+     */
+    public static String getEmailAddressForUnrepresentedRespondent(CaseData caseData, RespondentSumType respondent) {
+        RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
+        if (representative == null) {
+            return respondent.getRespondentEmail();
+        }
+        return null;
     }
 }

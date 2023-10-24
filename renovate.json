@@ -4,59 +4,8 @@
     "local>hmcts/.github:renovate-config",
     "local>hmcts/.github//renovate/automerge-all"
   ],
-  "labels": [
-    "dependencies"
-  ],
-  "helm-requirements": {
-    "fileMatch": [
-      "\\Chart.yaml$"
-    ],
-    "aliases": {
-      "hmctspublic": "https://hmctspublic.azurecr.io/helm/v1/repo/"
-    }
-  },
-  "groupName": "all dependencies",
-  "separateMajorMinor": false,
-  "groupSlug": "all",
-  "packageRules": [
-    {
-      "matchPackagePatterns": [
-        "*"
-      ],
-      "groupName": "all dependencies",
-      "groupSlug": "all"
-    },
-    {
-      "matchPackageNames": [
-        "org.apache.tomcat.embed:tomcat-embed-core",
-        "org.apache.tomcat.embed:tomcat-embed-websocket"
-      ],
-      "allowedVersions": "<=9"
-    },
-    {
-      "matchPackagePrefixes": [
-        "com.github.hmcts.java-logging:"
-      ],
-      "allowedVersions": "<=5"
-    },
-    {
-      "matchPackageNames": [
-        "com.github.hmcts:ccd-case-document-am-client"
-      ],
-      "allowedVersions": "=1.7.3"
-    },
-    {
-      "matchPackageNames": [
-        "au.com.dius.pact"
-      ],
-      "allowedVersions": "<=4.3.15"
-    }
-  ],
   "ignoreDeps": [
     "com.github.hmcts:et-common",
     "com.github.hmcts:et-data-model"
   ],
-  "schedule": [
-    "before 6am on Monday"
-  ]
 }

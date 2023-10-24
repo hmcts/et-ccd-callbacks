@@ -20,7 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ class RespondNotificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyMap());
 
         SendNotificationService sendNotificationService =
@@ -91,7 +91,6 @@ class RespondNotificationServiceTest {
 
     @Test
     void testCreateAndClearRespondNotification() throws IllegalAccessException {
-
         caseData.setRespondNotificationTitle("title");
         caseData.setRespondNotificationAdditionalInfo("info");
         caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
@@ -137,7 +136,56 @@ class RespondNotificationServiceTest {
         assertNull(caseData.getRespondNotificationCaseManagementMadeBy());
         assertNull(caseData.getRespondNotificationFullName());
         assertNull(caseData.getRespondNotificationPartyToNotify());
+    }
 
+    @Test
+    void testCreateAndClearRespondNotification_withClaimantResponseDue() throws IllegalAccessException {
+        caseData.setRespondNotificationTitle("title");
+        caseData.setRespondNotificationAdditionalInfo("info");
+        caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
+        caseData.setRespondNotificationCmoOrRequest(CASE_MANAGEMENT_ORDER);
+        caseData.setRespondNotificationResponseRequired(YES);
+        caseData.setRespondNotificationWhoRespond(CLAIMANT_ONLY);
+
+        caseData.setRespondNotificationFullName("John Doe");
+        caseData.setClaimantType(new ClaimantType());
+        caseData.setClaimant("Claimant");
+        caseData.setEthosCaseReference("1234");
+
+        String uuid = String.valueOf(UUID.randomUUID());
+        DynamicValueType dynamicValueType = DynamicValueType.create(uuid, "sendNotification");
+        caseData.setSelectNotificationDropdown(DynamicFixedListType.of(dynamicValueType));
+
+        SendNotificationType notificationType = new SendNotificationType();
+        notificationType.setSendNotificationTitle("test");
+        SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
+        sendNotificationTypeItem.setId(uuid);
+        sendNotificationTypeItem.setValue(notificationType);
+        caseData.setSendNotificationCollection(List.of(sendNotificationTypeItem));
+        caseDetails.setCaseData(caseData);
+
+        respondNotificationService.handleAboutToSubmit(caseDetails);
+        var sendNotificationType = caseDetails.getCaseData().getSendNotificationCollection().get(0).getValue();
+        var respondNotificationType = sendNotificationType.getRespondNotificationTypeCollection().get(0).getValue();
+
+        assertEquals("title", respondNotificationType.getRespondNotificationTitle());
+        assertEquals("info", respondNotificationType.getRespondNotificationAdditionalInfo());
+        assertEquals(CLAIMANT_ONLY, respondNotificationType.getRespondNotificationPartyToNotify());
+        assertEquals(CASE_MANAGEMENT_ORDER, respondNotificationType.getRespondNotificationCmoOrRequest());
+        assertEquals(YES, respondNotificationType.getRespondNotificationResponseRequired());
+        assertEquals(CLAIMANT_ONLY, respondNotificationType.getRespondNotificationWhoRespond());
+        assertEquals("John Doe", respondNotificationType.getRespondNotificationFullName());
+        assertEquals(YES, respondNotificationType.getIsClaimantResponseDue());
+
+        assertNull(caseData.getRespondNotificationTitle());
+        assertNull(caseData.getRespondNotificationAdditionalInfo());
+        assertNull(caseData.getRespondNotificationUploadDocument());
+        assertNull(caseData.getRespondNotificationCmoOrRequest());
+        assertNull(caseData.getRespondNotificationResponseRequired());
+        assertNull(caseData.getRespondNotificationWhoRespond());
+        assertNull(caseData.getRespondNotificationCaseManagementMadeBy());
+        assertNull(caseData.getRespondNotificationFullName());
+        assertNull(caseData.getRespondNotificationPartyToNotify());
     }
 
     @Test

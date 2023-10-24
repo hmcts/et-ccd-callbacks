@@ -112,8 +112,8 @@ class DocumentHelperTest {
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(jsonFileName)).toURI())));
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
@@ -2206,8 +2206,9 @@ class DocumentHelperTest {
     }
 
     private String getExpectedResult() throws URISyntaxException, IOException {
-        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("expectedDocumentContentScot4.json")).toURI()))).replace("\r\n", "\n");
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+            .getContextClassLoader().getResource("expectedDocumentContentScot4.json")).toURI())))
+                .replace("\r\n", "\n");
         LocalDate currentLocalDate = LocalDate.now();
         LocalDate currentLocalDatePlus28Days = currentLocalDate.plusDays(28);
         return expectedJson.replace("current-date-placeholder",

@@ -28,6 +28,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceCons
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -103,7 +104,7 @@ class TseRespondentReplyServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
                 respondentTellSomethingElseService, tseService, documentManagementService);
 

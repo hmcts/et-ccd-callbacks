@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -56,7 +55,7 @@ public class BulkSearchService {
             if (!ref.equals(DEFAULT_SELECT_ALL_VALUE)) {
                 return bulkDetails.getCaseData().getMultipleCollection().stream()
                         .filter(multipleTypeItem -> multipleTypeItem.getValue().getSubMultipleM().equals(ref))
-                        .collect(Collectors.toList());
+                        .toList();
             }
         }
         return bulkDetails.getCaseData().getMultipleCollection();
@@ -449,7 +448,7 @@ public class BulkSearchService {
                                                  Predicate<MultipleTypeItem> predicate) {
         return listToSearchBy.stream()
                 .filter(predicate)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

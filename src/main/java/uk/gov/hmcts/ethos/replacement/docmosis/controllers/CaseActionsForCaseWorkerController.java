@@ -698,6 +698,7 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        caseManagementForCaseWorkerService.setCaseDeepLink(caseData, ccdRequest.getCaseDetails().getCaseId());
         return getCallbackRespEntityNoErrors(caseData);
     }
 

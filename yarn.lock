@@ -739,38 +739,38 @@ __metadata:
   linkType: hard
 
 "@types/lodash.clonedeep@npm:^4.5.7":
-  version: 4.5.7
-  resolution: "@types/lodash.clonedeep@npm:4.5.7"
+  version: 4.5.8
+  resolution: "@types/lodash.clonedeep@npm:4.5.8"
   dependencies:
     "@types/lodash": "*"
-  checksum: 20d6a20970b3b54b3c10cf17ace1cea49c4905d7f7cae2575a98108466e8d4c9bea3b3449d11ccaac4da1fc9bab225f477f4c2dbea8ba877cc47f629455efb69
+  checksum: 7779674a1a4458c14b4c4a90424c94e48f433d4e506a254854899df3099f9b6c33ba5c63324016f077372682c5add9c8729796519c95e4dd210f7205f8108b27
   languageName: node
   linkType: hard
 
 "@types/lodash.isobject@npm:^3.0.7":
-  version: 3.0.7
-  resolution: "@types/lodash.isobject@npm:3.0.7"
+  version: 3.0.8
+  resolution: "@types/lodash.isobject@npm:3.0.8"
   dependencies:
     "@types/lodash": "*"
-  checksum: 0ee50208a4bc641172d4e79f497c8cd59e437ad6109f2118bfe45c4e8815ecd0e5ea563fb04f307580a1e8f34e6e364b45eac8097db0448f521c78a50a2ce0ab
+  checksum: dd270da1271b3230074b90f7adb2a56b40d1a5b767e35a5aaba221966b57e3245996aabc25dd67b5227f1acf28c8fe5746c128f562fa49418d4a48e69d9b125d
   languageName: node
   linkType: hard
 
 "@types/lodash.isplainobject@npm:^4.0.7":
-  version: 4.0.7
-  resolution: "@types/lodash.isplainobject@npm:4.0.7"
+  version: 4.0.8
+  resolution: "@types/lodash.isplainobject@npm:4.0.8"
   dependencies:
     "@types/lodash": "*"
-  checksum: a3946dbcef66c5931073c0c8a0ecc2bd38a6bf808daa018d1af7db5e980fdb4bc03664ffe3c583c6a8e0a082bbcfba8328b32b96a5a955569ee5704e92bf0b3a
+  checksum: f0b8a6bbcfb93fd60fb6142af7c533d4a006461cc9eb6ff18d7952dd20f2f4f5915470700efeb38afa79f045567c6a97985ca2a4e61dfadc9875285eb68c2010
   languageName: node
   linkType: hard
 
 "@types/lodash.zip@npm:^4.2.7":
-  version: 4.2.7
-  resolution: "@types/lodash.zip@npm:4.2.7"
+  version: 4.2.8
+  resolution: "@types/lodash.zip@npm:4.2.8"
   dependencies:
     "@types/lodash": "*"
-  checksum: 841c86482a94cd39228dceb7974d4094f5afbaf3077c1ffa02ead680acb7cd097e78d64ede10ee6bfd4e81c9020daa8c28e456abd0202eb4bccdd93681d94216
+  checksum: 292a86250ef89bc678ca21b642080ac43f0cb4b0cb6df8399b3c9fe5f3d4b8340e5f595da1d2e4775e9aaed26a58d64691e17f78bb3b52105c8b5ec3ae0cd85f
   languageName: node
   linkType: hard
 
@@ -835,11 +835,11 @@ __metadata:
   linkType: hard
 
 "@types/redis-mock@npm:^0.17.1":
-  version: 0.17.1
-  resolution: "@types/redis-mock@npm:0.17.1"
+  version: 0.17.2
+  resolution: "@types/redis-mock@npm:0.17.2"
   dependencies:
     "@types/redis": ^2.8.0
-  checksum: b3c61974f5470914b44edb4dc33cb5d4ee8d1d4f433bef8ad1ea07a78b8d90963be17008ecb451d0f005aa927c2ad1b9c31583dbb52e0db6eaa9b8b0fc96df95
+  checksum: 487ab4ff7a26da87c793a1d0cdb852deee38de433ebd27e1a8af0b9db81107a8184a2aaae9fc421dbf77de8692182d0e69ee66b5cf1a735aa9e17b6a97d5e954
   languageName: node
   linkType: hard
 
@@ -878,12 +878,12 @@ __metadata:
   linkType: hard
 
 "@types/sinon-chai@npm:^3.2.8":
-  version: 3.2.10
-  resolution: "@types/sinon-chai@npm:3.2.10"
+  version: 3.2.11
+  resolution: "@types/sinon-chai@npm:3.2.11"
   dependencies:
     "@types/chai": "*"
     "@types/sinon": "*"
-  checksum: 72e1f4e4622fba57d59f482ce421a7493e26baeea7bdc57a13e4ec93af62122188f9ea14c7b16e33d0e5a198c7d5df4651401c763071f114aebdc1893e03179e
+  checksum: 269c6e08c9a4c122a6ba25ecfa62ad0630edab0c432a2f752e21204fa4236029c40401f7eece2f409edd5613ce4d9fc22a79f33ef35789fe533e87c586bb4f60
   languageName: node
   linkType: hard
 
@@ -931,11 +931,11 @@ __metadata:
   linkType: hard
 
 "@types/supertest@npm:^2.0.8":
-  version: 2.0.14
-  resolution: "@types/supertest@npm:2.0.14"
+  version: 2.0.15
+  resolution: "@types/supertest@npm:2.0.15"
   dependencies:
     "@types/superagent": "*"
-  checksum: 9f6850a22b8f0fd4c26a6dfd9b64771a66476b1a4f841a3b84a9da843ce69463efbf37594fe107297dd14a225d199b802464d48d70e9413238c637903d392137
+  checksum: 89c1983662f0ab20969b3a6c44344397fd222d0f78b282619aabbe817f7c88a64210fd2b8b8f075ea22a27084e30ebc287bc5105619cbbf9af7f008e77f6eb93
   languageName: node
   linkType: hard
 
@@ -4285,8 +4285,8 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-jest@npm:^27.0.0":
-  version: 27.4.2
-  resolution: "eslint-plugin-jest@npm:27.4.2"
+  version: 27.4.3
+  resolution: "eslint-plugin-jest@npm:27.4.3"
   dependencies:
     "@typescript-eslint/utils": ^5.10.0
   peerDependencies:
@@ -4298,7 +4298,7 @@ __metadata:
       optional: true
     jest:
       optional: true
-  checksum: 99a8301ae00c37da97866b8b13c89a077716d2c653b26bc417d242e7300a43237c0017fd488c43966fa38585f19050facdbbc71d03ca36a1ce6f2ba930a9143e
+  checksum: de062a04f30d72535aecfd6594aa302cf350d62e86805c8f0edbb3dce4cde5b557766e7acfd0f87709a9b70854cc2522c04b875337925c64d0d9bc1118ef4693
   languageName: node
   linkType: hard
 
@@ -4615,7 +4615,7 @@ __metadata:
     mocha-junit-reporter: 2.2.1
     mocha-multi: 1.1.7
     mochawesome: 7.1.3
-    nock: 13.3.4
+    nock: 13.3.6
     nodemon: 2.0.22
     nsp: 3.2.1
     otp: 0.1.3
@@ -8287,15 +8287,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:13.3.4":
-  version: 13.3.4
-  resolution: "nock@npm:13.3.4"
+"nock@npm:13.3.6":
+  version: 13.3.6
+  resolution: "nock@npm:13.3.6"
   dependencies:
     debug: ^4.1.0
     json-stringify-safe: ^5.0.1
-    lodash: ^4.17.21
     propagate: ^2.0.0
-  checksum: 34ba5fdc025db1f6eb3ea5e3067489e37d6982534ad23d2c1e9fe33ab844c73ed9161012ce4c116c7aa9b765e5a9cfb1541163c936e06fb3331d51c61e2869f7
+  checksum: 795f334a17ed294b829968c177190571720492cc5113e2aa5b9d382c6508d81c8f79f6afae32009abce94213b0b7c1a474d582acf87e2c169d620314ac0ae60c
   languageName: node
   linkType: hard
 

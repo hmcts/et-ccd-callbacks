@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.WEEKEND_DAYS_LIST;
@@ -137,7 +136,7 @@ public class ServingClaimsReport {
     private List<ClaimServedTypeItem> getServedClaimItemsByDayNumber(AdhocReportType adhocReportType, int dayNumber) {
         return adhocReportType.getClaimServedItems().stream()
             .filter(item -> Integer.parseInt(item.getValue().getReportedNumberOfDays()) == dayNumber)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private void setServedClaimsSummary(AdhocReportType adhocReportType, String totalServedClaims,

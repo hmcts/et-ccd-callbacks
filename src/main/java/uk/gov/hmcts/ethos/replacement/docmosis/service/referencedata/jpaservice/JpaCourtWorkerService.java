@@ -9,7 +9,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepo
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -22,7 +21,7 @@ public class JpaCourtWorkerService implements CourtWorkerService {
         return courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType)
                 .stream()
                 .map(cw -> DynamicValueType.create(cw.getCode(), cw.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }
 

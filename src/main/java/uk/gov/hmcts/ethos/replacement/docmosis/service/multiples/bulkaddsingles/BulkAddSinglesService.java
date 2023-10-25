@@ -8,7 +8,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendServic
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADD_CASES_TO_MULTIPLE_AMENDMENT;
 
@@ -50,6 +49,6 @@ public class BulkAddSinglesService {
     private List<CaseIdTypeItem> convert(List<String> validatedSingleCases) {
         return validatedSingleCases.stream()
                 .map(CaseIdTypeItem::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

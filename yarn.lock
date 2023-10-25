@@ -2987,13 +2987,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^9.0.0":
-  version: 9.5.0
-  resolution: "commander@npm:9.5.0"
-  checksum: c7a3e27aa59e913b54a1bafd366b88650bc41d6651f0cbe258d4ff09d43d6a7394232a4dadd0bf518b3e696fdf595db1028a0d82c785b88bd61f8a440cecfade
-  languageName: node
-  linkType: hard
-
 "commander@npm:~8.0.0":
   version: 8.0.0
   resolution: "commander@npm:8.0.0"
@@ -4596,7 +4589,7 @@ __metadata:
     request-promise-native: 1.0.9
     require-directory: 2.1.1
     rewire: 6.0.0
-    selenium-standalone: 8.0.10
+    selenium-standalone: 8.3.0
     sinon: 13.0.2
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
@@ -10280,31 +10273,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selenium-standalone@npm:8.0.10":
-  version: 8.0.10
-  resolution: "selenium-standalone@npm:8.0.10"
-  dependencies:
-    commander: ^9.0.0
-    cross-spawn: ^7.0.3
-    debug: ^4.3.1
-    fs-extra: ^10.0.0
-    got: ^11.8.2
-    is-port-reachable: ^3.0.0
-    lodash.mapvalues: ^4.6.0
-    lodash.merge: ^4.6.2
-    minimist: ^1.2.5
-    mkdirp: ^1.0.4
-    progress: 2.0.3
-    tar-stream: 2.2.0
-    which: ^2.0.2
-    yauzl: ^2.10.0
-  bin:
-    selenium-standalone: bin/selenium-standalone
-  checksum: 25efd4cf9fba44682a5233775f921851e9ad5356d0df5186c99e0b9114f33c71d4363a7ee195ce43e0673867265f6cd1c4f5b89bdf02bf57e39e0c1c221fd745
-  languageName: node
-  linkType: hard
-
-"selenium-standalone@npm:^8.0.3":
+"selenium-standalone@npm:8.3.0, selenium-standalone@npm:^8.0.3":
   version: 8.3.0
   resolution: "selenium-standalone@npm:8.3.0"
   dependencies:
@@ -11274,19 +11243,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar-stream@npm:2.2.0, tar-stream@npm:^2.1.4, tar-stream@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "tar-stream@npm:2.2.0"
-  dependencies:
-    bl: ^4.0.3
-    end-of-stream: ^1.4.1
-    fs-constants: ^1.0.0
-    inherits: ^2.0.3
-    readable-stream: ^3.1.1
-  checksum: 699831a8b97666ef50021c767f84924cfee21c142c2eb0e79c63254e140e6408d6d55a065a2992548e72b06de39237ef2b802b99e3ece93ca3904a37622a66f3
-  languageName: node
-  linkType: hard
-
 "tar-stream@npm:3.0.0":
   version: 3.0.0
   resolution: "tar-stream@npm:3.0.0"
@@ -11310,6 +11266,19 @@ __metadata:
     to-buffer: ^1.1.1
     xtend: ^4.0.0
   checksum: a5d49e232d3e33321bbd150381b6a4e5046bf12b1c2618acb95435b7871efde4d98bd1891eb2200478a7142ef7e304e033eb29bbcbc90451a2cdfa1890e05245
+  languageName: node
+  linkType: hard
+
+"tar-stream@npm:^2.1.4, tar-stream@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "tar-stream@npm:2.2.0"
+  dependencies:
+    bl: ^4.0.3
+    end-of-stream: ^1.4.1
+    fs-constants: ^1.0.0
+    inherits: ^2.0.3
+    readable-stream: ^3.1.1
+  checksum: 699831a8b97666ef50021c767f84924cfee21c142c2eb0e79c63254e140e6408d6d55a065a2992548e72b06de39237ef2b802b99e3ece93ca3904a37622a66f3
   languageName: node
   linkType: hard
 

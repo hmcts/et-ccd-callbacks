@@ -172,6 +172,8 @@ public class TseRespondentReplyService {
                     .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                     .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
                     .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                    .dateTime(TseHelper.getCurrentDateTime()) // for Work Allocation DMNs
+                    .applicationType(genericTseApplicationType.getType()) // for Work Allocation DMNs
                     .build()
             ).build());
 

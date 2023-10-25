@@ -122,7 +122,8 @@ public final class ReferralHelper {
      * Populates Hearing, Referral and Replies details. For judges only hearing and referral details will be displayed.
      */
     public static String populateHearingReferralDetails(CaseData caseData) {
-        return populateHearingDetails(caseData) + populateReferralDetails(caseData)
+        return populateHearingDetails(caseData)
+                + populateReferralDetails(caseData)
                 + populateReplyDetails(caseData);
     }
 
@@ -542,6 +543,10 @@ public final class ReferralHelper {
 
         referralReply.setDirectionDetails(caseData.getDirectionDetails() != null
                 ? caseData.getDirectionDetails() : caseData.getReplyDetails());
+
+        // for Work Allocation DMNs only
+        referralReply.setReplyDateTime(Helper.getCurrentDateTime());
+        referralReply.setReferralSubject(referral.getReferralSubject());
 
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(UUID.randomUUID().toString());

@@ -111,7 +111,8 @@ class ReferralHelperTest {
 
     private final String expectedCreatedReferralReply = "ReferralReplyType(directionTo=directionTo, replyToEmailAddre"
         + "ss=replyTo, isUrgentReply=isUrgent, directionDetails=directionDetails, replyDocument=null, replyGeneralNot"
-        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ")";
+        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ", replyDateTime="
+        + Helper.getCurrentDateTime().substring(0, 11) + ", referralSubject=Other)";
 
     @BeforeEach
     void setUp() {
@@ -382,9 +383,17 @@ class ReferralHelperTest {
 
         ReferralHelper.createReferralReply(caseData, "Judge Alex");
 
-        assertEquals(expectedCreatedReferralReply,
+        /*assertEquals(expectedCreatedReferralReply,
                 caseData.getReferralCollection().get(0).getValue()
-                        .getReferralReplyCollection().get(0).getValue().toString());
+                        .getReferralReplyCollection().get(0).getValue().toString());*/
+
+        ReferralReplyType testReply = caseData.getReferralCollection()
+                .get(0).getValue().getReferralReplyCollection()
+                .get(0).getValue();
+        // test datetime
+        testReply.setReplyDateTime(testReply.getReplyDateTime().substring(0, 11));
+
+        assertEquals(expectedCreatedReferralReply, testReply.toString());
     }
 
     @Test
@@ -498,7 +507,8 @@ class ReferralHelperTest {
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
             + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
-            + "\"replyBy\",\"replyDate\":\"replyDate\"}}]}}";
+            + "\"replyBy\",\"replyDate\":\"replyDate\",\"replyDateTime\":\"replyDateTime\","
+            + "\"referralSubject\":\"Other\"}}]}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);
@@ -586,9 +596,13 @@ class ReferralHelperTest {
         referralReplyType.setReplyToEmailAddress("replyToEmail");
         referralReplyType.setDirectionTo("directionTo");
         referralReplyType.setReplyDocument(List.of(createDocumentType("1")));
+        referralReplyType.setReplyDateTime("replyDateTime");
+        referralReplyType.setReferralSubject("Other");
+
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(id);
         referralReplyTypeItem.setValue(referralReplyType);
+
         return referralReplyTypeItem;
     }
 

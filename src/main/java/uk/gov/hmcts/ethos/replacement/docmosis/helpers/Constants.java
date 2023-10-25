@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 public class Constants {
-    private Constants() {
-
-    }
 
     public static final String ET1_DOC_TYPE = "ET1";
     public static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
@@ -68,4 +65,8 @@ public class Constants {
     public static final String REPLY_TO_APPLICATION = "Reply to application";
     public static final String TSE_ADMIN_CORRESPONDENCE = "Tse admin correspondence";
     public static final String RESPONDENT_CORRESPONDENCE = "Respondent correspondence";
+
+    private Constants() {
+
+    }
 }

@@ -29,7 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -96,7 +96,7 @@ class TseAdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
         tseAdminService = new TseAdminService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);

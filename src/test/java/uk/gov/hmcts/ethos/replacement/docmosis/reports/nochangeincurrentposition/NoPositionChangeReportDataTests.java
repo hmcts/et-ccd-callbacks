@@ -110,11 +110,11 @@ class NoPositionChangeReportDataTests {
     private StringBuilder buildSummaryJsonString(String office, String reportDate, String totalCases,
                                                   String totalSingle, String totalMultiple) {
         StringBuilder sb = new StringBuilder();
-        sb.append(REPORT_OFFICE).append(StringUtils.defaultString(office, "")).append(NEW_LINE);
+        sb.append(REPORT_OFFICE).append(StringUtils.defaultIfEmpty(office, "")).append(NEW_LINE);
         sb.append(REPORT_DATE).append(UtilHelper.listingFormatLocalDate(reportDate)).append(NEW_LINE);
-        sb.append(TOTAL_CASES).append(StringUtils.defaultString(totalCases, "0")).append(NEW_LINE);
-        sb.append(TOTAL_SINGLE).append(StringUtils.defaultString(totalSingle, "0")).append(NEW_LINE);
-        sb.append(TOTAL_MULTIPLE).append(StringUtils.defaultString(totalMultiple, "0")).append(NEW_LINE);
+        sb.append(TOTAL_CASES).append(StringUtils.defaultIfEmpty(totalCases, "0")).append(NEW_LINE);
+        sb.append(TOTAL_SINGLE).append(StringUtils.defaultIfEmpty(totalSingle, "0")).append(NEW_LINE);
+        sb.append(TOTAL_MULTIPLE).append(StringUtils.defaultIfEmpty(totalMultiple, "0")).append(NEW_LINE);
         return sb;
     }
 

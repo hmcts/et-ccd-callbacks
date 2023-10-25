@@ -309,7 +309,7 @@ public class Et1VettingService {
             if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
                 codeList.stream().filter(codesTypeItem -> caseData.getJurCodesCollection().stream()
                         .map(existingCode -> existingCode.getValue().getJuridictionCodesList())
-                        .collect(Collectors.toList()).stream()
+                        .toList().stream()
                         .anyMatch(code -> code.equals(codesTypeItem.getValue().getEt1VettingJurCodeList())))
                     .forEach(c -> errors
                         .add(String.format(ERROR_EXISTING_JUR_CODE, c.getValue().getEt1VettingJurCodeList())));
@@ -373,7 +373,7 @@ public class Et1VettingService {
             .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
             .map(tribunalOffice ->
                 DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-            .collect(Collectors.toList()));
+            .toList());
     }
 
     public String toAddressWithTab(Address address) {

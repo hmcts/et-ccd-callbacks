@@ -7,7 +7,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRep
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class JpaFileLocationService implements FileLocationService {
@@ -23,6 +22,6 @@ public class JpaFileLocationService implements FileLocationService {
         return fileLocationRepository.findByTribunalOffice(tribunalOffice)
                 .stream()
                 .map(fl -> DynamicValueType.create(fl.getCode(), fl.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

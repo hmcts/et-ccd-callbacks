@@ -40,6 +40,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims.ServingClai
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReportDocumentInfoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
@@ -270,19 +272,14 @@ public class ListingService {
         if (isHearingTypeValid(listingData, hearingTypeItem)) {
             int hearingDateCollectionSize = hearingTypeItem.getValue().getHearingDateCollection().size();
             for (int i = 0; i < hearingDateCollectionSize; i++) {
-                log.info("EthosCaseRef Listing: " + caseData.getEthosCaseReference());
                 hearingTypeItem.getValue().getHearingNumber();
-                log.info("Hearing number: " + hearingTypeItem.getValue().getHearingNumber());
                 DateListedTypeItem dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
                 boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
                         caseTypeId, caseData.getEthosCaseReference());
                 boolean isListingDateValid = isListingDateValid(listingData, dateListedTypeItem);
-                log.info("isListingVenueValid: " + isListingVenueValid);
-                log.info("isListingDateValid: " + isListingDateValid);
                 boolean isListingStatusValid = true;
                 if (!showAllHearingType(listingData)) {
                     isListingStatusValid = isListingStatusValid(dateListedTypeItem);
-                    log.info("isListingStatusValid: " + isListingStatusValid);
                 }
                 if (!isListingVenueValid || !isListingDateValid || !isListingStatusValid) {
                     continue;
@@ -309,27 +306,19 @@ public class ListingService {
         clearListingFields(listingDetails.getCaseData());
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
         log.info("Number of cases found: " + submitEvents.size());
-        switch (listingDetails.getCaseData().getReportType()) {
-            case BROUGHT_FORWARD_REPORT:
-                return bfActionReport.runReport(listingDetails,
-                        submitEvents, userName);
-            case CLAIMS_ACCEPTED_REPORT:
-                return ReportHelper.processClaimsAcceptedRequest(listingDetails, submitEvents);
-            case LIVE_CASELOAD_REPORT:
-                return ReportHelper.processLiveCaseloadRequest(listingDetails, submitEvents);
-            case CASES_COMPLETED_REPORT:
-                return casesCompletedReport.generateReportData(listingDetails, submitEvents);
-            case TIME_TO_FIRST_HEARING_REPORT:
-                return timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
-            case SERVING_CLAIMS_REPORT:
-                return servingClaimsReport.generateReportData(listingDetails, submitEvents);
-            case CASE_SOURCE_LOCAL_REPORT:
-                return caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
-            case MEMBER_DAYS_REPORT:
-                return new MemberDaysReport().runReport(listingDetails, submitEvents);
-            default:
-                return listingDetails.getCaseData();
-        }
+        return switch (listingDetails.getCaseData().getReportType()) {
+            case BROUGHT_FORWARD_REPORT -> bfActionReport.runReport(listingDetails,
+                    submitEvents, userName);
+            case CLAIMS_ACCEPTED_REPORT -> ReportHelper.processClaimsAcceptedRequest(listingDetails, submitEvents);
+            case LIVE_CASELOAD_REPORT -> ReportHelper.processLiveCaseloadRequest(listingDetails, submitEvents);
+            case CASES_COMPLETED_REPORT -> casesCompletedReport.generateReportData(listingDetails, submitEvents);
+            case TIME_TO_FIRST_HEARING_REPORT ->
+                    timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
+            case SERVING_CLAIMS_REPORT -> servingClaimsReport.generateReportData(listingDetails, submitEvents);
+            case CASE_SOURCE_LOCAL_REPORT -> caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
+            case MEMBER_DAYS_REPORT -> new MemberDaysReport().runReport(listingDetails, submitEvents);
+            default -> listingDetails.getCaseData();
+        };
     }
 
     private void clearListingFields(ListingData listingData) {
@@ -385,13 +374,11 @@ public class ListingService {
         } else {
             String venueSearched;
             String venueToSearch = ListingVenueHelper.getListingVenue(listingData);
-            log.info("VENUE TO SEARCH: " + venueToSearch);
 
             if (ListingVenueHelper.isAllScottishVenues(listingData)) {
                 venueSearched = dateListedTypeItem.getValue().hasHearingVenue()
                         ? dateListedTypeItem.getValue().getHearingVenueDayScotland()
                         : " ";
-                log.info("Checking venue for all scottish level (HearingVenueDay): " + venueSearched);
             } else {
                 try {
                     venueSearched = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());

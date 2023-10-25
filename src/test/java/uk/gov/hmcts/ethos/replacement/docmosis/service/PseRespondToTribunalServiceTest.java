@@ -27,7 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ class PseRespondToTribunalServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
         pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService,
             tribunalOfficesService);
         caseData = CaseDataBuilder.builder().build();

@@ -23,4 +23,8 @@ public class FeatureToggleService {
     public boolean isGlobalSearchEnabled() {
         return this.featureToggleApi.isFeatureEnabled("global_search_enabled");
     }
+
+    public boolean isCaseFlagsEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("case-flags-linking-enabled");
+    }
 }

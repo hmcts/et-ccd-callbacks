@@ -20,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UpdateDataModelBuilder;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedMap;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -99,6 +98,8 @@ public class MultipleBatchUpdate3Service {
         try {
             CCDRequest returnedRequest = ccdClient.startEventForCase(userToken, caseTypeId,
                    jurisdiction, String.valueOf(caseId));
+            // NOTE TO DEV IN THE FUTURE: THE BELOW LINE IS VULNERABLE TO CONCURRENCY BUGS.
+            // PLEASE AMEND IT WHEN YOU ARE IMPLEMENTING MULTIPLES.
             ccdClient.submitEventForCase(userToken, caseData, caseTypeId,
                    jurisdiction, returnedRequest, String.valueOf(caseId));
         } catch (Exception e) {
@@ -127,7 +128,7 @@ public class MultipleBatchUpdate3Service {
             if (respondentSumTypeItemOptional.isPresent() && CollectionUtils.isNotEmpty(caseData.getRepCollection())) {
                 List<RepresentedTypeRItem> toBeRemoved = caseData.getRepCollection().stream().filter(
                     a -> a.getValue().getRespRepName().equals(representedType.getRespRepName()))
-                        .collect(Collectors.toList());
+                        .toList();
                 if (CollectionUtils.isNotEmpty(toBeRemoved)) {
                     log.info("Respondent representatives to be removed are: " + toBeRemoved.size());
                     for (RepresentedTypeRItem r: toBeRemoved) {

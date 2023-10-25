@@ -19,6 +19,7 @@ public class CaseFlagsService {
 
     /**
      * Setup case flags for Claimant, Respondent and Case level.
+     *
      * @param caseData Data about the current case
      */
     public void setupCaseFlags(CaseData caseData) {
@@ -35,5 +36,16 @@ public class CaseFlagsService {
                 .roleOnCase("respondent")
                 .build()
         );
+    }
+
+    /**
+     * Sets case flags for Claimant, Respondent and Case level to null.
+     *
+     * @param caseData Data about the current case
+     */
+    public void rollbackCaseFlags(CaseData caseData) {
+        caseData.setCaseFlags(null);
+        caseData.setClaimantFlags(null);
+        caseData.setRespondentFlags(null);
     }
 }

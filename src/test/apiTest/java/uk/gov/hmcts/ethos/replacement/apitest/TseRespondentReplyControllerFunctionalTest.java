@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
+
     private static final String AUTHORIZATION = "Authorization";
     private static final String YES_COPY = "I confirm I want to copy";
     private CCDRequest ccdRequest;

@@ -56,6 +56,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
@@ -65,8 +67,9 @@ class PseRespondToTribunalServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String TEMPLATE_ID = "someTemplateId";
+    private static final String WELSH_TEMPLATE_ID = "welshTemplateId";
     private static final String RESPONSE = "Some Response";
-
+    private static final String TEST_CASE_ID = "1677174791076683";
     private static final String RULE92_NO_DETAILS = "Rule 92 Reasons";
     private static final String SUBMITTED_BODY = """
         ### What happens next\r
@@ -95,6 +98,7 @@ class PseRespondToTribunalServiceTest {
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(pseRespondToTribService, "cyNotificationToClaimantTemplateId", WELSH_TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
     }
@@ -585,6 +589,30 @@ class PseRespondToTribunalServiceTest {
 
         pseRespondToTribService.sendClaimantEmail(caseDetails);
         verify(emailService).sendEmail(TEMPLATE_ID, "claimant@email.com", expectedMap);
+    }
+
+    @Test
+    void sendClaimantEmail_rule92Yes_SendEmail_Welsh() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000001/2023")
+                .withClaimant("Claimant Name")
+                .withClaimantType("claimant@email.com")
+                .withRespondent("Respondent One", YES, "01-Jan-2023", false)
+                .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
+                .withClaimantHearingPreference(WELSH_LANGUAGE)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId(TEST_CASE_ID);
+        caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
+
+        Map<String, String> expectedMap = Map.of(
+                "caseNumber", "6000001/2023",
+                "claimant", "Claimant Name",
+                "respondents", "Respondent One, Respondent Two",
+                LINK_TO_CITIZEN_HUB, CITIZEN_HUB_URL + TEST_CASE_ID + WELSH_LANGUAGE_PARAM
+        );
+
+        pseRespondToTribService.sendClaimantEmail(caseDetails);
+        verify(emailService).sendEmail(WELSH_TEMPLATE_ID, "claimant@email.com", expectedMap);
     }
 
     @Test

@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -42,6 +43,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -62,9 +66,9 @@ class TseHelperTest {
             .build();
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
-            .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
-            .withResponsesCount("0").withStatus(OPEN_STATE).build();
+                .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
+                .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
+                .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
         genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -264,6 +268,39 @@ class TseHelperTest {
         assertThat(actual.toString(), is(expected.toString()));
     }
 
+    @ParameterizedTest
+    @MethodSource("applicationTypes")
+    void getPersonalisationForResponse_withResponse_Welsh(
+            String applicationTypeKey) throws NotificationClientException {
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+        caseData.getGenericTseApplicationCollection().get(0).getValue().setType(applicationTypeKey);
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
+        caseData.setTseResponseText("TseResponseText");
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("CaseId");
+        caseDetails.setCaseData(caseData);
+        byte[] document = {};
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
+
+        Map<String, Object> expected = Map.of(
+                "linkToCitizenHub", "citizenUrlCaseId" + WELSH_LANGUAGE_PARAM,
+                "caseNumber", "1234",
+                "applicationType", CY_RESPONDENT_APP_TYPE_MAP.get(applicationTypeKey),
+                "response", "TseResponseText",
+                "claimant", "First Last",
+                "respondents", "Respondent Name",
+                "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
+        );
+        assertThat(actual.toString(), is(expected.toString()));
+    }
+
+    static Stream<String> applicationTypes() {
+        return CY_RESPONDENT_APP_TYPE_MAP.keySet().stream();
+    }
+
     @Test
     void getPersonalisationForResponse_withoutResponse() throws NotificationClientException {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
@@ -303,7 +340,7 @@ class TseHelperTest {
         @Test
         void nullWhenApplicationDoesNotExist() {
             caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-            caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("2", ""));
+            caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("3", ""));
 
             assertNull(getRespondentSelectedApplicationType(caseData));
         }

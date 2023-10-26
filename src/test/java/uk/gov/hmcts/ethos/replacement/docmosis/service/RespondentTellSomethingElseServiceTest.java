@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -43,6 +45,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -66,7 +69,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.MONTHS_WELSH_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService.CY_CLAIMANT_EMAIL_GROUP_A;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService.CY_CLAIMANT_EMAIL_GROUP_B;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class RespondentTellSomethingElseServiceTest {
@@ -342,11 +352,13 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     @Test
-    void claimantPersonalisation_buildsCorrectData() throws NotificationClientException {
+    void claimantPersonalisation_buildsCorrectData_English_Language() throws NotificationClientException {
         CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
 
         Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
             new byte[]{});
@@ -358,6 +370,28 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(actual.get("respondents"), is("Father Ted"));
         assertThat(actual.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download"
             + "\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+    }
+
+    @Test
+    void claimantPersonalisation_buildsCorrectData_Welsh_Language() throws NotificationClientException {
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+
+        Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
+                new byte[]{});
+
+        assertThat(actual.get("caseNumber"), is(caseData.getEthosCaseReference()));
+        assertThat(actual.get("applicationType"), is(CY_RESPONDENT_APP_TYPE_MAP.get(TSE_APP_AMEND_RESPONSE)));
+        assertThat(actual.get("instructions"), is("test"));
+        assertThat(actual.get("claimant"), is("claimant"));
+        assertThat(actual.get("respondents"), is("Father Ted"));
+        assertThat(actual.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download"
+                + "\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+        assertTrue(((String) actual.get("linkToCitizenHub")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 
     @Test
@@ -398,6 +432,42 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("instructions"), is(expectedInstructions));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        TSE_APP_AMEND_RESPONSE,
+        TSE_APP_CLAIMANT_NOT_COMPLIED,
+        TSE_APP_CONTACT_THE_TRIBUNAL,
+        TSE_APP_ORDER_OTHER_PARTY,
+        TSE_APP_POSTPONE_A_HEARING,
+        TSE_APP_RESTRICT_PUBLICITY,
+        TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM,
+        TSE_APP_VARY_OR_REVOKE_AN_ORDER
+    })
+    void sendClaimantEmail_groupA_sendsEmail_Welsh(String applicationType) throws IOException {
+        CaseData caseData = createCaseData(applicationType, I_DO_WANT_TO_COPY);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+
+        when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        Map<String, Object> personalisation = personalisationCaptor.getValue();
+        String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
+
+        for (Map.Entry<String, String> monthEntry : MONTHS_WELSH_MAP.entrySet()) {
+            if (expectedDueDate.contains(monthEntry.getKey())) {
+                expectedDueDate = expectedDueDate.replace(monthEntry.getKey(), monthEntry.getValue());
+                break;
+            }
+        }
+        String expectedInstructions = String.format(CY_CLAIMANT_EMAIL_GROUP_A, expectedDueDate);
+
+        assertThat(personalisation.get("instructions"), is(expectedInstructions));
+    }
+
     @Test
     void sendClaimantEmail_groupB_sendsEmail() throws IOException {
         CaseData caseData = createCaseData(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY);
@@ -413,6 +483,37 @@ class RespondentTellSomethingElseServiceTest {
             + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.",
             UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         assertThat(personalisation.get("instructions"), is(expected));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        TSE_APP_CHANGE_PERSONAL_DETAILS,
+        TSE_APP_CONSIDER_A_DECISION_AFRESH,
+        TSE_APP_RECONSIDER_JUDGEMENT
+    })
+    void sendClaimantEmail_groupB_sendsEmail_Welsh(String applicationType) throws IOException {
+        CaseData caseData = createCaseData(applicationType, I_DO_WANT_TO_COPY);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+
+        when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        Map<String, Object> personalisation = personalisationCaptor.getValue();
+
+        String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
+
+        for (Map.Entry<String, String> monthEntry : MONTHS_WELSH_MAP.entrySet()) {
+            if (expectedDueDate.contains(monthEntry.getKey())) {
+                expectedDueDate = expectedDueDate.replace(monthEntry.getKey(), monthEntry.getValue());
+                break;
+            }
+        }
+        String expectedInstructions = String.format(CY_CLAIMANT_EMAIL_GROUP_B, expectedDueDate);
+        assertThat(personalisation.get("instructions"), is(expectedInstructions));
     }
 
     @ParameterizedTest

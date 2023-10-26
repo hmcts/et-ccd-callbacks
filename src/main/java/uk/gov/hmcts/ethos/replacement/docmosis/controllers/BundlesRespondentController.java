@@ -7,12 +7,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -35,6 +37,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class BundlesRespondentController {
 
+    public static final String BUNDLES_LOG = "Bundles feature flag is {}";
+    public static final String BUNDLES_FEATURE_IS_NOT_AVAILABLE = "Bundles feature is not available";
     private final VerifyTokenService verifyTokenService;
     private final BundlesRespondentService bundlesRespondentService;
     private final FeatureToggleService featureToggleService;
@@ -63,20 +67,18 @@ public class BundlesRespondentController {
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info("Bundles feature flag is {}", bundlesToggle);
+        log.info(BUNDLES_LOG, bundlesToggle);
         if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
             caseData.setBundlesRespondentPrepareDocNotesShow(YES);
+            return getCallbackRespEntityNoErrors(caseData);
         }
-
-        return getCallbackRespEntityNoErrors(caseData);
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 
     /**
@@ -97,23 +99,22 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info("Bundles feature flag is {}", bundlesToggle);
+        log.info(BUNDLES_LOG, bundlesToggle);
         if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
             bundlesRespondentService.addToBundlesCollection(caseData);
             bundlesRespondentService.clearInputData(caseData);
+            return getCallbackRespEntityNoErrors(caseData);
         }
-
-        return getCallbackRespEntityNoErrors(caseData);
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 
     /**
@@ -138,20 +139,18 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info("Bundles feature flag is {}", bundlesToggle);
+        log.info(BUNDLES_LOG, bundlesToggle);
         if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
             bundlesRespondentService.populateSelectHearings(caseData);
+            return getCallbackRespEntityNoErrors(caseData);
         }
-
-        return getCallbackRespEntityNoErrors(caseData);
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 
     /**
@@ -175,22 +174,19 @@ public class BundlesRespondentController {
     public ResponseEntity<CCDCallbackResponse> midValidateUpload(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info("Bundles feature flag is {}", bundlesToggle);
+        log.info(BUNDLES_LOG, bundlesToggle);
         List<String> errors = new ArrayList<>();
         if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
             bundlesRespondentService.validateFileUpload(caseData);
+            return getCallbackRespEntityErrors(errors, caseData);
         }
-
-        return getCallbackRespEntityErrors(errors, caseData);
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 
     /**
@@ -211,17 +207,16 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-        CCDCallbackResponse response = CCDCallbackResponse.builder()
-                .data(ccdRequest.getCaseDetails().getCaseData())
-                .build();
-
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info("Bundles feature flag is {}", bundlesToggle);
+        log.info(BUNDLES_LOG, bundlesToggle);
         if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CCDCallbackResponse response = CCDCallbackResponse.builder()
+                    .data(ccdRequest.getCaseDetails().getCaseData())
+                    .build();
             String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
             String body = """
                     <h2>What happens next</h2>
@@ -230,7 +225,8 @@ public class BundlesRespondentController {
                     """;
             response.setConfirmation_header(header);
             response.setConfirmation_body(body);
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.ok(response);
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 }

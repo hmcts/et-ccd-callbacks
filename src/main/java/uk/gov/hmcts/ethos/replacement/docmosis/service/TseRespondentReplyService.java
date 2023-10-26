@@ -37,12 +37,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-<<<<<<< HEAD
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
-=======
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_CORRESPONDENCE;
->>>>>>> master
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_REPLY;

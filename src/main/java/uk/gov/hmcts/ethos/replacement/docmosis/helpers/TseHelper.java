@@ -19,14 +19,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -200,11 +199,12 @@ public final class TseHelper {
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
      */
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
+                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -255,7 +255,8 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
+                                                      String ccdGatewayBaseUrl) {
 
         return TseReplyData.builder()
             .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -264,28 +265,18 @@ public final class TseHelper {
             .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
             .response(defaultIfEmpty(application.getDetails(), null))
             .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-            .documentCollection(getUploadedDocList(caseData))
+            .documentCollection(getUploadedDocList(caseData, ccdGatewayBaseUrl))
             .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
             .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
+    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return null;
         }
 
-        List<GenericTypeItem<DocumentType>> genericDocTypeList = new ArrayList<>();
-
-        caseData.getTseResponseSupportingMaterial().forEach(doc -> {
-            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
-            DocumentType docType = new DocumentType();
-            docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-            genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
-            genTypeItems.setValue(docType);
-            genericDocTypeList.add(genTypeItems);
-        });
-
-        return genericDocTypeList;
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial(),
+                ccdGatewayBaseUrl);
     }
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {

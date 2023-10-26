@@ -26,10 +26,12 @@ import uk.gov.service.notify.NotificationClientException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -239,7 +241,7 @@ public class TseAdmReplyService {
         Map<String, Object> personalisationHashMap;
         CaseData caseData = caseDetails.getCaseData();
         if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
-            return null;
+            return Collections.emptyMap();
         }
 
         String customisedText = isResponseRequired(caseData, RESPONDENT_TITLE)

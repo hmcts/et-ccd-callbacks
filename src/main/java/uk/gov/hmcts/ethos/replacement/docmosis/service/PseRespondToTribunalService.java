@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.time.LocalDate;
@@ -39,6 +40,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatRespondDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedSendNotificationTypeItem;
@@ -58,6 +61,8 @@ public class PseRespondToTribunalService {
     private String acknowledgeEmailNoTemplateId;
     @Value("${template.pse.claimant}")
     private String notificationToClaimantTemplateId;
+    @Value("${template.pse.cyClaimant}")
+    private String cyNotificationToClaimantTemplateId;
     @Value("${template.pse.admin}")
     private String notificationToAdminTemplateId;
 
@@ -212,8 +217,13 @@ public class PseRespondToTribunalService {
      */
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
+        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
+        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        String emailTemplate = isWelsh
+                ? cyNotificationToClaimantTemplateId
+                : notificationToClaimantTemplateId;
         if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
-            emailService.sendEmail(notificationToClaimantTemplateId,
+            emailService.sendEmail(emailTemplate,
                 caseData.getClaimantType().getClaimantEmailAddress(),
                 buildPersonalisationNotify(caseDetails));
         }
@@ -221,11 +231,16 @@ public class PseRespondToTribunalService {
 
     private Map<String, String> buildPersonalisationNotify(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
+        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
+        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        String linkToCitizenHub = isWelsh
+                ? emailService.getCitizenCaseLink(caseDetails.getCaseId()) + WELSH_LANGUAGE_PARAM
+                : emailService.getCitizenCaseLink(caseDetails.getCaseId());
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
-                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId())
+                LINK_TO_CITIZEN_HUB, linkToCitizenHub
         );
     }
 

@@ -38,8 +38,18 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERS
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
-import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.*;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.*;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.MONTHS_WELSH_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_FILE_NAME;
@@ -79,13 +89,13 @@ public class RespondentTellSomethingElseService {
     private static final String CLAIMANT_EMAIL_GROUP_B = "You are not expected to respond to this application"
             + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
 
-    private static final String CY_CLAIMANT_EMAIL_GROUP_B = "Nid oes disgwyl i chi ymateb i'r cais hwn."
+    public static final String CY_CLAIMANT_EMAIL_GROUP_B = "Nid oes disgwyl i chi ymateb i'r cais hwn."
             + "\r\n\r\nOs byddwch yn ymateb dylech wneud hynny cyn gynted â phosibl ac erbyn %s fan bellaf.";
     private static final String CLAIMANT_EMAIL_GROUP_A = "You should respond as soon as possible, and in any "
             + "event by %s.";
 
-    private static final String CY_CLAIMANT_EMAIL_GROUP_A = "Dylech ymateb cyn gynted â phosibl, ac erbyn %s " +
-            "fan bellaf.";
+    public static final String CY_CLAIMANT_EMAIL_GROUP_A = "Dylech ymateb cyn gynted â phosibl, ac erbyn %s "
+            + "fan bellaf.";
 
     private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String TABLE_COLUMNS_MARKDOWN =
@@ -235,14 +245,11 @@ public class RespondentTellSomethingElseService {
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
         String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
         boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
-
         String shortText = isWelsh
                 ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
-                : APP_TYPE_MAP.get(caseData.getResTseSelectApplication());
-
-        String linkToCitizenHub = isWelsh
-                ? emailService.getCitizenCaseLink(caseDetails.getCaseId()) + WELSH_LANGUAGE_PARAM
-                : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+                : caseData.getResTseSelectApplication();
+        String linkToCitizenHub = emailService.getCitizenCaseLink(
+                caseDetails.getCaseId()) + (isWelsh ? WELSH_LANGUAGE_PARAM : "");
 
         return Map.of(
                 LINK_TO_CITIZEN_HUB, linkToCitizenHub,

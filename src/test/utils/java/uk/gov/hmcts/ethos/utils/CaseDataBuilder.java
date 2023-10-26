@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
@@ -227,6 +228,13 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withClaimant(String claimant) {
         caseData.setClaimant(claimant);
+        return this;
+    }
+
+    public CaseDataBuilder withClaimantHearingPreference(String preference) {
+        ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
+        claimantHearingPreference.setContactLanguage(preference);
+        caseData.setClaimantHearingPreference(claimantHearingPreference);
         return this;
     }
 
@@ -546,7 +554,7 @@ public class CaseDataBuilder {
         caseData.setChangeOrganisationRequestField(cor);
         return this;
     }
-        
+
     public CaseDataBuilder withAssignOffice(String selectedOffice) {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->

@@ -35,8 +35,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.*;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.*;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
@@ -230,8 +237,8 @@ public final class TseHelper {
                 ? citizenUrl + WELSH_LANGUAGE_PARAM
                 : citizenUrl;
         String applicationType = isWelsh
-                ? CY_APP_TYPE_MAP.get(selectedApplication.getType())
-                : APP_TYPE_MAP.get(selectedApplication.getType());
+                ? CY_RESPONDENT_APP_TYPE_MAP.get(selectedApplication.getType())
+                : selectedApplication.getType();
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 

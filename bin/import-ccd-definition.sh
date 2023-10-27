@@ -70,6 +70,7 @@ else
         ${dir}/utils/ccd-import-definition.sh ${importFile}
       fi
     fi
+fi
 if [ $1 != "all" ]
 then
   echo "Using CCD definition file ${importFile}"

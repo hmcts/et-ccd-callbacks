@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -551,6 +552,23 @@ class Et1VettingServiceTest {
         caseData.setSuggestedHearingVenues(dynamicFixedListType);
         et1VettingService.populateSuggestedHearingVenues(caseData);
         assertThat(caseData.getSuggestedHearingVenues().getSelectedLabel()).isEqualTo("RCJ");
+    }
+
+    @Test
+    void clearEt1VettingFields() {
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        et1VettingService.clearEt1FieldsFromCaseData(caseDetails.getCaseData());
+        assertNull(caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+        assertNull(caseDetails.getCaseData().getEt1VettingClaimantDetailsMarkUp());
+        assertNull(caseDetails.getCaseData().getEt1VettingRespondentDetailsMarkUp());
+        assertNull(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1());
+        assertNull(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2());
+        assertNull(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3());
+        assertNull(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails4());
+        assertNull(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails5());
+        assertNull(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails6());
+        assertNull(caseDetails.getCaseData().getExistingJurisdictionCodes());
+        assertNull(caseDetails.getCaseData().getRegionalOffice());
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {

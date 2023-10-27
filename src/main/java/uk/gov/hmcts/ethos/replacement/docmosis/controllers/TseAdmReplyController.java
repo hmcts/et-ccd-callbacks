@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -122,11 +123,15 @@ public class TseAdmReplyController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
         tseAdmReplyService.updateApplicationState(caseData);
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
-        tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
-        tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
+
+        // Generate a pdf copy of the CYA page of the Tse Admin reply application
+        tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, userToken);
+        tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData, userToken);
+        tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails(), userToken);
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

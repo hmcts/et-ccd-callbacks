@@ -134,6 +134,8 @@ venue-addresses:
         address: IAC
       - venue: Leeds
         address: 4th Floor, City Exchange, 11 Albion Street, Leeds, LS1 5ES
+      - venue: Leeds Westgate
+        address: 6 Westgate, Grace St, Leeds, LS1 2RP
       - venue: Scarborough
         address: Scarborough
       - venue: Sheffield Combi

@@ -8,10 +8,10 @@
     },
     "dependencies": {
         "@hmcts/nodejs-logging": "3.0.4",
-        "@wdio/cli": "7.27.0",
-        "@wdio/sauce-service": "7.25.4",
-        "@wdio/selenium-standalone-service": "7.25.4",
-        "@wdio/types": "7.25.4",
+        "@wdio/cli": "7.33.0",
+        "@wdio/sauce-service": "7.33.0",
+        "@wdio/selenium-standalone-service": "7.33.0",
+        "@wdio/types": "7.33.0",
         "axios": "0.27.2",
         "codeceptjs-saucehelper": "1.4.0",
         "cross-env": "7.0.3",
@@ -99,11 +99,11 @@
         "sonar-scanner": "3.1.0",
         "sonarqube-scanner": "3.1.0",
         "superagent-proxy": "3.0.0",
-        "supertest": "6.2.2",
+        "supertest": "6.3.3",
         "unirest": "0.6.0",
         "uuid": "8.3.2",
         "watch": "1.0.2",
-        "webdriverio": "8.11.2",
+        "webdriverio": "8.20.4",
         "when": "3.7.8"
     },
     "resolutions": {

@@ -43,7 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
@@ -289,7 +289,7 @@ class TseHelperTest {
         Map<String, Object> expected = Map.of(
                 "linkToCitizenHub", "citizenUrlCaseId" + WELSH_LANGUAGE_PARAM,
                 "caseNumber", "1234",
-                "applicationType", CY_RESPONDENT_APP_TYPE_MAP.get(applicationTypeKey),
+                "applicationType", CY_RESPONDING_TO_APP_TYPE_MAP.get(applicationTypeKey),
                 "response", "TseResponseText",
                 "claimant", "First Last",
                 "respondents", "Respondent Name",
@@ -299,7 +299,7 @@ class TseHelperTest {
     }
 
     static Stream<String> applicationTypes() {
-        return CY_RESPONDENT_APP_TYPE_MAP.keySet().stream();
+        return CY_RESPONDING_TO_APP_TYPE_MAP.keySet().stream();
     }
 
     @Test

@@ -38,8 +38,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERS
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
-import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.MONTHS_WELSH_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
@@ -187,7 +187,7 @@ public class RespondentTellSomethingElseService {
         boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
         String dueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
         if (isWelsh) {
-            for (Map.Entry<String, String> monthEntry : MONTHS_WELSH_MAP.entrySet()) {
+            for (Map.Entry<String, String> monthEntry : CY_MONTHS_MAP.entrySet()) {
                 if (dueDate.contains(monthEntry.getKey())) {
                     dueDate = dueDate.replace(monthEntry.getKey(), monthEntry.getValue());
                     break;

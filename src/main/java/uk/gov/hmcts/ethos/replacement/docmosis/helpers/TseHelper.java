@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
@@ -237,7 +237,7 @@ public final class TseHelper {
                 ? citizenUrl + WELSH_LANGUAGE_PARAM
                 : citizenUrl;
         String applicationType = isWelsh
-                ? CY_RESPONDENT_APP_TYPE_MAP.get(selectedApplication.getType())
+                ? CY_RESPONDING_TO_APP_TYPE_MAP.get(selectedApplication.getType())
                 : selectedApplication.getType();
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");

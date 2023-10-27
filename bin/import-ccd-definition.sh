@@ -5,6 +5,7 @@ set -eu
 
 if ([ $# -eq 0 ] || [ $# -eq 2 ] || ([ $1 != "a" ] && [ $1 != "s" ] && [ $1 != "e" ] && [ $1 != "all" ]))
 then
+
     echo "Usage: ./import-ccd-definition-zsh.sh [e|s|a|all]"
     exit 1
 fi
@@ -69,8 +70,6 @@ else
         ${dir}/utils/ccd-import-definition.sh ${importFile}
       fi
     fi
-fi
-
 if [ $1 != "all" ]
 then
   echo "Using CCD definition file ${importFile}"

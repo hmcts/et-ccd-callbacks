@@ -104,9 +104,9 @@ public final class ListingHelper {
             log.info("started getListingTypeFromCaseData");
             listingType.setElmoCaseReference(caseData.getEthosCaseReference());
             String listedDate = dateListedType.getListedDate();
-            listingType.setCauseListDate(!isNullOrEmpty(listedDate)
-                    ? LocalDate.parse(listedDate, OLD_DATE_TIME_PATTERN).format(CAUSE_LIST_DATE_TIME_PATTERN) : " ");
-            listingType.setCauseListTime(!isNullOrEmpty(listedDate) ? UtilHelper.formatLocalTime(listedDate) : " ");
+            listingType.setCauseListDate(isNullOrEmpty(listedDate)
+                    ? " " : LocalDate.parse(listedDate, OLD_DATE_TIME_PATTERN).format(CAUSE_LIST_DATE_TIME_PATTERN));
+            listingType.setCauseListTime(isNullOrEmpty(listedDate) ? " " : UtilHelper.formatLocalTime(listedDate));
 
             listingType.setJurisdictionCodesList(BulkHelper.getJurCodesCollectionWithHide(
                     caseData.getJurCodesCollection()));
@@ -723,11 +723,11 @@ public final class ListingHelper {
                                                  String dateToSearch, boolean dateRange) {
         LocalDate localDate = LocalDate.parse(dateToSearch, OLD_DATE_TIME_PATTERN2);
         LocalDate localDateFrom = LocalDate.parse(dateToSearchFrom, OLD_DATE_TIME_PATTERN2);
-        if (!dateRange) {
-            return localDateFrom.isEqual(localDate);
-        } else {
+        if (dateRange) {
             LocalDate localDateTo = LocalDate.parse(dateToSearchTo, OLD_DATE_TIME_PATTERN2);
             return !localDate.isBefore(localDateFrom) && !localDate.isAfter(localDateTo);
+        } else {
+            return localDateFrom.isEqual(localDate);
         }
     }
 

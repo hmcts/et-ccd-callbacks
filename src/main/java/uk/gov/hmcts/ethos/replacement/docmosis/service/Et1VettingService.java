@@ -112,6 +112,23 @@ public class Et1VettingService {
         }
     }
 
+    public void clearEt1FieldsFromCaseData(CaseData caseData) {
+        caseData.setEt1VettingBeforeYouStart(null);
+        caseData.setEt1VettingRespondentDetailsMarkUp(null);
+        caseData.setEt1VettingRespondentAcasDetails1(null);
+        caseData.setEt1VettingRespondentAcasDetails2(null);
+        caseData.setEt1VettingRespondentAcasDetails3(null);
+        caseData.setEt1VettingRespondentAcasDetails4(null);
+        caseData.setEt1VettingRespondentAcasDetails5(null);
+        caseData.setEt1VettingRespondentAcasDetails6(null);
+        caseData.setExistingJurisdictionCodes(null);
+        caseData.setEt1VettingClaimantDetailsMarkUp(null);
+        caseData.setTrackAllocation(null);
+        caseData.setEt1AddressDetails(null);
+        caseData.setTribunalCorrespondenceAddress(null);
+        caseData.setRegionalOffice(null);
+    }
+
     /**
      * Populates hearing venues for suggestedHearingVenues from the managing office.
      * @param caseData data on the case.
@@ -149,18 +166,21 @@ public class Et1VettingService {
         if (documentCollection != null) {
             et1Display = documentCollection
                     .stream()
-                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(ET1_DOC_TYPE))
+                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "")
+                            .equals(ET1_DOC_TYPE))
                     .map(d -> String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d)))
                     .collect(Collectors.joining());
             acasDisplay = documentCollection
                     .stream()
-                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(ACAS_DOC_TYPE))
+                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "")
+                            .equals(ACAS_DOC_TYPE))
                     .map(d -> String.format(
                              BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount.incrementAndReturnValue()))
                     .collect(Collectors.joining());
             et1Attachment = documentCollection
                     .stream()
-                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(ET1_ATTACHMENT_DOC_TYPE))
+                    .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "")
+                            .equals(ET1_ATTACHMENT_DOC_TYPE))
                     .map(d -> String.format(BEFORE_LABEL_ET1_ATTACHMENT,
                             createDocLinkBinary(d), d.getValue().getUploadedDocument().getDocumentFilename()))
                     .collect(Collectors.joining());
@@ -289,7 +309,7 @@ public class Et1VettingService {
             if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
                 codeList.stream().filter(codesTypeItem -> caseData.getJurCodesCollection().stream()
                         .map(existingCode -> existingCode.getValue().getJuridictionCodesList())
-                        .collect(Collectors.toList()).stream()
+                        .toList().stream()
                         .anyMatch(code -> code.equals(codesTypeItem.getValue().getEt1VettingJurCodeList())))
                     .forEach(c -> errors
                         .add(String.format(ERROR_EXISTING_JUR_CODE, c.getValue().getEt1VettingJurCodeList())));
@@ -353,7 +373,7 @@ public class Et1VettingService {
             .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
             .map(tribunalOffice ->
                 DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-            .collect(Collectors.toList()));
+            .toList());
     }
 
     public String toAddressWithTab(Address address) {

@@ -97,9 +97,9 @@ public class TseRespondentReplyService {
     /**
      * Creates a pdf copy of the TSE application Response from Respondent and adds it to the case doc collection.
      *
-     * @param caseData details of the case from which required fields are extracted
+     * @param caseData case data
      * @param userToken autherisation token to use for generating an event document
-     * @param caseTypeId case type to use for generating an event document
+     * @param caseTypeId the case type id
      */
     public void addTseRespondentReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
         try {
@@ -258,7 +258,8 @@ public class TseRespondentReplyService {
         }
 
         try {
-            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
+            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
+                    "TSE Reply.pdf");
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
                     bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()));

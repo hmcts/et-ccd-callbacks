@@ -139,7 +139,7 @@ class ListingGenerationControllerTest {
 
     private ListingRequest generateListingDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
-                getClass().getClassLoader().getResource(jsonFileName)).toURI())));
+                Thread.currentThread().getContextClassLoader().getResource(jsonFileName)).toURI())));
 
         return new ObjectMapper().readValue(json, ListingRequest.class);
     }

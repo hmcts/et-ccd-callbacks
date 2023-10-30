@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 public class Constants {
-    private Constants() {
-
-    }
 
     public static final String ET1_DOC_TYPE = "ET1";
     public static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
@@ -64,4 +61,12 @@ public class Constants {
     public static final int FIVE_ACAS_DOC_TYPE_ITEMS_COUNT = 5;
     public static final int ONE_RESPONDENT_COUNT = 1;
     public static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+    public static final String RECORD_DECISION = "Record decision";
+    public static final String REPLY_TO_APPLICATION = "Reply to application";
+    public static final String TSE_ADMIN_CORRESPONDENCE = "Tse admin correspondence";
+    public static final String RESPONDENT_CORRESPONDENCE = "Respondent correspondence";
+
+    private Constants() {
+
+    }
 }

@@ -162,8 +162,8 @@ class Et3ResponseHelperTest {
         caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
+        String expected = Files.readString(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource("et3ResponseDocument.json")).toURI()));
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);
@@ -178,8 +178,8 @@ class Et3ResponseHelperTest {
         caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
+        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource("et3ResponseDocument.json")).toURI())), UTF_8);
 
         JSONObject json = new JSONObject(expected);
         JSONObject data = (JSONObject) json.get("data");

@@ -18,9 +18,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -222,6 +224,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withClaimantRepresentedQuestion(String claimantRepresentedQuestion) {
+        caseData.setClaimantRepresentedQuestion(claimantRepresentedQuestion);
+        return this;
+    }
+
     public CaseDataBuilder withClaimant(String claimant) {
         caseData.setClaimant(claimant);
         return this;
@@ -231,6 +238,11 @@ public class CaseDataBuilder {
         caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(officeCT, officeCT)));
         caseData.setReasonForCT(reasonForCT);
 
+        return this;
+    }
+
+    public CaseDataBuilder withCaseLinks(ListTypeItem<CaseLink> caseLinks) {
+        caseData.setCaseLinks(caseLinks);
         return this;
     }
 

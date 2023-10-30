@@ -69,7 +69,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_ABBREVIATED_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
@@ -457,7 +457,7 @@ class RespondentTellSomethingElseServiceTest {
         Map<String, Object> personalisation = personalisationCaptor.getValue();
         String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
 
-        for (Map.Entry<String, String> monthEntry : CY_MONTHS_MAP.entrySet()) {
+        for (Map.Entry<String, String> monthEntry : CY_ABBREVIATED_MONTHS_MAP.entrySet()) {
             if (expectedDueDate.contains(monthEntry.getKey())) {
                 expectedDueDate = expectedDueDate.replace(monthEntry.getKey(), monthEntry.getValue());
                 break;
@@ -506,7 +506,7 @@ class RespondentTellSomethingElseServiceTest {
 
         String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
 
-        for (Map.Entry<String, String> monthEntry : CY_MONTHS_MAP.entrySet()) {
+        for (Map.Entry<String, String> monthEntry : CY_ABBREVIATED_MONTHS_MAP.entrySet()) {
             if (expectedDueDate.contains(monthEntry.getKey())) {
                 expectedDueDate = expectedDueDate.replace(monthEntry.getKey(), monthEntry.getValue());
                 break;

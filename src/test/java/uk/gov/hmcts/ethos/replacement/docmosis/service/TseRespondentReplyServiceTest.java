@@ -29,7 +29,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
@@ -57,6 +56,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -264,8 +264,10 @@ class TseRespondentReplyServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
 
-        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseDetails, "testUserToken");
+        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, "testUserToken",
+                caseDetails.getCaseTypeId());
 
         assertThat(caseData.getDocumentCollection().size(), is(1));
         assertThat(caseData.getDocumentCollection().get(0).getValue().getTopLevelDocuments(), is(WITHDRAWAL_SETTLED));

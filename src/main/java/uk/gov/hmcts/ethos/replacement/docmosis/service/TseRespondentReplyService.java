@@ -10,12 +10,12 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.time.LocalDate;
@@ -39,7 +39,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_REPLY;
@@ -98,15 +97,15 @@ public class TseRespondentReplyService {
     /**
      * Creates a pdf copy of the TSE application Response from Respondent and adds it to the case doc collection.
      *
-     * @param caseDetails details of the case from which required fields are extracted
+     * @param caseData case data
      * @param userToken autherisation token to use for generating an event document
+     * @param caseTypeId the case type id
      */
-    public void addTseRespondentReplyPdfToDocCollection(CaseDetails caseDetails, String userToken) {
-        CaseData caseData = caseDetails.getCaseData();
-
-        if (isEmpty(caseData.getDocumentCollection())) {
-            caseData.setDocumentCollection(new ArrayList<>());
-        }
+    public void addTseRespondentReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            if (isEmpty(caseData.getDocumentCollection())) {
+                caseData.setDocumentCollection(new ArrayList<>());
+            }
 
             GenericTseApplicationType applicationType = getRespondentSelectedApplicationType(caseData);
 

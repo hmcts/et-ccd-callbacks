@@ -52,4 +52,14 @@ class CaseFlagsServiceTest {
         assertThat(respondentFlags.getPartyName(), is(RESPONDENT_NAME));
         assertThat(respondentFlags.getRoleOnCase(), is("respondent"));
     }
+
+    @Test
+    void rollbackCaseFlags_shouldSetToNull() {
+        caseFlagsService.setupCaseFlags(caseData);
+        caseFlagsService.rollbackCaseFlags(caseData);
+
+        assertThat(caseData.getCaseFlags(), is(nullValue()));
+        assertThat(caseData.getClaimantFlags(), is(nullValue()));
+        assertThat(caseData.getRespondentFlags(), is(nullValue()));
+    }
 }

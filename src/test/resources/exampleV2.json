@@ -9,13 +9,15 @@
         "PostCode": "M3 2JA",
         "PostTown": "Manchester,"
       },
-      "tribunalCorrespondenceTelephone" : "03577131270",
-      "tribunalCorrespondenceFax" : "07577126570",
-      "tribunalCorrespondenceDX" : "123456",
-      "tribunalCorrespondenceEmail" : "ManchesterOfficeET@hmcts.gov.uk",
+      "tribunalCorrespondenceTelephone": "03577131270",
+      "tribunalCorrespondenceFax": "07577126570",
+      "tribunalCorrespondenceDX": "123456",
+      "tribunalCorrespondenceEmail": "ManchesterOfficeET@hmcts.gov.uk",
       "caseNotes": "Example note",
       "caseType": "Single",
-      "claimant_TypeOfClaimant" : "Individual",
+      "claimant_TypeOfClaimant": "Individual",
+      "claimantFlags": {},
+      "respondentFlags": {},
       "claimantCollection": [
         {
           "id": "1121212121",
@@ -71,7 +73,7 @@
         {
           "id": "12121",
           "value": {
-            "judgmentOutcome" : "something"
+            "judgmentOutcome": "something"
           }
         }
       ],
@@ -99,8 +101,8 @@
       },
       "repCollection": [
         {
-          "id" : "123345",
-          "value" : {
+          "id": "123345",
+          "value": {
             "dynamic_resp_rep_name": {
               "value": {
                 "code": "Robin",
@@ -113,7 +115,7 @@
                 }
               ]
             },
-            "resp_rep_name" : "Robin",
+            "resp_rep_name": "Robin",
             "name_of_organisation": "RepresentativeOrganisation",
             "name_of_representative": "RepresentativeNameRespondent",
             "representative_address": {
@@ -191,7 +193,7 @@
     },
     "id": "232323232",
     "jurisdiction": "Nothing",
-    "case_type_id" : "ET_EnglandWales",
+    "case_type_id": "ET_EnglandWales",
     "state": "Accepted"
   },
   "event_id": "1212121",

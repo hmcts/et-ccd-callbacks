@@ -67,15 +67,18 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
+        log.info(BUNDLES_LOG, bundlesToggle);
+        if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+            caseData.setBundlesRespondentPrepareDocNotesShow(YES);
+            return getCallbackRespEntityNoErrors(caseData);
         }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setBundlesRespondentPrepareDocNotesShow(YES);
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 
     /**

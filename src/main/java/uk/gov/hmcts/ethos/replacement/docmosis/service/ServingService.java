@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
@@ -151,9 +153,10 @@ public class ServingService {
      * Copy servingDocumentCollection to documentCollection.
      * @param caseData object that holds the case data.
      */
-    public void addServingDocToDocumentCollection(CaseData caseData) throws Exception {
+    public void addServingDocToDocumentCollection(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getServingDocumentCollection())) {
-            throw new Exception("Serving collection is empty");
+            log.warn("No serving documents found");
+            return;
         }
 
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {

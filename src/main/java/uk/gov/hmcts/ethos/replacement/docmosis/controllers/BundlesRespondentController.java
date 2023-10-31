@@ -22,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -167,15 +168,19 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
+        log.info(BUNDLES_LOG, bundlesToggle);
+        List<String> errors = new ArrayList<>();
+        if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+            bundlesRespondentService.validateFileUpload(caseData);
+            return getCallbackRespEntityErrors(errors, caseData);
         }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = bundlesRespondentService.validateFileUpload(caseData);
-
-        return getCallbackRespEntityErrors(errors, caseData);
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 
     /**
@@ -196,19 +201,26 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
+        log.info(BUNDLES_LOG, bundlesToggle);
+        if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CCDCallbackResponse response = CCDCallbackResponse.builder()
+                    .data(ccdRequest.getCaseDetails().getCaseData())
+                    .build();
+            String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
+            String body = """
+                    <h2>What happens next</h2>
+                        The tribunal will let you know
+                        if they have any questions about the hearing documents you have submitted.
+                    """;
+            response.setConfirmation_header(header);
+            response.setConfirmation_body(body);
+            return ResponseEntity.ok(response);
         }
-
-        String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
-        String body = "<h2>What happens next</h2>\r\n\r\nThe tribunal will let you know"
-                + " if they have any questions about the hearing documents you have submitted.";
-
-        return ResponseEntity.ok(CCDCallbackResponse.builder()
-                .data(ccdRequest.getCaseDetails().getCaseData())
-                .confirmation_header(header)
-                .confirmation_body(body)
-                .build());
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 }

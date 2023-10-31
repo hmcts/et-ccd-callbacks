@@ -274,11 +274,11 @@ public final class ListingHelper {
         StringBuilder sb = new StringBuilder();
 
         // Start building the instruction
-        getCourtListingData(listingData)
-                .append(sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE)
-                        .append("\"templateName\":\"")
-                        .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
-                        .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n")).append(getLogo(caseType))
+        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+                .append("\"templateName\":\"")
+                .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
+                .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n")
+                .append(getCourtListingData(listingData)).append(getLogo(caseType))
                 .append("\"Office_name\":\"")
                 .append(listingData.getManagingOffice()).append(NEW_LINE).append("\"Hearing_location\":\"")
                 .append(ListingVenueHelper.getListingVenueLabel(listingData)).append(NEW_LINE)
@@ -491,9 +491,9 @@ public final class ListingHelper {
 
     private static StringBuilder getListingTypeRow(ListingType listingType, String caseType, ListingData listingData) {
         StringBuilder sb = new StringBuilder();
-        getCourtListingData(listingData)
-                .append(sb.append("{\"Judge\":\"").append(nullCheck(extractHearingJudgeName(listingType)))
-                        .append(NEW_LINE)).append(getLogo(caseType)).append("\"ERMember\":\"")
+        sb.append("{\"Judge\":\"").append(nullCheck(extractHearingJudgeName(listingType)))
+                .append(NEW_LINE)
+                .append(getCourtListingData(listingData)).append(getLogo(caseType)).append("\"ERMember\":\"")
                 .append(nullCheck(listingType.getHearingERMember())).append(NEW_LINE).append("\"EEMember\":\"")
                 .append(nullCheck(listingType.getHearingEEMember())).append(NEW_LINE).append("\"Case_No\":\"")
                 .append(nullCheck(listingType.getElmoCaseReference())).append(NEW_LINE).append("\"Hearing_type\":\"")

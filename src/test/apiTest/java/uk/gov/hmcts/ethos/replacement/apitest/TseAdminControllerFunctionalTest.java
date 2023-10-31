@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
@@ -51,9 +52,10 @@ public class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
         caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
-        caseData.setTseAdminSelectApplication(
-            DynamicFixedListType.of(
-                DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));
+        DynamicValueType dvt = DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL);
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType.of(dvt);
+        dynamicFixedListType.setListItems(List.of(dvt));
+        caseData.setTseAdminSelectApplication(dynamicFixedListType);
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
@@ -157,6 +159,7 @@ public class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
         respondentTseType.setNumber(APPLICATION_CODE);
+        respondentTseType.setStatus(OPEN_STATE);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

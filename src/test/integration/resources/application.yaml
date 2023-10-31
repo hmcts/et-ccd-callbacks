@@ -105,6 +105,10 @@ template:
   respondNotification:
     noResponse: d2caad87-2bab-4bc0-b598-01f1a7341f9e
 
+  claimantSendNotificationHearingOther: ${CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
+
+  respondentSendNotificationHearingOther: ${RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
+
 etcos:
   system:
     username: demo@test.com

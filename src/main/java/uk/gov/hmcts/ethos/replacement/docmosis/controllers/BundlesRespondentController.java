@@ -7,16 +7,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
@@ -32,9 +35,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class BundlesRespondentController {
+    public static final String BUNDLES_LOG = "Bundles feature flag is {}";
+    public static final String BUNDLES_FEATURE_IS_NOT_AVAILABLE = "Bundles feature is not available";
 
     private final VerifyTokenService verifyTokenService;
     private final BundlesRespondentService bundlesRespondentService;
+    private final FeatureToggleService featureToggleService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -125,15 +131,18 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
+        log.info(BUNDLES_LOG, bundlesToggle);
+        if (bundlesToggle) {
+            if (!verifyTokenService.verifyTokenSignature(userToken)) {
+                log.error(INVALID_TOKEN, userToken);
+                return ResponseEntity.status(FORBIDDEN.value()).build();
+            }
+            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+            bundlesRespondentService.populateSelectHearings(caseData);
+            return getCallbackRespEntityNoErrors(caseData);
         }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        bundlesRespondentService.populateSelectHearings(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 
     /**

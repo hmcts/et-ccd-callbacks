@@ -323,14 +323,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts/nodejs-logging@npm:3.0.4":
-  version: 3.0.4
-  resolution: "@hmcts/nodejs-logging@npm:3.0.4"
+"@hmcts/nodejs-logging@npm:4.0.4":
+  version: 4.0.4
+  resolution: "@hmcts/nodejs-logging@npm:4.0.4"
   dependencies:
-    moment: ^2.19.3
+    moment: ^2.29.4
     on-finished: ^2.3.0
     winston: ^2.4.5
-  checksum: d690f06f3cc99c8c2d03c1da1d305dcbc7ddd2f2e374d347659e869aa0795d75de9e75b2a336a0b94e34e20ad3da5b27f8d89405acc474316ef3fb6ca545dcf2
+  checksum: 4a21f0beb02e2796ca4a3daa37845bbb8698bd3c5b1c0d2023fec37a7143d1e53cf5e8a9ef9083398ac61f04f429bb48484a570fff2ab1d47db53f14b2b35b26
   languageName: node
   linkType: hard
 
@@ -4903,7 +4903,7 @@ __metadata:
     "@codeceptjs/configure": 0.10.0
     "@codeceptjs/examples": 1.2.1
     "@codeceptjs/ui": 0.7.0
-    "@hmcts/nodejs-logging": 3.0.4
+    "@hmcts/nodejs-logging": 4.0.4
     "@types/archiver": ^5.3.1
     "@types/chai-as-promised": ^7.1.5
     "@types/fs-extra": ^11.0.0

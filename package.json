@@ -7,7 +7,7 @@
         "node": ">=14.0.0"
     },
     "dependencies": {
-        "@hmcts/nodejs-logging": "3.0.4",
+        "@hmcts/nodejs-logging": "4.0.4",
         "@wdio/cli": "7.33.0",
         "@wdio/sauce-service": "7.33.0",
         "@wdio/selenium-standalone-service": "7.33.0",

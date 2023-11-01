@@ -2,6 +2,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
+import com.launchdarkly.shaded.org.jetbrains.annotations.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -290,20 +291,37 @@ public class SendNotificationService {
                 CASE_ID, caseDetails.getCaseId());
     }
 
-    public void sendTribunalEmail(CaseDetails caseDetails) {
+    public void notifyTribunal(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
+        Map<String, String> emailData = getEmailData(caseData, caseId);
+        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
+                caseData.getTribunalCorrespondenceEmail(),
+                emailData
+        );
+
+    }
+    public void notifyClaimant(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        String caseId = caseDetails.getCaseId();
+        Map<String, String> emailData = getEmailData(caseData, caseId);
+        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
+                claimantEmailAddress,
+                emailData
+        );
+
+    }
+
+    @NotNull
+    private Map<String, String> getEmailData(CaseData caseData, String caseId) {
         Map<String, String> emailData = new ConcurrentHashMap<>();
         emailData.put(CLAIMANT, caseData.getClaimant());
         emailData.put(CASE_NUMBER, caseData.getEthosCaseReference());
         emailData.put(RESPONDENT_NAMES, caseData.getRespondent());
         emailData.put(HEARING_DATE, caseData.getTargetHearingDate());
         emailData.put(EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseId));
-        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
-                caseData.getTribunalCorrespondenceEmail(),
-                emailData
-        );
-
+        return emailData;
     }
 
 }

@@ -199,9 +199,10 @@ public class BundlesRespondentController {
         String body = "<h2>What happens next</h2>\r\n\r\nThe tribunal will let you know"
                 + " if they have any questions about the hearing documents you have submitted.";
 
-        // send email to notify admin
+        // send email to notify admin and claimant
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        sendNotificationService.sendTribunalEmail(caseDetails);
+        sendNotificationService.notifyTribunal(caseDetails);
+        sendNotificationService.notifyClaimant(caseDetails);
 
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

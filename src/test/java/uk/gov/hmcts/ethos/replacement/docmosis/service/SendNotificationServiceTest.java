@@ -70,10 +70,10 @@ class SendNotificationServiceTest {
 
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
-            .withClaimantType("claimant@email.com")
-            .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
-            .withRespondentRepresentative("Name", "Sally", "respondentRep@email.com")
-            .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
+                .withClaimantType("claimant@email.com")
+                .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
+                .withRespondentRepresentative("Name", "Sally", "respondentRep@email.com")
+                .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
 
         caseDetails.setCaseId("1234");
 
@@ -288,9 +288,9 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void sendNotifyEmailsToAdmin(){
+    void sendNotifyEmailsToAdmin() {
 
-        sendNotificationService.sendTribunalEmail(caseDetails);
+        sendNotificationService.notifyTribunal(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());

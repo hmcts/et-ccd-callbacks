@@ -16,5 +16,5 @@ import uk.gov.hmcts.et.common.model.generic.GenericRequest;
 public class CCDRequest extends GenericRequest {
 
     @JsonProperty("case_details")
-    private CaseDetails caseDetails;
+    private PreHearingDepositCaseDetails caseDetails;
 }

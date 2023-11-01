@@ -6,9 +6,9 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class PreHearingDepositTypeItem {
-    @JsonProperty("id")
-    private String id;
-    @JsonProperty("value")
-    private PreHearingDepositType value;
+public class PreHearingDepositItem {
+
+    @JsonProperty("preHearingDepositData")
+    PreHearingDepositData preHearingDepositData;
+
 }

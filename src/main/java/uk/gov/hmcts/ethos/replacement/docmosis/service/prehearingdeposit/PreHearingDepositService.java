@@ -1,91 +1,92 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.prehearingdeposit;
 
-import org.apache.commons.collections.CollectionUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositCaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PreHearingDepositService {
     private final UserService userService;
     private final ExcelReadingService excelReadingService;
-
-    public PreHearingDepositService(UserService userService,
-                                    ExcelReadingService excelReadingService) {
-        this.userService = userService;
-        this.excelReadingService = excelReadingService;
-    }
+    private final CcdClient ccdClient;
 
     @Transactional
-    public void importData(PreHearingDepositData data, String userToken) throws IOException {
-        String documentUrl = data.getPreHearingDepositImportFile().getFile().getBinaryUrl();
+    public void importPreHearingDepositData(
+            ImportFile preHearingDepositImportFile, String userToken) throws IOException {
+        String documentUrl = preHearingDepositImportFile.getFile().getBinaryUrl();
         UserDetails user = userService.getUserDetails(userToken);
+        preHearingDepositImportFile.setUser(user.getName());
+        preHearingDepositImportFile.setLastImported(LocalDateTime.now().toString());
         try (XSSFWorkbook workbook = excelReadingService.readWorkbook(userToken, documentUrl)) {
-            setPreHearingDepositData(workbook, user, data);
+            XSSFSheet officeSheet = workbook.getSheetAt(0);
+            for (Row row : officeSheet) {
+                if (row.getRowNum() > 0) {
+                    PreHearingDepositData preHearingDepositData = new PreHearingDepositData();
+                    preHearingDepositData.setPreHearingDepositImportFile(preHearingDepositImportFile);
+                    setPreHearingDepositDataWithExcelRowValues(row, preHearingDepositData);
+                    PreHearingDepositCaseDetails preHearingDepositCaseDetails = new PreHearingDepositCaseDetails();
+                    PreHearingDepositItem preHearingDepositItem = new PreHearingDepositItem();
+                    preHearingDepositItem.setPreHearingDepositData(preHearingDepositData);
+                    preHearingDepositCaseDetails.setPreHearingDepositItem(preHearingDepositItem);
+                    preHearingDepositCaseDetails.setCaseTypeId("Pre_Hearing_Deposit");
+                    preHearingDepositCaseDetails.setJurisdiction("EMPLOYMENT");
+                    CCDRequest request = ccdClient.startCaseCreation(userToken, preHearingDepositCaseDetails);
+                    ccdClient.submitCaseCreation(userToken, preHearingDepositCaseDetails, request);
+                }
+            }
         }
     }
 
-    private void setPreHearingDepositData(XSSFWorkbook workbook, UserDetails user, PreHearingDepositData data) {
-        XSSFSheet officeSheet = workbook.getSheetAt(0);
-        data.getPreHearingDepositImportFile().setUser(user.getName());
-        data.getPreHearingDepositImportFile().setLastImported(LocalDateTime.now().toString());
-        List<PreHearingDepositTypeItem> preHearingDepositTypeItems = new ArrayList<>();
-        for (Row row : officeSheet) {
-            if (row.getRowNum() > 0) {
-                PreHearingDepositTypeItem preHearingDepositTypeItem = new PreHearingDepositTypeItem();
-                preHearingDepositTypeItem.setId(UUID.randomUUID().toString());
-                PreHearingDepositType preHearingDepositType = new PreHearingDepositType();
-                preHearingDepositType.setCaseNumber(row.getCell(0).getStringCellValue());
-                preHearingDepositType.setClaimantOrRespondentName(row.getCell(1).getStringCellValue());
-                preHearingDepositType.setDepositDue(row.getCell(2).getDateCellValue().toString());
-                preHearingDepositType.setDateDepositReceived(row.getCell(3).getDateCellValue().toString());
-                preHearingDepositType.setDepositAmount(String.valueOf(row.getCell(4).getNumericCellValue()));
-                preHearingDepositType.setAmountRefunded(row.getCell(5).getStringCellValue());
-                preHearingDepositType.setDepositRefundDate(row.getCell(6).getDateCellValue().toString());
-                preHearingDepositType.setChequeOrPONumber(excelReadingService.getCellValue(row.getCell(7)));
-                preHearingDepositType.setReceivedBy(row.getCell(8).getStringCellValue());
-                preHearingDepositType.setDepositReceivedFrom(row.getCell(9).getStringCellValue());
-                preHearingDepositType.setDepositComments(row.getCell(10).getStringCellValue());
-                preHearingDepositType.setPhrNumber(String.valueOf(row.getCell(11).getNumericCellValue()));
-                preHearingDepositType.setMr1Reference(row.getCell(12).getStringCellValue());
-                if (row.getCell(13).getDateCellValue() != null) {
-                    preHearingDepositType.setBankingDate(row.getCell(13).getDateCellValue().toString());
-                }
-                if (row.getCell(14).getDateCellValue() != null) {
-                    preHearingDepositType.setJournalConfirmedReceipt(row.getCell(14).getDateCellValue().toString());
-                }
-                preHearingDepositType.setComments(row.getCell(15).getStringCellValue());
-                preHearingDepositType.setStatus(row.getCell(16).getStringCellValue());
-                if (row.getCell(17).getDateCellValue() != null) {
-                    preHearingDepositType.setDateSentForRefund(row.getCell(17).getDateCellValue().toString());
-                }
-                preHearingDepositType.setDepositAmount(String.valueOf(row.getCell(18).getNumericCellValue()));
-                preHearingDepositType.setPayeeName(row.getCell(19).getStringCellValue());
-                preHearingDepositType.setRefundReference(row.getCell(20).getStringCellValue());
-                preHearingDepositType.setJournalConfirmedPaid(row.getCell(21).getDateCellValue().toString());
-                if (!row.getCell(25).getCellType().equals(CellType.ERROR)) {
-                    preHearingDepositType.setRegionOffice(row.getCell(25).getStringCellValue());
-                }
-                preHearingDepositTypeItem.setValue(preHearingDepositType);
-                preHearingDepositTypeItems.add(preHearingDepositTypeItem);
-            }
+    private void setPreHearingDepositDataWithExcelRowValues(
+            Row row, PreHearingDepositData preHearingDepositData) {
+        preHearingDepositData.setCaseNumber(row.getCell(0).getStringCellValue());
+        preHearingDepositData.setClaimantOrRespondentName(row.getCell(1).getStringCellValue());
+        preHearingDepositData.setDepositDue(row.getCell(2).getDateCellValue().toString());
+        preHearingDepositData.setDateDepositReceived(row.getCell(3).getDateCellValue().toString());
+        preHearingDepositData.setDepositAmount(String.valueOf(row.getCell(4).getNumericCellValue()));
+        preHearingDepositData.setAmountRefunded(row.getCell(5).getStringCellValue());
+        preHearingDepositData.setDepositRefundDate(row.getCell(6).getDateCellValue().toString());
+        preHearingDepositData.setChequeOrPONumber(excelReadingService.getCellValue(row.getCell(7)));
+        preHearingDepositData.setReceivedBy(row.getCell(8).getStringCellValue());
+        preHearingDepositData.setDepositReceivedFrom(row.getCell(9).getStringCellValue());
+        preHearingDepositData.setDepositComments(row.getCell(10).getStringCellValue());
+        preHearingDepositData.setPhrNumber(String.valueOf(row.getCell(11).getNumericCellValue()));
+        preHearingDepositData.setMr1Reference(row.getCell(12).getStringCellValue());
+        if (row.getCell(13).getDateCellValue() != null) {
+            preHearingDepositData.setBankingDate(row.getCell(13).getDateCellValue().toString());
         }
-        if (CollectionUtils.isNotEmpty(preHearingDepositTypeItems)) {
-            data.setPreHearingDepositDataCollection(preHearingDepositTypeItems);
+        if (row.getCell(14).getDateCellValue() != null) {
+            preHearingDepositData.setJournalConfirmedReceipt(row.getCell(14).getDateCellValue().toString());
+        }
+        preHearingDepositData.setComments(row.getCell(15).getStringCellValue());
+        preHearingDepositData.setStatus(row.getCell(16).getStringCellValue());
+        if (row.getCell(17).getDateCellValue() != null) {
+            preHearingDepositData.setDateSentForRefund(row.getCell(17).getDateCellValue().toString());
+        }
+        preHearingDepositData.setDepositAmount(String.valueOf(row.getCell(18).getNumericCellValue()));
+        preHearingDepositData.setPayeeName(row.getCell(19).getStringCellValue());
+        preHearingDepositData.setRefundReference(row.getCell(20).getStringCellValue());
+        preHearingDepositData.setJournalConfirmedPaid(row.getCell(21).getDateCellValue().toString());
+        if (!row.getCell(25).getCellType().equals(CellType.ERROR)) {
+            preHearingDepositData.setRegionOffice(row.getCell(25).getStringCellValue());
         }
     }
 }

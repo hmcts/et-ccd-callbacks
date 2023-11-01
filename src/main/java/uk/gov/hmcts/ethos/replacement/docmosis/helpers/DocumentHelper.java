@@ -111,17 +111,23 @@ public final class DocumentHelper {
                     .append(getCourtData(caseData, allocatedCourtAddress));
         }
 
-        sb.append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
+        sb.append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_")
+                .replace(" ", "_"))
                 .append("_enhmcts\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append("\"i")
-                .append(getEWSectionName(correspondenceType).replace(".", "_"))
+                .append(getEWSectionName(correspondenceType).replace(".", "_")
+                .replace(" ", "_"))
                 .append("_enhmcts1\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append("\"i")
-                .append(getEWSectionName(correspondenceType).replace(".", "_"))
+                .append(getEWSectionName(correspondenceType).replace(".", "_")
+                .replace(" ", "_"))
                 .append("_enhmcts2\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
-                .append(getScotSectionName(correspondenceScotType).replace(".", "_"))
+                .append(getScotSectionName(correspondenceScotType).replace(".", "_")
+                .replace(" ", "_"))
                 .append("_schmcts\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
-                .append(getScotSectionName(correspondenceScotType).replace(".", "_"))
+                .append(getScotSectionName(correspondenceScotType).replace(".", "_")
+                .replace(" ", "_"))
                 .append("_schmcts1\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
-                .append(getScotSectionName(correspondenceScotType).replace(".", "_"))
+                .append(getScotSectionName(correspondenceScotType).replace(".", "_")
+                .replace(" ", "_"))
                 .append("_schmcts2\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());

@@ -22,7 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -48,6 +47,7 @@ public class BundlesRespondentController {
     /**
      * Called at the start of Bundles Respondent Prepare Doc for Hearing journey.
      * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
+     *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
@@ -67,24 +67,24 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info(BUNDLES_LOG, bundlesToggle);
-        if (bundlesToggle) {
-            if (!verifyTokenService.verifyTokenSignature(userToken)) {
-                log.error(INVALID_TOKEN, userToken);
-                return ResponseEntity.status(FORBIDDEN.value()).build();
-            }
-            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-            caseData.setBundlesRespondentPrepareDocNotesShow(YES);
-            return getCallbackRespEntityNoErrors(caseData);
+        validateBundlesFeature();
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setBundlesRespondentPrepareDocNotesShow(YES);
+        return getCallbackRespEntityNoErrors(caseData);
     }
+
+
 
     /**
      * About to Submit for Bundles Respondent Prepare Doc for Hearing journey.
+     *
      * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * @param userToken  authentication token to verify the user
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -101,20 +101,17 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info(BUNDLES_LOG, bundlesToggle);
-        if (bundlesToggle) {
-            if (!verifyTokenService.verifyTokenSignature(userToken)) {
-                log.error(INVALID_TOKEN, userToken);
-                return ResponseEntity.status(FORBIDDEN.value()).build();
-            }
-
-            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-            bundlesRespondentService.addToBundlesCollection(caseData);
-            bundlesRespondentService.clearInputData(caseData);
-            return getCallbackRespEntityNoErrors(caseData);
+        validateBundlesFeature();
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        bundlesRespondentService.addToBundlesCollection(caseData);
+        bundlesRespondentService.clearInputData(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+
     }
 
     /**
@@ -139,18 +136,14 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info(BUNDLES_LOG, bundlesToggle);
-        if (bundlesToggle) {
-            if (!verifyTokenService.verifyTokenSignature(userToken)) {
-                log.error(INVALID_TOKEN, userToken);
-                return ResponseEntity.status(FORBIDDEN.value()).build();
-            }
-            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-            bundlesRespondentService.populateSelectHearings(caseData);
-            return getCallbackRespEntityNoErrors(caseData);
+        validateBundlesFeature();
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        bundlesRespondentService.populateSelectHearings(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
@@ -175,19 +168,14 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
 
-        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info(BUNDLES_LOG, bundlesToggle);
-        List<String> errors = new ArrayList<>();
-        if (bundlesToggle) {
-            if (!verifyTokenService.verifyTokenSignature(userToken)) {
-                log.error(INVALID_TOKEN, userToken);
-                return ResponseEntity.status(FORBIDDEN.value()).build();
-            }
-            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-            bundlesRespondentService.validateFileUpload(caseData);
-            return getCallbackRespEntityErrors(errors, caseData);
+        validateBundlesFeature();
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = bundlesRespondentService.validateFileUpload(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**
@@ -208,26 +196,30 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
+        validateBundlesFeature();
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        CCDCallbackResponse response = CCDCallbackResponse.builder()
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .build();
+        String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
+        String body = """
+                <h2>What happens next</h2>
+                    The tribunal will let you know
+                    if they have any questions about the hearing documents you have submitted.
+                """;
+        response.setConfirmation_header(header);
+        response.setConfirmation_body(body);
+        return ResponseEntity.ok(response);
+    }
+
+    private void validateBundlesFeature() {
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
         log.info(BUNDLES_LOG, bundlesToggle);
-        if (bundlesToggle) {
-            if (!verifyTokenService.verifyTokenSignature(userToken)) {
-                log.error(INVALID_TOKEN, userToken);
-                return ResponseEntity.status(FORBIDDEN.value()).build();
-            }
-            CCDCallbackResponse response = CCDCallbackResponse.builder()
-                    .data(ccdRequest.getCaseDetails().getCaseData())
-                    .build();
-            String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
-            String body = """
-                    <h2>What happens next</h2>
-                        The tribunal will let you know
-                        if they have any questions about the hearing documents you have submitted.
-                    """;
-            response.setConfirmation_header(header);
-            response.setConfirmation_body(body);
-            return ResponseEntity.ok(response);
+        if (!bundlesToggle) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
         }
-        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
     }
 }

@@ -82,6 +82,7 @@ class SendNotificationServiceTest {
         caseData.setRespondent("claimant");
         caseData.setTargetHearingDate("2020-01-02");
 
+
         caseData.setSendNotificationTitle("title");
         caseData.setSendNotificationLetter("no");
         caseData.setSendNotificationUploadDocument(new ArrayList<>());

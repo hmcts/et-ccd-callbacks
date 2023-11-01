@@ -203,6 +203,7 @@ public class BundlesRespondentController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         sendNotificationService.sendTribunalEmail(caseDetails);
 
+
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_header(header)

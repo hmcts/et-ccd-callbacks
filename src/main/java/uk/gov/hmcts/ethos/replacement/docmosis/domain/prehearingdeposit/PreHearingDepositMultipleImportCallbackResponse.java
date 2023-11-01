@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.et.common.model.ccd.PreHearingDepositData;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import java.util.List;
 

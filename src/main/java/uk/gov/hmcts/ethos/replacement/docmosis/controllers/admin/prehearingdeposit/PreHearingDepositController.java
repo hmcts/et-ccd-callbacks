@@ -18,16 +18,12 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositMultipleImportCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.prehearingdeposit.PreHearingDepositService;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController

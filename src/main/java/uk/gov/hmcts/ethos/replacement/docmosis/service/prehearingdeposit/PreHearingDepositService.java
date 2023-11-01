@@ -9,17 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositCaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositItem;
+import uk.gov.hmcts.et.common.model.ccd.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +36,10 @@ public class PreHearingDepositService {
                     PreHearingDepositData preHearingDepositData = new PreHearingDepositData();
                     preHearingDepositData.setPreHearingDepositImportFile(preHearingDepositImportFile);
                     setPreHearingDepositDataWithExcelRowValues(row, preHearingDepositData);
-                    PreHearingDepositCaseDetails preHearingDepositCaseDetails = new PreHearingDepositCaseDetails();
-                    PreHearingDepositItem preHearingDepositItem = new PreHearingDepositItem();
-                    preHearingDepositItem.setPreHearingDepositData(preHearingDepositData);
-                    preHearingDepositCaseDetails.setPreHearingDepositItem(preHearingDepositItem);
+                    CaseDetails preHearingDepositCaseDetails = new CaseDetails();
+                    CaseData caseData = new CaseData();
+                    caseData.setPreHearingDepositData(preHearingDepositData);
+                    preHearingDepositCaseDetails.setCaseData(caseData);
                     preHearingDepositCaseDetails.setCaseTypeId("Pre_Hearing_Deposit");
                     preHearingDepositCaseDetails.setJurisdiction("EMPLOYMENT");
                     CCDRequest request = ccdClient.startCaseCreation(userToken, preHearingDepositCaseDetails);

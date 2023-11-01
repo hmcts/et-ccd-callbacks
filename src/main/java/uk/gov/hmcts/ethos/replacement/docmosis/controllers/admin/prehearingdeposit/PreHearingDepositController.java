@@ -39,7 +39,7 @@ public class PreHearingDepositController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Accessed successfully",
                     content = {@Content(mediaType = "application/json", schema = @Schema(
-                            implementation = PreHearingDepositMultipleImportCallbackResponse.class))}),
+                            implementation = AdminData.class))}),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })

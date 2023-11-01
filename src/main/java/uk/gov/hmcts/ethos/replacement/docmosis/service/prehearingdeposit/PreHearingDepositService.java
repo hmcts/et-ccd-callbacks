@@ -21,6 +21,9 @@ public class PreHearingDepositService {
     private final UserService userService;
     private final ExcelReadingService excelReadingService;
     private final CcdClient ccdClient;
+    private static final String PRE_HEARING_CASE_CREATION_EVENT_DESCRIPTION =
+            "Pre-Hearing Deposit is Crated By Excel File";
+    private static final String PRE_HEARING_CASE_CREATION_EVENT_SUMMARY = "Pre-Hearing Deposit Bulk Case Creation";
 
     @Transactional
     public void importPreHearingDepositData(
@@ -36,13 +39,15 @@ public class PreHearingDepositService {
                     PreHearingDepositData preHearingDepositData = new PreHearingDepositData();
                     preHearingDepositData.setPreHearingDepositImportFile(preHearingDepositImportFile);
                     setPreHearingDepositDataWithExcelRowValues(row, preHearingDepositData);
-                    CaseDetails preHearingDepositCaseDetails = new CaseDetails();
+                    CaseDetails preHearingDepositCaseDetails =
+                            new CaseDetails();
                     CaseData caseData = new CaseData();
                     caseData.setPreHearingDepositData(preHearingDepositData);
                     preHearingDepositCaseDetails.setCaseData(caseData);
                     preHearingDepositCaseDetails.setCaseTypeId("Pre_Hearing_Deposit");
                     preHearingDepositCaseDetails.setJurisdiction("EMPLOYMENT");
-                    CCDRequest request = ccdClient.startCaseCreation(userToken, preHearingDepositCaseDetails);
+                    CCDRequest request = ccdClient.startCaseCreation(
+                            userToken, preHearingDepositCaseDetails);
                     ccdClient.submitCaseCreation(userToken, preHearingDepositCaseDetails, request);
                 }
             }

@@ -185,3 +185,5 @@ launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
+
+bundlesClaimantSubmittedRespondentNotificationTemplateId: ${BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID:5c829358-0b54-4335-9d60-1c8296c4a516}

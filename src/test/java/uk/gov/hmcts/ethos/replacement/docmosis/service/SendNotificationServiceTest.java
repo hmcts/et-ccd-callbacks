@@ -26,13 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -44,6 +38,7 @@ class SendNotificationServiceTest {
     private SendNotificationService sendNotificationService;
 
     private EmailService emailService;
+
     @Captor
     ArgumentCaptor<Map<String, String>> personalisationCaptor;
 
@@ -52,6 +47,9 @@ class SendNotificationServiceTest {
             "claimantSendNotificationHearingOtherTemplateId";
     private static final String RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID =
             "claimantSendNotificationHearingOtherTemplateId";
+
+    private static final String BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID =
+            "bundlesClaimantSubmittedRespondentNotificationTemplateId";
 
     @BeforeEach
     public void setUp() {
@@ -66,6 +64,10 @@ class SendNotificationServiceTest {
         ReflectionTestUtils.setField(sendNotificationService,
                 CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID,
                 "claimantSendNotificationHearingOtherTemplateId");
+        ReflectionTestUtils.setField(sendNotificationService,
+                BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID,
+                "bundlesClaimantSubmittedRespondentNotificationTemplateId");
+
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
             .withClaimantType("claimant@email.com")
@@ -76,6 +78,9 @@ class SendNotificationServiceTest {
         caseDetails.setCaseId("1234");
 
         caseData = caseDetails.getCaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("claimant");
+        caseData.setTargetHearingDate("2020-01-02");
 
         caseData.setSendNotificationTitle("title");
         caseData.setSendNotificationLetter("no");
@@ -279,6 +284,21 @@ class SendNotificationServiceTest {
         assertEquals("title", val.get("sendNotificationTitle"));
         assertEquals("citizenUrl1234", val.get("environmentUrl"));
         assertEquals("1234", val.get("caseId"));
+    }
+
+    @Test
+    void sendNotifyEmailsToAdmin(){
+
+        sendNotificationService.sendTribunalEmail(caseDetails);
+        verify(emailService, times(1))
+                .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
+        Map<String, String> val = personalisationCaptor.getValue();
+        assertEquals("1234", val.get("caseNumber"));
+        assertEquals("claimant", val.get("claimant"));
+        assertEquals("claimant", val.get("respondentNames"));
+        assertEquals("2020-01-02", val.get("hearingDate"));
+
     }
 
 }

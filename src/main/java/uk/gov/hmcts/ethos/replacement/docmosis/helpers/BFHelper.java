@@ -43,6 +43,7 @@ public final class BFHelper {
     public static void populateDynamicListBfActions(CaseData caseData) {
 
         List<BFActionTypeItem> bfActionTypeItemListAux = new ArrayList<>();
+        BFActionTypeItem bfActionTypeItemAux = new BFActionTypeItem();
 
         if (caseData.getBfActions() != null && !caseData.getBfActions().isEmpty()) {
 
@@ -56,7 +57,6 @@ public final class BFHelper {
 
                     log.info("Updating the value of bfActionDynamicLists: " + dynamicFixedListType.getValue());
 
-                    BFActionTypeItem bfActionTypeItemAux = new BFActionTypeItem();
                     bfActionTypeItemAux.setId(bfActionTypeItem.getId());
                     bfActionTypeItemAux.setValue(bfActionTypeItem.getValue());
                     bfActionTypeItemListAux.add(bfActionTypeItemAux);

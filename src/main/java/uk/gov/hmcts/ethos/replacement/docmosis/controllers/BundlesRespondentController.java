@@ -18,9 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -221,9 +221,8 @@ public class BundlesRespondentController {
                 .build());
     }
 
-
     private void throwIfBundlesFlagDisabled() {
-        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
+        boolean bundlesToggle = !featureToggleService.isBundlesEnabled();
         log.info(BUNDLES_LOG, bundlesToggle);
         if (!bundlesToggle) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);

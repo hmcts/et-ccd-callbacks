@@ -19,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -47,7 +48,7 @@ public class CaseFlagsDataMigrationController {
     })
     public ResponseEntity<CCDCallbackResponse> addCaseFlagsData(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("Migrating existing case Id for case flags ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
@@ -58,6 +59,7 @@ public class CaseFlagsDataMigrationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.setGlobalSearchDefaults(caseData);
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         caseFlagsService.setupCaseFlags(caseData);
         log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
                 ccdRequest.getCaseDetails().getCaseTypeId(),

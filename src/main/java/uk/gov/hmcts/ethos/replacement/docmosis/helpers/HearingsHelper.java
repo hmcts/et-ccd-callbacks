@@ -99,6 +99,29 @@ public final class HearingsHelper {
         }
     }
 
+    // public static void updatePostponedDate(CaseData caseData) {
+    //     if (caseData.getHearingCollection() != null) {
+    //         for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+    //             if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
+    //                 for (DateListedTypeItem dateListedTypeItem
+    //                         : hearingTypeItem.getValue().getHearingDateCollection()) {
+    //                     DateListedType dateListedType = dateListedTypeItem.getValue();
+    //                     if (isHearingStatusPostponed(dateListedType) && dateListedType.getPostponedDate() == null) {
+    //                         dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
+    //                     }
+    //                     if (dateListedType.getPostponedDate() != null
+    //                             &&
+    //                             (!isHearingStatusPostponed(dateListedType)
+    //                                     || dateListedType.getHearingStatus() == null)) {
+    //                         dateListedType.setPostponedDate(null);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    // }
+
     public static List<String> hearingTimeValidation(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         String hearingNumber = "Hearing ";

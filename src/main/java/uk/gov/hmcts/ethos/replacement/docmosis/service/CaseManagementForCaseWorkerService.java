@@ -119,6 +119,7 @@ public class CaseManagementForCaseWorkerService {
         if (!featureToggleService.isGlobalSearchEnabled()) {
             return;
         }
+        log.info("Setting GS defaults");
         setCaseNameHmctsInternal(caseData);
         setCaseManagementLocation(caseData);
         setCaseManagementCategory(caseData);
@@ -529,6 +530,8 @@ public class CaseManagementForCaseWorkerService {
         if (!featureToggleService.isGlobalSearchEnabled()) {
             return;
         }
+
+        log.info("Setting service ID");
 
         Map<String, Map<String, Object>> payloadData = Maps.newHashMap();
         payloadData.put("$set", singletonMap(HMCTS_SERVICE_ID, hmctsServiceId));

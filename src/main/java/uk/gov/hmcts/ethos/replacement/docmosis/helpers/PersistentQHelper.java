@@ -51,7 +51,9 @@ public final class PersistentQHelper {
                                               String multipleRef, CreateUpdatesBusSender createUpdatesBusSender,
                                               String updateSize, String multipleRefLinkMarkUp) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
-        if (!ethosCaseRefCollection.isEmpty()) {
+        if (ethosCaseRefCollection.isEmpty()) {
+            log.info("Case Ref collection is empty");
+        } else {
             CreateUpdatesDto createUpdatesDto = PersistentQHelper.getCreateUpdatesDto(bulkDetails,
                     ethosCaseRefCollection, username, multipleRef, multipleRefLinkMarkUp);
 
@@ -60,8 +62,6 @@ public final class PersistentQHelper {
                     dataModelParent,
                     errors,
                     updateSize);
-        } else {
-            log.info("Case Ref collection is empty");
         }
     }
 
@@ -77,7 +77,9 @@ public final class PersistentQHelper {
                                                     String multipleReferenceLinkMarkUp
                                                     ) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
-        if (!ethosCaseRefCollection.isEmpty()) {
+        if (ethosCaseRefCollection.isEmpty()) {
+            log.warn("Case Ref collection is empty");
+        } else {
             CreateUpdatesDto createUpdatesDto = PersistentQHelper.getMultipleCreateUpdatesDto(caseTypeId,
                     jurisdiction, ethosCaseRefCollection, username, multipleRef, confirmation,
                     multipleReferenceLinkMarkUp);
@@ -87,8 +89,6 @@ public final class PersistentQHelper {
                     dataModelParent,
                     errors,
                     updateSize);
-        } else {
-            log.warn("Case Ref collection is empty");
         }
     }
 

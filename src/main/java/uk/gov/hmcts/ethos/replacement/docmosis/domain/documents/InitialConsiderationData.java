@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
+
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class InitialConsiderationData {
     @JsonProperty("issuesJurCodesGiveDetails")
     private String issuesJurCodesGiveDetails;
     @JsonProperty("canProceed")
-    private String canProceed;
+    private String icCanProceed;
     @JsonProperty("hearingAlreadyListed")
     private String hearingAlreadyListed;
 

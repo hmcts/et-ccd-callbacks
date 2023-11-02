@@ -67,7 +67,7 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        validateBundlesFeature();
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -101,7 +101,7 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        validateBundlesFeature();
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -136,7 +136,7 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        validateBundlesFeature();
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -168,7 +168,7 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
 
-        validateBundlesFeature();
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -196,7 +196,7 @@ public class BundlesRespondentController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        validateBundlesFeature();
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -215,7 +215,7 @@ public class BundlesRespondentController {
         return ResponseEntity.ok(response);
     }
 
-    private void validateBundlesFeature() {
+    private void throwIfBundlesFlagDisabled() {
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
         log.info(BUNDLES_LOG, bundlesToggle);
         if (!bundlesToggle) {

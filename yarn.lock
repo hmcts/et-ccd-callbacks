@@ -684,12 +684,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/archiver@npm:^5.3.1":
-  version: 5.3.4
-  resolution: "@types/archiver@npm:5.3.4"
+"@types/archiver@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@types/archiver@npm:6.0.0"
   dependencies:
     "@types/readdir-glob": "*"
-  checksum: 4ef27b99091ada9b8f13017d5b9e6d42a439e35a7858b30e040c408e081d98d8db6307b0762500288b5da38cab9823c4756b6abae1fdd2658d42bfb09eb7c5fb
+  checksum: 2b7a859f4276d679c2e60d3bcfdf98293382bdcfd98bc324db1bb4fbd16d54ff526fc81efc6693b36b82f04c839aef5a9376fb8ea126944544a38fc2bac9d673
   languageName: node
   linkType: hard
 
@@ -4904,7 +4904,7 @@ __metadata:
     "@codeceptjs/examples": 1.2.1
     "@codeceptjs/ui": 0.7.0
     "@hmcts/nodejs-logging": 4.0.4
-    "@types/archiver": ^5.3.1
+    "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^7.1.5
     "@types/fs-extra": ^11.0.0
     "@types/git-rev-sync": 2.0.1

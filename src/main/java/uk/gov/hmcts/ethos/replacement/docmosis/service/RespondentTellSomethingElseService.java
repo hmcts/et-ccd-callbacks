@@ -181,30 +181,14 @@ public class RespondentTellSomethingElseService {
         }
 
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
-        String instructions;
         boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
-        String dueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
-        if (isWelsh) {
-            for (Map.Entry<String, String> monthEntry : CY_MONTHS_MAP.entrySet()) {
-                if (dueDate.contains(monthEntry.getKey())) {
-                    dueDate = dueDate.replace(monthEntry.getKey(), monthEntry.getValue());
-                    break;
-                }
-            }
-        }
-        String emailTemplate = isWelsh
-                ? cyTseRespondentToClaimantTemplateId
-                : tseRespondentToClaimantTemplateId;
 
-        if (GROUP_B_TYPES.contains(caseData.getResTseSelectApplication())) {
-            instructions = isWelsh
-                    ? String.format(CY_CLAIMANT_EMAIL_GROUP_B, dueDate)
-                    : String.format(CLAIMANT_EMAIL_GROUP_B, dueDate);
-        } else {
-            instructions = isWelsh
-                    ? String.format(CY_CLAIMANT_EMAIL_GROUP_A, dueDate)
-                    : String.format(CLAIMANT_EMAIL_GROUP_A, dueDate);
-        }
+        String dueDate = isWelsh
+                ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
+                : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
+
+        String emailTemplate = getEmailTemplateId(isWelsh);
+        String instructions = getInstructions(dueDate, isWelsh, caseData.getResTseSelectApplication());
 
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", TSE_FILE_NAME);
@@ -213,6 +197,25 @@ public class RespondentTellSomethingElseService {
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
+    }
+
+    private String translateDateToWelsh(String date) {
+        return CY_MONTHS_MAP.entrySet().stream()
+                .filter(entry -> date.contains(entry.getKey()))
+                .findFirst()
+                .map(entry -> date.replace(entry.getKey(), entry.getValue()))
+                .orElse(date);
+    }
+
+    private String getEmailTemplateId(boolean isWelsh) {
+        return isWelsh ? cyTseRespondentToClaimantTemplateId : tseRespondentToClaimantTemplateId;
+    }
+
+    private String getInstructions(String dueDate, boolean isWelsh, String applicationType) {
+        String instructionFormat = isWelsh
+                ? GROUP_B_TYPES.contains(applicationType) ? CY_CLAIMANT_EMAIL_GROUP_B : CY_CLAIMANT_EMAIL_GROUP_A
+                : GROUP_B_TYPES.contains(applicationType) ? CLAIMANT_EMAIL_GROUP_B : CLAIMANT_EMAIL_GROUP_A;
+        return String.format(instructionFormat, dueDate);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {

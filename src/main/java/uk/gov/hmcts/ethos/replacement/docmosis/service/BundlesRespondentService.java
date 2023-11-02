@@ -17,7 +17,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
 

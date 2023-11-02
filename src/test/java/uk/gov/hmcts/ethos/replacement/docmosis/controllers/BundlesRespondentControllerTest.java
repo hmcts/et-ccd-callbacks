@@ -45,6 +45,8 @@ class BundlesRespondentControllerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+    
+    @MockBean
     private SendNotificationService sendNotificationService;
 
     @Autowired

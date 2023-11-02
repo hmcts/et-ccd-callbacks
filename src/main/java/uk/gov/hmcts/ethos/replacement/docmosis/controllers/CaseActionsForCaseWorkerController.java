@@ -605,7 +605,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        HearingsHelper.updatePostponedDate(caseData);
+        Helper.updatePostponedDate(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

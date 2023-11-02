@@ -56,6 +56,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 
@@ -576,6 +577,7 @@ class PseRespondToTribunalServiceTest {
             .withClaimantType("claimant@email.com")
             .withRespondent("Respondent One", YES, "01-Jan-2023", false)
             .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
+                .withClaimantHearingPreference(ENGLISH_LANGUAGE)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId("1677174791076683");
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
@@ -618,6 +620,7 @@ class PseRespondToTribunalServiceTest {
     @Test
     void sendClaimantEmail_rule92No_NotSend() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withClaimantHearingPreference(ENGLISH_LANGUAGE)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(NO);
 

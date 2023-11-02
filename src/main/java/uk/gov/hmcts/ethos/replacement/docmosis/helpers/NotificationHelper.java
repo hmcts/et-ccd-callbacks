@@ -24,8 +24,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 
 @Slf4j
 public final class NotificationHelper {
@@ -199,15 +197,5 @@ public final class NotificationHelper {
             return respondent.getRespondentEmail();
         }
         return null;
-    }
-
-    /**
-     * Gets the claimant contact language preference.
-     */
-    public static String findClaimantLanguage(CaseData caseData) {
-        return caseData.getClaimantHearingPreference() != null
-                && caseData.getClaimantHearingPreference().getContactLanguage() != null
-                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage()) ? WELSH_LANGUAGE
-                : ENGLISH_LANGUAGE;
     }
 }

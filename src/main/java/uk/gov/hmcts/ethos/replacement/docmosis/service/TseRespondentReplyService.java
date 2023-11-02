@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
@@ -239,8 +238,7 @@ public class TseRespondentReplyService {
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
-        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
-        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String emailTemplate = isWelsh
                 ? cyTseRespondentResponseTemplateId
                 : tseRespondentResponseTemplateId;

@@ -422,6 +422,8 @@ class RespondentTellSomethingElseServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
@@ -474,6 +476,8 @@ class RespondentTellSomethingElseServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);

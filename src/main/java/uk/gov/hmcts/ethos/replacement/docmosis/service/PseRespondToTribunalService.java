@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.time.LocalDate;
@@ -217,8 +216,8 @@ public class PseRespondToTribunalService {
      */
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
-        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        boolean isWelsh = WELSH_LANGUAGE.equals(
+                caseDetails.getCaseData().getClaimantHearingPreference().getContactLanguage());
         String emailTemplate = isWelsh
                 ? cyNotificationToClaimantTemplateId
                 : notificationToClaimantTemplateId;
@@ -231,8 +230,7 @@ public class PseRespondToTribunalService {
 
     private Map<String, String> buildPersonalisationNotify(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
-        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String linkToCitizenHub = isWelsh
                 ? emailService.getCitizenCaseLink(caseDetails.getCaseId()) + WELSH_LANGUAGE_PARAM
                 : emailService.getCitizenCaseLink(caseDetails.getCaseId());

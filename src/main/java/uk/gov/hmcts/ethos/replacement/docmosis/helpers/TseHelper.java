@@ -231,8 +231,8 @@ public final class TseHelper {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
-        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
-        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        boolean isWelsh = WELSH_LANGUAGE.equals(
+                caseDetails.getCaseData().getClaimantHearingPreference().getContactLanguage());
         String linkToCitizenHub = isWelsh
                 ? citizenUrl + WELSH_LANGUAGE_PARAM
                 : citizenUrl;

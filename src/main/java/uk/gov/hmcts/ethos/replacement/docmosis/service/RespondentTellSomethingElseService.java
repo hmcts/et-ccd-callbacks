@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
@@ -183,8 +182,7 @@ public class RespondentTellSomethingElseService {
 
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
         String instructions;
-        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
-        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String dueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
         if (isWelsh) {
             for (Map.Entry<String, String> monthEntry : CY_MONTHS_MAP.entrySet()) {
@@ -243,8 +241,7 @@ public class RespondentTellSomethingElseService {
 
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
-        String selectedLanguage = NotificationHelper.findClaimantLanguage(caseData);
-        boolean isWelsh = WELSH_LANGUAGE.equals(selectedLanguage);
+        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String shortText = isWelsh
                 ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
                 : caseData.getResTseSelectApplication();

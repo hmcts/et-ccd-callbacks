@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class CaseFlagsDataMigrationController {
 
     private final VerifyTokenService verifyTokenService;
     private final CaseFlagsService caseFlagsService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @PostMapping(value = "/case-flags-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update existing cases with default values for case flags.")
@@ -55,6 +57,7 @@ public class CaseFlagsDataMigrationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.setGlobalSearchDefaults(caseData);
         caseFlagsService.setupCaseFlags(caseData);
         log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
                 ccdRequest.getCaseDetails().getCaseTypeId(),

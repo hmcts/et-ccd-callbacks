@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -46,6 +47,9 @@ class CaseFlagsDataMigrationControllerTest {
 
     @MockBean
     private CaseFlagsService caseFlagsService;
+
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @Autowired
     private WebApplicationContext applicationContext;

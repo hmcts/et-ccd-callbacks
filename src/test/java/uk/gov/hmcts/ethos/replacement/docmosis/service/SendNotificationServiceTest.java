@@ -26,7 +26,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -68,12 +74,11 @@ class SendNotificationServiceTest {
                 BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID,
                 "bundlesClaimantSubmittedRespondentNotificationTemplateId");
 
-
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
-            .withClaimantType("claimant@email.com")
-            .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
-            .withRespondentRepresentative("Name", "Sally", "respondentRep@email.com")
-            .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
+                .withClaimantType("claimant@email.com")
+                .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
+                .withRespondentRepresentative("Name", "Sally", "respondentRep@email.com")
+                .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
 
         caseDetails.setCaseId("1234");
 
@@ -81,7 +86,6 @@ class SendNotificationServiceTest {
         caseData.setClaimant("claimant");
         caseData.setRespondent("claimant");
         caseData.setTargetHearingDate("2020-01-02");
-
 
         caseData.setSendNotificationTitle("title");
         caseData.setSendNotificationLetter("no");
@@ -288,9 +292,9 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void sendNotifyEmailsToAdmin(){
+    void sendNotifyEmailsToAdmin() {
 
-        sendNotificationService.sendTribunalEmail(caseDetails);
+        sendNotificationService.notifyTribunal(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());

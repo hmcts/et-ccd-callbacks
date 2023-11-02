@@ -2,6 +2,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
+import com.launchdarkly.shaded.org.jetbrains.annotations.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,14 +22,27 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.*;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 
 @Service("sendNotificationService")
@@ -290,20 +304,38 @@ public class SendNotificationService {
                 CASE_ID, caseDetails.getCaseId());
     }
 
-    public void sendTribunalEmail(CaseDetails caseDetails) {
+    public void notifyTribunal(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
+        Map<String, String> emailData = getEmailData(caseData, caseId);
+        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
+                caseData.getTribunalCorrespondenceEmail(),
+                emailData
+        );
+
+    }
+
+    public void notifyClaimant(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        String caseId = caseDetails.getCaseId();
+        Map<String, String> emailData = getEmailData(caseData, caseId);
+        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
+                claimantEmailAddress,
+                emailData
+        );
+
+    }
+
+    @NotNull
+    private Map<String, String> getEmailData(CaseData caseData, String caseId) {
         Map<String, String> emailData = new ConcurrentHashMap<>();
         emailData.put(CLAIMANT, caseData.getClaimant());
         emailData.put(CASE_NUMBER, caseData.getEthosCaseReference());
         emailData.put(RESPONDENT_NAMES, caseData.getRespondent());
         emailData.put(HEARING_DATE, caseData.getTargetHearingDate());
         emailData.put(EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseId));
-        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
-                caseData.getTribunalCorrespondenceEmail(),
-                emailData
-        );
-
+        return emailData;
     }
 
 }

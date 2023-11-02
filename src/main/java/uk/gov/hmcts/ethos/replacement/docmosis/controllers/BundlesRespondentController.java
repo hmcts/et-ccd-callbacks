@@ -222,7 +222,7 @@ public class BundlesRespondentController {
     }
 
     private void throwIfBundlesFlagDisabled() {
-        boolean bundlesToggle = !featureToggleService.isBundlesEnabled();
+        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
         log.info(BUNDLES_LOG, bundlesToggle);
         if (!bundlesToggle) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);

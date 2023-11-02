@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
@@ -35,6 +37,7 @@ public class BundlesRespondentController {
 
     private final VerifyTokenService verifyTokenService;
     private final BundlesRespondentService bundlesRespondentService;
+    private final SendNotificationService sendNotificationService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -195,6 +198,11 @@ public class BundlesRespondentController {
         String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
         String body = "<h2>What happens next</h2>\r\n\r\nThe tribunal will let you know"
                 + " if they have any questions about the hearing documents you have submitted.";
+
+        // send email to notify admin and claimant
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        sendNotificationService.notifyClaimant(caseDetails);
+        sendNotificationService.notifyTribunal(caseDetails);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())

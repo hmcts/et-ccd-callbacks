@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -43,6 +44,7 @@ class BundlesRespondentControllerTest {
     private BundlesRespondentService bundlesRespondentService;
 
     @MockBean
+    private FeatureToggleService featureToggleService;
     private SendNotificationService sendNotificationService;
 
     @Autowired
@@ -58,6 +60,8 @@ class BundlesRespondentControllerTest {
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(CaseDataBuilder.builder().build())
             .build();
+
+        when(featureToggleService.isBundlesEnabled()).thenReturn(true);
     }
 
     @Test

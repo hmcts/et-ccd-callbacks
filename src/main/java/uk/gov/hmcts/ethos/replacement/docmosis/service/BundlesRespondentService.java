@@ -50,7 +50,7 @@ public class BundlesRespondentService {
         }
         DynamicFixedListType listType = DynamicFixedListType.from(caseData.getHearingCollection().stream()
                 .map(this::createValueType)
-                .collect(Collectors.toList())
+                .toList()
         );
 
         caseData.setBundlesRespondentSelectHearing(listType);

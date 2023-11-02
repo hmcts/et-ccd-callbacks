@@ -7,17 +7,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -38,12 +41,16 @@ public class BundlesRespondentController {
     private final VerifyTokenService verifyTokenService;
     private final BundlesRespondentService bundlesRespondentService;
     private final SendNotificationService sendNotificationService;
+    public static final String BUNDLES_LOG = "Bundles feature flag is {}";
+    public static final String BUNDLES_FEATURE_IS_NOT_AVAILABLE = "Bundles feature is not available";
+    private final FeatureToggleService featureToggleService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     /**
      * Called at the start of Bundles Respondent Prepare Doc for Hearing journey.
      * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
+     *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
@@ -60,9 +67,10 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -70,14 +78,16 @@ public class BundlesRespondentController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setBundlesRespondentPrepareDocNotesShow(YES);
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityNoErrors(caseData);
     }
+
+
 
     /**
      * About to Submit for Bundles Respondent Prepare Doc for Hearing journey.
+     *
      * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * @param userToken  authentication token to verify the user
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -91,9 +101,10 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -102,8 +113,8 @@ public class BundlesRespondentController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         bundlesRespondentService.addToBundlesCollection(caseData);
         bundlesRespondentService.clearInputData(caseData);
-
         return getCallbackRespEntityNoErrors(caseData);
+
     }
 
     /**
@@ -125,16 +136,15 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midPopulateHearings(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         bundlesRespondentService.populateSelectHearings(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -158,17 +168,16 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midValidateUpload(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = bundlesRespondentService.validateFileUpload(caseData);
-
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -187,9 +196,10 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> submitted(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
+        throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -209,5 +219,14 @@ public class BundlesRespondentController {
                 .confirmation_header(header)
                 .confirmation_body(body)
                 .build());
+    }
+
+
+    private void throwIfBundlesFlagDisabled() {
+        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
+        log.info(BUNDLES_LOG, bundlesToggle);
+        if (!bundlesToggle) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
+        }
     }
 }

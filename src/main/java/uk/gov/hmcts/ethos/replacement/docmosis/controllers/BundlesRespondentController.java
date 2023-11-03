@@ -211,7 +211,8 @@ public class BundlesRespondentController {
 
         // send email to notify admin and claimant
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        sendNotificationService.notify(caseDetails, caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress());
+        sendNotificationService.notify(caseDetails, caseDetails.getCaseData()
+                .getClaimantType().getClaimantEmailAddress());
         sendNotificationService.notify(caseDetails, caseDetails.getCaseData().getTribunalCorrespondenceEmail());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

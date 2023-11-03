@@ -304,7 +304,7 @@ public class SendNotificationService {
                 CASE_ID, caseDetails.getCaseId());
     }
 
-    public void notify(CaseDetails caseDetails, String user){
+    public void notify(CaseDetails caseDetails, String user) {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
         Map<String, String> emailData = getEmailData(caseData, caseId);

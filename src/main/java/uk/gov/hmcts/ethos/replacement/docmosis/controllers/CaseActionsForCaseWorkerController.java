@@ -36,6 +36,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -106,6 +107,7 @@ public class CaseActionsForCaseWorkerController {
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
+    private final CaseManagementLocationCodeService caseManagementLocationCodeService;
 
     private final NocRespondentHelper nocRespondentHelper;
 
@@ -286,6 +288,12 @@ public class CaseActionsForCaseWorkerController {
             if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
                 caseFlagsService.setupCaseFlags(caseData);
             }
+
+            caseFlagsService.setDefaultFlags(caseData);
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+            caseManagementForCaseWorkerService.setCaseDeepLink(caseData, ccdRequest.getCaseDetails().getCaseId());
+            caseManagementForCaseWorkerService.setHearingIsLinkedFlag(caseData);
+            caseManagementLocationCodeService.setCaseManagementLocationCode(caseData);
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -424,6 +432,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
         }
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -474,6 +483,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
         }
 
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -633,6 +643,8 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         eventValidationService.validateRestrictedReportingNames(caseData);
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+        caseFlagsService.setPrivateHearingFlag(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

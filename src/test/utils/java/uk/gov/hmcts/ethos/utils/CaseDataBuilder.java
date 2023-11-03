@@ -42,9 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class CaseDataBuilder {
@@ -57,27 +55,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withEthosCaseReference(String ethosCaseReference) {
         caseData.setEthosCaseReference(ethosCaseReference);
-        return this;
-    }
-
-    public CaseDataBuilder withSingleCaseType() {
-        caseData.setEcmCaseType(SINGLE_CASE_TYPE);
-        return this;
-    }
-
-    public CaseDataBuilder withMultipleCaseType(String multipleReference) {
-        caseData.setEcmCaseType(MULTIPLE_CASE_TYPE);
-        caseData.setMultipleReference(multipleReference);
-        return this;
-    }
-
-    public CaseDataBuilder withCurrentPosition(String currentPosition) {
-        caseData.setCurrentPosition(currentPosition);
-        return this;
-    }
-
-    public CaseDataBuilder withDateToPosition(String dateToPosition) {
-        caseData.setDateToPosition(dateToPosition);
         return this;
     }
 

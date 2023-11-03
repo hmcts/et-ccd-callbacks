@@ -17,6 +17,5 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class TribunalOfficesConfiguration {
     private Map<TribunalOffice, ContactDetails> contactDetails = new ConcurrentHashMap<>();
-
     private Map<TribunalOffice, CourtLocations> courtLocations = new ConcurrentHashMap<>();
 }

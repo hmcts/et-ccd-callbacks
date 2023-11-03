@@ -10,6 +10,9 @@ import lombok.Setter;
 @Setter
 public class CourtLocations {
 
+    @JsonProperty("name")
+    private String name;
+
     @JsonProperty("region")
     private String region;
 

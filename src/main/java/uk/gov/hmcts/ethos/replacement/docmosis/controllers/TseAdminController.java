@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmCloseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -38,6 +39,7 @@ public class TseAdminController {
     private final VerifyTokenService verifyTokenService;
     private final TseAdminService tseAdminService;
     private final TseAdmCloseService tseAdmCloseService;
+    private final CaseFlagsService caseFlagsService;
 
     /**
     * Populates the dynamic list for select an application to respond to.
@@ -100,6 +102,7 @@ public class TseAdminController {
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
         tseAdminService.sendEmailToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
         tseAdminService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
+        caseFlagsService.setPrivateHearingFlag(caseData);
         tseAdminService.clearTseAdminDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

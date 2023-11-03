@@ -6,7 +6,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 
 import java.util.List;
 
-public class DocumentTypeItemUtil {
+public final class DocumentTypeItemUtil {
     private DocumentTypeItemUtil() {
     }
 

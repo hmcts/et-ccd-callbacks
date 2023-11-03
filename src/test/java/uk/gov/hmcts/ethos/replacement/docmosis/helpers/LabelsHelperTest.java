@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_COPIES_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_COPIES_LESS_10_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_LABELS_LIMIT_ERROR;
@@ -54,7 +53,7 @@ class LabelsHelperTest {
 
     @Test
     void customiseSelectedAddressesMultiplesEmptySelectedAddresses() {
-        assertNull(LabelsHelper.customiseSelectedAddressesMultiples(labelPayloadEvents,
+        assertEquals(Collections.emptyList(), LabelsHelper.customiseSelectedAddressesMultiples(labelPayloadEvents,
                 multipleDetails.getCaseData()));
     }
 

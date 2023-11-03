@@ -106,6 +106,7 @@ class HearingsHelperTest {
 
         caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_POSTPONED);
+
         Helper.updatePostponedDate(caseDetails1.getCaseData());
 
         assertNotNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()

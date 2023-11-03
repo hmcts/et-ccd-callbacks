@@ -84,6 +84,16 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void rollbackCaseFlags_shouldSetToNull() {
+        caseFlagsService.setupCaseFlags(caseData);
+        caseFlagsService.rollbackCaseFlags(caseData);
+
+        assertThat(caseData.getCaseFlags(), is(nullValue()));
+        assertThat(caseData.getClaimantFlags(), is(nullValue()));
+        assertThat(caseData.getRespondentFlags(), is(nullValue()));
+    }
+
+    @Test
     void setDefaultFlags_setsDefaultFlags() {
         caseFlagsService.setDefaultFlags(caseData);
 

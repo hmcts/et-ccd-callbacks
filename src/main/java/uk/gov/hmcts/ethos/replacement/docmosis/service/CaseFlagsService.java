@@ -41,6 +41,7 @@ public class CaseFlagsService {
 
     /**
      * Setup case flags for Claimant, Respondent and Case level.
+     *
      * @param caseData Data about the current case
      */
     public void setupCaseFlags(CaseData caseData) {
@@ -62,6 +63,17 @@ public class CaseFlagsService {
                 .details(ListTypeItem.from())
                 .build()
         );
+    }
+
+    /**
+     * Sets case flags for Claimant, Respondent and Case level to null.
+     *
+     * @param caseData Data about the current case
+     */
+    public void rollbackCaseFlags(CaseData caseData) {
+        caseData.setCaseFlags(null);
+        caseData.setClaimantFlags(null);
+        caseData.setRespondentFlags(null);
     }
 
     /**
@@ -107,7 +119,7 @@ public class CaseFlagsService {
         RestrictedReportingType restricted = caseData.getRestrictedReporting();
         return restricted != null && (YES.equals(restricted.getRule503b()) || YES.equals(restricted.getImposed()));
     }
-    
+
     private boolean hasGrantedRestrictedPublicityDecision(CaseData caseData) {
         if (caseData.getGenericTseApplicationCollection() == null) {
             return false;

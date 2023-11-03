@@ -23,17 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -293,9 +284,9 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void sendNotifyEmailsToAdmin() {
-        sendNotificationService.notify(caseDetails, CLAIMANT);
-        verify(emailService, times(1))
+    void sendNotifyEmailsToAdminAndClaimant() {
+        sendNotificationService.notify(caseDetails);
+        verify(emailService, times(2))
                 .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();

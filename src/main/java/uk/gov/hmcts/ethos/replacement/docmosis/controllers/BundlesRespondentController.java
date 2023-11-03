@@ -211,9 +211,7 @@ public class BundlesRespondentController {
 
         // send email to notify admin and claimant
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        sendNotificationService.notify(caseDetails, caseDetails.getCaseData()
-                .getClaimantType().getClaimantEmailAddress());
-        sendNotificationService.notify(caseDetails, caseDetails.getCaseData().getTribunalCorrespondenceEmail());
+        sendNotificationService.notify(caseDetails);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
@@ -223,7 +221,7 @@ public class BundlesRespondentController {
     }
 
     private void throwIfBundlesFlagDisabled() {
-        boolean bundlesToggle = !featureToggleService.isBundlesEnabled();
+        boolean bundlesToggle = featureToggleService.isBundlesEnabled();
         log.info(BUNDLES_LOG, bundlesToggle);
         if (!bundlesToggle) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);

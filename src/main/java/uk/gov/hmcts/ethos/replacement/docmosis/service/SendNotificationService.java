@@ -304,24 +304,12 @@ public class SendNotificationService {
                 CASE_ID, caseDetails.getCaseId());
     }
 
-    public void notifyTribunal(CaseDetails caseDetails) {
+    public void notify(CaseDetails caseDetails, String user){
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
         Map<String, String> emailData = getEmailData(caseData, caseId);
         emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
-                caseData.getTribunalCorrespondenceEmail(),
-                emailData
-        );
-
-    }
-
-    public void notifyClaimant(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
-        String caseId = caseDetails.getCaseId();
-        Map<String, String> emailData = getEmailData(caseData, caseId);
-        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
-                claimantEmailAddress,
+                user,
                 emailData
         );
 

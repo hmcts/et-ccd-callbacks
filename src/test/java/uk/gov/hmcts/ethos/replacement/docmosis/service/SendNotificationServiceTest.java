@@ -33,6 +33,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -294,7 +296,7 @@ class SendNotificationServiceTest {
     @Test
     void sendNotifyEmailsToAdmin() {
 
-        sendNotificationService.notifyTribunal(caseDetails);
+        sendNotificationService.notify(caseDetails, CLAIMANT);
         verify(emailService, times(1))
                 .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());

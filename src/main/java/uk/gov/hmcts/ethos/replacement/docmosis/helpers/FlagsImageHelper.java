@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
@@ -129,29 +130,28 @@ public final class FlagsImageHelper {
                 break;
         }
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
-        flagsImageAltText.append(flagRequired && flagsImageAltText.length() > 0 ? "<font size='5'> - </font>" : "");
-        flagsImageAltText.append(flagRequired ? "<font color='"
-                + flagColor + "' size='5'> " + flagName + " </font>" : "");
+        flagsImageAltText.append(flagRequired && !flagsImageAltText.isEmpty() ? "<font size='5'> - </font>" : "")
+                .append(flagRequired ? "<font color='" + flagColor + "' size='5'> " + flagName + " </font>" : "");
     }
 
     private static boolean sensitiveCase(CaseData caseData) {
         if (caseData.getAdditionalCaseInfoType() != null) {
-            if (!isNullOrEmpty(caseData.getAdditionalCaseInfoType().getAdditionalSensitive())) {
-                return caseData.getAdditionalCaseInfoType().getAdditionalSensitive().equals(YES);
+            if (isNullOrEmpty(caseData.getAdditionalCaseInfoType().getAdditionalSensitive())) {
+                return false;
             } else {
-                return  false;
+                return YES.equals(caseData.getAdditionalCaseInfoType().getAdditionalSensitive());
             }
         } else {
-            return  false;
+            return false;
         }
     }
 
     private static boolean rule503dApplies(CaseData caseData) {
         if (caseData.getRestrictedReporting() != null) {
-            if (!isNullOrEmpty(caseData.getRestrictedReporting().getImposed())) {
-                return caseData.getRestrictedReporting().getImposed().equals(YES);
-            } else {
+            if (isNullOrEmpty(caseData.getRestrictedReporting().getImposed())) {
                 return false;
+            } else {
+                return YES.equals(caseData.getRestrictedReporting().getImposed());
             }
         } else {
             return false;
@@ -160,10 +160,10 @@ public final class FlagsImageHelper {
 
     private static boolean rule503bApplies(CaseData caseData) {
         if (caseData.getRestrictedReporting() != null) {
-            if (!isNullOrEmpty(caseData.getRestrictedReporting().getRule503b())) {
-                return caseData.getRestrictedReporting().getRule503b().equals(YES);
-            } else {
+            if (isNullOrEmpty(caseData.getRestrictedReporting().getRule503b())) {
                 return false;
+            } else {
+                return YES.equals(caseData.getRestrictedReporting().getRule503b());
             }
         } else {
             return false;
@@ -200,10 +200,10 @@ public final class FlagsImageHelper {
 
     private static boolean liveAppeal(CaseData caseData) {
         if (caseData.getAdditionalCaseInfoType() != null) {
-            if (!isNullOrEmpty(caseData.getAdditionalCaseInfoType().getAdditionalLiveAppeal())) {
-                return caseData.getAdditionalCaseInfoType().getAdditionalLiveAppeal().equals(YES);
-            } else {
+            if (isNullOrEmpty(caseData.getAdditionalCaseInfoType().getAdditionalLiveAppeal())) {
                 return false;
+            } else {
+                return YES.equals(caseData.getAdditionalCaseInfoType().getAdditionalLiveAppeal());
             }
         } else {
             return false;
@@ -212,10 +212,10 @@ public final class FlagsImageHelper {
 
     private static boolean doNotPostpone(CaseData caseData) {
         if (caseData.getAdditionalCaseInfoType() != null) {
-            if (!isNullOrEmpty(caseData.getAdditionalCaseInfoType().getDoNotPostpone())) {
-                return caseData.getAdditionalCaseInfoType().getDoNotPostpone().equals(YES);
-            } else {
+            if (isNullOrEmpty(caseData.getAdditionalCaseInfoType().getDoNotPostpone())) {
                 return false;
+            } else {
+                return YES.equals(caseData.getAdditionalCaseInfoType().getDoNotPostpone());
             }
         } else {
             return false;

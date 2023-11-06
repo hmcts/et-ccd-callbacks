@@ -18,8 +18,10 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
@@ -35,11 +37,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class BundlesRespondentController {
-    public static final String BUNDLES_LOG = "Bundles feature flag is {}";
-    public static final String BUNDLES_FEATURE_IS_NOT_AVAILABLE = "Bundles feature is not available";
 
     private final VerifyTokenService verifyTokenService;
     private final BundlesRespondentService bundlesRespondentService;
+    private final SendNotificationService sendNotificationService;
+    public static final String BUNDLES_LOG = "Bundles feature flag is {}";
+    public static final String BUNDLES_FEATURE_IS_NOT_AVAILABLE = "Bundles feature is not available";
     private final FeatureToggleService featureToggleService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -201,18 +204,26 @@ public class BundlesRespondentController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        CCDCallbackResponse response = CCDCallbackResponse.builder()
-                .data(ccdRequest.getCaseDetails().getCaseData())
-                .build();
+
         String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
         String body = """
-                <h2>What happens next</h2>
-                    The tribunal will let you know
-                    if they have any questions about the hearing documents you have submitted.
-                """;
-        response.setConfirmation_header(header);
-        response.setConfirmation_body(body);
-        return ResponseEntity.ok(response);
+        <html>
+            <body>
+                <tag><h2>What happens next</h2></tag>
+                <h2>The tribunal will let you know</h2>
+                <h2> if they have any questions about the hearing documents you have submitted.</h2>
+            </body>
+        </html>""";
+
+        // send email to notify admin and claimant
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        sendNotificationService.notify(caseDetails);
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_header(header)
+                .confirmation_body(body)
+                .build());
     }
 
     private void throwIfBundlesFlagDisabled() {

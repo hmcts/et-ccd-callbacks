@@ -66,7 +66,7 @@ public class SendNotificationService {
     private String claimantSendNotificationHearingOtherTemplateId;
     @Value("${template.respondentSendNotificationHearingOther}")
     private String respondentSendNotificationHearingOtherTemplateId;
-    @Value("${bundlesClaimantSubmittedRespondentNotificationTemplateId}")
+    @Value("${template.bundlesClaimantSubmittedRespondentNotificationTemplateId}")
     private String bundlesClaimantSubmittedRespondentNotificationTemplateId;
 
     private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";

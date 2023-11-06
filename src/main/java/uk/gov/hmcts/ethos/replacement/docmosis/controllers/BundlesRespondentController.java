@@ -206,8 +206,14 @@ public class BundlesRespondentController {
         }
 
         String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
-        String body = "<h2>What happens next</h2>\r\n\r\nThe tribunal will let you know"
-                + " if they have any questions about the hearing documents you have submitted.";
+        String body = """
+        <html>
+            <body>
+                <tag><h2>What happens next</h2></tag>
+                <h2>The tribunal will let you know</h2>
+                <h2> if they have any questions about the hearing documents you have submitted.</h2>
+            </body>
+        </html>""";
 
         // send email to notify admin and claimant
         CaseDetails caseDetails = ccdRequest.getCaseDetails();

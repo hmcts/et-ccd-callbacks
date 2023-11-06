@@ -54,5 +54,5 @@ public class AdminData {
     @JsonProperty("courtWorkerSelectList")
     private DynamicFixedListType courtWorkerSelectList;
     @JsonProperty("preHearingDepositImportFile")
-    private uk.gov.hmcts.et.common.model.ccd.ImportFile preHearingDepositImportFile;
+    private ImportFile preHearingDepositImportFile;
 }

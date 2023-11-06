@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.ccd.*;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.GenericTypeCaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import java.io.IOException;
@@ -39,16 +42,15 @@ public class PreHearingDepositService {
                     PreHearingDepositData preHearingDepositData = new PreHearingDepositData();
                     preHearingDepositData.setPreHearingDepositImportFile(preHearingDepositImportFile);
                     setPreHearingDepositDataWithExcelRowValues(row, preHearingDepositData);
-                    CaseDetails preHearingDepositCaseDetails =
-                            new CaseDetails();
-                    CaseData caseData = new CaseData();
-                    caseData.setPreHearingDepositData(preHearingDepositData);
-                    preHearingDepositCaseDetails.setCaseData(caseData);
+                    GenericTypeCaseDetails<PreHearingDepositData> preHearingDepositCaseDetails;
+                    preHearingDepositCaseDetails = new GenericTypeCaseDetails<>();
+                    preHearingDepositCaseDetails.setCaseData(preHearingDepositData);
                     preHearingDepositCaseDetails.setCaseTypeId("Pre_Hearing_Deposit");
                     preHearingDepositCaseDetails.setJurisdiction("EMPLOYMENT");
-                    CCDRequest request = ccdClient.startCaseCreation(
+                    CCDRequest request = ccdClient.startGenericTypeCaseCreation(
                             userToken, preHearingDepositCaseDetails);
-                    ccdClient.submitCaseCreation(userToken, preHearingDepositCaseDetails, request);
+                    ccdClient.submitGenericTypeCaseCreation(userToken, preHearingDepositCaseDetails, request,
+                            PRE_HEARING_CASE_CREATION_EVENT_SUMMARY, PRE_HEARING_CASE_CREATION_EVENT_DESCRIPTION);
                 }
             }
         }

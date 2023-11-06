@@ -48,7 +48,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelec
 @RequiredArgsConstructor
 public class PseRespondToTribunalService {
     private final EmailService emailService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final HearingSelectionService hearingSelectionService;
     private final TribunalOfficesService tribunalOfficesService;
 
@@ -167,7 +167,7 @@ public class PseRespondToTribunalService {
      */
     public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
-        String email = userService.getUserDetails(userToken).getEmail();
+        String email = userIdamService.getUserDetails(userToken).getEmail();
         if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
             emailService.sendEmail(acknowledgeEmailYesTemplateId, email,
                     buildPersonalisationYes(caseDetails));

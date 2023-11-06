@@ -9,7 +9,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 @RequiredArgsConstructor
 public class AdminUserService {
     public static final String BEARER = "Bearer";
-    private final UserService userService;
+    private final UserIdamService userIdamService;
 
     @Value("${etcos.system.username}")
     private String systemUserName;
@@ -18,10 +18,10 @@ public class AdminUserService {
     private String systemUserPassword;
 
     public String getAdminUserToken() {
-        return String.join(" ", BEARER, userService.getAccessToken(systemUserName, systemUserPassword));
+        return String.join(" ", BEARER, userIdamService.getAccessToken(systemUserName, systemUserPassword));
     }
 
     public UserDetails getUserDetails(String userId) {
-        return userService.getUserDetailsById(getAdminUserToken(), userId);
+        return userIdamService.getUserDetailsById(getAdminUserToken(), userId);
     }
 }

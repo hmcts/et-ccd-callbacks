@@ -67,7 +67,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
     @Mock
     private CreateUpdatesBusSender createUpdatesBusSender;
     @Mock
-    private UserService userService;
+    private UserIdamService userIdamService;
 
     private BulkRequest bulkRequest;
     private BulkRequest bulkRequest1;
@@ -212,7 +212,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
         submitEvent3.setCaseData(getCaseData("1122"));
         bulkSearchService = new BulkSearchService(ccdClient, multipleReferenceService);
         bulkCreationService = new BulkCreationService(
-                ccdClient, bulkSearchService, createUpdatesBusSender, userService);
+                ccdClient, bulkSearchService, createUpdatesBusSender, userIdamService);
 
         bulkCasesPayload = new BulkCasesPayload();
         bulkCasesPayload.setAlreadyTakenIds(new ArrayList<>());
@@ -445,7 +445,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
     @Test
      void bulkCreationLogicAfterSubmittedPQCallback() {
-        when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(
                 getBulkDetails(YES, "Single"),
                 bulkCasesPayload, "authToken", UPDATE_SINGLES_PQ_STEP);
@@ -549,7 +549,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
     @Test
      void updateBulkRequestPQ() throws IOException {
-        when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         List<SubmitEvent> submitEventList = new ArrayList<>(Collections.singletonList(submitEvent));
         String expectedResult = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, "
                 + "ethosCaseReferenceM=1111,"

@@ -16,6 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
@@ -132,7 +133,7 @@ public class MultipleSingleMidEventValidationService {
             jurCodesCollection = submitEvent.getCaseData().getJurCodesCollection().stream()
                     .map(jurCodesTypeItem ->
                             DynamicListHelper.getDynamicValue(jurCodesTypeItem.getValue().getJuridictionCodesList()))
-                    .toList();
+                    .collect(Collectors.toList());
 
         }
 
@@ -147,7 +148,7 @@ public class MultipleSingleMidEventValidationService {
             respondentCollection = submitEvent.getCaseData().getRespondentCollection().stream()
                     .map(respondentSumTypeItem ->
                             DynamicListHelper.getDynamicValue(respondentSumTypeItem.getValue().getRespondentName()))
-                    .toList();
+                    .collect(Collectors.toList());
 
         }
 
@@ -184,7 +185,7 @@ public class MultipleSingleMidEventValidationService {
                                             + " ("
                                             + representedTypeRItem.getValue().getRespRepName()
                                             + ")"))
-                    .toList();
+                    .collect(Collectors.toList());
 
         }
 

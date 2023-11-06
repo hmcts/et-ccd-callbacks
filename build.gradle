@@ -430,7 +430,7 @@ dependencies {
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.15.0'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 
-    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.6.0'
+    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.7.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 

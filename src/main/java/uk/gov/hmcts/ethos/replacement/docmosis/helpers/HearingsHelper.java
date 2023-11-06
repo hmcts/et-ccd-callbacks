@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.webjars.NotFoundException;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -69,47 +67,36 @@ public final class HearingsHelper {
         List<String> errors = new ArrayList<>();
         if (caseData.getHearingCollection() != null) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                if (hearingTypeItem.getValue().getHearingNumber() == null
-                        || hearingTypeItem.getValue().getHearingNumber().isEmpty()) {
-                    errors.add(HEARING_CREATION_NUMBER_ERROR);
+                findHearingNumberErrors(errors, hearingTypeItem);
+                if (!errors.isEmpty()) {
                     return errors;
                 }
-                if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        if (dateListedTypeItem.getValue().getListedDate() == null
-                                || dateListedTypeItem.getValue().getListedDate().isEmpty()) {
-                            errors.add(HEARING_CREATION_DAY_ERROR);
-                            return  errors;
-                        }
-                    }
+                findHearingDayErrors(errors, hearingTypeItem);
+                if (!errors.isEmpty()) {
+                    return errors;
                 }
             }
         }
         return errors;
     }
 
-    public static void updatePostponedDate(CaseData caseData) {
-        if (caseData.getHearingCollection() != null) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (isHearingStatusPostponed(dateListedType) && dateListedType.getPostponedDate() == null) {
-                            dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
-                        }
-                        if (dateListedType.getPostponedDate() != null
-                                &&
-                                (!isHearingStatusPostponed(dateListedType)
-                                        || dateListedType.getHearingStatus() == null)) {
-                            dateListedType.setPostponedDate(null);
-                        }
-                    }
+    private static void findHearingNumberErrors(List<String> errors, HearingTypeItem hearingTypeItem) {
+        if (hearingTypeItem.getValue().getHearingNumber() == null
+                || hearingTypeItem.getValue().getHearingNumber().isEmpty()) {
+            errors.add(HEARING_CREATION_NUMBER_ERROR);
+        }
+    }
+
+    private static void findHearingDayErrors(List<String> errors, HearingTypeItem hearingTypeItem) {
+        if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
+            for (DateListedTypeItem dateListedTypeItem
+                    : hearingTypeItem.getValue().getHearingDateCollection()) {
+                if (dateListedTypeItem.getValue().getListedDate() == null
+                        || dateListedTypeItem.getValue().getListedDate().isEmpty()) {
+                    errors.add(HEARING_CREATION_DAY_ERROR);
                 }
             }
         }
-
     }
 
     public static List<String> hearingTimeValidation(CaseData caseData) {
@@ -187,15 +174,16 @@ public final class HearingsHelper {
     /**
      * This finds the hearing by using the listed date and comparing it to the date provided. It streams through each
      * hearing and then checks whether the date listed is equal to the date provided.
-     * @param caseData used to query the hearing collection
+     *
+     * @param caseData    used to query the hearing collection
      * @param hearingDate date given to find in the collection
      * @return hearingItem which contains the hearing data
      */
     public static HearingType findHearingByListedDate(CaseData caseData, String hearingDate) {
         Optional<HearingTypeItem> hearingTypeItem =
                 caseData.getHearingCollection().stream()
-                .filter(h -> hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
-                .findFirst();
+                        .filter(h -> hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
+                        .findFirst();
         if (hearingTypeItem.isEmpty()) {
             throw new NotFoundException("Failed to find hearing");
         }
@@ -222,12 +210,12 @@ public final class HearingsHelper {
         }
 
         return Collections.min(earliestDatePerHearing, Comparator.comparing(c -> c.getValue().getListedDate()))
-            .getValue().getListedDate();
+                .getValue().getListedDate();
     }
 
-    private static DateListedTypeItem mapEarliest(HearingTypeItem hearingTypeItem) {
+    public static DateListedTypeItem mapEarliest(HearingTypeItem hearingTypeItem) {
         List<DateListedTypeItem> futureHearings = filterFutureHearings(hearingTypeItem.getValue()
-            .getHearingDateCollection());
+                .getHearingDateCollection());
         if (futureHearings.isEmpty()) {
             return null;
         }
@@ -239,5 +227,12 @@ public final class HearingsHelper {
             .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now())
                     && HEARING_STATUS_LISTED.equals(d.getValue().getHearingStatus()))
             .toList();
+    }
+
+    public static String getHearingVenue(HearingType hearing) {
+        if (hearing.getHearingVenueScotland() != null) {
+            return hearing.getHearingVenueScotland();
+        }
+        return hearing.getHearingVenue().getSelectedLabel();
     }
 }

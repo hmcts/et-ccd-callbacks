@@ -383,10 +383,6 @@ class ReferralHelperTest {
 
         ReferralHelper.createReferralReply(caseData, "Judge Alex");
 
-        /*assertEquals(expectedCreatedReferralReply,
-                caseData.getReferralCollection().get(0).getValue()
-                        .getReferralReplyCollection().get(0).getValue().toString());*/
-
         ReferralReplyType testReply = caseData.getReferralCollection()
                 .get(0).getValue().getReferralReplyCollection()
                 .get(0).getValue();

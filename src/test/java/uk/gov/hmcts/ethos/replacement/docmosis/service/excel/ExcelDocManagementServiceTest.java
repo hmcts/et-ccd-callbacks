@@ -13,7 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -39,7 +39,7 @@ class ExcelDocManagementServiceTest {
     @Mock
     private ExcelCreationService excelCreationService;
     @Mock
-    private UserService userService;
+    private UserIdamService userIdamService;
     @Mock
     private ScheduleCreationService scheduleCreationService;
     @InjectMocks
@@ -54,7 +54,7 @@ class ExcelDocManagementServiceTest {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         userToken = "authString";
         bytes = "Bytes to return".getBytes();
     }

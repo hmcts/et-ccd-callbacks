@@ -62,6 +62,7 @@ public final class ReportDocHelper {
     private static final String CASE_REFERENCE = "{\"Case_Reference\":\"";
     private static final String CANNOT_CREATE_REPORT_DATA_EXCEPTION = "Unable to create report data";
     private static final String LISTING_DATA_STATE_EXCEPTION = "ListingData is not instanceof ";
+    private static  final String REPORT_DETAILS = "reportDetails";
     private static final int FIFTH_DAY = 5;
 
     private ReportDocHelper() {
@@ -212,7 +213,7 @@ public final class ReportDocHelper {
         StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE);
         addJsonCollection("positionTypes", reportData.getReportSummary().getPositionTypes().iterator(), sb);
-        addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
+        addJsonCollection(REPORT_DETAILS, reportData.getReportDetails().iterator(), sb);
         return sb;
     }
 
@@ -606,7 +607,7 @@ public final class ReportDocHelper {
                 .append("\"MoreThan1Resp\":\"")
                 .append(nullCheck(reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent()))
                 .append(NEW_LINE);
-        addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
+        addJsonCollection(REPORT_DETAILS, reportData.getReportDetails().iterator(), sb);
         return sb;
     }
 
@@ -630,7 +631,7 @@ public final class ReportDocHelper {
                 .append("\"percentPtcSessionDays\":\"")
                 .append(nullCheck(reportData.getReportSummary().getPtSessionDaysPerCent())).append(NEW_LINE);
         addJsonCollection("reportSummary2", reportData.getReportSummary2List().iterator(), sb);
-        addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
+        addJsonCollection(REPORT_DETAILS, reportData.getReportDetails().iterator(), sb);
         return sb;
     }
 
@@ -643,7 +644,7 @@ public final class ReportDocHelper {
         StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getOffice()).append(NEW_LINE);
         if (CollectionUtils.isNotEmpty(reportData.getReportDetails())) {
-            addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
+            addJsonCollection(REPORT_DETAILS, reportData.getReportDetails().iterator(), sb);
         }
         return sb;
     }
@@ -673,7 +674,7 @@ public final class ReportDocHelper {
         addJsonCollection("reportSummary1", reportData.getReportSummaryList().iterator(), sb);
         addJsonCollection("reportSummary2Hdr", reportData.getReportSummary2HdrList().iterator(), sb);
         addJsonCollection("reportSummary2", reportData.getReportSummary2List().iterator(), sb);
-        addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
+        addJsonCollection(REPORT_DETAILS, reportData.getReportDetails().iterator(), sb);
         return sb;
     }
 }

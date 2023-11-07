@@ -20,7 +20,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ class MultipleHelperServiceTest {
     @Mock
     private CreateUpdatesBusSender createUpdatesBusSender;
     @Mock
-    private UserService userService;
+    private UserIdamService userIdamService;
 
     @InjectMocks
     private MultipleHelperService multipleHelperService;
@@ -78,7 +78,7 @@ class MultipleHelperServiceTest {
         multipleDetails.setCaseId("12121212");
         submitEventList = MultipleUtil.getSubmitEvents();
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         userToken = "authString";
         submitMultipleEvents = MultipleUtil.getSubmitMultipleEvents();
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
@@ -334,8 +334,8 @@ class MultipleHelperServiceTest {
                 multipleDetails.getCaseId()
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
@@ -349,8 +349,8 @@ class MultipleHelperServiceTest {
                 multipleObjects
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
@@ -366,8 +366,8 @@ class MultipleHelperServiceTest {
                 multipleDetails.getCaseId()
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
@@ -382,8 +382,8 @@ class MultipleHelperServiceTest {
                 null
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
@@ -424,8 +424,8 @@ class MultipleHelperServiceTest {
                 submitEventList.get(0).getCaseData()
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
@@ -443,8 +443,8 @@ class MultipleHelperServiceTest {
                 new ArrayList<>()
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
@@ -463,8 +463,8 @@ class MultipleHelperServiceTest {
                 new ArrayList<>()
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
@@ -480,8 +480,8 @@ class MultipleHelperServiceTest {
                 new ArrayList<>()
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
     }
 
     @Test

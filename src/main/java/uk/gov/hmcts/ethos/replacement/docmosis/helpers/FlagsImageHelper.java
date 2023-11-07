@@ -177,9 +177,9 @@ public final class FlagsImageHelper {
 
         for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
             HearingType hearingType = hearingTypeItem.getValue();
-            if (hearingType != null && CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
+            if (hearingNotNullOrEmpty(hearingType)) {
                 for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
-                    if (dateListedTypeItem != null && dateListedTypeItem.getValue() != null) {
+                    if (dateNotNull(dateListedTypeItem)) {
                         String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
                         if (YES.equals(hearingReservedJudgement)) {
                             return true;
@@ -190,6 +190,14 @@ public final class FlagsImageHelper {
         }
 
         return false;
+    }
+
+    private static boolean dateNotNull(DateListedTypeItem dateListedTypeItem) {
+        return dateListedTypeItem != null && dateListedTypeItem.getValue() != null;
+    }
+
+    private static boolean hearingNotNullOrEmpty(HearingType hearingType) {
+        return hearingType != null && CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection());
     }
 
     private static boolean counterClaimMade(CaseData caseData) {

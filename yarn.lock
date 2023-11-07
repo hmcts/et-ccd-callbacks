@@ -577,7 +577,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sideway/formula@npm:^3.0.0":
+"@sideway/formula@npm:^3.0.1":
   version: 3.0.1
   resolution: "@sideway/formula@npm:3.0.1"
   checksum: e4beeebc9dbe2ff4ef0def15cec0165e00d1612e3d7cea0bc9ce5175c3263fc2c818b679bd558957f49400ee7be9d4e5ac90487e1625b4932e15c4aa7919c57a
@@ -699,11 +699,11 @@ __metadata:
   linkType: hard
 
 "@types/archiver@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@types/archiver@npm:6.0.0"
+  version: 6.0.1
+  resolution: "@types/archiver@npm:6.0.1"
   dependencies:
     "@types/readdir-glob": "*"
-  checksum: 2b7a859f4276d679c2e60d3bcfdf98293382bdcfd98bc324db1bb4fbd16d54ff526fc81efc6693b36b82f04c839aef5a9376fb8ea126944544a38fc2bac9d673
+  checksum: 384d81ff7c78d289e410efee360adcfc2bf41a9f376637282d61e2ce3d73d8ecbe2b76250342ffe6aeac638350811fba28c4b6beb6e5ee179a52be433ebbe5fb
   languageName: node
   linkType: hard
 
@@ -720,11 +720,11 @@ __metadata:
   linkType: hard
 
 "@types/chai-as-promised@npm:^7.1.5":
-  version: 7.1.7
-  resolution: "@types/chai-as-promised@npm:7.1.7"
+  version: 7.1.8
+  resolution: "@types/chai-as-promised@npm:7.1.8"
   dependencies:
     "@types/chai": "*"
-  checksum: 59199afbd91289588648e263d7f32f7d72fa9c0075f3c17b1e760e10fdc1a310c2170a392b0d17d96cfff2c51daca72839eed6d80142f9230c9784b8e08ba676
+  checksum: f0e5eab451b91bc1e289ed89519faf6591932e8a28d2ec9bbe95826eb73d28fe43713633e0c18706f3baa560a7d97e7c7c20dc53ce639e5d75bac46b2a50bf21
   languageName: node
   linkType: hard
 
@@ -762,10 +762,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/git-rev-sync@npm:2.0.1":
-  version: 2.0.1
-  resolution: "@types/git-rev-sync@npm:2.0.1"
-  checksum: aee8dbc8cb3f74f2728dccb5f357792a7f7a67ed927421b7565ebc02bea9072d4c1f2103d779c440f87f915817b0674b72b7cc126964ef78754855ae74592f39
+"@types/git-rev-sync@npm:2.0.2":
+  version: 2.0.2
+  resolution: "@types/git-rev-sync@npm:2.0.2"
+  checksum: 24d8e9573cffad57b6809b0e60917f01d70d1577d5cc027ef1fe557ae2968f827e38836750dd9acbe2339ec9d9d7faa05584b8a162665706085943ade2601a7b
   languageName: node
   linkType: hard
 
@@ -2760,6 +2760,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chai-exclude@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "chai-exclude@npm:2.1.0"
+  dependencies:
+    fclone: ^1.0.11
+  peerDependencies:
+    chai: ">= 4.0.0 < 5"
+  checksum: 29d964d9f667bd2c8e0e5e597c299550ff13e41b737450d6f91aa4a28064e24f034c1296c85a1d0ba5ebc2a01188f4147dc60bda0f46382f8fb851052f770bb3
+  languageName: node
+  linkType: hard
+
 "chai-http@npm:4.4.0":
   version: 4.4.0
   resolution: "chai-http@npm:4.4.0"
@@ -2773,6 +2784,43 @@ __metadata:
     qs: ^6.11.2
     superagent: ^8.0.9
   checksum: beaf2418eb00c27d6a2a315340f770e5a53aaf589dec57e70b878f2dd809caae4cee7b5531165a4e40a451d472e98e429d8d8beac9cae01568f28b6145182f8a
+  languageName: node
+  linkType: hard
+
+"chai-json-schema-ajv@npm:^5.2.4":
+  version: 5.2.4
+  resolution: "chai-json-schema-ajv@npm:5.2.4"
+  checksum: 8da84222964f087fa93f1d8b1da5dcedf905822f1a1f801c37fb08185e87e5621ba9eebc0af077465ccb4fea32bd51020c5d66fc1e5c1c30a0a5ba80c652e7cb
+  languageName: node
+  linkType: hard
+
+"chai-json-schema@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "chai-json-schema@npm:1.5.1"
+  dependencies:
+    jsonpointer.js: 0.4.0
+    tv4: ^1.3.0
+  peerDependencies:
+    chai: ">= 1.6.1 < 5"
+  checksum: 9e161a8fb576532ddc2604e58936dc397db3d0d71772e20e86747391236fc053e7f71589c7cdcf13419b094f2ab32c71c561a4c2a17ff0c15647c31eb741cdbb
+  languageName: node
+  linkType: hard
+
+"chai-match-pattern@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "chai-match-pattern@npm:1.3.0"
+  dependencies:
+    lodash-match-pattern: ^2.3.1
+  checksum: 7a1737d8ea74f3fb6b350b9e747e60625693082cd18515eeb9db974384b3afa34d9269e63773b4b854a8c6938cf247a8eddf30ab93a35d512240f17cff953d8f
+  languageName: node
+  linkType: hard
+
+"chai-string@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "chai-string@npm:1.5.0"
+  peerDependencies:
+    chai: ^4.1.2
+  checksum: d443bb416f6d4dd3395442f459af197aff93f2546dcb5bce6313badf505aa828615117f0eadc99e97ec518b7d2df387b538c81c647e6daf5c386d5bafa212e8f
   languageName: node
   linkType: hard
 
@@ -2924,6 +2972,16 @@ __metadata:
   version: 11.2.2
   resolution: "check-types@npm:11.2.2"
   checksum: 61ed60d59e3397c8cf694f20edf73d0061cd6a905754efdec2ccdceafbd390cb09717bab855f9eba921d36278f84c86fe20f7e731a384e9803bc469c09153831
+  languageName: node
+  linkType: hard
+
+"checkit@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "checkit@npm:0.7.0"
+  dependencies:
+    inherits: ^2.0.1
+    lodash: ^4.0.0
+  checksum: 28badce270365797af10976e344824da03862b344675161ee4e9d785f7322fc8e684a3d999e69c49951a830d0336e0983f5c038716caae107ed6e23fec4d48ba
   languageName: node
   linkType: hard
 
@@ -3173,9 +3231,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codeceptjs@npm:3.5.6":
-  version: 3.5.6
-  resolution: "codeceptjs@npm:3.5.6"
+"codeceptjs@npm:3.5.7":
+  version: 3.5.7
+  resolution: "codeceptjs@npm:3.5.7"
   dependencies:
     "@codeceptjs/configure": 0.10.0
     "@codeceptjs/helper": 2.0.1
@@ -3188,6 +3246,11 @@ __metadata:
     axios: 1.3.3
     chai: 4.3.8
     chai-deep-match: 1.2.1
+    chai-exclude: ^2.1.0
+    chai-json-schema: ^1.5.1
+    chai-json-schema-ajv: ^5.2.4
+    chai-match-pattern: ^1.3.0
+    chai-string: ^1.5.0
     chalk: 4.1.2
     commander: 11.0.0
     cross-spawn: 7.0.3
@@ -3200,7 +3263,7 @@ __metadata:
     glob: 6.0.1
     html-minifier: 4.0.0
     inquirer: 6.5.2
-    joi: 17.6.0
+    joi: 17.11.0
     js-beautify: 1.14.9
     lodash.clonedeep: 4.5.0
     lodash.merge: 4.6.2
@@ -3217,7 +3280,7 @@ __metadata:
     uuid: 9.0
   bin:
     codeceptjs: bin/codecept.js
-  checksum: 476595c6874017c5201afd0bbdd36ffbf371d9c8952508f833854396d419c9bb9dc0757f95f60e44b80a9a615150a543e56220485796536f9ece89dead92e6d7
+  checksum: 19009d442fc1ebb450dacbbee78f4628afb7f8284b3c33afd74240481af42dbf0ee666cf417c4fb6b5ba3643679ec746d7815da73831568ef2754db8335a5841
   languageName: node
   linkType: hard
 
@@ -4972,7 +5035,7 @@ __metadata:
     "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^7.1.5
     "@types/fs-extra": ^11.0.0
-    "@types/git-rev-sync": 2.0.1
+    "@types/git-rev-sync": 2.0.2
     "@types/jest": ^29.0.0
     "@types/lodash.clonedeep": ^4.5.7
     "@types/lodash.isobject": ^3.0.7
@@ -4992,7 +5055,7 @@ __metadata:
     chai: 4.3.10
     chai-as-promised: 7.1.1
     chai-http: 4.4.0
-    codeceptjs: 3.5.6
+    codeceptjs: 3.5.7
     codeceptjs-saucehelper: ^1.4.0
     cross-env: 7.0.3
     eslint: 8.53.0
@@ -5011,7 +5074,7 @@ __metadata:
     mocha-multi: 1.1.7
     mochawesome: 7.1.3
     nock: 13.3.8
-    nodemon: 2.0.22
+    nodemon: 3.0.1
     nsp: 3.2.1
     otp: 0.1.3
     pa11y: 6.2.3
@@ -5029,7 +5092,7 @@ __metadata:
     sinon: 13.0.2
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 3.1.0
+    sonarqube-scanner: 3.2.0
     superagent-proxy: 3.0.0
     supertest: 6.3.3
     totp-generator: 0.0.14
@@ -5409,6 +5472,13 @@ __metadata:
   dependencies:
     reusify: ^1.0.4
   checksum: 0170e6bfcd5d57a70412440b8ef600da6de3b2a6c5966aeaf0a852d542daff506a0ee92d6de7679d1de82e644bce69d7a574a6c93f0b03964b5337eed75ada1a
+  languageName: node
+  linkType: hard
+
+"fclone@npm:^1.0.11":
+  version: 1.0.11
+  resolution: "fclone@npm:1.0.11"
+  checksum: 016eb1eac443b0c896adf938f6b300bfc86365444f5160ccf3d68a598d1372d00ca96ab8e116185dc9f316cec83de5f2df157fe7fe365a57bcba1ccc17491f61
   languageName: node
   linkType: hard
 
@@ -6811,7 +6881,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"inherits@npm:2, inherits@npm:2.0.4, inherits@npm:^2.0.3, inherits@npm:^2.0.4, inherits@npm:~2.0.0, inherits@npm:~2.0.1, inherits@npm:~2.0.3":
+"inherits@npm:2, inherits@npm:2.0.4, inherits@npm:^2.0.1, inherits@npm:^2.0.3, inherits@npm:^2.0.4, inherits@npm:~2.0.0, inherits@npm:~2.0.1, inherits@npm:~2.0.3":
   version: 2.0.4
   resolution: "inherits@npm:2.0.4"
   checksum: 4a48a733847879d6cf6691860a6b1e3f0f4754176e4d71494c41f3475553768b10f84b5ce1d40fbd0e34e6bfbb864ee35858ad4dd2cf31e02fc4a154b724d7f1
@@ -7557,6 +7627,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jest-sonar-reporter@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "jest-sonar-reporter@npm:2.0.0"
+  dependencies:
+    xml: ^1.0.1
+  checksum: a79d87f0db6d83c9306b90b1fe44fa8ea19f1598c3bd11d3198b17617c54b9bd8e982ea3b5a857865acf2f6f96b830321e684e320f7961bcb7444935029be724
+  languageName: node
+  linkType: hard
+
 "jest-util@npm:^29.5.0":
   version: 29.5.0
   resolution: "jest-util@npm:29.5.0"
@@ -7571,16 +7650,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:17.6.0":
-  version: 17.6.0
-  resolution: "joi@npm:17.6.0"
+"joi@npm:17.11.0":
+  version: 17.11.0
+  resolution: "joi@npm:17.11.0"
   dependencies:
     "@hapi/hoek": ^9.0.0
     "@hapi/topo": ^5.0.0
     "@sideway/address": ^4.1.3
-    "@sideway/formula": ^3.0.0
+    "@sideway/formula": ^3.0.1
     "@sideway/pinpoint": ^2.0.0
-  checksum: eaf62f6c02f2edb1042f1ab04fc23a5918a2cb8f54bec84c6e1033624d8a462c10ae9518af55a3ba84f1793960450d58094eda308e7ef93c17edd4e3c8ef31d5
+  checksum: 3a4e9ecba345cdafe585e7ed8270a44b39718e11dff3749aa27e0001a63d578b75100c062be28e6f48f960b594864034e7a13833f33fbd7ad56d5ce6b617f9bf
   languageName: node
   linkType: hard
 
@@ -7754,6 +7833,13 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 7af3b8e1ac8fe7f1eccc6263c6ca14e1966fcbc74b618d3c78a0a2075579487547b94f72b7a1114e844a1e15bb00d440e5d1720bfc4612d790a6f285d5ea8354
+  languageName: node
+  linkType: hard
+
+"jsonpointer.js@npm:0.4.0":
+  version: 0.4.0
+  resolution: "jsonpointer.js@npm:0.4.0"
+  checksum: 98c96f9705e4d9d29202ea589dd84d4a8d2ac0ec4627fa925263f3d054f37f36d7b8678b18755be30fc443f370e4e6d937ad4e80c86cf9bd12855c884b2d7dc1
   languageName: node
   linkType: hard
 
@@ -7951,6 +8037,27 @@ __metadata:
   dependencies:
     p-locate: ^6.0.0
   checksum: c1b653bdf29beaecb3d307dfb7c44d98a2a98a02ebe353c9ad055d1ac45d6ed4e1142563d222df9b9efebc2bcb7d4c792b507fad9e7150a04c29530b7db570f8
+  languageName: node
+  linkType: hard
+
+"lodash-checkit@npm:^2.4.1":
+  version: 2.4.1
+  resolution: "lodash-checkit@npm:2.4.1"
+  dependencies:
+    checkit: ^0.7.0
+    lodash: ^4.17.21
+  checksum: f52d40213743b92d82b9523b5e71155026c24d7c2e90d1aa883206da6028e303ec796e8b343a8ac76b190f0b11c33dff4f2b05a5c436cc9523a7672999b60039
+  languageName: node
+  linkType: hard
+
+"lodash-match-pattern@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "lodash-match-pattern@npm:2.3.1"
+  dependencies:
+    chalk: ^4.1.0
+    he: ^1.2.0
+    lodash-checkit: ^2.4.1
+  checksum: 580eb10b630903c4cf7c92a08087dc6ca78af0a4a99dee59b5713f281ea9d1e4b9b7b18cb301b34f1e0e10ee0bdddf0c602ccf750d919148383f3aeff6df8051
   languageName: node
   linkType: hard
 
@@ -8962,23 +9069,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:2.0.22":
-  version: 2.0.22
-  resolution: "nodemon@npm:2.0.22"
+"nodemon@npm:3.0.1":
+  version: 3.0.1
+  resolution: "nodemon@npm:3.0.1"
   dependencies:
     chokidar: ^3.5.2
     debug: ^3.2.7
     ignore-by-default: ^1.0.1
     minimatch: ^3.1.2
     pstree.remy: ^1.1.8
-    semver: ^5.7.1
-    simple-update-notifier: ^1.0.7
+    semver: ^7.5.3
+    simple-update-notifier: ^2.0.0
     supports-color: ^5.5.0
     touch: ^3.1.0
     undefsafe: ^2.0.5
   bin:
     nodemon: bin/nodemon.js
-  checksum: 9c987e139748f5b5c480c6c9080bdc97304ee7d29172b7b3da1a7db590b1323ad57b96346304e9b522b0e445c336dc393ccd3f9f45c73b20d476d2347890dcd0
+  checksum: 6a5d81855760d6617049eccce10ccf02bddb482dab13ceea5280ae595ec7004eee13e7b934368e3f46c37fe4d970342a8c38c99cae7e93e4d7a3ed1c1ecb6acf
   languageName: node
   linkType: hard
 
@@ -11097,7 +11204,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.3.0, semver@npm:^5.4.1, semver@npm:^5.7.1":
+"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.3.0, semver@npm:^5.4.1":
   version: 5.7.2
   resolution: "semver@npm:5.7.2"
   bin:
@@ -11143,15 +11250,6 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 12d8ad952fa353b0995bf180cdac205a4068b759a140e5d3c608317098b3575ac2f1e09182206bf2eb26120e1c0ed8fb92c48c592f6099680de56bb071423ca3
-  languageName: node
-  linkType: hard
-
-"semver@npm:~7.0.0":
-  version: 7.0.0
-  resolution: "semver@npm:7.0.0"
-  bin:
-    semver: bin/semver.js
-  checksum: 272c11bf8d083274ef79fe40a81c55c184dff84dd58e3c325299d0927ba48cece1f020793d138382b85f89bab5002a35a5ba59a3a68a7eebbb597eb733838778
   languageName: node
   linkType: hard
 
@@ -11342,12 +11440,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-update-notifier@npm:^1.0.7":
-  version: 1.1.0
-  resolution: "simple-update-notifier@npm:1.1.0"
+"simple-update-notifier@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "simple-update-notifier@npm:2.0.0"
   dependencies:
-    semver: ~7.0.0
-  checksum: 1012e9b6c504e559a948078177b3eedbb9d7e4d15878e2bda56314d08db609ca5da485be4ac9f838759faae8057935ee0246fcdf63f1233c86bd9fecb2a5544b
+    semver: ^7.5.3
+  checksum: 9ba00d38ce6a29682f64a46213834e4eb01634c2f52c813a9a7b8873ca49cdbb703696f3290f3b27dc067de6d9418b0b84bef22c3eb074acf352529b2d6c27fd
   languageName: node
   linkType: hard
 
@@ -11531,20 +11629,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:3.1.0":
-  version: 3.1.0
-  resolution: "sonarqube-scanner@npm:3.1.0"
+"sonarqube-scanner@npm:3.2.0":
+  version: 3.2.0
+  resolution: "sonarqube-scanner@npm:3.2.0"
   dependencies:
     adm-zip: ^0.5.10
     fancy-log: ^2.0.0
     https-proxy-agent: ^7.0.1
+    jest-sonar-reporter: ^2.0.0
     mkdirp: ^3.0.1
     node-downloader-helper: ^2.1.9
     progress: ^2.0.3
     slugify: ^1.6.6
   bin:
     sonar-scanner: src/bin/sonar-scanner
-  checksum: 973e6f7f6b7f6fc1d888d69bafb43fb42dcb8c879c1dacf8fa01eb7d04ab2ec457444c4a385a9c1667d30c0cb0bf2e3c49d885b83774ecec61b06ce47d2d48a0
+  checksum: 7f1a2364f30350c9b1dfe3c5ad11109a2355fe7da6dbaa709a27d828fb09c8765820dc3b5272e6e124460d6954d97e72ee6a05a44b4de1b5135dd1816f37b87b
   languageName: node
   linkType: hard
 
@@ -12353,6 +12452,13 @@ __metadata:
   version: 0.0.6
   resolution: "tunnel@npm:0.0.6"
   checksum: c362948df9ad34b649b5585e54ce2838fa583aa3037091aaed66793c65b423a264e5229f0d7e9a95513a795ac2bd4cb72cda7e89a74313f182c1e9ae0b0994fa
+  languageName: node
+  linkType: hard
+
+"tv4@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "tv4@npm:1.3.0"
+  checksum: 075096cf3bc2db5727650e16717a343954625c5fde6b2bb5553c86a9a5ca7b9fd287c0f5ab7ac03094f39e982fe9288dc715c7223a90e1684fd2263460a74bbd
   languageName: node
   linkType: hard
 

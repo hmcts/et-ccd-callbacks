@@ -72,7 +72,7 @@ class TseRespondentReplyServiceTest {
     @MockBean
     private TornadoService tornadoService;
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @MockBean
     private TseService tseService;
     @MockBean
@@ -101,11 +101,11 @@ class TseRespondentReplyServiceTest {
     @BeforeEach
     void setUp() throws Exception {
         emailService = spy(new EmailUtils());
-        tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
+        tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userIdamService,
                 respondentTellSomethingElseService, tseService, documentManagementService);
 
         userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         doNothing().when(emailService).sendEmail(any(), any(), any());
 

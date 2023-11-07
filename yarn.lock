@@ -762,10 +762,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/git-rev-sync@npm:2.0.1":
-  version: 2.0.1
-  resolution: "@types/git-rev-sync@npm:2.0.1"
-  checksum: aee8dbc8cb3f74f2728dccb5f357792a7f7a67ed927421b7565ebc02bea9072d4c1f2103d779c440f87f915817b0674b72b7cc126964ef78754855ae74592f39
+"@types/git-rev-sync@npm:2.0.2":
+  version: 2.0.2
+  resolution: "@types/git-rev-sync@npm:2.0.2"
+  checksum: 24d8e9573cffad57b6809b0e60917f01d70d1577d5cc027ef1fe557ae2968f827e38836750dd9acbe2339ec9d9d7faa05584b8a162665706085943ade2601a7b
   languageName: node
   linkType: hard
 
@@ -4972,7 +4972,7 @@ __metadata:
     "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^7.1.5
     "@types/fs-extra": ^11.0.0
-    "@types/git-rev-sync": 2.0.1
+    "@types/git-rev-sync": 2.0.2
     "@types/jest": ^29.0.0
     "@types/lodash.clonedeep": ^4.5.7
     "@types/lodash.isobject": ^3.0.7

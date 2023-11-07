@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -108,7 +109,7 @@ class SingleCasesReadingServiceTest {
                 anyString(),
                 anyList()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        HashSet<SchedulePayloadEvent> schedulePayloadEventList = singleCasesReadingService
+        Set<SchedulePayloadEvent> schedulePayloadEventList = singleCasesReadingService
                 .retrieveScheduleCases(userToken,
                     multipleDetails.getCaseTypeId(),
                     new ArrayList<>(Collections.singletonList("240001/2020")));

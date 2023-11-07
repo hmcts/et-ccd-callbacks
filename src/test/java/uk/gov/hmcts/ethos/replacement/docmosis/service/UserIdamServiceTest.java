@@ -19,9 +19,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class UserServiceTest {
+class UserIdamServiceTest {
     @InjectMocks
-    private UserService userService;
+    private UserIdamService userIdamService;
     private UserDetails userDetails;
 
     private TokenResponse tokenResponse;
@@ -50,37 +50,37 @@ class UserServiceTest {
 
         mockOauth2Configuration();
 
-        userService = new UserService(idamApi, oauth2Configuration);
+        userIdamService = new UserIdamService(idamApi, oauth2Configuration);
     }
 
     @Test
     void shouldHaveUserDetails() {
-        assertEquals(userService.getUserDetails("TOKEN"), userDetails);
+        assertEquals(userIdamService.getUserDetails("TOKEN"), userDetails);
     }
 
     @Test
     void shouldCheckAllUserDetails() {
-        assertEquals(userDetails, userService.getUserDetails("TOKEN"));
-        assertEquals("mail@mail.com", userService.getUserDetails("TOKEN").getEmail());
-        assertEquals("Mike", userService.getUserDetails("TOKEN").getFirstName());
-        assertEquals("Jordan", userService.getUserDetails("TOKEN").getLastName());
-        assertEquals(Collections.singletonList("role"), userService.getUserDetails("TOKEN").getRoles());
-        assertEquals(userDetails.toString(), userService.getUserDetails("TOKEN").toString());
+        assertEquals(userDetails, userIdamService.getUserDetails("TOKEN"));
+        assertEquals("mail@mail.com", userIdamService.getUserDetails("TOKEN").getEmail());
+        assertEquals("Mike", userIdamService.getUserDetails("TOKEN").getFirstName());
+        assertEquals("Jordan", userIdamService.getUserDetails("TOKEN").getLastName());
+        assertEquals(Collections.singletonList("role"), userIdamService.getUserDetails("TOKEN").getRoles());
+        assertEquals(userDetails.toString(), userIdamService.getUserDetails("TOKEN").toString());
     }
 
     @Test
     void shouldGetUserById() {
-        assertEquals(userDetails, userService.getUserDetailsById("TOKEN", "id"));
+        assertEquals(userDetails, userIdamService.getUserDetailsById("TOKEN", "id"));
     }
 
     @Test
     void shouldGetAccessToken() {
-        assertEquals("abcefg", userService.getAccessToken("John@email.com", "abc123"));
+        assertEquals("abcefg", userIdamService.getAccessToken("John@email.com", "abc123"));
     }
 
     @Test
     void shouldReturnAccessTokenResponse() {
-        assertEquals(tokenResponse, userService.getAccessTokenResponse("John@email.com", "abc123"));
+        assertEquals(tokenResponse, userIdamService.getAccessTokenResponse("John@email.com", "abc123"));
     }
 
     private void mockOauth2Configuration() {

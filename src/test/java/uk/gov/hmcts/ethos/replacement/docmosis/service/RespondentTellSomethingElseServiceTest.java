@@ -75,7 +75,7 @@ class RespondentTellSomethingElseServiceTest {
     private EmailService emailService;
 
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
 
     @MockBean
     private TribunalOfficesService tribunalOfficesService;
@@ -119,7 +119,7 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         emailService = spy(new EmailUtils());
         respondentTellSomethingElseService =
-                new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
+                new RespondentTellSomethingElseService(emailService, userIdamService, tribunalOfficesService,
                         tornadoService, documentManagementService);
         tseService = new TseService(documentManagementService);
 
@@ -129,7 +129,7 @@ class RespondentTellSomethingElseServiceTest {
                 "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
 
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
     }
 
     @ParameterizedTest

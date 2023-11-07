@@ -5092,7 +5092,7 @@ __metadata:
     sinon: 13.0.2
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 3.1.0
+    sonarqube-scanner: 3.2.0
     superagent-proxy: 3.0.0
     supertest: 6.3.3
     totp-generator: 0.0.14
@@ -7624,6 +7624,15 @@ __metadata:
     slash: ^3.0.0
     stack-utils: ^2.0.3
   checksum: daddece6bbf846eb6a2ab9be9f2446e54085bef4e5cecd13d2a538fa9c01cb89d38e564c6b74fd8e12d37ed9eface8a362240ae9f21d68b214590631e7a0d8bf
+  languageName: node
+  linkType: hard
+
+"jest-sonar-reporter@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "jest-sonar-reporter@npm:2.0.0"
+  dependencies:
+    xml: ^1.0.1
+  checksum: a79d87f0db6d83c9306b90b1fe44fa8ea19f1598c3bd11d3198b17617c54b9bd8e982ea3b5a857865acf2f6f96b830321e684e320f7961bcb7444935029be724
   languageName: node
   linkType: hard
 
@@ -11629,20 +11638,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:3.1.0":
-  version: 3.1.0
-  resolution: "sonarqube-scanner@npm:3.1.0"
+"sonarqube-scanner@npm:3.2.0":
+  version: 3.2.0
+  resolution: "sonarqube-scanner@npm:3.2.0"
   dependencies:
     adm-zip: ^0.5.10
     fancy-log: ^2.0.0
     https-proxy-agent: ^7.0.1
+    jest-sonar-reporter: ^2.0.0
     mkdirp: ^3.0.1
     node-downloader-helper: ^2.1.9
     progress: ^2.0.3
     slugify: ^1.6.6
   bin:
     sonar-scanner: src/bin/sonar-scanner
-  checksum: 973e6f7f6b7f6fc1d888d69bafb43fb42dcb8c879c1dacf8fa01eb7d04ab2ec457444c4a385a9c1667d30c0cb0bf2e3c49d885b83774ecec61b06ce47d2d48a0
+  checksum: 7f1a2364f30350c9b1dfe3c5ad11109a2355fe7da6dbaa709a27d828fb09c8765820dc3b5272e6e124460d6954d97e72ee6a05a44b4de1b5135dd1816f37b87b
   languageName: node
   linkType: hard
 

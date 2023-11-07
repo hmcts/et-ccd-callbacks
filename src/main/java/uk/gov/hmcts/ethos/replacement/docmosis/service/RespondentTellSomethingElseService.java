@@ -62,6 +62,7 @@ public class RespondentTellSomethingElseService {
     private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
     private final DocumentManagementService documentManagementService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.tse.respondent.application.respondent}")
     private String tseRespondentAcknowledgeTemplateId;
@@ -181,7 +182,9 @@ public class RespondentTellSomethingElseService {
         }
 
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
-        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
+        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
+                caseData.getClaimantHearingPreference().getContactLanguage());
 
         String dueDate = isWelsh
                 ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
@@ -244,7 +247,9 @@ public class RespondentTellSomethingElseService {
 
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
-        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
+        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
+                caseData.getClaimantHearingPreference().getContactLanguage());
         String shortText = isWelsh
                 ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
                 : caseData.getResTseSelectApplication();

@@ -53,6 +53,7 @@ public class PseRespondToTribunalService {
     private final UserIdamService userIdamService;
     private final HearingSelectionService hearingSelectionService;
     private final TribunalOfficesService tribunalOfficesService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.pse.respondent.rule-92-yes}")
     private String acknowledgeEmailYesTemplateId;
@@ -216,8 +217,9 @@ public class PseRespondToTribunalService {
      */
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        boolean isWelsh = WELSH_LANGUAGE.equals(
-                caseDetails.getCaseData().getClaimantHearingPreference().getContactLanguage());
+        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
+        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
+                caseData.getClaimantHearingPreference().getContactLanguage());
         String emailTemplate = isWelsh
                 ? cyNotificationToClaimantTemplateId
                 : notificationToClaimantTemplateId;
@@ -230,7 +232,9 @@ public class PseRespondToTribunalService {
 
     private Map<String, String> buildPersonalisationNotify(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
+        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
+                caseData.getClaimantHearingPreference().getContactLanguage());
         String linkToCitizenHub = isWelsh
                 ? emailService.getCitizenCaseLink(caseDetails.getCaseId()) + WELSH_LANGUAGE_PARAM
                 : emailService.getCitizenCaseLink(caseDetails.getCaseId());

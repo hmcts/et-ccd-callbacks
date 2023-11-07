@@ -52,6 +52,7 @@ public class TseRespondentReplyService {
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
     private final DocumentManagementService documentManagementService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.tse.respondent.respond.claimant}")
     private String tseRespondentResponseTemplateId;
@@ -238,7 +239,9 @@ public class TseRespondentReplyService {
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
-        boolean isWelsh = WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
+        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
+                caseData.getClaimantHearingPreference().getContactLanguage());
         String emailTemplate = isWelsh
                 ? cyTseRespondentResponseTemplateId
                 : tseRespondentResponseTemplateId;
@@ -248,7 +251,7 @@ public class TseRespondentReplyService {
                     "TSE Reply.pdf");
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), featureToggleService);
             emailService.sendEmail(emailTemplate,
                     claimantEmail, personalisation);
         } catch (Exception e) {

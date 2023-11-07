@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -225,14 +226,17 @@ public final class TseHelper {
      * @throws NotificationClientException Throw Exception
      */
 
-    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document,
-                                                                    String citizenUrl)
+    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails,
+                                                                    byte[] document,
+                                                                    String citizenUrl,
+                                                                    FeatureToggleService featureToggleService)
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
-        boolean isWelsh = WELSH_LANGUAGE.equals(
-                caseDetails.getCaseData().getClaimantHearingPreference().getContactLanguage());
+        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
+        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
+                caseData.getClaimantHearingPreference().getContactLanguage());
         String linkToCitizenHub = isWelsh
                 ? citizenUrl + WELSH_LANGUAGE_PARAM
                 : citizenUrl;

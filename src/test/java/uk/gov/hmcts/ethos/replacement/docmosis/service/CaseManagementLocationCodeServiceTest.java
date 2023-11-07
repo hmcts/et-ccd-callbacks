@@ -45,7 +45,7 @@ class CaseManagementLocationCodeServiceTest {
         return Stream.of(
                 Arguments.of("123", "123"),
                 Arguments.of("", ""),
-                Arguments.of("", null)
+                Arguments.of(null, "")
         );
     }
 

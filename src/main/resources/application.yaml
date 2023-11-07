@@ -111,13 +111,11 @@ template:
     respondent:
       application:
         claimant: ${TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID:5d014e5a-9528-4d02-bd31-8eca98cfba19}
-        cyClaimant: ${CY_TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID:198c5afc-9984-4a04-96db-37e1f6e96843}
         respondent: ${TSE_RESPONDENT_TO_RESPONDENT_TEMPLATE_ID:c0b393f6-daf0-46fc-8995-d5e98149326f}
         respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:e60bc338-db48-4270-95b0-5e8f29e6ae0f}
         tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
       respond:
         claimant: ${TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:dec79c11-2c02-481d-aed8-6f013667cdf5}
-        cyClaimant: ${CY_TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:c7fc31e8-9370-405a-8b2e-cf5ce99f39b7}
         respondent:
           rule-92-yes: ${TSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:232f1fbe-3a7f-44cd-926b-bfa192c25ac4}
           rule-92-no: ${TSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:d647a4c5-5859-42f6-96a6-30d57c0e98c2}
@@ -138,7 +136,6 @@ template:
 
   pse:
     claimant: ${PSE_RESPONDENT_NOTIFICATION_CLAIMANT_TEMPLATE_ID:bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff}
-    cyClaimant: ${CY_PSE_RESPONDENT_NOTIFICATION_CLAIMANT_TEMPLATE_ID:fcd14cac-5e8e-478e-ab3c-89e394a3c663}
     respondent:
       rule-92-yes: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:aa114479-e72b-4893-9024-c25aee1be6fc}
       rule-92-no: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee}
@@ -160,6 +157,10 @@ template:
 
   respondNotification:
     noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
+
+  bundles:
+    claimantSubmittedRespondentNotification:
+      ${BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID:5c829358-0b54-4335-9d60-1c8296c4a516}
 
 etcos:
   system:
@@ -188,3 +189,5 @@ launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
+
+

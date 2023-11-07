@@ -66,11 +66,11 @@ public class VerifyTokenService {
             if (jsonWebKey == null) {
                 throw new VerifyTokenServiceException("JWK does not exist in the key set");
             }
-            if (jsonWebKey instanceof SecretJWK) {
-                return ((SecretJWK) jsonWebKey).toSecretKey();
+            if (jsonWebKey instanceof SecretJWK secretJWK) {
+                return secretJWK.toSecretKey();
             }
-            if (jsonWebKey instanceof AsymmetricJWK) {
-                return ((AsymmetricJWK) jsonWebKey).toPublicKey();
+            if (jsonWebKey instanceof AsymmetricJWK asymmetricJWK) {
+                return asymmetricJWK.toPublicKey();
             }
             throw new VerifyTokenServiceException("Unsupported JWK " + jsonWebKey.getClass().getName());
         } catch (JOSEException e) {

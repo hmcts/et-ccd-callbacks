@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -65,6 +66,8 @@ class PseRespondToTribunalServiceTest {
     private PseRespondToTribunalService pseRespondToTribService;
     private EmailService emailService;
     private CaseData caseData;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String TEMPLATE_ID = "someTemplateId";
@@ -95,7 +98,7 @@ class PseRespondToTribunalServiceTest {
         emailService = spy(new EmailUtils());
         pseRespondToTribService = new PseRespondToTribunalService(emailService, userIdamService,
                 hearingSelectionService,
-                tribunalOfficesService);
+                tribunalOfficesService, featureToggleService);
         caseData = CaseDataBuilder.builder().build();
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
@@ -606,6 +609,7 @@ class PseRespondToTribunalServiceTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(TEST_CASE_ID);
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         Map<String, String> expectedMap = Map.of(
                 "caseNumber", "6000001/2023",

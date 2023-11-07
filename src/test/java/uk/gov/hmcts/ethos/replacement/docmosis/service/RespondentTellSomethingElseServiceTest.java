@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -95,6 +96,8 @@ class RespondentTellSomethingElseServiceTest {
 
     @MockBean
     private DocumentManagementService documentManagementService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Captor
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
@@ -130,7 +133,7 @@ class RespondentTellSomethingElseServiceTest {
         emailService = spy(new EmailUtils());
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userIdamService, tribunalOfficesService,
-                        tornadoService, documentManagementService);
+                        tornadoService, documentManagementService, featureToggleService);
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
@@ -380,6 +383,7 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
                 new byte[]{});
@@ -452,6 +456,7 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
@@ -502,6 +507,7 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);

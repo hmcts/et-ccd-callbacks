@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
@@ -82,6 +83,8 @@ class TseRespondentReplyServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
@@ -103,7 +106,7 @@ class TseRespondentReplyServiceTest {
     void setUp() throws Exception {
         emailService = spy(new EmailUtils());
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userIdamService,
-                respondentTellSomethingElseService, tseService, documentManagementService);
+                respondentTellSomethingElseService, tseService, documentManagementService, featureToggleService);
 
         userDetails = HelperTest.getUserDetails();
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -111,7 +114,7 @@ class TseRespondentReplyServiceTest {
         doNothing().when(emailService).sendEmail(any(), any(), any());
 
         mockStatic = mockStatic(TseHelper.class, Mockito.CALLS_REAL_METHODS);
-        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any()))
+        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), any()))
                 .thenReturn(Collections.emptyMap());
         mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any()))
                 .thenReturn(Collections.emptyMap());

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -38,6 +40,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -56,6 +59,8 @@ class TseHelperTest {
 
     private CaseData caseData;
     private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     public void setUp() {
@@ -257,7 +262,8 @@ class TseHelperTest {
         caseDetails.setCaseId("CaseId");
         caseDetails.setCaseData(caseData);
         byte[] document = {};
-        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
+                caseDetails, document, "citizenUrlCaseId", featureToggleService);
 
         Map<String, Object> expected = Map.of(
             "linkToCitizenHub", "citizenUrlCaseId",
@@ -282,12 +288,14 @@ class TseHelperTest {
         caseData.setTseResponseText("TseResponseText");
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("CaseId");
         caseDetails.setCaseData(caseData);
         byte[] document = {};
-        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
+                caseDetails, document, "citizenUrlCaseId", featureToggleService);
 
         Map<String, Object> expected = Map.of(
                 "linkToCitizenHub", "citizenUrlCaseId" + WELSH_LANGUAGE_PARAM,
@@ -316,7 +324,8 @@ class TseHelperTest {
         caseDetails.setCaseId("CaseId");
         caseDetails.setCaseData(caseData);
         byte[] document = {};
-        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
+                caseDetails, document, "citizenUrlCaseId", featureToggleService);
 
         Map<String, Object> expected = Map.of(
             "linkToCitizenHub", "citizenUrlCaseId",

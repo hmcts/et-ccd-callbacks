@@ -151,8 +151,16 @@ template:
 
   sendNotification: ${SEND_NOTIFICATION_TEMPLATE_ID:1b8299d7-5051-4b78-a870-726b6384d8a8}
 
+  claimantSendNotificationHearingOther: ${CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
+
+  respondentSendNotificationHearingOther: ${RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
+
   respondNotification:
     noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
+
+  bundles:
+    claimantSubmittedRespondentNotification:
+      ${BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID:5c829358-0b54-4335-9d60-1c8296c4a516}
 
 etcos:
   system:
@@ -181,3 +189,5 @@ launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
+
+

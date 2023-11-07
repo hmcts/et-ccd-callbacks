@@ -82,7 +82,7 @@ public class Et1VettingData {
 
     // ET1 Vetting - Track allocation
     @JsonProperty("isTrackAllocationCorrect")
-    private String isTrackAllocationCorrect;
+    private String trackAllocationCorrect;
     @JsonProperty("suggestAnotherTrack")
     private String suggestAnotherTrack;
     @JsonProperty("whyChangeTrackAllocation")
@@ -90,7 +90,7 @@ public class Et1VettingData {
     @JsonProperty("trackAllocationGeneralNotes")
     private String trackAllocationGeneralNotes;
     @JsonProperty("isLocationCorrect")
-    private String isLocationCorrect;
+    private String correctLocation;
     @JsonProperty("whyChangeOffice")
     private String whyChangeOffice;
     @JsonProperty("et1LocationGeneralNotes")

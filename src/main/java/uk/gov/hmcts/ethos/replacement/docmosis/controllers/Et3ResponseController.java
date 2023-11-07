@@ -166,7 +166,7 @@ public class Et3ResponseController {
     })
     public ResponseEntity<CCDCallbackResponse> submitSection(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -191,7 +191,7 @@ public class Et3ResponseController {
     })
     public ResponseEntity<CCDCallbackResponse> sectionComplete(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -289,7 +289,7 @@ public class Et3ResponseController {
     })
     public ResponseEntity<CCDCallbackResponse> startSubmitEt3(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -314,7 +314,7 @@ public class Et3ResponseController {
     })
     public ResponseEntity<CCDCallbackResponse> reloadSubmitData(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

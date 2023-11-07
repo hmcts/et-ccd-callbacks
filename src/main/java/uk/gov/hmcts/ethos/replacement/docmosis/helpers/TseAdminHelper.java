@@ -26,7 +26,6 @@ public final class TseAdminHelper {
             .filter(r -> r.getValue().getStatus() != null && !CLOSED_STATE.equals(r.getValue().getStatus()))
             .map(r -> DynamicValueType.create(r.getValue().getNumber(),
                 r.getValue().getNumber() + " - " + r.getValue().getType())
-            )
-            .toList());
+            ).toList());
     }
 }

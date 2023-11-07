@@ -50,6 +50,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenBundlesIsEnabled(Boolean toggleStat) {
+        givenToggle("bundles", toggleStat);
+
+        assertThat(featureToggleService.isBundlesEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

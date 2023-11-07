@@ -60,16 +60,16 @@ public class BulkUpdateService {
 
     private static final String MESSAGE = "Failed to update case for case id : ";
     private final CcdClient ccdClient;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final CreateUpdatesBusSender createUpdatesBusSender;
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
 
     @Autowired
-    public BulkUpdateService(CcdClient ccdClient, UserService userService,
+    public BulkUpdateService(CcdClient ccdClient, UserIdamService userIdamService,
                              CreateUpdatesBusSender createUpdatesBusSender) {
         this.ccdClient = ccdClient;
-        this.userService = userService;
+        this.userIdamService = userIdamService;
         this.createUpdatesBusSender = createUpdatesBusSender;
     }
 
@@ -543,7 +543,7 @@ public class BulkUpdateService {
             } else {
                 List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
                 PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
-                        userService.getUserDetails(userToken).getEmail(),
+                        userIdamService.getUserDetails(userToken).getEmail(),
                         ethosCaseRefCollection,
                         PersistentQHelper.getPreAcceptDataModel("dateAccepted"),
                         errors,

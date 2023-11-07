@@ -58,7 +58,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE
 @RequiredArgsConstructor
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
     private final DocumentManagementService documentManagementService;
@@ -122,7 +122,7 @@ public class RespondentTellSomethingElseService {
 
     /**
      * Uses {@link EmailService} to generate an email to Respondent.
-     * Uses {@link UserService} to get Respondents email address.
+     * Uses {@link UserIdamService} to get Respondents email address.
      *
      * @param caseDetails in which the case details are extracted from
      * @param userToken   jwt used for authorization
@@ -130,7 +130,7 @@ public class RespondentTellSomethingElseService {
     public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
 
-        String email = userService.getUserDetails(userToken).getEmail();
+        String email = userIdamService.getUserDetails(userToken).getEmail();
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
             emailService.sendEmail(tseRespondentAcknowledgeTypeCTemplateId, email,

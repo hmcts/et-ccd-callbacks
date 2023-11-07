@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FileLocationFixedListSheetImporter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetImporter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReader;
@@ -25,16 +25,16 @@ public class VenueImportService {
     private final ExcelReadingService excelReadingService;
     private final VenueFixedListSheetImporter venueFixedListSheetImporter;
     private final FileLocationFixedListSheetImporter fileLocationFixedListSheetImporter;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
 
     public VenueImportService(ExcelReadingService excelReadingService,
                               VenueFixedListSheetImporter venueFixedListSheetImporter,
                               FileLocationFixedListSheetImporter fileLocationFixedListSheetImporter,
-                              UserService userService) {
+                              UserIdamService userIdamService) {
         this.excelReadingService = excelReadingService;
         this.venueFixedListSheetImporter = venueFixedListSheetImporter;
         this.fileLocationFixedListSheetImporter = fileLocationFixedListSheetImporter;
-        this.userService = userService;
+        this.userIdamService = userIdamService;
     }
 
     public void initImport(AdminData adminData) {
@@ -65,7 +65,7 @@ public class VenueImportService {
             }
         }
 
-        UserDetails user = userService.getUserDetails(userToken);
+        UserDetails user = userIdamService.getUserDetails(userToken);
         adminData.getVenueImport().getVenueImportFile().setUser(user.getName());
         adminData.getVenueImport().getVenueImportFile().setLastImported(LocalDateTime.now().toString());
     }

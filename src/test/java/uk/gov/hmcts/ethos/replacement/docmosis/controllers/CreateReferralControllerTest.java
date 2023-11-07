@@ -20,7 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -53,7 +53,7 @@ class CreateReferralControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
@@ -120,7 +120,7 @@ class CreateReferralControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
-        when(userService.getUserDetails(any())).thenReturn(details);
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
         when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
             .thenReturn(new DocumentInfo());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)

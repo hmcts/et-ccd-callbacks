@@ -84,7 +84,7 @@ class PseRespondToTribunalServiceTest {
     private static final String EXUI_URL = "exuiUrl";
 
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @MockBean
     private HearingSelectionService hearingSelectionService;
     @MockBean
@@ -93,8 +93,9 @@ class PseRespondToTribunalServiceTest {
     @BeforeEach
     void setUp() {
         emailService = spy(new EmailUtils());
-        pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService,
-            tribunalOfficesService);
+        pseRespondToTribService = new PseRespondToTribunalService(emailService, userIdamService,
+                hearingSelectionService,
+                tribunalOfficesService);
         caseData = CaseDataBuilder.builder().build();
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
@@ -511,7 +512,7 @@ class PseRespondToTribunalServiceTest {
         caseDetails.setCaseId("1677174791076683");
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
 
-        when(userService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
 
         Map<String, String> expectedMap = Map.of(
             "caseNumber", "6000001/2023",
@@ -550,7 +551,7 @@ class PseRespondToTribunalServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        when(userService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
 
         DateListedType selectedListing = new DateListedType();
         selectedListing.setListedDate("2023-12-25T12:00:00.000");

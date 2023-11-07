@@ -64,7 +64,7 @@ class TornadoServiceTest {
     private TornadoService tornadoService;
     private TornadoConnection tornadoConnection;
     private DocumentManagementService documentManagementService;
-    private UserService userService;
+    private UserIdamService userIdamService;
     private DefaultValuesReaderService defaultValuesReaderService;
     private VenueAddressReaderService venueAddressReaderService;
     private MockHttpURLConnection mockConnection;
@@ -81,7 +81,7 @@ class TornadoServiceTest {
         mockVenueAddressReaderService();
 
         tornadoService = new TornadoService(tornadoConnection, documentManagementService,
-                userService, defaultValuesReaderService, venueAddressReaderService);
+                userIdamService, defaultValuesReaderService, venueAddressReaderService);
     }
 
     @Test
@@ -295,7 +295,7 @@ class TornadoServiceTest {
         };
 
         mockOauth2Configuration();
-        userService = new UserService(idamApi, oauth2Configuration);
+        userIdamService = new UserIdamService(idamApi, oauth2Configuration);
     }
 
     private void mockTornadoConnection() throws IOException {

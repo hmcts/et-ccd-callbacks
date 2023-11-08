@@ -18,6 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositCallbackResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.prehearingdeposit.PreHearingDepositRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.prehearingdeposit.PreHearingDepositService;
 import java.io.IOException;
@@ -58,5 +61,24 @@ public class PreHearingDepositController {
         }
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
+    }
+
+    @PostMapping(value = "/createPHRDeposit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create Pre-Hearing deposit Data")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = AdminData.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<PreHearingDepositCallbackResponse> createPHRDeposit(
+            @RequestHeader("Authorization") String userToken,
+            @RequestBody PreHearingDepositRequest ccdRequest) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        PreHearingDepositData preHearingDepositData = ccdRequest.getCaseDetails().getCaseData();
+        return PreHearingDepositCallbackResponse.getCallbackRespEntityNoErrors(preHearingDepositData);
     }
 }

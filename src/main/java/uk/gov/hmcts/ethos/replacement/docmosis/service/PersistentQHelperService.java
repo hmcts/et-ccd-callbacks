@@ -16,7 +16,7 @@ import java.util.List;
 public class PersistentQHelperService {
 
     private final CreateUpdatesBusSender createUpdatesBusSender;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
 
     public void sendCreationEventToSingles(String userToken, String caseTypeId, String jurisdiction,
                                            List<String> errors, List<String> ethosCaseRefCollection, String officeCT,
@@ -25,7 +25,7 @@ public class PersistentQHelperService {
                                            String multipleReferenceLinkMarkUp, boolean transferSameCountry,
                                            String sourceEthosCaseReference) {
 
-        String username = userService.getUserDetails(userToken).getEmail();
+        String username = userIdamService.getUserDetails(userToken).getEmail();
         CreationSingleDataModel dataModel = PersistentQHelper.getCreationSingleDataModel(ccdGatewayBaseUrl,
             officeCT, positionTypeCT, reasonForCT, transferSameCountry, sourceEthosCaseReference);
 
@@ -48,7 +48,7 @@ public class PersistentQHelperService {
                                        List<String> errors, List<String> ethosCaseRefCollection, String officeCT,
                                        String positionTypeCT, String ccdGatewayBaseUrl,
                                        String reasonForCT, String confirmation, String sourceEthosCaseReference) {
-        String username = userService.getUserDetails(userToken).getEmail();
+        String username = userIdamService.getUserDetails(userToken).getEmail();
         TransferToEcmDataModel dataModel = PersistentQHelper.getTransferToEcmModel(ccdGatewayBaseUrl, officeCT,
             positionTypeCT, reasonForCT, sourceEthosCaseReference);
 

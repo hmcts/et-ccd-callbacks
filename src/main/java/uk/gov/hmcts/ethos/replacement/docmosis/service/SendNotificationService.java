@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 
@@ -66,8 +67,10 @@ public class SendNotificationService {
     private String claimantSendNotificationHearingOtherTemplateId;
     @Value("${template.respondentSendNotificationHearingOther}")
     private String respondentSendNotificationHearingOtherTemplateId;
-    @Value("${template.bundles.claimantSubmittedRespondentNotification}")
-    private String bundlesClaimantSubmittedRespondentNotificationTemplateId;
+    @Value("${template.bundles.claimantSubmittedNotificationForClaimant}")
+    private String bundlesSubmittedNotificationForClaimantTemplateId;
+    @Value("${template.bundles.claimantSubmittedNotificationForRespondent}")
+    private String bundlesSubmittedNotificationForRespondentTemplateId;
 
     private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";
 
@@ -308,16 +311,17 @@ public class SendNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
         Map<String, String> emailData = getEmailData(caseData, caseId);
-        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
+        emailService.sendEmail(bundlesSubmittedNotificationForClaimantTemplateId,
                 caseDetails.getCaseData()
                         .getClaimantType().getClaimantEmailAddress(),
                 emailData
         );
-        emailService.sendEmail(bundlesClaimantSubmittedRespondentNotificationTemplateId,
+        emailData.remove(LINK_TO_CITIZEN_HUB);
+        emailData.put(EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseId));
+        emailService.sendEmail(bundlesSubmittedNotificationForRespondentTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData
         );
-
     }
 
     @NotNull
@@ -327,7 +331,7 @@ public class SendNotificationService {
         emailData.put(CASE_NUMBER, caseData.getEthosCaseReference());
         emailData.put(RESPONDENT_NAMES, caseData.getRespondent());
         emailData.put(HEARING_DATE, caseData.getTargetHearingDate());
-        emailData.put(EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseId));
+        emailData.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         return emailData;
     }
 

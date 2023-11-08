@@ -53,9 +53,10 @@ class SendNotificationServiceTest {
             "claimantSendNotificationHearingOtherTemplateId";
     private static final String RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID =
             "claimantSendNotificationHearingOtherTemplateId";
-
-    private static final String BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID =
-            "bundlesClaimantSubmittedRespondentNotificationTemplateId";
+    private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID =
+            "bundlesSubmittedNotificationForClaimantTemplateId";
+    private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID =
+            "bundlesSubmittedNotificationForRespondentTemplateId";
 
     @BeforeEach
     public void setUp() {
@@ -71,8 +72,11 @@ class SendNotificationServiceTest {
                 CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID,
                 "claimantSendNotificationHearingOtherTemplateId");
         ReflectionTestUtils.setField(sendNotificationService,
-                BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID,
-                "bundlesClaimantSubmittedRespondentNotificationTemplateId");
+                BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID,
+                "bundlesSubmittedNotificationForClaimantTemplateId");
+        ReflectionTestUtils.setField(sendNotificationService,
+                BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID,
+                "bundlesSubmittedNotificationForRespondentTemplateId");
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
                 .withClaimantType("claimant@email.com")
@@ -294,8 +298,11 @@ class SendNotificationServiceTest {
     @Test
     void sendNotifyEmailsToAdminAndClaimant() {
         sendNotificationService.notify(caseDetails);
-        verify(emailService, times(2))
-                .sendEmail(eq(BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID),
+        verify(emailService, times(1))
+                .sendEmail(eq(BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID),
+                        any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("1234", val.get("caseNumber"));

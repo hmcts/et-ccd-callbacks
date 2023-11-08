@@ -88,11 +88,7 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
-    public static final String DOCUMENTS_TAB = "#Documents";
     public static final String ORGANISATION = "Organisation";
-    
-    @Value("${case-details-url.exui}")
-    private String exuiUrl;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -609,10 +605,6 @@ public class CaseManagementForCaseWorkerService {
                 .baseLocation(tribunalLocations.getEpimmsId())
                 .region(tribunalLocations.getRegionId())
                 .build());
-    }
-
-    public void setCaseDeepLink(CaseData caseData, String caseId) {
-        caseData.setCaseDeepLink(exuiUrl + caseId + DOCUMENTS_TAB);
     }
 
     public void setPublicCaseName(CaseData caseData) {

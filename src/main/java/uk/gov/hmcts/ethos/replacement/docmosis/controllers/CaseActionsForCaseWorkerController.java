@@ -293,7 +293,6 @@ public class CaseActionsForCaseWorkerController {
             log.info("HMC feature flag is {}", hmcToggle);
             if (hmcToggle) {
                 caseManagementForCaseWorkerService.setPublicCaseName(caseData);
-                caseManagementForCaseWorkerService.setCaseDeepLink(caseData, ccdRequest.getCaseDetails().getCaseId());
                 caseManagementLocationCodeService.setCaseManagementLocationCode(caseData);
             }
         }

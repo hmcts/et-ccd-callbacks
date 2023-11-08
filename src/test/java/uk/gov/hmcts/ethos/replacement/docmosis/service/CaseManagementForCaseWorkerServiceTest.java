@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
@@ -1174,14 +1173,6 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
         assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE, caseData.getPublicCaseName());
-    }
-
-    @Test
-    void testCaseDeepLink() {
-        ReflectionTestUtils.setField(caseManagementForCaseWorkerService, "exuiUrl", "http://exui/cases/case-details/");
-        CaseData caseData = new CaseData();
-        caseManagementForCaseWorkerService.setCaseDeepLink(caseData, "123");
-        assertEquals("http://exui/cases/case-details/123#Documents", caseData.getCaseDeepLink());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

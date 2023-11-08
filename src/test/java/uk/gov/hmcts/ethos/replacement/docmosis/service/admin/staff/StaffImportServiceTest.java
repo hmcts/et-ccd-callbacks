@@ -11,7 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.ClerkRowHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.EmployeeMemberRowHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.EmployerMemberRowHandler;
@@ -41,8 +41,8 @@ class StaffImportServiceTest {
         String userName = "Donald Duck";
         UserDetails user = new UserDetails();
         user.setName(userName);
-        UserService userService = mock(UserService.class);
-        when(userService.getUserDetails(userToken)).thenReturn(user);
+        UserIdamService userIdamService = mock(UserIdamService.class);
+        when(userIdamService.getUserDetails(userToken)).thenReturn(user);
         ExcelReadingService excelReadingService = mockExcelReadingService(userToken, documentBinaryUrl);
         JudgeRepository judgeRepository = mock(JudgeRepository.class);
         CourtWorkerRepository courtWorkerRepository = mock(CourtWorkerRepository.class);
@@ -58,7 +58,7 @@ class StaffImportServiceTest {
 
         AdminData adminData = createAdminData(documentBinaryUrl);
 
-        StaffImportService staffImportService = new StaffImportService(userService, excelReadingService,
+        StaffImportService staffImportService = new StaffImportService(userIdamService, excelReadingService,
             staffImportStrategy);
         staffImportService.importStaff(adminData, userToken);
 

@@ -47,7 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE
 public class TseRespondentReplyService {
     private final TornadoService tornadoService;
     private final EmailService emailService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
     private final DocumentManagementService documentManagementService;
@@ -256,7 +256,7 @@ public class TseRespondentReplyService {
                                               boolean isRespondingToTribunal) {
         emailService.sendEmail(
             getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
-            userService.getUserDetails(userToken).getEmail(),
+            userIdamService.getUserDetails(userToken).getEmail(),
             TseHelper.getPersonalisationForAcknowledgement(
                 caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId())));
     }

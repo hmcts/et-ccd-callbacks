@@ -136,10 +136,10 @@ public final class HearingsToJudgmentsReport {
         long totalCasesWithin4Weeks = hearings.stream().filter(h -> h.judgmentWithin4Weeks).count();
         long totalCasesNotWithin4Weeks = hearings.stream().filter(h -> !h.judgmentWithin4Weeks).count();
 
-        float totalCasesWithin4WeeksPercent = (totalCases != 0)
-                ? ((float) totalCasesWithin4Weeks / totalCases) * 100 : 0;
-        float totalCasesNotWithin4WeeksPercent = (totalCases != 0)
-                ? ((float) totalCasesNotWithin4Weeks / totalCases) * 100 : 0;
+        float totalCasesWithin4WeeksPercent =
+                (totalCases == 0) ? 0 : ((float) totalCasesWithin4Weeks / totalCases) * 100;
+        float totalCasesNotWithin4WeeksPercent =
+                (totalCases == 0) ? 0 : ((float) totalCasesNotWithin4Weeks / totalCases) * 100;
 
         reportSummary.setTotalCases(String.valueOf(totalCases));
         reportSummary.setTotal4Wk(String.valueOf(totalCasesWithin4Weeks));

@@ -24,7 +24,7 @@ public class TseAdminReplyData extends TseReplyData {
     @JsonProperty("responseAdditionalInfo")
     private String responseAdditionalInfo;
     @JsonProperty("isCmoOrRequest")
-    private String isCmoOrRequest;
+    private String cmoOrRequest;
     @JsonProperty("cmoMadeBy")
     private String cmoMadeBy;
     @JsonProperty("cmoEnterFullName")

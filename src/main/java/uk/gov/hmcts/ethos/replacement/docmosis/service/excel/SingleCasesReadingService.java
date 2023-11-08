@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service("singleCasesReadingService")
@@ -81,8 +82,8 @@ public class SingleCasesReadingService {
 
     }
 
-    public HashSet<SchedulePayloadEvent> retrieveScheduleCases(String userToken, String multipleCaseTypeId,
-                                                               List<String> caseIds) {
+    public Set<SchedulePayloadEvent> retrieveScheduleCases(String userToken, String multipleCaseTypeId,
+                                                           List<String> caseIds) {
 
         HashSet<SchedulePayloadEvent> schedulePayloadEvents = new HashSet<>();
 

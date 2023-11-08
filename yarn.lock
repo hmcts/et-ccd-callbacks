@@ -853,11 +853,11 @@ __metadata:
   linkType: hard
 
 "@types/lodash.isobject@npm:^3.0.7":
-  version: 3.0.8
-  resolution: "@types/lodash.isobject@npm:3.0.8"
+  version: 3.0.9
+  resolution: "@types/lodash.isobject@npm:3.0.9"
   dependencies:
     "@types/lodash": "*"
-  checksum: dd270da1271b3230074b90f7adb2a56b40d1a5b767e35a5aaba221966b57e3245996aabc25dd67b5227f1acf28c8fe5746c128f562fa49418d4a48e69d9b125d
+  checksum: 09785a1c150759730b4eb32f7435eeeb8e52c78ea8030f744bcf83d6a9dfda493327dad31fb74d0c7e180cdb920bf68a37ac5f69dcc5285d092c5c3301ffb1c3
   languageName: node
   linkType: hard
 

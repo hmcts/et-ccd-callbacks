@@ -58,6 +58,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isBundlesEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
+        givenToggle("hmc", toggleStat);
+
+        assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

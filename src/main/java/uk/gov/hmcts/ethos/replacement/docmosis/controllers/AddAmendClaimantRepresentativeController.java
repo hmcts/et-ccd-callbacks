@@ -37,7 +37,7 @@ public class AddAmendClaimantRepresentativeController {
     private final AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
 
     /**
-     * AboutToSubmit for creating/managing case flags. Validates flags and sets other flags as needed.
+     * AboutToSubmit for addAmendClaimantRepresentative.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization

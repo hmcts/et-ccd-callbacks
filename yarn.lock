@@ -862,11 +862,11 @@ __metadata:
   linkType: hard
 
 "@types/lodash.isplainobject@npm:^4.0.7":
-  version: 4.0.8
-  resolution: "@types/lodash.isplainobject@npm:4.0.8"
+  version: 4.0.9
+  resolution: "@types/lodash.isplainobject@npm:4.0.9"
   dependencies:
     "@types/lodash": "*"
-  checksum: f0b8a6bbcfb93fd60fb6142af7c533d4a006461cc9eb6ff18d7952dd20f2f4f5915470700efeb38afa79f045567c6a97985ca2a4e61dfadc9875285eb68c2010
+  checksum: 2ccfff10ff81a78caa9ed4d660efecdebaa145e428c0e3b175650d6de27a5fa06627e2fab0636ab25178f57ec58325fc31b46398aef05df0a912e65b211a20b2
   languageName: node
   linkType: hard
 

@@ -37,7 +37,7 @@ public class AddAmendClaimantRepresentativeController {
     private final AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
 
     /**
-     * AboutToSubmit for addAmendClaimantRepresentative.
+     * AboutToSubmit for addAmendClaimantRepresentative. Sets the claimant rep's id.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization

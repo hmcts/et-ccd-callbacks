@@ -871,11 +871,11 @@ __metadata:
   linkType: hard
 
 "@types/lodash.zip@npm:^4.2.7":
-  version: 4.2.8
-  resolution: "@types/lodash.zip@npm:4.2.8"
+  version: 4.2.9
+  resolution: "@types/lodash.zip@npm:4.2.9"
   dependencies:
     "@types/lodash": "*"
-  checksum: 292a86250ef89bc678ca21b642080ac43f0cb4b0cb6df8399b3c9fe5f3d4b8340e5f595da1d2e4775e9aaed26a58d64691e17f78bb3b52105c8b5ec3ae0cd85f
+  checksum: 5a0470386db37b8bc886fa3c2825e3c87553f96801dab49e46947ece942ca1c11d79105e644672bc1887edf87efb2733f39cb39a026e78d723621cecc7e0aa69
   languageName: node
   linkType: hard
 

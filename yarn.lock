@@ -947,11 +947,11 @@ __metadata:
   linkType: hard
 
 "@types/redis-mock@npm:^0.17.1":
-  version: 0.17.2
-  resolution: "@types/redis-mock@npm:0.17.2"
+  version: 0.17.3
+  resolution: "@types/redis-mock@npm:0.17.3"
   dependencies:
     "@types/redis": ^2.8.0
-  checksum: 487ab4ff7a26da87c793a1d0cdb852deee38de433ebd27e1a8af0b9db81107a8184a2aaae9fc421dbf77de8692182d0e69ee66b5cf1a735aa9e17b6a97d5e954
+  checksum: 9bf3edb36e07ca3c40ea6e5131638665f79a7388770b9ebc654e3c214ff38c654492df97a50f9e76da15a7eaea14edff42285faf77aab4117d7d37ecb2a0bf20
   languageName: node
   linkType: hard
 

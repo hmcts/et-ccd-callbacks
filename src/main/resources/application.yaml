@@ -159,8 +159,11 @@ template:
     noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
 
   bundles:
-    claimantSubmittedRespondentNotification:
-      ${BUNDLES_CLAIMANT_SUBMITTED_RESPONDENT_NOTIFICATION_TEMPLATE_ID:5c829358-0b54-4335-9d60-1c8296c4a516}
+    claimantSubmittedNotificationForClaimant:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
+    claimantSubmittedNotificationForRespondent:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+
 
 etcos:
   system:

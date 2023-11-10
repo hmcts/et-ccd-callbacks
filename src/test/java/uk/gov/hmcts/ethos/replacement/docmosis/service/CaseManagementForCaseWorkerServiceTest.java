@@ -58,6 +58,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -1173,6 +1174,24 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.setPublicCaseName(caseData);
 
         assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE, caseData.getPublicCaseName());
+    }
+
+    @Test
+    void testClaimantDefaultsAddsClaimantIdWhenHmcFlagTruthy() {
+        CaseData caseData = new CaseData();
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        caseManagementForCaseWorkerService.claimantDefaults(caseData);
+
+        assertNotNull(caseData.getClaimantId());
+    }
+
+    @Test
+    void testClaimantDefaultsDoesNotAddClaimantIdWhenHmcFlagFalsy() {
+        CaseData caseData = new CaseData();
+        when(featureToggleService.isHmcEnabled()).thenReturn(false);
+        caseManagementForCaseWorkerService.claimantDefaults(caseData);
+
+        assertNull(caseData.getClaimantId());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

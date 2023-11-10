@@ -21,6 +21,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,10 @@ public class PreHearingDepositService {
     private static final String PRE_HEARING_CASE_CREATION_EVENT_SUMMARY = "Pre-Hearing Deposit Bulk Case Creation";
     private static final String PRE_HEARING_CASE_TYPE_ID = "Pre_Hearing_Deposit";
     private static final String JURISDICTION_EMPLOYMENT = "EMPLOYMENT";
-    private static final String ZERO_STRING = "0";
+    private static final String YES = "Yes";
+    private static final String NO = "No";
+    private static final int CURRENCY_FACTOR = 100;
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     private static final int FIRST_SHEET_NUMBER = 0;
     private static final int FIRST_ROW_NUMBER = 0;
     private static final int CASE_NUMBER_COLUMN_NO = 0;
@@ -71,14 +76,8 @@ public class PreHearingDepositService {
             XSSFSheet officeSheet = workbook.getSheetAt(FIRST_SHEET_NUMBER);
             for (Row row : officeSheet) {
                 if (row.getRowNum() > FIRST_ROW_NUMBER) {
-                    PreHearingDepositData preHearingDepositData = new PreHearingDepositData();
-                    preHearingDepositData.setPreHearingDepositImportFile(preHearingDepositImportFile);
-                    setPreHearingDepositDataWithExcelRowValues(row, preHearingDepositData);
-                    GenericTypeCaseDetails<PreHearingDepositData> preHearingDepositCaseDetails;
-                    preHearingDepositCaseDetails = new GenericTypeCaseDetails<>();
-                    preHearingDepositCaseDetails.setCaseData(preHearingDepositData);
-                    preHearingDepositCaseDetails.setCaseTypeId(PRE_HEARING_CASE_TYPE_ID);
-                    preHearingDepositCaseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
+                    GenericTypeCaseDetails<PreHearingDepositData> preHearingDepositCaseDetails =
+                        generatePreHearingDepositCaseDetails(preHearingDepositImportFile, row);
                     CCDRequest request = ccdClient.startGenericTypeCaseCreation(
                             userToken, preHearingDepositCaseDetails);
                     ccdClient.submitGenericTypeCaseCreation(userToken, preHearingDepositCaseDetails, request,
@@ -88,39 +87,22 @@ public class PreHearingDepositService {
         }
     }
 
-    private void setPreHearingDepositDataWithExcelRowValues(
-            Row row, PreHearingDepositData preHearingDepositData) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    private GenericTypeCaseDetails<PreHearingDepositData> generatePreHearingDepositCaseDetails(
+            ImportFile importFile, Row row) {
+        GenericTypeCaseDetails<PreHearingDepositData> preHearingDepositCaseDetails = new GenericTypeCaseDetails<>();
+        preHearingDepositCaseDetails.setCaseTypeId(PRE_HEARING_CASE_TYPE_ID);
+        preHearingDepositCaseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
+        PreHearingDepositData preHearingDepositData = new PreHearingDepositData();
+        preHearingDepositData.setPreHearingDepositImportFile(importFile);
         preHearingDepositData.setCaseNumber(row.getCell(CASE_NUMBER_COLUMN_NO).getStringCellValue());
         preHearingDepositData.setClaimantOrRespondentName(
                 row.getCell(CLAIMANT_OR_RESPONDENT_COLUMN_NO).getStringCellValue());
-        if (ObjectUtils.isNotEmpty(row.getCell(DEPOSIT_DUE_DATE_COLUMN_NO_1).getDateCellValue())) {
-            preHearingDepositData.setDepositDue(
-                    formatter.format(row.getCell(DEPOSIT_DUE_DATE_COLUMN_NO_1).getDateCellValue()));
-        }
-        if (ObjectUtils.isNotEmpty(row.getCell(DEPOSIT_RECEIVED_DATE_COLUMN_NO).getDateCellValue())) {
-            preHearingDepositData.setDateDepositReceived(
-                    formatter.format(row.getCell(DEPOSIT_RECEIVED_DATE_COLUMN_NO).getDateCellValue()));
-        }
-
-        if (ObjectUtils.isNotEmpty(row.getCell(DEPOSIT_AMOUNT_COLUMN_NO).getNumericCellValue())) {
-            preHearingDepositData.setDepositAmount(NumberToTextConverter.toText(
-                    row.getCell(DEPOSIT_AMOUNT_COLUMN_NO).getNumericCellValue() * 100));
-        }
-        if (ObjectUtils.isNotEmpty(row.getCell(AMOUNT_REFUNDED_COLUMN_NO).getNumericCellValue())) {
-            preHearingDepositData.setAmountRefunded(NumberToTextConverter.toText(
-                    row.getCell(AMOUNT_REFUNDED_COLUMN_NO).getNumericCellValue() * 100));
-        }
-        String yesOrNo = row.getCell(DEPOSIT_REFUNDED_COLUMN_NO).getStringCellValue();
-        if ("YES".equalsIgnoreCase(yesOrNo)) {
-            preHearingDepositData.setDepositRefund("Yes");
-        } else {
-            preHearingDepositData.setDepositRefund("No");
-        }
-        if (ObjectUtils.isNotEmpty(row.getCell(DEPOSIT_REFUND_DATE_COLUMN_NO).getDateCellValue())) {
-            preHearingDepositData.setDepositRefundDate(
-                    formatter.format(row.getCell(DEPOSIT_REFUND_DATE_COLUMN_NO).getDateCellValue()));
-        }
+        setDateValue(preHearingDepositData, row.getCell(DEPOSIT_DUE_DATE_COLUMN_NO_1).getDateCellValue());
+        setDateValue(preHearingDepositData, row.getCell(DEPOSIT_RECEIVED_DATE_COLUMN_NO).getDateCellValue());
+        setCurrencyValue(preHearingDepositData, row.getCell(DEPOSIT_AMOUNT_COLUMN_NO).getNumericCellValue());
+        setCurrencyValue(preHearingDepositData, row.getCell(AMOUNT_REFUNDED_COLUMN_NO).getNumericCellValue());
+        setYesOrNoValue(preHearingDepositData, row.getCell(DEPOSIT_REFUNDED_COLUMN_NO).getStringCellValue());
+        setDateValue(preHearingDepositData, row.getCell(DEPOSIT_REFUND_DATE_COLUMN_NO).getDateCellValue());
         preHearingDepositData.setChequeOrPONumber(excelReadingService.getCellValue(
                 row.getCell(CHEQUE_OR_PO_NUMBER_COLUMN_NO)));
         preHearingDepositData.setReceivedBy(row.getCell(RECEIVED_BY_COLUMN_NO).getStringCellValue());
@@ -132,29 +114,41 @@ public class PreHearingDepositService {
         }
 
         preHearingDepositData.setMr1Reference(row.getCell(MR_1_REFERENCE_COLUMN_NO).getStringCellValue());
-        if (ObjectUtils.isNotEmpty(row.getCell(BANKING_DATE_COLUMN_NO).getDateCellValue())) {
-            preHearingDepositData.setBankingDate(
-                    formatter.format(row.getCell(BANKING_DATE_COLUMN_NO).getDateCellValue()));
-        }
-        if (ObjectUtils.isNotEmpty(row.getCell(JOURNAL_CONFIRMED_RECEIPT_DATE_COLUMN_NO).getDateCellValue())) {
-            preHearingDepositData.setJournalConfirmedReceipt(
-                    formatter.format(row.getCell(JOURNAL_CONFIRMED_RECEIPT_DATE_COLUMN_NO).getDateCellValue()));
-        }
+        setDateValue(preHearingDepositData, row.getCell(BANKING_DATE_COLUMN_NO).getDateCellValue());
+        setDateValue(preHearingDepositData, row.getCell(JOURNAL_CONFIRMED_RECEIPT_DATE_COLUMN_NO).getDateCellValue());
+
         preHearingDepositData.setComments(row.getCell(COMMENTS_COLUMN_NO).getStringCellValue());
         preHearingDepositData.setStatus(row.getCell(STATUS_COLUMN_NO).getStringCellValue());
-        if (ObjectUtils.isNotEmpty(row.getCell(DATE_SENT_FOR_REFUND_COLUMN_NO).getDateCellValue())) {
-            preHearingDepositData.setDateSentForRefund(
-                    formatter.format(row.getCell(DATE_SENT_FOR_REFUND_COLUMN_NO).getDateCellValue()));
-        }
+        setDateValue(preHearingDepositData, row.getCell(DATE_SENT_FOR_REFUND_COLUMN_NO).getDateCellValue());
+
         preHearingDepositData.setPayeeName(row.getCell(PAYEE_NAME_COLUMN_NO).getStringCellValue());
         preHearingDepositData.setRefundReference(row.getCell(REFUND_REFERENCE_COLUMN_NO).getStringCellValue());
-        if (ObjectUtils.isNotEmpty(row.getCell(JOURNAL_CONFIRMED_PAID_DATE_COLUMN_NO).getDateCellValue())) {
-            preHearingDepositData.setJournalConfirmedPaid(
-                    formatter.format(row.getCell(JOURNAL_CONFIRMED_PAID_DATE_COLUMN_NO).getDateCellValue()));
-        }
+        setDateValue(preHearingDepositData, row.getCell(JOURNAL_CONFIRMED_PAID_DATE_COLUMN_NO).getDateCellValue());
         if (ObjectUtils.isNotEmpty(row.getCell(REGION_OFFICE_COLUMN_NO))
                 && !row.getCell(REGION_OFFICE_COLUMN_NO).getCellType().equals(CellType.ERROR)) {
             preHearingDepositData.setRegionOffice(row.getCell(REGION_OFFICE_COLUMN_NO).getStringCellValue());
+        }
+        preHearingDepositCaseDetails.setCaseData(preHearingDepositData);
+        return preHearingDepositCaseDetails;
+    }
+
+    private void setDateValue(PreHearingDepositData preHearingDepositData, Date date) {
+        if (ObjectUtils.isNotEmpty(date)) {
+            preHearingDepositData.setDepositDue(dateFormatter.format(date));
+        }
+    }
+
+    private void setCurrencyValue(PreHearingDepositData preHearingDepositData, double doubleValue) {
+        if (ObjectUtils.isNotEmpty(doubleValue)) {
+            preHearingDepositData.setDepositAmount(NumberToTextConverter.toText(doubleValue * CURRENCY_FACTOR));
+        }
+    }
+
+    private void setYesOrNoValue(PreHearingDepositData preHearingDepositData, String yesOrNo) {
+        if (YES.equalsIgnoreCase(yesOrNo)) {
+            preHearingDepositData.setDepositRefund(YES);
+        } else {
+            preHearingDepositData.setDepositRefund(NO);
         }
     }
 }

@@ -40,6 +40,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
@@ -68,12 +69,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
@@ -82,6 +85,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -104,6 +108,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest ccdRequest14;
     private CCDRequest ccdRequest15;
     private CCDRequest ccdRequest21;
+    private CCDRequest ccdRequest22;
 
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
@@ -169,6 +174,10 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseDetails caseDetails21 = generateCaseDetails("caseDetailsTest21.json");
         ccdRequest21.setCaseDetails(caseDetails21);
 
+        ccdRequest22 = new CCDRequest();
+        CaseDetails caseDetails22 = generateCaseDetails("caseDetailsTest22.json");
+        ccdRequest22.setCaseDetails(caseDetails22);
+
         CCDRequest ccdRequest2 = new CCDRequest();
         CaseDetails caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         ccdRequest2.setCaseDetails(caseDetails2);
@@ -211,6 +220,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn(TribunalOffice.valueOfOfficeName("Edinburgh"));
         when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getEdinburghCourtLocations());
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService,
@@ -234,6 +244,20 @@ class CaseManagementForCaseWorkerServiceTest {
         address.setCountry("UK");
         address.setPostCode("L1 122");
         return address;
+    }
+
+    @Test
+    void caseDataDefaultsClearRespondentTypeFields() {
+        CaseData caseData = ccdRequest22.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+            if (respondentSumTypeItem.getValue().getRespondentType().equals(ORGANISATION)) {
+                assertEquals("", respondentSumTypeItem.getValue().getRespondentFirstName());
+                assertEquals("", respondentSumTypeItem.getValue().getRespondentLastName());
+            } else {
+                assertEquals("", respondentSumTypeItem.getValue().getRespondentOrganisation());
+            }
+        }
     }
 
     @Test
@@ -1124,6 +1148,31 @@ class CaseManagementForCaseWorkerServiceTest {
         Exception exception = assertThrows(CaseCreationException.class,
                 () -> caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(caseDetails));
         assertEquals("Call to Supplementary Data API failed for 123456789 with call failed", exception.getMessage());
+    }
+
+    @Test
+    void testPublicCaseName() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("claimant");
+        caseData.setRespondent("respondent");
+
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+
+        assertEquals("claimant vs respondent", caseData.getPublicCaseName());
+    }
+
+    @Test
+    void testPublicCaseNameWithRule50() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("Person1");
+        caseData.setRespondent("Person2");
+        RestrictedReportingType restrictedReportingType = new RestrictedReportingType();
+        restrictedReportingType.setRule503b(YES);
+        caseData.setRestrictedReporting(restrictedReportingType);
+
+        caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+
+        assertEquals(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE, caseData.getPublicCaseName());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

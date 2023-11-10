@@ -348,7 +348,7 @@ public class CaseDataBuilder {
                                                    String postTown, String postCode, String country) {
         ClaimantWorkAddressType claimantWorkAddress = new ClaimantWorkAddressType();
         claimantWorkAddress.setClaimantWorkAddress(
-            createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country)
+                createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country)
         );
         caseData.setClaimantWorkAddress(claimantWorkAddress);
         return this;
@@ -370,7 +370,7 @@ public class CaseDataBuilder {
                                           String respondentEmail, boolean extension) {
         withRespondent(respondentName, responseReceived, receivedDate, extension);
         RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection()
-            .get(caseData.getRespondentCollection().size() - 1);
+                .get(caseData.getRespondentCollection().size() - 1);
         respondentSumTypeItem.getValue().setRespondentEmail(respondentEmail);
         return this;
 
@@ -431,7 +431,7 @@ public class CaseDataBuilder {
         respondentSumType.setRespondentName(respondentName);
         respondentSumType.setRespondentEmail(email);
         respondentSumType.setRespondentAddress(
-            createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
+                createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
 
         if (!Strings.isNullOrEmpty(responseAcas)) {
             respondentSumType.setRespondentAcas(responseAcas);
@@ -452,9 +452,9 @@ public class CaseDataBuilder {
      */
     public CaseDataBuilder withRespondentRepresentative(String respondentName, String repName, String email) {
         RepresentedTypeR item = RepresentedTypeR.builder()
-            .respRepName(respondentName)
-            .nameOfRepresentative(repName)
-            .representativeEmailAddress(email).build();
+                .respRepName(respondentName)
+                .nameOfRepresentative(repName)
+                .representativeEmailAddress(email).build();
         RepresentedTypeRItem itemType = new RepresentedTypeRItem();
         itemType.setValue(item);
         if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
@@ -496,7 +496,7 @@ public class CaseDataBuilder {
      * Creates an Address object from its properties.
      */
     public Address createAddress(String addressLine1, String addressLine2, String addressLine3,
-                                  String postTown, String county, String postCode, String country) {
+                                 String postTown, String county, String postCode, String country) {
         Address address = new Address();
         address.setAddressLine1(addressLine1);
         if (!Strings.isNullOrEmpty(addressLine2)) {
@@ -536,17 +536,17 @@ public class CaseDataBuilder {
         caseRoleIDList.setListItems(List.of(caseRoleIDValue));
 
         ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
-            .organisationToAdd(organisationToAdd)
-            .organisationToRemove(organisationToRemove)
-            .caseRoleId(caseRoleIDList)
-            .requestTimestamp(requestTimestamp)
-            .approvalStatus(approvalStatus)
-            .build();
+                .organisationToAdd(organisationToAdd)
+                .organisationToRemove(organisationToRemove)
+                .caseRoleId(caseRoleIDList)
+                .requestTimestamp(requestTimestamp)
+                .approvalStatus(approvalStatus)
+                .build();
 
         caseData.setChangeOrganisationRequestField(cor);
         return this;
     }
-        
+
     public CaseDataBuilder withAssignOffice(String selectedOffice) {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->
@@ -590,4 +590,3 @@ public class CaseDataBuilder {
         return this;
     }
 }
-

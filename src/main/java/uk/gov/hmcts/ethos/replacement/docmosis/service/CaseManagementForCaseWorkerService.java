@@ -138,6 +138,9 @@ public class CaseManagementForCaseWorkerService {
         } else {
             caseData.setClaimant(MISSING_CLAIMANT);
         }
+        if (featureToggleService.isHmcEnabled()) {
+            caseData.setClaimantId(UUID.randomUUID().toString());
+        }
         addClaimantDocuments(caseData);
     }
 

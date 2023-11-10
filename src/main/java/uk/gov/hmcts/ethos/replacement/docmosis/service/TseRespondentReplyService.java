@@ -239,9 +239,8 @@ public class TseRespondentReplyService {
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
-        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
-        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
-                caseData.getClaimantHearingPreference().getContactLanguage());
+        boolean isWelsh = featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String emailTemplate = isWelsh
                 ? cyTseRespondentResponseTemplateId
                 : tseRespondentResponseTemplateId;

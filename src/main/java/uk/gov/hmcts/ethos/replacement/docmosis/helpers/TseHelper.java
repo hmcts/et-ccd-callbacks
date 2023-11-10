@@ -234,9 +234,8 @@ public final class TseHelper {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
-        boolean welshFlagEnabled = featureToggleService.isWelshEnabled();
-        boolean isWelsh = welshFlagEnabled && WELSH_LANGUAGE.equals(
-                caseData.getClaimantHearingPreference().getContactLanguage());
+        boolean isWelsh = featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String linkToCitizenHub = isWelsh
                 ? citizenUrl + WELSH_LANGUAGE_PARAM
                 : citizenUrl;

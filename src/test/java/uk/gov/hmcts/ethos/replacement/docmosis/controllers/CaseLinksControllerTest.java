@@ -14,7 +14,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
+import uk.gov.hmcts.et.common.model.ccd.types.LinkReason;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -29,6 +33,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseLinksController.class, JsonMapper.class})
@@ -43,6 +49,8 @@ class CaseLinksControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private CaseLinksEmailService caseLinksEmailService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -52,7 +60,7 @@ class CaseLinksControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -120,4 +128,66 @@ class CaseLinksControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void testHearingIsLinkedFlagIsYes() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(CREATE_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()))
+                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(YES));
+    }
+
+    @Test
+    void testHearingIsLinkedFlagIsFalse() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(MAINTAIN_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()))
+                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(NO));
+    }
+
+    @Test
+    void shouldNotSetHearingIsLinkedFlagWhenLinksRemain() throws Exception {
+
+        CaseLink caseLink1 = getCaseLink("CLRC016");
+        CaseLink caseLink2 = getCaseLink("CLRC016");
+
+        ListTypeItem<CaseLink> caseLinks = ListTypeItem.from(caseLink1, caseLink2);
+
+        ccdRequest.getCaseDetails().getCaseData().setCaseLinks(caseLinks);
+        ccdRequest.getCaseDetails().getCaseData().setHearingIsLinkedFlag(YES);
+
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(MAINTAIN_SUBMITTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()))
+                .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(YES));
+    }
+
+    private CaseLink getCaseLink(String linkReasonCode) {
+        LinkReason linkReason = new LinkReason();
+        linkReason.setReason(linkReasonCode);
+        ListTypeItem<LinkReason> linkReasons = ListTypeItem.from(linkReason, "1");
+
+        return CaseLink.builder().caseReference("1").caseType(ENGLANDWALES_CASE_TYPE_ID)
+                .reasonForLink(linkReasons).build();
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
@@ -50,6 +51,7 @@ import static java.time.DayOfWeek.SUNDAY;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
@@ -59,6 +61,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
@@ -70,7 +73,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesSer
 @Slf4j
 @Service("caseManagementForCaseWorkerService")
 public class CaseManagementForCaseWorkerService {
-
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
@@ -86,7 +88,6 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
-    public static final String DOCUMENTS_TAB = "#Documents";
     public static final String ORGANISATION = "Organisation";
 
     @Autowired
@@ -166,6 +167,7 @@ public class CaseManagementForCaseWorkerService {
                 checkResponseReceived(respondentSumTypeItem);
                 checkResponseAddress(respondentSumTypeItem);
                 checkResponseContinue(respondentSumTypeItem);
+                clearRespondentTypeFields(respondentSumTypeItem);
             }
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
@@ -603,5 +605,28 @@ public class CaseManagementForCaseWorkerService {
                 .baseLocation(tribunalLocations.getEpimmsId())
                 .region(tribunalLocations.getRegionId())
                 .build());
+    }
+
+    public void setPublicCaseName(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData.getRestrictedReporting())) {
+            caseData.setPublicCaseName(caseData.getClaimant() + " vs " + caseData.getRespondent());
+        } else {
+            caseData.setPublicCaseName(CLAIMANT_TITLE + " vs " + RESPONDENT_TITLE);
+        }
+    }
+
+    private void clearRespondentTypeFields(RespondentSumTypeItem respondentSumTypeItem) {
+        if (!featureToggleService.isHmcEnabled()) {
+            return;
+        }
+        RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+        if (respondentSumType != null && respondentSumType.getRespondentType() != null) {
+            if (respondentSumType.getRespondentType().equals(ORGANISATION)) {
+                respondentSumType.setRespondentFirstName("");
+                respondentSumType.setRespondentLastName("");
+            } else {
+                respondentSumType.setRespondentOrganisation("");
+            }
+        }
     }
 }

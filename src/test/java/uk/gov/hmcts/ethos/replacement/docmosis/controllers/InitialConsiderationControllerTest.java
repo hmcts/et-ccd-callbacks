@@ -16,7 +16,9 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -29,6 +31,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -64,6 +68,12 @@ class InitialConsiderationControllerTest {
     @MockBean
     private TornadoService tornadoService;
 
+    @MockBean
+    private CaseFlagsService caseFlagsService;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     private MockMvc mvc;
 
     private CCDRequest ccdRequest;
@@ -74,6 +84,7 @@ class InitialConsiderationControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
         String hearingNumber = "123";
         String venue = "Some venue";
@@ -132,6 +143,7 @@ class InitialConsiderationControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
     }
 
     @Test

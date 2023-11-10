@@ -12,7 +12,7 @@
         "@wdio/sauce-service": "7.33.0",
         "@wdio/selenium-standalone-service": "7.33.0",
         "@wdio/types": "7.33.0",
-        "axios": "1.6.0",
+        "axios": "1.6.1",
         "codeceptjs-saucehelper": "1.4.0",
         "cross-env": "7.0.3",
         "eslint": "8.53.0",

@@ -111,7 +111,12 @@ public class PreHearingDepositService {
             preHearingDepositData.setAmountRefunded(NumberToTextConverter.toText(
                     row.getCell(AMOUNT_REFUNDED_COLUMN_NO).getNumericCellValue() * 100));
         }
-        preHearingDepositData.setDepositRefund(row.getCell(DEPOSIT_REFUNDED_COLUMN_NO).getStringCellValue());
+        String yesOrNo = row.getCell(DEPOSIT_REFUNDED_COLUMN_NO).getStringCellValue();
+        if ("YES".equalsIgnoreCase(yesOrNo)) {
+            preHearingDepositData.setDepositRefund("Yes");
+        } else {
+            preHearingDepositData.setDepositRefund("No");
+        }
         if (ObjectUtils.isNotEmpty(row.getCell(DEPOSIT_REFUND_DATE_COLUMN_NO).getDateCellValue())) {
             preHearingDepositData.setDepositRefundDate(
                     formatter.format(row.getCell(DEPOSIT_REFUND_DATE_COLUMN_NO).getDateCellValue()));

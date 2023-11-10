@@ -214,8 +214,7 @@ public final class HearingsByHearingTypeReport {
                 fields.setHearingPrelimCount(String.valueOf(Integer.parseInt(fields.getHearingPrelimCount()) + 1));
                 fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
                 break;
-            case COSTS_HEARING_TYPE:
-            case COSTS_HEARING_TYPE_SCOTLAND:
+            case COSTS_HEARING_TYPE, COSTS_HEARING_TYPE_SCOTLAND:
                 fields.setCostsCount(String.valueOf(Integer.parseInt(fields.getCostsCount()) + 1));
                 fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
                 break;

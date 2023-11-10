@@ -105,6 +105,12 @@ template:
   respondNotification:
     noResponse: d2caad87-2bab-4bc0-b598-01f1a7341f9e
 
+  bundles:
+    claimantSubmittedNotificationForClaimant:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
+    claimantSubmittedNotificationForRespondent:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+
   claimantSendNotificationHearingOther: ${CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
 
   respondentSendNotificationHearingOther: ${RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
@@ -131,3 +137,4 @@ hmcts_service_id: BHA1
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   env: ${LAUNCH_DARKLY_ENV:default}
+

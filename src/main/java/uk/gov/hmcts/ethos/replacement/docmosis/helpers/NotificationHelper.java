@@ -145,8 +145,8 @@ public final class NotificationHelper {
 
     private static String getNameOfRespondents(CaseData caseData) {
         return caseData.getRespondentCollection().stream()
-            .map(o -> getNameForRespondent(caseData, o.getValue()))
-            .collect(Collectors.joining(", "));
+                .map(o -> getNameForRespondent(caseData, o.getValue()))
+                .collect(Collectors.joining(", "));
     }
 
     /**
@@ -182,8 +182,8 @@ public final class NotificationHelper {
         }
 
         Optional<RepresentedTypeRItem> respondentRep = repCollection.stream()
-            .filter(o -> respondent.getRespondentName().equals(o.getValue().getRespRepName()))
-            .findFirst();
+                .filter(o -> respondent.getRespondentName().equals(o.getValue().getRespRepName()))
+                .findFirst();
 
         return respondentRep.map(RepresentedTypeRItem::getValue).orElse(null);
     }

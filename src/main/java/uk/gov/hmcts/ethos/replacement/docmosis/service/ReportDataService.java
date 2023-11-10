@@ -53,7 +53,7 @@ public class ReportDataService {
     private final CcdClient ccdClient;
     private final ListingService listingService;
     private final JudgeService judgeService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
 
     private static final String REPORT_DATA_GENERATION_FAILED_ERROR = "Failed to generate report data for case id : ";
 
@@ -144,7 +144,7 @@ public class ReportDataService {
     }
 
     public String getUserFullName(String userToken) {
-        UserDetails userDetails = userService.getUserDetails(userToken);
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
         String firstName = userDetails.getFirstName() != null ? userDetails.getFirstName() : "";
         String lastName = userDetails.getLastName() != null ? userDetails.getLastName() : "";
         return firstName + " " + lastName;

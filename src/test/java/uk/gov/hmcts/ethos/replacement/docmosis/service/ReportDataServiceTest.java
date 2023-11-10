@@ -93,7 +93,7 @@ class ReportDataServiceTest {
     private CcdClient ccdClient;
     private ListingDetails listingDetails;
     @Mock
-    private UserService userService;
+    private UserIdamService userIdamService;
 
     @BeforeEach
     public void setUp() {
@@ -376,7 +376,7 @@ class ReportDataServiceTest {
         when(ccdClient.claimsByHearingVenueSearch(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(submitEvent));
         UserDetails userDetails = new UserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
 
         ClaimsByHearingVenueReportData listingDataResult =
             (ClaimsByHearingVenueReportData) reportDataService.generateReportData(listingDetails, "authToken");

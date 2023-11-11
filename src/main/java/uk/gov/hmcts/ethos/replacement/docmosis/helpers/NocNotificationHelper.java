@@ -63,12 +63,14 @@ public final class NocNotificationHelper {
 
     }
 
-    public static Map<String, String> buildPersonalisationWithPartyName(CaseDetails caseDetails, String partyName) {
+    public static Map<String, String> buildPersonalisationWithPartyName(CaseDetails caseDetails, String partyName,
+                                                                        String citUrl) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseDetails.getCaseData(), personalisation);
         personalisation.put("party_name", partyName);
         personalisation.put("ccdId", caseDetails.getCaseId());
+        personalisation.put("linkToCitUI", citUrl);
 
         return personalisation;
     }

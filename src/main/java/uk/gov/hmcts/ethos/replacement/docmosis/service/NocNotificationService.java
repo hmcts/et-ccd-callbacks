@@ -51,10 +51,11 @@ public class NocNotificationService {
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
         } else {
+            String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
             emailService.sendEmail(
                     claimantTemplateId,
                     claimantEmail,
-                    NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsPrevious, partyName)
+                    NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsPrevious, partyName, citUrl)
             );
         }
 
@@ -122,10 +123,11 @@ public class NocNotificationService {
                 if (isNullOrEmpty(newOrgAdminEmail)) {
                     log.warn("New Org " + orgId + " is missing org admin email");
                 } else {
+                    String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
                     emailService.sendEmail(
                             newRespondentSolicitorTemplateId,
                             newOrgAdminEmail,
-                            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsNew, partyName)
+                            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl)
                     );
                 }
             }

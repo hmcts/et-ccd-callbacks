@@ -101,48 +101,54 @@ public class NocNotificationService {
 
     private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
-            Object resBody = getOrgResponse.getBody();
-            if (resBody != null) {
-                String oldOrgAdminEmail = ((RetrieveOrgByIdResponse) resBody).getSuperUser().getEmail();
-                if (isNullOrEmpty(oldOrgAdminEmail)) {
-                    log.warn("Previous Org " + orgId + " is missing org admin email");
-                } else {
-                    emailService.sendEmail(
-                            previousRespondentSolicitorTemplateId,
-                            oldOrgAdminEmail,
-                            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
-                    );
-                }
-            }
+        HttpStatus statusCode = getOrgResponse.getStatusCode();
 
-        } else {
-            log.error("Cannot retrieve old org by id " + orgId
-                    + " [" + getOrgResponse.getStatusCode() + "] " + getOrgResponse.getBody());
+        if (!HttpStatus.OK.equals(statusCode)) {
+            log.error("Cannot retrieve old org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
+            return;
         }
+
+        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
+        if (resBody == null) {
+            return;
+        }
+
+        String oldOrgAdminEmail = resBody.getSuperUser().getEmail();
+        if (isNullOrEmpty(oldOrgAdminEmail)) {
+            log.warn("Previous Org " + orgId + " is missing org admin email");
+            return;
+        }
+
+        emailService.sendEmail(
+                previousRespondentSolicitorTemplateId,
+                oldOrgAdminEmail,
+                NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
+        );
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
-            Object resBody = getOrgResponse.getBody();
-            if (resBody != null) {
-                String newOrgAdminEmail = ((RetrieveOrgByIdResponse) resBody).getSuperUser().getEmail();
-                if (isNullOrEmpty(newOrgAdminEmail)) {
-                    log.warn("New Org " + orgId + " is missing org admin email");
-                } else {
-                    String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
-                    emailService.sendEmail(
-                            newRespondentSolicitorTemplateId,
-                            newOrgAdminEmail,
-                            buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl)
-                    );
-                }
-            }
-        } else {
-            log.error("Cannot retrieve new org by id " + orgId
-                    + " [" + getOrgResponse.getStatusCode() + "] " + getOrgResponse.getBody());
+        HttpStatus statusCode = getOrgResponse.getStatusCode();
+
+        if (!HttpStatus.OK.equals(statusCode)) {
+            log.error("Cannot retrieve new org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
+            return;
         }
+
+        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
+        if (resBody == null) {
+            return;
+        }
+
+        String newOrgAdminEmail = resBody.getSuperUser().getEmail();
+        if (isNullOrEmpty(newOrgAdminEmail)) {
+            log.warn("New Org {} is missing org admin email", orgId);
+            return;
+        }
+
+        String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
+        Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
+        emailService.sendEmail(newRespondentSolicitorTemplateId, newOrgAdminEmail, personalisation);
     }
 
     private ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(String orgId) {

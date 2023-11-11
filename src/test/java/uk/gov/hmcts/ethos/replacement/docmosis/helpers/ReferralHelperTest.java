@@ -381,7 +381,7 @@ class ReferralHelperTest {
         caseData.setSelectReferral(selectReferralList);
         setReferralReplyData();
 
-        ReferralHelper.createReferralReply(caseData, "Judge Alex");
+        ReferralHelper.createReferralReply(caseData, "Judge Alex", true);
 
         ReferralReplyType testReply = caseData.getReferralCollection()
                 .get(0).getValue().getReferralReplyCollection()

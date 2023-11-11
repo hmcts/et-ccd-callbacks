@@ -81,6 +81,8 @@ class TseRespondentReplyServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
@@ -102,9 +104,10 @@ class TseRespondentReplyServiceTest {
     void setUp() throws Exception {
         emailService = spy(new EmailUtils());
         tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userIdamService,
-                respondentTellSomethingElseService, tseService, documentManagementService);
+                respondentTellSomethingElseService, tseService, documentManagementService, featureToggleService);
 
         userDetails = HelperTest.getUserDetails();
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         doNothing().when(emailService).sendEmail(any(), any(), any());

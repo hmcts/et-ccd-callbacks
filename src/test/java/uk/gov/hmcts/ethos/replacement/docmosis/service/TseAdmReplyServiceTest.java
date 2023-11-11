@@ -79,6 +79,8 @@ class TseAdmReplyServiceTest {
     private TornadoService tornadoService;
     @MockBean
     private TseService tseService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     private CaseData caseData;
 
@@ -104,10 +106,11 @@ class TseAdmReplyServiceTest {
     void setUp() {
         emailService = spy(new EmailUtils());
         tseAdmReplyService = new TseAdmReplyService(documentManagementService, emailService,
-                tornadoService, tseService);
+                tornadoService, tseService, featureToggleService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
 
         Resource resource = new ByteArrayResource(new byte[] { 10, 20, 15});

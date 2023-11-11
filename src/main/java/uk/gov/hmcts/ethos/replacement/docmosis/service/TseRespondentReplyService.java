@@ -51,6 +51,7 @@ public class TseRespondentReplyService {
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
     private final DocumentManagementService documentManagementService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.tse.respondent.respond.claimant}")
     private String tseRespondentResponseTemplateId;
@@ -151,21 +152,22 @@ public class TseRespondentReplyService {
         }
         List<TseRespondTypeItem> respondCollection = genericTseApplicationType.getRespondCollection();
 
-        respondCollection.add(TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(
-                TseRespondType.builder()
-                    .response(caseData.getTseResponseText())
-                    .supportingMaterial(caseData.getTseResponseSupportingMaterial())
-                    .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
-                    .from(RESPONDENT_TITLE)
-                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                    .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
-                    .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
-                    .dateTime(TseHelper.getCurrentDateTime()) // for Work Allocation DMNs
-                    .applicationType(genericTseApplicationType.getType()) // for Work Allocation DMNs
-                    .build()
-            ).build());
+        TseRespondType response = TseRespondType.builder()
+                .response(caseData.getTseResponseText())
+                .supportingMaterial(caseData.getTseResponseSupportingMaterial())
+                .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
+                .from(RESPONDENT_TITLE)
+                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
+                .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                .build();
+
+        respondCollection.add(TseRespondTypeItem.builder().id(UUID.randomUUID().toString()).value(response).build());
+
+        if (featureToggleService.isWorkAllocationEnabled()) {
+            response.setDateTime(TseHelper.getCurrentDateTime()); // for Work Allocation DMNs
+            response.setApplicationType(genericTseApplicationType.getType()); // for Work Allocation DMNs
+        }
 
         if (isRespondingToTribunal) {
             genericTseApplicationType.setRespondentResponseRequired(NO);

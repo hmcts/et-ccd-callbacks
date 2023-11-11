@@ -66,6 +66,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenWorkAllocationIsEnabled(Boolean toggleStat) {
+        givenToggle("work-allocation", toggleStat);
+
+        assertThat(featureToggleService.isWorkAllocationEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

@@ -525,7 +525,7 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName The full name of the logged-in user
      */
-    public static void createReferralReply(CaseData caseData, String userFullName) {
+    public static void createReferralReply(CaseData caseData, String userFullName, Boolean waEnabled) {
         ReferralType referral = getSelectedReferral(caseData);
         if (CollectionUtils.isEmpty(referral.getReferralReplyCollection())) {
             referral.setReferralReplyCollection(new ArrayList<>());
@@ -544,9 +544,11 @@ public final class ReferralHelper {
         referralReply.setDirectionDetails(caseData.getDirectionDetails() != null
                 ? caseData.getDirectionDetails() : caseData.getReplyDetails());
 
-        // for Work Allocation DMNs only
-        referralReply.setReplyDateTime(Helper.getCurrentDateTime());
-        referralReply.setReferralSubject(referral.getReferralSubject());
+        if (waEnabled) {
+            // for Work Allocation DMNs only
+            referralReply.setReplyDateTime(Helper.getCurrentDateTime());
+            referralReply.setReferralSubject(referral.getReferralSubject());
+        }
 
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(UUID.randomUUID().toString());

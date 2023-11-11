@@ -127,7 +127,7 @@ public final class NotificationHelper {
         return representativeClaimantType.getNameOfRepresentative();
     }
 
-    private static String getEmailAddressForClaimant(CaseData caseData) {
+    public static String getEmailAddressForClaimant(CaseData caseData) {
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
         if (representativeClaimantType == null || NO.equals(caseData.getClaimantRepresentedQuestion())) {

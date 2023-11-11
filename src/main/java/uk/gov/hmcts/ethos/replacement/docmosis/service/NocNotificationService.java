@@ -115,7 +115,7 @@ public class NocNotificationService {
 
         String oldOrgAdminEmail = resBody.getSuperUser().getEmail();
         if (isNullOrEmpty(oldOrgAdminEmail)) {
-            log.warn("Previous Org " + orgId + " is missing org admin email");
+            log.warn("Previous Org {} is missing org admin email", orgId);
             return;
         }
 

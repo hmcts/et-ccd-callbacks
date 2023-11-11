@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildRespondentPersonalisation;
 
 /**
@@ -119,11 +120,8 @@ public class NocNotificationService {
             return;
         }
 
-        emailService.sendEmail(
-                previousRespondentSolicitorTemplateId,
-                oldOrgAdminEmail,
-                NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
-        );
+        Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
+        emailService.sendEmail(previousRespondentSolicitorTemplateId, oldOrgAdminEmail, personalisation);
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {

@@ -224,13 +224,12 @@ public class PseRespondToTribunalService {
         if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
             emailService.sendEmail(emailTemplate,
                 caseData.getClaimantType().getClaimantEmailAddress(),
-                buildPersonalisationNotify(caseDetails));
+                buildPersonalisationNotify(caseDetails, isWelsh));
         }
     }
 
-    private Map<String, String> buildPersonalisationNotify(CaseDetails caseDetails) {
+    private Map<String, String> buildPersonalisationNotify(CaseDetails caseDetails, boolean isWelsh) {
         CaseData caseData = caseDetails.getCaseData();
-        boolean isWelsh = isWelsh(caseData);
         String linkToCitizenHub = isWelsh
                 ? emailService.getCitizenCaseLink(caseDetails.getCaseId()) + WELSH_LANGUAGE_PARAM
                 : emailService.getCitizenCaseLink(caseDetails.getCaseId());

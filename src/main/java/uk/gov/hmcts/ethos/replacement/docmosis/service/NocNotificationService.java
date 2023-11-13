@@ -17,7 +17,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.util.Map;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildRespondentPersonalisation;
 
 /**
  * Service to support the notification of change journey with email notifications.
@@ -47,16 +52,7 @@ public class NocNotificationService {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
-        String claimantEmail = NotificationHelper.buildMapForClaimant(caseDataPrevious, "").get("emailAddress");
-        if (isNullOrEmpty(claimantEmail)) {
-            log.warn("missing claimantEmail");
-        } else {
-            emailService.sendEmail(
-                    claimantTemplateId,
-                    claimantEmail,
-                    NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsPrevious, partyName)
-            );
-        }
+        sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
 
         if (changeRequest.getOrganisationToRemove() != null) {
             String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
@@ -66,73 +62,91 @@ public class NocNotificationService {
         String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
         sendEmailToNewOrgAdmin(newOrgId, caseDetailsNew, partyName);
 
-        String tribunalEmail = caseDataPrevious.getTribunalCorrespondenceEmail();
-        if (isNullOrEmpty(tribunalEmail)) {
-            log.warn("missing tribunalEmail");
-        } else {
-            emailService.sendEmail(
-                    tribunalTemplateId,
-                    caseDataPrevious.getTribunalCorrespondenceEmail(),
-                    NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious)
-            );
-        }
+        sendTribunalEmail(caseDataPrevious);
 
         RespondentSumType respondent =
                 NocNotificationHelper.getRespondent(changeRequest, caseDataPrevious, nocRespondentHelper);
         String respondentEmail = respondent == null ? null : respondent.getRespondentEmail();
+
         if (isNullOrEmpty(respondentEmail)) {
             log.warn("Missing respondentEmail");
-        } else {
-            emailService.sendEmail(
-                respondentTemplateId,
-                respondent.getRespondentEmail(),
-                NocNotificationHelper.buildRespondentPersonalisation(caseDetailsPrevious, respondent));
+            return;
         }
+
+        Map<String, String> personalisation = buildRespondentPersonalisation(caseDetailsPrevious, respondent);
+        emailService.sendEmail(respondentTemplateId, respondentEmail, personalisation);
+    }
+
+    private void sendTribunalEmail(CaseData caseDataPrevious) {
+        String tribunalEmail = caseDataPrevious.getTribunalCorrespondenceEmail();
+        if (isNullOrEmpty(tribunalEmail)) {
+            log.warn("missing tribunalEmail");
+            return;
+        }
+
+        Map<String, String> personalisation = NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious);
+        emailService.sendEmail(tribunalTemplateId, tribunalEmail, personalisation);
+    }
+
+    private void sendClaimantEmail(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew, String partyName) {
+        String email = NotificationHelper.getEmailAddressForClaimant(caseDetailsPrevious.getCaseData());
+        if (isNullOrEmpty(email)) {
+            log.warn("missing claimantEmail");
+            return;
+        }
+
+        String citUILink = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
+        var personalisation = buildPersonalisationWithPartyName(caseDetailsPrevious, partyName, citUILink);
+        emailService.sendEmail(claimantTemplateId, email, personalisation);
     }
 
     private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
-            Object resBody = getOrgResponse.getBody();
-            if (resBody != null) {
-                String oldOrgAdminEmail = ((RetrieveOrgByIdResponse) resBody).getSuperUser().getEmail();
-                if (isNullOrEmpty(oldOrgAdminEmail)) {
-                    log.warn("Previous Org " + orgId + " is missing org admin email");
-                } else {
-                    emailService.sendEmail(
-                            previousRespondentSolicitorTemplateId,
-                            oldOrgAdminEmail,
-                            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
-                    );
-                }
-            }
+        HttpStatus statusCode = getOrgResponse.getStatusCode();
 
-        } else {
-            log.error("Cannot retrieve old org by id " + orgId
-                    + " [" + getOrgResponse.getStatusCode() + "] " + getOrgResponse.getBody());
+        if (!HttpStatus.OK.equals(statusCode)) {
+            log.error("Cannot retrieve old org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
+            return;
         }
+
+        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
+        if (resBody == null) {
+            return;
+        }
+
+        String oldOrgAdminEmail = resBody.getSuperUser().getEmail();
+        if (isNullOrEmpty(oldOrgAdminEmail)) {
+            log.warn("Previous Org {} is missing org admin email", orgId);
+            return;
+        }
+
+        Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
+        emailService.sendEmail(previousRespondentSolicitorTemplateId, oldOrgAdminEmail, personalisation);
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
-            Object resBody = getOrgResponse.getBody();
-            if (resBody != null) {
-                String newOrgAdminEmail = ((RetrieveOrgByIdResponse) resBody).getSuperUser().getEmail();
-                if (isNullOrEmpty(newOrgAdminEmail)) {
-                    log.warn("New Org " + orgId + " is missing org admin email");
-                } else {
-                    emailService.sendEmail(
-                            newRespondentSolicitorTemplateId,
-                            newOrgAdminEmail,
-                            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsNew, partyName)
-                    );
-                }
-            }
-        } else {
-            log.error("Cannot retrieve new org by id " + orgId
-                    + " [" + getOrgResponse.getStatusCode() + "] " + getOrgResponse.getBody());
+        HttpStatus statusCode = getOrgResponse.getStatusCode();
+
+        if (!HttpStatus.OK.equals(statusCode)) {
+            log.error("Cannot retrieve new org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
+            return;
         }
+
+        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
+        if (resBody == null) {
+            return;
+        }
+
+        String newOrgAdminEmail = resBody.getSuperUser().getEmail();
+        if (isNullOrEmpty(newOrgAdminEmail)) {
+            log.warn("New Org {} is missing org admin email", orgId);
+            return;
+        }
+
+        String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
+        Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
+        emailService.sendEmail(newRespondentSolicitorTemplateId, newOrgAdminEmail, personalisation);
     }
 
     private ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(String orgId) {

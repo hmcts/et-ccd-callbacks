@@ -89,9 +89,10 @@ class NocNotificationHelperTest {
 
     @Test
     void testbuildClaimantPersonalisation() {
+        String citLink = "http://domain/citizen-hub/1234";
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party");
-        assertThat(claimantPersonalisation.size(), is(5));
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party", citLink);
+        assertThat(claimantPersonalisation.size(), is(6));
         assertThat(claimantPersonalisation.get("party_name"), is("test_party"));
         assertThat(claimantPersonalisation.get("ccdId"), is("1234"));
         assertThat(claimantPersonalisation.get("claimant"), is("Claimant LastName"));
@@ -99,6 +100,7 @@ class NocNotificationHelperTest {
                 is("Respondent Respondent Unrepresented Respondent Represented Respondent")
         );
         assertThat(claimantPersonalisation.get("case_number"), is("12345/6789"));
+        assertThat(claimantPersonalisation.get("linkToCitUI"), is(citLink));
     }
 
     @Test

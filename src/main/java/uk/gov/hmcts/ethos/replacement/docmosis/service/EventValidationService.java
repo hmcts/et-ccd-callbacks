@@ -521,7 +521,7 @@ public class EventValidationService {
                 .stream()
                 .filter(element -> element.getValue() > 1)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
         if (!duplicatedJurCodes.isEmpty()) {
             duplicatedJurCodesMap.put(key, duplicatedJurCodes);
         }

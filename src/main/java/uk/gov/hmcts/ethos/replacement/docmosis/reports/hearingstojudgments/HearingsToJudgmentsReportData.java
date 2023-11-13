@@ -60,6 +60,7 @@ public final class HearingsToJudgmentsReportData extends ListingData {
             .append(StringUtils.defaultString(reportSummary.getTotalX4Wk(), "0")).append(NEW_LINE)
             .append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS)
             .append(StringUtils.defaultString(reportSummary.getTotalX4WkPercent(), "0.00")).append(NEW_LINE);
+
         addJsonCollection(REPORT_DETAILS, reportDetails.iterator(), sb);
         return sb;
     }

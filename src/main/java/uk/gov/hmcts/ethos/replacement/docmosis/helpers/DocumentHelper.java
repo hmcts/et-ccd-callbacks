@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
+import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -62,7 +63,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 @Slf4j
 public final class DocumentHelper {
 
+    public static final String USER_IMAGE = "[userImage:";
+    public static final String ENHMCTS_PNG = "enhmcts.png]";
+    public static final String SCHMCTS_PNG = "schmcts.png]";
     public static final String I_SCOT = "\"iScot";
+    public static final String CLAIMANT_FULL_NAME = "\"claimant_full_name\":\"";
+    public static final String CLAIMANT = "\"Claimant\":\"";
+    public static final String RESPONDENT_OR_REP_FULL_NAME = "\"respondent_or_rep_full_name\":\"";
+    public static final String COLON = "\":\"";
+    public static final String HEARING_DATE = "\"Hearing_date\":\"";
+    public static final String HEARING_TIME = "\"Hearing_time\":\"";
+    public static final String HEARING_DATE_TIME = "\"Hearing_date_time\":\"";
+    public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
 
     private DocumentHelper() {
     }
@@ -81,10 +93,8 @@ public final class DocumentHelper {
                 .append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
 
         if (templateName.equals(ADDRESS_LABELS_TEMPLATE) && multipleData == null) {
-            log.info("Getting address labels data for single case:" + caseData.getEthosCaseReference());
             sb.append(getAddressLabelsDataSingleCase(caseData));
         } else if (templateName.equals(ADDRESS_LABELS_TEMPLATE)) {
-            log.info("Getting address labels data for multiple reference:" + multipleData.getMultipleReference());
             sb.append(getAddressLabelsDataMultipleCase(multipleData));
         } else {
             log.info("Getting data for single template for case:" + caseData.getEthosCaseReference());
@@ -142,17 +152,14 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getClaimantData(CaseData caseData) {
-        log.info("Getting Claimant Data for case: " + caseData.getEthosCaseReference());
         StringBuilder sb = new StringBuilder();
         RepresentedTypeC representedTypeC = caseData.getRepresentativeClaimantType();
         Optional<ClaimantIndType> claimantIndType = Optional.ofNullable(caseData.getClaimantIndType());
         if (representedTypeC != null && caseData.getClaimantRepresentedQuestion() != null &&  caseData
                 .getClaimantRepresentedQuestion().equals(YES)) {
-            log.info("Claimant is represented for case reference: " + caseData.getEthosCaseReference());
-            sb.append("\"claimant_or_rep_full_name\":\"").append(nullCheck(representedTypeC.getNameOfRepresentative()))
-                    .append(NEW_LINE);
-            sb.append("\"claimant_rep_organisation\":\"").append(nullCheck(representedTypeC.getNameOfOrganisation()))
-                    .append(NEW_LINE);
+            sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(representedTypeC.getNameOfRepresentative()))
+                    .append(NEW_LINE).append("\"claimant_rep_organisation\":\"")
+                    .append(nullCheck(representedTypeC.getNameOfOrganisation())).append(NEW_LINE);
             if (representedTypeC.getRepresentativeAddress() != null) {
                 sb.append(getClaimantOrRepAddressUK(representedTypeC.getRepresentativeAddress()));
             } else {
@@ -163,44 +170,33 @@ public final class DocumentHelper {
             Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
             if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
                     .equals(COMPANY_TYPE_CLAIMANT)) {
-                log.info("Claimant is a company for case reference: " + caseData.getEthosCaseReference());
-                sb.append("\"claimant_full_name\":\"").append(nullCheck(caseData.getClaimantCompany()))
-                        .append(NEW_LINE);
-                sb.append("\"Claimant\":\"").append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
+                sb.append(CLAIMANT_FULL_NAME).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE)
+                        .append(CLAIMANT).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
             } else if (claimantIndType.isPresent()) {
-                sb.append("\"claimant_full_name\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
-                        .append(NEW_LINE);
-                sb.append("\"Claimant\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
+                sb.append(CLAIMANT_FULL_NAME).append(nullCheck(claimantIndType.get().claimantFullName()))
+                        .append(NEW_LINE).append(CLAIMANT).append(nullCheck(claimantIndType.get().claimantFullName()))
                         .append(NEW_LINE);
             } else {
-                sb.append("\"claimant_full_name\":\"").append(NEW_LINE);
-                sb.append("\"Claimant\":\"").append(NEW_LINE);
+                sb.append(CLAIMANT_FULL_NAME).append(NEW_LINE).append(CLAIMANT).append(NEW_LINE);
             }
         } else {
-            log.info("Claimant is not represented for case: " + caseData.getEthosCaseReference());
             Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
             if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
                     .equals(COMPANY_TYPE_CLAIMANT)) {
-                log.info("Claimant Company");
-                sb.append("\"claimant_or_rep_full_name\":\"").append(nullCheck(caseData.getClaimantCompany()))
-                        .append(NEW_LINE);
-                sb.append("\"claimant_full_name\":\"").append(nullCheck(caseData.getClaimantCompany()))
-                        .append(NEW_LINE);
-                sb.append("\"Claimant\":\"").append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
+                sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE)
+                        .append(CLAIMANT_FULL_NAME).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE)
+                        .append(CLAIMANT).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
             } else {
-                log.info("Claimant data");
                 if (claimantIndType.isPresent()) {
-                    sb.append("\"claimant_or_rep_full_name\":\"").append(nullCheck(claimantIndType.get()
-                            .claimantFullName())).append(NEW_LINE);
-                    sb.append("\"claimant_full_name\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
-                            .append(NEW_LINE);
-                    sb.append("\"Claimant\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
+                    sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(claimantIndType.get().claimantFullName()))
+                            .append(NEW_LINE).append(CLAIMANT_FULL_NAME)
+                            .append(nullCheck(claimantIndType.get().claimantFullName())).append(NEW_LINE)
+                            .append(CLAIMANT).append(nullCheck(claimantIndType.get().claimantFullName()))
                             .append(NEW_LINE);
                 } else {
-                    sb.append("\"claimant_or_rep_full_name\":\"").append(NEW_LINE);
-                    sb.append("\"claimant_full_name\":\"").append(NEW_LINE);
-                    sb.append("\"Claimant\":\"").append(NEW_LINE);
-                    sb.append("\"claimant_rep_organisation\":\"").append(NEW_LINE);
+                    sb.append(CLAIMANT_OR_REP_FULL_NAME).append(NEW_LINE).append(CLAIMANT_FULL_NAME).append(NEW_LINE)
+                            .append(CLAIMANT).append(NEW_LINE).append("\"claimant_rep_organisation\":\"")
+                            .append(NEW_LINE);
                 }
             }
             Optional<ClaimantType> claimantType = Optional.ofNullable(caseData.getClaimantType());
@@ -210,7 +206,6 @@ public final class DocumentHelper {
                 sb.append(getClaimantOrRepAddressUK(new Address()));
             }
         }
-        log.info("Claimant address UK");
         Optional<ClaimantType> claimantType = Optional.ofNullable(caseData.getClaimantType());
         if (claimantType.isPresent()) {
             sb.append(getClaimantAddressUK(claimantType.get().getClaimantAddressUK()));
@@ -243,7 +238,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentData(CaseData caseData) {
-        log.info("Respondent Data");
         StringBuilder sb = new StringBuilder();
         List<RespondentSumTypeItem> respondentSumTypeItemList = CollectionUtils.isNotEmpty(
                 caseData.getRespondentCollection())
@@ -259,13 +253,12 @@ public final class DocumentHelper {
         RespondentSumType respondentToBeShown = new RespondentSumType();
 
         for (RespondentSumTypeItem respondentSumTypeItem: respondentSumTypeItemList) {
-            responseContinue = Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())
+            responseContinue = isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())
                     || YES.equals(respondentSumTypeItem.getValue().getResponseContinue());
-            responseNotStruckOut = Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseStruckOut())
+            responseNotStruckOut = isNullOrEmpty(respondentSumTypeItem.getValue().getResponseStruckOut())
                     || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO);
 
             if (responseContinue && responseNotStruckOut) {
-                log.info("Response is continuing and not struck out for case: " + caseData.getEthosCaseReference());
                 respondentToBeShown = respondentSumTypeItem.getValue();
                 break;
             }
@@ -298,9 +291,8 @@ public final class DocumentHelper {
         }
 
         if (representedTypeRItem.isPresent()) {
-            log.info("Respondent represented");
             RepresentedTypeR representedTypeR = representedTypeRItem.get().getValue();
-            sb.append("\"respondent_or_rep_full_name\":\"").append(nullCheck(representedTypeR
+            sb.append(RESPONDENT_OR_REP_FULL_NAME).append(nullCheck(representedTypeR
                     .getNameOfRepresentative())).append(NEW_LINE);
             if (representedTypeR.getRepresentativeAddress() != null) {
                 sb.append(getRespondentOrRepAddressUK(representedTypeR.getRepresentativeAddress()));
@@ -308,36 +300,30 @@ public final class DocumentHelper {
                 sb.append(getRespondentOrRepAddressUK(new Address()));
             }
             sb.append("\"respondent_reference\":\"").append(nullCheck(representedTypeR.getRepresentativeReference()))
-                    .append(NEW_LINE);
-            sb.append("\"respondent_rep_organisation\":\"").append(nullCheck(representedTypeR.getNameOfOrganisation()))
-                    .append(NEW_LINE);
+                    .append(NEW_LINE).append("\"respondent_rep_organisation\":\"")
+                    .append(nullCheck(representedTypeR.getNameOfOrganisation())).append(NEW_LINE);
 
         } else {
-            log.info("Respondent not represented");
             if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
                     && responseNotStruckOut && responseContinue
                     && !finalRespondentToBeShown.equals(new RespondentSumType())) {
-                sb.append("\"respondent_or_rep_full_name\":\"").append(nullCheck(finalRespondentToBeShown
-                        .getRespondentName())).append(NEW_LINE);
-                sb.append(getRespondentOrRepAddressUK(getRespondentAddressET3(finalRespondentToBeShown)));
+                sb.append(RESPONDENT_OR_REP_FULL_NAME).append(nullCheck(finalRespondentToBeShown.getRespondentName()))
+                        .append(NEW_LINE)
+                        .append(getRespondentOrRepAddressUK(getRespondentAddressET3(finalRespondentToBeShown)));
             } else {
-                sb.append("\"respondent_or_rep_full_name\":\"").append(NEW_LINE);
-                sb.append("\"respondent_rep_organisation\":\"").append(NEW_LINE);
-                sb.append(getRespondentOrRepAddressUK(new Address()));
+                sb.append(RESPONDENT_OR_REP_FULL_NAME).append(NEW_LINE).append("\"respondent_rep_organisation\":\"")
+                        .append(NEW_LINE).append(getRespondentOrRepAddressUK(new Address()));
             }
         }
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
-            log.info("Respondent collection");
-            sb.append("\"respondent_full_name\":\"").append(
-                    nullCheck(Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
-                            || YES.equals(finalRespondentToBeShown.getResponseContinue())
-                            ? finalRespondentToBeShown.getRespondentName()
-                            : ""))
-                    .append(NEW_LINE);
-            sb.append((Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
-                    || YES.equals(finalRespondentToBeShown.getResponseContinue()))
-                    && !finalRespondentToBeShown.equals(new RespondentSumType())
-                    ? getRespondentAddressUK(getRespondentAddressET3(finalRespondentToBeShown)) : "");
+            sb.append("\"respondent_full_name\":\"").append(nullCheck(
+                            isNullOrEmpty(finalRespondentToBeShown.getResponseContinue()) || YES.equals(
+                                    finalRespondentToBeShown.getResponseContinue())
+                                    ? finalRespondentToBeShown.getRespondentName() : "")).append(NEW_LINE)
+                    .append((isNullOrEmpty(finalRespondentToBeShown.getResponseContinue()) || YES.equals(
+                            finalRespondentToBeShown.getResponseContinue())) && !finalRespondentToBeShown.equals(
+                                new RespondentSumType())
+                            ? getRespondentAddressUK(getRespondentAddressET3(finalRespondentToBeShown)) : "");
 
             if (Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
                     || YES.equals(finalRespondentToBeShown.getResponseContinue())) {
@@ -346,20 +332,17 @@ public final class DocumentHelper {
                         .append(NEW_LINE);
             }
 
-            sb.append(getRespOthersName(caseData, finalRespondentToBeShown.getRespondentName()));
-            sb.append(getRespAddress(caseData));
+            sb.append(getRespOthersName(caseData, finalRespondentToBeShown.getRespondentName()))
+                    .append(getRespAddress(caseData));
         } else {
-            sb.append("\"respondent_full_name\":\"").append(NEW_LINE);
-            sb.append(getRespondentAddressUK(new Address()));
-            sb.append("\"Respondent\":\"").append(NEW_LINE);
-            sb.append("\"resp_others\":\"").append(NEW_LINE);
-            sb.append("\"resp_address\":\"").append(NEW_LINE);
+            sb.append("\"respondent_full_name\":\"").append(NEW_LINE).append(getRespondentAddressUK(new Address()))
+                    .append("\"Respondent\":\"").append(NEW_LINE).append("\"resp_others\":\"").append(NEW_LINE)
+                    .append("\"resp_address\":\"").append(NEW_LINE);
         }
         return sb;
     }
 
     private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {
-        log.info("Respondent Others Name");
         StringBuilder sb = new StringBuilder();
         AtomicInteger atomicInteger = new AtomicInteger(2);
         List<String> respOthers = caseData.getRespondentCollection()
@@ -377,7 +360,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespAddress(CaseData caseData) {
-        log.info("Get Resp address");
         StringBuilder sb = new StringBuilder();
         AtomicInteger atomicInteger = new AtomicInteger(1);
         int size = caseData.getRespondentCollection().size();
@@ -399,37 +381,31 @@ public final class DocumentHelper {
                                                 CorrespondenceType correspondenceType,
                                                 CorrespondenceScotType correspondenceScotType,
                                                 VenueAddressReaderService venueAddressReaderService) {
-        log.info("Hearing Data");
         StringBuilder sb = new StringBuilder();
         //Currently checking collection not the HearingType
         if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
             String correspondenceHearingNumber = getCorrespondenceHearingNumber(
                     correspondenceType, correspondenceScotType);
-            log.info("Hearing Number: " + correspondenceHearingNumber);
             HearingType hearingType = getHearingByNumber(caseData.getHearingCollection(), correspondenceHearingNumber);
-            log.info("Hearing type info by number");
             if (hearingType.getHearingDateCollection() != null && !hearingType.getHearingDateCollection().isEmpty()) {
-                log.info("Hearing dates collection");
-                sb.append("\"Hearing_date\":\"").append(nullCheck(getHearingDates(hearingType
+                sb.append(HEARING_DATE).append(nullCheck(getHearingDates(hearingType
                         .getHearingDateCollection()))).append(NEW_LINE);
                 String hearingDateAndTime = nullCheck(getHearingDatesAndTime(hearingType.getHearingDateCollection()));
-                sb.append("\"Hearing_date_time\":\"").append(hearingDateAndTime).append(NEW_LINE);
-                sb.append("\"Hearing_time\":\"").append(getHearingTime(hearingDateAndTime)).append(NEW_LINE);
+                sb.append(HEARING_DATE_TIME).append(hearingDateAndTime).append(NEW_LINE).append(HEARING_TIME)
+                        .append(getHearingTime(hearingDateAndTime)).append(NEW_LINE);
             } else {
-                sb.append("\"Hearing_date\":\"").append(NEW_LINE);
-                sb.append("\"Hearing_date_time\":\"").append(NEW_LINE);
-                sb.append("\"Hearing_time\":\"").append(NEW_LINE);
+                sb.append(HEARING_DATE).append(NEW_LINE).append(HEARING_DATE_TIME).append(NEW_LINE).append(HEARING_TIME)
+                        .append(NEW_LINE);
             }
-            log.info("Checking hearing venue and duration");
-            sb.append("\"Hearing_venue\":\"").append(nullCheck(venueAddressReaderService.getVenueAddress(
-                    hearingType, caseTypeId, caseData.getManagingOffice()))).append(NEW_LINE);
-            sb.append("\"Hearing_duration\":\"").append(nullCheck(getHearingDuration(hearingType))).append(NEW_LINE);
+            sb.append("\"Hearing_venue\":\"").append(nullCheck(
+                            venueAddressReaderService.getVenueAddress(hearingType, caseTypeId,
+                                    caseData.getManagingOffice())))
+                    .append(NEW_LINE).append("\"Hearing_duration\":\"")
+                    .append(nullCheck(getHearingDuration(hearingType))).append(NEW_LINE);
         } else {
-            sb.append("\"Hearing_date\":\"").append(NEW_LINE);
-            sb.append("\"Hearing_date_time\":\"").append(NEW_LINE);
-            sb.append("\"Hearing_venue\":\"").append(NEW_LINE);
-            sb.append("\"Hearing_duration\":\"").append(NEW_LINE);
-            sb.append("\"Hearing_time\":\"").append(NEW_LINE);
+            sb.append(HEARING_DATE).append(NEW_LINE).append(HEARING_DATE_TIME).append(NEW_LINE)
+                    .append("\"Hearing_venue\":\"").append(NEW_LINE).append("\"Hearing_duration\":\"").append(NEW_LINE)
+                    .append(HEARING_TIME).append(NEW_LINE);
         }
         return sb;
     }
@@ -462,7 +438,7 @@ public final class DocumentHelper {
     }
 
     private static String getHearingTime(String dateTime) {
-        return !dateTime.isEmpty() ? dateTime.substring(dateTime.indexOf("at") + 3) : "";
+        return dateTime.isEmpty() ? "" : dateTime.substring(dateTime.indexOf("at") + 3);
     }
 
     private static String getHearingDates(List<DateListedTypeItem> hearingDateCollection) {
@@ -497,8 +473,7 @@ public final class DocumentHelper {
             }
         }
         if (!isEmpty) {
-            sb.append(" at ");
-            sb.append(earliestTime.toString());
+            sb.append(" at ").append(earliestTime.toString());
         }
 
         return sb.toString();
@@ -668,6 +643,8 @@ public final class DocumentHelper {
     private static StringBuilder getCorrespondenceData(CorrespondenceType correspondence) {
         log.info("Correspondence data");
         String sectionName = getEWSectionName(correspondence);
+        sectionName = sectionName.replace(".", "_");
+        sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
             sb.append("\"t").append(sectionName.replace(".", "_")).append("\":\"true")
@@ -677,7 +654,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getCorrespondenceScotData(CorrespondenceScotType correspondenceScotType) {
-        log.info("Correspondence scot data");
         String scotSectionName = getScotSectionName(correspondenceScotType);
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.equals("")) {
@@ -689,73 +665,68 @@ public final class DocumentHelper {
 
     private static StringBuilder getCourtData(CaseData caseData, DefaultValues allocatedCourtAddress) {
         StringBuilder sb = new StringBuilder();
-        log.info("Court data");
         if (allocatedCourtAddress != null) {
-            sb.append("\"Court_addressLine1\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceAddressLine1())).append(NEW_LINE);
-            sb.append("\"Court_addressLine2\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceAddressLine2())).append(NEW_LINE);
-            sb.append("\"Court_addressLine3\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceAddressLine3())).append(NEW_LINE);
-            sb.append("\"Court_town\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceTown())).append(NEW_LINE);
-            sb.append("\"Court_county\":\"").append(NEW_LINE);
-            sb.append("\"Court_postCode\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondencePostCode())).append(NEW_LINE);
-            sb.append("\"Court_telephone\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceTelephone())).append(NEW_LINE);
-            sb.append("\"Court_fax\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceFax())).append(NEW_LINE);
-            sb.append("\"Court_DX\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceDX())).append(NEW_LINE);
-            sb.append("\"Court_Email\":\"").append(nullCheck(allocatedCourtAddress
-                    .getTribunalCorrespondenceEmail())).append(NEW_LINE);
+            sb.append("\"Court_addressLine1\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine1())).append(NEW_LINE)
+                    .append("\"Court_addressLine2\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine2())).append(NEW_LINE)
+                    .append("\"Court_addressLine3\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceAddressLine3())).append(NEW_LINE)
+                    .append("\"Court_town\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceTown())).append(NEW_LINE)
+                    .append("\"Court_county\":\"").append(NEW_LINE).append("\"Court_postCode\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondencePostCode())).append(NEW_LINE)
+                    .append("\"Court_telephone\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceTelephone())).append(NEW_LINE)
+                    .append("\"Court_fax\":\"").append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceFax()))
+                    .append(NEW_LINE).append("\"Court_DX\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceDX())).append(NEW_LINE)
+                    .append("\"Court_Email\":\"")
+                    .append(nullCheck(allocatedCourtAddress.getTribunalCorrespondenceEmail())).append(NEW_LINE);
         } else {
             if (caseData.getTribunalCorrespondenceAddress() != null) {
-                sb.append("\"Court_addressLine1\":\"").append(nullCheck(caseData
-                        .getTribunalCorrespondenceAddress().getAddressLine1())).append(NEW_LINE);
-                sb.append("\"Court_addressLine2\":\"").append(nullCheck(caseData
-                        .getTribunalCorrespondenceAddress().getAddressLine2())).append(NEW_LINE);
-                sb.append("\"Court_addressLine3\":\"").append(nullCheck(caseData
-                        .getTribunalCorrespondenceAddress().getAddressLine3())).append(NEW_LINE);
-                sb.append("\"Court_town\":\"").append(nullCheck(caseData
-                        .getTribunalCorrespondenceAddress().getPostTown())).append(NEW_LINE);
-                sb.append("\"Court_county\":\"").append(nullCheck(caseData
-                        .getTribunalCorrespondenceAddress().getCounty())).append(NEW_LINE);
-                sb.append("\"Court_postCode\":\"").append(nullCheck(caseData
-                        .getTribunalCorrespondenceAddress().getPostCode())).append(NEW_LINE);
+                sb.append("\"Court_addressLine1\":\"")
+                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getAddressLine1()))
+                        .append(NEW_LINE).append("\"Court_addressLine2\":\"")
+                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getAddressLine2()))
+                        .append(NEW_LINE).append("\"Court_addressLine3\":\"")
+                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getAddressLine3()))
+                        .append(NEW_LINE).append("\"Court_town\":\"")
+                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getPostTown())).append(NEW_LINE)
+                        .append("\"Court_county\":\"")
+                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getCounty())).append(NEW_LINE)
+                        .append("\"Court_postCode\":\"")
+                        .append(nullCheck(caseData.getTribunalCorrespondenceAddress().getPostCode())).append(NEW_LINE);
             }
-            sb.append("\"Court_telephone\":\"").append(nullCheck(caseData
-                    .getTribunalCorrespondenceTelephone())).append(NEW_LINE);
-            sb.append("\"Court_fax\":\"").append(nullCheck(caseData
-                    .getTribunalCorrespondenceFax())).append(NEW_LINE);
-            sb.append("\"Court_DX\":\"").append(nullCheck(caseData
-                    .getTribunalCorrespondenceDX())).append(NEW_LINE);
-            sb.append("\"Court_Email\":\"").append(nullCheck(caseData
-                    .getTribunalCorrespondenceEmail())).append(NEW_LINE);
+            sb.append("\"Court_telephone\":\"").append(nullCheck(caseData.getTribunalCorrespondenceTelephone()))
+                    .append(NEW_LINE).append("\"Court_fax\":\"")
+                    .append(nullCheck(caseData.getTribunalCorrespondenceFax())).append(NEW_LINE)
+                    .append("\"Court_DX\":\"").append(nullCheck(caseData.getTribunalCorrespondenceDX()))
+                    .append(NEW_LINE).append("\"Court_Email\":\"")
+                    .append(nullCheck(caseData.getTribunalCorrespondenceEmail())).append(NEW_LINE);
         }
         return sb;
     }
 
     private static StringBuilder getAddressLabelsDataSingleCase(CaseData caseData) {
 
-        int numberOfCopies = Integer.parseInt(caseData.getAddressLabelsAttributesType().getNumberOfCopies());
-        int startingLabel = Integer.parseInt(caseData.getAddressLabelsAttributesType().getStartingLabel());
-        String showTelFax = caseData.getAddressLabelsAttributesType().getShowTelFax();
-        List<AddressLabelTypeItem> addressLabelCollection = caseData.getAddressLabelCollection();
+        return getNumberOfCopies(caseData.getAddressLabelsAttributesType(), caseData.getAddressLabelCollection());
+    }
 
-        return getAddressLabelsData(numberOfCopies, startingLabel, showTelFax, addressLabelCollection);
+    @NotNull
+    private static StringBuilder getNumberOfCopies(AddressLabelsAttributesType addressLabelsAttributesType,
+                                                   List<AddressLabelTypeItem> addressLabelCollection2) {
+        int numberOfCopies = Integer.parseInt(addressLabelsAttributesType.getNumberOfCopies());
+        int startingLabel = Integer.parseInt(addressLabelsAttributesType.getStartingLabel());
+        String showTelFax = addressLabelsAttributesType.getShowTelFax();
 
+        return getAddressLabelsData(numberOfCopies, startingLabel, showTelFax, addressLabelCollection2);
     }
 
     private static StringBuilder getAddressLabelsDataMultipleCase(MultipleData multipleData) {
 
-        int numberOfCopies = Integer.parseInt(multipleData.getAddressLabelsAttributesType().getNumberOfCopies());
-        int startingLabel = Integer.parseInt(multipleData.getAddressLabelsAttributesType().getStartingLabel());
-        String showTelFax = multipleData.getAddressLabelsAttributesType().getShowTelFax();
-        List<AddressLabelTypeItem> addressLabelCollection = multipleData.getAddressLabelCollection();
-
-        return getAddressLabelsData(numberOfCopies, startingLabel, showTelFax, addressLabelCollection);
+        return getNumberOfCopies(multipleData.getAddressLabelsAttributesType(),
+                multipleData.getAddressLabelCollection());
 
     }
 
@@ -772,18 +743,7 @@ public final class DocumentHelper {
         boolean startingLabelAboveOne = true;
 
         for (int i = 0; i < copiedAddressLabelCollection.size(); i++) {
-            int pageLabelNumber = i + 1;
-
-            if (startingLabel > 1) {
-                pageLabelNumber += startingLabel - 1;
-            }
-
-            if (pageLabelNumber > ADDRESS_LABELS_PAGE_SIZE) {
-                int numberOfFullLabelPages = pageLabelNumber / ADDRESS_LABELS_PAGE_SIZE;
-                pageLabelNumber = pageLabelNumber % ADDRESS_LABELS_PAGE_SIZE == 0
-                        ? ADDRESS_LABELS_PAGE_SIZE
-                        : pageLabelNumber - (numberOfFullLabelPages * ADDRESS_LABELS_PAGE_SIZE);
-            }
+            int pageLabelNumber = getPageLabelNumber(startingLabel, i);
 
             if (pageLabelNumber == 1 || startingLabelAboveOne) {
                 startingLabelAboveOne = false;
@@ -804,6 +764,22 @@ public final class DocumentHelper {
         }
         sb.append("],\n");
         return sb;
+    }
+
+    private static int getPageLabelNumber(int startingLabel, int i) {
+        int pageLabelNumber = i + 1;
+
+        if (startingLabel > 1) {
+            pageLabelNumber += startingLabel - 1;
+        }
+
+        if (pageLabelNumber > ADDRESS_LABELS_PAGE_SIZE) {
+            int numberOfFullLabelPages = pageLabelNumber / ADDRESS_LABELS_PAGE_SIZE;
+            pageLabelNumber = pageLabelNumber % ADDRESS_LABELS_PAGE_SIZE == 0
+                    ? ADDRESS_LABELS_PAGE_SIZE
+                    : pageLabelNumber - (numberOfFullLabelPages * ADDRESS_LABELS_PAGE_SIZE);
+        }
+        return pageLabelNumber;
     }
 
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
@@ -875,7 +851,7 @@ public final class DocumentHelper {
         StringBuilder sb = new StringBuilder();
         String lineNumber = "0" + lineNum;
         sb.append('"').append(LABEL).append(labelNumber).append("_Address_Line_").append(lineNumber)
-                .append("\":\"").append(addressLine).append(NEW_LINE);
+                .append(COLON).append(addressLine).append(NEW_LINE);
         return sb;
     }
 
@@ -900,8 +876,8 @@ public final class DocumentHelper {
                 }
             }
 
-            sb.append('"').append(LABEL).append(labelNumber).append("_Telephone\":\"").append(tel).append(NEW_LINE);
-            sb.append('"').append(LABEL).append(labelNumber).append("_Fax\":\"").append(fax).append(NEW_LINE);
+            sb.append('"').append(LABEL).append(labelNumber).append("_Telephone\":\"").append(tel).append(NEW_LINE)
+                    .append('"').append(LABEL).append(labelNumber).append("_Fax\":\"").append(fax).append(NEW_LINE);
         }
         return sb;
     }
@@ -946,12 +922,9 @@ public final class DocumentHelper {
     }
 
     public static Address getRespondentAddressET3(RespondentSumType respondentSumType) {
-
-        log.info("Get respondent address ET3");
-
         return YES.equals(respondentSumType.getResponseReceived())
                 && respondentSumType.getResponseRespondentAddress() != null
-                && !Strings.isNullOrEmpty(respondentSumType.getResponseRespondentAddress().toString())
+                && !isNullOrEmpty(respondentSumType.getResponseRespondentAddress().toString())
                 ? respondentSumType.getResponseRespondentAddress()
                 : respondentSumType.getRespondentAddress();
 

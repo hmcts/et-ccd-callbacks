@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
 import java.io.IOException;
@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 @Service
 public class StaffImportService {
 
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final ExcelReadingService excelReadingService;
     private final StaffImportStrategy staffImportStrategy;
 
-    public StaffImportService(UserService userService, ExcelReadingService excelReadingService,
+    public StaffImportService(UserIdamService userIdamService, ExcelReadingService excelReadingService,
                               StaffImportStrategy staffImportStrategy) {
-        this.userService = userService;
+        this.userIdamService = userIdamService;
         this.excelReadingService = excelReadingService;
         this.staffImportStrategy = staffImportStrategy;
     }
@@ -32,7 +32,7 @@ public class StaffImportService {
             staffImportStrategy.importWorkbook(workbook);
         }
 
-        UserDetails user = userService.getUserDetails(userToken);
+        UserDetails user = userIdamService.getUserDetails(userToken);
         adminData.getStaffImportFile().setUser(user.getName());
         adminData.getStaffImportFile().setLastImported(LocalDateTime.now().toString());
     }

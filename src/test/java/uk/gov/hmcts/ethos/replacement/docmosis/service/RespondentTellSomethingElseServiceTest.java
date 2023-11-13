@@ -27,7 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -76,7 +76,7 @@ class RespondentTellSomethingElseServiceTest {
     private EmailService emailService;
 
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
 
     @MockBean
     private TribunalOfficesService tribunalOfficesService;
@@ -118,9 +118,9 @@ class RespondentTellSomethingElseServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
         respondentTellSomethingElseService =
-                new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
+                new RespondentTellSomethingElseService(emailService, userIdamService, tribunalOfficesService,
                         tornadoService, documentManagementService);
         tseService = new TseService(documentManagementService);
 
@@ -130,7 +130,7 @@ class RespondentTellSomethingElseServiceTest {
                 "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
 
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
     }
 
     @ParameterizedTest

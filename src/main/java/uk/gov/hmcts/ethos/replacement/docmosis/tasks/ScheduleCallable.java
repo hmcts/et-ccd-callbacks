@@ -8,6 +8,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SingleCasesReadingS
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 @Slf4j
@@ -29,7 +30,7 @@ public class ScheduleCallable implements Callable<HashSet<SchedulePayload>> {
     @Override
     public HashSet<SchedulePayload> call() {
         HashSet<SchedulePayload> schedulePayloads = new HashSet<>();
-        HashSet<SchedulePayloadEvent> schedulePayloadEvents = singleCasesReadingService.retrieveScheduleCases(userToken,
+        Set<SchedulePayloadEvent> schedulePayloadEvents = singleCasesReadingService.retrieveScheduleCases(userToken,
                 caseTypeId, partitionCaseIds);
 
         for (SchedulePayloadEvent schedulePayloadEvent : schedulePayloadEvents) {

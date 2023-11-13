@@ -40,28 +40,8 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
 
     private CCDRequest ccdRequest;
 
-    private JsonPath body;
-
     @BeforeAll
     public void setUpCaseData() {
-        Map<String, Object> caseData = new ConcurrentHashMap<>();
-        caseData.put("caseType", "Single");
-        caseData.put("caseSource", "Manually Created");
-        CaseRequest caseRequest = CaseRequest.builder()
-                .caseData(caseData)
-                .build();
-
-        body = RestAssured.given()
-                .spec(new RequestSpecBuilder().setBaseUri(syaApiUrl).build())
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(caseRequest)
-                .post("/cases/initiate-case")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log().all(true)
-                .extract().body().jsonPath();
-
         DynamicFixedListType caseRole = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(SOLICITORA);
@@ -86,6 +66,24 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
                 .requestTimestamp(null)
                 .approvalStatus(null)
                 .build());
+
+        Map<String, Object> caseData = new ConcurrentHashMap<>();
+        caseData.put("caseType", "Single");
+        caseData.put("caseSource", "Manually Created");
+        CaseRequest caseRequest = CaseRequest.builder()
+                .caseData(caseData)
+                .build();
+
+        JsonPath body = RestAssured.given()
+                .spec(new RequestSpecBuilder().setBaseUri(syaApiUrl).build())
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(caseRequest)
+                .post("/cases/initiate-case")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log().all(true)
+                .extract().body().jsonPath();
 
         Long caseId = body.get("id");
 

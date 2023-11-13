@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -16,6 +17,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -24,6 +27,8 @@ import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -32,14 +37,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
 @ExtendWith(SpringExtension.class)
@@ -58,7 +61,7 @@ class TseHelperTest {
             .withRespondent("Respondent Name", YES, "13 December 2022", false)
             .build();
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
             .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
@@ -113,7 +116,7 @@ class TseHelperTest {
             .withRespondent("Respondent Name", YES, "13 December 2022", false)
             .build();
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Order a witness to attend")
             .withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
@@ -154,11 +157,15 @@ class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
-        String expected = "The respondent has applied to <b>Withdraw my claim</b>.</br>You do not need to respond to "
-            + "this application.<br></br> If you have any objections or responses to their application you must send "
-            + "them to the tribunal as soon as possible and by 20 December 2022 at the latest.</br></br>If you need "
-            + "more time to respond, you may request more time from the tribunal. If you do not respond or request more"
-            + " time to respond, the tribunal will consider the application without your response.";
+        String expected = """
+            <p>The respondent has applied to <strong>Withdraw my claim</strong>.</p>
+            <p>You do not need to respond to this application.</p>
+            <p>If you have any objections or responses to their application you must send them to the tribunal as soon
+            as possible and by <strong>20 December 2022</strong> at the latest.
+            
+            If you need more time to respond, you may request more time from the tribunal. If you do not respond or
+            request more time to respond, the tribunal will consider the application without your response.</p>
+            """;
 
         assertThat(caseData.getTseResponseIntro(), is(expected));
     }
@@ -169,11 +176,15 @@ class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         TseHelper.setDataForRespondingToApplication(caseData);
-        String expected = "The respondent has applied to <b>Postpone a hearing</b>.</br></br> If you have any "
-            + "objections or responses to their application you must send them to the tribunal as soon as possible and "
-            + "by 20 December 2022 at the latest.</br></br>If you need more time to respond, you may request more time "
-            + "from the tribunal. If you do not respond or request more time to respond, the tribunal will consider the"
-            + " application without your response.";
+        String expected = """
+            <p>The respondent has applied to <strong>Postpone a hearing</strong>.</p>
+            
+            <p>If you have any objections or responses to their application you must send them to the tribunal as soon
+            as possible and by <strong>20 December 2022</strong> at the latest.
+            
+            If you need more time to respond, you may request more time from the tribunal. If you do not respond or
+            request more time to respond, the tribunal will consider the application without your response.</p>
+            """;
 
         assertThat(caseData.getTseResponseIntro(), is(expected));
     }
@@ -218,14 +229,15 @@ class TseHelperTest {
         String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
-            + "\"type\":\"Withdraw my claim\",\"supportingYesNo\":\"Yes\","
-            + "\"documentCollection\":[{\"id\":\"1234\","
+            + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
+            + "\"documentCollection\":[{\"id\":\"78910\","
             + "\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"image.png|testBinaryUrl/documents/1234/binary"
             + "\",\"document_filename\":\"image.png\","
-            + "\"document_url\":\"http://dm-store:8080/documents/1234\"},\"ownerDocument\":null,"
+            + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\":null},"
+            + "\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
-            + "\"response\":\"response\"}}";
+            + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
     }

@@ -8,23 +8,34 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
+import uk.gov.service.notify.NotificationClientException;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
@@ -39,16 +50,20 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TSE_ADMIN_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_REPLY;
+import static uk.gov.service.notify.NotificationClient.prepareUpload;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TseAdmReplyService {
+    private final DocumentManagementService documentManagementService;
     private final EmailService emailService;
-
+    private final TornadoService tornadoService;
     private final TseService tseService;
-
+    
     @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
     @Value("${template.tse.admin.reply.respondent}")
@@ -181,43 +196,71 @@ public class TseAdmReplyService {
      * @param caseId used in email link to case
      * @param caseData in which the case details are extracted from
      */
-    public void sendAdmReplyEmails(String caseId, CaseData caseData) {
-        String caseNumber = caseData.getEthosCaseReference();
-
-        List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
-        collectRespondents(caseData, emailsToSend);
-        collectClaimants(caseData, emailsToSend);
-
-        for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
-            emailService.sendEmail(
-                emailRecipient.getRecipientTemplate(),
-                emailRecipient.getRecipientEmail(),
-                buildPersonalisation(caseNumber, caseId, emailRecipient.getCustomisedText()));
+    public Map<String, Object> sendNotifyEmailsToClaimant(String caseId, CaseData caseData, String userToken) {
+        Map<String, Object> personalisationHashMap = new ConcurrentHashMap<>();
+        if (RESPONDENT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            return personalisationHashMap;
         }
+
+        String caseNumber = caseData.getEthosCaseReference();
+        List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
+        collectClaimants(caseData, emailsToSend);
+        byte[] uploadedDocContent =  getUploadedDocumentContent(caseData, userToken);
+        for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
+            personalisationHashMap = buildPersonalisation(caseNumber, caseId,
+                    emailRecipient.getCustomisedText(), uploadedDocContent);
+            emailService.sendEmail(emailRecipient.getRecipientTemplate(), emailRecipient.getRecipientEmail(),
+                    personalisationHashMap);
+        }
+
+        return personalisationHashMap;
     }
 
-    private void collectRespondents(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
-        // if respondent only or both parties: send Respondents Reply Emails
-        if (RESPONDENT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
-            || BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyNotify())) {
-            TSEAdminEmailRecipientsData respondentDetails;
-            for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
-                if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    respondentDetails =
-                        new TSEAdminEmailRecipientsData(
-                            tseAdminReplyRespondentTemplateId,
-                            respondentSumTypeItem.getValue().getRespondentEmail());
-
-                    if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
-                        respondentDetails.setCustomisedText(RESPONSE_REQUIRED);
-                    } else {
-                        respondentDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);
-                    }
-
-                    emailsToSend.add(respondentDetails);
-                }
+    private byte[] getUploadedDocumentContent(CaseData caseData, String userToken) {
+        DocumentTypeItem docItem = caseData.getDocumentCollection()
+                .get(caseData.getDocumentCollection().size() - 1);
+        byte[] uploadedDocContent = null;
+        try {
+            UploadedDocument uploadedDoc = documentManagementService.downloadFile(userToken,
+                    docItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
+            if (uploadedDoc != null) {
+                uploadedDocContent = uploadedDoc.getContent().getInputStream().readAllBytes();
             }
+        } catch (IOException ioException) {
+            log.error("Source: TseAdmReplyService, method - getUploadedDocumentContent. "
+                    + "Error downloading uploaded document binary content: " + ioException.getMessage());
         }
+
+        return uploadedDocContent;
+    }
+
+    /**
+     * Send notify emails to Respondents (or LR if they are assigned).
+     */
+    public Map<String, Object> sendNotifyEmailsToRespondents(CaseDetails caseDetails, String userToken) {
+        Map<String, Object> personalisationHashMap;
+        CaseData caseData = caseDetails.getCaseData();
+        if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            return Collections.emptyMap();
+        }
+
+        String customisedText = isResponseRequired(caseData, RESPONDENT_TITLE)
+                ? RESPONSE_REQUIRED : RESPONSE_NOT_REQUIRED;
+
+        personalisationHashMap = buildPersonalisation(caseData.getEthosCaseReference(),
+                caseDetails.getCaseId(), customisedText, getUploadedDocumentContent(caseData, userToken));
+
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        respondents.forEach(obj -> sendRespondentEmail(caseData, personalisationHashMap, obj.getValue()));
+        return personalisationHashMap;
+    }
+
+    private void sendRespondentEmail(CaseData caseData, Map<String, Object> emailData, RespondentSumType respondent) {
+        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
+        if (isNullOrEmpty(respondentEmail)) {
+            return;
+        }
+        emailService.sendEmail(tseAdminReplyRespondentTemplateId, respondentEmail, emailData);
     }
 
     private void collectClaimants(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
@@ -260,13 +303,36 @@ public class TseAdmReplyService {
             || party.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
     }
 
-    private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put(CASE_NUMBER, caseNumber);
-        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
-        personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
-        personalisation.put("customisedText", customText);
+    private Map<String, Object> buildPersonalisation(String caseNumber, String caseId, String customText,
+                                                     byte[] adminReplyPdfDocContent) {
+        Map<String, Object> personalisation = new ConcurrentHashMap<>();
+        try {
+            personalisation.put(CASE_NUMBER, caseNumber);
+            personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
+            personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
+            personalisation.put("customisedText", customText);
+            personalisation.put("linkToUploadedPdfDocumentBinary", prepareUpload(adminReplyPdfDocContent));
+        } catch (NotificationClientException notificationClientEx) {
+            log.error("Attaching pdf content to email failed: " + notificationClientEx.getMessage());
+        }
         return personalisation;
+    }
+
+    /**
+     * Creates a pdf copy of the TSE application Response from Admin/Caseworker and
+     * adds it to the case doc collection.
+     *
+     * @param caseDetails details of the case from which required fields are extracted
+     * @param userToken autherisation token to use for generating an event document
+     */
+    public void addTseAdmReplyPdfToDocCollection(CaseDetails caseDetails, String userToken) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+        DocumentTypeItem docItem = TseAdmReplyHelper.getDocumentTypeItem(documentManagementService, tornadoService,
+                caseDetails, userToken, TSE_ADMIN_REPLY, TSE_ADMIN_CORRESPONDENCE);
+        caseData.getDocumentCollection().add(docItem);
     }
 
     /**

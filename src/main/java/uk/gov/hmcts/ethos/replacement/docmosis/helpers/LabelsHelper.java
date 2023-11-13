@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -163,11 +164,11 @@ public final class LabelsHelper {
         getEntityTelephone(addressLabelType, representedTypeC.getRepresentativePhoneNumber());
         getEntityFax(addressLabelType, representedTypeC.getRepresentativeMobileNumber());
 
-        if (!isNullOrEmpty(nullCheck(representedTypeC.getRepresentativeReference()))) {
+        if (isNullOrEmpty(nullCheck(representedTypeC.getRepresentativeReference()))) {
+            addressLabelType.setLabelEntityReference(REF);
+        } else {
             addressLabelType.setLabelEntityReference(
                     REF + nullCheck(representedTypeC.getRepresentativeReference()));
-        } else {
-            addressLabelType.setLabelEntityReference(REF);
         }
 
         addressLabelType.setLabelCaseReference(ethosCaseReference);
@@ -297,11 +298,11 @@ public final class LabelsHelper {
             getEntityTelephone(addressLabelType, representedTypeR.getRepresentativePhoneNumber());
             getEntityFax(addressLabelType, representedTypeR.getRepresentativeMobileNumber());
 
-            if (!isNullOrEmpty(nullCheck(representedTypeR.getRepresentativeReference()))) {
+            if (isNullOrEmpty(nullCheck(representedTypeR.getRepresentativeReference()))) {
+                addressLabelType.setLabelEntityReference(REF);
+            } else {
                 addressLabelType.setLabelEntityReference(
                         REF + nullCheck(representedTypeR.getRepresentativeReference()));
-            } else {
-                addressLabelType.setLabelEntityReference(REF);
             }
 
             addressLabelType.setLabelCaseReference(ethosCaseReference);
@@ -331,21 +332,19 @@ public final class LabelsHelper {
 
     private static void getEntityTelephone(AddressLabelType addressLabelType, String telephone) {
 
-        if (!isNullOrEmpty(nullCheck(telephone))) {
-            addressLabelType.setLabelEntityTelephone(TEL + nullCheck(telephone));
-
-        } else {
+        if (isNullOrEmpty(nullCheck(telephone))) {
             addressLabelType.setLabelEntityTelephone("");
+        } else {
+            addressLabelType.setLabelEntityTelephone(TEL + nullCheck(telephone));
         }
     }
 
     private static void getEntityFax(AddressLabelType addressLabelType, String fax) {
 
-        if (!isNullOrEmpty(nullCheck(fax))) {
-            addressLabelType.setLabelEntityFax(TEL + nullCheck(fax));
-
-        } else {
+        if (isNullOrEmpty(nullCheck(fax))) {
             addressLabelType.setLabelEntityFax("");
+        } else {
+            addressLabelType.setLabelEntityFax(TEL + nullCheck(fax));
         }
     }
 
@@ -380,9 +379,7 @@ public final class LabelsHelper {
                     multipleData.getAddressLabelsSelectionTypeMSL()));
 
         } else {
-
-            return null;
-
+            return Collections.emptyList();
         }
 
     }

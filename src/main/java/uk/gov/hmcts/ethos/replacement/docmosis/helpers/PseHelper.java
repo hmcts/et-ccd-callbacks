@@ -111,7 +111,7 @@ public final class PseHelper {
         return sendNotificationType.getSendNotificationUploadDocument()
             .stream()
             .flatMap(documentTypeItem -> MarkdownHelper.addDocumentRow(documentTypeItem.getValue()).stream())
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private static String getSendNotificationSelectHearing(SendNotificationType sendNotificationType) {

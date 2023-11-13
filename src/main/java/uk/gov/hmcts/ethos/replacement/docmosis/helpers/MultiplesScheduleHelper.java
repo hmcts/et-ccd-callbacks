@@ -86,39 +86,24 @@ public final class MultiplesScheduleHelper {
     }
 
     private static String getScheduleAddress(String field, Address address) {
-        switch (field) {
-            case ADDRESS_LINE1:
-                return address.getAddressLine1() != null
-                        ? address.getAddressLine1()
-                        : "";
-            case ADDRESS_LINE2:
-                return address.getAddressLine2() != null
-                        ? address.getAddressLine2()
-                        : "";
-            case ADDRESS_LINE3:
-                return address.getAddressLine3() != null
-                        ? address.getAddressLine3()
-                        : "";
-            case TOWN:
-                return address.getPostTown() != null
-                        ? address.getPostTown()
-                        : "";
-            default:
-                return address != null
-                        ? address.getPostCode()
-                        : "";
-        }
+        return switch (field) {
+            case ADDRESS_LINE1 -> address.getAddressLine1() != null ? address.getAddressLine1() : "";
+            case ADDRESS_LINE2 -> address.getAddressLine2() != null ? address.getAddressLine2() : "";
+            case ADDRESS_LINE3 -> address.getAddressLine3() != null ? address.getAddressLine3() : "";
+            case TOWN -> address.getPostTown() != null ? address.getPostTown() : "";
+            default -> address != null ? address.getPostCode() : "";
+        };
     }
 
     private static String getClaimantName(String claimantCompany, ScheduleClaimantIndType scheduleClaimantIndType) {
-        if (!isNullOrEmpty(claimantCompany)) {
-            return claimantCompany;
-        } else {
+        if (isNullOrEmpty(claimantCompany)) {
             if (scheduleClaimantIndType != null) {
                 return scheduleClaimantIndType.claimantFullNames();
             } else {
                 return "";
             }
+        } else {
+            return claimantCompany;
         }
     }
 

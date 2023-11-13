@@ -5,7 +5,6 @@ public final class RolesConstants {
     public static final String CASEWORKER_ET_PCQEXTRACTOR = CASEWORKER.concat("-et-pcqextractor");
     public static final String CASEWORKER_CAA = CASEWORKER.concat("-caa");
     public static final String CASEWORKER_EMPLOYMENT = CASEWORKER.concat("-employment");
-    public static final String CASEWORKER_APPROVER = CASEWORKER.concat("-approver");
     public static final String CASEWORKER_EMPLOYMENT_API = CASEWORKER_EMPLOYMENT.concat("-api");
     public static final String CASEWORKER_EMPLOYMENT_ENGLANDWALES = CASEWORKER_EMPLOYMENT.concat("-englandwales");
     public static final String CASEWORKER_EMPLOYMENT_SCOTLAND = CASEWORKER_EMPLOYMENT.concat("-scotland");
@@ -16,7 +15,6 @@ public final class RolesConstants {
         CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-scotland");
     public static final String CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR =
         CASEWORKER_EMPLOYMENT.concat("-legalrep-solicitor");
-    public static final String CASEWORKER_DIVORCE_SOLICITOR = CASEWORKER.concat("divorce-solicitor");
 
     public static final String CITIZEN = "citizen";
     public static final String CCD_IMPORT = "ccd-import";
@@ -29,8 +27,13 @@ public final class RolesConstants {
     public static final String PUI_USER_MANAGER = "pui-user-manager";
     public static final String PUI_CAA = "pui-caa";
     public static final String MANAGE_USER = "manage-user";
+    public static final String CASEWORKER_APPROVER = "caseworker-approver";
     public static final String PRD_AAC_SYSTEM = "prd-aac-system";
     public static final String PRD_ADMIN = "prd-admin";
+    public static final String ACAS_API = "et-acas-api";
+    public static final String GS_PROFILE = "GS_profile";
+    public static final String RAS_VALIDATION = "caseworker-ras-validation";
+    public static final String WA_TASK_CONFIGURATION = "caseworker-wa-task-configuration";
 
     //Emails constants
     public static final String CCD_DOCKER_DEFAULT_EMAIL = "ccd.docker.default@hmcts.net";
@@ -41,10 +44,9 @@ public final class RolesConstants {
     public static final String SOLICITOR_1_EMAIL = "solicitor1@etorganisation1.com";
     public static final String CITIZEN_EMAIL = "citizen@gmail.com";
     public static final String IDAM_SYSTEM_USER_EMAIL = "data.store.idam.system.user@gmail.com";
-
     public static final String MCA_SYSTEM_IDAM_ACC_EMAIL = "mca.system.idam.acc@gmail.com";
     public static final String MCA_NOC_APPROVER_EMAIL = "mca.noc.approver@gmail.com";
-
+    public static final String ACAS_EMAIL = "et@acas.com";
     public static final String ET_SYSTEM_EMAIL = "et.service@hmcts.net";
 
     //Paths to definition files
@@ -56,8 +58,8 @@ public final class RolesConstants {
         CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_ETJUDGE, CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR, CITIZEN, ET_ACAS_API,
-        PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA,
-        MANAGE_USER, CASEWORKER_APPROVER};
+        PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA, MANAGE_USER,
+        CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN, ACAS_API, GS_PROFILE, RAS_VALIDATION, WA_TASK_CONFIGURATION};
 
     private RolesConstants() {
     }

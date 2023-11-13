@@ -7,7 +7,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -45,7 +44,7 @@ public class BulkAddSinglesValidator {
             return validatedSingleCases.stream()
                     .filter(Predicate.not(ValidatedSingleCase::isValid))
                     .map(s -> s.getEthosReference() + ": " + s.getInvalidReason())
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
             log.error("Unexpected error when validating single cases for " + multipleEthosReference, e);
             return List.of("Unexpected error when validating single cases");

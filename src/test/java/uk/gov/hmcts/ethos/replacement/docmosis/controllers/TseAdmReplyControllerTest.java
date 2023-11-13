@@ -156,8 +156,8 @@ class TseAdmReplyControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdmReplyService).saveTseAdmReplyDataFromCaseData(
             ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdmReplyService).sendAdmReplyEmails(
-            ccdRequest.getCaseDetails().getCaseId(), ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdmReplyService).sendNotifyEmailsToClaimant(
+            ccdRequest.getCaseDetails().getCaseId(), ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN);
         verify(tseAdmReplyService).clearTseAdmReplyDataFromCaseData(
             ccdRequest.getCaseDetails().getCaseData());
     }
@@ -172,8 +172,8 @@ class TseAdmReplyControllerTest {
                 .andExpect(status().isForbidden());
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdmReplyService, never()).sendAdmReplyEmails(
-            "4321", ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
+            "4321", ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN);
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
     }
@@ -187,8 +187,8 @@ class TseAdmReplyControllerTest {
                 .andExpect(status().isBadRequest());
         verify(tseAdmReplyService, never()).saveTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdmReplyService, never()).sendAdmReplyEmails(
-            "4321", ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdmReplyService, never()).sendNotifyEmailsToClaimant(
+            "4321", ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN);
         verify(tseAdmReplyService, never()).clearTseAdmReplyDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
     }

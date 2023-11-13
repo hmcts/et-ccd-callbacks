@@ -56,4 +56,29 @@
         <packageUrl regex="true">^pkg:maven/com\.squareup\.okhttp3/okhttp\-urlconnection@.*$</packageUrl>
         <cve>CVE-2023-3782</cve>
     </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.75.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-websocket@.*$</packageUrl>
+        <cve>CVE-2023-41080</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.75.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+        <cve>CVE-2023-41080</cve>
+    </suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: json-20231013.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
+   <cpe>cpe:/a:json-java_project:json-java</cpe>
+</suppress>
+    <suppress>
+        <cve>CVE-2023-4586</cve>
+    </suppress>
 </suppressions>

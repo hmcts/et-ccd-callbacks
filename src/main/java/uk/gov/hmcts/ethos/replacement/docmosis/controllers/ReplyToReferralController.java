@@ -27,7 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
@@ -48,7 +48,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @RestController
 public class ReplyToReferralController {
     private final VerifyTokenService verifyTokenService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
     private final EmailService emailService;
@@ -91,7 +91,7 @@ public class ReplyToReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setIsJudge(ReferralHelper.isJudge(userService.getUserDetails(userToken).getRoles()));
+        caseData.setIsJudge(ReferralHelper.isJudge(userIdamService.getUserDetails(userToken).getRoles()));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -193,7 +193,7 @@ public class ReplyToReferralController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        UserDetails userDetails = userService.getUserDetails(userToken);
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
         String referralCode = caseData.getSelectReferral().getValue().getCode();
 
         ReferralHelper.createReferralReply(

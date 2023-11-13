@@ -5,8 +5,8 @@ import uk.gov.service.notify.NotificationClient;
 
 import static org.mockito.Mockito.mock;
 
-public class TestEmailService extends EmailService {
-    public TestEmailService() {
+public class EmailUtils extends EmailService {
+    public EmailUtils() {
         super(mock(NotificationClient.class));
     }
 

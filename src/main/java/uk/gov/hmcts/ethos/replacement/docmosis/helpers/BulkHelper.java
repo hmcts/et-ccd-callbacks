@@ -244,9 +244,9 @@ public final class BulkHelper {
         CaseData caseData = submitEvent.getCaseData();
         MultipleType multipleType = getMultipleTypeFromCaseData(caseData);
         multipleType.setCaseIDM(String.valueOf(submitEvent.getCaseId()));
-        multipleType.setMultipleReferenceM(!isNullOrEmpty(
-                caseData.getMultipleReference()) ? caseData.getMultipleReference() : " ");
-        multipleType.setStateM(!isNullOrEmpty(submitEvent.getState()) ? submitEvent.getState() : " ");
+        multipleType.setMultipleReferenceM(isNullOrEmpty(
+                caseData.getMultipleReference()) ? " " : caseData.getMultipleReference());
+        multipleType.setStateM(isNullOrEmpty(submitEvent.getState()) ? " " : submitEvent.getState());
         return multipleType;
     }
 
@@ -427,10 +427,10 @@ public final class BulkHelper {
             Iterator<Map.Entry<String, List<SearchType>>> entries = new TreeMap<>(multipleMap).entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry<String, List<SearchType>> subMultipleEntry = entries.next();
-                sb.append("{\"SubMultiple_No\":\"").append(subMultipleEntry.getKey()).append(NEW_LINE);
-                sb.append("\"SubMultiple_title\":\"").append(getSubMultipleTitle(subMultipleEntry.getKey(), bulkData))
-                        .append(NEW_LINE);
-                sb.append("\"multiple\":[\n");
+                sb.append("{\"SubMultiple_No\":\"").append(subMultipleEntry.getKey()).append(NEW_LINE)
+                        .append("\"SubMultiple_title\":\"")
+                        .append(getSubMultipleTitle(subMultipleEntry.getKey(), bulkData)).append(NEW_LINE)
+                        .append("\"multiple\":[\n");
                 for (int i = 0; i < subMultipleEntry.getValue().size(); i++) {
                     sb.append(getMultipleTypeRow(subMultipleEntry.getValue().get(i)));
                     if (i != subMultipleEntry.getValue().size() - 1) {

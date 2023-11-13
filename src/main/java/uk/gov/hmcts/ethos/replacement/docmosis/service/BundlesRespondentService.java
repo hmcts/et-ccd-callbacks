@@ -19,11 +19,15 @@ import java.util.List;
 import java.util.Locale;
 
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BundlesRespondentService {
+
+    private static final String EXCEEDED_CHAR_LIMIT = "This field must be 2500 characters or less";
+    private static final String BUT = "But";
 
     /**
      * Clear interface data from caseData.
@@ -86,6 +90,25 @@ public class BundlesRespondentService {
         }
 
         return List.of("Your upload contains a disallowed file type");
+    }
+
+    /**
+     * Validate text area length < 2500 for fields.
+     * @param caseData contains all the case data
+     * @return Error Message List
+     */
+    public List<String> validateTextAreaLength(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (NO.equals(caseData.getBundlesRespondentAgreedDocWith())) {
+            if (caseData.getBundlesRespondentAgreedDocWithNo().length() > 2500) {
+                errors.add(EXCEEDED_CHAR_LIMIT);
+            }
+        } else if (BUT.equals(caseData.getBundlesRespondentAgreedDocWith())) {
+            if (caseData.getBundlesRespondentAgreedDocWithBut().length() > 2500) {
+                errors.add(EXCEEDED_CHAR_LIMIT);
+            }
+        }
+        return errors;
     }
 
     /**

@@ -20,6 +20,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -29,6 +30,51 @@ class BundlesRespondentServiceTest {
     private BundlesRespondentService bundlesRespondentService;
     private CaseData scotlandCaseData;
     private CaseData englandCaseData;
+
+    private static final String VALID_TEXT = "valid text";
+    private static final String EXCEED_CHAR_LIMIT_TEXT = "Life is a journey filled with "
+            + "twists and turns, highs and lows. It's "
+            + "a mosaic of experiences that shape us into who we are. Embrace the challenges, for "
+            + "they are opportunities in disguise. Cherish the "
+            + "moments of joy, for they are the fuel that keeps us going."
+            + "In the tapestry of life, relationships are the threads that bind us together. "
+            + "They come in various forms - family, "
+            + "friends, mentors, and even chance encounters. Each connection adds a unique hue "
+            + "to the canvas of our existence. Nurture these bonds,"
+            + " for they hold the power to lift us up and carry us through the toughest of times."
+            + "Remember to take a moment to appreciate the beauty around you. Nature, with its"
+            + " breathtaking landscapes and intricate "
+            + "ecosystems, reminds us of the wonders of the world. The laughter of children, "
+            + "the warmth of a hug, the taste of a delicious meal "
+            + "- these simple pleasures are the jewels that adorn the fabric of our days."
+            + "Don't be afraid to dream, to set ambitious goals, and to chase after them with "
+            + "unwavering determination. "
+            + "The path to success may be fraught with obstacles, but with persistence and a "
+            + "resilient spirit, you can overcome "
+            + "anything that stands in your way."
+            + "Self-care is not a luxury, but a necessity. Take the time to rest, to recharge,"
+            + " and to nourish your body "
+            + "and mind. Prioritize your well-being, for it is the cornerstone of a fulfilling life."
+            + "In moments of doubt, remember that you are stronger than you think. You have the power to rise"
+            + " above adversity and to emerge from challenges with newfound wisdom and strength. "
+            + "Trust in yourself and your abilities."
+            + "Finally, be kind. Kindness is a beacon of light in a sometimes dark world. It has the power to "
+            + "heal wounds, to bridge divides, and to inspire hope. Practice it freely, and watch "
+            + "as it ripples out, touching the lives"
+            + " of those around you."
+            + "So, as you navigate the intricate tapestry of life, remember to cherish t"
+            + "he threads of connection,"
+            + " to savor the colors of joy, and to weave your own story with purpose and intention. "
+            + "You are the artist of your own masterpiece, "
+            + "and the world is your canvas. Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
+            + "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            + " Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex "
+            + "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            + " Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex "
+            + "ea commodo consequat. Duis aute irure dolor in "
+            + "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur "
+            + "sint occaecat cupidatat non proident, "
+            + "sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
     @BeforeEach
     void setUp() {
@@ -101,6 +147,40 @@ class BundlesRespondentServiceTest {
         List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
         assertThat(errors.size(), is(1));
         assertThat(errors.get(0), is("You must upload a PDF file"));
+    }
+
+    @Test
+    void validateTextAreaLength_noTooLong_returnsError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith("No");
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(EXCEED_CHAR_LIMIT_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
+    }
+
+    @Test
+    void validateTextAreaLength_butTooLong_returnsError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith("But");
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(EXCEED_CHAR_LIMIT_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
+    }
+
+    @Test
+    void validateTextAreaLength_validTextForNo_returnsNoError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(VALID_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
+    void validateTextAreaLength_validTextForBut_returnsNoError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith("But");
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(VALID_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertTrue(errors.isEmpty());
     }
 
     @Test

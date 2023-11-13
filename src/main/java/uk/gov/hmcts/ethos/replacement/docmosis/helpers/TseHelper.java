@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -42,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
@@ -229,13 +227,11 @@ public final class TseHelper {
     public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails,
                                                                     byte[] document,
                                                                     String citizenUrl,
-                                                                    FeatureToggleService featureToggleService)
+                                                                    boolean isWelsh)
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
-        boolean isWelsh = featureToggleService.isWelshEnabled()
-                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String linkToCitizenHub = isWelsh
                 ? citizenUrl + WELSH_LANGUAGE_PARAM
                 : citizenUrl;

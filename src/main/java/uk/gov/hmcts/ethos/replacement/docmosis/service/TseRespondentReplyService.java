@@ -250,7 +250,7 @@ public class TseRespondentReplyService {
                     "TSE Reply.pdf");
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), featureToggleService);
+                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
             emailService.sendEmail(emailTemplate,
                     claimantEmail, personalisation);
         } catch (Exception e) {

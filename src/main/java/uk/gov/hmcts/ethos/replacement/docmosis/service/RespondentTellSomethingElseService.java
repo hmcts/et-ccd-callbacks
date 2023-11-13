@@ -89,8 +89,11 @@ public class RespondentTellSomethingElseService {
     private static final String CLAIMANT_EMAIL_GROUP_B = "You are not expected to respond to this application"
             + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
 
-    public static final String CY_CLAIMANT_EMAIL_GROUP_B = "Nid oes disgwyl i chi ymateb i'r cais hwn."
-            + "\r\n\r\nOs byddwch yn ymateb dylech wneud hynny cyn gynted â phosibl ac erbyn %s fan bellaf.";
+    public static final String CY_CLAIMANT_EMAIL_GROUP_B = """
+    Nid oes disgwyl i chi ymateb i'r cais hwn.
+
+    Os byddwch yn ymateb dylech wneud hynny cyn gynted â phosibl ac erbyn %s fan bellaf.
+        """;
     private static final String CLAIMANT_EMAIL_GROUP_A = "You should respond as soon as possible, and in any "
             + "event by %s.";
 
@@ -214,9 +217,16 @@ public class RespondentTellSomethingElseService {
     }
 
     private String getInstructions(String dueDate, boolean isWelsh, String applicationType) {
-        String instructionFormat = isWelsh
-                ? GROUP_B_TYPES.contains(applicationType) ? CY_CLAIMANT_EMAIL_GROUP_B : CY_CLAIMANT_EMAIL_GROUP_A
-                : GROUP_B_TYPES.contains(applicationType) ? CLAIMANT_EMAIL_GROUP_B : CLAIMANT_EMAIL_GROUP_A;
+        String instructionFormat;
+        if (isWelsh) {
+            instructionFormat = GROUP_B_TYPES.contains(applicationType)
+                    ? CY_CLAIMANT_EMAIL_GROUP_B
+                    : CY_CLAIMANT_EMAIL_GROUP_A;
+        } else {
+            instructionFormat = GROUP_B_TYPES.contains(applicationType)
+                    ? CLAIMANT_EMAIL_GROUP_B
+                    : CLAIMANT_EMAIL_GROUP_A;
+        }
         return String.format(instructionFormat, dueDate);
     }
 

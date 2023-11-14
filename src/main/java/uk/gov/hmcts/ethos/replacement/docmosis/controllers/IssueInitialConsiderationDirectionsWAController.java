@@ -37,26 +37,25 @@ public class IssueInitialConsiderationDirectionsWAController {
     private static final String COMPLETE_IICD_HDR =
             "<h1>Issue Initial Consideration Directions for Work Allocation complete</h1>";
 
-    @PostMapping(value = "/completeIssueInitialConsiderationDirectionsWA", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Completes the Issue Initial Consideration Directions WA flow")
+    @PostMapping(value = "/startIssueInitialConsiderationDirectionsWA", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "start the Issue Initial Consideration Directions WA flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                            @RequestHeader("Authorization")
-                                                                                String userToken) {
-        log.info("Issue Initial Consideration Directions WA complete requested for case reference ---> {}",
-            ccdRequest.getCaseDetails().getCaseId());
+            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+    public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
+                                                                         @RequestHeader("Authorization")
+                                                                         String userToken) {
+        log.info("START OF ISSUE INITIAL CONSIDERATION DIRECTIONS FOR WORK ALLOCATION ---> {}",
+                ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .confirmation_header(COMPLETE_IICD_HDR)
-            .build());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
@@ -86,16 +85,16 @@ public class IssueInitialConsiderationDirectionsWAController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-    @PostMapping(value = "/startIssueInitialConsiderationDirectionsWA", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "start the Issue Initial Consideration Directions WA flow")
+    @PostMapping(value = "/completeIssueInitialConsiderationDirectionsWA", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Completes the Issue Initial Consideration Directions WA flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                         @RequestHeader("Authorization")
-                                                                             String userToken) {
-        log.info("START OF ISSUE INITIAL CONSIDERATION DIRECTIONS FOR WORK ALLOCATION ---> {}",
+            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
+                                                                            @RequestHeader("Authorization")
+                                                                            String userToken) {
+        log.info("Issue Initial Consideration Directions WA complete requested for case reference ---> {}",
                 ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -103,7 +102,8 @@ public class IssueInitialConsiderationDirectionsWAController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityNoErrors(caseData);
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .confirmation_header(COMPLETE_IICD_HDR)
+                .build());
     }
 }

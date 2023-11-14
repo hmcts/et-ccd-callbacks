@@ -111,7 +111,8 @@ class ReferralHelperTest {
 
     private final String expectedCreatedReferralReply = "ReferralReplyType(directionTo=directionTo, replyToEmailAddre"
         + "ss=replyTo, isUrgentReply=isUrgent, directionDetails=directionDetails, replyDocument=null, replyGeneralNot"
-        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ")";
+        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate()
+        + ", replyDateTime=null, referralSubject=null)";
 
     @BeforeEach
     void setUp() {
@@ -498,7 +499,7 @@ class ReferralHelperTest {
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
             + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
-            + "\"replyBy\",\"replyDate\":\"replyDate\"}}]}}";
+            + "\"replyBy\",\"replyDate\":\"replyDate\",\"replyDateTime\":null,\"referralSubject\":null}}]}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);

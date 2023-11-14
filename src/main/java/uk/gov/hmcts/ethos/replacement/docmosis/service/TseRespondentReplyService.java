@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
@@ -55,6 +56,8 @@ public class TseRespondentReplyService {
 
     @Value("${template.tse.respondent.respond.claimant}")
     private String tseRespondentResponseTemplateId;
+    @Value("${template.tse.respondent.respond.cyClaimant}")
+    private String cyTseRespondentResponseTemplateId;
     @Value("${template.tse.respondent.respond.respondent.rule-92-no}")
     private String acknowledgementRule92NoEmailTemplateId;
     @Value("${template.tse.respondent.respond.respondent.rule-92-yes}")
@@ -239,14 +242,19 @@ public class TseRespondentReplyService {
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
+        boolean isWelsh = featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+        String emailTemplate = isWelsh
+                ? cyTseRespondentResponseTemplateId
+                : tseRespondentResponseTemplateId;
 
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
                     "TSE Reply.pdf");
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
-            emailService.sendEmail(tseRespondentResponseTemplateId,
+                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
+            emailService.sendEmail(emailTemplate,
                     claimantEmail, personalisation);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);

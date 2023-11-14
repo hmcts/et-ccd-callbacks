@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
@@ -84,7 +83,7 @@ class TseRespondentReplyServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
@@ -110,6 +109,7 @@ class TseRespondentReplyServiceTest {
                 respondentTellSomethingElseService, tseService, documentManagementService, featureToggleService);
 
         userDetails = HelperTest.getUserDetails();
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         doNothing().when(emailService).sendEmail(any(), any(), any());

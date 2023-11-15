@@ -86,5 +86,7 @@ class PreHearingDepositServiceTest {
         importFile.setFile(document);
         preHearingDepositService.importPreHearingDepositData(importFile, USER_TOKEN);
         verify(ccdClient, times(4)).startGenericTypeCaseCreation(anyString(), any());
+        verify(ccdClient, times(4)).submitGenericTypeCaseCreation(
+                anyString(), any(), any(), anyString(), anyString());
     }
 }

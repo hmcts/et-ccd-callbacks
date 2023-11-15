@@ -80,6 +80,8 @@ public class PreHearingDepositService {
                         generatePreHearingDepositCaseDetails(preHearingDepositImportFile, row);
                     CCDRequest request = ccdClient.startGenericTypeCaseCreation(
                             userToken, preHearingDepositCaseDetails);
+                    preHearingDepositCaseDetails.getCaseData().setCaseReferenceNumber(
+                            request.getCaseDetails().getCaseId());
                     ccdClient.submitGenericTypeCaseCreation(userToken, preHearingDepositCaseDetails, request,
                             PRE_HEARING_CASE_CREATION_EVENT_SUMMARY, PRE_HEARING_CASE_CREATION_EVENT_DESCRIPTION);
                 }

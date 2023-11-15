@@ -8,8 +8,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class PreHearingDepositData {
+    @JsonProperty("caseReferenceNumber")
+    private String caseReferenceNumber;
     @JsonProperty("preHearingDepositImportFile")
     private ImportFile preHearingDepositImportFile;
+    @JsonProperty("caseNumber")
+    private String caseNumber;
     @JsonProperty("payeeName")
     private String payeeName;
     @JsonProperty("regionOffice")
@@ -36,8 +40,6 @@ public class PreHearingDepositData {
     private String depositComments;
     @JsonProperty("depositReceivedFrom")
     private String depositReceivedFrom;
-    @JsonProperty("caseNumber")
-    private String caseNumber;
     @JsonProperty("documentUpload")
     private String documentUpload;
     @JsonProperty("depositRefundedTo")

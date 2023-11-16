@@ -115,9 +115,9 @@ public class CaseFlagsService {
                 .anyMatch(this::hasGrantedDecision);
     }
 
-    private boolean hasGrantedDecision(ListTypeItem<TypeItem<TseAdminRecordDecisionType>> list) {
+    private boolean hasGrantedDecision(ListTypeItem<TseAdminRecordDecisionType> list) {
         return list.stream()
-                .map(TseAdminRecordDecisionTypeItem::getValue)
+                .map(TypeItem<TseAdminRecordDecisionType>::getValue)
                 .filter(o -> o.getDecision() != null)
                 .anyMatch(o -> o.getDecision().startsWith(GRANTED));
     }

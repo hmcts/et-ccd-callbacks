@@ -270,7 +270,7 @@ public final class TseHelper {
             .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
+    private static ListTypeItem<TypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return null;
         }
@@ -279,7 +279,7 @@ public final class TseHelper {
                 ccdGatewayBaseUrl);
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+    private static String hasSupportingDocs(ListTypeItem<TypeItem<DocumentType>> supportDocList) {
         return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
     }
 }

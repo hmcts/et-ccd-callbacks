@@ -7,7 +7,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
@@ -97,7 +97,7 @@ public class BundlesRespondentService {
         }
 
         caseData.getBundlesRespondentCollection().add(
-            GenericTypeItem.from(HearingBundleType.builder()
+            TypeItem.from(HearingBundleType.builder()
                 .agreedDocWith(caseData.getBundlesRespondentAgreedDocWith())
                 .agreedDocWithBut(caseData.getBundlesRespondentAgreedDocWithBut())
                 .agreedDocWithNo(caseData.getBundlesRespondentAgreedDocWithNo())

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 
 import java.util.ArrayList;
@@ -13,12 +14,12 @@ public final class DocumentUtil {
         // Utility classes should not have a public or default constructor.
     }
 
-    public static List<GenericTypeItem<DocumentType>> generateUploadedDocumentListFromDocumentList(
-            List<GenericTypeItem<DocumentType>> documentList, String ccdGatewayBaseUrl) {
+    public static ListTypeItem<DocumentType> generateUploadedDocumentListFromDocumentList(
+            ListTypeItem<DocumentType> documentList, String ccdGatewayBaseUrl) {
 
-        List<GenericTypeItem<DocumentType>> uploadedDocumentList = new ArrayList<>();
+        ListTypeItem<DocumentType> uploadedDocumentList = new ArrayList<>();
         documentList.forEach(doc -> {
-            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
+            TypeItem<DocumentType> genTypeItems = new TypeItem<>();
             DocumentType docType = new DocumentType();
             docType.setUploadedDocument(doc.getValue().getUploadedDocument());
 

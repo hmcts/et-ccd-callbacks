@@ -9,7 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
@@ -73,7 +73,7 @@ public class CaseLinksEmailService {
         if (list1 == null || list1.isEmpty()) {
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(list2);
         } else {
-            List<GenericTypeItem<CaseLink>> diff = list2.stream()
+            ListTypeItem<TypeItem<CaseLink>> diff = list2.stream()
                     .filter(element -> !list1.contains(element))
                     .toList();
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(diff);

@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public final class CaseLinksHelper {
     private CaseLinksHelper() {
     }
 
-    public static boolean isLinkedForHearing(List<GenericTypeItem<CaseLink>> caseLinks) {
+    public static boolean isLinkedForHearing(ListTypeItem<TypeItem<CaseLink>> caseLinks) {
         if (caseLinks == null || caseLinks.isEmpty()) {
             return false;
         }

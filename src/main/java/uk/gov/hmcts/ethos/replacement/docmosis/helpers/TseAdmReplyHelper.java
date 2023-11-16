@@ -9,8 +9,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseAdminReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
@@ -111,15 +111,15 @@ public final class TseAdmReplyHelper {
                 .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(
-            List<GenericTypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
+    private static ListTypeItem<TypeItem<DocumentType>> getUploadedDocList(
+            ListTypeItem<TypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
         if (docTypeList == null) {
             return new ArrayList<>();
         }
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList, ccdGatewayBaseUrl);
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+    private static String hasSupportingDocs(ListTypeItem<TypeItem<DocumentType>> supportDocList) {
         return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 

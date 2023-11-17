@@ -21,7 +21,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
-
 /**
  * REST controller for the Issue Initial Consideration Directions Work Allocation pages.
  * Event is triggered by CaseWorkers to initiate a Work Allocation task
@@ -40,9 +39,9 @@ public class IssueInitialConsiderationDirectionsWAController {
     @PostMapping(value = "/startIssueInitialConsiderationDirectionsWA", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "start the Issue Initial Consideration Directions WA flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
                                                                          @RequestHeader("Authorization")
                                                                          String userToken) {
@@ -88,9 +87,9 @@ public class IssueInitialConsiderationDirectionsWAController {
     @PostMapping(value = "/completeIssueInitialConsiderationDirectionsWA", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Completes the Issue Initial Consideration Directions WA flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
                                                                             @RequestHeader("Authorization")
                                                                             String userToken) {

@@ -68,7 +68,7 @@
         "chai": "4.3.10",
         "chai-as-promised": "7.1.1",
         "chai-http": "4.4.0",
-        "codeceptjs": "3.5.7",
+        "codeceptjs": "3.5.8",
         "codeceptjs-saucehelper": "^1.4.0",
         "eslint": "8.53.0",
         "eslint-config-prettier": "^9.0.0",
@@ -124,5 +124,5 @@
         "qs": ">=6.10.3",
         "ua-parser-js": "^1.0.33"
     },
-    "packageManager": "yarn@3.6.4"
+    "packageManager": "yarn@3.7.0"
 }

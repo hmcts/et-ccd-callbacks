@@ -453,6 +453,8 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(nocRespondentRepresentativeService, times(1)).updateNonMyHmctsOrgIds(any());
     }
 
     @Test

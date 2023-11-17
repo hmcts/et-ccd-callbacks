@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -42,8 +43,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -770,6 +774,42 @@ class NocRespondentRepresentativeServiceTest {
         Address representative3Org = repCollection.get(2).getValue().getRepresentativeAddress();
         assertThat(representative3Org.getAddressLine1())
                 .isEqualTo(resOrg3.getContactInformation().get(0).getAddressLine1());
+    }
+
+    @Test
+    void updateNonMyHmctsOrgIds() {
+        RepresentedTypeRItem myHmctsRep = RepresentedTypeRItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(RepresentedTypeR.builder()
+                        .myHmctsYesNo(YES)
+                        .nameOfRepresentative("Jack")
+                        .build())
+                .build();
+
+        RepresentedTypeRItem nonMyHmctsRep = RepresentedTypeRItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(RepresentedTypeR.builder()
+                        .myHmctsYesNo(NO)
+                        .nameOfRepresentative("Jill")
+                        .build())
+                .build();
+
+        String alreadySetId = UUID.randomUUID().toString();
+        RepresentedTypeRItem nonMyHmctsRepTwo = RepresentedTypeRItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(RepresentedTypeR.builder()
+                        .myHmctsYesNo(NO)
+                        .nameOfRepresentative("Jimbo")
+                        .nonMyHmctsOrganisationId(alreadySetId)
+                        .build())
+                .build();
+
+        List<RepresentedTypeRItem> repCollection = List.of(myHmctsRep, nonMyHmctsRep, nonMyHmctsRepTwo);
+        nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(repCollection);
+
+        assertNull(repCollection.get(0).getValue().getNonMyHmctsOrganisationId());
+        assertNotNull(repCollection.get(1).getValue().getNonMyHmctsOrganisationId());
+        assertEquals(alreadySetId, repCollection.get(2).getValue().getNonMyHmctsOrganisationId());
     }
 
     private OrganisationsResponse createOrganisationsResponse(String orgId, String orgName) {

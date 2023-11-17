@@ -36,7 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -310,6 +312,26 @@ public class NocRespondentRepresentativeService {
             repAddress.setPostCode(orgAddress.getPostCode());
 
             repDetails.setRepresentativeAddress(repAddress);
+        }
+    }
+
+    /**
+     * Assigns an ID to each non myHMCTS legal rep representing their legal firm.
+     * @param repCollection Collection of representatives on the case
+     */
+    public void updateNonMyHmctsOrgIds(List<RepresentedTypeRItem> repCollection) {
+        repCollection.stream()
+                .map(RepresentedTypeRItem::getValue)
+                .forEach(this::updateNonMyHmctsOrgId);
+    }
+
+    private void updateNonMyHmctsOrgId(RepresentedTypeR rep) {
+        if (YES.equals(rep.getMyHmctsYesNo())) {
+            return;
+        }
+
+        if (isNullOrEmpty(rep.getNonMyHmctsOrganisationId())) {
+            rep.setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
         }
     }
 }

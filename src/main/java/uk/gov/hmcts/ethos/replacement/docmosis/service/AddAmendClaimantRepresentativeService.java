@@ -9,6 +9,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,12 @@ public class AddAmendClaimantRepresentativeService {
             return;
         }
 
-        claimantRep.setRepresentativeId(UUID.randomUUID().toString());
+        if (isNullOrEmpty(claimantRep.getRepresentativeId())) {
+            claimantRep.setRepresentativeId(UUID.randomUUID().toString());
+        }
+
+        if (isNullOrEmpty(claimantRep.getOrganisationId())) {
+            claimantRep.setOrganisationId(UUID.randomUUID().toString());
+        }
     }
 }

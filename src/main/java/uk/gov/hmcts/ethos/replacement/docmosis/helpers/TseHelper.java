@@ -34,12 +34,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
@@ -221,19 +223,28 @@ public final class TseHelper {
      * @return Personalisation For Response
      * @throws NotificationClientException Throw Exception
      */
-    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document,
-                                                                    String citizenUrl)
+
+    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails,
+                                                                    byte[] document,
+                                                                    String citizenUrl,
+                                                                    boolean isWelsh)
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
+        String linkToCitizenHub = isWelsh
+                ? citizenUrl + WELSH_LANGUAGE_PARAM
+                : citizenUrl;
+        String applicationType = isWelsh
+                ? CY_RESPONDING_TO_APP_TYPE_MAP.get(selectedApplication.getType())
+                : selectedApplication.getType();
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
-                LINK_TO_CITIZEN_HUB, citizenUrl,
+                LINK_TO_CITIZEN_HUB, linkToCitizenHub,
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, selectedApplication.getType(),
+                APPLICATION_TYPE, applicationType,
                 "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),

@@ -37,6 +37,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERS
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
@@ -45,6 +47,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_FILE_NAME;
@@ -58,6 +62,7 @@ public class RespondentTellSomethingElseService {
     private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
     private final DocumentManagementService documentManagementService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.tse.respondent.application.respondent}")
     private String tseRespondentAcknowledgeTemplateId;
@@ -65,6 +70,8 @@ public class RespondentTellSomethingElseService {
     private String tseRespondentAcknowledgeTypeCTemplateId;
     @Value("${template.tse.respondent.application.claimant}")
     private String tseRespondentToClaimantTemplateId;
+    @Value("${template.tse.respondent.application.cyClaimant}")
+    private String cyTseRespondentToClaimantTemplateId;
     @Value("${template.tse.respondent.application.tribunal}")
     private String tseNewApplicationAdminTemplateId;
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
@@ -81,8 +88,17 @@ public class RespondentTellSomethingElseService {
             + "sent to the tribunal as soon as possible, and in any event within 7 days.";
     private static final String CLAIMANT_EMAIL_GROUP_B = "You are not expected to respond to this application"
             + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
+
+    public static final String CY_CLAIMANT_EMAIL_GROUP_B = """
+    Nid oes disgwyl i chi ymateb i'r cais hwn.
+
+    Os byddwch yn ymateb dylech wneud hynny cyn gynted â phosibl ac erbyn %s fan bellaf.
+        """;
     private static final String CLAIMANT_EMAIL_GROUP_A = "You should respond as soon as possible, and in any "
             + "event by %s.";
+
+    public static final String CY_CLAIMANT_EMAIL_GROUP_A = "Dylech ymateb cyn gynted â phosibl, ac erbyn %s "
+            + "fan bellaf.";
 
     private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String TABLE_COLUMNS_MARKDOWN =
@@ -169,22 +185,49 @@ public class RespondentTellSomethingElseService {
         }
 
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
-        String instructions;
-        String dueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
+        boolean isWelsh = featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
 
-        if (GROUP_B_TYPES.contains(caseData.getResTseSelectApplication())) {
-            instructions = String.format(CLAIMANT_EMAIL_GROUP_B, dueDate);
-        } else {
-            instructions = String.format(CLAIMANT_EMAIL_GROUP_A, dueDate);
-        }
+        String dueDate = isWelsh
+                ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
+                : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
+
+        String emailTemplate = getEmailTemplateId(isWelsh);
+        String instructions = getInstructions(dueDate, isWelsh, caseData.getResTseSelectApplication());
 
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", TSE_FILE_NAME);
             Map<String, Object> personalisation = claimantPersonalisation(caseDetails, instructions, bytes);
-            emailService.sendEmail(tseRespondentToClaimantTemplateId, claimantEmail, personalisation);
+            emailService.sendEmail(emailTemplate, claimantEmail, personalisation);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
+    }
+
+    private String translateDateToWelsh(String date) {
+        return CY_MONTHS_MAP.entrySet().stream()
+                .filter(entry -> date.contains(entry.getKey()))
+                .findFirst()
+                .map(entry -> date.replace(entry.getKey(), entry.getValue()))
+                .orElse(date);
+    }
+
+    private String getEmailTemplateId(boolean isWelsh) {
+        return isWelsh ? cyTseRespondentToClaimantTemplateId : tseRespondentToClaimantTemplateId;
+    }
+
+    private String getInstructions(String dueDate, boolean isWelsh, String applicationType) {
+        String instructionFormat;
+        if (isWelsh) {
+            instructionFormat = GROUP_B_TYPES.contains(applicationType)
+                    ? CY_CLAIMANT_EMAIL_GROUP_B
+                    : CY_CLAIMANT_EMAIL_GROUP_A;
+        } else {
+            instructionFormat = GROUP_B_TYPES.contains(applicationType)
+                    ? CLAIMANT_EMAIL_GROUP_B
+                    : CLAIMANT_EMAIL_GROUP_A;
+        }
+        return String.format(instructionFormat, dueDate);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {
@@ -213,11 +256,18 @@ public class RespondentTellSomethingElseService {
 
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
+        boolean isWelsh = featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+        String shortText = isWelsh
+                ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
+                : caseData.getResTseSelectApplication();
+        String linkToCitizenHub = emailService.getCitizenCaseLink(
+                caseDetails.getCaseId()) + (isWelsh ? WELSH_LANGUAGE_PARAM : "");
 
         return Map.of(
-                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()),
+                LINK_TO_CITIZEN_HUB, linkToCitizenHub,
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, caseData.getResTseSelectApplication(),
+                APPLICATION_TYPE, shortText,
                 "instructions", instructions,
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, getRespondentNames(caseData),

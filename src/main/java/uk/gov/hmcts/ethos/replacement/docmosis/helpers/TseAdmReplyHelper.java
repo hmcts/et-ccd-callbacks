@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 
@@ -91,7 +93,7 @@ public final class TseAdmReplyHelper {
                 .type(defaultIfEmpty(application.getType(), null))
                 .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .response(defaultIfEmpty(application.getDetails(), null))
-                .supportingYesNo(hasSupportingDocs(caseData.getTseAdmReplyAddDocument()))
+                .supportingYesNo(hasSupportingDocs(caseData.getTseAdmReplyAddDocument()) ? YES : NO)
                 .documentCollection(getUploadedDocList(caseData.getTseAdmReplyAddDocument(), ccdGatewayBaseUrl))
                 .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
                 .responseTitle(defaultIfEmpty(caseData.getTseAdmReplyEnterResponseTitle(), null))
@@ -119,8 +121,8 @@ public final class TseAdmReplyHelper {
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList, ccdGatewayBaseUrl);
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
+    private static boolean hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+        return supportDocList != null && !supportDocList.isEmpty();
     }
 
 }

@@ -431,7 +431,9 @@ public final class MultipleUtil {
 
         Resource body = new ClassPathResource(fileName);
         XSSFWorkbook workbook = new XSSFWorkbook(body.getInputStream());
-        return workbook.getSheet(SHEET_NAME);
+        XSSFSheet sheet = workbook.getSheet(SHEET_NAME);
+        workbook.close();
+        return sheet;
 
     }
 

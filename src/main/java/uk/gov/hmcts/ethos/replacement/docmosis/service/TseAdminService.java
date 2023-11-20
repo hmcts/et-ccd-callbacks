@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -88,7 +87,7 @@ public class TseAdminService {
      * @param caseData in which the case details are extracted from
      */
     public void saveTseAdminDataFromCaseData(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -99,7 +98,7 @@ public class TseAdminService {
 
         applicationType.setApplicationState(NOT_VIEWED_YET);
 
-        if (CollectionUtils.isEmpty(applicationType.getAdminDecision())) {
+        if (isEmpty(applicationType.getAdminDecision())) {
             applicationType.setAdminDecision(new ArrayList<>());
         }
 
@@ -197,7 +196,7 @@ public class TseAdminService {
         personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("name", recipientName);
         String decisionDocumentURL = "";
-        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
+        if (isNotEmpty(caseData.getDocumentCollection())) {
             DocumentTypeItem documentTypeItem =
                     caseData.getDocumentCollection().get(caseData.getDocumentCollection().size() - 1);
             if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())

@@ -9,9 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -421,7 +421,7 @@ class TseHelperTest {
 
         try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
                 InvocationOnMock::callRealMethod)) {
-            tseHelperMockedStatic.when(() -> TseHelper.getRespondentSelectedApplicationType(caseData))
+            tseHelperMockedStatic.when(() -> getRespondentSelectedApplicationType(caseData))
                     .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
             CaseDetails caseDetails = new CaseDetails();
             caseDetails.setCaseData(caseData);

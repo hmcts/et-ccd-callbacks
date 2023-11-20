@@ -31,7 +31,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailUtil;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
@@ -101,7 +101,7 @@ class TseAdmReplyServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new EmailUtils());
+        emailService = spy(new TestEmailUtil());
         tseAdmReplyService = new TseAdmReplyService(documentManagementService, emailService,
                 tornadoService, tseService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);

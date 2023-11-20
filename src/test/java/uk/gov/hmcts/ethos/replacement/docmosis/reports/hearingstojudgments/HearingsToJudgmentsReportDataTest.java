@@ -72,9 +72,8 @@ class HearingsToJudgmentsReportDataTest {
         HearingsToJudgmentsReportSummary reportSummary = reportData.getReportSummary();
         sb.append(buildSummaryJsonString(
                 reportSummary.getOffice(), reportSummary.getTotalCases(), reportSummary.getTotal4Wk(),
-                reportSummary.getTotal4WkPercent(), reportSummary.getTotalX4Wk(), reportSummary.getTotalX4WkPercent()));
-
-        sb.append('\"').append(REPORT_DETAILS).append("\":[\n");
+                reportSummary.getTotal4WkPercent(), reportSummary.getTotalX4Wk(), reportSummary.getTotalX4WkPercent()))
+                .append('\"').append(REPORT_DETAILS).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetails())
                 && reportData.getReportDetails().get(0) != null) {
             HearingsToJudgmentsReportDetail reportDetail1 = reportData.getReportDetails().get(0);
@@ -102,15 +101,14 @@ class HearingsToJudgmentsReportDataTest {
     private StringBuilder buildSummaryJsonString(String office, String totalCases, String total4Wk,
                                                  String total4WkPercent, String totalX4Wk, String totalX4WkPercent) {
         StringBuilder sb = new StringBuilder();
-        sb.append(REPORT_OFFICE).append(office).append(NEW_LINE);
-        sb.append(TOTAL_CASES).append(StringUtils.defaultIfEmpty(totalCases, "0")).append(NEW_LINE);
-        sb.append(TOTAL_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(total4Wk, "0")).append(NEW_LINE);
-        sb.append(TOTAL_PERCENT_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(
-                total4WkPercent, "0.00")).append(NEW_LINE);
-        sb.append(TOTAL_NOT_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(
-                totalX4Wk, "0")).append(NEW_LINE);
-        sb.append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(
-                totalX4WkPercent, "0.00")).append(NEW_LINE);
+        sb.append(REPORT_OFFICE).append(office).append(NEW_LINE).append(TOTAL_CASES)
+                .append(StringUtils.defaultIfEmpty(totalCases, "0")).append(NEW_LINE)
+                .append(TOTAL_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(total4Wk, "0"))
+                .append(NEW_LINE).append(TOTAL_PERCENT_WITHIN_4WEEKS)
+                .append(StringUtils.defaultIfEmpty(total4WkPercent, "0.00")).append(NEW_LINE)
+                .append(TOTAL_NOT_WITHIN_4WEEKS).append(StringUtils.defaultIfEmpty(totalX4Wk, "0"))
+                .append(NEW_LINE).append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS)
+                .append(StringUtils.defaultIfEmpty(totalX4WkPercent, "0.00")).append(NEW_LINE);
         return sb;
     }
 
@@ -119,13 +117,27 @@ class HearingsToJudgmentsReportDataTest {
                                                 String totalDays) {
         StringBuilder sb = new StringBuilder(160);
         sb.append('{');
-        sb.append("\"reportOffice\":\"").append(office).append("\",");
-        sb.append("\"caseReference\":\"").append(caseReference).append("\",");
-        sb.append("\"hearingDate\":\"").append(hearingDate).append("\",");
-        sb.append("\"judgementDateSent\":\"").append(judgementDateSent).append("\",");
-        sb.append("\"totalDays\":\"").append(totalDays).append("\",");
-        sb.append("\"reservedHearing\":\"").append(reservedHearing).append("\",");
-        sb.append("\"hearingJudge\":\"").append(hearingJudge).append('\"');
+        sb.append("\"reportOffice\":\"");
+        sb.append(office);
+        sb.append("\",");
+        sb.append("\"caseReference\":\"");
+        sb.append(caseReference);
+        sb.append("\",");
+        sb.append("\"hearingDate\":\"");
+        sb.append(hearingDate);
+        sb.append("\",");
+        sb.append("\"judgementDateSent\":\"");
+        sb.append(judgementDateSent);
+        sb.append("\",");
+        sb.append("\"totalDays\":\"");
+        sb.append(totalDays);
+        sb.append("\",");
+        sb.append("\"reservedHearing\":\"");
+        sb.append(reservedHearing);
+        sb.append("\",");
+        sb.append("\"hearingJudge\":\"");
+        sb.append(hearingJudge);
+        sb.append('\"');
         sb.append('}');
         return sb;
     }

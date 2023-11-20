@@ -37,7 +37,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -122,10 +122,8 @@ class TseAdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new TestEmailUtil());
         tseAdminService = new TseAdminService(emailService, tornadoService, tseService, documentManagementService);
-        emailService = spy(new EmailUtils());
-        tseAdminService = new TseAdminService(emailService, tseService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
 
@@ -504,8 +502,6 @@ class TseAdminServiceTest {
         caseDetails.setCaseData(caseData);
         tseAdminService.sendEmailToClaimant(caseDetails);
         if (!RESPONDENT_ONLY.equals(partyNotified) && isNotBlank(claimantEmailAddress)) {
-        tseAdminService.sendEmailToClaimant(CASE_ID, caseData);
-        if (!RESPONDENT_ONLY.equals(partyNotified)) {
             verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
         } else {
             verify(emailService, never()).sendEmail(anyString(), anyString(), any());

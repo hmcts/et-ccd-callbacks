@@ -234,7 +234,6 @@ class TornadoServiceTest {
 
     @Test
     @SneakyThrows
-    void generateInConEWDocument() {
     void generateEt1VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
@@ -321,7 +320,7 @@ class TornadoServiceTest {
                             null))
                     .thenReturn("");
             tseHelperMockedStatic.when(() -> TseHelper.getReplyDocumentRequest(caseData,
-                            tornadoConnection.getAccessKey())).thenReturn("");
+                    tornadoConnection.getAccessKey(), null)).thenReturn("");
             et1VettingHelperMockedStatic.when(() -> Et1VettingHelper.getDocumentRequest(caseData,
                             tornadoConnection.getAccessKey())).thenReturn("");
             et3VettingHelperMockedStatic.when(() -> Et3VettingHelper.getDocumentRequest(caseData,

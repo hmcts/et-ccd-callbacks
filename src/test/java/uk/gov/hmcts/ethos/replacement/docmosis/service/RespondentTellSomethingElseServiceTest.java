@@ -30,7 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailUtil;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -135,7 +135,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new EmailUtils());
+        emailService = spy(new TestEmailUtil());
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userIdamService, tribunalOfficesService,
                         tornadoService, documentManagementService, featureToggleService);

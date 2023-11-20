@@ -28,6 +28,7 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -223,20 +224,6 @@ public final class TseHelper {
         return new ObjectMapper().writeValueAsString(document);
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
-
-        return TseReplyData.builder()
-                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .respondentParty(RESPONDENT_TITLE)
-                .type(defaultIfEmpty(application.getType(), null))
-                .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
-                .response(defaultIfEmpty(application.getDetails(), null))
-                .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-                .documentCollection(getUploadedDocList(caseData))
-                .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
-                .build();
-    }
-
     /**
      * Personalisation for sending Acknowledgement for Response.
      *
@@ -288,24 +275,37 @@ public final class TseHelper {
         );
     }
 
-    private static TseDecisionData createDataForTseDecision(CaseData caseData, String ccdGatewayBaseUrl) {
     private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
                                                       String ccdGatewayBaseUrl) {
+
+        return TseReplyData.builder()
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .respondentParty(RESPONDENT_TITLE)
+                .type(defaultIfEmpty(application.getType(), null))
+                .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .response(defaultIfEmpty(application.getDetails(), null))
+                .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()) ? YES : NO)
+                .documentCollection(getUploadedDocList(caseData, ccdGatewayBaseUrl))
+                .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
+                .build();
+    }
+
+    private static TseDecisionData createDataForTseDecision(CaseData caseData, String ccdGatewayBaseUrl) {
         return TseDecisionData.builder()
-            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .notificationTitle(defaultIfEmpty(caseData.getTseAdminEnterNotificationTitle(), ""))
-                .decision(defaultIfEmpty(caseData.getTseAdminDecision(), ""))
-                .decisionDetails(defaultIfEmpty(caseData.getTseAdminDecisionDetails(), ""))
-                .typeOfDecision(defaultIfEmpty(caseData.getTseAdminTypeOfDecision(), ""))
-                .responseRequired(YES.equals(caseData.getTseAdminIsResponseRequired())
-                        ? TSE_ADMIN_DECISION_RESPONSE_REQUIRED_MESSAGE : NO)
-                .selectedRespondents(defaultIfEmpty(caseData.getTseAdminSelectPartyRespond(), ""))
-                .additionalInformation(defaultIfEmpty(caseData.getTseAdminAdditionalInformation(), ""))
-                .supportingMaterial(getSupportedDocumentsList(caseData, ccdGatewayBaseUrl))
-                .decisionMadeBy(defaultIfEmpty(caseData.getTseAdminDecisionMadeBy(), ""))
-                .decisionMakerFullName(defaultIfEmpty(caseData.getTseAdminDecisionMadeByFullName(), ""))
-                .notificationParties(defaultIfEmpty(caseData.getTseAdminSelectPartyNotify(), ""))
-            .build();
+        .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .notificationTitle(defaultIfEmpty(caseData.getTseAdminEnterNotificationTitle(), ""))
+            .decision(defaultIfEmpty(caseData.getTseAdminDecision(), ""))
+            .decisionDetails(defaultIfEmpty(caseData.getTseAdminDecisionDetails(), ""))
+            .typeOfDecision(defaultIfEmpty(caseData.getTseAdminTypeOfDecision(), ""))
+            .responseRequired(YES.equals(caseData.getTseAdminIsResponseRequired())
+                    ? TSE_ADMIN_DECISION_RESPONSE_REQUIRED_MESSAGE : NO)
+            .selectedRespondents(defaultIfEmpty(caseData.getTseAdminSelectPartyRespond(), ""))
+            .additionalInformation(defaultIfEmpty(caseData.getTseAdminAdditionalInformation(), ""))
+            .supportingMaterial(getSupportedDocumentsList(caseData, ccdGatewayBaseUrl))
+            .decisionMadeBy(defaultIfEmpty(caseData.getTseAdminDecisionMadeBy(), ""))
+            .decisionMakerFullName(defaultIfEmpty(caseData.getTseAdminDecisionMadeByFullName(), ""))
+            .notificationParties(defaultIfEmpty(caseData.getTseAdminSelectPartyNotify(), ""))
+        .build();
     }
 
     private static List<DocumentType> getSupportedDocumentsList(CaseData caseData, String ccdGatewayBaseUrl) {
@@ -341,17 +341,6 @@ public final class TseHelper {
         return documentURL.substring(documentURL.lastIndexOf('/') + 1);
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
-            .respondentParty(RESPONDENT_TITLE)
-            .type(defaultIfEmpty(application.getType(), null))
-            .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
-            .response(defaultIfEmpty(application.getDetails(), null))
-            .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-            .documentCollection(getUploadedDocList(caseData, ccdGatewayBaseUrl))
-            .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
-            .build();
-    }
-
     private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return new ArrayList<>();
@@ -361,8 +350,8 @@ public final class TseHelper {
                 ccdGatewayBaseUrl);
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+    private static boolean hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+        return supportDocList != null && !supportDocList.isEmpty();
     }
 
     /**

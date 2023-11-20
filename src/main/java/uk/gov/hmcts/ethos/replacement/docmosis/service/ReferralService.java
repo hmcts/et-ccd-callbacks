@@ -17,7 +17,7 @@ public class ReferralService {
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
     private final EmailService emailService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final TornadoService tornadoService;
 
     @Value("${template.referral}")
@@ -48,7 +48,7 @@ public class ReferralService {
                 caseData,
                 referralNumber,
                 isNew,
-                userService.getUserDetails(userToken).getName(),
+                userIdamService.getUserDetails(userToken).getName(),
                 emailService.getExuiCaseLink(caseDetails.getCaseId())
             )
         );

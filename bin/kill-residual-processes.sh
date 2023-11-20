@@ -23,7 +23,6 @@ then
 else
   echo "There is no process running on port 4455"
 fi
-
 echo "Checking port 8489"
 processId_8489=`lsof -i -n -P | grep LISTEN | grep :8489 | awk '{print $2}'`
 
@@ -34,4 +33,3 @@ then
 else
   echo "There is no process running on port 8489"
 fi
-

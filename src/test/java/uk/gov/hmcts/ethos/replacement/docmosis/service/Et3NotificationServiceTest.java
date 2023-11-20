@@ -8,7 +8,7 @@ import org.mockito.Captor;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ class Et3NotificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
         et3NotificationService = new Et3NotificationService(emailService);
 
         caseDetails = CaseDataBuilder.builder()

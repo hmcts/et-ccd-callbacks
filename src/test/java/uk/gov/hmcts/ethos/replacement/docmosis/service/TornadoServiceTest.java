@@ -16,6 +16,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingEl
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
+import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +44,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -54,6 +58,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
@@ -61,6 +66,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
@@ -69,7 +75,7 @@ class TornadoServiceTest {
     private TornadoService tornadoService;
     private TornadoConnection tornadoConnection;
     private DocumentManagementService documentManagementService;
-    private UserService userService;
+    private UserIdamService userIdamService;
     private DefaultValuesReaderService defaultValuesReaderService;
     private VenueAddressReaderService venueAddressReaderService;
     private MockHttpURLConnection mockConnection;
@@ -88,7 +94,7 @@ class TornadoServiceTest {
         mockVenueAddressReaderService();
 
         tornadoService = new TornadoService(tornadoConnection, documentManagementService,
-                userService, defaultValuesReaderService, venueAddressReaderService);
+                userIdamService, defaultValuesReaderService, venueAddressReaderService);
     }
 
     @Test
@@ -229,6 +235,31 @@ class TornadoServiceTest {
     @Test
     @SneakyThrows
     void generateInConEWDocument() {
+    void generateEt1VettingDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    void generateTseAdminReplyDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "TSE Admin Reply.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    void generateEt3VettingDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    void generateInConEWDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
@@ -353,7 +384,7 @@ class TornadoServiceTest {
         };
 
         mockOauth2Configuration();
-        userService = new UserService(idamApi, oauth2Configuration);
+        userIdamService = new UserIdamService(idamApi, oauth2Configuration);
     }
 
     private void mockTornadoConnection() throws IOException {
@@ -437,5 +468,29 @@ class TornadoServiceTest {
         when(oauth2Configuration.getClientSecret()).thenReturn("AAAAA");
         when(oauth2Configuration.getRedirectUri()).thenReturn("http://localhost:8080/test");
         when(oauth2Configuration.getClientScope()).thenReturn("roles");
+    }
+
+    private CaseData getCaseData() {
+        CaseData caseData = new CaseData();
+        GenericTseApplicationType build = TseApplicationBuilder.builder()
+                .withApplicant(CLAIMANT_TITLE)
+                .withDate("13 December 2022")
+                .withDue("20 December 2022")
+                .withType("Withdraw my claim")
+                .withDetails("Text")
+                .withNumber("1")
+                .withResponsesCount("0")
+                .withStatus(OPEN_STATE)
+                .build();
+        GenericTseApplicationTypeItem item = new GenericTseApplicationTypeItem();
+        item.setValue(build);
+        caseData.setGenericTseApplicationCollection(List.of(item));
+        DynamicFixedListType flt = new DynamicFixedListType();
+        DynamicValueType valueType = new DynamicValueType();
+        valueType.setCode("1");
+        valueType.setLabel("test lbl");
+        flt.setValue(valueType);
+        caseData.setTseAdminSelectApplication(flt);
+        return caseData;
     }
 }

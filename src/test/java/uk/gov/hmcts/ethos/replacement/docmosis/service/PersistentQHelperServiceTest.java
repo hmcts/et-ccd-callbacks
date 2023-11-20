@@ -35,7 +35,7 @@ class PersistentQHelperServiceTest {
     @Mock
     private CreateUpdatesBusSender createUpdatesBusSender;
     @Mock
-    private UserService userService;
+    private UserIdamService userIdamService;
 
     private CCDRequest ccdRequest;
     private String userToken;
@@ -63,7 +63,7 @@ class PersistentQHelperServiceTest {
     @Test
     void sendCreationEventToSinglesWithoutConfirmation() {
 
-        when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         persistentQHelperService.sendCreationEventToSingles(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
                 new ArrayList<>(), new ArrayList<>(
@@ -76,15 +76,15 @@ class PersistentQHelperServiceTest {
                 true, null
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 
     @Test
     void sendTransferToEcmEvent() {
 
-        when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         persistentQHelperService.sendTransferToEcmEvent(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
                 new ArrayList<>(), new ArrayList<>(
@@ -93,8 +93,8 @@ class PersistentQHelperServiceTest {
                 NO, null
         );
 
-        verify(userService).getUserDetails(userToken);
-        verifyNoMoreInteractions(userService);
+        verify(userIdamService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userIdamService);
 
     }
 

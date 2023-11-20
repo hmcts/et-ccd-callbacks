@@ -11,7 +11,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -70,7 +69,7 @@ public class MultipleAmendCaseIdsService {
         log.info("EthosCaseRefCollection: " + newEthosCaseRefCollection);
 
         return Stream.concat(newEthosCaseRefCollection.stream(), multipleObjects.keySet().stream())
-                .distinct().collect(Collectors.toList());
+                .distinct().toList();
 
     }
 

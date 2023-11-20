@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
@@ -270,7 +269,7 @@ public class SubMultipleService {
         if (bulkData.getMidSearchCollection() != null) {
             List<String> midSearchCollection = bulkData.getMidSearchCollection().stream()
                     .map(MidSearchTypeItem::getValue)
-                    .collect(Collectors.toList());
+                    .toList();
             List<MultipleTypeItem> auxMultiplesList = new ArrayList<>();
             for (MultipleTypeItem multipleTypeItem : bulkData.getMultipleCollection()) {
                 String caseRefNumber = multipleTypeItem.getValue().getEthosCaseReferenceM();

@@ -14,7 +14,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.SubMultipleReferenceServi
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.AMEND_ACTION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CREATE_ACTION;
@@ -123,7 +122,7 @@ public class SubMultipleUpdateService {
                                 !subMultipleTypeItem.getValue().getSubMultipleName().equals(existingSubMultipleName)
                                         ? subMultipleTypeItem
                                         : updateSubMultipleName(subMultipleTypeItem, newSubMultipleName))
-                        .collect(Collectors.toList()));
+                        .toList());
 
         log.info("Generating the multiple object list with the new sub multiple name updated");
 
@@ -143,7 +142,7 @@ public class SubMultipleUpdateService {
                 multipleDetails.getCaseData().getSubMultipleCollection().stream()
                 .filter(subMultipleTypeItem ->
                         !subMultipleTypeItem.getValue().getSubMultipleName().equals(deleteSubMultipleName))
-                .collect(Collectors.toList()));
+                .toList());
 
         log.info("Generating the multiple object list without the sub multiple name");
 

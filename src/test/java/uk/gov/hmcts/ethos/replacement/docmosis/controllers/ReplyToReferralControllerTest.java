@@ -25,7 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -59,7 +59,7 @@ class ReplyToReferralControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @MockBean
     private ReferralService referralService;
     @MockBean
@@ -109,7 +109,7 @@ class ReplyToReferralControllerTest {
 
         UserDetails userDetails = new UserDetails();
         userDetails.setRoles(List.of("role1"));
-        when(userService.getUserDetails(any())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
     }
 
     @Test
@@ -143,7 +143,7 @@ class ReplyToReferralControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
-        when(userService.getUserDetails(any())).thenReturn(details);
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -177,7 +177,7 @@ class ReplyToReferralControllerTest {
     @Test
     void aboutToSubmitReferralReply_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        when(userService.getUserDetails(any())).thenReturn(new UserDetails());
+        when(userIdamService.getUserDetails(any())).thenReturn(new UserDetails());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

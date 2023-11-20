@@ -6,6 +6,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 
 public final class TseAdminHelper {
 
@@ -27,7 +28,6 @@ public final class TseAdminHelper {
                 && OPEN_STATE.equals(r.getValue().getStatus()))
             .map(r -> DynamicValueType.create(r.getValue().getNumber(),
                 r.getValue().getNumber() + " - " + r.getValue().getType())
-            )
-            .toList());
+            ).toList());
     }
 }

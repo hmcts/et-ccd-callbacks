@@ -14,9 +14,7 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 @Slf4j
 public class TseClaimantControllerFunctionalTest extends BaseFunctionalTest  {
     private static final String AUTHORIZATION = "Authorization";
-    private static final String APPLICATION_LABEL = "1 - Amend response";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseClaimant/aboutToSubmit";
-    private static final String APPLICATION_CODE = "1";
     private CCDRequest ccdRequest;
 
     @BeforeAll

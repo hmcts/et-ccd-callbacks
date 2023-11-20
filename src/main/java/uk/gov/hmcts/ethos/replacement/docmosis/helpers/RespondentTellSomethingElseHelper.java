@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -47,7 +48,7 @@ public final class RespondentTellSomethingElseHelper {
             .resTseApplicant(RESPONDENT_TITLE)
             .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
             .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
-            .resTseApplicationDate((lastApp != null && StringUtils.isNotBlank(lastApp.getValue().getDate()))
+            .resTseApplicationDate(lastApp != null && StringUtils.isNotBlank(lastApp.getValue().getDate())
                 ? lastApp.getValue().getDate() : UtilHelper.formatCurrentDate(LocalDate.now()))
             .resTseDocument(getDocumentName(selectedAppData))
             .resTseTextBox(getTextBoxDetails(selectedAppData))
@@ -64,7 +65,7 @@ public final class RespondentTellSomethingElseHelper {
     }
 
     private static GenericTseApplicationTypeItem getCurrentGenericTseApplicationTypeItem(CaseData caseData) {
-        if (caseData.getGenericTseApplicationCollection() == null) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return null;
         }
 

@@ -12,7 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FileLocationFixedListSheetImporter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReaderException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.VenueFixedListSheetImporter;
@@ -37,7 +37,7 @@ class VenueImportServiceTest {
     private ExcelReadingService excelReadingService;
     private VenueFixedListSheetImporter venueFixedListSheetImporter;
     private FileLocationFixedListSheetImporter fileLocationFixedListSheetImporter;
-    private UserService userService;
+    private UserIdamService userIdamService;
 
     private static final String TEST_TOKEN = "test-token";
     private static final String DOCUMENT_URL = "test-document-url";
@@ -49,10 +49,10 @@ class VenueImportServiceTest {
         venueFixedListSheetImporter = mock(VenueFixedListSheetImporter.class);
         fileLocationFixedListSheetImporter = mock(FileLocationFixedListSheetImporter.class);
 
-        userService = mock(UserService.class);
+        userIdamService = mock(UserIdamService.class);
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getName()).thenReturn(USER_NAME);
-        when(userService.getUserDetails(TEST_TOKEN)).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(TEST_TOKEN)).thenReturn(userDetails);
     }
 
     @Test
@@ -60,7 +60,7 @@ class VenueImportServiceTest {
         AdminData adminData = createAdminData(TribunalOffice.MANCHESTER);
 
         VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
-                fileLocationFixedListSheetImporter, userService);
+                fileLocationFixedListSheetImporter, userIdamService);
         venueImportService.initImport(adminData);
 
         assertNull(adminData.getVenueImport().getVenueImportFile());
@@ -76,7 +76,7 @@ class VenueImportServiceTest {
         }
 
         VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
-                fileLocationFixedListSheetImporter, userService);
+                fileLocationFixedListSheetImporter, userIdamService);
         venueImportService.importVenues(adminData, TEST_TOKEN);
 
         verify(venueFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice), any(XSSFSheet.class));
@@ -92,7 +92,7 @@ class VenueImportServiceTest {
     @Test
     void testImportVenuesScotland() throws FixedListSheetReaderException, IOException {
         VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
-                fileLocationFixedListSheetImporter, userService);
+                fileLocationFixedListSheetImporter, userIdamService);
 
         AdminData adminData = createAdminData(TribunalOffice.SCOTLAND);
         try (XSSFWorkbook workbook = createWorkbook(TribunalOffice.SCOTLAND)) {

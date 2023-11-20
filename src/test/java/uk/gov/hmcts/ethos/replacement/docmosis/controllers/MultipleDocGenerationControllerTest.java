@@ -89,7 +89,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void printSchedule() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleScheduleService.bulkScheduleLogic(eq(AUTH_TOKEN), isA(MultipleDetails.class),
                 isA(List.class))).thenReturn(documentInfo);
         mvc.perform(post(PRINT_SCHEDULE_URL)
@@ -104,7 +104,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void printLetter() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleLetterService.bulkLetterLogic(eq(AUTH_TOKEN), isA(MultipleDetails.class),
                 isA(List.class), isA(Boolean.class))).thenReturn(documentInfo);
         mvc.perform(post(PRINT_LETTER_URL)
@@ -119,7 +119,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void printDocumentConfirmation() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRINT_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -132,7 +132,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void midSelectedAddressLabelsMultiple() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -145,7 +145,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void midValidateAddressLabelsMultiple() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -205,7 +205,7 @@ class MultipleDocGenerationControllerTest {
     void printScheduleError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleScheduleService).bulkScheduleLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), isA(List.class));
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRINT_SCHEDULE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -217,7 +217,7 @@ class MultipleDocGenerationControllerTest {
     void printLetterError500() throws Exception {
         when(multipleLetterService.bulkLetterLogic(eq(AUTH_TOKEN), isA(MultipleDetails.class),
                 isA(List.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRINT_LETTER_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -227,7 +227,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void printScheduleForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRINT_SCHEDULE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -237,7 +237,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void printLetterForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRINT_LETTER_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -247,7 +247,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void printDocumentConfirmationForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRINT_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -257,7 +257,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void midSelectedAddressLabelsMultipleForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -267,7 +267,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void midValidateAddressLabelsMultipleForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -277,7 +277,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void dynamicMultipleLetters() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_MULTIPLE_LETTERS)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -290,7 +290,7 @@ class MultipleDocGenerationControllerTest {
 
     @Test
     void dynamicMultipleLettersForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_MULTIPLE_LETTERS)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)

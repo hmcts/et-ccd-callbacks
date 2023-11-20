@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -61,16 +60,16 @@ public class BulkUpdateService {
 
     private static final String MESSAGE = "Failed to update case for case id : ";
     private final CcdClient ccdClient;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final CreateUpdatesBusSender createUpdatesBusSender;
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
 
     @Autowired
-    public BulkUpdateService(CcdClient ccdClient, UserService userService,
+    public BulkUpdateService(CcdClient ccdClient, UserIdamService userIdamService,
                              CreateUpdatesBusSender createUpdatesBusSender) {
         this.ccdClient = ccdClient;
-        this.userService = userService;
+        this.userIdamService = userIdamService;
         this.createUpdatesBusSender = createUpdatesBusSender;
     }
 
@@ -490,7 +489,7 @@ public class BulkUpdateService {
         List<MultipleTypeItem> multipleTypeItemsAux = new ArrayList<>();
         List<String> refNumbersFromSearchList = searchTypeItemList.stream()
                 .map(searchTypeItem -> searchTypeItem.getValue().getEthosCaseReferenceS())
-                .collect(Collectors.toList());
+                .toList();
         String subMultipleRefNewValue = bulkData.getSubMultipleDynamicList() != null
                 ? bulkData.getSubMultipleDynamicList().getValue().getCode() : "";
         String subMultipleTitleNewValue = bulkData.getSubMultipleDynamicList() != null
@@ -544,7 +543,7 @@ public class BulkUpdateService {
             } else {
                 List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
                 PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
-                        userService.getUserDetails(userToken).getEmail(),
+                        userIdamService.getUserDetails(userToken).getEmail(),
                         ethosCaseRefCollection,
                         PersistentQHelper.getPreAcceptDataModel("dateAccepted"),
                         errors,

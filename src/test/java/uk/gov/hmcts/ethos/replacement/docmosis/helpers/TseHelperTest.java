@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -22,9 +23,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -45,11 +48,16 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -61,6 +69,8 @@ class TseHelperTest {
 
     private CaseData caseData;
     private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     public void setUp() {
@@ -72,9 +82,9 @@ class TseHelperTest {
             .build();
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
-            .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
-            .withResponsesCount("0").withStatus(OPEN_STATE).build();
+                .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
+                .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
+                .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
         genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -233,13 +243,14 @@ class TseHelperTest {
         item.setId("78910");
         caseData.setTseResponseSupportingMaterial(List.of(item));
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
-        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
+        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "",
+                "testBinaryUrl");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
             + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
             + "\"documentCollection\":[{\"id\":\"78910\","
             + "\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"image.png|testBinaryUrl/documents/1234/binary"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\":null},"
             + "\"ownerDocument\":null,"
@@ -254,12 +265,15 @@ class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
         caseData.setTseResponseText("TseResponseText");
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("CaseId");
         caseDetails.setCaseData(caseData);
         byte[] document = {};
-        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
+                caseDetails, document, "citizenUrlCaseId", false);
 
         Map<String, Object> expected = Map.of(
             "linkToCitizenHub", "citizenUrlCaseId",
@@ -274,16 +288,54 @@ class TseHelperTest {
         assertThat(actual.toString(), is(expected.toString()));
     }
 
-    @Test
-    void getPersonalisationForResponse_withoutResponse() throws NotificationClientException {
+    @ParameterizedTest
+    @MethodSource("applicationTypes")
+    void getPersonalisationForResponse_withResponse_Welsh(
+            String applicationTypeKey) throws NotificationClientException {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+        caseData.getGenericTseApplicationCollection().get(0).getValue().setType(applicationTypeKey);
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
+        caseData.setTseResponseText("TseResponseText");
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("CaseId");
         caseDetails.setCaseData(caseData);
         byte[] document = {};
-        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document, "citizenUrlCaseId");
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
+                caseDetails, document, "citizenUrlCaseId", true);
+
+        Map<String, Object> expected = Map.of(
+                "linkToCitizenHub", "citizenUrlCaseId" + WELSH_LANGUAGE_PARAM,
+                "caseNumber", "1234",
+                "applicationType", CY_RESPONDING_TO_APP_TYPE_MAP.get(applicationTypeKey),
+                "response", "TseResponseText",
+                "claimant", "First Last",
+                "respondents", "Respondent Name",
+                "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
+        );
+        assertThat(actual.toString(), is(expected.toString()));
+    }
+
+    static Stream<String> applicationTypes() {
+        return CY_RESPONDING_TO_APP_TYPE_MAP.keySet().stream();
+    }
+
+    @Test
+    void getPersonalisationForResponse_withoutResponse() throws NotificationClientException {
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+        caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("CaseId");
+        caseDetails.setCaseData(caseData);
+        byte[] document = {};
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
+                caseDetails, document, "citizenUrlCaseId", false);
 
         Map<String, Object> expected = Map.of(
             "linkToCitizenHub", "citizenUrlCaseId",
@@ -313,7 +365,7 @@ class TseHelperTest {
         @Test
         void nullWhenApplicationDoesNotExist() {
             caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
-            caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("2", ""));
+            caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("3", ""));
 
             assertNull(getRespondentSelectedApplicationType(caseData));
         }

@@ -16,8 +16,8 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ class Et3ResponseServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
 
         et3ResponseService = new Et3ResponseService(documentManagementService, tornadoService, emailService);
         caseData = CaseDataBuilder.builder()
@@ -100,8 +100,11 @@ class Et3ResponseServiceTest {
     @Test
     void assertThatEt3DocumentIsSaved() {
         et3ResponseService.saveEt3Response(caseData, documentInfo);
+
         assertThat(caseData.getDocumentCollection().size(), is(1));
         assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getCategoryId(),
+                is("C18"));
     }
 
     @Test

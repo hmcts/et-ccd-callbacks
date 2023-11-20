@@ -196,7 +196,6 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
             "caseworker-divorce-solicitor");
 
-
         lib.createIdamUser(CITIZEN_EMAIL, CITIZEN);
 
         // Required by ccd-data-store-api

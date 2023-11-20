@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -52,7 +52,7 @@ public class PseRespondentViewService {
                     r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
                 )
             )
-            .collect(Collectors.toList()));
+            .toList());
     }
 
     private boolean isNotifyRespondent(SendNotificationTypeItem sendNotificationTypeItem) {
@@ -83,7 +83,7 @@ public class PseRespondentViewService {
                 notification.getSendNotificationNotify(),
                 notification.getDate(),
                 notification.getSendNotificationTitle(),
-                defaultString(notification.getSendNotificationResponseTribunal(), "No"),
+                defaultIfEmpty(notification.getSendNotificationResponseTribunal(), "No"),
                 "0"
         );
     }

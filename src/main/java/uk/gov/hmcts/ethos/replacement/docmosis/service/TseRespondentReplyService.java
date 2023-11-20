@@ -10,10 +10,10 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.time.LocalDate;
@@ -36,7 +36,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_REPLY;
@@ -47,13 +48,16 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE
 public class TseRespondentReplyService {
     private final TornadoService tornadoService;
     private final EmailService emailService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
     private final DocumentManagementService documentManagementService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.tse.respondent.respond.claimant}")
     private String tseRespondentResponseTemplateId;
+    @Value("${template.tse.respondent.respond.cyClaimant}")
+    private String cyTseRespondentResponseTemplateId;
     @Value("${template.tse.respondent.respond.respondent.rule-92-no}")
     private String acknowledgementRule92NoEmailTemplateId;
     @Value("${template.tse.respondent.respond.respondent.rule-92-yes}")
@@ -95,28 +99,18 @@ public class TseRespondentReplyService {
     /**
      * Creates a pdf copy of the TSE application Response from Respondent and adds it to the case doc collection.
      *
-     * @param caseData details of the case from which required fields are extracted
+     * @param caseDetails details of the case from which required fields are extracted
      * @param userToken autherisation token to use for generating an event document
-     * @param caseTypeId case type to use for generating an event document
      */
-    public void addTseRespondentReplyPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
-        try {
-            if (isEmpty(caseData.getDocumentCollection())) {
-                caseData.setDocumentCollection(new ArrayList<>());
-            }
+    public void addTseRespondentReplyPdfToDocCollection(CaseDetails caseDetails, String userToken) {
+        CaseData caseData = caseDetails.getCaseData();
 
-            DocumentTypeItem docItem = createDocumentTypeItem(
-                    documentManagementService.addDocumentToDocumentField(
-                            tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_REPLY)),
-                    "Respondent correspondence",
-                    caseData.getResTseSelectApplication()
-            );
-
-            caseData.getDocumentCollection().add(docItem);
-
-        } catch (Exception e) {
-            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        if (isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
         }
+
+        caseData.getDocumentCollection().add(TseAdmReplyHelper.getDocumentTypeItem(documentManagementService,
+                tornadoService, caseDetails, userToken, TSE_REPLY, RESPONDENT_CORRESPONDENCE));
     }
 
     /**
@@ -245,13 +239,19 @@ public class TseRespondentReplyService {
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
+        boolean isWelsh = featureToggleService.isWelshEnabled()
+                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+        String emailTemplate = isWelsh
+                ? cyTseRespondentResponseTemplateId
+                : tseRespondentResponseTemplateId;
 
         try {
-            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
+            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
+                    "TSE Reply.pdf");
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
-            emailService.sendEmail(tseRespondentResponseTemplateId,
+                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
+            emailService.sendEmail(emailTemplate,
                     claimantEmail, personalisation);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
@@ -263,7 +263,7 @@ public class TseRespondentReplyService {
                                               boolean isRespondingToTribunal) {
         emailService.sendEmail(
             getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
-            userService.getUserDetails(userToken).getEmail(),
+            userIdamService.getUserDetails(userToken).getEmail(),
             TseHelper.getPersonalisationForAcknowledgement(
                 caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId())));
     }

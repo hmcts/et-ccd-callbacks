@@ -27,7 +27,7 @@ public class ReferralTypeData {
     @JsonProperty("referentEmail")
     private String referentEmail;
     @JsonProperty("isUrgent")
-    private String isUrgent;
+    private String urgent;
     @JsonProperty("nextHearingDate")
     private String nextHearingDate;
     @JsonProperty("referralSubject")

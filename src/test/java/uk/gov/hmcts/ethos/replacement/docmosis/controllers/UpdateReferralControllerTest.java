@@ -23,7 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -55,7 +55,7 @@ class UpdateReferralControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
@@ -146,7 +146,7 @@ class UpdateReferralControllerTest {
         caseData.setUpdateIsUrgent("Yes");
         caseData.setUpdateReferentEmail("example@example.com");
         caseData.setUpdateReferralSubject("subject");
-        when(userService.getUserDetails(any())).thenReturn(details);
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
         when(emailService.getExuiCaseLink(any())).thenReturn("dummyLink");
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
@@ -164,7 +164,7 @@ class UpdateReferralControllerTest {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         ccdRequest.getCaseDetails().getCaseData().getReferralCollection().get(0).getValue().setReferralStatus("Closed");
-        when(userService.getUserDetails(any())).thenReturn(details);
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -183,7 +183,7 @@ class UpdateReferralControllerTest {
         details.setName("First Last");
         ccdRequest.getCaseDetails().getCaseData().getReferralCollection()
                 .get(0).getValue().setReferralStatus("Awaiting instructions");
-        when(userService.getUserDetails(any())).thenReturn(details);
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

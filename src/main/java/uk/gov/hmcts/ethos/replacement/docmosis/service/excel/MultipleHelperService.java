@@ -17,7 +17,7 @@ import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class MultipleHelperService {
     private final ExcelDocManagementService excelDocManagementService;
     private final MultipleCasesSendingService multipleCasesSendingService;
     private final CreateUpdatesBusSender createUpdatesBusSender;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -211,7 +211,7 @@ public class MultipleHelperService {
                                                                 String leadId,
                                                                 String multipleReferenceLinkMarkUp) {
 
-        String username = userService.getUserDetails(userToken).getEmail();
+        String username = userIdamService.getUserDetails(userToken).getEmail();
         PersistentQHelper.sendSingleUpdatesPersistentQ(caseTypeId,
                 jurisdiction, username, multipleObjectsFiltered,
                 PersistentQHelper.getCreationDataModel(leadId,
@@ -228,7 +228,7 @@ public class MultipleHelperService {
                                                           SortedMap<String, Object> multipleObjects) {
         List<String> multipleObjectsFiltered = new ArrayList<>(multipleObjects.keySet());
         MultipleData multipleData = multipleDetails.getCaseData();
-        String username = userService.getUserDetails(userToken).getEmail();
+        String username = userIdamService.getUserDetails(userToken).getEmail();
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
@@ -250,7 +250,7 @@ public class MultipleHelperService {
 
         List<String> multipleObjectsFiltered = new ArrayList<>(multipleObjects.keySet());
         MultipleData multipleData = multipleDetails.getCaseData();
-        String username = userService.getUserDetails(userToken).getEmail();
+        String username = userIdamService.getUserDetails(userToken).getEmail();
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
@@ -310,7 +310,7 @@ public class MultipleHelperService {
 
         MultipleData multipleData = multipleDetails.getCaseData();
         List<String> ethosCaseRefCollection = getEthosCaseRefCollection(userToken, multipleData, errors);
-        String username = userService.getUserDetails(userToken).getEmail();
+        String username = userIdamService.getUserDetails(userToken).getEmail();
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
@@ -331,7 +331,7 @@ public class MultipleHelperService {
                                                           String parentMultipleCaseId) {
 
         String caseToSend = MultiplesHelper.getCurrentLead(multipleData.getLeadCase());
-        String username = userService.getUserDetails(userToken).getEmail();
+        String username = userIdamService.getUserDetails(userToken).getEmail();
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(caseTypeId,
                 jurisdiction,

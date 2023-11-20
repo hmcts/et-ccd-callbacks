@@ -134,6 +134,8 @@ venue-addresses:
         address: IAC
       - venue: Leeds
         address: 4th Floor, City Exchange, 11 Albion Street, Leeds, LS1 5ES
+      - venue: Leeds Westgate
+        address: 6 Westgate, Grace St, Leeds, LS1 2RP
       - venue: Scarborough
         address: Scarborough
       - venue: Sheffield Combi
@@ -281,7 +283,7 @@ venue-addresses:
       - venue: Aberystwyth CC
         address: Aberystwyth CC
       - venue: Aberystwyth JC
-        address: Y Lanfa, Trefechan, Aberystwyth, SY23 1AS
+        address: Aberystwyth Justice Centre, Y Lanfa, Trefechan, Aberystwyth, SY23 1AS
       - venue: Aberystwyth Mag
         address: Aberystwyth Mag
       - venue: Brecon Court
@@ -289,19 +291,19 @@ venue-addresses:
       - venue: Caernarfon CC
         address: Caernarfon CC
       - venue: Caernarfon CJC
-        address: Llanberis Road, Caernarfon, LL55 2DF
+        address: Caernarfon Justice Centre, Llanberis Road, Caernarfon, LL55 2DF
       - venue: CARDIFF
         address: CARDIFF
       - venue: Cardiff CJC
-        address: 2 Park Street, Cardiff, CF10 1ET
+        address: Cardiff Civil & Family Justice Centre, 2 Park Street, Cardiff, CF10 1ET
       - venue: Cardiff Crown
-        address: The Law Courts, Cathays Park, Cardiff, CF10 3PG
+        address: Cardiff Crown Court, The Law Courts, Cathays Park, Cardiff, CF10 3PG
       - venue: Cardiff Mag YC1
         address: Cardiff Mag YC1
       - venue: Cardiff Mag YC2
         address: Cardiff Mag YC2
       - venue: Cardiff Mags
-        address: Wales Employment Tribunal, 3rd Floor, Cardiff Magistrates’ Court, Fitzalan Place, Cardiff, CF24 0RZ
+        address: Cardiff Magistrates’ Court, Fitzalan Place, Cardiff, CF24 0RZ
       - venue: Cardiff Social
         address: Cardiff Social
       - venue: Cardiff SSCSA
@@ -309,7 +311,7 @@ venue-addresses:
       - venue: Carmarthen
         address: Carmarthen
       - venue: Carmarthen CC
-        address: The Hearing Centre, Hill House, Picton Terrace, Carmarthen, SA31 3BT
+        address: Carmarthen County & Family Court, The Hearing Centre, Hill House, Picton Terrace, Carmarthen, SA31 3BT
       - venue: CARMARTHEN DC
         address: CARMARTHEN DC
       - venue: Carmarthen HH
@@ -331,7 +333,7 @@ venue-addresses:
       - venue: Haverfordwest M
         address: Haverfordwest M
       - venue: HaverfordwestCC
-        address: Penffynnon, Hawthorn Rise, Haverfordwest, SA61 2AX
+        address: Haverfordwest County & Family Court, Penffynnon, Hawthorn Rise, Haverfordwest, SA61 2AX
       - venue: Hereford
         address: Hereford
       - venue: Hereford CC
@@ -345,11 +347,11 @@ venue-addresses:
       - venue: Llandrindod W
         address: Llandrindod W
       - venue: Llandudno Mags
-        address: The Court House, Conwy Road, Llandudno, LL30 1GA
+        address: Llandudno Magistrates Court, The Court House, Conwy Road, Llandudno, LL30 1GA
       - venue: Llanelli County
         address: Llanelli County
       - venue: Llanelli Mags
-        address: Town Hall Square, Llanelli, SA15 3AW
+        address: Llanelli Law Courts, Town Hall Square, Llanelli, SA15 3AW
       - venue: Llangefni Court
         address: Llangefni Court
       - venue: Llangefni Mags
@@ -357,7 +359,7 @@ venue-addresses:
       - venue: Manchester ET
         address: Manchester ET
       - venue: Mold
-        address: Law Courts, Mold, CH7 1AE
+        address: Mold Justice Centre, Law Courts, Mold, CH7 1AE
       - venue: Mold Court
         address: Mold Court
       - venue: Neath
@@ -367,15 +369,15 @@ venue-addresses:
       - venue: Newport
         address: Newport
       - venue: Newport AIT
-        address: Columbus House, Langstone Business Park, Chepstow Road, Newport, NP18 2LX
+        address: Newport Immigration & Asylum Tribunal, Columbus House, Langstone Business Park, Chepstow Road, Newport, NP18 2LX
       - venue: ORIEL HOUSE
         address: ORIEL HOUSE
       - venue: Pontypridd
-        address: The Courthouse, Courthouse Street, Pontypridd, CF37 1JR
+        address: Pontypridd County and Family Court, The Courthouse, Courthouse Street, Pontypridd, CF37 1JR
       - venue: Port Talbot
-        address: Harbourside Road, Port Talbot, SA13 1SB
+        address: Port Talbot Justice Centre, Harbourside Road, Port Talbot, SA13 1SB
       - venue: Prestatyn JC
-        address: Victoria Road, Prestatyn, LL19 7TE
+        address: Prestatyn Justice Centre, Victoria Road, Prestatyn, LL19 7TE
       - venue: Shrewsbury
         address: Shrewsbury
       - venue: SW AREA TRAFFIC
@@ -385,11 +387,11 @@ venue-addresses:
       - venue: Swansea
         address: Swansea
       - venue: Swansea CJ
-        address: Caravella House, Quay West, Quay Parade, Swansea, SA1 1SP
+        address: Swansea Civil Justice Centre, Caravella House, Quay West, Quay Parade, Swansea, SA1 1SP
       - venue: SWANSEA CROWN C
         address: SWANSEA CROWN C
       - venue: Swansea Mags
-        address: Grove Place, Swansea, SA1 5DB
+        address: Swansea Magistrates Court, Grove Place, Swansea, SA1 5DB
       - venue: Swansea Sage
         address: Swansea Sage
       - venue: Towyn & Kinmel
@@ -397,17 +399,17 @@ venue-addresses:
       - venue: Tribunalservice
         address: Tribunalservice
       - venue: Wales
-        address: 3rd Floor, Cardiff Magistrates’ Court, Fitzalan Place, Cardiff, CF24 0RZ
+        address: Wales Employment Tribunal, 3rd Floor, Cardiff Magistrates’ Court, Fitzalan Place, Cardiff, CF24 0RZ
       - venue: Welshpool Mags
-        address: Mansion House, 24 Severn Street, Welshpool, SY21 7UX
+        address: Welshpool Magistrates Court, Mansion House, 24 Severn Street, Welshpool, SY21 7UX
       - venue: With Georgia
         address: With Georgia
       - venue: Wrexham Courts
-        address: The Law Courts, Bodhyfryd, Wrexham, LL12 7BP
+        address: Wrexham County and Family Court, The Law Courts, Bodhyfryd, Wrexham, LL12 7BP
       - venue: Wrexham SSCSA
         address: Wrexham SSCSA
       - venue: Cardiff SSCS
-        address: Eastgate House, 35-43 Newport Rd, Cardiff CF24 0AB
+        address: Cardiff Social Security & Child Support Tribunal, Eastgate House, 35-43 Newport Rd, Cardiff CF24 0AB
     watford:
       - venue: Amersham
         address: Amersham Law Courts King George V Road, Amersham, HP6 5AJ

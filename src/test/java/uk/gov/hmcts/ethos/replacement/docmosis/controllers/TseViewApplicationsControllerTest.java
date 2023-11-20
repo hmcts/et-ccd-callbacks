@@ -15,7 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -49,7 +49,7 @@ class TseViewApplicationsControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @Autowired
     private JsonMapper jsonMapper;
 
@@ -76,7 +76,7 @@ class TseViewApplicationsControllerTest {
             .build();
 
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails("")).thenReturn(userDetails);
+        when(userIdamService.getUserDetails("")).thenReturn(userDetails);
     }
 
     @Test

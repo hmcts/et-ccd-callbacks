@@ -69,6 +69,14 @@ else
         ${dir}/utils/ccd-import-definition.sh ${importFile}
       fi
     fi
+else
+  echo "Importing admin config"
+  if [[ -z "$ADMIN_CCD_CONFIG_PATH" ]]
+  then
+    echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-admin"
+    exit 1
+  fi
+  importFile="${ADMIN_CCD_CONFIG_PATH}/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx"
 fi
 
 if [ $1 != "all" ]

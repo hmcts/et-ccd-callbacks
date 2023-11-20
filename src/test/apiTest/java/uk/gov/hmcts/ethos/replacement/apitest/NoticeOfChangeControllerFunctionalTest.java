@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CaseRequest;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 
 public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
 
@@ -40,36 +43,19 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
 
     private CCDRequest ccdRequest;
 
-    private JsonPath body;
-
     @BeforeAll
     public void setUpCaseData() {
-        Map<String, Object> caseData = new ConcurrentHashMap<>();
-        caseData.put("caseType", "Single");
-        caseData.put("caseSource", "Manually Created");
-        CaseRequest caseRequest = CaseRequest.builder()
-                .caseData(caseData)
-                .build();
-
-        body = RestAssured.given()
-                .spec(new RequestSpecBuilder().setBaseUri(syaApiUrl).build())
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(caseRequest)
-                .post("/cases/initiate-case")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log().all(true)
-                .extract().body().jsonPath();
-
         DynamicFixedListType caseRole = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(SOLICITORA);
         dynamicValueType.setLabel(SOLICITORA);
         caseRole.setValue(dynamicValueType);
+        ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
+        hearingPreference.setContactLanguage(ENGLISH_LANGUAGE);
 
         CaseData caseData2 = CaseDataBuilder.builder()
                 .withClaimant("claimant")
+                .withClaimantHearingPreference(hearingPreference.getContactLanguage())
                 .build();
 
         caseData2.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
@@ -86,6 +72,25 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
                 .requestTimestamp(null)
                 .approvalStatus(null)
                 .build());
+
+        Map<String, Object> caseData = new ConcurrentHashMap<>();
+        caseData.put("caseType", "Single");
+        caseData.put("caseSource", "Manually Created");
+        caseData.put("claimantHearingPreference", hearingPreference);
+        CaseRequest caseRequest = CaseRequest.builder()
+                .caseData(caseData)
+                .build();
+
+        JsonPath body = RestAssured.given()
+                .spec(new RequestSpecBuilder().setBaseUri(syaApiUrl).build())
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(caseRequest)
+                .post("/cases/initiate-case")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log().all(true)
+                .extract().body().jsonPath();
 
         Long caseId = body.get("id");
 

@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
@@ -60,7 +59,7 @@ public class CaseTransferSameCountryService {
         CaseData sourceCaseData = caseDetails.getCaseData();
         List<CaseData> casesToSubmitTransferEvent = caseDataList.stream()
                 .filter(caseData -> !caseData.getEthosCaseReference().equals(sourceCaseData.getEthosCaseReference()))
-                .collect(Collectors.toList());
+                .toList();
 
         String newManagingOffice = caseDetails.getCaseData().getOfficeCT().getSelectedCode();
 

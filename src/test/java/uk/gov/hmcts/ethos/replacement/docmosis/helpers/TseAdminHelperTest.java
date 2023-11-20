@@ -60,6 +60,7 @@ class TseAdminHelperTest {
     @Test
     void populateSelectApplicationAdminDropdown_withAnApplication_returnsDynamicList() {
         DynamicFixedListType actual = TseAdminHelper.populateSelectApplicationAdminDropdown(caseData);
+        assert actual != null;
         assertThat(actual.getListItems().size(), is(1));
     }
 

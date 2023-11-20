@@ -16,9 +16,11 @@ import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItemComparator;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
@@ -101,10 +103,12 @@ public class BfActionReport {
         BFDateType bfDateType = new BFDateType();
         bfDateType.setCaseReference(ethosCaseReference);
 
-        if (!isNullOrEmpty(bfActionType.getAllActions())) {
+        if (isNullOrEmpty(bfActionType.getAllActions())) {
+            if (!isNullOrEmpty(bfActionType.getCwActions())) {
+                bfDateType.setBroughtForwardAction(bfActionType.getCwActions());
+            }
+        } else {
             bfDateType.setBroughtForwardAction(bfActionType.getAllActions());
-        } else if (!isNullOrEmpty(bfActionType.getCwActions())) {
-            bfDateType.setBroughtForwardAction(bfActionType.getCwActions());
         }
 
         bfDateType.setBroughtForwardEnteredDate(ReportHelper.getFormattedLocalDate(bfActionType.getDateEntered()));

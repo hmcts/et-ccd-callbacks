@@ -8,7 +8,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.VenueRepository
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -20,6 +19,6 @@ public class JpaVenueService implements VenueService {
     public List<DynamicValueType> getVenues(TribunalOffice tribunalOffice) {
         return venueRepository.findByTribunalOffice(tribunalOffice).stream()
                 .map(venue -> DynamicValueType.create(venue.getCode(), venue.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

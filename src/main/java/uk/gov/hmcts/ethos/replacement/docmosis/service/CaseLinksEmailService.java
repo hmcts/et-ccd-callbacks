@@ -20,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper.getRespondentRepresentative;
@@ -73,7 +74,7 @@ public class CaseLinksEmailService {
         if (list1 == null || list1.isEmpty()) {
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(list2);
         } else {
-            ListTypeItem<TypeItem<CaseLink>> diff = list2.stream()
+            ListTypeItem<CaseLink> diff = list2.stream()
                     .filter(element -> !list1.contains(element))
                     .toList();
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(diff);

@@ -15,7 +15,7 @@ public final class CaseLinksHelper {
     private CaseLinksHelper() {
     }
 
-    public static boolean isLinkedForHearing(ListTypeItem<TypeItem<CaseLink>> caseLinks) {
+    public static boolean isLinkedForHearing(ListTypeItem<CaseLink> caseLinks) {
         if (caseLinks == null || caseLinks.isEmpty()) {
             return false;
         }

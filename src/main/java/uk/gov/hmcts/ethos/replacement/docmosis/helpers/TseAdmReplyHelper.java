@@ -78,7 +78,7 @@ public final class TseAdmReplyHelper {
                 .filter(item -> item.getValue().getNumber().equals(caseData.getTseAdminSelectApplication()
                         .getSelectedCode()))
                 .findFirst()
-                .map(GenericTseApplicationTypeItem::getValue)
+                .map(TypeItem::getValue)
                 .orElse(null);
     }
 
@@ -111,15 +111,15 @@ public final class TseAdmReplyHelper {
                 .build();
     }
 
-    private static ListTypeItem<TypeItem<DocumentType>> getUploadedDocList(
-            ListTypeItem<TypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
+    private static List<TypeItem<DocumentType>> getUploadedDocList(
+            List<TypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
         if (docTypeList == null) {
             return new ArrayList<>();
         }
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList, ccdGatewayBaseUrl);
     }
 
-    private static String hasSupportingDocs(ListTypeItem<TypeItem<DocumentType>> supportDocList) {
+    private static String hasSupportingDocs(ListTypeItem<DocumentType> supportDocList) {
         return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 

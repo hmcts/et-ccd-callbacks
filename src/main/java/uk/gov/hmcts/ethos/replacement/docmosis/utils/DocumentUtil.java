@@ -14,10 +14,10 @@ public final class DocumentUtil {
         // Utility classes should not have a public or default constructor.
     }
 
-    public static ListTypeItem<DocumentType> generateUploadedDocumentListFromDocumentList(
-            ListTypeItem<DocumentType> documentList, String ccdGatewayBaseUrl) {
+    public static List<TypeItem<DocumentType>> generateUploadedDocumentListFromDocumentList(
+            List<TypeItem<DocumentType>> documentList, String ccdGatewayBaseUrl) {
 
-        ListTypeItem<DocumentType> uploadedDocumentList = new ArrayList<>();
+        List<TypeItem<DocumentType>> uploadedDocumentList = new ArrayList<>();
         documentList.forEach(doc -> {
             TypeItem<DocumentType> genTypeItems = new TypeItem<>();
             DocumentType docType = new DocumentType();

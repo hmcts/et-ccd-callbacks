@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.elasticsearch.common.Strings;
+import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysCaseData;
@@ -268,26 +269,8 @@ public final class SessionDaysReport {
             if (CollectionUtils.isNotEmpty(dates)) {
                 for (DateListedTypeItem dateListedTypeItem : dates) {
                     if (isHearingStatusValid(dateListedTypeItem)) {
-                        SessionDaysReportDetail reportDetail = new SessionDaysReportDetail();
-                        reportDetail.setHearingDate(LocalDateTime.parse(
-                                        dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN)
-                                .toLocalDate().toString());
-                        String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
-
-                        reportDetail.setHearingJudge(
-                                Strings.isNullOrEmpty(judgeName)
-                                        ? "* Not Allocated" : judgeName);
-                        JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
-                        setJudgeType(judgeStatus, reportDetail);
-                        reportDetail.setCaseReference(caseData.getEthosCaseReference());
-                        reportDetail.setHearingNumber(hearingTypeItem.getValue().getHearingNumber());
-                        reportDetail.setHearingType(hearingTypeItem.getValue().getHearingType());
-                        reportDetail.setHearingSitAlone("Sit Alone".equals(
-                                hearingTypeItem.getValue().getHearingSitAlone()) ? "Y" : "");
-                        setTelCon(hearingTypeItem, reportDetail);
-                        String duration = getHearingDurationInMinutes(dateListedTypeItem);
-                        reportDetail.setHearingDuration(duration);
-                        reportDetail.setSessionType(getSessionType(Long.parseLong(duration)));
+                        SessionDaysReportDetail reportDetail =
+                                getSessionDaysReportDetail(caseData, hearingTypeItem, dateListedTypeItem);
                         if (dateListedTypeItem.getValue().hasHearingClerk()) {
                             reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
                                     .getSelectedLabel());
@@ -297,6 +280,33 @@ public final class SessionDaysReport {
                 }
             }
         }
+    }
+
+    @NotNull
+    private SessionDaysReportDetail getSessionDaysReportDetail(SessionDaysCaseData caseData,
+                                                               HearingTypeItem hearingTypeItem,
+                                                               DateListedTypeItem dateListedTypeItem) {
+        SessionDaysReportDetail reportDetail = new SessionDaysReportDetail();
+        reportDetail.setHearingDate(LocalDateTime.parse(
+                        dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN)
+                .toLocalDate().toString());
+        String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
+
+        reportDetail.setHearingJudge(
+                Strings.isNullOrEmpty(judgeName)
+                        ? "* Not Allocated" : judgeName);
+        JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
+        setJudgeType(judgeStatus, reportDetail);
+        reportDetail.setCaseReference(caseData.getEthosCaseReference());
+        reportDetail.setHearingNumber(hearingTypeItem.getValue().getHearingNumber());
+        reportDetail.setHearingType(hearingTypeItem.getValue().getHearingType());
+        reportDetail.setHearingSitAlone("Sit Alone".equals(
+                hearingTypeItem.getValue().getHearingSitAlone()) ? "Y" : "");
+        setTelCon(hearingTypeItem, reportDetail);
+        String duration = getHearingDurationInMinutes(dateListedTypeItem);
+        reportDetail.setHearingDuration(duration);
+        reportDetail.setSessionType(getSessionType(Long.parseLong(duration)));
+        return reportDetail;
     }
 
     private void setJudgeType(JudgeEmploymentStatus judgeStatus, SessionDaysReportDetail reportDetail) {

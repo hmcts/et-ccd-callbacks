@@ -48,7 +48,7 @@ public final class RespondentTellSomethingElseHelper {
             .resTseApplicant(RESPONDENT_TITLE)
             .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
             .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
-            .resTseApplicationDate((lastApp != null && StringUtils.isNotBlank(lastApp.getValue().getDate()))
+            .resTseApplicationDate(lastApp != null && StringUtils.isNotBlank(lastApp.getValue().getDate())
                 ? lastApp.getValue().getDate() : UtilHelper.formatCurrentDate(LocalDate.now()))
             .resTseDocument(getDocumentName(selectedAppData))
             .resTseTextBox(getTextBoxDetails(selectedAppData))

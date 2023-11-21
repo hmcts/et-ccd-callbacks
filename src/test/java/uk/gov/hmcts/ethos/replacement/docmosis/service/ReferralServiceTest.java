@@ -25,7 +25,7 @@ class ReferralServiceTest {
     @MockBean
     private EmailService emailService;
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @MockBean
     private TornadoService tornadoService;
 
@@ -33,7 +33,7 @@ class ReferralServiceTest {
 
     @BeforeEach
     void setUp() {
-        referralService = new ReferralService(emailService, userService, tornadoService);
+        referralService = new ReferralService(emailService, userIdamService, tornadoService);
 
         documentInfo = DocumentInfo.builder()
             .description("Referral Summary.pdf")

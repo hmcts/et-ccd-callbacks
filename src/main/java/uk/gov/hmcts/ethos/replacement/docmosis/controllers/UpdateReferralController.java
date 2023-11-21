@@ -25,7 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class UpdateReferralController {
     private final VerifyTokenService verifyTokenService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final EmailService emailService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final ReferralService referralService;
@@ -157,7 +157,7 @@ public class UpdateReferralController {
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
             caseData.setUpdateReferralSubject("Party not responded/complied");
         }
-        UserDetails userDetails = userService.getUserDetails(userToken);
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
         ReferralHelper.updateReferral(
                 caseData,
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));

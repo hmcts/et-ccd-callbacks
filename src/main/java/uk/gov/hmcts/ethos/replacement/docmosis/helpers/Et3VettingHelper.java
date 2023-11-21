@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -102,7 +101,8 @@ public final class Et3VettingHelper {
     public static List<String> populateRespondentDynamicList(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         if (CollectionUtils.isEmpty(respondentCollection)) {
-            return Arrays.asList(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
+            return Collections.singletonList(
+                    String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
         }
 
         List<DynamicValueType> dynamicRespondentList =
@@ -120,7 +120,6 @@ public final class Et3VettingHelper {
      * @param caseData contains all the case data
      */
     public static void getRespondentNameAndAddress(CaseData caseData) {
-        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         if (CollectionUtils.isEmpty(respondentCollection))  {
@@ -128,6 +127,7 @@ public final class Et3VettingHelper {
             return;
         }
 
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         Optional<RespondentSumTypeItem> respondentSumTypeOptional = respondentCollection
             .stream()
             .filter(r -> respondentExistsAndEt3Received(respondentName, r.getValue()))
@@ -156,11 +156,11 @@ public final class Et3VettingHelper {
             )
         );
 
-        caseData.setEt3DoWeHaveRespondentsName(respondentName.equals(NONE_GIVEN)
+        caseData.setEt3DoWeHaveRespondentsName(NONE_GIVEN.equals(respondentName)
             ? NO
             : YES);
 
-        caseData.setEt3DoWeHaveRespondentsAddress(respondentAddress.equals(NONE_GIVEN)
+        caseData.setEt3DoWeHaveRespondentsAddress(NONE_GIVEN.equals(respondentAddress)
             ? NO
             : YES);
     }

@@ -67,7 +67,7 @@ class DocumentManagementServiceTest {
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
-    private UserService userService;
+    private UserIdamService userIdamService;
     @Mock
     private DocumentDownloadClientApi documentDownloadClientApi;
     @Mock
@@ -96,7 +96,7 @@ class DocumentManagementServiceTest {
         when(authTokenGenerator.generate()).thenReturn("authString");
         responseEntity = MultipleUtil.getResponseOK();
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         ReflectionTestUtils.setField(documentManagementService, "ccdDMStoreBaseUrl", "http://dm-store:8080");
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", false);
     }

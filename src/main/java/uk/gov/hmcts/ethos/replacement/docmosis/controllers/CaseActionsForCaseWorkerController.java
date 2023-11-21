@@ -36,6 +36,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -106,6 +107,7 @@ public class CaseActionsForCaseWorkerController {
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
+    private final CaseManagementLocationCodeService caseManagementLocationCodeService;
 
     private final NocRespondentHelper nocRespondentHelper;
 
@@ -286,6 +288,13 @@ public class CaseActionsForCaseWorkerController {
             if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
                 caseFlagsService.setupCaseFlags(caseData);
             }
+
+            boolean hmcToggle = featureToggleService.isHmcEnabled();
+            log.info("HMC feature flag is {}", hmcToggle);
+            if (hmcToggle) {
+                caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+                caseManagementLocationCodeService.setCaseManagementLocationCode(caseData);
+            }
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -425,6 +434,10 @@ public class CaseActionsForCaseWorkerController {
         }
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
 
+        if (featureToggleService.isHmcEnabled()) {
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+        }
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -474,6 +487,10 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
         }
 
+        if (featureToggleService.isHmcEnabled()) {
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+        }
+
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -508,6 +525,10 @@ public class CaseActionsForCaseWorkerController {
             nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+
+            if (featureToggleService.isHmcEnabled()) {
+                nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+            }
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
@@ -633,6 +654,11 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         eventValidationService.validateRestrictedReportingNames(caseData);
+
+        if (featureToggleService.isHmcEnabled()) {
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+            caseFlagsService.setPrivateHearingFlag(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

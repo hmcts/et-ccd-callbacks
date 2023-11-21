@@ -193,7 +193,8 @@ public class CftlibConfig implements CFTLibConfigurer {
             PUI_ORGANISATION_MANAGER,
             PUI_USER_MANAGER,
             PUI_CAA,
-            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
+            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
+            "caseworker-divorce-solicitor");
 
         lib.createIdamUser(CITIZEN_EMAIL, CITIZEN);
 

@@ -93,7 +93,7 @@ public final class MultiplesHelper {
             return multipleData.getCaseIdCollection().stream()
                     .filter(caseId ->
                             caseId.getValue().getEthosCaseReference() != null
-                                    && !caseId.getValue().getEthosCaseReference().trim().equals(""))
+                                    && !caseId.getValue().getEthosCaseReference().trim().isEmpty())
                     .filter(distinctByValue(CaseIdTypeItem::getValue))
                     .distinct()
                     .toList();

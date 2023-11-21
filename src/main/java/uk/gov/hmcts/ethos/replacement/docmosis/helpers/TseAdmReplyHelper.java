@@ -96,7 +96,7 @@ public final class TseAdmReplyHelper {
                 .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
                 .responseTitle(defaultIfEmpty(caseData.getTseAdmReplyEnterResponseTitle(), null))
                 .responseAdditionalInfo(defaultIfEmpty(caseData.getTseAdmReplyAdditionalInformation(), null))
-                .isCmoOrRequest(defaultIfEmpty(caseData.getTseAdmReplyIsCmoOrRequest(), null))
+                .cmoOrRequest(defaultIfEmpty(caseData.getTseAdmReplyIsCmoOrRequest(), null))
                 .cmoMadeBy(defaultIfEmpty(caseData.getTseAdmReplyCmoMadeBy(), null))
                 .cmoEnterFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(), null))
                 .cmoIsResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(), null))
@@ -120,7 +120,7 @@ public final class TseAdmReplyHelper {
     }
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+        return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 
 }

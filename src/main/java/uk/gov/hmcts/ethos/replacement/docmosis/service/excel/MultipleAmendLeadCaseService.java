@@ -25,7 +25,7 @@ public class MultipleAmendLeadCaseService {
         this.multipleHelperService = multipleHelperService;
     }
 
-    public List<?> bulkAmendLeadCaseLogic(String userToken, MultipleDetails multipleDetails,
+    public List<Object> bulkAmendLeadCaseLogic(String userToken, MultipleDetails multipleDetails,
                                           List<String> errors, SortedMap<String, Object> multipleObjects) {
 
         String amendLeadCase  = multipleDetails.getCaseData().getAmendLeadCase();

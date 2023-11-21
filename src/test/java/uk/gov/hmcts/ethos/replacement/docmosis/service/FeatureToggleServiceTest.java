@@ -50,6 +50,30 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenBundlesIsEnabled(Boolean toggleStat) {
+        givenToggle("bundles", toggleStat);
+
+        assertThat(featureToggleService.isBundlesEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
+        givenToggle("hmc", toggleStat);
+
+        assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenWelshIsEnabled(Boolean toggleStat) {
+        givenToggle("welsh-language", toggleStat);
+
+        assertThat(featureToggleService.isWelshEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

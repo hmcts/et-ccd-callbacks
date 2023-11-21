@@ -111,8 +111,8 @@ class ReferralHelperTest {
 
     private final String expectedCreatedReferralReply = "ReferralReplyType(directionTo=directionTo, replyToEmailAddre"
         + "ss=replyTo, isUrgentReply=isUrgent, directionDetails=directionDetails, replyDocument=null, replyGeneralNot"
-        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ", replyDateTime=null, "
-        + "referralSubject=null)";
+        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate()
+        + ", replyDateTime=null, referralSubject=null)";
 
     @BeforeEach
     void setUp() {

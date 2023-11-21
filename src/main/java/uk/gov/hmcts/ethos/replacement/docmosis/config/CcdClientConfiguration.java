@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CaseDataBuilder;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.client.CcdClientConfig;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 @Configuration
@@ -18,9 +18,9 @@ public class CcdClientConfiguration {
     private String ccdDataStoreApiBaseUrl;
 
     @Bean
-    public CcdClient ccdClient(RestTemplate restTemplate, UserService userService,
+    public CcdClient ccdClient(RestTemplate restTemplate, UserIdamService userIdamService,
                                CaseDataBuilder caseDataBuilder, AuthTokenGenerator authTokenGenerator) {
-        return new CcdClient(restTemplate, userService, caseDataBuilder,
+        return new CcdClient(restTemplate, userIdamService, caseDataBuilder,
                 new CcdClientConfig(ccdDataStoreApiBaseUrl), authTokenGenerator);
     }
 

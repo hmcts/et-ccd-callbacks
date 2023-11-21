@@ -61,10 +61,10 @@ public final class Helper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private Helper() {
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public static String nullCheck(String value) {
@@ -162,7 +162,7 @@ public final class Helper {
     public static String getDocumentName(CorrespondenceType correspondenceType,
                                          CorrespondenceScotType correspondenceScotType) {
         String ewSection = DocumentHelper.getEWSectionName(correspondenceType);
-        String sectionName = ewSection.equals("")
+        String sectionName = ewSection.isEmpty()
                 ? DocumentHelper.getScotSectionName(correspondenceScotType) : ewSection;
         return DocumentHelper.getTemplateName(correspondenceType, correspondenceScotType) + "_" + sectionName;
     }
@@ -276,7 +276,7 @@ public final class Helper {
      * @return A new object that has a subset of data from the source object dependent on the class passed
      */
     public static Object intersectProperties(Object sourceObject, Class<?> targetClassType) {
-        return mapper.convertValue(sourceObject, targetClassType);
+        return objectMapper.convertValue(sourceObject, targetClassType);
     }
 
     /**

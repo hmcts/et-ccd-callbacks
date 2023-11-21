@@ -65,7 +65,7 @@ class BulkUpdateServiceTest {
     @Mock
     private CcdClient ccdClient;
     @Mock
-    private UserService userService;
+    private UserIdamService userIdamService;
     @Mock
     private CreateUpdatesBusSender createUpdatesBusSender;
 
@@ -126,7 +126,7 @@ class BulkUpdateServiceTest {
         submitBulkEvent = new SubmitBulkEvent();
         submitBulkEvent.setCaseId(1111);
         submitBulkEvent.setCaseData(bulkData);
-        bulkUpdateService = new BulkUpdateService(ccdClient, userService, createUpdatesBusSender);
+        bulkUpdateService = new BulkUpdateService(ccdClient, userIdamService, createUpdatesBusSender);
         bulkRequestPayload = new BulkRequestPayload();
         bulkRequestPayload.setBulkDetails(bulkDetails);
     }
@@ -402,7 +402,7 @@ class BulkUpdateServiceTest {
 
     @Test
     void bulkPreAcceptPQLogic() {
-        when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));
         BulkRequestPayload bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(
@@ -422,7 +422,7 @@ class BulkUpdateServiceTest {
 
     @Test
     void bulkPreAcceptPQLogicEmptyCases() {
-        when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         List<SubmitEvent> submitEvents = new ArrayList<>(Collections.singleton(submitEvent));
         bulkRequest.setCaseDetails(getBulkDetailsCompleteWithValues(bulkRequest.getCaseDetails()));
         bulkRequest.getCaseDetails().getCaseData().setCaseIdCollection(new ArrayList<>());

@@ -116,29 +116,11 @@ class HearingsToJudgmentsReportDataTest {
                                                 String reservedHearing, String hearingJudge, String judgementDateSent,
                                                 String totalDays) {
         StringBuilder sb = new StringBuilder(160);
-        sb.append('{');
-        sb.append("\"reportOffice\":\"");
-        sb.append(office);
-        sb.append("\",");
-        sb.append("\"caseReference\":\"");
-        sb.append(caseReference);
-        sb.append("\",");
-        sb.append("\"hearingDate\":\"");
-        sb.append(hearingDate);
-        sb.append("\",");
-        sb.append("\"judgementDateSent\":\"");
-        sb.append(judgementDateSent);
-        sb.append("\",");
-        sb.append("\"totalDays\":\"");
-        sb.append(totalDays);
-        sb.append("\",");
-        sb.append("\"reservedHearing\":\"");
-        sb.append(reservedHearing);
-        sb.append("\",");
-        sb.append("\"hearingJudge\":\"");
-        sb.append(hearingJudge);
-        sb.append('\"');
-        sb.append('}');
+        sb.append('{').append("\"reportOffice\":\"").append(office).append("\",").append("\"caseReference\":\"")
+                .append(caseReference).append("\",").append("\"hearingDate\":\"").append(hearingDate).append("\",")
+                .append("\"judgementDateSent\":\"").append(judgementDateSent).append("\",").append("\"totalDays\":\"")
+                .append(totalDays).append("\",").append("\"reservedHearing\":\"").append(reservedHearing)
+                .append("\",").append("\"hearingJudge\":\"").append(hearingJudge).append('\"').append('}');
         return sb;
     }
 }

@@ -72,9 +72,8 @@ class NoPositionChangeReportDataTests {
         NoPositionChangeReportSummary reportSummary = reportData.getReportSummary();
         sb.append(buildSummaryJsonString(
                 reportSummary.getOffice(), reportData.getReportDate(), reportSummary.getTotalCases(),
-                reportSummary.getTotalSingleCases(), reportSummary.getTotalMultipleCases()));
-
-        sb.append('\"').append(REPORT_DETAILS_SINGLE).append("\":[\n");
+                reportSummary.getTotalSingleCases(), reportSummary.getTotalMultipleCases()))
+                .append('\"').append(REPORT_DETAILS_SINGLE).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
                 && reportData.getReportDetailsSingle().get(0) != null) {
             NoPositionChangeReportDetailSingle rdSingle1 = reportData.getReportDetailsSingle().get(0);
@@ -92,9 +91,7 @@ class NoPositionChangeReportDataTests {
             ));
             sb.append('\n');
         }
-        sb.append("],\n");
-
-        sb.append('\"').append(REPORT_DETAILS_MULTIPLE).append("\":[\n");
+        sb.append("],\n").append('\"').append(REPORT_DETAILS_MULTIPLE).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())) {
             NoPositionChangeReportDetailMultiple rdMultiple = reportData.getReportDetailsMultiple().get(0);
             sb.append(buildDetailMultipleJsonString(
@@ -110,37 +107,32 @@ class NoPositionChangeReportDataTests {
     private StringBuilder buildSummaryJsonString(String office, String reportDate, String totalCases,
                                                   String totalSingle, String totalMultiple) {
         StringBuilder sb = new StringBuilder();
-        sb.append(REPORT_OFFICE).append(StringUtils.defaultIfEmpty(office, "")).append(NEW_LINE);
-        sb.append(REPORT_DATE).append(UtilHelper.listingFormatLocalDate(reportDate)).append(NEW_LINE);
-        sb.append(TOTAL_CASES).append(StringUtils.defaultIfEmpty(totalCases, "0")).append(NEW_LINE);
-        sb.append(TOTAL_SINGLE).append(StringUtils.defaultIfEmpty(totalSingle, "0")).append(NEW_LINE);
-        sb.append(TOTAL_MULTIPLE).append(StringUtils.defaultIfEmpty(totalMultiple, "0")).append(NEW_LINE);
+        sb.append(REPORT_OFFICE).append(StringUtils.defaultIfEmpty(office, "")).append(NEW_LINE)
+                .append(REPORT_DATE).append(UtilHelper.listingFormatLocalDate(reportDate)).append(NEW_LINE)
+                .append(TOTAL_CASES).append(StringUtils.defaultIfEmpty(totalCases, "0")).append(NEW_LINE)
+                .append(TOTAL_SINGLE).append(StringUtils.defaultIfEmpty(totalSingle, "0")).append(NEW_LINE)
+                .append(TOTAL_MULTIPLE).append(StringUtils.defaultIfEmpty(totalMultiple, "0"))
+                .append(NEW_LINE);
         return sb;
     }
 
     private StringBuilder buildDetailSingleJsonString(String caseReference, String year, String currentPosition,
                                                       String dateToPosition, String respondent) {
         StringBuilder sb = new StringBuilder(120);
-        sb.append('{');
-        sb.append("\"caseReference\":\"").append(caseReference).append("\",");
-        sb.append("\"year\":\"").append(year).append("\",");
-        sb.append("\"currentPosition\":\"").append(currentPosition).append("\",");
-        sb.append("\"dateToPosition\":\"").append(dateToPosition).append("\",");
-        sb.append("\"respondent\":\"").append(respondent).append('\"');
-        sb.append('}');
+        sb.append('{').append("\"caseReference\":\"").append(caseReference).append("\",")
+                .append("\"year\":\"").append(year).append("\",").append("\"currentPosition\":\"")
+                .append(currentPosition).append("\",").append("\"dateToPosition\":\"").append(dateToPosition)
+                .append("\",").append("\"respondent\":\"").append(respondent).append('\"').append('}');
         return sb;
     }
 
     private StringBuilder buildDetailMultipleJsonString(String caseReference, String year, String currentPosition,
                                                         String dateToPosition, String multipleName) {
         StringBuilder sb = new StringBuilder(120);
-        sb.append('{');
-        sb.append("\"caseReference\":\"").append(caseReference).append("\",");
-        sb.append("\"year\":\"").append(year).append("\",");
-        sb.append("\"currentPosition\":\"").append(currentPosition).append("\",");
-        sb.append("\"dateToPosition\":\"").append(dateToPosition).append("\",");
-        sb.append("\"multipleName\":\"").append(multipleName).append('\"');
-        sb.append('}');
+        sb.append('{').append("\"caseReference\":\"").append(caseReference).append("\",").append("\"year\":\"")
+                .append(year).append("\",").append("\"currentPosition\":\"").append(currentPosition).append("\",")
+                .append("\"dateToPosition\":\"").append(dateToPosition).append("\",").append("\"multipleName\":\"")
+                .append(multipleName).append('\"').append('}');
         return sb;
     }
 }

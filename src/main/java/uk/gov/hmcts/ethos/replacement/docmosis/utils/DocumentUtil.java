@@ -21,13 +21,7 @@ public final class DocumentUtil {
             GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
             DocumentType docType = new DocumentType();
             docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-
-            docType.getUploadedDocument().setDocumentBinaryUrl(
-                    doc.getValue().getUploadedDocument().getDocumentFilename()
-                            + "|"
-                            + getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
-                            ccdGatewayBaseUrl)
-            );
+            docType.getUploadedDocument().setDocumentBinaryUrl(doc.getValue().getUploadedDocument().getDocumentUrl());
 
             genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
             genTypeItems.setValue(docType);

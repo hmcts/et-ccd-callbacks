@@ -525,7 +525,7 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName The full name of the logged-in user
      */
-    public static void createReferralReply(CaseData caseData, String userFullName, Boolean waEnabled) {
+    public static void createReferralReply(CaseData caseData, String userFullName, boolean waEnabled) {
         ReferralType referral = getSelectedReferral(caseData);
         if (CollectionUtils.isEmpty(referral.getReferralReplyCollection())) {
             referral.setReferralReplyCollection(new ArrayList<>());

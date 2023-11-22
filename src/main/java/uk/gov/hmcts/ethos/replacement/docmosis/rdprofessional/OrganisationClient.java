@@ -14,7 +14,7 @@ import java.util.List;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi.SERVICE_AUTHORIZATION;
 
-@FeignClient(name = "organisation-client", url = "${rd_professional.api.url}")
+@FeignClient(name = "organisation-client", url = "${rd_professional-api-url}")
 public interface OrganisationClient {
 
     @GetMapping(

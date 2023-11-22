@@ -81,7 +81,10 @@ public class UploadDocumentHelperTest {
     @Test
     void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
         Map<String, String> expected = buildPersonalisation("F");
-        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
+        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(
+            caseDetails.getCaseData(),
+            "link"
+        );
 
         assertThat(actual, is(expected));
     }
@@ -90,7 +93,10 @@ public class UploadDocumentHelperTest {
     void buildPersonalisationForCaseRejection_givenClaimantTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantTitle("Mr");
         Map<String, String> expected = buildPersonalisation("Mr");
-        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
+        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(
+            caseDetails.getCaseData(),
+            "link"
+        );
 
         assertThat(actual, is(expected));
     }
@@ -99,7 +105,10 @@ public class UploadDocumentHelperTest {
     void buildPersonalisationForCaseRejection_givenClaimantPreferredTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantPreferredTitle("Professor");
         Map<String, String> expected = buildPersonalisation("Professor");
-        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
+        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(
+            caseDetails.getCaseData(),
+            "link"
+        );
 
         assertThat(actual, is(expected));
     }
@@ -109,7 +118,7 @@ public class UploadDocumentHelperTest {
         personalisation.put(CASE_NUMBER, "1234");
         personalisation.put("initialTitle", initialTitle);
         personalisation.put("lastName", "Last");
-        personalisation.put("ccdId", "1234");
+        personalisation.put("linkToCitizenHub", "link");
         return personalisation;
     }
 

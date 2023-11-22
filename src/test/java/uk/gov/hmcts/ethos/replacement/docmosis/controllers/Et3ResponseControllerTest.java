@@ -15,10 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -35,7 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({Et3ResponseController.class, Et3ResponseService.class, JsonMapper.class})
+@WebMvcTest({Et3ResponseController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
 class Et3ResponseControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -54,11 +51,7 @@ class Et3ResponseControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private DocumentManagementService documentManagementService;
-    @MockBean
-    private TornadoService tornadoService;
-    @MockBean
-    private EmailService emailService;
+    private Et3ResponseService  et3ResponseService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 

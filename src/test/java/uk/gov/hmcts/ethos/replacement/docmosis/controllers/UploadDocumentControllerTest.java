@@ -22,6 +22,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,6 +49,8 @@ class UploadDocumentControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        when(emailService.getCitizenCaseLink(any())).thenReturn("");
+
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);

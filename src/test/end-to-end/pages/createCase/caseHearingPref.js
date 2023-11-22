@@ -15,4 +15,5 @@ module.exports =  async function () {
     I.see('Why is the claimant unable to take part in video or phone hearings');
     I.fillField(caseRepConfig.why_cant_claimant_not_take_part, 'Because of a Learning Condition');
     I.click(commonConfig.submit);
+    I.wait(commonConfig.time_interval1_second);
 }

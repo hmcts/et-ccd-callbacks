@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -13,14 +13,15 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 
 @Service
@@ -42,23 +44,22 @@ public class TseRespondentReplyService {
     private final TornadoService tornadoService;
     private final EmailService emailService;
     private final UserService userService;
-    private final NotificationProperties notificationProperties;
     private final RespondentTellSomethingElseService respondentTseService;
     private final TseService tseService;
 
-    @Value("${tse.respondent.respond.notify.claimant.template.id}")
+    @Value("${template.tse.respondent.respond.claimant}")
     private String tseRespondentResponseTemplateId;
-    @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
+    @Value("${template.tse.respondent.respond.respondent.rule-92-no}")
     private String acknowledgementRule92NoEmailTemplateId;
-    @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
+    @Value("${template.tse.respondent.respond.respondent.rule-92-yes}")
     private String acknowledgementRule92YesEmailTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-tribunal}")
+    @Value("${template.tse.respondent.reply-to-tribunal.tribunal}")
     private String replyToTribunalEmailToTribunalTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-claimant}")
+    @Value("${template.tse.respondent.reply-to-tribunal.claimant}")
     private String replyToTribunalEmailToClaimantTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-yes}")
+    @Value("${template.tse.respondent.reply-to-tribunal.respondent.rule-92-yes}")
     private String replyToTribunalAckEmailToLRRule92YesTemplateId;
-    @Value("${tse.respondent.reply-to-tribunal.to-res-rule92-no}")
+    @Value("${template.tse.respondent.reply-to-tribunal.respondent.rule-92-no}")
     private String replyToTribunalAckEmailToLRRule92NoTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
@@ -175,10 +176,11 @@ public class TseRespondentReplyService {
     public void initialResReplyToTribunalTableMarkUp(CaseData caseData, String authToken) {
         GenericTseApplicationType application = getRespondentSelectedApplicationType(caseData);
 
-        String applicationTable = tseService.formatApplicationDetails(application, authToken, true);
-        String responses = tseService.formatApplicationResponses(application, authToken, true);
+        List<String[]> applicationTable = tseService.getApplicationDetailsRows(application, authToken, true);
+        List<String[]> responses = tseService.formatApplicationResponses(application, authToken, true);
 
-        caseData.setTseResponseTable(applicationTable + "\r\n" + responses);
+        caseData.setTseResponseTable(createTwoColumnTable(new String[]{"Application", ""},
+            Stream.of(applicationTable, responses).flatMap(Collection::stream).toList()));
         caseData.setTseRespondingToTribunal(YES);
     }
 
@@ -189,8 +191,8 @@ public class TseRespondentReplyService {
      */
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        if (StringUtils.isEmpty(caseData.getTseResponseText())
-                && StringUtils.isEmpty(caseData.getTseRespondingToTribunalText())
+        if (ObjectUtils.isEmpty(caseData.getTseResponseText())
+                && ObjectUtils.isEmpty(caseData.getTseRespondingToTribunalText())
                 && NO.equals(caseData.getTseResponseHasSupportingMaterial())) {
             errors.add(GIVE_MISSING_DETAIL);
         }
@@ -216,7 +218,7 @@ public class TseRespondentReplyService {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, notificationProperties.getCitizenUrl());
+                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
             emailService.sendEmail(tseRespondentResponseTemplateId,
                     claimantEmail, personalisation);
         } catch (Exception e) {
@@ -227,11 +229,11 @@ public class TseRespondentReplyService {
 
     private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken,
                                               boolean isRespondingToTribunal) {
-        String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-                getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
-                legalRepEmail,
-                TseHelper.getPersonalisationForAcknowledgement(caseDetails, notificationProperties.getExuiUrl()));
+            getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
+            userService.getUserDetails(userToken).getEmail(),
+            TseHelper.getPersonalisationForAcknowledgement(
+                caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId())));
     }
 
     private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {
@@ -269,7 +271,7 @@ public class TseRespondentReplyService {
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 APPLICATION_TYPE, selectedApplication.getType(),
-                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId()));
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
         emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 
@@ -288,7 +290,7 @@ public class TseRespondentReplyService {
 
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId()));
+                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
         emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, claimantEmail, personalisation);
     }
 

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 
 /**
  * Helper methods for the Upload Documents event.
@@ -51,15 +51,15 @@ public final class UploadDocumentHelper {
     /**
      * Generates a map of personalised information that will be used for the
      * placeholder fields in the Case Rejected email template.
-     * @param caseDetails Contains details about the case.
+     * @param caseData Contains all the case's data.
+     * @param citizenHubLink link to the citizen hub with case id.
      */
-    public static Map<String, String> buildPersonalisationForCaseRejection(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
+    public static Map<String, String> buildPersonalisationForCaseRejection(CaseData caseData, String citizenHubLink) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put("initialTitle", getClaimantTitleOrInitial(caseData));
         personalisation.put("lastName", getLastName(caseData.getClaimant()));
-        personalisation.put(CCD_ID, caseDetails.getCaseId());
+        personalisation.put(LINK_TO_CITIZEN_HUB, citizenHubLink);
         return personalisation;
     }
 

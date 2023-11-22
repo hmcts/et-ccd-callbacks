@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -53,23 +51,23 @@ public class PseRespondToTribunalService {
     private final UserService userService;
     private final HearingSelectionService hearingSelectionService;
     private final TribunalOfficesService tribunalOfficesService;
-    private final NotificationProperties notificationProperties;
 
-    @Value("${pse.respondent.acknowledgement.yes.template.id}")
+    @Value("${template.pse.respondent.rule-92-yes}")
     private String acknowledgeEmailYesTemplateId;
-    @Value("${pse.respondent.acknowledgement.no.template.id}")
+    @Value("${template.pse.respondent.rule-92-no}")
     private String acknowledgeEmailNoTemplateId;
-    @Value("${pse.respondent.notification.claimant.template.id}")
+    @Value("${template.pse.claimant}")
     private String notificationToClaimantTemplateId;
-    @Value("${pse.respondent.notification.admin.template.id}")
+    @Value("${template.pse.admin}")
     private String notificationToAdminTemplateId;
 
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
 
-    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n"
-        + "%s"
-        + "The tribunal will consider all correspondence and let you know what happens next.";
+    private static final String SUBMITTED_BODY = """
+        ### What happens next\r
+        \r
+        %sThe tribunal will consider all correspondence and let you know what happens next.""";
 
     private static final String RULE92_ANSWERED_YES =
         "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
@@ -95,7 +93,7 @@ public class PseRespondToTribunalService {
                     r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
                 )
             )
-            .collect(Collectors.toList()));
+            .toList());
     }
 
     private boolean isNotifyRespondent(SendNotificationTypeItem sendNotificationTypeItem) {
@@ -113,10 +111,8 @@ public class PseRespondToTribunalService {
      * @param caseData contains all the case data
      */
     public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
-        SendNotificationType sendNotificationType =
-            getSelectedSendNotificationTypeItem(caseData).getValue();
-        return formatOrdReqDetails(sendNotificationType)
-            + formatRespondDetails(sendNotificationType);
+        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        return formatOrdReqDetails(sendNotificationType) + formatRespondDetails(sendNotificationType);
     }
 
     /**
@@ -185,7 +181,7 @@ public class PseRespondToTribunalService {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_EXUI,  notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_EXUI,  emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -197,7 +193,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -229,7 +225,7 @@ public class PseRespondToTribunalService {
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
-                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -263,7 +259,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 

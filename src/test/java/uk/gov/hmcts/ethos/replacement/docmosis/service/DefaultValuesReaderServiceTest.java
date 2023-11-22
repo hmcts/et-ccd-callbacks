@@ -3,6 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -16,9 +20,11 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -33,6 +39,8 @@ class DefaultValuesReaderServiceTest {
     private TribunalOfficesService tribunalOfficesService;
 
     private DefaultValuesReaderService defaultValuesReaderService;
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @BeforeEach
     public void setup() {
@@ -41,7 +49,7 @@ class DefaultValuesReaderServiceTest {
         ConciliationTrackService conciliationTrackService = mock(ConciliationTrackService.class);
         defaultValuesReaderService = new DefaultValuesReaderService(config,
                 tribunalOfficesService,
-                conciliationTrackService);
+                conciliationTrackService, caseManagementForCaseWorkerService);
     }
 
     @Test
@@ -217,6 +225,24 @@ class DefaultValuesReaderServiceTest {
         assertEquals("TestFax", listingData.getTribunalCorrespondenceFax());
         assertEquals("TestDX", listingData.getTribunalCorrespondenceDX());
         assertEquals("TestEmail", listingData.getTribunalCorrespondenceEmail());
+    }
+
+    @ParameterizedTest
+    @MethodSource("setPositionTypeArguments")
+    void setPositionType(String positionType, String expectedPosition) {
+        CaseData caseData = new CaseDataBuilder()
+                .withPositionType(positionType)
+                .withCaseSource(Constants.ET1_ONLINE_CASE_SOURCE)
+                .build();
+        defaultValuesReaderService.setPositionAndOffice(Constants.ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertEquals(expectedPosition, caseData.getPositionType());
+    }
+
+    private static Stream<Arguments> setPositionTypeArguments() {
+        return Stream.of(
+                Arguments.of(null, "ET1 Online submission"),
+                Arguments.of(Constants.MANUALLY_CREATED_POSITION, Constants.MANUALLY_CREATED_POSITION)
+        );
     }
 
     private DefaultValues createDefaultValues() {

@@ -14,6 +14,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfigura
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
 
 import java.util.Optional;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -24,15 +27,19 @@ public class DefaultValuesReaderService {
     private final CaseDefaultValuesConfiguration config;
     private final TribunalOfficesService tribunalOfficesService;
     private final ConciliationTrackService conciliationTrackService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     public static final String ALL_OFFICES = "All";
+    private static final String ET1_ONLINE_SUBMISSION_POSITION_TYPE = "ET1 Online submission";
 
     public DefaultValuesReaderService(CaseDefaultValuesConfiguration config,
                                       TribunalOfficesService tribunalOfficesService,
-                                      ConciliationTrackService conciliationTrackService) {
+                                      ConciliationTrackService conciliationTrackService,
+                                      CaseManagementForCaseWorkerService caseManagementForCaseWorkerService) {
         this.config = config;
         this.tribunalOfficesService = tribunalOfficesService;
         this.conciliationTrackService = conciliationTrackService;
+        this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
     }
 
     public DefaultValues getListingDefaultValues(ListingDetails listingDetails) {
@@ -140,4 +147,12 @@ public class DefaultValuesReaderService {
                 Optional.ofNullable(defaultValues.getTribunalCorrespondencePostCode()).orElse(""));
         return address;
     }
+
+    public void setPositionAndOffice(String caseTypeId, CaseData caseData) {
+        if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource()) && isNullOrEmpty(caseData.getPositionType())) {
+            caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
+            caseManagementForCaseWorkerService.setScotlandAllocatedOffice(caseTypeId, caseData);
+        }
+    }
+
 }

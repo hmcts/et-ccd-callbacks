@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -38,7 +39,7 @@ public class UploadDocumentController {
     private final VerifyTokenService verifyTokenService;
     private final EmailService emailService;
 
-    public UploadDocumentController(@Value("${rejected.template.id}") String templateId,
+    public UploadDocumentController(@Value("${template.rejected}") String templateId,
                                     VerifyTokenService verifyTokenService,
                                     EmailService emailService) {
         this.templateId = templateId;
@@ -73,11 +74,13 @@ public class UploadDocumentController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
 
-        if (UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails())) {
+        if (UploadDocumentHelper.shouldSendRejectionEmail(caseDetails)) {
+            String citizenCaseLink = emailService.getCitizenCaseLink(caseDetails.getCaseId());
             emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),
-                UploadDocumentHelper.buildPersonalisationForCaseRejection(ccdRequest.getCaseDetails()));
+                UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData, citizenCaseLink));
             caseData.setCaseRejectedEmailSent(YES);
         }
 

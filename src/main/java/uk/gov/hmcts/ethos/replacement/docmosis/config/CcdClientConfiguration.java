@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 @Configuration
 public class CcdClientConfiguration {
 
-    @Value("${ccd.data.store.api.url}")
+    @Value("${ccd.data-store-api-url}")
     private String ccdDataStoreApiBaseUrl;
 
     @Bean

@@ -219,7 +219,7 @@ public final class TseHelper {
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
-                LINK_TO_CITIZEN_HUB, citizenUrl + caseDetails.getCaseId(),
+                LINK_TO_CITIZEN_HUB, citizenUrl,
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 APPLICATION_TYPE, selectedApplication.getType(),
                 "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText(),
@@ -239,7 +239,7 @@ public final class TseHelper {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 "shortText", selectedApplication.getType(),
-                LINK_TO_EXUI, exuiUrl + caseDetails.getCaseId()
+                LINK_TO_EXUI, exuiUrl
         );
     }
 

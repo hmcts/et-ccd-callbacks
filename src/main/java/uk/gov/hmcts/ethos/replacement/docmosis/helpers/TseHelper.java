@@ -295,12 +295,4 @@ public final class TseHelper {
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
         return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
     }
-
-    /**
-     * Gives current datetime in string format.
-     * @return current datetime in "yyyy-MM-dd'T'HH:mm:ss.SSS" format
-     */
-    public static String getCurrentDateTime() {
-        return LocalDateTime.now().format(OLD_DATE_TIME_PATTERN);
-    }
 }

@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
@@ -168,7 +169,7 @@ public class TseRespondentReplyService {
         respondCollection.add(TseRespondTypeItem.builder().id(UUID.randomUUID().toString()).value(response).build());
 
         if (featureToggleService.isWorkAllocationEnabled()) {
-            response.setDateTime(TseHelper.getCurrentDateTime()); // for Work Allocation DMNs
+            response.setDateTime(Helper.getCurrentDateTime()); // for Work Allocation DMNs
             response.setApplicationType(genericTseApplicationType.getType()); // for Work Allocation DMNs
         }
 

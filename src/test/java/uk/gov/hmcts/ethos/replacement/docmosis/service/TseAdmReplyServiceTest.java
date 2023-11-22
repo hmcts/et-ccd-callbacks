@@ -8,32 +8,37 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -61,17 +67,22 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class TseAdmReplyServiceTest {
-
     private TseAdmReplyService tseAdmReplyService;
     private EmailService emailService;
 
+    @MockBean
+    public TseAdminHelper tseAdminHelper;
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @MockBean
+    private TornadoService tornadoService;
     @MockBean
     private TseService tseService;
 
     private CaseData caseData;
 
     private static final String FILE_NAME = "document.txt";
-
+    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
 
     private static final String TEMPLATE_ID = "someTemplateId";
@@ -84,14 +95,24 @@ class TseAdmReplyServiceTest {
         "The tribunal requires some information from you about an application.";
     private static final String RESPONSE_NOT_REQUIRED =
         "You have a new message from HMCTS about a claim made to an employment tribunal.";
+    private static final String RESPONDENT_1 = "Respondent 1";
+    private static final String RESPONDENT_2 = "Respondent 2";
+    private static final String REP_EMAIL = "rep@test.com";
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new TestEmailService());
-        tseAdmReplyService = new TseAdmReplyService(emailService, tseService);
+        emailService = spy(new EmailUtils());
+        tseAdmReplyService = new TseAdmReplyService(documentManagementService, emailService,
+                tornadoService, tseService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
+
+        Resource resource = new ByteArrayResource(new byte[] { 10, 20, 15});
+        UploadedDocument uploadedDocument = UploadedDocument.builder().content(resource)
+                .contentType("application/pdf").name("test uploaded doc").build();
+        when(documentManagementService.downloadFile(any(), any())).thenReturn(uploadedDocument);
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -295,7 +316,7 @@ class TseAdmReplyServiceTest {
 
     @ParameterizedTest
     @MethodSource
-    void saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields(String requestSelectPartyRespond,
+    void saveTseAdmReplyDataFromCaseData(String requestSelectPartyRespond,
                                                                   String cmoSelectPartyRespond,
                                                                   String respondentResponseRequired,
                                                                   String claimantResponseRequired) {
@@ -322,7 +343,7 @@ class TseAdmReplyServiceTest {
 
     }
 
-    private static Stream<Arguments> saveTseAdmReplyDataFromCaseData_SetResponseRequiredFields() {
+    private static Stream<Arguments> saveTseAdmReplyDataFromCaseData() {
         return Stream.of(
                 Arguments.of(RESPONDENT_TITLE, null, YES, null),
                 Arguments.of(CLAIMANT_TITLE, null, null, YES),
@@ -438,93 +459,79 @@ class TseAdmReplyServiceTest {
                                          String admReplyIsResponseRequired,
                                          String admReplySelectPartyRespond,
                                          Boolean emailSentToClaimant,
-                                         String expectedClaimantCustomText,
-                                         Boolean emailSentToRespondent,
-                                         String expectedRespondentCustomText) {
+                                         String expectedClaimantCustomText) {
         caseData.setEthosCaseReference(CASE_NUMBER);
         createClaimant(caseData);
-        createRespondent(caseData);
-
         caseData.setTseAdmReplySelectPartyNotify(admReplySelectPartyNotify);
         caseData.setTseAdmReplyRequestIsResponseRequired(admReplyIsResponseRequired);
         caseData.setTseAdmReplyRequestSelectPartyRespond(admReplySelectPartyRespond);
-
-        Map<String, String> expectedPersonalisationClaimant =
-            createPersonalisation(caseData, expectedClaimantCustomText);
-        Map<String, String> expectedPersonalisationRespondent =
-            createPersonalisation(caseData, expectedRespondentCustomText);
-
-        tseAdmReplyService.sendAdmReplyEmails(CASE_ID, caseData);
+        setDocCollection(caseData);
+        Map<String, Object> resultMap = tseAdmReplyService.sendNotifyEmailsToClaimant(CASE_ID, caseData, AUTH_TOKEN);
 
         if (emailSentToClaimant) {
-            verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
+            verify(emailService, times(1)).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, resultMap);
         } else {
-            verify(emailService, never()).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
+            verify(emailService, never()).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL,
+                    resultMap);
         }
+    }
 
-        if (emailSentToRespondent) {
-            verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisationRespondent);
-        } else {
-            verify(emailService, never()).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisationRespondent);
-        }
+    private void setDocCollection(CaseData caseData) {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentUrl("test url");
+        uploadedDocumentType.setDocumentFilename("test file name");
+        uploadedDocumentType.setDocumentBinaryUrl("test binary url");
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(uploadedDocumentType);
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(documentType);
+        caseData.setDocumentCollection(List.of(documentTypeItem));
     }
 
     private static Stream<Arguments> sendEmails() {
         return Stream.of(
             Arguments.of(BOTH_PARTIES, "Yes", BOTH_PARTIES,
-                true, RESPONSE_REQUIRED, true, RESPONSE_REQUIRED),
+                true, RESPONSE_REQUIRED),
             Arguments.of(BOTH_PARTIES, "Yes", CLAIMANT_TITLE,
-                true, RESPONSE_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+                true, RESPONSE_REQUIRED),
             Arguments.of(BOTH_PARTIES, "Yes", RESPONDENT_TITLE,
-                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_REQUIRED),
+                true, RESPONSE_NOT_REQUIRED),
 
             Arguments.of(BOTH_PARTIES, "No", BOTH_PARTIES,
-                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+                true, RESPONSE_NOT_REQUIRED),
             Arguments.of(BOTH_PARTIES, "No", CLAIMANT_TITLE,
-                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+                true, RESPONSE_NOT_REQUIRED),
             Arguments.of(BOTH_PARTIES, "No", RESPONDENT_TITLE,
-                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+                true, RESPONSE_NOT_REQUIRED),
 
             Arguments.of(CLAIMANT_ONLY, "Yes", BOTH_PARTIES,
-                true, RESPONSE_REQUIRED, false, "never sent"),
+                true, RESPONSE_REQUIRED),
             Arguments.of(CLAIMANT_ONLY, "Yes", CLAIMANT_TITLE,
-                true, RESPONSE_REQUIRED, false, "never sent"),
+                true, RESPONSE_REQUIRED),
             Arguments.of(CLAIMANT_ONLY, "Yes", RESPONDENT_TITLE,
-                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+                true, RESPONSE_NOT_REQUIRED),
 
             Arguments.of(CLAIMANT_ONLY, "No", BOTH_PARTIES,
-                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+                true, RESPONSE_NOT_REQUIRED),
             Arguments.of(CLAIMANT_ONLY, "No", CLAIMANT_TITLE,
-                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+                true, RESPONSE_NOT_REQUIRED),
             Arguments.of(CLAIMANT_ONLY, "No", RESPONDENT_TITLE,
-                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+                true, RESPONSE_NOT_REQUIRED),
 
             Arguments.of(RESPONDENT_ONLY, "Yes", BOTH_PARTIES,
-                false, "never sent", true, RESPONSE_REQUIRED),
+                false, "never sent"),
             Arguments.of(RESPONDENT_ONLY, "Yes", CLAIMANT_TITLE,
-                false, "never sent", true, RESPONSE_NOT_REQUIRED),
+                false, "never sent"),
             Arguments.of(RESPONDENT_ONLY, "Yes", RESPONDENT_TITLE,
-                false, "never sent", true, RESPONSE_REQUIRED),
+                false, "never sent"),
 
             Arguments.of(RESPONDENT_ONLY, "No", BOTH_PARTIES,
-                false, "never sent", true, RESPONSE_NOT_REQUIRED),
+                false, "never sent"),
             Arguments.of(RESPONDENT_ONLY, "No", CLAIMANT_TITLE,
-                false, "never sent", true, RESPONSE_NOT_REQUIRED),
+                false, "never sent"),
             Arguments.of(RESPONDENT_ONLY, "No", RESPONDENT_TITLE,
-                false, "never sent", true, RESPONSE_NOT_REQUIRED)
+                false, "never sent")
         );
-    }
-
-    private Map<String, String> createPersonalisation(CaseData caseData,
-                                                      String expectedCustomText) {
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("linkToCitizenHub", "citizenUrlsomeCaseId");
-        personalisation.put("linkToExUI", "exuiUrlsomeCaseId");
-        if (expectedCustomText != null) {
-            personalisation.put("customisedText", expectedCustomText);
-        }
-        return personalisation;
     }
 
     @Test
@@ -571,13 +578,93 @@ class TseAdmReplyServiceTest {
         caseData.setClaimantType(claimantType);
     }
 
-    private void createRespondent(CaseData caseData) {
+    @Test
+    void sendNotifyEmailsToRespondents_selectPartyNotifyClaimantOnly_noEmailSent() {
+        caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails, "testToken");
+
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendEmailsToRespondents")
+    void sendNotifyEmailsToRespondents_sendEmailToRespondents(String admReplyIsCmoOrRequest,
+                                                              String admReplyCmoIsResponseRequired,
+                                                              String admReplyCmoSelectPartyRespond,
+                                                              String expectedCustomText) {
+        // Given that there are two respondents in the case, one has a Representative assigned and one does not.
+        setRespondents();
+        setRepresentative();
+
+        caseData.setEthosCaseReference(CASE_NUMBER);
+        caseData.setTseAdmReplyIsCmoOrRequest(admReplyIsCmoOrRequest);
+        caseData.setTseAdmReplyCmoIsResponseRequired(admReplyCmoIsResponseRequired);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(admReplyCmoSelectPartyRespond);
+        setDocCollection(caseData);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+        Map<String, Object> resultMap = tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails, AUTH_TOKEN);
+
+        // Email will be sent to the Representative if it exists,
+        // if not then email will be sent to the Respondent instead.
+        verify(emailService).sendEmail(TEMPLATE_ID, "rep@test.com", resultMap);
+        verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, resultMap);
+    }
+
+    @Test
+    void addTseAdmReplyPdfToDocCollection_addsPdfFile() {
+        caseData.setEthosCaseReference(CASE_NUMBER);
+        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+        caseData.setTseAdmReplyCmoIsResponseRequired("Yes");
+        caseData.setTseAdmReplyCmoSelectPartyRespond("Both");
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, "test token");
+
+        assertThat(caseData.getDocumentCollection()).isNotNull();
+    }
+
+    private static Stream<Arguments> sendEmailsToRespondents() {
+        return Stream.of(
+                Arguments.of(CASE_MANAGEMENT_ORDER, YES, RESPONDENT_TITLE, RESPONSE_REQUIRED),
+                Arguments.of(CASE_MANAGEMENT_ORDER, YES, BOTH_PARTIES, RESPONSE_REQUIRED),
+                Arguments.of(CASE_MANAGEMENT_ORDER, YES, CLAIMANT_TITLE, RESPONSE_NOT_REQUIRED),
+                Arguments.of(CASE_MANAGEMENT_ORDER, NO, RESPONDENT_TITLE, RESPONSE_NOT_REQUIRED)
+
+        );
+    }
+
+    private void setRepresentative() {
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setValue(RepresentedTypeR.builder()
+                .respRepName(RESPONDENT_1)
+                .representativeEmailAddress(REP_EMAIL)
+                .build());
+
+        caseData.setRepCollection(List.of(representedTypeRItem));
+    }
+
+    private void setRespondents() {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
+        respondentSumType.setRespondentName(RESPONDENT_1);
+
+        RespondentSumType respondentSumType2 = new RespondentSumType();
+        respondentSumType2.setRespondentEmail(RESPONDENT_EMAIL);
+        respondentSumType2.setRespondentName(RESPONDENT_2);
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
 
-        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
+        RespondentSumTypeItem respondentSumTypeItem2 = new RespondentSumTypeItem();
+        respondentSumTypeItem2.setValue(respondentSumType2);
+
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem, respondentSumTypeItem2));
     }
 }

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
@@ -41,15 +40,15 @@ public class BulkCreationService {
     private final CcdClient ccdClient;
     private final BulkSearchService bulkSearchService;
     private final CreateUpdatesBusSender createUpdatesBusSender;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
 
     @Autowired
     public BulkCreationService(CcdClient ccdClient, BulkSearchService bulkSearchService,
-                               CreateUpdatesBusSender createUpdatesBusSender, UserService userService) {
+                               CreateUpdatesBusSender createUpdatesBusSender, UserIdamService userIdamService) {
         this.ccdClient = ccdClient;
         this.bulkSearchService = bulkSearchService;
         this.createUpdatesBusSender = createUpdatesBusSender;
-        this.userService = userService;
+        this.userIdamService = userIdamService;
     }
 
     public BulkRequestPayload bulkCreationLogic(BulkDetails bulkDetails, BulkCasesPayload bulkCasesPayload,
@@ -83,7 +82,7 @@ public class BulkCreationService {
                 log.info("ETHOS CASE REF COLLECTION: " + ethosCaseRefCollection);
                 if (!ethosCaseRefCollection.isEmpty()) {
 
-                    String username = userService.getUserDetails(userToken).getEmail();
+                    String username = userIdamService.getUserDetails(userToken).getEmail();
                     PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
                             username,
                             ethosCaseRefCollection,
@@ -143,7 +142,7 @@ public class BulkCreationService {
         List<String> multipleCaseIds = BulkHelper.getMultipleCaseIds(bulkDetails);
         try {
             List<String> unionLists = Stream.concat(caseIds.stream(), multipleCaseIds.stream())
-                    .distinct().collect(Collectors.toList());
+                    .distinct().toList();
             bulkCasesPayload = bulkSearchService.filterSubmitEventsElasticSearch(
                     ccdClient.retrieveCasesElasticSearch(authToken,
                             UtilHelper.getCaseTypeId(bulkDetails.getCaseTypeId()), unionLists),
@@ -211,7 +210,7 @@ public class BulkCreationService {
         if (isPersistentQ) {
 
             String updateSize = String.valueOf(detachCasesList.size() + attachCasesList.size());
-            String username = userService.getUserDetails(authToken).getEmail();
+            String username = userIdamService.getUserDetails(authToken).getEmail();
 
             PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
                     username,

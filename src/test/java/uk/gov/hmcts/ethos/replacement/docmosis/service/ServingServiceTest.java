@@ -14,7 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.nio.file.Files;
@@ -47,7 +47,7 @@ class ServingServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        emailService = spy(new TestEmailService());
+        emailService = spy(new EmailUtils());
         caseDetails = generateCaseDetails();
         servingService = new ServingService(emailService);
         notifyCaseDetails = CaseDataBuilder.builder()

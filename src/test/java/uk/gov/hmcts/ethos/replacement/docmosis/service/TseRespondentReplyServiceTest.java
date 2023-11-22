@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
@@ -22,11 +23,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -61,6 +63,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
@@ -71,11 +74,17 @@ class TseRespondentReplyServiceTest {
     @MockBean
     private TornadoService tornadoService;
     @MockBean
-    private UserService userService;
+    private UserIdamService userIdamService;
     @MockBean
     private TseService tseService;
     @MockBean
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @MockBean
+    private TseRespondentReplyService tseRespondentReplyService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
@@ -88,7 +97,6 @@ class TseRespondentReplyServiceTest {
     private static final String WITHDRAW_MY_CLAIM = "Withdraw my claim";
 
     private EmailService emailService;
-    private TseRespondentReplyService tseRespondentReplyService;
     private UserDetails userDetails;
     private CaseData caseData;
     private MockedStatic<TseHelper> mockStatic;
@@ -96,17 +104,17 @@ class TseRespondentReplyServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        emailService = spy(new TestEmailService());
-        tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userService,
-                respondentTellSomethingElseService, tseService);
+        emailService = spy(new EmailUtils());
+        tseRespondentReplyService = new TseRespondentReplyService(tornadoService, emailService, userIdamService,
+                respondentTellSomethingElseService, tseService, documentManagementService, featureToggleService);
 
         userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         doNothing().when(emailService).sendEmail(any(), any(), any());
 
         mockStatic = mockStatic(TseHelper.class, Mockito.CALLS_REAL_METHODS);
-        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any()))
+        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), anyBoolean()))
                 .thenReturn(Collections.emptyMap());
         mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any()))
                 .thenReturn(Collections.emptyMap());
@@ -219,6 +227,8 @@ class TseRespondentReplyServiceTest {
     void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant,
                                            String ackEmailTemplate) {
         caseData.setTseResponseCopyToOtherParty(rule92);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
@@ -247,6 +257,19 @@ class TseRespondentReplyServiceTest {
         );
     }
 
+    @Test
+    void addTseRespondentReplyPdfToDocCollection() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseDetails, "testUserToken");
+
+        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument(),
+                is("Respondent correspondence"));
+    }
+
     @ParameterizedTest
     @MethodSource
     void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant,
@@ -264,7 +287,7 @@ class TseRespondentReplyServiceTest {
         ReflectionTestUtils.setField(tseRespondentReplyService,
                 "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
 
-        Map<String, String> tribunlPersonalisation = Map.of(
+        Map<String, String> tribunalPersonalisation = Map.of(
                 NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
                 APPLICATION_TYPE, WITHDRAW_MY_CLAIM,
                 LINK_TO_EXUI, TEST_XUI_URL + "caseId");
@@ -274,13 +297,11 @@ class TseRespondentReplyServiceTest {
                 LINK_TO_CITIZEN_HUB, TEST_CUI_URL + "caseId");
 
         tseRespondentReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
-
-        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunlPersonalisation));
+        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
         verify(emailService, isEmailSentToClaimant)
                 .sendEmail(any(),
                         eq(caseData.getClaimantType().getClaimantEmailAddress()),
                         eq(claimantPersonalisation));
-
         verify(emailService)
                 .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }

@@ -13,9 +13,11 @@ import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationDocument;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
@@ -56,7 +58,7 @@ public final class InitialConsiderationHelper {
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
                 .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
-                .canProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
+                .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
                 .hearingListed(Optional.ofNullable(caseData.getEtICHearingListed()).orElse(null))
                 .hearingPostpone(defaultIfEmpty(caseData.getEtICPostponeGiveDetails(), null))

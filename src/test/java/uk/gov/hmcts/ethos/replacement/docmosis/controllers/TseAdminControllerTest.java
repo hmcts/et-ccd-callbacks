@@ -13,6 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmCloseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -26,7 +28,9 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,8 +56,14 @@ class TseAdminControllerTest {
 
     @MockBean
     private TseAdminService tseAdminService;
+
     @MockBean
     private TseAdmCloseService tseAdmCloseService;
+
+    @MockBean
+    private CaseFlagsService caseFlagsService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -63,6 +73,7 @@ class TseAdminControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("1234")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
@@ -169,11 +180,12 @@ class TseAdminControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseAdminService).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService).sendRecordADecisionEmails(
+        verify(tseAdminService).sendEmailToClaimant(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService).clearTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
+        verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
     }
 
     @Test
@@ -186,7 +198,7 @@ class TseAdminControllerTest {
             .andExpect(status().isForbidden());
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(
+        verify(tseAdminService, never()).sendEmailToClaimant(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
@@ -202,7 +214,7 @@ class TseAdminControllerTest {
             .andExpect(status().isBadRequest());
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(
+        verify(tseAdminService, never()).sendEmailToClaimant(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(

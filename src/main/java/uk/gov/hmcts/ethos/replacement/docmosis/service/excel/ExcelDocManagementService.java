@@ -16,7 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +44,7 @@ public class ExcelDocManagementService {
 
     private final DocumentManagementService documentManagementService;
     private final ExcelCreationService excelCreationService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final ScheduleCreationService scheduleCreationService;
 
     public void uploadExcelDocument(String userToken, MultipleDetails multipleDetails, byte[] excelBytes) {
@@ -107,7 +107,7 @@ public class ExcelDocManagementService {
 
         CaseImporterFile caseImporterFile = new CaseImporterFile();
         LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
-        UserDetails userDetails = userService.getUserDetails(userToken);
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
 
         caseImporterFile.setUploadedDocument(uploadedDocumentType);
         caseImporterFile.setUploadedDateTime(dateTime.format(DATE_TIME_USER_FRIENDLY_PATTERN));

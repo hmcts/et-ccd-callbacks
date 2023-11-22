@@ -244,9 +244,9 @@ public final class BulkHelper {
         CaseData caseData = submitEvent.getCaseData();
         MultipleType multipleType = getMultipleTypeFromCaseData(caseData);
         multipleType.setCaseIDM(String.valueOf(submitEvent.getCaseId()));
-        multipleType.setMultipleReferenceM(!isNullOrEmpty(
-                caseData.getMultipleReference()) ? caseData.getMultipleReference() : " ");
-        multipleType.setStateM(!isNullOrEmpty(submitEvent.getState()) ? submitEvent.getState() : " ");
+        multipleType.setMultipleReferenceM(isNullOrEmpty(
+                caseData.getMultipleReference()) ? " " : caseData.getMultipleReference());
+        multipleType.setStateM(isNullOrEmpty(submitEvent.getState()) ? " " : submitEvent.getState());
         return multipleType;
     }
 
@@ -369,19 +369,13 @@ public final class BulkHelper {
     public static StringBuilder buildScheduleDocumentContent(BulkData bulkData, String accessKey) {
         StringBuilder sb = new StringBuilder();
         // Start building the instruction
-        sb.append("{\n");
-        sb.append("\"accessKey\":\"").append(accessKey).append(NEW_LINE);
-        sb.append("\"templateName\":\"").append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName()))
-                .append(FILE_EXTENSION).append(NEW_LINE);
-        sb.append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE);
-        // Building the document data
-        sb.append("\"data\":{\n");
-        sb.append("\"Multiple_No\":\"").append(bulkData.getMultipleReference()).append(NEW_LINE);
-        sb.append("\"Multiple_title\":\"").append(bulkData.getBulkCaseTitle()).append(NEW_LINE);
-        sb.append(getDocumentData(bulkData));
-        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n");
-        sb.append("}\n");
-        sb.append("}\n");
+        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
+                .append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName())).append(FILE_EXTENSION)
+                .append(NEW_LINE).append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE)
+                .append("\"data\":{\n").append("\"Multiple_No\":\"").append(bulkData.getMultipleReference())
+                .append(NEW_LINE).append("\"Multiple_title\":\"").append(bulkData.getBulkCaseTitle()).append(NEW_LINE)
+                .append(getDocumentData(bulkData)).append("\"Today_date\":\"")
+                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n").append("}\n").append("}\n");
         return sb;
     }
 
@@ -411,24 +405,18 @@ public final class BulkHelper {
 
     private static StringBuilder getMultipleTypeRow(SearchType searchType) {
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"Claimant\":\"").append(
-                nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE);
-        sb.append("\"Current_position\":\"").append(
-                nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE);
-        sb.append("\"Case_No\":\"").append(
-                nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE);
-        sb.append("\"claimant_full_name\":\"").append(
-                nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE);
-        sb.append("\"claimant_addressLine1\":\"").append(
-                nullCheck(searchType.getClaimantAddressLine1S())).append(NEW_LINE);
-        sb.append("\"claimant_postCode\":\"").append(
-                nullCheck(searchType.getClaimantPostCodeS())).append(NEW_LINE);
-        sb.append("\"respondent_full_name\":\"").append(
-                nullCheck(searchType.getRespondentSurnameS())).append(NEW_LINE);
-        sb.append("\"respondent_addressLine1\":\"").append(
-                nullCheck(searchType.getRespondentAddressLine1S())).append(NEW_LINE);
-        sb.append("\"respondent_postCode\":\"").append(
-                nullCheck(searchType.getRespondentPostCodeS())).append("\"}");
+        sb.append("{\"Claimant\":\"").append(nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
+                .append("\"Current_position\":\"").append(nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE)
+                .append("\"Case_No\":\"").append(nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE)
+                .append("\"claimant_full_name\":\"").append(nullCheck(searchType.getClaimantSurnameS()))
+                .append(NEW_LINE).append("\"claimant_addressLine1\":\"")
+                .append(nullCheck(searchType.getClaimantAddressLine1S())).append(NEW_LINE)
+                .append("\"claimant_postCode\":\"").append(nullCheck(searchType.getClaimantPostCodeS()))
+                .append(NEW_LINE).append("\"respondent_full_name\":\"")
+                .append(nullCheck(searchType.getRespondentSurnameS())).append(NEW_LINE)
+                .append("\"respondent_addressLine1\":\"").append(nullCheck(searchType.getRespondentAddressLine1S()))
+                .append(NEW_LINE).append("\"respondent_postCode\":\"")
+                .append(nullCheck(searchType.getRespondentPostCodeS())).append("\"}");
         return sb;
     }
 
@@ -440,10 +428,10 @@ public final class BulkHelper {
             Iterator<Map.Entry<String, List<SearchType>>> entries = new TreeMap<>(multipleMap).entrySet().iterator();
             while (entries.hasNext()) {
                 Map.Entry<String, List<SearchType>> subMultipleEntry = entries.next();
-                sb.append("{\"SubMultiple_No\":\"").append(subMultipleEntry.getKey()).append(NEW_LINE);
-                sb.append("\"SubMultiple_title\":\"").append(getSubMultipleTitle(subMultipleEntry.getKey(), bulkData))
-                        .append(NEW_LINE);
-                sb.append("\"multiple\":[\n");
+                sb.append("{\"SubMultiple_No\":\"").append(subMultipleEntry.getKey()).append(NEW_LINE)
+                        .append("\"SubMultiple_title\":\"")
+                        .append(getSubMultipleTitle(subMultipleEntry.getKey(), bulkData)).append(NEW_LINE)
+                        .append("\"multiple\":[\n");
                 for (int i = 0; i < subMultipleEntry.getValue().size(); i++) {
                     sb.append(getMultipleTypeRow(subMultipleEntry.getValue().get(i)));
                     if (i != subMultipleEntry.getValue().size() - 1) {

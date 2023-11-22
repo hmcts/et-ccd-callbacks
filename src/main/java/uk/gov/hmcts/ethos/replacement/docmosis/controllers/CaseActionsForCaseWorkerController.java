@@ -30,10 +30,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepos
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -42,6 +45,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -101,6 +105,9 @@ public class CaseActionsForCaseWorkerController {
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsService caseFlagsService;
+    private final CaseManagementLocationCodeService caseManagementLocationCodeService;
 
     private final NocRespondentHelper nocRespondentHelper;
 
@@ -263,6 +270,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
 
         if (errors.isEmpty()) {
+            defaultValuesReaderService.setSubmissionReference(ccdRequest.getCaseDetails());
             DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
@@ -275,12 +283,48 @@ public class CaseActionsForCaseWorkerController {
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
 
+            boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
+            log.info("Caseflags feature flag is {}", caseFlagsToggle);
+            if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+                caseFlagsService.setupCaseFlags(caseData);
+            }
+
+            boolean hmcToggle = featureToggleService.isHmcEnabled();
+            log.info("HMC feature flag is {}", hmcToggle);
+            if (hmcToggle) {
+                caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+                caseManagementLocationCodeService.setCaseManagementLocationCode(caseData);
+            }
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
 
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add HMCTSServiceId to supplementary_data on a case.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> addServiceId(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) throws IOException {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/initialiseAmendCaseDetails", consumes = APPLICATION_JSON_VALUE)
@@ -385,7 +429,14 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+        if (featureToggleService.isGlobalSearchEnabled()) {
+            caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
+        }
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
+
+        if (featureToggleService.isHmcEnabled()) {
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -415,6 +466,9 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             errors = eventValidationService.validateET3ResponseFields(caseData);
             if (errors.isEmpty()) {
+                errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "respondent");
+            }
+            if (errors.isEmpty()) {
                 caseManagementForCaseWorkerService.continuingRespondent(ccdRequest);
                 caseManagementForCaseWorkerService.struckOutRespondents(ccdRequest);
             }
@@ -428,6 +482,13 @@ public class CaseActionsForCaseWorkerController {
                 nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
             }
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+        }
+        if (featureToggleService.isGlobalSearchEnabled()) {
+            caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
+        }
+
+        if (featureToggleService.isHmcEnabled()) {
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
@@ -461,9 +522,13 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             // add org policy and NOC elements
-            caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
+            nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+
+            if (featureToggleService.isHmcEnabled()) {
+                nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+            }
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
@@ -561,7 +626,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        HearingsHelper.updatePostponedDate(caseData);
+        Helper.updatePostponedDate(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -589,6 +654,11 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         eventValidationService.validateRestrictedReportingNames(caseData);
+
+        if (featureToggleService.isHmcEnabled()) {
+            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
+            caseFlagsService.setPrivateHearingFlag(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

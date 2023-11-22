@@ -25,7 +25,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -34,6 +36,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -119,6 +122,8 @@ class CaseActionsForCaseWorkerControllerTest {
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
     private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
             "/reinstateClosedCaseMidEventValidation";
+
+    private static final String ADD_SERVICE_ID_URL = "/addServiceId";
     private static final String AUTHORIZATION = "Authorization";
 
     @Autowired
@@ -184,8 +189,15 @@ class CaseActionsForCaseWorkerControllerTest {
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @MockBean
-    private NocRespondentHelper nocRespondentHelper;
+    private CaseFlagsService caseFlagsService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private NocRespondentHelper nocRespondentHelper;
+    @MockBean
+    private CaseManagementLocationCodeService caseManagementLocationCodeService;
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent2;
@@ -214,6 +226,7 @@ class CaseActionsForCaseWorkerControllerTest {
     @BeforeEach
     public void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
         doRequestSetUp();
         submitEvent = new SubmitEvent();
@@ -440,6 +453,8 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(nocRespondentRepresentativeService, times(1)).updateNonMyHmctsOrgIds(any());
     }
 
     @Test
@@ -479,6 +494,7 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
     }
 
     @Test
@@ -1649,5 +1665,58 @@ class CaseActionsForCaseWorkerControllerTest {
 
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
+    }
+
+    @Test
+    void addServiceIdUrl_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(ADD_SERVICE_ID_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(caseManagementForCaseWorkerService, times(1))
+                .setHmctsServiceIdSupplementary(any());
+    }
+
+    @Test
+    void addServiceIdUrl_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(ADD_SERVICE_ID_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void addServiceIdUrl_badRequest() throws Exception {
+        mvc.perform(post(ADD_SERVICE_ID_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void setPostDefaultValuesAddsCaseManagementLocationCode() throws Exception {
+        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(caseManagementLocationCodeService, times(1))
+                .setCaseManagementLocationCode(any());
     }
 }

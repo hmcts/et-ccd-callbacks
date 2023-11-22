@@ -111,7 +111,8 @@ class ReferralHelperTest {
 
     private final String expectedCreatedReferralReply = "ReferralReplyType(directionTo=directionTo, replyToEmailAddre"
         + "ss=replyTo, isUrgentReply=isUrgent, directionDetails=directionDetails, replyDocument=null, replyGeneralNot"
-        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ")";
+        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate()
+        + ", replyDateTime=null, referralSubject=null)";
 
     @BeforeEach
     void setUp() {
@@ -130,7 +131,7 @@ class ReferralHelperTest {
             .build();
 
         assertThat(ReferralHelper.populateHearingDetails(caseData))
-            .isEqualTo(expectedSingleHearingDetails);
+                .isEqualTo(expectedSingleHearingDetails);
     }
 
     @Test
@@ -167,10 +168,12 @@ class ReferralHelperTest {
                 + "referralSubjectSpecify=Custom subject line, referralDetails=This is an explanation, "
                 + "referralDocument=[GenericTypeItem(id=1, value=DocumentType(typeOfDocument=null, "
                 + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
-                + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
+                + "documentFilename=testFileName, documentUrl=null, categoryId=null, uploadTimestamp=null), "
+                + "ownerDocument=null, creationDate=null, "
                 + "shortDescription=null)), GenericTypeItem(id=2, value=DocumentType(typeOfDocument=null, "
                 + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
-                + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
+                + "documentFilename=testFileName, documentUrl=null, categoryId=null, uploadTimestamp=null), "
+                + "ownerDocument=null, creationDate=null, "
                 + "shortDescription=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
                 + "closeReferralGeneralNotes=null, referralReplyCollection=null, updateReferralCollection=null,"
@@ -239,7 +242,7 @@ class ReferralHelperTest {
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
         assertEquals(expectedHearingReferralDetailsSingleReply,
-            ReferralHelper.populateHearingReferralDetails(caseData));
+                ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
@@ -247,7 +250,7 @@ class ReferralHelperTest {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1"),
-            createReferralReplyTypeItem("2")));
+                createReferralReplyTypeItem("2")));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
@@ -256,7 +259,7 @@ class ReferralHelperTest {
         caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
 
         assertEquals(expectedHearingReferralDetailsMultipleReplies,
-            ReferralHelper.populateHearingReferralDetails(caseData));
+                ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
@@ -351,7 +354,7 @@ class ReferralHelperTest {
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
         assertEquals(expectedHearingReferralDetailsSingleReply.replace(singleHearingDetailsNullDoc, ""),
-            ReferralHelper.populateHearingReferralDetails(caseData));
+                ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
@@ -381,8 +384,8 @@ class ReferralHelperTest {
         ReferralHelper.createReferralReply(caseData, "Judge Alex");
 
         assertEquals(expectedCreatedReferralReply,
-            caseData.getReferralCollection().get(0).getValue()
-                .getReferralReplyCollection().get(0).getValue().toString());
+                caseData.getReferralCollection().get(0).getValue()
+                        .getReferralReplyCollection().get(0).getValue().toString());
     }
 
     @Test
@@ -393,7 +396,7 @@ class ReferralHelperTest {
         caseData.setCloseReferralGeneralNotes("generalNotes");
 
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
-        
+
         assertNull(caseData.getSelectReferral());
         assertNull(caseData.getCloseReferralHearingDetails());
         assertNull(caseData.getConfirmCloseReferral());
@@ -437,7 +440,7 @@ class ReferralHelperTest {
         caseDetails.setCaseData(caseData);
 
         Map<String, String> actual = ReferralHelper.buildPersonalisation(
-            caseDetails.getCaseData(), "1", true, "First Last", "linkToExui"
+                caseDetails.getCaseData(), "1", true, "First Last", "linkToExui"
         );
 
         assertEquals(getExpectedPersonalisation(), actual);
@@ -456,10 +459,12 @@ class ReferralHelperTest {
             + "\"referralSubject\":null,\"referralDetails\":null,"
             + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}},{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"referralInstruction\":null,"
             + "\"referralReplyCollection\":null}}";
 
@@ -469,7 +474,7 @@ class ReferralHelperTest {
 
     @Test
     void documentRequestExistingReferral() throws JsonProcessingException {
-        ReferralType referralType =  createReferralTypeItem().getValue();
+        ReferralType referralType = createReferralTypeItem().getValue();
         referralType.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setValue(referralType);
@@ -491,9 +496,10 @@ class ReferralHelperTest {
             + "\"replyToEmailAddress\":\"replyToEmail\",\"isUrgentReply\":\"isUrgent\","
             + "\"directionDetails\":\"details\",\"replyDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
-            + "\"replyBy\",\"replyDate\":\"replyDate\"}}]}}";
+            + "\"replyBy\",\"replyDate\":\"replyDate\",\"replyDateTime\":null,\"referralSubject\":null}}]}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);
@@ -537,7 +543,7 @@ class ReferralHelperTest {
 
         return respondentSumTypeItem;
     }
-    
+
     private void setReferralReplyData() {
         caseData.setHearingAndReferralDetails("hearingDetails");
         caseData.setDirectionTo("directionTo");

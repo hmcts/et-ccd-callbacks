@@ -24,14 +24,14 @@ public final class DynamicLetters {
         if (CollectionUtils.isNotEmpty(listItems)) {
             DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
-            if (!caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
-                CorrespondenceType correspondenceType = new CorrespondenceType();
-                correspondenceType.setDynamicHearingNumber(dynamicFixedListType);
-                caseData.setCorrespondenceType(correspondenceType);
-            } else {
+            if (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
                 CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
                 correspondenceScotType.setDynamicHearingNumber(dynamicFixedListType);
                 caseData.setCorrespondenceScotType(correspondenceScotType);
+            } else {
+                CorrespondenceType correspondenceType = new CorrespondenceType();
+                correspondenceType.setDynamicHearingNumber(dynamicFixedListType);
+                caseData.setCorrespondenceType(correspondenceType);
             }
         }
     }
@@ -41,14 +41,14 @@ public final class DynamicLetters {
         if (CollectionUtils.isNotEmpty(listItems)) {
             DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
-            if (!caseTypeId.equals(SCOTLAND_BULK_CASE_TYPE_ID)) {
-                CorrespondenceType correspondenceType = new CorrespondenceType();
-                correspondenceType.setDynamicHearingNumber(dynamicFixedListType);
-                multipleData.setCorrespondenceType(correspondenceType);
-            } else {
+            if (caseTypeId.equals(SCOTLAND_BULK_CASE_TYPE_ID)) {
                 CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
                 correspondenceScotType.setDynamicHearingNumber(dynamicFixedListType);
                 multipleData.setCorrespondenceScotType(correspondenceScotType);
+            } else {
+                CorrespondenceType correspondenceType = new CorrespondenceType();
+                correspondenceType.setDynamicHearingNumber(dynamicFixedListType);
+                multipleData.setCorrespondenceType(correspondenceType);
             }
         }
     }

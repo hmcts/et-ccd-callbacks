@@ -76,7 +76,6 @@ public final class Et3ResponseHelper {
     public static List<String> validateEmploymentDates(CaseData caseData) {
         ArrayList<String> errors = new ArrayList<>();
         String startDateStr = caseData.getEt3ResponseEmploymentStartDate();
-        String endDateStr = caseData.getEt3ResponseEmploymentEndDate();
 
         if (isNullOrEmpty(startDateStr)) {
             return errors;
@@ -87,6 +86,8 @@ public final class Et3ResponseHelper {
         if (startDate.isAfter(LocalDate.now())) {
             errors.add(START_DATE_MUST_BE_IN_THE_PAST);
         }
+
+        String endDateStr = caseData.getEt3ResponseEmploymentEndDate();
 
         if (isNullOrEmpty(endDateStr)) {
             return errors;

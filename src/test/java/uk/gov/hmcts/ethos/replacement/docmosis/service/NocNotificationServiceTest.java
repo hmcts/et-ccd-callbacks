@@ -137,6 +137,7 @@ class NocNotificationServiceTest {
         respondentSumType.setRespondentName("Respondent");
         respondentSumType.setRespondentEmail("res@rep.com");
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
+        when(emailService.getCitizenCaseLink(any())).thenReturn("http://domain/citizen-hub/1234");
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,

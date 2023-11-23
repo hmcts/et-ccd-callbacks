@@ -77,7 +77,7 @@ class ReferralHelperTest {
         + "9&#09&#09&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<b"
         + "r><br>Referral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 "
         + "%s"
-        +"<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &nbsp;"
+        + "<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &nbsp;"
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09"
         + "&#09 details<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>"
         + "testFileName</a>&nbsp;<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
@@ -239,7 +239,7 @@ class ReferralHelperTest {
         String replyDateTime = Helper.getCurrentDateTime();
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
-        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1",replyDate,replyDateTime)));
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
@@ -247,7 +247,7 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
-        assertEquals(String.format(expectedHearingReferralDetailsSingleReply,replyDate),
+        assertEquals(String.format(expectedHearingReferralDetailsSingleReply, replyDate),
                 ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
@@ -258,8 +258,8 @@ class ReferralHelperTest {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(
-                createReferralReplyTypeItem("1",replyDate,replyDateTime),
-                createReferralReplyTypeItem("2",replyDate,replyDateTime)));
+                createReferralReplyTypeItem("1", replyDate, replyDateTime),
+                createReferralReplyTypeItem("2", replyDate, replyDateTime)));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
@@ -267,7 +267,7 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
 
-        assertEquals(String.format(expectedHearingReferralDetailsMultipleReplies,replyDate,replyDate),
+        assertEquals(String.format(expectedHearingReferralDetailsMultipleReplies, replyDate, replyDate),
                 ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
@@ -357,14 +357,14 @@ class ReferralHelperTest {
         String replyDateTime = Helper.getCurrentDateTime();
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
-        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1",replyDate,replyDateTime)));
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
-        assertEquals(String.format(expectedHearingReferralDetailsSingleReply,replyDate)
+        assertEquals(String.format(expectedHearingReferralDetailsSingleReply, replyDate)
                         .replace(singleHearingDetailsNullDoc, ""),
                 ReferralHelper.populateHearingReferralDetails(caseData));
     }
@@ -505,7 +505,7 @@ class ReferralHelperTest {
         String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
 
-        referralType.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1",replyDate,replyDateTime)));
+        referralType.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setValue(referralType);
         caseData.setReferralCollection(List.of(referralTypeItem));

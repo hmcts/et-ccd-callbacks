@@ -233,14 +233,13 @@ class TseHelperTest {
         item.setId("78910");
         caseData.setTseResponseSupportingMaterial(List.of(item));
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
-        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "",
-                "testBinaryUrl");
+        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
             + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
             + "\"documentCollection\":[{\"id\":\"78910\","
             + "\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"image.png|testBinaryUrl/documents/1234/binary"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\":null},"
             + "\"ownerDocument\":null,"

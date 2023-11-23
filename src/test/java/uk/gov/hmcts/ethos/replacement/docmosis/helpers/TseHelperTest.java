@@ -239,7 +239,7 @@ class TseHelperTest {
             + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
             + "\"documentCollection\":[{\"id\":\"78910\","
             + "\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"image.png|testBinaryUrl/documents/1234/binary"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\":null},"
             + "\"ownerDocument\":null,"

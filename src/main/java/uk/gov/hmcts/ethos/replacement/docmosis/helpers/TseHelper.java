@@ -201,12 +201,11 @@ public final class TseHelper {
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
      */
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
-                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -266,8 +265,7 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
-                                                      String ccdGatewayBaseUrl) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
 
         return TseReplyData.builder()
             .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -276,18 +274,18 @@ public final class TseHelper {
             .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
             .response(defaultIfEmpty(application.getDetails(), null))
             .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-            .documentCollection(getUploadedDocList(caseData, ccdGatewayBaseUrl))
+            .documentCollection(getUploadedDocList(caseData))
             .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
             .build();
     }
 
     private static List<TypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
+
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return null;
         }
 
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial(),
-                ccdGatewayBaseUrl);
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
     private static String hasSupportingDocs(ListTypeItem<DocumentType> supportDocList) {

@@ -696,11 +696,11 @@ __metadata:
   linkType: hard
 
 "@types/archiver@npm:^6.0.0":
-  version: 6.0.1
-  resolution: "@types/archiver@npm:6.0.1"
+  version: 6.0.2
+  resolution: "@types/archiver@npm:6.0.2"
   dependencies:
     "@types/readdir-glob": "*"
-  checksum: 384d81ff7c78d289e410efee360adcfc2bf41a9f376637282d61e2ce3d73d8ecbe2b76250342ffe6aeac638350811fba28c4b6beb6e5ee179a52be433ebbe5fb
+  checksum: 4bef71e5b95863be9880339275ad92c2513dd78d56587653614dc5a74af1d078f5f5926ec996de06e7071a1003e0c2764d0e9d2bb0893a2ffb14ab1718eaf5ca
   languageName: node
   linkType: hard
 
@@ -799,12 +799,12 @@ __metadata:
   linkType: hard
 
 "@types/jest@npm:^29.0.0":
-  version: 29.5.8
-  resolution: "@types/jest@npm:29.5.8"
+  version: 29.5.10
+  resolution: "@types/jest@npm:29.5.10"
   dependencies:
     expect: ^29.0.0
     pretty-format: ^29.0.0
-  checksum: ca8438a5b4c098c8c023e9d5b279ea306494a1d0b5291cfb498100fa780377145f068b2a021d545b0398bbe0328dcc37044dd3aaf3c6c0fe9b0bef7b46a63453
+  checksum: ef385905787db528de9b6beb2688865c0bb276e64256ed60b9a1a6ffc0b75737456cb5e27e952a3241c5845b6a1da487470010dd30f3ca59c8581624c564a823
   languageName: node
   linkType: hard
 
@@ -4322,16 +4322,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:27.1.0":
-  version: 27.1.0
-  resolution: "electron@npm:27.1.0"
+"electron@npm:27.1.2":
+  version: 27.1.2
+  resolution: "electron@npm:27.1.2"
   dependencies:
     "@electron/get": ^2.0.0
     "@types/node": ^18.11.18
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 729b81bd302abda9694819310f74bcff04e7fb6a751c5f9db5a761d023fad071fb5770bdb928f6ce337f6723d3055e58c1f0c14170d3a1447411b0638375a256
+  checksum: 9d5f4583f00e6b0ccee4ef7c98f20765cb3528810906cb34c57b2a9e481307018662ed11f9ebe630b3e21e60327737ab484a68d08f52d4a790acc153e049be05
   languageName: node
   linkType: hard
 

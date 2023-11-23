@@ -76,7 +76,7 @@ public class CaseLinksEmailService {
         } else {
             ListTypeItem<CaseLink> diff = list2.stream()
                     .filter(element -> !list1.contains(element))
-                    .toList();
+                    .collect(Collectors.toCollection(ListTypeItem::new));
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(diff);
         }
         if (isLinkedForHearing) {

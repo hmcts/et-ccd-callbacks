@@ -13,7 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -59,10 +60,10 @@ class TseAdmReplyHelperTest {
             .withStatus(OPEN_STATE)
             .build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
-        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        genericTseApplicationTypeItem.setValue(build);
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        TypeItem<GenericTseApplicationType> genericTseApplicationType = new TypeItem<GenericTseApplicationType>();
+        genericTseApplicationType.setId(UUID.randomUUID().toString());
+        genericTseApplicationType.setValue(build);
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationType));
     }
 
     @Test

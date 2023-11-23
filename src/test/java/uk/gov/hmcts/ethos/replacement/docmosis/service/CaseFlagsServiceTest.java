@@ -7,9 +7,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -115,13 +114,14 @@ class CaseFlagsServiceTest {
 
     @Test
     void setPrivateHearingFlag_shouldBeTruthy_whenRestrictPublicityTseApplicationIsGranted() {
-        List<TseAdminRecordDecisionTypeItem> granted = List.of(TseAdminRecordDecisionTypeItem.builder()
+        ListTypeItem<TseAdminRecordDecisionType> granted = ListTypeItem
+                .from(TypeItem.<TseAdminRecordDecisionType>builder()
                 .value(TseAdminRecordDecisionType.builder()
                         .decision("Granted")
                         .build())
                 .build());
 
-        List<GenericTseApplicationTypeItem> build = List.of(GenericTseApplicationTypeItem.builder()
+        ListTypeItem<GenericTseApplicationType> build = ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .value(GenericTseApplicationType.builder()
                         .type(TSE_APP_RESTRICT_PUBLICITY)
                         .adminDecision(granted)
@@ -137,13 +137,14 @@ class CaseFlagsServiceTest {
 
     @Test
     void setPrivateHearingFlag_shouldBeFalsy_whenRestrictPublicityTseApplicationIsRejected() {
-        List<TseAdminRecordDecisionTypeItem> granted = List.of(TseAdminRecordDecisionTypeItem.builder()
+        ListTypeItem<TseAdminRecordDecisionType> granted = ListTypeItem
+                .from(TypeItem.<TseAdminRecordDecisionType>builder()
                 .value(TseAdminRecordDecisionType.builder()
                         .decision("Refused")
                         .build())
                 .build());
 
-        List<GenericTseApplicationTypeItem> build = List.of(GenericTseApplicationTypeItem.builder()
+        ListTypeItem<GenericTseApplicationType> build = ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .value(GenericTseApplicationType.builder()
                         .type(TSE_APP_RESTRICT_PUBLICITY)
                         .adminDecision(granted)

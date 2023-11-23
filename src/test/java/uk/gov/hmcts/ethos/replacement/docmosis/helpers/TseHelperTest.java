@@ -42,16 +42,13 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
 @ExtendWith(SpringExtension.class)
@@ -223,21 +220,20 @@ class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
 
-        caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondCollection(ListTypeItem.from(TypeItem.<TseRespondType>builder()
-                    .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
-                    .value(
-                        TseRespondType.builder()
-                            .from(CLAIMANT_TITLE)
-                            .date("16-May-1996")
-                            .response("response")
-                            .hasSupportingMaterial(YES)
-                            .supportingMaterial(createSupportingMaterial())
-                            .copyToOtherParty(YES)
-                            .build()
-                    ).build()));
+        UploadedDocumentType docType = new UploadedDocumentType();
+        docType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
+        docType.setDocumentFilename("image.png");
+        docType.setDocumentUrl("http://dm-store:8080/documents/1234");
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(docType);
+        TypeItem<DocumentType> item = new TypeItem<>();
+        item.setValue(documentType);
+        item.setId("78910");
+        caseData.setTseResponseSupportingMaterial(ListTypeItem.from(item));
+        String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
 
-        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
+        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "",
+                "testBinaryUrl");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
             + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","

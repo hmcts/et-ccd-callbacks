@@ -13,7 +13,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
@@ -389,9 +390,9 @@ class TornadoServiceTest {
                 .withResponsesCount("0")
                 .withStatus(OPEN_STATE)
                 .build();
-        GenericTseApplicationTypeItem item = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> item = new TypeItem<GenericTseApplicationType>();
         item.setValue(build);
-        caseData.setGenericTseApplicationCollection(List.of(item));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(item));
         DynamicFixedListType flt = new DynamicFixedListType();
         DynamicValueType valueType = new DynamicValueType();
         valueType.setCode("1");

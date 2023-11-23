@@ -2,6 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Slf4j
 @Service
@@ -29,6 +33,10 @@ public class BundlesRespondentService {
      * Clear interface data from caseData.
      * @param caseData contains all the case data
      */
+    private static final String AGREED_DOCS_WITH_BUT = "No, we have not agreed and I want to provide my own documents";
+    private static final String AGREED_DOCS_WITH_NO = "No, we have not agreed and I want to provide my own documents";
+    private static final String BUT = "But";
+
     public void clearInputData(CaseData caseData) {
         caseData.setBundlesRespondentPrepareDocNotesShow(null);
         caseData.setBundlesRespondentAgreedDocWith(null);
@@ -95,16 +103,26 @@ public class BundlesRespondentService {
         if (caseData.getBundlesRespondentCollection() == null) {
             caseData.setBundlesRespondentCollection(new ArrayList<>());
         }
+        String agreedDocsWith = caseData.getBundlesRespondentAgreedDocWith();
+        if (agreedDocsWith.equals(BUT)) {
+            agreedDocsWith = AGREED_DOCS_WITH_BUT;
+        }
+        if (agreedDocsWith.equals(NO)) {
+            agreedDocsWith = AGREED_DOCS_WITH_NO;
+        }
 
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("d MMMM yyyy HH:mm");
         caseData.getBundlesRespondentCollection().add(
             GenericTypeItem.from(HearingBundleType.builder()
-                .agreedDocWith(caseData.getBundlesRespondentAgreedDocWith())
+                .agreedDocWith(agreedDocsWith)
                 .agreedDocWithBut(caseData.getBundlesRespondentAgreedDocWithBut())
                 .agreedDocWithNo(caseData.getBundlesRespondentAgreedDocWithNo())
                 .hearing(caseData.getBundlesRespondentSelectHearing().getSelectedCode())
                 .uploadFile(caseData.getBundlesRespondentUploadFile())
                 .whatDocuments(caseData.getBundlesRespondentWhatDocuments())
                 .whoseDocuments(caseData.getBundlesRespondentWhoseDocuments())
+                    .formattedSelectedHearing(caseData.getBundlesRespondentSelectHearing().getSelectedLabel())
+                    .uploadDateTime(dateTimeFormatter.print(DateTime.now()))
                 .build()
             )
         );

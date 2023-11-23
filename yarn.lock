@@ -5080,7 +5080,7 @@ __metadata:
     sinon: 13.0.2
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 3.2.0
+    sonarqube-scanner: 3.3.0
     superagent-proxy: 3.0.0
     supertest: 6.3.3
     totp-generator: 0.0.14
@@ -11367,6 +11367,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"shell-quote@npm:^1.8.1":
+  version: 1.8.1
+  resolution: "shell-quote@npm:1.8.1"
+  checksum: 5f01201f4ef504d4c6a9d0d283fa17075f6770bfbe4c5850b074974c68062f37929ca61700d95ad2ac8822e14e8c4b990ca0e6e9272e64befd74ce5e19f0736b
+  languageName: node
+  linkType: hard
+
 "side-channel@npm:^1.0.4":
   version: 1.0.4
   resolution: "side-channel@npm:1.0.4"
@@ -11588,9 +11595,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:3.2.0":
-  version: 3.2.0
-  resolution: "sonarqube-scanner@npm:3.2.0"
+"sonarqube-scanner@npm:3.3.0":
+  version: 3.3.0
+  resolution: "sonarqube-scanner@npm:3.3.0"
   dependencies:
     adm-zip: ^0.5.10
     fancy-log: ^2.0.0
@@ -11599,10 +11606,11 @@ __metadata:
     mkdirp: ^3.0.1
     node-downloader-helper: ^2.1.9
     progress: ^2.0.3
+    shell-quote: ^1.8.1
     slugify: ^1.6.6
   bin:
     sonar-scanner: src/bin/sonar-scanner
-  checksum: 7f1a2364f30350c9b1dfe3c5ad11109a2355fe7da6dbaa709a27d828fb09c8765820dc3b5272e6e124460d6954d97e72ee6a05a44b4de1b5135dd1816f37b87b
+  checksum: 7960bc1efe6b4c0d915f673c04549ddf0c57026fea610b05320f5d73773673918405e7ae74bfc0ab9f960875ad77022ed8b2a2714dee9851987f986d34482e17
   languageName: node
   linkType: hard
 

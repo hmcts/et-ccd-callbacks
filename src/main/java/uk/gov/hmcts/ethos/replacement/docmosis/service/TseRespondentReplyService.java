@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
@@ -155,19 +156,22 @@ public class TseRespondentReplyService {
         }
         List<TseRespondTypeItem> respondCollection = genericTseApplicationType.getRespondCollection();
 
-        respondCollection.add(TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(
-                TseRespondType.builder()
-                    .response(caseData.getTseResponseText())
-                    .supportingMaterial(caseData.getTseResponseSupportingMaterial())
-                    .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
-                    .from(RESPONDENT_TITLE)
-                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                    .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
-                    .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
-                    .build()
-            ).build());
+        TseRespondType response = TseRespondType.builder()
+                .response(caseData.getTseResponseText())
+                .supportingMaterial(caseData.getTseResponseSupportingMaterial())
+                .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
+                .from(RESPONDENT_TITLE)
+                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
+                .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                .build();
+
+        respondCollection.add(TseRespondTypeItem.builder().id(UUID.randomUUID().toString()).value(response).build());
+
+        if (featureToggleService.isWorkAllocationEnabled()) {
+            response.setDateTime(Helper.getCurrentDateTime()); // for Work Allocation DMNs
+            response.setApplicationType(genericTseApplicationType.getType()); // for Work Allocation DMNs
+        }
 
         if (isRespondingToTribunal) {
             genericTseApplicationType.setRespondentResponseRequired(NO);

@@ -124,7 +124,7 @@ class BundlesRespondentServiceTest {
     void addToBundlesCollection_whenEmptyCollection_createsNewCollection() {
         englandCaseData.setBundlesRespondentCollection(null);
         englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
-
+        englandCaseData.setBundlesRespondentAgreedDocWith("Yes");
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
 
         assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(1));
@@ -169,5 +169,32 @@ class BundlesRespondentServiceTest {
         assertThat(actual.getUploadFile(), is(file));
         assertThat(actual.getWhatDocuments(), is(witnessStatementsOnly));
         assertThat(actual.getWhoseDocuments(), is(respondentsDocumentsOnly));
+        assertThat(actual.getFormattedSelectedHearing(), is(englandCaseData.getBundlesRespondentSelectHearing().getSelectedLabel()));
+    }
+    @Test
+    void addToBundlesCollection_addsCorrectReason() {
+        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        englandCaseData.setBundlesRespondentCollection(collection);
+
+        String respondentsDocumentsOnly = "Respondent's documents only";
+        String witnessStatementsOnly = "Witness statements only";
+        String butReason = "ButReason";
+        String disagree = "Disagree";
+        String expectedAgreedDocsWith = "No, we have not agreed and I want to provide my own documents";
+        UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
+
+        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
+        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
+        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
+        englandCaseData.setBundlesRespondentUploadFile(file);
+        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
+
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+        HearingBundleType actual = collection.get(0).getValue();
+
+        assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));
+        assertThat(actual.getAgreedDocWith(), is(expectedAgreedDocsWith));
     }
 }

@@ -64,6 +64,7 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
                         TseRespondType.builder()
                             .from(CLAIMANT_TITLE)
                             .date("16-May-1996")
+                            .dateTime("1996-05-16T10:20:30.555")
                             .response("response")
                             .hasSupportingMaterial(NO)
                             .copyToOtherParty(YES)

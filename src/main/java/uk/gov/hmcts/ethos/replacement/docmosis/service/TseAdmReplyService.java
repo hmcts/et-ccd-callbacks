@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
@@ -63,6 +64,7 @@ public class TseAdmReplyService {
     private final EmailService emailService;
     private final TornadoService tornadoService;
     private final TseService tseService;
+    private final FeatureToggleService featureToggleService;
     
     @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
@@ -152,27 +154,33 @@ public class TseAdmReplyService {
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
         String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
 
-        applicationType.getRespondCollection().add(
-            TypeItem.<TseRespondType>builder()
-                .id(UUID.randomUUID().toString())
-                .value(TseRespondType.builder()
-                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                    .from(ADMIN)
-                    .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
-                    .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
-                    .addDocument(caseData.getTseAdmReplyAddDocument())
-                    .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
-                    .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
-                    .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
-                    .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
+        TseRespondType response = TseRespondType.builder()
+                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .from(ADMIN)
+                .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
+                .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
+                .addDocument(caseData.getTseAdmReplyAddDocument())
+                .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
+                .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
+                .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
+                .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
                         caseData.getTseAdmReplyRequestEnterFullName()))
-                    .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
+                .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
                         caseData.getTseAdmReplyRequestIsResponseRequired()))
-                    .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
+                .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
                         tseAdmReplyRequestSelectPartyRespond))
-                    .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                    .build()
-            ).build());
+                .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                .build();
+
+        applicationType.getRespondCollection().add(TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(response)
+                .build());
+
+        if (featureToggleService.isWorkAllocationEnabled()) {
+            response.setDateTime(Helper.getCurrentDateTime()); // for Work Allocation DMNs
+            response.setApplicationType(applicationType.getType()); // for Work Allocation DMNs
+        }
 
         applicationType.setResponsesCount(String.valueOf(applicationType.getRespondCollection().size()));
 

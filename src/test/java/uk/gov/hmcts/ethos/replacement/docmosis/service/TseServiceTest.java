@@ -530,6 +530,7 @@ class TseServiceTest {
         return TseRespondType.builder()
             .enterResponseTitle("Title")
             .date("2000-01-01")
+            .dateTime("2000-01-01T10:20:30.555")
             .isCmoOrRequest("Request")
             .isResponseRequired("No")
             .selectPartyRespond(BOTH_PARTIES)
@@ -549,6 +550,7 @@ class TseServiceTest {
     private TseRespondType setupNonAdminTseRespondType() {
         return TseRespondType.builder()
             .date("2000-01-01")
+            .dateTime("2000-01-01T10:20:30.555")
             .from(CLAIMANT_TITLE)
             .response("I disagree")
             .copyToOtherParty(NO)

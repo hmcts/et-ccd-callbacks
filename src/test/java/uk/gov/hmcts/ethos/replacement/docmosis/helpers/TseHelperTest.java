@@ -224,6 +224,7 @@ class TseHelperTest {
         docType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
         docType.setDocumentFilename("image.png");
         docType.setDocumentUrl("http://dm-store:8080/documents/1234");
+
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(docType);
         TypeItem<DocumentType> item = new TypeItem<>();

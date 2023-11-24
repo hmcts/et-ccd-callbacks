@@ -9,7 +9,7 @@ import java.util.UUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 
-public class TseApplicationUtil {
+public final class TseApplicationUtil {
     private TseApplicationUtil() {
     }
 

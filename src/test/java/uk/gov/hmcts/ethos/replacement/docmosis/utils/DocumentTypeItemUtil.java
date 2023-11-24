@@ -4,7 +4,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 
-public class DocumentTypeItemUtil {
+public final class DocumentTypeItemUtil {
+
     private DocumentTypeItemUtil() {
     }
 

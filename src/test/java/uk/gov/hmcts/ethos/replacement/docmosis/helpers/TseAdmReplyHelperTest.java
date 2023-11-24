@@ -21,7 +21,6 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;

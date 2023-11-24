@@ -35,7 +35,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;

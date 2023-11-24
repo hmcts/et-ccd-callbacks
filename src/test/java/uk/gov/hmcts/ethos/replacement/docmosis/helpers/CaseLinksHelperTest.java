@@ -3,13 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.LinkReason;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

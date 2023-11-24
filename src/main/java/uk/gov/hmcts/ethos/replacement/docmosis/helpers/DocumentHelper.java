@@ -86,45 +86,57 @@ public final class DocumentHelper {
                                                      MultipleData multipleData,
                                                      DefaultValues allocatedCourtAddress,
                                                      VenueAddressReaderService venueAddressReaderService) {
-
+        StringBuilder sb = new StringBuilder();
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
-        StringBuilder sb = new StringBuilder().append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
-                .append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE)
-                .append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
+
+        // Start building the instruction
+        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
+                .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
+                .append(OUTPUT_FILE_NAME).append(NEW_LINE);
+
+        // Building the document data
+        sb.append("\"data\":{\n");
 
         if (templateName.equals(ADDRESS_LABELS_TEMPLATE) && multipleData == null) {
             sb.append(getAddressLabelsDataSingleCase(caseData));
         } else if (templateName.equals(ADDRESS_LABELS_TEMPLATE)) {
             sb.append(getAddressLabelsDataMultipleCase(multipleData));
         } else {
-            log.info("Getting data for single template for case:" + caseData.getEthosCaseReference());
             sb.append(getClaimantData(caseData)).append(getRespondentData(caseData))
-                .append(getHearingData(caseData, caseTypeId, correspondenceType,
-                correspondenceScotType, venueAddressReaderService))
-                .append(getCorrespondenceData(correspondenceType))
-                .append(getCorrespondenceScotData(correspondenceScotType))
-                .append(getCourtData(caseData, allocatedCourtAddress));
+                    .append(getHearingData(caseData, caseTypeId, correspondenceType,
+                            correspondenceScotType, venueAddressReaderService))
+                    .append(getCorrespondenceData(correspondenceType))
+                    .append(getCorrespondenceScotData(correspondenceScotType))
+                    .append(getCourtData(caseData, allocatedCourtAddress));
         }
 
-        sb.append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
-            .append("_enhmcts\":\"[userImage:enhmcts.png]").append(NEW_LINE)
-            .append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
-            .append("_enhmcts1\":\"[userImage:enhmcts.png]").append(NEW_LINE)
-            .append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_"))
-            .append("_enhmcts2\":\"[userImage:enhmcts.png]").append(NEW_LINE)
-            .append(I_SCOT).append(getScotSectionName(correspondenceScotType).replace(".", "_"))
-            .append("_schmcts\":\"[userImage:schmcts.png]").append(NEW_LINE).append(I_SCOT)
-            .append(getScotSectionName(correspondenceScotType).replace(".", "_"))
-            .append("_schmcts1\":\"[userImage:schmcts.png]").append(NEW_LINE)
-            .append(I_SCOT).append(getScotSectionName(correspondenceScotType).replace(".", "_"))
-            .append("_schmcts2\":\"[userImage:schmcts.png]").append(NEW_LINE);
+        sb.append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_")
+                        .replace(" ", "_"))
+                .append("_enhmcts\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append("\"i")
+                .append(getEWSectionName(correspondenceType).replace(".", "_")
+                        .replace(" ", "_"))
+                .append("_enhmcts1\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append("\"i")
+                .append(getEWSectionName(correspondenceType).replace(".", "_")
+                        .replace(" ", "_"))
+                .append("_enhmcts2\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
+                .append(getScotSectionName(correspondenceScotType).replace(".", "_")
+                        .replace(" ", "_"))
+                .append("_schmcts\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
+                .append(getScotSectionName(correspondenceScotType).replace(".", "_")
+                        .replace(" ", "_"))
+                .append("_schmcts1\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
+                .append(getScotSectionName(correspondenceScotType).replace(".", "_")
+                        .replace(" ", "_"))
+                .append("_schmcts2\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
-        sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE)
-            .append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE)
-            .append("\"TodayPlus28Days\":\"").append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28))
-            .append(NEW_LINE).append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference()))
-            .append(NEW_LINE).append("}\n}\n");
+        sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE).append("\"Today_date\":\"")
+                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE).append("\"TodayPlus28Days\":\"")
+                .append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28)).append(NEW_LINE)
+                .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
+                .append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference()))
+                .append(NEW_LINE).append("}\n").append("}\n");
+
         return sb;
     }
 

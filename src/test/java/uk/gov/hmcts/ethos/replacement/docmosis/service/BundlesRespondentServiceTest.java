@@ -10,13 +10,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;

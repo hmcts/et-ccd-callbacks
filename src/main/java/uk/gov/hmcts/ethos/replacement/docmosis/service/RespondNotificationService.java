@@ -71,12 +71,11 @@ public class RespondNotificationService {
      * @param caseData caseData contains the notification details
      * @param sendNotificationType the notificationType where the data will be stored
      */
-    private void createRespondNotification(CaseData caseData, SendNotificationType sendNotificationType) {
 
+    private void createRespondNotification(CaseData caseData, SendNotificationType sendNotificationType) {
         if (sendNotificationType.getRespondNotificationTypeCollection() == null) {
             sendNotificationType.setRespondNotificationTypeCollection(new ArrayList<>());
         }
-
         RespondNotificationType respondNotificationType = new RespondNotificationType();
         respondNotificationType.setRespondNotificationDate(UtilHelper.formatCurrentDate(LocalDate.now()));
         respondNotificationType.setRespondNotificationTitle(caseData.getRespondNotificationTitle());
@@ -88,10 +87,14 @@ public class RespondNotificationService {
         String whoRespond = caseData.getRespondNotificationWhoRespond();
         respondNotificationType.setRespondNotificationWhoRespond(whoRespond);
         respondNotificationType.setRespondNotificationCaseManagementMadeBy(
-            caseData.getRespondNotificationCaseManagementMadeBy());
+                caseData.getRespondNotificationCaseManagementMadeBy());
         respondNotificationType.setRespondNotificationRequestMadeBy(caseData.getRespondNotificationRequestMadeBy());
         respondNotificationType.setRespondNotificationFullName(caseData.getRespondNotificationFullName());
         respondNotificationType.setRespondNotificationPartyToNotify(caseData.getRespondNotificationPartyToNotify());
+
+        if (YES.equals(responseRequired) && whoRespond != null && !RESPONDENT_ONLY.equals(whoRespond)) {
+            respondNotificationType.setIsClaimantResponseDue(YES);
+        }
 
         TypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new TypeItem<>();
         respondNotificationTypeGenericTypeItem.setId(String.valueOf(randomUUID()));

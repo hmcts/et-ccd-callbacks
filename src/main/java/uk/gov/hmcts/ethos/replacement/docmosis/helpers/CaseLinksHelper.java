@@ -1,11 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 
-import java.util.List;
 import java.util.Objects;
 
 @Slf4j

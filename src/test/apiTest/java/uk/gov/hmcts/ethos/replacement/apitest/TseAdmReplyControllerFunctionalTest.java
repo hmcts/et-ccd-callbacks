@@ -15,10 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j

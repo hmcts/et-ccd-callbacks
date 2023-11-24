@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 

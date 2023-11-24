@@ -91,7 +91,6 @@ public class CaseManagementForCaseWorkerService {
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
     public static final String ORGANISATION = "Organisation";
 
-
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,

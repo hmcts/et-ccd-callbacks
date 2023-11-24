@@ -6,14 +6,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 

@@ -18,10 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -32,7 +30,6 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -42,13 +39,16 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
 @ExtendWith(SpringExtension.class)

@@ -14,8 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;

@@ -169,8 +169,10 @@ class BundlesRespondentServiceTest {
         assertThat(actual.getUploadFile(), is(file));
         assertThat(actual.getWhatDocuments(), is(witnessStatementsOnly));
         assertThat(actual.getWhoseDocuments(), is(respondentsDocumentsOnly));
-        assertThat(actual.getFormattedSelectedHearing(), is(englandCaseData.getBundlesRespondentSelectHearing().getSelectedLabel()));
+        assertThat(actual.getFormattedSelectedHearing(),
+                is(englandCaseData.getBundlesRespondentSelectHearing().getSelectedLabel()));
     }
+
     @Test
     void addToBundlesCollection_addsCorrectReason() {
         List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
@@ -180,7 +182,6 @@ class BundlesRespondentServiceTest {
         String witnessStatementsOnly = "Witness statements only";
         String butReason = "ButReason";
         String disagree = "Disagree";
-        String expectedAgreedDocsWith = "No, we have not agreed and I want to provide my own documents";
         UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
 
         englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
@@ -193,6 +194,7 @@ class BundlesRespondentServiceTest {
 
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
         HearingBundleType actual = collection.get(0).getValue();
+        String expectedAgreedDocsWith = "No, we have not agreed and I want to provide my own documents";
 
         assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));
         assertThat(actual.getAgreedDocWith(), is(expectedAgreedDocsWith));

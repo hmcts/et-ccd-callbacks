@@ -297,10 +297,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:8.53.0":
-  version: 8.53.0
-  resolution: "@eslint/js@npm:8.53.0"
-  checksum: e0d5cfb0000aaee237c8e6d6d6e366faa60b1ef7f928ce17778373aa44d3b886368f6d5e1f97f913f0f16801aad016db8b8df78418c9d18825c15590328028af
+"@eslint/js@npm:8.54.0":
+  version: 8.54.0
+  resolution: "@eslint/js@npm:8.54.0"
+  checksum: 6d88a6f711ef0133566b5340e3178a178fbb297585766460f195d0a9db85688f1e5cf8559fd5748aeb3131e2096c66595b323d8edab22df015acda68f1ebde92
   languageName: node
   linkType: hard
 
@@ -696,11 +696,11 @@ __metadata:
   linkType: hard
 
 "@types/archiver@npm:^6.0.0":
-  version: 6.0.1
-  resolution: "@types/archiver@npm:6.0.1"
+  version: 6.0.2
+  resolution: "@types/archiver@npm:6.0.2"
   dependencies:
     "@types/readdir-glob": "*"
-  checksum: 384d81ff7c78d289e410efee360adcfc2bf41a9f376637282d61e2ce3d73d8ecbe2b76250342ffe6aeac638350811fba28c4b6beb6e5ee179a52be433ebbe5fb
+  checksum: 4bef71e5b95863be9880339275ad92c2513dd78d56587653614dc5a74af1d078f5f5926ec996de06e7071a1003e0c2764d0e9d2bb0893a2ffb14ab1718eaf5ca
   languageName: node
   linkType: hard
 
@@ -799,12 +799,12 @@ __metadata:
   linkType: hard
 
 "@types/jest@npm:^29.0.0":
-  version: 29.5.8
-  resolution: "@types/jest@npm:29.5.8"
+  version: 29.5.10
+  resolution: "@types/jest@npm:29.5.10"
   dependencies:
     expect: ^29.0.0
     pretty-format: ^29.0.0
-  checksum: ca8438a5b4c098c8c023e9d5b279ea306494a1d0b5291cfb498100fa780377145f068b2a021d545b0398bbe0328dcc37044dd3aaf3c6c0fe9b0bef7b46a63453
+  checksum: ef385905787db528de9b6beb2688865c0bb276e64256ed60b9a1a6ffc0b75737456cb5e27e952a3241c5845b6a1da487470010dd30f3ca59c8581624c564a823
   languageName: node
   linkType: hard
 
@@ -3219,9 +3219,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codeceptjs@npm:3.5.7":
-  version: 3.5.7
-  resolution: "codeceptjs@npm:3.5.7"
+"codeceptjs@npm:3.5.8":
+  version: 3.5.8
+  resolution: "codeceptjs@npm:3.5.8"
   dependencies:
     "@codeceptjs/configure": 0.10.0
     "@codeceptjs/helper": 2.0.1
@@ -3268,7 +3268,7 @@ __metadata:
     uuid: 9.0
   bin:
     codeceptjs: bin/codecept.js
-  checksum: 19009d442fc1ebb450dacbbee78f4628afb7f8284b3c33afd74240481af42dbf0ee666cf417c4fb6b5ba3643679ec746d7815da73831568ef2754db8335a5841
+  checksum: d15dab6f427521d12d3831267fbaf90275bf704cf101efaa4925cdc24e3a73e10a9cd2929951143187c5f9582bccb82f394cee60e97b8a8e0b67976019378211
   languageName: node
   linkType: hard
 
@@ -4322,16 +4322,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:27.1.0":
-  version: 27.1.0
-  resolution: "electron@npm:27.1.0"
+"electron@npm:27.1.2":
+  version: 27.1.2
+  resolution: "electron@npm:27.1.2"
   dependencies:
     "@electron/get": ^2.0.0
     "@types/node": ^18.11.18
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 729b81bd302abda9694819310f74bcff04e7fb6a751c5f9db5a761d023fad071fb5770bdb928f6ce337f6723d3055e58c1f0c14170d3a1447411b0638375a256
+  checksum: 9d5f4583f00e6b0ccee4ef7c98f20765cb3528810906cb34c57b2a9e481307018662ed11f9ebe630b3e21e60327737ab484a68d08f52d4a790acc153e049be05
   languageName: node
   linkType: hard
 
@@ -4842,14 +4842,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:8.53.0":
-  version: 8.53.0
-  resolution: "eslint@npm:8.53.0"
+"eslint@npm:8.54.0":
+  version: 8.54.0
+  resolution: "eslint@npm:8.54.0"
   dependencies:
     "@eslint-community/eslint-utils": ^4.2.0
     "@eslint-community/regexpp": ^4.6.1
     "@eslint/eslintrc": ^2.1.3
-    "@eslint/js": 8.53.0
+    "@eslint/js": 8.54.0
     "@humanwhocodes/config-array": ^0.11.13
     "@humanwhocodes/module-importer": ^1.0.1
     "@nodelib/fs.walk": ^1.2.8
@@ -4886,7 +4886,7 @@ __metadata:
     text-table: ^0.2.0
   bin:
     eslint: bin/eslint.js
-  checksum: 2da808655c7aa4b33f8970ba30d96b453c3071cc4d6cd60d367163430677e32ff186b65270816b662d29139283138bff81f28dddeb2e73265495245a316ed02c
+  checksum: 7e876e9da2a18a017271cf3733d05a3dfbbe469272d75753408c6ea5b1646c71c6bb18cb91e10ca930144c32c1ce3701e222f1ae6784a3975a69f8f8aa68e49f
   languageName: node
   linkType: hard
 
@@ -5043,10 +5043,10 @@ __metadata:
     chai: 4.3.10
     chai-as-promised: 7.1.1
     chai-http: 4.4.0
-    codeceptjs: 3.5.7
+    codeceptjs: 3.5.8
     codeceptjs-saucehelper: ^1.4.0
     cross-env: 7.0.3
-    eslint: 8.53.0
+    eslint: 8.54.0
     eslint-config-prettier: ^9.0.0
     eslint-plugin-codeceptjs: ^1.3.0
     eslint-plugin-import: ^2.26.0
@@ -5080,7 +5080,7 @@ __metadata:
     sinon: 13.0.2
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 3.2.0
+    sonarqube-scanner: 3.3.0
     superagent-proxy: 3.0.0
     supertest: 6.3.3
     totp-generator: 0.0.14
@@ -11367,6 +11367,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"shell-quote@npm:^1.8.1":
+  version: 1.8.1
+  resolution: "shell-quote@npm:1.8.1"
+  checksum: 5f01201f4ef504d4c6a9d0d283fa17075f6770bfbe4c5850b074974c68062f37929ca61700d95ad2ac8822e14e8c4b990ca0e6e9272e64befd74ce5e19f0736b
+  languageName: node
+  linkType: hard
+
 "side-channel@npm:^1.0.4":
   version: 1.0.4
   resolution: "side-channel@npm:1.0.4"
@@ -11588,9 +11595,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:3.2.0":
-  version: 3.2.0
-  resolution: "sonarqube-scanner@npm:3.2.0"
+"sonarqube-scanner@npm:3.3.0":
+  version: 3.3.0
+  resolution: "sonarqube-scanner@npm:3.3.0"
   dependencies:
     adm-zip: ^0.5.10
     fancy-log: ^2.0.0
@@ -11599,10 +11606,11 @@ __metadata:
     mkdirp: ^3.0.1
     node-downloader-helper: ^2.1.9
     progress: ^2.0.3
+    shell-quote: ^1.8.1
     slugify: ^1.6.6
   bin:
     sonar-scanner: src/bin/sonar-scanner
-  checksum: 7f1a2364f30350c9b1dfe3c5ad11109a2355fe7da6dbaa709a27d828fb09c8765820dc3b5272e6e124460d6954d97e72ee6a05a44b4de1b5135dd1816f37b87b
+  checksum: 7960bc1efe6b4c0d915f673c04549ddf0c57026fea610b05320f5d73773673918405e7ae74bfc0ab9f960875ad77022ed8b2a2714dee9851987f986d34482e17
   languageName: node
   linkType: hard
 

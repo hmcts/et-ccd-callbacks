@@ -525,6 +525,10 @@ public class CaseActionsForCaseWorkerController {
             nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+
+            if (featureToggleService.isHmcEnabled()) {
+                nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+            }
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);

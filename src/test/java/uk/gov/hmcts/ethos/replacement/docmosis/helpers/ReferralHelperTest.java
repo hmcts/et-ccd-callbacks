@@ -408,10 +408,10 @@ class ReferralHelperTest {
         assertEquals("Other", testReply.getReferralSubject());
 
         LocalDate replyDate = LocalDate.parse(testReply.getReplyDate(), REFERRAL_DATE_PATTERN);
-        assertEquals(true, LocalDate.now().equals(replyDate));
+        assertEquals(LocalDate.now(), replyDate);
 
         LocalDateTime replyDateTime = LocalDateTime.parse(testReply.getReplyDateTime(), OLD_DATE_TIME_PATTERN);
-        assertEquals(true, LocalDateTime.now().isAfter(replyDateTime));
+        assertTrue(LocalDateTime.now().isAfter(replyDateTime));
     }
 
     @Test

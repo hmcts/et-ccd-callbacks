@@ -362,11 +362,10 @@ public class TornadoService {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_REPLY -> {
-                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey(), ccdGatewayBaseUrl);
+                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_ADMIN_REPLY -> {
-                return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        ccdGatewayBaseUrl);
+                return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_ADMIN_DECISION_FILE_NAME -> {
                 return TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(), ccdGatewayBaseUrl);

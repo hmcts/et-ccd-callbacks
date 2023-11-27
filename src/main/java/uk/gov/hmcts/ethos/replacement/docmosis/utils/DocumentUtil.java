@@ -14,20 +14,14 @@ public final class DocumentUtil {
     }
 
     public static List<GenericTypeItem<DocumentType>> generateUploadedDocumentListFromDocumentList(
-            List<GenericTypeItem<DocumentType>> documentList, String ccdGatewayBaseUrl) {
+            List<GenericTypeItem<DocumentType>> documentList) {
 
         List<GenericTypeItem<DocumentType>> uploadedDocumentList = new ArrayList<>();
         documentList.forEach(doc -> {
             GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
             DocumentType docType = new DocumentType();
             docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-
-            docType.getUploadedDocument().setDocumentBinaryUrl(
-                    doc.getValue().getUploadedDocument().getDocumentFilename()
-                            + "|"
-                            + getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
-                            ccdGatewayBaseUrl)
-            );
+            docType.getUploadedDocument().setDocumentBinaryUrl(doc.getValue().getUploadedDocument().getDocumentUrl());
 
             genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
             genTypeItems.setValue(docType);
@@ -35,13 +29,5 @@ public final class DocumentUtil {
         });
 
         return uploadedDocumentList;
-    }
-
-    public static String getDownloadableDocumentURL(String documentURL, String ccdGatewayBaseUrl) {
-        return ccdGatewayBaseUrl + "/documents/" + getDocumentUUIDByDocumentURL(documentURL) + "/binary";
-    }
-
-    private static String getDocumentUUIDByDocumentURL(String documentURL) {
-        return documentURL.substring(documentURL.lastIndexOf('/') + 1);
     }
 }

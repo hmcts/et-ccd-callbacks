@@ -36,6 +36,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bundles");
     }
 
+    public boolean isWorkAllocationEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("work-allocation");
+    }
+
     public boolean isWelshEnabled() {
         return this.featureToggleApi.isFeatureEnabled("welsh-language");
     }

@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -52,6 +53,7 @@ public class ReplyToReferralController {
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
     private final EmailService emailService;
+    private final FeatureToggleService featureToggleService;
     @Value("${template.referral}")
     private String referralTemplateId;
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
@@ -196,10 +198,8 @@ public class ReplyToReferralController {
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         String referralCode = caseData.getSelectReferral().getValue().getCode();
 
-        ReferralHelper.createReferralReply(
-            caseData,
-            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
-        );
+        String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
+        ReferralHelper.createReferralReply(caseData, name, featureToggleService.isWorkAllocationEnabled());
 
         DocumentInfo documentInfo = referralService.generateCRDocument(caseData, userToken,
             caseDetails.getCaseTypeId());

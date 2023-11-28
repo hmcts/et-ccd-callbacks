@@ -210,11 +210,12 @@ public final class TseHelper {
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
      */
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
+                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -274,7 +275,8 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
+                                                      String ccdGatewayBaseUrl) {
 
         return TseReplyData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -337,23 +339,15 @@ public final class TseHelper {
 
     private static String getDocumentUUIDByDocumentURL(String documentURL) {
         return documentURL.substring(documentURL.lastIndexOf('/') + 1);
-            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-            .respondentParty(RESPONDENT_TITLE)
-            .type(defaultIfEmpty(application.getType(), null))
-            .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
-            .response(defaultIfEmpty(application.getDetails(), null))
-            .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-            .documentCollection(getUploadedDocList(caseData))
-            .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
-            .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
+    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return new ArrayList<>();
         }
 
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial(),
+                ccdGatewayBaseUrl);
     }
 
     private static boolean hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {

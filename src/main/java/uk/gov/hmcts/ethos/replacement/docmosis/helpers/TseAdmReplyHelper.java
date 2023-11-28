@@ -61,11 +61,12 @@ public final class TseAdmReplyHelper {
         }
     }
 
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
+                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getTseAdminSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(TSE_ADMIN_REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -83,7 +84,8 @@ public final class TseAdmReplyHelper {
                 .orElse(null);
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
+                                                      String ccdGatewayBaseUrl) {
         String selectedCmoRespondent = caseData.getTseAdmReplyCmoSelectPartyRespond();
         return TseAdminReplyData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -112,11 +114,11 @@ public final class TseAdmReplyHelper {
     }
 
     private static List<GenericTypeItem<DocumentType>> getUploadedDocList(
-            List<GenericTypeItem<DocumentType>> docTypeList) {
+            List<GenericTypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
         if (docTypeList == null) {
             return new ArrayList<>();
         }
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList, ccdGatewayBaseUrl);
     }
 
     private static boolean hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {

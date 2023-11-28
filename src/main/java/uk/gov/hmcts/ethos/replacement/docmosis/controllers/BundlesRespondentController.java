@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -118,7 +119,7 @@ public class BundlesRespondentController {
     }
 
     /**
-     * Populates the hearing list on page 3.
+     * Populates the hearing list on page 3 and validates the length of text input.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -145,6 +146,10 @@ public class BundlesRespondentController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(caseData);
+        if (CollectionUtils.isNotEmpty(errors)) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
         bundlesRespondentService.populateSelectHearings(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -169,7 +174,7 @@ public class BundlesRespondentController {
     })
     public ResponseEntity<CCDCallbackResponse> midValidateUpload(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         throwIfBundlesFlagDisabled();
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

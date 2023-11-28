@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
@@ -35,6 +34,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +88,7 @@ class TseRespondentReplyServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
@@ -114,6 +114,7 @@ class TseRespondentReplyServiceTest {
                 respondentTellSomethingElseService, tseService, documentManagementService, featureToggleService);
 
         userDetails = HelperTest.getUserDetails();
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         doNothing().when(emailService).sendEmail(any(), any(), any());
@@ -201,6 +202,13 @@ class TseRespondentReplyServiceTest {
             assertThat(replyType.getFrom()).isEqualTo(RESPONDENT_TITLE);
             assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename())
                     .isEqualTo("image.png");
+
+            // WA properties
+            String dateTimeParsedForTesting = UtilHelper.formatCurrentDate(
+                LocalDateTime.parse(replyType.getDateTime()).toLocalDate()
+            );
+            assertThat(dateTimeParsedForTesting).isEqualTo(dateNow);
+            assertThat(replyType.getApplicationType()).isEqualTo(WITHDRAW_MY_CLAIM);
         }
 
         @Test

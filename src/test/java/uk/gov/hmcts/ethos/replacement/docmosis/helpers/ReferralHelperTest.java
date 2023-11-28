@@ -530,7 +530,7 @@ class ReferralHelperTest {
             + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
             + "\"replyBy\",\"replyDate\":\"" + replyDate + "\",\"replyDateTime\":\"" + replyDateTime + "\","
-            + "\"referralSubject\":\"Other\"}}]}}";
+            + "\"referralSubject\":\"Other\",\"referralNumber\":\"1\"}}]}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);
@@ -620,6 +620,7 @@ class ReferralHelperTest {
         referralReplyType.setReplyDocument(List.of(createDocumentType("1")));
         referralReplyType.setReplyDateTime(replyDateTime);
         referralReplyType.setReferralSubject("Other");
+        referralReplyType.setReferralNumber("1");
 
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(id);

@@ -22,11 +22,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -37,15 +35,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class BundlesRespondentController {
-
-    private final VerifyTokenService verifyTokenService;
     private final BundlesRespondentService bundlesRespondentService;
     private final SendNotificationService sendNotificationService;
     public static final String BUNDLES_LOG = "Bundles feature flag is {}";
     public static final String BUNDLES_FEATURE_IS_NOT_AVAILABLE = "Bundles feature is not available";
     private final FeatureToggleService featureToggleService;
-
-    private static final String INVALID_TOKEN = "Invalid Token {}";
 
     /**
      * Called at the start of Bundles Respondent Prepare Doc for Hearing journey.
@@ -71,17 +65,10 @@ public class BundlesRespondentController {
             @RequestHeader("Authorization") String userToken) {
 
         throwIfBundlesFlagDisabled();
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setBundlesRespondentPrepareDocNotesShow(YES);
         return getCallbackRespEntityNoErrors(caseData);
     }
-
-
 
     /**
      * About to Submit for Bundles Respondent Prepare Doc for Hearing journey.
@@ -105,11 +92,6 @@ public class BundlesRespondentController {
             @RequestHeader("Authorization") String userToken) {
 
         throwIfBundlesFlagDisabled();
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         bundlesRespondentService.addToBundlesCollection(caseData);
         bundlesRespondentService.clearInputData(caseData);
@@ -140,10 +122,7 @@ public class BundlesRespondentController {
             @RequestHeader("Authorization") String userToken) {
 
         throwIfBundlesFlagDisabled();
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         bundlesRespondentService.populateSelectHearings(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -172,10 +151,7 @@ public class BundlesRespondentController {
             @RequestHeader(value = "Authorization") String userToken) {
 
         throwIfBundlesFlagDisabled();
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = bundlesRespondentService.validateFileUpload(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
@@ -200,11 +176,6 @@ public class BundlesRespondentController {
             @RequestHeader("Authorization") String userToken) {
 
         throwIfBundlesFlagDisabled();
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
         String body = """
         <html>

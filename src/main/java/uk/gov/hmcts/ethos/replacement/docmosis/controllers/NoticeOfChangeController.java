@@ -21,11 +21,9 @@ import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -33,22 +31,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Slf4j
 public class NoticeOfChangeController {
-    private final VerifyTokenService verifyTokenService;
+
     private final NocNotificationService nocNotificationService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
     @PostMapping("/about-to-submit")
     public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
                                                       @RequestHeader("Authorization")
                                                       String userToken) throws IOException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = nocRespondentRepresentativeService.updateRepresentation(callbackRequest.getCaseDetails());
         caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
 
@@ -67,10 +59,6 @@ public class NoticeOfChangeController {
     public GenericCallbackResponse nocSubmitted(@RequestBody CallbackRequest callbackRequest,
                                                 @RequestHeader("Authorization")
                                                 String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-        }
 
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 

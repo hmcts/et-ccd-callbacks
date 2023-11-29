@@ -18,12 +18,10 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.StaffImportService;
 
 import java.io.IOException;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -31,8 +29,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Slf4j
 public class StaffImportController {
-
-    private final VerifyTokenService verifyTokenService;
     private final StaffImportService staffImportService;
 
     @PostMapping(value = "/import", consumes = APPLICATION_JSON_VALUE)
@@ -48,10 +44,6 @@ public class StaffImportController {
     public ResponseEntity<CCDCallbackResponse> importFile(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         try {
             staffImportService.importStaff(adminData, userToken);

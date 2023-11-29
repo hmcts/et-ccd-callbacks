@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.SaveJudgeException;
 
@@ -29,8 +27,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/admin/staff")
 @RequiredArgsConstructor
 public class JudgeController {
-
-    private final VerifyTokenService verifyTokenService;
     private final JudgeService judgeService;
 
     @PostMapping(value = "/initAddJudge", consumes = APPLICATION_JSON_VALUE)
@@ -43,10 +39,6 @@ public class JudgeController {
     public ResponseEntity<CCDCallbackResponse> initAddJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         judgeService.initAddJudge(adminData);
@@ -71,10 +63,6 @@ public class JudgeController {
     public ResponseEntity<CCDCallbackResponse> addJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         try {
@@ -104,10 +92,6 @@ public class JudgeController {
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.updateJudgeMidEventSelectOffice(adminData);
 
@@ -134,10 +118,6 @@ public class JudgeController {
 
         log.info("/updateJudgeMidEventSelectJudge");
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.updateJudgeMidEventSelectJudge(adminData);
 
@@ -161,10 +141,6 @@ public class JudgeController {
     public ResponseEntity<CCDCallbackResponse> updateJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.updateJudge(adminData);
@@ -190,10 +166,6 @@ public class JudgeController {
         @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.deleteJudgeMidEventSelectOffice(adminData);
 
@@ -218,10 +190,6 @@ public class JudgeController {
         @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.deleteJudgeMidEventSelectJudge(adminData);
 
@@ -245,10 +213,6 @@ public class JudgeController {
     public ResponseEntity<CCDCallbackResponse> deleteJudge(
         @RequestHeader("Authorization") String userToken,
         @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.deleteJudge(adminData);

@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandVenueSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.VenueSelectionService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -25,15 +23,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 public class ListHearingController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    private final VerifyTokenService verifyTokenService;
     private final VenueSelectionService venueSelectionService;
     private final ScotlandVenueSelectionService scotlandVenueSelectionService;
 
-    public ListHearingController(VerifyTokenService verifyTokenService, VenueSelectionService venueSelectionService,
+    public ListHearingController(VenueSelectionService venueSelectionService,
                                  ScotlandVenueSelectionService scotlandVenueSelectionService) {
-        this.verifyTokenService = verifyTokenService;
+
         this.venueSelectionService = venueSelectionService;
         this.scotlandVenueSelectionService = scotlandVenueSelectionService;
     }
@@ -50,11 +45,6 @@ public class ListHearingController {
             @RequestHeader("Authorization") String userToken) {
 
         log.info("/initialiseHearings");
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();

@@ -18,9 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -32,10 +30,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class TseViewApplicationsController {
-
-    private final VerifyTokenService verifyTokenService;
     private final TseService tseService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     
     /**
      * Resets the dynamic list for select an application to view either an open or closed application.
@@ -58,11 +53,6 @@ public class TseViewApplicationsController {
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseViewApplicationSelect(null);
         return getCallbackRespEntityNoErrors(caseData);
@@ -93,11 +83,6 @@ public class TseViewApplicationsController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseViewApplicationSelect(TseViewApplicationHelper.populateOpenOrClosedApplications(caseData));
         return getCallbackRespEntityNoErrors(caseData);
@@ -116,11 +101,6 @@ public class TseViewApplicationsController {
     public ResponseEntity<CCDCallbackResponse> populateSelectedApplicationData(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseApplicationSummaryAndResponsesMarkup(
             tseService.formatViewApplication(caseData, userToken, true)

@@ -22,13 +22,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FUNCTION_NOT_AVAILABLE_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -40,13 +38,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequestMapping("/respondentTSE")
 public class RespondentTellSomethingElseController {
-
-    private final VerifyTokenService verifyTokenService;
     private final RespondentTellSomethingElseService resTseService;
     private final TseService tseService;
-
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
     private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_NO = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>The tribunal will consider all correspondence and let you know what happens next.</p>";
@@ -57,7 +50,6 @@ public class RespondentTellSomethingElseController {
         + "<p>If they do respond, they are expected to copy their response to you.</p>"
         + "<p>You may be asked to supply further information. "
         + "The tribunal will consider all correspondence and let you know what happens next.</p>";
-
 
     /**
      * Called when RespondentTSE event is about to start.
@@ -80,10 +72,7 @@ public class RespondentTellSomethingElseController {
     public ResponseEntity<CCDCallbackResponse> aboutToStartRespondentTSE(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (Helper.isClaimantNonSystemUser(caseData)) {
             caseData.setResTseNotAvailableWarning(YES);
@@ -113,10 +102,7 @@ public class RespondentTellSomethingElseController {
     public ResponseEntity<CCDCallbackResponse> showError(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         if (Helper.isClaimantNonSystemUser(caseData)) {
@@ -150,11 +136,6 @@ public class RespondentTellSomethingElseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = resTseService.validateGiveDetails(caseData);
 
@@ -174,11 +155,6 @@ public class RespondentTellSomethingElseController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondentTSE(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         resTseService.sendAcknowledgeEmail(caseDetails, userToken);
@@ -203,11 +179,6 @@ public class RespondentTellSomethingElseController {
     public ResponseEntity<CCDCallbackResponse> displayRespondentApplicationsTable(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setResTseTableMarkUp(resTseService.generateTableMarkdown(caseData));
 
@@ -235,11 +206,6 @@ public class RespondentTellSomethingElseController {
     public ResponseEntity<CCDCallbackResponse> completeApplication(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         List<GenericTseApplicationTypeItem> tseApplicationCollection =
             ccdRequest.getCaseDetails().getCaseData().getGenericTseApplicationCollection();

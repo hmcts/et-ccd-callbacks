@@ -19,9 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLinksEmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -32,9 +30,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @RequiredArgsConstructor
 public class CaseLinksController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    private final VerifyTokenService verifyTokenService;
     private final CaseLinksEmailService caseLinksEmailService;
     private final FeatureToggleService featureToggleService;
 
@@ -55,11 +50,6 @@ public class CaseLinksController {
     public ResponseEntity<CCDCallbackResponse> createCaseLinkAboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         log.info("Adding case links");
 
         if (featureToggleService.isHmcEnabled()) {
@@ -89,11 +79,6 @@ public class CaseLinksController {
     public ResponseEntity<CCDCallbackResponse> maintainCaseLinkAboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         log.info("Removing case links");
         caseLinksEmailService.sendMailWhenCaseLinkForHearing(ccdRequest, userToken, false);
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();

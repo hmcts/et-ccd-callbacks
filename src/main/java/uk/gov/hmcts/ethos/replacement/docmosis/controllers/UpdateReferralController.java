@@ -26,10 +26,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
 import java.util.ArrayList;
 import java.util.List;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -44,10 +44,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class UpdateReferralController {
-    private final VerifyTokenService verifyTokenService;
+
     private final UserIdamService userIdamService;
     private final EmailService emailService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
@@ -76,11 +75,6 @@ public class UpdateReferralController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
         log.info("ABOUT TO START UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
@@ -110,11 +104,6 @@ public class UpdateReferralController {
             @RequestHeader(value = "Authorization") String userToken) {
         log.info("INIT HEARING AND UPDATE REFERRAL DETAILS ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (ReferralHelper.isValidReferralStatus(caseData)) {
@@ -148,11 +137,6 @@ public class UpdateReferralController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
         log.info("ABOUT TO SUBMIT UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
             caseData.setUpdateReferralSubject("Party not responded/complied");
@@ -206,11 +190,6 @@ public class UpdateReferralController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
         log.info("COMPLETE UPDATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .build());
     }

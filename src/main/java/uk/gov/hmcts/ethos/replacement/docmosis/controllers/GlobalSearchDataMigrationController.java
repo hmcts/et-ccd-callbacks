@@ -16,12 +16,10 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -32,9 +30,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class GlobalSearchDataMigrationController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    private final VerifyTokenService verifyTokenService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @PostMapping(value = "/global-search-migration/about-to-submit", consumes = APPLICATION_JSON_VALUE)
@@ -51,11 +46,6 @@ public class GlobalSearchDataMigrationController {
             @RequestHeader("Authorization") String userToken) {
         log.info("Migrating existing case Id for global search ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
@@ -82,11 +72,6 @@ public class GlobalSearchDataMigrationController {
     public ResponseEntity<CCDCallbackResponse> addServiceIdForGlobalSearchInCaseData(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) throws IOException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
@@ -106,11 +91,6 @@ public class GlobalSearchDataMigrationController {
             @RequestHeader("Authorization") String userToken) {
         log.info("Migrating existing case Id by removing data of global search ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
@@ -134,11 +114,6 @@ public class GlobalSearchDataMigrationController {
     public ResponseEntity<CCDCallbackResponse> removeServiceIdForGlobalSearchFromCaseData(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) throws IOException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.removeHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);

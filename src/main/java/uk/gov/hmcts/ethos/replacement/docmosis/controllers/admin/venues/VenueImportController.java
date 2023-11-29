@@ -16,13 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReaderException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.venues.VenueImportService;
 
 import java.io.IOException;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -30,8 +28,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Slf4j
 public class VenueImportController {
-
-    private final VerifyTokenService verifyTokenService;
     private final VenueImportService venueImportService;
 
     @PostMapping(value = "/initImport", consumes = APPLICATION_JSON_VALUE)
@@ -47,10 +43,6 @@ public class VenueImportController {
     public ResponseEntity<CCDCallbackResponse> initImport(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         venueImportService.initImport(adminData);
 
@@ -70,10 +62,6 @@ public class VenueImportController {
     public ResponseEntity<CCDCallbackResponse> importFile(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) throws FixedListSheetReaderException, IOException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         venueImportService.importVenues(adminData, userToken);
 

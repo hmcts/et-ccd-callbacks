@@ -21,18 +21,15 @@ import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-
 
 /**
  * REST controller for the ET3 Vetting pages, provides access to the state of the ET3 Response
@@ -44,12 +41,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class Et3VettingController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String PROCESSING_COMPLETE_HEADER = "<h1>ET3 Processing complete</h1>";
     public static final String PROCESSING_COMPLETE_BODY = "<h2>Do this next</h2>You must:"
             + "<ul><li>accept or reject the ET3 response or refer the response</li>"
             + "<li>add any changed or new information to case details</li></ul>";
-    private final VerifyTokenService verifyTokenService;
+
     private final Et3VettingService et3VettingService;
 
     /**
@@ -73,11 +69,6 @@ public class Et3VettingController {
     public ResponseEntity<CCDCallbackResponse> initEt3RespondentList(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "respondent");
         if (errors.isEmpty()) {
@@ -109,11 +100,6 @@ public class Et3VettingController {
     public ResponseEntity<CCDCallbackResponse> et3VettingStart(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
@@ -150,11 +136,6 @@ public class Et3VettingController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         if (YES.equals(caseData.getEt3IsThereAnEt3Response())) {
@@ -186,11 +167,6 @@ public class Et3VettingController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3VettingHelper.getRespondentNameAndAddress(caseData);
 
@@ -219,11 +195,6 @@ public class Et3VettingController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3VettingHelper.setHearingListedForExUi(caseData);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
@@ -249,11 +220,6 @@ public class Et3VettingController {
     public ResponseEntity<CCDCallbackResponse> transferApplication(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3VettingHelper.transferApplication(caseData);
@@ -282,11 +248,6 @@ public class Et3VettingController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3VettingService.generateEt3ProcessingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
@@ -314,11 +275,6 @@ public class Et3VettingController {
     public ResponseEntity<CCDCallbackResponse> processingComplete(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         // TODO refactor the PROCESSING_COMPLETE_HEADER variable. This will need to be refactored to include a
         //  hyperlink as part of the text. See RET-2020 for what the links should be once they have been added

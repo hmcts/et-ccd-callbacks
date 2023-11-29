@@ -21,11 +21,9 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkSearchService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkUpdateService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService.UPDATE_SINGLES_PQ_STEP;
@@ -36,12 +34,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationServic
 public class PersistentQueueActionsController {
 
     private static final String LOG_MESSAGE = "received notification request for bulk reference :    ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final BulkCreationService bulkCreationService;
     private final BulkUpdateService bulkUpdateService;
     private final BulkSearchService bulkSearchService;
-    private final VerifyTokenService verifyTokenService;
 
     @PostMapping(value = "/afterSubmittedBulkPQ", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "display the bulk info.")
@@ -57,11 +53,6 @@ public class PersistentQueueActionsController {
             @RequestBody BulkRequest bulkRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("AFTER SUBMITTED BULK PERSISTENT Q ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
 
@@ -95,11 +86,6 @@ public class PersistentQueueActionsController {
             @RequestHeader("Authorization") String userToken) {
         log.info("PRE ACCEPT BULK PERSISTENT Q ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         List<SubmitEvent> submitEvents = bulkSearchService.retrievalCasesForPreAcceptRequest(
                 bulkRequest.getCaseDetails(), userToken);
 
@@ -126,11 +112,6 @@ public class PersistentQueueActionsController {
             @RequestBody BulkRequest bulkRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("UPDATE BULK CASE IDS PERSISTENT Q ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkUpdateCaseIdsLogic(
                 bulkRequest, userToken, true);

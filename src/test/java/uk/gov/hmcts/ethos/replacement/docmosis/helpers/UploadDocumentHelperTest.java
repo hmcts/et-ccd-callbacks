@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -205,6 +206,11 @@ public class UploadDocumentHelperTest {
     public static void attachDocumentToCollection(CaseData caseData, String typeOfDocument) {
         DocumentTypeItem docItem = new DocumentTypeItem();
         DocumentType doc = new DocumentType();
+        doc.setUploadedDocument(UploadedDocumentType.builder()
+            .documentUrl("http://localhost:8080/documents/1234")
+            .documentBinaryUrl("http://localhost:8080/documents/1234/binary")
+            .documentFilename("test.pdf")
+            .build());
         doc.setTypeOfDocument(typeOfDocument);
         docItem.setValue(doc);
         caseData.setDocumentCollection(List.of(docItem));

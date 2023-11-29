@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
+import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -172,6 +173,8 @@ public final class UploadDocumentHelper {
         if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
+                documentTypeItem.getValue().getUploadedDocument().setCategoryId(
+                        DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getTypeOfDocument()));
             }
         }
     }

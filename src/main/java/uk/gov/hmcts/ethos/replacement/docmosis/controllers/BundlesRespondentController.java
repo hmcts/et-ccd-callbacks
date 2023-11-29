@@ -82,8 +82,6 @@ public class BundlesRespondentController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-
-
     /**
      * About to Submit for Bundles Respondent Prepare Doc for Hearing journey.
      *
@@ -115,7 +113,6 @@ public class BundlesRespondentController {
         bundlesRespondentService.addToBundlesCollection(caseData);
         bundlesRespondentService.clearInputData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
-
     }
 
     /**

@@ -71,7 +71,6 @@ class BundlingServiceTest {
     void stitchBundleRequest() {
         caseDetails.getCaseData().setCaseBundles(bundlingService.stitchBundle(caseDetails, authToken));
         assertNotNull(caseDetails.getCaseData().getCaseBundles());
-        System.out.println(caseDetails.getCaseData().getCaseBundles());
         assertNotNull(caseDetails.getCaseData().getCaseBundles().get(0).value().getStitchedDocument());
     }
 

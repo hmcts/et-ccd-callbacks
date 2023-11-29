@@ -107,7 +107,7 @@ class HearingsHelperTest {
         caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_POSTPONED);
 
-        HearingsHelper.updatePostponedDate(caseDetails1.getCaseData());
+        Helper.updatePostponedDate(caseDetails1.getCaseData());
 
         assertNotNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getPostponedDate());
@@ -115,7 +115,7 @@ class HearingsHelperTest {
         caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_SETTLED);
 
-        HearingsHelper.updatePostponedDate(caseDetails1.getCaseData());
+        Helper.updatePostponedDate(caseDetails1.getCaseData());
 
         assertNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getPostponedDate());

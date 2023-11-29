@@ -147,6 +147,7 @@ class TseAdminServiceTest {
                 TseRespondType.builder()
                     .from(CLAIMANT_TITLE)
                     .date("23 December 2022")
+                    .dateTime("2022-12-23T10:20:30.555")
                     .response("Response Details")
                     .hasSupportingMaterial(YES)
                     .supportingMaterial(List.of(
@@ -162,6 +163,7 @@ class TseAdminServiceTest {
                 TseRespondType.builder()
                     .from(ADMIN)
                     .date("24 December 2022")
+                    .dateTime("2022-12-24T10:20:30.555")
                     .enterResponseTitle("Title of Response")
                     .isCmoOrRequest("Request")
                     .isResponseRequired("Yes - view document for details")

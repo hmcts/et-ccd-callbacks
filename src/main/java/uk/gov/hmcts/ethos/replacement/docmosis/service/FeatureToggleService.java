@@ -27,4 +27,20 @@ public class FeatureToggleService {
     public boolean isCaseFlagsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("case-flags-linking-enabled");
     }
+
+    public boolean isHmcEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("hmc");
+    }
+
+    public boolean isBundlesEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("bundles");
+    }
+
+    public boolean isWorkAllocationEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("work-allocation");
+    }
+
+    public boolean isWelshEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("welsh-language");
+    }
 }

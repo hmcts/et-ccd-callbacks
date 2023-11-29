@@ -62,11 +62,13 @@ template:
     respondent:
       application:
         claimant: 5d014e5a-9528-4d02-bd31-8eca98cfba19
+        cyClaimant: 198c5afc-9984-4a04-96db-37e1f6e96843
         respondent: c0b393f6-daf0-46fc-8995-d5e98149326f
         respondent-type-c: e60bc338-db48-4270-95b0-5e8f29e6ae0f
         tribunal: bd7addc3-d1ea-47cf-9249-208a7033d454
       respond:
         claimant: dec79c11-2c02-481d-aed8-6f013667cdf5
+        cyClaimant: c7fc31e8-9370-405a-8b2e-cf5ce99f39b7
         respondent:
           rule-92-yes: 232f1fbe-3a7f-44cd-926b-bfa192c25ac4
           rule-92-no: d647a4c5-5859-42f6-96a6-30d57c0e98c2
@@ -87,6 +89,7 @@ template:
 
   pse:
     claimant: bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff
+    cyClaimant: fcd14cac-5e8e-478e-ab3c-89e394a3c663
     respondent:
       rule-92-yes: aa114479-e72b-4893-9024-c25aee1be6fc
       rule-92-no: 3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee
@@ -104,6 +107,12 @@ template:
 
   respondNotification:
     noResponse: d2caad87-2bab-4bc0-b598-01f1a7341f9e
+
+  bundles:
+    claimantSubmittedNotificationForClaimant:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
+    claimantSubmittedNotificationForRespondent:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
 
   claimantSendNotificationHearingOther: ${CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
 
@@ -136,3 +145,4 @@ hmcts_service_id: BHA1
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   env: ${LAUNCH_DARKLY_ENV:default}
+

@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_STRIKING_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
@@ -61,10 +63,10 @@ public final class Helper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private Helper() {
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public static String nullCheck(String value) {
@@ -162,7 +164,7 @@ public final class Helper {
     public static String getDocumentName(CorrespondenceType correspondenceType,
                                          CorrespondenceScotType correspondenceScotType) {
         String ewSection = DocumentHelper.getEWSectionName(correspondenceType);
-        String sectionName = ewSection.equals("")
+        String sectionName = ewSection.isEmpty()
                 ? DocumentHelper.getScotSectionName(correspondenceScotType) : ewSection;
         return DocumentHelper.getTemplateName(correspondenceType, correspondenceScotType) + "_" + sectionName;
     }
@@ -220,10 +222,8 @@ public final class Helper {
     }
 
     public static void updatePositionTypeToClosed(CaseData caseData) {
-
         caseData.setPositionType(CASE_CLOSED_POSITION);
         caseData.setCurrentPosition(CASE_CLOSED_POSITION);
-
     }
 
     public static void updatePostponedDate(CaseData caseData) {
@@ -276,7 +276,7 @@ public final class Helper {
      * @return A new object that has a subset of data from the source object dependent on the class passed
      */
     public static Object intersectProperties(Object sourceObject, Class<?> targetClassType) {
-        return mapper.convertValue(sourceObject, targetClassType);
+        return objectMapper.convertValue(sourceObject, targetClassType);
     }
 
     /**
@@ -285,6 +285,14 @@ public final class Helper {
      */
     public static String getCurrentDate() {
         return new SimpleDateFormat("dd MMM yyyy").format(new Date());
+    }
+
+    /**
+     * Gives current datetime in string format.
+     * @return current datetime in "yyyy-MM-dd'T'HH:mm:ss.SSS" format
+     */
+    public static String getCurrentDateTime() {
+        return LocalDateTime.now().format(OLD_DATE_TIME_PATTERN);
     }
 
     public static String getRespondentNames(CaseData caseData) {

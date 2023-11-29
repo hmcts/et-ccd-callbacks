@@ -59,12 +59,11 @@ public final class TseAdmReplyHelper {
         }
     }
 
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
-                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getTseAdminSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(TSE_ADMIN_REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -82,8 +81,7 @@ public final class TseAdmReplyHelper {
                 .orElse(null);
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
-                                                      String ccdGatewayBaseUrl) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
         String selectedCmoRespondent = caseData.getTseAdmReplyCmoSelectPartyRespond();
         return TseAdminReplyData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -92,11 +90,11 @@ public final class TseAdmReplyHelper {
                 .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .response(defaultIfEmpty(application.getDetails(), null))
                 .supportingYesNo(hasSupportingDocs(caseData.getTseAdmReplyAddDocument()))
-                .documentCollection(getUploadedDocList(caseData.getTseAdmReplyAddDocument(), ccdGatewayBaseUrl))
+                .documentCollection(getUploadedDocList(caseData.getTseAdmReplyAddDocument()))
                 .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
                 .responseTitle(defaultIfEmpty(caseData.getTseAdmReplyEnterResponseTitle(), null))
                 .responseAdditionalInfo(defaultIfEmpty(caseData.getTseAdmReplyAdditionalInformation(), null))
-                .isCmoOrRequest(defaultIfEmpty(caseData.getTseAdmReplyIsCmoOrRequest(), null))
+                .cmoOrRequest(defaultIfEmpty(caseData.getTseAdmReplyIsCmoOrRequest(), null))
                 .cmoMadeBy(defaultIfEmpty(caseData.getTseAdmReplyCmoMadeBy(), null))
                 .cmoEnterFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(), null))
                 .cmoIsResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(), null))
@@ -112,15 +110,15 @@ public final class TseAdmReplyHelper {
     }
 
     private static List<GenericTypeItem<DocumentType>> getUploadedDocList(
-            List<GenericTypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
+            List<GenericTypeItem<DocumentType>> docTypeList) {
         if (docTypeList == null) {
             return new ArrayList<>();
         }
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList, ccdGatewayBaseUrl);
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
     }
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+        return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 
 }

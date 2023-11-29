@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 
 @Slf4j
 public class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
@@ -40,11 +42,14 @@ public class PseRespondToTribunalControllerFunctionalTest extends BaseFunctional
 
     @BeforeAll
     public void setUpCaseData() {
+        ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
+        hearingPreference.setContactLanguage(ENGLISH_LANGUAGE);
         CaseData caseData = CaseDataBuilder.builder()
-            .withEthosCaseReference("testCaseReference")
-            .withClaimant("claimant")
-            .withManagingOffice("Manchester")
-            .build();
+                .withEthosCaseReference("testCaseReference")
+                .withClaimant("claimant")
+                .withManagingOffice("Manchester")
+                .withClaimantHearingPreference(hearingPreference.getContactLanguage())
+                .build();
 
         caseData.setSendNotificationCollection(List.of(
             SendNotificationTypeItem.builder()

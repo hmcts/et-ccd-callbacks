@@ -59,7 +59,7 @@ public class DocumentManagementService {
     private final DocumentUploadClientApi documentUploadClient;
     private final AuthTokenGenerator authTokenGenerator;
     private final DocumentDownloadClientApi documentDownloadClientApi;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final CaseDocumentClient caseDocumentClient;
     private final RestTemplate restTemplate;
 
@@ -74,13 +74,13 @@ public class DocumentManagementService {
 
     @Autowired
     public DocumentManagementService(DocumentUploadClientApi documentUploadClient,
-                                     AuthTokenGenerator authTokenGenerator, UserService userService,
+                                     AuthTokenGenerator authTokenGenerator, UserIdamService userIdamService,
                                      DocumentDownloadClientApi documentDownloadClientApi,
                                      CaseDocumentClient caseDocumentClient,
                                      RestTemplate restTemplate) {
         this.documentUploadClient = documentUploadClient;
         this.authTokenGenerator = authTokenGenerator;
-        this.userService = userService;
+        this.userIdamService = userIdamService;
         this.documentDownloadClientApi = documentDownloadClientApi;
         this.caseDocumentClient = caseDocumentClient;
         this.restTemplate = restTemplate;
@@ -111,7 +111,7 @@ public class DocumentManagementService {
                 return URI.create(document.links.self.href);
             } else {
                 log.info("Using Document Upload Client");
-                UserDetails user = userService.getUserDetails(authToken);
+                UserDetails user = userIdamService.getUserDetails(authToken);
                 UploadResponse response = documentUploadClient.upload(
                        authToken,
                        authTokenGenerator.generate(),
@@ -144,7 +144,7 @@ public class DocumentManagementService {
     }
 
     public UploadedDocument downloadFile(String authToken, String urlString) {
-        UserDetails user = userService.getUserDetails(authToken);
+        UserDetails user = userIdamService.getUserDetails(authToken);
         ResponseEntity<Resource> response;
 
         response = documentDownloadClientApi.downloadBinary(

@@ -61,7 +61,7 @@ public class TornadoService {
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
-    private final UserService userService;
+    private final UserIdamService userIdamService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final VenueAddressReaderService venueAddressReaderService;
     private final TseService tseService;
@@ -98,7 +98,7 @@ public class TornadoService {
                                   MultipleData multipleData) throws IOException {
         try (OutputStreamWriter os = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
             DefaultValues allocatedCourtAddress = getAllocatedCourtAddress(caseData, caseTypeId, multipleData);
-            UserDetails userDetails = userService.getUserDetails(authToken);
+            UserDetails userDetails = userIdamService.getUserDetails(authToken);
 
             StringBuilder documentContent = DocumentHelper.buildDocumentContent(caseData,
                     tornadoConnection.getAccessKey(),
@@ -142,7 +142,7 @@ public class TornadoService {
 
     private void buildListingInstruction(HttpURLConnection conn, ListingData listingData,
                                          String documentName, String authToken, String caseType) throws IOException {
-        UserDetails userDetails = userService.getUserDetails(authToken);
+        UserDetails userDetails = userIdamService.getUserDetails(authToken);
         StringBuilder sb;
 
         if (ListingHelper.isReportType(listingData.getReportType())) {
@@ -367,11 +367,10 @@ public class TornadoService {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_REPLY -> {
-                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey(), ccdGatewayBaseUrl);
+                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_ADMIN_REPLY -> {
-                return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        ccdGatewayBaseUrl);
+                return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

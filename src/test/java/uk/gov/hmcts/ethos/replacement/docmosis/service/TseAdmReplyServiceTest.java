@@ -36,6 +36,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -78,6 +79,8 @@ class TseAdmReplyServiceTest {
     private TornadoService tornadoService;
     @MockBean
     private TseService tseService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     private CaseData caseData;
 
@@ -103,10 +106,11 @@ class TseAdmReplyServiceTest {
     void setUp() {
         emailService = spy(new EmailUtils());
         tseAdmReplyService = new TseAdmReplyService(documentManagementService, emailService,
-                tornadoService, tseService);
+                tornadoService, tseService, featureToggleService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(tseService.formatViewApplication(any(), any(), eq(false))).thenReturn("Application Details\r\n");
 
         Resource resource = new ByteArrayResource(new byte[] { 10, 20, 15});
@@ -290,6 +294,15 @@ class TseAdmReplyServiceTest {
             caseData.getGenericTseApplicationCollection().get(0).getValue()
                 .getRespondCollection().get(0).getValue();
 
+        String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
+
+        String actualDateTimeParsedForTesting = UtilHelper.formatCurrentDate(
+            LocalDateTime.parse(actual.getDateTime()).toLocalDate()
+        );
+
+        assertThat(actual.getDate()).isEqualTo(dateNow);
+        assertThat(actualDateTimeParsedForTesting).isEqualTo(dateNow);
+
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(actual.getEnterResponseTitle())
@@ -382,8 +395,9 @@ class TseAdmReplyServiceTest {
             caseData.getGenericTseApplicationCollection().get(0).getValue()
                 .getRespondCollection().get(0).getValue();
 
-        assertThat(actual.getDate())
-            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+        String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
+
+        assertThat(actual.getDate()).isEqualTo(dateNow);
         assertThat(actual.getEnterResponseTitle())
             .isNull();
         assertThat(actual.getAdditionalInformation())
@@ -404,6 +418,13 @@ class TseAdmReplyServiceTest {
             .isNull();
         assertThat(actual.getSelectPartyNotify())
             .isEqualTo(RESPONDENT_ONLY);
+
+        // WA properties
+        String actualDateTimeParsedForTesting = UtilHelper.formatCurrentDate(
+            LocalDateTime.parse(actual.getDateTime()).toLocalDate()
+        );
+        assertThat(actualDateTimeParsedForTesting).isEqualTo(dateNow);
+        assertThat(actual.getApplicationType()).isEqualTo("Claimant not complied");
     }
 
     @Test

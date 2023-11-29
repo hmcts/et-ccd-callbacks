@@ -34,12 +34,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
@@ -199,12 +201,11 @@ public final class TseHelper {
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
      */
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
-                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -221,19 +222,28 @@ public final class TseHelper {
      * @return Personalisation For Response
      * @throws NotificationClientException Throw Exception
      */
-    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document,
-                                                                    String citizenUrl)
+
+    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails,
+                                                                    byte[] document,
+                                                                    String citizenUrl,
+                                                                    boolean isWelsh)
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
+        String linkToCitizenHub = isWelsh
+                ? citizenUrl + WELSH_LANGUAGE_PARAM
+                : citizenUrl;
+        String applicationType = isWelsh
+                ? CY_RESPONDING_TO_APP_TYPE_MAP.get(selectedApplication.getType())
+                : selectedApplication.getType();
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
-                LINK_TO_CITIZEN_HUB, citizenUrl,
+                LINK_TO_CITIZEN_HUB, linkToCitizenHub,
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, selectedApplication.getType(),
+                APPLICATION_TYPE, applicationType,
                 "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
@@ -255,8 +265,7 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
-                                                      String ccdGatewayBaseUrl) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
 
         return TseReplyData.builder()
             .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -265,18 +274,17 @@ public final class TseHelper {
             .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
             .response(defaultIfEmpty(application.getDetails(), null))
             .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-            .documentCollection(getUploadedDocList(caseData, ccdGatewayBaseUrl))
+            .documentCollection(getUploadedDocList(caseData))
             .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
             .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
+    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return null;
         }
 
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial(),
-                ccdGatewayBaseUrl);
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {

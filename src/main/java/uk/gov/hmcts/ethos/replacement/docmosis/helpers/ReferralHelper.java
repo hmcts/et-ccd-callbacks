@@ -122,7 +122,8 @@ public final class ReferralHelper {
      * Populates Hearing, Referral and Replies details. For judges only hearing and referral details will be displayed.
      */
     public static String populateHearingReferralDetails(CaseData caseData) {
-        return populateHearingDetails(caseData) + populateReferralDetails(caseData)
+        return populateHearingDetails(caseData)
+                + populateReferralDetails(caseData)
                 + populateReplyDetails(caseData);
     }
 
@@ -414,7 +415,7 @@ public final class ReferralHelper {
                 .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))
                 .referentEmail(defaultIfEmpty(caseData.getReferentEmail(), null))
-                .isUrgent(defaultIfEmpty(caseData.getIsUrgent(), null))
+                .urgent(defaultIfEmpty(caseData.getIsUrgent(), null))
                 .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
                 .referralSubject(defaultIfEmpty(caseData.getReferralSubject(), null))
                 .referralDetails(defaultIfEmpty(caseData.getReferralDetails(), null))
@@ -436,7 +437,7 @@ public final class ReferralHelper {
                 .referredBy(defaultIfEmpty(referral.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(referral.getReferCaseTo(), null))
                 .referentEmail(defaultIfEmpty(referral.getReferentEmail(), null))
-                .isUrgent(defaultIfEmpty(referral.getIsUrgent(), null))
+                .urgent(defaultIfEmpty(referral.getIsUrgent(), null))
                 .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
                 .referralSubject(defaultIfEmpty(referral.getReferralSubject(), null))
                 .referralDetails(defaultIfEmpty(referral.getReferralDetails(), null))
@@ -524,7 +525,7 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName The full name of the logged-in user
      */
-    public static void createReferralReply(CaseData caseData, String userFullName) {
+    public static void createReferralReply(CaseData caseData, String userFullName, boolean waEnabled) {
         ReferralType referral = getSelectedReferral(caseData);
         if (CollectionUtils.isEmpty(referral.getReferralReplyCollection())) {
             referral.setReferralReplyCollection(new ArrayList<>());
@@ -542,6 +543,13 @@ public final class ReferralHelper {
 
         referralReply.setDirectionDetails(caseData.getDirectionDetails() != null
                 ? caseData.getDirectionDetails() : caseData.getReplyDetails());
+
+        if (waEnabled) {
+            // for Work Allocation DMNs only
+            referralReply.setReplyDateTime(Helper.getCurrentDateTime());
+            referralReply.setReferralSubject(referral.getReferralSubject());
+            referralReply.setReferralNumber(referral.getReferralNumber());
+        }
 
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(UUID.randomUUID().toString());

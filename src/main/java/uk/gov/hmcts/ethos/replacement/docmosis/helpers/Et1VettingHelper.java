@@ -9,11 +9,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocument;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
@@ -80,11 +82,11 @@ public final class Et1VettingHelper {
                 .codesCorrectGiveDetails(defaultIfEmpty(caseData.getCodesCorrectGiveDetails(), null))
                 .vettingJurisdictionCodeCollection(formatJurCodes(caseData.getVettingJurisdictionCodeCollection()))
                 .et1JurisdictionCodeGeneralNotes(defaultIfEmpty(caseData.getEt1JurisdictionCodeGeneralNotes(), null))
-                .isTrackAllocationCorrect(defaultIfEmpty(caseData.getIsTrackAllocationCorrect(), null))
+                .trackAllocationCorrect(defaultIfEmpty(caseData.getIsTrackAllocationCorrect(), null))
                 .suggestAnotherTrack(defaultIfEmpty(caseData.getSuggestAnotherTrack(), null))
                 .whyChangeTrackAllocation(defaultIfEmpty(caseData.getWhyChangeTrackAllocation(), null))
                 .trackAllocationGeneralNotes(defaultIfEmpty(caseData.getTrackAllocationGeneralNotes(), null))
-                .isLocationCorrect(defaultIfEmpty(caseData.getIsLocationCorrect(), null))
+                .correctLocation(defaultIfEmpty(caseData.getIsLocationCorrect(), null))
                 .regionalOfficeList(getSelectedLabel(caseData.getRegionalOfficeList()).isPresent()
                         ? defaultIfEmpty(caseData.getRegionalOfficeList().getSelectedLabel(), null)
                         : null)

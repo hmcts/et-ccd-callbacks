@@ -82,6 +82,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isWelshEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEccIsEnabled(Boolean toggleStat) {
+        givenToggle("ecc", toggleStat);
+
+        assertThat(featureToggleService.isEccEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

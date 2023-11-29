@@ -55,8 +55,8 @@ class SendNotificationServiceTest {
             "claimantSendNotificationHearingOtherTemplateId";
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID =
             "bundlesSubmittedNotificationForClaimantTemplateId";
-    private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID =
-            "bundlesSubmittedNotificationForRespondentTemplateId";
+    private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
+            "bundlesSubmittedNotificationForTribunalTemplateId";
 
     @BeforeEach
     public void setUp() {
@@ -75,8 +75,8 @@ class SendNotificationServiceTest {
                 BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID,
                 "bundlesSubmittedNotificationForClaimantTemplateId");
         ReflectionTestUtils.setField(sendNotificationService,
-                BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID,
-                "bundlesSubmittedNotificationForRespondentTemplateId");
+                BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID,
+                "bundlesSubmittedNotificationForTribunalTemplateId");
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
                 .withClaimantType("claimant@email.com")
@@ -302,7 +302,7 @@ class SendNotificationServiceTest {
                 .sendEmail(eq(BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
         verify(emailService, times(1))
-                .sendEmail(eq(BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID),
+                .sendEmail(eq(BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("1234", val.get("caseNumber"));

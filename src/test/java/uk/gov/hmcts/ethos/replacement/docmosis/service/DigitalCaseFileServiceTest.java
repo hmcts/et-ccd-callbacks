@@ -29,21 +29,21 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 
 @ExtendWith(SpringExtension.class)
-class BundlingServiceTest {
+class DigitalCaseFileServiceTest {
 
     @MockBean
     private BundleApiClient bundleApiClient;
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
-    private BundlingService bundlingService;
+    private DigitalCaseFileService digitalCaseFileService;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private String authToken = "Bearer token";
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
-        bundlingService = new BundlingService(bundleApiClient, authTokenGenerator);
+        digitalCaseFileService = new DigitalCaseFileService(bundleApiClient, authTokenGenerator);
         caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
                 .withDocumentCollection(ET1)
@@ -56,20 +56,20 @@ class BundlingServiceTest {
         when(bundleApiClient.stitchBundle(any(), any(), any()))
                 .thenReturn(ResourceLoader.stitchBundleRequest());
         when(authTokenGenerator.generate()).thenReturn("authToken");
-        ReflectionTestUtils.setField(bundlingService, "defaultBundle", "et-dcf-2.yaml");
+        ReflectionTestUtils.setField(digitalCaseFileService, "defaultBundle", "et-dcf-2.yaml");
 
     }
 
     @Test
     void createBundleRequest() {
-        caseDetails.getCaseData().setCaseBundles(bundlingService.createBundleRequest(caseDetails, authToken));
+        caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseDetails, authToken));
         assertNotNull(caseDetails.getCaseData().getCaseBundles());
         assertEquals(YES, caseDetails.getCaseData().getCaseBundles().get(0).value().getEligibleForStitching());
     }
 
     @Test
     void stitchBundleRequest() {
-        caseDetails.getCaseData().setCaseBundles(bundlingService.stitchBundle(caseDetails, authToken));
+        caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.stitchCaseFile(caseDetails, authToken));
         assertNotNull(caseDetails.getCaseData().getCaseBundles());
         assertNotNull(caseDetails.getCaseData().getCaseBundles().get(0).value().getStitchedDocument());
     }
@@ -78,7 +78,7 @@ class BundlingServiceTest {
     @MethodSource
     void shouldSetBundleConfiguration(String bundleConfig, String expectedConfig) {
         caseData.setBundleConfiguration(bundleConfig);
-        bundlingService.setBundleConfig(caseData);
+        digitalCaseFileService.setBundleConfig(caseData);
         assertEquals(caseData.getBundleConfiguration(), expectedConfig);
     }
 

@@ -18,9 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BundlingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
@@ -31,9 +31,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/bundle")
-public class BundlingController {
+public class DigitalCaseFileController {
 
-    private final BundlingService bundlingService;
+    private final DigitalCaseFileService digitalCaseFileService;
     private final VerifyTokenService verifyTokenService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -62,7 +62,7 @@ public class BundlingController {
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseDetails.getCaseData());
         UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseDetails.getCaseData());
         caseDetails.getCaseData().setCaseBundles(null);
-        caseDetails.getCaseData().setCaseBundles(bundlingService.createBundleRequest(caseDetails, userToken));
+        caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseDetails, userToken));
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
@@ -86,8 +86,8 @@ public class BundlingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setCaseBundles(bundlingService.stitchBundle(ccdRequest.getCaseDetails(), userToken));
-        BundlingHelper.addBundleToDocumentCollection(caseData);
+        caseData.setCaseBundles(digitalCaseFileService.stitchCaseFile(ccdRequest.getCaseDetails(), userToken));
+        DigitalCaseFileHelper.addBundleToDocumentCollection(caseData);
         caseData.setCaseBundles(null);
         return getCallbackRespEntityNoErrors(caseData);
     }

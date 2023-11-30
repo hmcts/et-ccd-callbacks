@@ -14,7 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelperTest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
@@ -35,8 +35,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({BundlingController.class, JsonMapper.class})
-class BundlingControllerTest {
+@WebMvcTest({DigitalCaseFileController.class, JsonMapper.class})
+class DigitalCaseFileControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String SELECT_BUNDLE_URL = "/bundle/selectBundle";
@@ -47,7 +47,7 @@ class BundlingControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private BundlingService bundlingService;
+    private DigitalCaseFileService digitalCaseFileService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired

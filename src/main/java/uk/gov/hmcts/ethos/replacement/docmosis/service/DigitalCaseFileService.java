@@ -18,7 +18,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RequiredArgsConstructor
 @Service
-public class BundlingService {
+public class DigitalCaseFileService {
 
     private final BundleApiClient bundleApiClient;
     private final AuthTokenGenerator authTokenGenerator;
@@ -26,7 +26,7 @@ public class BundlingService {
     @Value("${bundle.config.default}")
     private String defaultBundle;
 
-    public List<Bundle> createBundleRequest(CaseDetails caseDetails, String userToken) {
+    public List<Bundle> createCaseFileRequest(CaseDetails caseDetails, String userToken) {
         setBundleConfig(caseDetails.getCaseData());
         BundleCreateResponse bundleCreateResponse = createBundle(userToken, authTokenGenerator.generate(),
                 bundleRequestMapper(caseDetails));
@@ -47,15 +47,15 @@ public class BundlingService {
         return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
     }
 
-    public List<Bundle> stitchBundle(CaseDetails caseDetails, String userToken) {
+    public List<Bundle> stitchCaseFile(CaseDetails caseDetails, String userToken) {
         setBundleConfig(caseDetails.getCaseData());
-        BundleCreateResponse bundleCreateResponse = stitchBundle(userToken, authTokenGenerator.generate(),
+        BundleCreateResponse bundleCreateResponse = stitchCaseFile(userToken, authTokenGenerator.generate(),
                 bundleRequestMapper(caseDetails));
         return bundleCreateResponse.getData().getCaseBundles();
     }
 
-    private BundleCreateResponse stitchBundle(String authorization, String serviceAuthorization,
-                                              BundleCreateRequest bundleCreateRequest) {
+    private BundleCreateResponse stitchCaseFile(String authorization, String serviceAuthorization,
+                                                BundleCreateRequest bundleCreateRequest) {
         return bundleApiClient.stitchBundle(authorization, serviceAuthorization, bundleCreateRequest);
     }
 

@@ -335,7 +335,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'6823ee3ee8'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'ed8e0f52c4'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version:'c93e8c43d9'
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'

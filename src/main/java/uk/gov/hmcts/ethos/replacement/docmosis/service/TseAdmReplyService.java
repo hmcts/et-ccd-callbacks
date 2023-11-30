@@ -172,7 +172,7 @@ public class TseAdmReplyService {
                 .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
                 .build();
 
-        applicationType.getRespondCollection().add(TseRespondTypeItem.builder()
+        applicationType.getRespondCollection().add(TypeItem.<TseRespondType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(response)
                 .build());

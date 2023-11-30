@@ -279,7 +279,7 @@ public final class TseHelper {
             .build();
     }
 
-    private static List<TypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
+    private static ListTypeItem<DocumentType> getUploadedDocList(CaseData caseData) {
 
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return null;

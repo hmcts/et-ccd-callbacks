@@ -20,8 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
@@ -109,10 +107,10 @@ public final class TseAdmReplyHelper {
                 .build();
     }
 
-    private static List<TypeItem<DocumentType>> getUploadedDocList(
-            List<TypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
+    private static ListTypeItem<DocumentType> getUploadedDocList(
+            ListTypeItem<DocumentType> docTypeList) {
         if (docTypeList == null) {
-            return new ArrayList<>();
+            return new ListTypeItem<DocumentType>();
         }
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
     }

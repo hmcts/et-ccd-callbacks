@@ -167,7 +167,8 @@ public class TseRespondentReplyService {
                 .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
                 .build();
 
-        respondCollection.add(TseRespondTypeItem.builder().id(UUID.randomUUID().toString()).value(response).build());
+        respondCollection.add(TypeItem.<TseRespondType>builder().id(UUID.randomUUID().toString())
+                .value(response).build());
 
         if (featureToggleService.isWorkAllocationEnabled()) {
             response.setDateTime(Helper.getCurrentDateTime()); // for Work Allocation DMNs

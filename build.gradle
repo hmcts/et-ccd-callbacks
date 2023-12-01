@@ -302,9 +302,9 @@ ext {
     junitJupiterVersion = '5.10.1'
     log4JVersion = '2.22.0'
     pact_version = '4.3.10'
-    reformLoggingVersion = '5.1.9'
-    serenity = '3.7.1'
-    tomcatEmbedVersion = '9.0.80'
+    reformLoggingVersion = '6.0.1'
+    serenity = '3.9.8'
+    tomcatEmbedVersion = '9.0.83'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -347,7 +347,7 @@ dependencies {
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.15.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.62.Final'
     implementation group: 'org.json', name: 'json', version: '20231013'
@@ -361,7 +361,6 @@ dependencies {
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.8'
-
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
@@ -428,7 +427,7 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.15.0'
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.15.1'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.7.0'

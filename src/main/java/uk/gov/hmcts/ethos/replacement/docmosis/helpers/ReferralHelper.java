@@ -548,6 +548,7 @@ public final class ReferralHelper {
             // for Work Allocation DMNs only
             referralReply.setReplyDateTime(Helper.getCurrentDateTime());
             referralReply.setReferralSubject(referral.getReferralSubject());
+            referralReply.setReferralNumber(referral.getReferralNumber());
         }
 
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();

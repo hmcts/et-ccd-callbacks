@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -157,10 +159,14 @@ public class ReplyToReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = ReferralHelper.validateEmail(caseData.getReplyToEmailAddress());
+        List<String> errors = new ArrayList<>();
 
-        if (CollectionUtils.isNotEmpty(caseData.getReplyDocument())) {
-            ReferralHelper.addDocumentUploadErrors(caseData.getReplyDocument(), errors);
+        if (StringUtils.isNotEmpty(caseData.getReplyToEmailAddress())) {
+            errors = ReferralHelper.validateEmail(caseData.getReplyToEmailAddress());
+
+            if (CollectionUtils.isNotEmpty(caseData.getReplyDocument())) {
+                ReferralHelper.addDocumentUploadErrors(caseData.getReplyDocument(), errors);
+            }
         }
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -209,17 +215,19 @@ public class ReplyToReferralController {
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
         String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
-        emailService.sendEmail(
-                referralTemplateId,
-                caseData.getReplyToEmailAddress(),
-                ReferralHelper.buildPersonalisation(caseData, referralCode, false, userDetails.getName(), caseLink)
-        );
+        if (StringUtils.isNotEmpty(caseData.getReplyToEmailAddress())) {
+            emailService.sendEmail(
+                    referralTemplateId,
+                    caseData.getReplyToEmailAddress(),
+                    ReferralHelper.buildPersonalisation(caseData, referralCode, false, userDetails.getName(), caseLink)
+            );
 
-        log.info("Event: Referral Reply Email sent. "
-                + ". EventId: " + ccdRequest.getEventId()
-                + ". Referral code: " + referralCode
-                + ". Emailed at: " + DateTime.now());
+            log.info("Event: Referral Reply Email sent. "
+                    + ". EventId: " + ccdRequest.getEventId()
+                    + ". Referral code: " + referralCode
+                    + ". Emailed at: " + DateTime.now());
 
+        }
         clearReferralReplyDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

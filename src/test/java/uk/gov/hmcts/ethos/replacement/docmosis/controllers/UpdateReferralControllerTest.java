@@ -157,6 +157,7 @@ class UpdateReferralControllerTest {
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
     }
+
     @Test
     void aboutToSubmitNoUpdateReferentEmailAddress_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);

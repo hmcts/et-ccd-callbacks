@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
+    private static final String EMPLOYER_CONTRACT_CLAIM = "Employer Contract Claim";
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
@@ -194,8 +195,9 @@ public class SendNotificationService {
 
         boolean ecc = featureToggleService.isEccEnabled();
 
-        if (caseData.getSendNotificationSubject().contains("Employer Contract Claim")
+        if (caseData.getSendNotificationSubject().contains(EMPLOYER_CONTRACT_CLAIM)
                 && !ecc) {
+            log.warn("No emails sent. ECC feature flag is not enabled");
             return;
         }
 

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -23,9 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
@@ -39,6 +38,8 @@ class SendNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
@@ -59,7 +60,7 @@ class SendNotificationServiceTest {
     @BeforeEach
     public void setUp() {
         emailService = spy(new EmailUtils());
-        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
+        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService, featureToggleService);
         ReflectionTestUtils.setField(sendNotificationService,
                 RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID,
                 "respondentSendNotificationTemplateId");
@@ -199,6 +200,26 @@ class SendNotificationServiceTest {
         caseData.getRepCollection().forEach(o -> o.getValue().setRepresentativeEmailAddress(null));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1)).sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
+    }
+
+    @Test
+    void sendNotifyEmails_EccToBothParties() {
+        when(featureToggleService.isEccEnabled()).thenReturn(true);
+        caseData.setSendNotificationSubject(List.of("Employer Contract Claim"));
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(1)).sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
+        verify(emailService, times(1)).sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
+    }
+
+    @Test
+    void sendNotifyEmails_EccDisabled() {
+        when(featureToggleService.isEccEnabled()).thenReturn(false);
+        caseData.setSendNotificationSubject(List.of("Employer Contract Claim"));
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(0)).sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
+        verify(emailService, times(0)).sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
     }
 
     @Test

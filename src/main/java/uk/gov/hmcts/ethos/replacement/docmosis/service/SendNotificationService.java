@@ -52,6 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 public class SendNotificationService {
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
+    private final FeatureToggleService featureToggleService;
     @Value("${template.claimantSendNotification}")
     private String claimantSendNotificationTemplateId;
     @Value("${template.respondentSendNotification}")
@@ -190,6 +191,13 @@ public class SendNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
         String caseId = caseDetails.getCaseId();
+
+        boolean ecc = featureToggleService.isEccEnabled();
+
+        if (caseData.getSendNotificationSubject().contains("Employer Contract Claim")
+                && !ecc) {
+            return;
+        }
 
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
             emailService.sendEmail(claimantSendNotificationTemplateId, claimantEmailAddress,

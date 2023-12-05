@@ -11,7 +11,8 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
@@ -152,9 +153,9 @@ public class TseRespondentReplyService {
         GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
 
         if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            genericTseApplicationType.setRespondCollection(new ArrayList<>());
+            genericTseApplicationType.setRespondCollection(new ListTypeItem<TseRespondType>());
         }
-        List<TseRespondTypeItem> respondCollection = genericTseApplicationType.getRespondCollection();
+        List<TypeItem<TseRespondType>> respondCollection = genericTseApplicationType.getRespondCollection();
 
         TseRespondType response = TseRespondType.builder()
                 .response(caseData.getTseResponseText())
@@ -166,7 +167,8 @@ public class TseRespondentReplyService {
                 .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
                 .build();
 
-        respondCollection.add(TseRespondTypeItem.builder().id(UUID.randomUUID().toString()).value(response).build());
+        respondCollection.add(TypeItem.<TseRespondType>builder().id(UUID.randomUUID().toString())
+                .value(response).build());
 
         if (featureToggleService.isWorkAllocationEnabled()) {
             response.setDateTime(Helper.getCurrentDateTime()); // for Work Allocation DMNs

@@ -13,10 +13,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
@@ -92,7 +92,7 @@ public final class TseHelper {
                 .toList());
     }
 
-    private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
+    private static boolean isNoRespondentReply(List<TypeItem<TseRespondType>> tseRespondTypeItems) {
         return CollectionUtils.isEmpty(tseRespondTypeItems)
                 || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
     }
@@ -104,8 +104,9 @@ public final class TseHelper {
         return YES.equals(application.getRespondentResponseRequired());
     }
 
-    private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
-        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+    private static DynamicValueType formatDropdownOption(TypeItem<GenericTseApplicationType>
+                                                                 genericTseApplicationType) {
+        GenericTseApplicationType value = genericTseApplicationType.getValue();
         return DynamicValueType.create(value.getNumber(), String.format("%s %s", value.getNumber(), value.getType()));
     }
 
@@ -190,7 +191,7 @@ public final class TseHelper {
         return caseData.getGenericTseApplicationCollection().stream()
             .filter(item -> item.getValue().getNumber().equals(selectedAppId))
             .findFirst()
-            .map(GenericTseApplicationTypeItem::getValue)
+            .map(TypeItem<GenericTseApplicationType>::getValue)
             .orElse(null);
     }
 
@@ -279,7 +280,7 @@ public final class TseHelper {
             .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
+    private static ListTypeItem<DocumentType> getUploadedDocList(CaseData caseData) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
             return null;
         }
@@ -287,7 +288,7 @@ public final class TseHelper {
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+    private static String hasSupportingDocs(ListTypeItem<DocumentType> supportDocList) {
         return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
     }
 }

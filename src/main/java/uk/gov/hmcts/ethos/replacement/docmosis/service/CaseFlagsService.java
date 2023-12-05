@@ -6,12 +6,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -109,16 +108,16 @@ public class CaseFlagsService {
         }
 
         return caseData.getGenericTseApplicationCollection().stream()
-                .map(GenericTseApplicationTypeItem::getValue)
+                .map(TypeItem<GenericTseApplicationType>::getValue)
                 .filter(o -> TSE_APP_RESTRICT_PUBLICITY.equals(o.getType()))
                 .map(GenericTseApplicationType::getAdminDecision)
                 .filter(Objects::nonNull)
                 .anyMatch(this::hasGrantedDecision);
     }
 
-    private boolean hasGrantedDecision(List<TseAdminRecordDecisionTypeItem> list) {
+    private boolean hasGrantedDecision(List<TypeItem<TseAdminRecordDecisionType>> list) {
         return list.stream()
-                .map(TseAdminRecordDecisionTypeItem::getValue)
+                .map(TypeItem<TseAdminRecordDecisionType>::getValue)
                 .filter(o -> o.getDecision() != null)
                 .anyMatch(o -> o.getDecision().startsWith(GRANTED));
     }
@@ -133,7 +132,7 @@ public class CaseFlagsService {
     @Nullable
     private FlagDetailType findFlagByName(ListTypeItem<FlagDetailType> flags, String name) {
         return flags.stream()
-                .map(GenericTypeItem::getValue)
+                .map(TypeItem::getValue)
                 .filter(o -> name.equals(o.getName()))
                 .findFirst()
                 .orElse(null);

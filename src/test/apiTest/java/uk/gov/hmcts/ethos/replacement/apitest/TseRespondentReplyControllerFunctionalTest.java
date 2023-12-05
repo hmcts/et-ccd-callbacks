@@ -11,15 +11,14 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
-import java.util.List;
 import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -49,17 +48,17 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
             .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<>();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(build);
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
 
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondCollection(List.of(
-                TseRespondTypeItem.builder()
+            .setRespondCollection(ListTypeItem.from(
+                TypeItem.<TseRespondType>builder()
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
                     .value(
                         TseRespondType.builder()

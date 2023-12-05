@@ -20,10 +20,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -120,8 +120,8 @@ class TseAdmReplyServiceTest {
         caseData = CaseDataBuilder.builder().build();
     }
 
-    private List<GenericTypeItem<DocumentType>> createDocumentList() {
-        return List.of(GenericTypeItem.from(DocumentType.from(createUploadedDocumentType())));
+    private ListTypeItem<DocumentType> createDocumentList() {
+        return ListTypeItem.from(TypeItem.from(DocumentType.from(createUploadedDocumentType())));
     }
 
     private UploadedDocumentType createUploadedDocumentType() {
@@ -196,7 +196,7 @@ class TseAdmReplyServiceTest {
         @BeforeEach
         void setUp() {
             caseData.setGenericTseApplicationCollection(
-                    List.of(GenericTseApplicationTypeItem.builder()
+                    ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                             .id(UUID.randomUUID().toString())
                             .value(TseApplicationBuilder.builder().withNumber("1").build())
                             .build()
@@ -231,7 +231,7 @@ class TseAdmReplyServiceTest {
             @BeforeEach
             void setUp() {
                 caseData.setGenericTseApplicationCollection(
-                        List.of(GenericTseApplicationTypeItem.builder()
+                        ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                                 .id(UUID.randomUUID().toString())
                                 .value(TseApplicationBuilder.builder().withNumber("1").build())
                                 .build()
@@ -266,7 +266,7 @@ class TseAdmReplyServiceTest {
     @Test
     void saveTseAdmReplyDataFromCaseData_CmoYes_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("2")
@@ -279,7 +279,7 @@ class TseAdmReplyServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
         caseData.setTseAdmReplyEnterResponseTitle("Submit hearing agenda");
         caseData.setTseAdmReplyAdditionalInformation("Additional Information Details");
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList();
+        ListTypeItem<DocumentType> documentList = createDocumentList();
         caseData.setTseAdmReplyAddDocument(documentList);
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
@@ -334,7 +334,7 @@ class TseAdmReplyServiceTest {
                                                                   String respondentResponseRequired,
                                                                   String claimantResponseRequired) {
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                         .id(UUID.randomUUID().toString())
                         .value(TseApplicationBuilder.builder()
                                 .withNumber("3")
@@ -370,7 +370,7 @@ class TseAdmReplyServiceTest {
     @Test
     void saveTseAdmReplyDataFromCaseData_RequestNo_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("3")
@@ -381,7 +381,7 @@ class TseAdmReplyServiceTest {
 
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
-        List<GenericTypeItem<DocumentType>> admReplyDocument = createDocumentList();
+        ListTypeItem<DocumentType> admReplyDocument = createDocumentList();
         caseData.setTseAdmReplyAddDocument(admReplyDocument);
         caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyRequestMadeBy("Judge");
@@ -430,7 +430,7 @@ class TseAdmReplyServiceTest {
     @Test
     void saveTseAdmReplyDataFromCaseData_Neither_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("4")

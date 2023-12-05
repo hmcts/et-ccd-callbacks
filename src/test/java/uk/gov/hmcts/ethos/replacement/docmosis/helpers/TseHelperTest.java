@@ -16,9 +16,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -31,7 +30,6 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -58,7 +56,7 @@ class TseHelperTest {
     private static final DynamicValueType SELECT_APPLICATION = DynamicValueType.create("1", "");
 
     private CaseData caseData;
-    private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
+    private TypeItem<GenericTseApplicationType> genericTseApplicationType;
     @Mock
     private FeatureToggleService featureToggleService;
 
@@ -76,10 +74,10 @@ class TseHelperTest {
                 .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
                 .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
-        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        genericTseApplicationTypeItem.setValue(build);
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        genericTseApplicationType = new TypeItem<>();
+        genericTseApplicationType.setId(UUID.randomUUID().toString());
+        genericTseApplicationType.setValue(build);
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationType));
     }
 
     @Test
@@ -100,9 +98,9 @@ class TseHelperTest {
     @MethodSource
     void populateSelectApplicationDropdown_hasTribunalResponse(String respondentResponseRequired,
                                                                int numberOfApplication) {
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
+        TypeItem<GenericTseApplicationType> genericTseApplicationType = getGenericTseApplicationTypeItem(
             respondentResponseRequired);
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationType));
 
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
         assert actual != null;
@@ -131,10 +129,10 @@ class TseHelperTest {
             .withDetails("Text").withNumber("1")
             .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
-        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        genericTseApplicationTypeItem.setValue(build);
-        caseData1.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        TypeItem<GenericTseApplicationType> genericTseApplicationType = new TypeItem<>();
+        genericTseApplicationType.setId(UUID.randomUUID().toString());
+        genericTseApplicationType.setValue(build);
+        caseData1.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationType));
 
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData1);
         assert actual != null;
@@ -144,7 +142,7 @@ class TseHelperTest {
     @Test
     void populateSelectApplicationDropdown_withRespondentReply_returnsNothing() {
         caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondCollection(List.of(TseRespondTypeItem.builder()
+            .setRespondCollection(ListTypeItem.from(TypeItem.<TseRespondType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseRespondType.builder()
                     .from(RESPONDENT_TITLE)
@@ -230,11 +228,11 @@ class TseHelperTest {
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(docType);
 
-        GenericTypeItem<DocumentType> item = new GenericTypeItem<>();
+        TypeItem<DocumentType> item = new TypeItem<>();
         item.setValue(documentType);
         item.setId("78910");
 
-        caseData.setTseResponseSupportingMaterial(List.of(item));
+        caseData.setTseResponseSupportingMaterial(ListTypeItem.from(item));
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
         String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
@@ -351,7 +349,7 @@ class TseHelperTest {
 
             GenericTseApplicationType actualApplication = getRespondentSelectedApplicationType(caseData);
 
-            assertEquals(genericTseApplicationTypeItem.getValue(), actualApplication);
+            assertEquals(genericTseApplicationType.getValue(), actualApplication);
         }
 
         @Test

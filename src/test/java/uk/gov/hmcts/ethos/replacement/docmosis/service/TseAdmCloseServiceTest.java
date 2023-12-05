@@ -9,9 +9,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -51,7 +50,7 @@ class TseAdmCloseServiceTest {
     @Test
     void updateStatusToClose() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("1")
@@ -83,7 +82,7 @@ class TseAdmCloseServiceTest {
         GenericTseApplicationType tseApplicationType = getTseAppType();
 
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(tseApplicationType)
                 .build())
@@ -107,7 +106,7 @@ class TseAdmCloseServiceTest {
     }
 
     private static GenericTseApplicationType getTseAppType() {
-        TseAdminRecordDecisionTypeItem recordDecisionTypeItem = TseAdminRecordDecisionTypeItem.builder()
+        TypeItem<TseAdminRecordDecisionType> recordDecisionTypeItem = TypeItem.<TseAdminRecordDecisionType>builder()
             .id(UUID.randomUUID().toString())
             .value(
                 TseAdminRecordDecisionType.builder()
@@ -121,7 +120,7 @@ class TseAdmCloseServiceTest {
                     .decisionMadeByFullName("made by full name")
                     .selectPartyNotify("party notify")
                     .responseRequiredDoc(
-                        List.of(GenericTypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
+                        List.of(TypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
                             .withFilename("admin.txt")
                             .withUuid("1234")
                             .build()))))
@@ -135,9 +134,7 @@ class TseAdmCloseServiceTest {
             .withDate("13 December 2022")
             .withDetails("Details Text")
             .withStatus(OPEN_STATE)
-            .withDecisionCollection(List.of(
-                recordDecisionTypeItem
-            ))
+            .withDecisionCollection(ListTypeItem.from(recordDecisionTypeItem))
             .build();
 
         tseApplicationBuilder.setDocumentUpload(

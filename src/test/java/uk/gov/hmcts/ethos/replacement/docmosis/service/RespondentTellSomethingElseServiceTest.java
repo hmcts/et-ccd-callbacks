@@ -22,8 +22,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -655,7 +656,7 @@ class RespondentTellSomethingElseServiceTest {
                 is(TribunalOffice.BRISTOL.getOfficeEmail()));
     }
 
-    private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {
+    private ListTypeItem<GenericTseApplicationType> generateGenericTseApplicationList() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
 
         respondentTseType.setDate("testDate");
@@ -668,14 +669,11 @@ class RespondentTellSomethingElseServiceTest {
         respondentTseType.setCopyToOtherPartyText("text");
         respondentTseType.setDueDate("testDueDate");
 
-        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> tseApplicationTypeItem = new TypeItem<>();
         tseApplicationTypeItem.setId("id");
         tseApplicationTypeItem.setValue(respondentTseType);
 
-        List<GenericTseApplicationTypeItem> tseApplicationCollection = new ArrayList<>();
-        tseApplicationCollection.add(tseApplicationTypeItem);
-
-        return tseApplicationCollection;
+        return ListTypeItem.from(tseApplicationTypeItem);
     }
 
     private void setDocAndTextForSelectedApplication(CaseData caseData,

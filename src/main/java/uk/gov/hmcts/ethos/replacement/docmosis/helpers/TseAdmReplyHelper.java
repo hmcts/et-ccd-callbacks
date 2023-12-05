@@ -9,8 +9,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseAdminReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
@@ -20,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -77,7 +76,7 @@ public final class TseAdmReplyHelper {
                 .filter(item -> item.getValue().getNumber().equals(caseData.getTseAdminSelectApplication()
                         .getSelectedCode()))
                 .findFirst()
-                .map(GenericTseApplicationTypeItem::getValue)
+                .map(TypeItem<GenericTseApplicationType>::getValue)
                 .orElse(null);
     }
 
@@ -109,15 +108,15 @@ public final class TseAdmReplyHelper {
                 .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(
-            List<GenericTypeItem<DocumentType>> docTypeList) {
+    private static List<TypeItem<DocumentType>> getUploadedDocList(
+            ListTypeItem<DocumentType> docTypeList) {
         if (docTypeList == null) {
-            return new ArrayList<>();
+            return new ListTypeItem<DocumentType>();
         }
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+    private static String hasSupportingDocs(ListTypeItem<DocumentType> supportDocList) {
         return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 

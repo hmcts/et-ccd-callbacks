@@ -7,15 +7,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -115,17 +112,17 @@ class CaseFlagsServiceTest {
 
     @Test
     void setPrivateHearingFlag_shouldBeTruthy_whenRestrictPublicityTseApplicationIsGranted() {
-        List<TseAdminRecordDecisionTypeItem> granted = List.of(TseAdminRecordDecisionTypeItem.builder()
-                .value(TseAdminRecordDecisionType.builder()
-                        .decision("Granted")
-                        .build())
+        ListTypeItem<TseAdminRecordDecisionType> granted = ListTypeItem.from(TypeItem
+                .<TseAdminRecordDecisionType>builder().value(TseAdminRecordDecisionType.builder()
+                .decision("Granted")
+                .build())
                 .build());
 
-        List<GenericTseApplicationTypeItem> build = List.of(GenericTseApplicationTypeItem.builder()
-                .value(GenericTseApplicationType.builder()
-                        .type(TSE_APP_RESTRICT_PUBLICITY)
-                        .adminDecision(granted)
-                        .build())
+        ListTypeItem<GenericTseApplicationType> build = ListTypeItem.from(TypeItem
+                .<GenericTseApplicationType>builder().value(GenericTseApplicationType.builder()
+                .type(TSE_APP_RESTRICT_PUBLICITY)
+                .adminDecision(granted)
+                .build())
                 .build());
 
         caseData.setGenericTseApplicationCollection(build);
@@ -137,13 +134,13 @@ class CaseFlagsServiceTest {
 
     @Test
     void setPrivateHearingFlag_shouldBeFalsy_whenRestrictPublicityTseApplicationIsRejected() {
-        List<TseAdminRecordDecisionTypeItem> granted = List.of(TseAdminRecordDecisionTypeItem.builder()
-                .value(TseAdminRecordDecisionType.builder()
-                        .decision("Refused")
-                        .build())
+        ListTypeItem<TseAdminRecordDecisionType> granted = ListTypeItem.from(TypeItem
+                .<TseAdminRecordDecisionType>builder().value(TseAdminRecordDecisionType.builder()
+                .decision("Refused")
+                .build())
                 .build());
 
-        List<GenericTseApplicationTypeItem> build = List.of(GenericTseApplicationTypeItem.builder()
+        ListTypeItem<GenericTseApplicationType> build = ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .value(GenericTseApplicationType.builder()
                         .type(TSE_APP_RESTRICT_PUBLICITY)
                         .adminDecision(granted)

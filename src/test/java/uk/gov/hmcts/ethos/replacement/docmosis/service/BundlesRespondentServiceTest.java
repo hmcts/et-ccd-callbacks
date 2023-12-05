@@ -9,7 +9,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -220,7 +220,7 @@ class BundlesRespondentServiceTest {
 
     @Test
     void addToBundlesCollection_addsBundlesObject() {
-        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        List<TypeItem<HearingBundleType>> collection = new ArrayList<>();
         englandCaseData.setBundlesRespondentCollection(collection);
 
         String respondentsDocumentsOnly = "Respondent's documents only";
@@ -254,7 +254,7 @@ class BundlesRespondentServiceTest {
 
     @Test
     void addToBundlesCollection_addsCorrectReason() {
-        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        List<TypeItem<HearingBundleType>> collection = new ArrayList<>();
         englandCaseData.setBundlesRespondentCollection(collection);
 
         String respondentsDocumentsOnly = "Respondent's documents only";

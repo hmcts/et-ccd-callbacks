@@ -105,9 +105,9 @@ class CaseCompletedReportTest {
                 POSITION_TYPE_CASE_TRANSFERRED_OTHER_COUNTRY);
 
         CaseData caseData = submitEvents.get(0).getCaseData();
+        CasesCompletedReport casesCompletedReport = new CasesCompletedReport();
         for (String positionType : invalidPositionTypes) {
             caseData.setPositionType(positionType);
-            CasesCompletedReport casesCompletedReport = new CasesCompletedReport();
             ListingData reportListingData = casesCompletedReport.generateReportData(listingDetails, submitEvents);
 
             verifyReportHeaderIsZero(reportListingData);
@@ -133,9 +133,9 @@ class CaseCompletedReportTest {
 
         CaseData caseData = submitEvents.get(0).getCaseData();
         caseData.setJurCodesCollection(new ArrayList<>());
+        CasesCompletedReport casesCompletedReport = new CasesCompletedReport();
         for (String outcome : invalidOutcomes) {
             caseData.getJurCodesCollection().add(createJurisdiction(outcome));
-            CasesCompletedReport casesCompletedReport = new CasesCompletedReport();
             ListingData reportListingData = casesCompletedReport.generateReportData(listingDetails, submitEvents);
 
             verifyReportHeaderIsZero(reportListingData);
@@ -562,7 +562,7 @@ class CaseCompletedReportTest {
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
-        DateListedTypeItem[] dateListedTypeItem = new DateListedTypeItem[] {
+        DateListedTypeItem[] dateListedTypeItem = {
                 createHearingDateListed("1970-01-01T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-02T00:00:00", HEARING_STATUS_WITHDRAWN, NO), // should be ignored
                 createHearingDateListed("1970-01-03T00:00:00", HEARING_STATUS_HEARD, NO),
@@ -606,7 +606,7 @@ class CaseCompletedReportTest {
         List<SubmitEvent> submitEvents = new ArrayList<>();
 
         // Case 1: 4 session days no conciliation
-        DateListedTypeItem[] dateListedTypeItem = new DateListedTypeItem[] {
+        DateListedTypeItem[] dateListedTypeItem = {
                 createHearingDateListed("1970-01-01T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-02T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-03T00:00:00", HEARING_STATUS_HEARD, NO),
@@ -676,7 +676,7 @@ class CaseCompletedReportTest {
         List<SubmitEvent> submitEvents = new ArrayList<>();
 
         // Case 1: 4 session days
-        DateListedTypeItem[] dateListedTypeItem = new DateListedTypeItem[] {
+        DateListedTypeItem[] dateListedTypeItem = {
                 createHearingDateListed("1970-01-01T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-02T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-03T00:00:00", HEARING_STATUS_HEARD, NO),

@@ -84,7 +84,7 @@ class TseViewApplicationHelperTest {
                 .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")
                 .withStatus(OPEN_STATE).build();
 
-        TypeItem<GenericTseApplicationType> genericTseApplicationType = new TypeItem<GenericTseApplicationType>();
+        TypeItem<GenericTseApplicationType> genericTseApplicationType = new TypeItem<>();
         genericTseApplicationType.setId(UUID.randomUUID().toString());
         genericTseApplicationType.setValue(build);
         assertFalse(TseViewApplicationHelper.applicationsSharedWithRespondent(genericTseApplicationType));
@@ -97,7 +97,7 @@ class TseViewApplicationHelperTest {
                 .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")
                 .withStatus(OPEN_STATE).build();
 
-        TypeItem<GenericTseApplicationType> genericTseApplicationType = new TypeItem<GenericTseApplicationType>();
+        TypeItem<GenericTseApplicationType> genericTseApplicationType = new TypeItem<>();
         genericTseApplicationType.setId(UUID.randomUUID().toString());
         genericTseApplicationType.setValue(build);
         assertTrue(TseViewApplicationHelper.applicationsSharedWithRespondent(genericTseApplicationType));

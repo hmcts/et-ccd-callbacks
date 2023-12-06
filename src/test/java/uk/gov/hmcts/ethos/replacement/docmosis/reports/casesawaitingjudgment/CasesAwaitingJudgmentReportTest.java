@@ -93,14 +93,14 @@ class CasesAwaitingJudgmentReportTest {
         // Then the case should not be in the report data
 
         String[] invalidPositionTypes = { "An invalid position type", null};
+        caseDataBuilder = new CaseDataBuilder();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         for (String invalidPositionType : invalidPositionTypes) {
             submitEvents.clear();
-            caseDataBuilder = new CaseDataBuilder();
             submitEvents.add(caseDataBuilder
                     .withPositionType(invalidPositionType)
                     .buildAsSubmitEvent(ACCEPTED_STATE));
-            ListingDetails listingDetails = new ListingDetails();
-            ListingData caseData = new ListingData();
             caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
             listingDetails.setCaseData(caseData);
             listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);

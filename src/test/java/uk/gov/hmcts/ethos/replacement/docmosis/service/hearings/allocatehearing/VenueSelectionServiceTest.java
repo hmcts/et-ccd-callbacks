@@ -112,14 +112,14 @@ class VenueSelectionServiceTest {
     private CaseData createCaseDataWithHearings(TribunalOffice tribunalOffice, DynamicValueType selectedVenue) {
         CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setHearingCollection(new ArrayList<>());
+        HearingType hearingType = new HearingType();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         for (int i = 0; i < 3; i++) {
-            HearingType hearingType = new HearingType();
             if (selectedVenue != null) {
-                DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
                 dynamicFixedListType.setValue(selectedVenue);
                 hearingType.setHearingVenue(dynamicFixedListType);
             }
-            HearingTypeItem hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setValue(hearingType);
             caseData.getHearingCollection().add(hearingTypeItem);
         }

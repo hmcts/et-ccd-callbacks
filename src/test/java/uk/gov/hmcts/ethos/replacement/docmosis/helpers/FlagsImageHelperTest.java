@@ -26,8 +26,8 @@ class FlagsImageHelperTest {
     void testAddsOutstationForScotlandExcludingGlasgow() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.SCOTLAND_OFFICES);
         tribunalOffices.remove(TribunalOffice.GLASGOW);
+        CaseData caseData = new CaseData();
         for (TribunalOffice tribunalOffice : tribunalOffices) {
-            CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(SCOTLAND_CASE_TYPE_ID, caseData);
 
@@ -42,10 +42,10 @@ class FlagsImageHelperTest {
     @Test
     void testAddWelshFlag() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        CaseData caseData = new CaseData();
+        ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
         for (TribunalOffice tribunalOffice : tribunalOffices) {
-            CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
-            ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
             hearingPreference.setContactLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
@@ -57,10 +57,10 @@ class FlagsImageHelperTest {
     @Test
     void testAddWelshFlagHearingLang() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        CaseData caseData = new CaseData();
+        ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
         for (TribunalOffice tribunalOffice : tribunalOffices) {
-            CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
-            ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
             hearingPreference.setHearingLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
@@ -72,10 +72,10 @@ class FlagsImageHelperTest {
     @Test
     void testAddWelshFlagBothOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        CaseData caseData = new CaseData();
+        ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
         for (TribunalOffice tribunalOffice : tribunalOffices) {
-            CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
-            ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
             hearingPreference.setHearingLanguage("Welsh");
             hearingPreference.setContactLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
@@ -88,8 +88,8 @@ class FlagsImageHelperTest {
     @Test
     void testAddWelshFlagNoOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        CaseData caseData = new CaseData();
         for (TribunalOffice tribunalOffice : tribunalOffices) {
-            CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             FlagsImageHelper.buildFlagsImageFileName(caseDetails);
@@ -112,8 +112,8 @@ class FlagsImageHelperTest {
 
     @Test
     void testDoesNotAddOutstationForEnglandWales() {
+        CaseData caseData = new CaseData();
         for (TribunalOffice tribunalOffice : TribunalOffice.ENGLANDWALES_OFFICES) {
-            CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
 

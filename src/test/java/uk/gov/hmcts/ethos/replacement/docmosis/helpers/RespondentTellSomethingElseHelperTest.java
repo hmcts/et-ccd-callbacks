@@ -82,44 +82,20 @@ class RespondentTellSomethingElseHelperTest {
 
     private void setTextBoxForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseTextBox1("Not Blank");
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseTextBox2("Not Blank");
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseTextBox3("Not Blank");
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseTextBox4("Not Blank");
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseTextBox5("Not Blank");
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseTextBox6("Not Blank");
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                caseData.setResTseTextBox7("Not Blank");
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseTextBox8("Not Blank");
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseTextBox9("Not Blank");
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseTextBox10("Not Blank");
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                caseData.setResTseTextBox11("Not Blank");
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseTextBox12("Not Blank");
-                break;
-            default:
-                break;
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseTextBox1("Not Blank");
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseTextBox2("Not Blank");
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseTextBox3("Not Blank");
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseTextBox4("Not Blank");
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseTextBox5("Not Blank");
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseTextBox6("Not Blank");
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> caseData.setResTseTextBox7("Not Blank");
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseTextBox8("Not Blank");
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseTextBox9("Not Blank");
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseTextBox10("Not Blank");
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> caseData.setResTseTextBox11("Not Blank");
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseTextBox12("Not Blank");
+            default -> {
+            }
         }
     }
 
@@ -149,44 +125,21 @@ class RespondentTellSomethingElseHelperTest {
 
     private void setDocForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseDocument1(createDocumentType());
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseDocument2(createDocumentType());
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseDocument3(createDocumentType());
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseDocument4(createDocumentType());
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseDocument5(createDocumentType());
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseDocument6(createDocumentType());
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                caseData.setResTseDocument7(createDocumentType());
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseDocument8(createDocumentType());
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseDocument9(createDocumentType());
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseDocument10(createDocumentType());
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                caseData.setResTseDocument11(createDocumentType());
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseDocument12(createDocumentType());
-                break;
-            default:
-                break;
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseDocument1(createDocumentType());
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseDocument2(createDocumentType());
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseDocument3(createDocumentType());
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseDocument4(createDocumentType());
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseDocument5(createDocumentType());
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseDocument6(createDocumentType());
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE ->
+                    caseData.setResTseDocument7(createDocumentType());
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseDocument8(createDocumentType());
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseDocument9(createDocumentType());
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseDocument10(createDocumentType());
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> caseData.setResTseDocument11(createDocumentType());
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseDocument12(createDocumentType());
+            default -> {
+            }
         }
     }
 

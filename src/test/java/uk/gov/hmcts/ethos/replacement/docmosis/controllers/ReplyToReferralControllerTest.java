@@ -40,6 +40,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -126,6 +128,24 @@ class ReplyToReferralControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void aboutToSubmit_NoReplyToEmailAddress_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        CCDRequest noReplyToEmailAddressCDRequest = ccdRequest;
+        noReplyToEmailAddressCDRequest.getCaseDetails().getCaseData().setReplyToEmailAddress("");
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(noReplyToEmailAddressCDRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
     @Test
@@ -218,6 +238,19 @@ class ReplyToReferralControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
             .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
+    }
+
+    @Test
+    void validateNoReplyToEmail_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        CCDRequest noReplyToEmailAddressCDRequest = ccdRequest;
+        noReplyToEmailAddressCDRequest.getCaseDetails().getCaseData().setReplyToEmailAddress("");
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(noReplyToEmailAddressCDRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
     }
 
     @Test

@@ -90,7 +90,7 @@
     <packageUrl regex="true">^pkg:maven/com\.azure.*$</packageUrl>
     <cve>CVE-2023-36052</cve>
  </suppress>
-    <suppress>
+ <suppress>
         <notes><![CDATA[
    file name: bcprov-jdk15on-1.69.jar
    ]]></notes>

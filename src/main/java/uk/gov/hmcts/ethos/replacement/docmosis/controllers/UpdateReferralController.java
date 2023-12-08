@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -171,20 +172,22 @@ public class UpdateReferralController {
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
         String caseLink = emailService.getExuiCaseLink(ccdRequest.getCaseDetails().getCaseId());
-        emailService.sendEmail(
-                referralTemplateId,
-                caseData.getUpdateReferentEmail(),
-                ReferralHelper.buildPersonalisationUpdateReferral(
-                        ccdRequest.getCaseDetails(),
-                        referralNumber,
-                        userDetails.getName(),
-                        caseLink
-                )
-        );
-        log.info("Event: Update Referral Email sent. "
-                + ". EventId: " + ccdRequest.getEventId()
-                + ". Update Referral number: " + referralNumber
-                + ". Emailed at: " + DateTime.now());
+        if (StringUtils.isNotEmpty(caseData.getReplyToEmailAddress())) {
+            emailService.sendEmail(
+                    referralTemplateId,
+                    caseData.getUpdateReferentEmail(),
+                    ReferralHelper.buildPersonalisationUpdateReferral(
+                            ccdRequest.getCaseDetails(),
+                            referralNumber,
+                            userDetails.getName(),
+                            caseLink
+                    )
+            );
+            log.info("Event: Update Referral Email sent. "
+                    + ". EventId: " + ccdRequest.getEventId()
+                    + ". Update Referral number: " + referralNumber
+                    + ". Emailed at: " + DateTime.now());
+        }
         clearUpdateReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

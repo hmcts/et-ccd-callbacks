@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
@@ -122,7 +123,7 @@ public class BundlesRespondentService {
      */
     public void addToBundlesCollection(CaseData caseData) {
         if (caseData.getBundlesRespondentCollection() == null) {
-            caseData.setBundlesRespondentCollection(new ArrayList<>());
+            caseData.setBundlesRespondentCollection(new ListTypeItem<>());
         }
         String agreedDocsWith = caseData.getBundlesRespondentAgreedDocWith();
         if (BUT.equals(agreedDocsWith)) {

@@ -2277,7 +2277,7 @@ class DocumentHelperTest {
                     .value(TseRespondType.builder()
                         .from(CLAIMANT_TITLE)
                         .copyToOtherParty(NO)
-                        .supportingMaterial(List.of(doc2, doc3))
+                        .supportingMaterial(ListTypeItem.from(doc2, doc3))
                         .build())
                 .build()
             );

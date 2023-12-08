@@ -31,8 +31,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -231,7 +229,7 @@ class PseRespondToTribunalServiceTest {
                     .sendNotificationFullName("Mr Lee Gal Officer")
                     .sendNotificationAdditionalInfo("Additional Info")
                     .sendNotificationNotify(BOTH_PARTIES)
-                    .respondCollection(List.of(pseResponseTypeItem))
+                    .respondCollection(ListTypeItem.from(pseResponseTypeItem))
                     .build())
                 .build()
         ));
@@ -307,7 +305,7 @@ class PseRespondToTribunalServiceTest {
                     .sendNotificationFullName("Mr Lee Gal Officer")
                     .sendNotificationAdditionalInfo("Additional Info")
                     .sendNotificationNotify(BOTH_PARTIES)
-                    .respondCollection(List.of(pseResponseTypeItem))
+                    .respondCollection(ListTypeItem.from(pseResponseTypeItem))
                     .build())
                 .build()
         ));
@@ -728,8 +726,7 @@ class PseRespondToTribunalServiceTest {
         caseData.setPseRespondentOrdReqTableMarkUp("|Hearing, case management order or request | |\r\n|--|--|\r\n");
         caseData.setPseRespondentOrdReqResponseText(RESPONSE);
         caseData.setPseRespondentOrdReqHasSupportingMaterial(YES);
-        caseData.setPseRespondentOrdReqUploadDocument(
-            new ArrayList<>(Collections.singletonList(createDocumentType("documentId"))));
+        caseData.setPseRespondentOrdReqUploadDocument(new ListTypeItem<>());
         caseData.setPseRespondentOrdReqCopyToOtherParty(I_DO_NOT_WANT_TO_COPY);
         caseData.setPseRespondentOrdReqCopyNoGiveDetails(RULE92_NO_DETAILS);
 

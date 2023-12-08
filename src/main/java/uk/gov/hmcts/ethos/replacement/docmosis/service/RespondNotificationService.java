@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
@@ -74,7 +75,7 @@ public class RespondNotificationService {
     private void createRespondNotification(CaseData caseData, SendNotificationType sendNotificationType) {
 
         if (sendNotificationType.getRespondNotificationTypeCollection() == null) {
-            sendNotificationType.setRespondNotificationTypeCollection(new ArrayList<>());
+            sendNotificationType.setRespondNotificationTypeCollection(new ListTypeItem<>());
         }
 
         RespondNotificationType respondNotificationType = new RespondNotificationType();

@@ -120,7 +120,7 @@ class TseAdmCloseServiceTest {
                     .decisionMadeByFullName("made by full name")
                     .selectPartyNotify("party notify")
                     .responseRequiredDoc(
-                        List.of(TypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
+                        ListTypeItem.from(TypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
                             .withFilename("admin.txt")
                             .withUuid("1234")
                             .build()))))

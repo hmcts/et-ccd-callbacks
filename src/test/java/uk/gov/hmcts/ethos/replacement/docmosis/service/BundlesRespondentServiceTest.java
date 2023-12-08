@@ -9,12 +9,11 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -220,7 +219,7 @@ class BundlesRespondentServiceTest {
 
     @Test
     void addToBundlesCollection_addsBundlesObject() {
-        List<TypeItem<HearingBundleType>> collection = new ArrayList<>();
+        ListTypeItem<HearingBundleType> collection = new ListTypeItem<>();
         englandCaseData.setBundlesRespondentCollection(collection);
 
         String respondentsDocumentsOnly = "Respondent's documents only";
@@ -254,7 +253,7 @@ class BundlesRespondentServiceTest {
 
     @Test
     void addToBundlesCollection_addsCorrectReason() {
-        List<TypeItem<HearingBundleType>> collection = new ArrayList<>();
+        ListTypeItem<HearingBundleType> collection = new ListTypeItem<>();
         englandCaseData.setBundlesRespondentCollection(collection);
 
         String respondentsDocumentsOnly = "Respondent's documents only";

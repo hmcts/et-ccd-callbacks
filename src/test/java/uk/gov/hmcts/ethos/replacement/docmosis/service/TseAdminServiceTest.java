@@ -149,7 +149,7 @@ class TseAdminServiceTest {
                     .dateTime("2022-12-23T10:20:30.555")
                     .response("Response Details")
                     .hasSupportingMaterial(YES)
-                    .supportingMaterial(List.of(
+                    .supportingMaterial(ListTypeItem.from(
                         createDocumentTypeItem("image.png"),
                         createDocumentTypeItem("Form.pdf")))
                     .copyToOtherParty(YES)

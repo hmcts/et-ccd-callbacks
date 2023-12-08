@@ -109,7 +109,7 @@ public class TseAdminService {
         );
     }
 
-    private List<TypeItem<DocumentType>> getResponseRequiredDocYesOrNo(CaseData caseData) {
+    private ListTypeItem<DocumentType> getResponseRequiredDocYesOrNo(CaseData caseData) {
         if (YES.equals(caseData.getTseAdminIsResponseRequired())) {
             return caseData.getTseAdminResponseRequiredYesDoc();
         }

@@ -6,6 +6,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
@@ -121,7 +122,7 @@ class PseRespondentViewServiceTest {
                     .sendNotificationFullName("Mr Lee Gal Officer")
                     .sendNotificationAdditionalInfo("Additional Info")
                     .sendNotificationNotify(BOTH_PARTIES)
-                    .respondCollection(List.of(pseResponseTypeItem))
+                    .respondCollection(ListTypeItem.from(pseResponseTypeItem))
                     .build())
                 .build()
         ));

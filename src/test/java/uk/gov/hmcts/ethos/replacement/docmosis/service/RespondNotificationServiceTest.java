@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
@@ -254,7 +255,7 @@ class RespondNotificationServiceTest {
 
         var respondNotificationTypeItem = new TypeItem<RespondNotificationType>();
         respondNotificationTypeItem.setValue(respondNotificationType);
-        var respondNotificationTypeItemList = new ArrayList<TypeItem<RespondNotificationType>>();
+        var respondNotificationTypeItemList = new ListTypeItem<RespondNotificationType>();
         respondNotificationTypeItemList.add(respondNotificationTypeItem);
 
         SendNotificationType notificationType = new SendNotificationType();

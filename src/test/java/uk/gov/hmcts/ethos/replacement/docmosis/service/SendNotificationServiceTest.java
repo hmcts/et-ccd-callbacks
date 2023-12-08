@@ -24,7 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
@@ -60,7 +63,8 @@ class SendNotificationServiceTest {
     @BeforeEach
     public void setUp() {
         emailService = spy(new EmailUtils());
-        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService, featureToggleService);
+        sendNotificationService = new SendNotificationService(hearingSelectionService,
+                emailService, featureToggleService);
         ReflectionTestUtils.setField(sendNotificationService,
                 RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID,
                 "respondentSendNotificationTemplateId");

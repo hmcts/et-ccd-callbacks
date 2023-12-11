@@ -90,7 +90,6 @@
     <packageUrl regex="true">^pkg:maven/com\.azure.*$</packageUrl>
     <cve>CVE-2023-36052</cve>
  </suppress>
- <suppress>
     <!-- Above to be removed when migrated to com.azure:azure-messaging-servicebus -->
     <suppress>
         <notes><![CDATA[

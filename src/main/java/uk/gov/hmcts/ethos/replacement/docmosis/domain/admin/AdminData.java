@@ -17,7 +17,6 @@ public class AdminData {
     private ImportFile staffImportFile;
     @JsonProperty("venueImport")
     private VenueImport venueImport;
-
     // For adding judge
     @JsonProperty("tribunalOffice")
     private String tribunalOffice;
@@ -54,4 +53,6 @@ public class AdminData {
     private String courtWorkerName;
     @JsonProperty("courtWorkerSelectList")
     private DynamicFixedListType courtWorkerSelectList;
+    @JsonProperty("preHearingDepositImportFile")
+    private ImportFile preHearingDepositImportFile;
 }

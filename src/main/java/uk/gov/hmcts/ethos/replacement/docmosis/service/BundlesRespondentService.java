@@ -10,8 +10,8 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -134,16 +134,16 @@ public class BundlesRespondentService {
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("d MMMM yyyy HH:mm");
         caseData.getBundlesRespondentCollection().add(
-            GenericTypeItem.from(HearingBundleType.builder()
-                .agreedDocWith(agreedDocsWith)
+            TypeItem.from(HearingBundleType.builder()
+                .agreedDocWith(caseData.getBundlesRespondentAgreedDocWith())
                 .agreedDocWithBut(caseData.getBundlesRespondentAgreedDocWithBut())
                 .agreedDocWithNo(caseData.getBundlesRespondentAgreedDocWithNo())
                 .hearing(caseData.getBundlesRespondentSelectHearing().getSelectedCode())
                 .uploadFile(caseData.getBundlesRespondentUploadFile())
                 .whatDocuments(caseData.getBundlesRespondentWhatDocuments())
                 .whoseDocuments(caseData.getBundlesRespondentWhoseDocuments())
-                    .formattedSelectedHearing(caseData.getBundlesRespondentSelectHearing().getSelectedLabel())
-                    .uploadDateTime(dateTimeFormatter.print(DateTime.now()))
+                .formattedSelectedHearing(caseData.getBundlesRespondentSelectHearing().getSelectedLabel())
+                .uploadDateTime(dateTimeFormatter.print(DateTime.now()))
                 .build()
             )
         );

@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public final class DocumentUtil {
@@ -13,12 +12,12 @@ public final class DocumentUtil {
         // Utility classes should not have a public or default constructor.
     }
 
-    public static List<GenericTypeItem<DocumentType>> generateUploadedDocumentListFromDocumentList(
-            List<GenericTypeItem<DocumentType>> documentList) {
+    public static ListTypeItem<DocumentType> generateUploadedDocumentListFromDocumentList(
+            ListTypeItem<DocumentType> documentList) {
 
-        List<GenericTypeItem<DocumentType>> uploadedDocumentList = new ArrayList<>();
+        ListTypeItem<DocumentType> uploadedDocumentList = new ListTypeItem<DocumentType>();
         documentList.forEach(doc -> {
-            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
+            TypeItem<DocumentType> genTypeItems = new TypeItem<>();
             DocumentType docType = new DocumentType();
             docType.setUploadedDocument(doc.getValue().getUploadedDocument());
             docType.getUploadedDocument().setDocumentBinaryUrl(doc.getValue().getUploadedDocument().getDocumentUrl());

@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -310,7 +311,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(activeRespondent.stream(),
-                    struckRespondent.stream()).toList());
+                    struckRespondent.stream()).collect(Collectors.toList()));
             respondentDefaults(caseData);
         }
         return caseData;
@@ -333,7 +334,7 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
-                    notContinuingRespondent.stream()).toList());
+                    notContinuingRespondent.stream()).collect(Collectors.toList()));
             respondentDefaults(caseData);
         }
         return caseData;
@@ -345,23 +346,32 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                HearingType hearingType = hearingTypeItem.getValue();
-                if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (dateListedType.getHearingStatus() == null) {
-                            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-                            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
-                            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
-                        }
-                        populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
-                    }
+        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return;
+        }
+
+        for (HearingTypeItem hearingTypeItem : hearingCollection) {
+            HearingType hearingType = hearingTypeItem.getValue();
+            List<DateListedTypeItem> hearingDateCollection = hearingType.getHearingDateCollection();
+            if (CollectionUtils.isEmpty(hearingDateCollection)) {
+                continue;
+            }
+
+            for (DateListedTypeItem dateListedTypeItem : hearingDateCollection) {
+                DateListedType dateListedType = dateListedTypeItem.getValue();
+                if (dateListedType.getHearingStatus() == null) {
+                    initializeHearingStatus(dateListedType);
                 }
+                populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
             }
         }
+    }
+
+    private void initializeHearingStatus(DateListedType dateListedType) {
+        dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+        dateListedType.setHearingTimingStart(dateListedType.getListedDate());
+        dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
     }
 
     public void midEventAmendHearing(CaseData caseData, List<String> errors) {
@@ -415,14 +425,9 @@ public class CaseManagementForCaseWorkerService {
                                                                 HearingType hearingType,
                                                                 String caseTypeId) {
         switch (caseTypeId) {
-            case ENGLANDWALES_CASE_TYPE_ID:
-                populateHearingVenueEnglandWales(dateListedType, hearingType);
-                break;
-            case SCOTLAND_CASE_TYPE_ID:
-                populateHearingVenueScotland(dateListedType, hearingType);
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+            case ENGLANDWALES_CASE_TYPE_ID -> populateHearingVenueEnglandWales(dateListedType, hearingType);
+            case SCOTLAND_CASE_TYPE_ID -> populateHearingVenueScotland(dateListedType, hearingType);
+            default -> throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
         }
     }
 
@@ -470,20 +475,18 @@ public class CaseManagementForCaseWorkerService {
             SubmitEvent submitEvent = submitEvents.get(0);
             if (ECCHelper.validCaseForECC(submitEvent, errors)) {
                 switch (callback) {
-                    case MID_EVENT_CALLBACK:
+                    case MID_EVENT_CALLBACK -> {
                         Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
                         currentCaseData.setManagingOffice(submitEvent.getCaseData().getManagingOffice());
                         clerkService.initialiseClerkResponsible(currentCaseData);
-                        break;
-                    case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
+                    }
+                    case ABOUT_TO_SUBMIT_EVENT_CALLBACK -> {
                         ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
                         currentCaseData.setRespondentECC(null);
                         currentCaseData.setCaseSource(FLAG_ECC);
-                        break;
-                    default:
-                        sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
-                                String.valueOf(submitEvent.getCaseId()));
-                        break;
+                    }
+                    default -> sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
+                            String.valueOf(submitEvent.getCaseId()));
                 }
             }
         } else {

@@ -3,13 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
 import uk.gov.hmcts.et.common.model.ccd.types.LinkReason;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,7 +17,7 @@ class CaseLinksHelperTest {
 
     @Test
     void shouldReturnFalseIfEmpty() {
-        List<GenericTypeItem<CaseLink>> caseLinks = new ArrayList<>();
+        ListTypeItem<CaseLink> caseLinks = new ListTypeItem<CaseLink>();
         boolean result = CaseLinksHelper.isLinkedForHearing(caseLinks);
         assertFalse(result);
     }
@@ -39,8 +36,8 @@ class CaseLinksHelperTest {
         var caseLink = CaseLink.builder().caseReference("1").caseType(ENGLANDWALES_CASE_TYPE_ID)
                 .reasonForLink(linkReasons).build();
 
-        List<GenericTypeItem<CaseLink>> caseLinks = new ArrayList<>();
-        GenericTypeItem<CaseLink> caseLinksBeforeSubmit = GenericTypeItem.from(caseLink);
+        ListTypeItem<CaseLink> caseLinks = new ListTypeItem<CaseLink>();
+        TypeItem<CaseLink> caseLinksBeforeSubmit = TypeItem.from(caseLink);
         caseLinks.add(caseLinksBeforeSubmit);
 
         boolean result = CaseLinksHelper.isLinkedForHearing(caseLinks);
@@ -55,8 +52,8 @@ class CaseLinksHelperTest {
         ListTypeItem<LinkReason> linkReasons = ListTypeItem.from(linkReason, "1");
         var caseLink = CaseLink.builder().caseReference("1").caseType(ENGLANDWALES_CASE_TYPE_ID)
                 .reasonForLink(linkReasons).build();
-        List<GenericTypeItem<CaseLink>> caseLinks = new ArrayList<>();
-        GenericTypeItem<CaseLink> caseLinksBeforeSubmit = GenericTypeItem.from(caseLink);
+        ListTypeItem<CaseLink> caseLinks = new ListTypeItem<CaseLink>();
+        TypeItem<CaseLink> caseLinksBeforeSubmit = TypeItem.from(caseLink);
         caseLinks.add(caseLinksBeforeSubmit);
 
         boolean result = CaseLinksHelper.isLinkedForHearing(caseLinks);

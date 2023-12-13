@@ -72,10 +72,9 @@ public final class ReportDocHelper {
                                                            String templateName, UserDetails userDetails) {
         log.info("Building {} report document data", listingData.getReportType());
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
-                .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
-                .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
+        StringBuilder sb = new StringBuilder().append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+            .append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE)
+            .append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
 
         switch (listingData.getReportType()) {
             case CLAIMS_ACCEPTED_REPORT -> {
@@ -158,8 +157,8 @@ public final class ReportDocHelper {
         }
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
-        sb.append("\"Report_Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE).append("\"Today_date\":\"")
-                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n").append("}\n").append("}\n");
+        sb.append("\"Report_Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE)
+            .append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
         return sb;
     }
 
@@ -206,10 +205,9 @@ public final class ReportDocHelper {
 
     private static StringBuilder getCasesAwaitingJudgmentReport(ListingData listingData)
             throws JsonProcessingException {
-        if (!(listingData instanceof CasesAwaitingJudgmentReportData)) {
+        if (!(listingData instanceof CasesAwaitingJudgmentReportData reportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "CasesAwaitingJudgmentReportData");
         }
-        CasesAwaitingJudgmentReportData reportData = (CasesAwaitingJudgmentReportData) listingData;
         StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE);
         addJsonCollection("positionTypes", reportData.getReportSummary().getPositionTypes().iterator(), sb);
@@ -279,17 +277,15 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getAdhocReportCommonTypeRow(AdhocReportType adhocReportType) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(CASE_REFERENCE).append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE)
-                .append("\"Date_Of_Acceptance\":\"").append(nullCheck(adhocReportType.getDateOfAcceptance()))
-                .append(NEW_LINE).append("\"Multiple_Ref\":\"").append(nullCheck(adhocReportType.getMultipleRef()))
-                .append(NEW_LINE).append("\"Lead_Case\":\"").append(nullCheck(adhocReportType.getLeadCase()))
-                .append(NEW_LINE).append("\"Position\":\"").append(nullCheck(adhocReportType.getPosition()))
-                .append(NEW_LINE).append("\"Date_To_Position\":\"")
-                .append(nullCheck(adhocReportType.getDateToPosition())).append(NEW_LINE).append("\"File_Location\":\"")
-                .append(nullCheck(adhocReportType.getFileLocation())).append(NEW_LINE).append("\"Clerk\":\"")
-                .append(nullCheck(adhocReportType.getClerk())).append("\"}");
-        return sb;
+        return new StringBuilder().append(CASE_REFERENCE).append(
+            nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE).append("\"Date_Of_Acceptance\":\"")
+            .append(nullCheck(adhocReportType.getDateOfAcceptance())).append(NEW_LINE).append("\"Multiple_Ref\":\"")
+            .append(nullCheck(adhocReportType.getMultipleRef())).append(NEW_LINE).append("\"Lead_Case\":\"")
+            .append(nullCheck(adhocReportType.getLeadCase())).append(NEW_LINE).append("\"Position\":\"")
+            .append(nullCheck(adhocReportType.getPosition())).append(NEW_LINE).append("\"Date_To_Position\":\"")
+            .append(nullCheck(adhocReportType.getDateToPosition())).append(NEW_LINE).append("\"File_Location\":\"")
+            .append(nullCheck(adhocReportType.getFileLocation())).append(NEW_LINE).append("\"Clerk\":\"")
+            .append(nullCheck(adhocReportType.getClerk())).append("\"}");
     }
 
     private static StringBuilder getCaseSourceLocalReport(ListingData listingData) {
@@ -430,34 +426,29 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getAdhocReportCompletedTypeRow(AdhocReportType adhocReportType) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(CASE_REFERENCE).append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE)
-                .append("\"Position\":\"").append(nullCheck(adhocReportType.getPosition())).append(NEW_LINE)
-                .append("\"Conciliation_Track\":\"").append(nullCheck(adhocReportType.getConciliationTrack()))
-                .append(NEW_LINE).append("\"Session_Days\":\"").append(nullCheck(adhocReportType.getSessionDays()))
-                .append(NEW_LINE).append("\"Hearing_Number\":\"").append(nullCheck(adhocReportType.getHearingNumber()))
-                .append(NEW_LINE).append("\"Hearing_Date\":\"")
-                .append(UtilHelper.formatLocalDate(adhocReportType.getHearingDate())).append(NEW_LINE)
-                .append("\"Hearing_Type\":\"").append(nullCheck(adhocReportType.getHearingType())).append(NEW_LINE)
-                .append("\"Hearing_Judge\":\"").append(nullCheck(adhocReportType.getHearingJudge())).append(NEW_LINE)
-                .append("\"Hearing_Clerk\":\"").append(nullCheck(adhocReportType.getHearingClerk())).append("\"}");
-        return sb;
+        return new StringBuilder().append(CASE_REFERENCE)
+            .append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE).append("\"Position\":\"")
+            .append(nullCheck(adhocReportType.getPosition())).append(NEW_LINE).append("\"Conciliation_Track\":\"")
+            .append(nullCheck(adhocReportType.getConciliationTrack())).append(NEW_LINE).append("\"Session_Days\":\"")
+            .append(nullCheck(adhocReportType.getSessionDays())).append(NEW_LINE).append("\"Hearing_Number\":\"")
+            .append(nullCheck(adhocReportType.getHearingNumber())).append(NEW_LINE).append("\"Hearing_Date\":\"")
+            .append(UtilHelper.formatLocalDate(adhocReportType.getHearingDate())).append(NEW_LINE)
+            .append("\"Hearing_Type\":\"").append(nullCheck(adhocReportType.getHearingType())).append(NEW_LINE)
+            .append("\"Hearing_Judge\":\"").append(nullCheck(adhocReportType.getHearingJudge())).append(NEW_LINE)
+            .append("\"Hearing_Clerk\":\"").append(nullCheck(adhocReportType.getHearingClerk())).append("\"}");
     }
 
     private static StringBuilder getTimeToFirstHearingAdhocReportTypeRow(AdhocReportType adhocReportType) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"Office\":\"").append(nullCheck(adhocReportType.getReportOffice())).append(NEW_LINE)
-                .append("\"Case_Reference\":\"").append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE)
-                .append("\"Conciliation_Track\":\"").append(nullCheck(adhocReportType.getConciliationTrack()))
-                .append(NEW_LINE).append("\"Receipt_Date\":\"").append(nullCheck(adhocReportType.getReceiptDate()))
-                .append(NEW_LINE).append("\"Hearing_Date\":\"").append(nullCheck(adhocReportType.getHearingDate()))
-                .append(NEW_LINE).append("\"Days\":\"")
-                .append(nullCheck(adhocReportType.getDelayedDaysForFirstHearing())).append("\"}");
-        return sb;
+        return new StringBuilder().append("{\"Office\":\"")
+            .append(nullCheck(adhocReportType.getReportOffice())).append(NEW_LINE).append("\"Case_Reference\":\"")
+            .append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE).append("\"Conciliation_Track\":\"")
+            .append(nullCheck(adhocReportType.getConciliationTrack())).append(NEW_LINE).append("\"Receipt_Date\":\"")
+            .append(nullCheck(adhocReportType.getReceiptDate())).append(NEW_LINE).append("\"Hearing_Date\":\"")
+            .append(nullCheck(adhocReportType.getHearingDate())).append(NEW_LINE).append("\"Days\":\"")
+            .append(nullCheck(adhocReportType.getDelayedDaysForFirstHearing())).append("\"}");
     }
 
     private static StringBuilder getLiveCaseLoadReportSummaryHdr(ListingData listingData) {
-        StringBuilder sb = new StringBuilder();
         String singlesTotal = "0";
         String multiplesTotal = "0";
         String total = "0";
@@ -469,10 +460,9 @@ public final class ReportDocHelper {
             total = nullCheck(summaryHdr.getTotal());
         }
 
-        sb.append("\"Multiples_Total\":\"").append(multiplesTotal).append(NEW_LINE).append("\"Singles_Total\":\"")
-                .append(singlesTotal).append(NEW_LINE).append("\"Total\":\"").append(total).append(NEW_LINE);
-
-        return sb;
+        return new StringBuilder().append("\"Multiples_Total\":\"").append(multiplesTotal).append(NEW_LINE)
+            .append("\"Singles_Total\":\"").append(singlesTotal).append(NEW_LINE).append("\"Total\":\"")
+            .append(total).append(NEW_LINE);
     }
 
     private static StringBuilder getLiveCaseLoadReport(ListingData listingData) {
@@ -531,8 +521,9 @@ public final class ReportDocHelper {
                 reportContent.append("\"Actual_Number_Of_Days\":\"")
                         .append(claimServedTypeItemsListSize).append(NEW_LINE);
             }
-            reportContent.append("\"Date_Of_Receipt\":\"").append(claimServedTypeItemsListSize).append(NEW_LINE)
-                    .append("\"Date_Of_Service\":\"").append(claimServedTypeItemsListSize).append("\"}").append(",\n");
+            reportContent.append("\"Date_Of_Receipt\":\"").append(claimServedTypeItemsListSize).append(NEW_LINE);
+            reportContent.append("\"Date_Of_Service\":\"").append(claimServedTypeItemsListSize);
+            reportContent.append("\"},\n");
         } else {
             for (int i = 0; i < claimServedTypeItemsCount; i++) {
                 reportContent.append(getServedClaimsReportRow(claimServedTypeItems.get(i).getValue(), dayNumber));
@@ -557,12 +548,13 @@ public final class ReportDocHelper {
 
         if (dayNumber >= claimsServedDayListUpperBoundary) {
             reportRowContent.append("\"Actual_Number_Of_Days\":\"")
-                    .append(nullCheck(claimServedTypeItem.getActualNumberOfDays())).append(NEW_LINE);
+                .append(nullCheck(claimServedTypeItem.getActualNumberOfDays())).append(NEW_LINE);
         }
 
-        reportRowContent.append("\"Date_Of_Receipt\":\"").append(nullCheck(claimServedTypeItem.getCaseReceiptDate()))
-                .append(NEW_LINE).append("\"Date_Of_Service\":\"")
-                .append(nullCheck(claimServedTypeItem.getClaimServedDate())).append("\"}");
+        reportRowContent.append("\"Date_Of_Receipt\":\"")
+            .append(nullCheck(claimServedTypeItem.getCaseReceiptDate())).append(NEW_LINE)
+            .append("\"Date_Of_Service\":\"")
+            .append(nullCheck(claimServedTypeItem.getClaimServedDate())).append("\"}");
 
         return reportRowContent;
     }
@@ -597,39 +589,32 @@ public final class ReportDocHelper {
 
     private static StringBuilder getRespondentsReport(ListingData listingData)
             throws JsonProcessingException {
-        if (!(listingData instanceof RespondentsReportData)) {
+        if (!(listingData instanceof RespondentsReportData reportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "RespondentsReportData");
         }
-        RespondentsReportData reportData = (RespondentsReportData) listingData;
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE)
-                .append("\"MoreThan1Resp\":\"")
-                .append(nullCheck(reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent()))
-                .append(NEW_LINE);
-        addJsonCollection(REPORT_DETAILS, reportData.getReportDetails().iterator(), sb);
+        StringBuilder sb = new StringBuilder().append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice())
+            .append(NEW_LINE).append("\"MoreThan1Resp\":\"")
+            .append(nullCheck(reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent())).append(NEW_LINE);
+        addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
         return sb;
     }
 
     private static StringBuilder getSessionDaysReport(ListingData listingData)
             throws JsonProcessingException {
-        if (!(listingData instanceof SessionDaysReportData)) {
+        if (!(listingData instanceof SessionDaysReportData reportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "SessionDaysReportData");
         }
-        SessionDaysReportData reportData = (SessionDaysReportData) listingData;
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE)
-                .append("\"ftcSessionDays\":\"")
-                .append(nullCheck(reportData.getReportSummary().getFtSessionDaysTotal())).append(NEW_LINE)
-                .append("\"ptcSessionDays\":\"")
-                .append(nullCheck(reportData.getReportSummary().getPtSessionDaysTotal())).append(NEW_LINE)
-                .append("\"otherSessionDays\":\"")
-                .append(nullCheck(reportData.getReportSummary().getOtherSessionDaysTotal())).append(NEW_LINE)
-                .append("\"totalSessionDays\":\"")
-                .append(nullCheck(reportData.getReportSummary().getSessionDaysTotal())).append(NEW_LINE)
-                .append("\"percentPtcSessionDays\":\"")
-                .append(nullCheck(reportData.getReportSummary().getPtSessionDaysPerCent())).append(NEW_LINE);
+        StringBuilder sb = new StringBuilder().append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice())
+            .append(NEW_LINE).append("\"ftcSessionDays\":\"")
+            .append(nullCheck(reportData.getReportSummary().getFtSessionDaysTotal())).append(NEW_LINE)
+            .append("\"ptcSessionDays\":\"").append(nullCheck(reportData.getReportSummary().getPtSessionDaysTotal()))
+            .append(NEW_LINE).append("\"otherSessionDays\":\"")
+            .append(nullCheck(reportData.getReportSummary().getOtherSessionDaysTotal())).append(NEW_LINE)
+            .append("\"totalSessionDays\":\"").append(nullCheck(reportData.getReportSummary().getSessionDaysTotal()))
+            .append(NEW_LINE).append("\"percentPtcSessionDays\":\"")
+            .append(nullCheck(reportData.getReportSummary().getPtSessionDaysPerCent())).append(NEW_LINE);
         addJsonCollection("reportSummary2", reportData.getReportSummary2List().iterator(), sb);
         addJsonCollection(REPORT_DETAILS, reportData.getReportDetails().iterator(), sb);
         return sb;
@@ -637,10 +622,9 @@ public final class ReportDocHelper {
 
     private static StringBuilder getEccReport(ListingData listingData)
             throws JsonProcessingException {
-        if (!(listingData instanceof EccReportData)) {
+        if (!(listingData instanceof EccReportData reportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "EccReportData");
         }
-        EccReportData reportData = (EccReportData) listingData;
         StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getOffice()).append(NEW_LINE);
         if (CollectionUtils.isNotEmpty(reportData.getReportDetails())) {
@@ -651,26 +635,25 @@ public final class ReportDocHelper {
 
     private static StringBuilder getHearingsByHearingTypeReport(ListingData listingData)
             throws JsonProcessingException {
-        if (!(listingData instanceof HearingsByHearingTypeReportData)) {
+        if (!(listingData instanceof HearingsByHearingTypeReportData reportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "HearingsByHearingTypeReportData");
         }
-        HearingsByHearingTypeReportData reportData = (HearingsByHearingTypeReportData) listingData;
-        StringBuilder sb = new StringBuilder();
-        sb.append(REPORT_OFFICE).append(reportData.getReportSummaryHdr().getOffice()).append(NEW_LINE)
-                .append("\"cm_SummaryHdr\":\"")
-                .append(nullCheck(reportData.getReportSummaryHdr().getFields().getCmCount())).append(NEW_LINE)
-                .append("\"hearing_SummaryHdr\":\"")
-                .append(nullCheck(reportData.getReportSummaryHdr().getFields().getHearingCount())).append(NEW_LINE)
-                .append("\"preLim_SummaryHdr\":\"")
-                .append(nullCheck(reportData.getReportSummaryHdr().getFields().getHearingPrelimCount()))
-                .append(NEW_LINE).append("\"total_SummaryHdr\":\"")
-                .append(nullCheck(reportData.getReportSummaryHdr().getFields().getTotal())).append(NEW_LINE)
-                .append("\"costs_SummaryHdr\":\"")
-                .append(nullCheck(reportData.getReportSummaryHdr().getFields().getCostsCount())).append(NEW_LINE)
-                .append("\"remedy_SummaryHdr\":\"")
-                .append(nullCheck(reportData.getReportSummaryHdr().getFields().getRemedyCount())).append(NEW_LINE)
-                .append("\"reconsider_SummaryHdr\":\"")
-                .append(nullCheck(reportData.getReportSummaryHdr().getFields().getReconsiderCount())).append(NEW_LINE);
+        StringBuilder sb = new StringBuilder().append(REPORT_OFFICE)
+            .append(reportData.getReportSummaryHdr().getOffice()).append(NEW_LINE).append("\"cm_SummaryHdr\":\"")
+            .append(nullCheck(reportData.getReportSummaryHdr().getFields().getCmCount())).append(NEW_LINE)
+            .append("\"hearing_SummaryHdr\":\"")
+            .append(nullCheck(reportData.getReportSummaryHdr().getFields().getHearingCount())).append(NEW_LINE)
+            .append("\"preLim_SummaryHdr\":\"")
+            .append(nullCheck(reportData.getReportSummaryHdr().getFields().getHearingPrelimCount())).append(NEW_LINE)
+            .append("\"total_SummaryHdr\":\"")
+            .append(nullCheck(reportData.getReportSummaryHdr().getFields().getTotal())).append(NEW_LINE)
+            .append("\"costs_SummaryHdr\":\"")
+            .append(nullCheck(reportData.getReportSummaryHdr().getFields().getCostsCount())).append(NEW_LINE)
+            .append("\"remedy_SummaryHdr\":\"")
+            .append(nullCheck(reportData.getReportSummaryHdr().getFields().getRemedyCount())).append(NEW_LINE)
+            .append("\"reconsider_SummaryHdr\":\"")
+            .append(nullCheck(reportData.getReportSummaryHdr().getFields().getReconsiderCount())).append(NEW_LINE);
+
         addJsonCollection("reportSummary1", reportData.getReportSummaryList().iterator(), sb);
         addJsonCollection("reportSummary2Hdr", reportData.getReportSummary2HdrList().iterator(), sb);
         addJsonCollection("reportSummary2", reportData.getReportSummary2List().iterator(), sb);

@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLink;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper.getRespondentRepresentative;
@@ -73,9 +73,9 @@ public class CaseLinksEmailService {
         if (list1 == null || list1.isEmpty()) {
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(list2);
         } else {
-            List<GenericTypeItem<CaseLink>> diff = list2.stream()
+            ListTypeItem<CaseLink> diff = list2.stream()
                     .filter(element -> !list1.contains(element))
-                    .toList();
+                    .collect(Collectors.toCollection(ListTypeItem::new));
             isLinkedForHearing = CaseLinksHelper.isLinkedForHearing(diff);
         }
         if (isLinkedForHearing) {

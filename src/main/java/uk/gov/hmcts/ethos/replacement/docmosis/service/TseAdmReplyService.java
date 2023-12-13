@@ -12,9 +12,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -103,7 +103,7 @@ public class TseAdmReplyService {
     }
 
     private boolean addDocumentMissing(CaseData caseData) {
-        List<GenericTypeItem<DocumentType>> documents = caseData.getTseAdmReplyAddDocument();
+        List<TypeItem<DocumentType>> documents = caseData.getTseAdmReplyAddDocument();
         if (NEITHER.equals(caseData.getTseAdmReplyIsCmoOrRequest()) || isNotEmpty(documents)) {
             return false;
         }
@@ -148,7 +148,7 @@ public class TseAdmReplyService {
         }
 
         if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
-            applicationType.setRespondCollection(new ArrayList<>());
+            applicationType.setRespondCollection(new ListTypeItem<TseRespondType>());
         }
 
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
@@ -172,7 +172,7 @@ public class TseAdmReplyService {
                 .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
                 .build();
 
-        applicationType.getRespondCollection().add(TseRespondTypeItem.builder()
+        applicationType.getRespondCollection().add(TypeItem.<TseRespondType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(response)
                 .build());

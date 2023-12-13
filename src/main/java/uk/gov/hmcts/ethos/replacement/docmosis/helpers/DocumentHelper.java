@@ -14,11 +14,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -112,22 +111,22 @@ public final class DocumentHelper {
         }
 
         sb.append("\"i").append(getEWSectionName(correspondenceType).replace(".", "_")
-                .replace(" ", "_"))
+                        .replace(" ", "_"))
                 .append("_enhmcts\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append("\"i")
                 .append(getEWSectionName(correspondenceType).replace(".", "_")
-                .replace(" ", "_"))
+                        .replace(" ", "_"))
                 .append("_enhmcts1\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append("\"i")
                 .append(getEWSectionName(correspondenceType).replace(".", "_")
-                .replace(" ", "_"))
+                        .replace(" ", "_"))
                 .append("_enhmcts2\":\"").append(USER_IMAGE).append(ENHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
                 .append(getScotSectionName(correspondenceScotType).replace(".", "_")
-                .replace(" ", "_"))
+                        .replace(" ", "_"))
                 .append("_schmcts\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
                 .append(getScotSectionName(correspondenceScotType).replace(".", "_")
-                .replace(" ", "_"))
+                        .replace(" ", "_"))
                 .append("_schmcts1\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE).append(I_SCOT)
                 .append(getScotSectionName(correspondenceScotType).replace(".", "_")
-                .replace(" ", "_"))
+                        .replace(" ", "_"))
                 .append("_schmcts2\":\"").append(USER_IMAGE).append(SCHMCTS_PNG).append(NEW_LINE);
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
@@ -142,26 +141,26 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getClaimantAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"claimant_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
-                .append("\"claimant_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
-                .append("\"claimant_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
-                .append("\"claimant_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
-                .append("\"claimant_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
-                .append("\"claimant_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder().append("\"claimant_addressLine1\":\"")
+            .append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
+            .append("\"claimant_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
+            .append("\"claimant_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
+            .append("\"claimant_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"claimant_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"claimant_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"claimant_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
-                .append("\"claimant_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
-                .append(NEW_LINE).append("\"claimant_or_rep_addressLine3\":\"")
-                .append(nullCheck(address.getAddressLine3())).append(NEW_LINE).append("\"claimant_or_rep_town\":\"")
-                .append(nullCheck(address.getPostTown())).append(NEW_LINE).append("\"claimant_or_rep_county\":\"")
-                .append(nullCheck(address.getCounty())).append(NEW_LINE).append("\"claimant_or_rep_postCode\":\"")
-                .append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder()
+            .append("\"claimant_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1()))
+            .append(NEW_LINE)
+            .append("\"claimant_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
+            .append(NEW_LINE)
+            .append("\"claimant_or_rep_addressLine3\":\"").append(nullCheck(address.getAddressLine3()))
+            .append(NEW_LINE)
+            .append("\"claimant_or_rep_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"claimant_or_rep_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"claimant_or_rep_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getClaimantData(CaseData caseData) {
@@ -229,26 +228,25 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"respondent_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
-                .append("\"respondent_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
-                .append("\"respondent_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
-                .append("\"respondent_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
-                .append("\"respondent_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
-                .append("\"respondent_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder().append("\"respondent_addressLine1\":\"")
+            .append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
+            .append("\"respondent_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
+            .append("\"respondent_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
+            .append("\"respondent_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"respondent_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"respondent_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getRespondentOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"respondent_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
-                .append("\"respondent_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
-                .append(NEW_LINE).append("\"respondent_or_rep_addressLine3\":\"")
-                .append(nullCheck(address.getAddressLine3())).append(NEW_LINE).append("\"respondent_or_rep_town\":\"")
-                .append(nullCheck(address.getPostTown())).append(NEW_LINE).append("\"respondent_or_rep_county\":\"")
-                .append(nullCheck(address.getCounty())).append(NEW_LINE).append("\"respondent_or_rep_postCode\":\"")
-                .append(nullCheck(address.getPostCode())).append(NEW_LINE);
-        return sb;
+        return new StringBuilder().append("\"respondent_or_rep_addressLine1\":\"")
+            .append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
+            .append("\"respondent_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
+            .append(NEW_LINE)
+            .append("\"respondent_or_rep_addressLine3\":\"").append(nullCheck(address.getAddressLine3()))
+            .append(NEW_LINE)
+            .append("\"respondent_or_rep_town\":\"").append(nullCheck(address.getPostTown())).append(NEW_LINE)
+            .append("\"respondent_or_rep_county\":\"").append(nullCheck(address.getCounty())).append(NEW_LINE)
+            .append("\"respondent_or_rep_postCode\":\"").append(nullCheck(address.getPostCode())).append(NEW_LINE);
     }
 
     private static StringBuilder getRespondentData(CaseData caseData) {
@@ -661,8 +659,8 @@ public final class DocumentHelper {
         sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append('"').append('t').append(sectionName)
-                    .append(COLON).append("true").append(NEW_LINE);
+            sb.append("\"t").append(sectionName.replace(".", "_")).append("\":\"true")
+            .append(NEW_LINE);
         }
         return sb;
     }
@@ -671,8 +669,8 @@ public final class DocumentHelper {
         String scotSectionName = getScotSectionName(correspondenceScotType);
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.equals("")) {
-            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
-                    .append(COLON).append("true").append(NEW_LINE);
+            sb.append("\"t_Scot_").append(scotSectionName.replace(".", "_"))
+                    .append("\":\"true").append(NEW_LINE);
         }
         return sb;
     }
@@ -798,17 +796,17 @@ public final class DocumentHelper {
 
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
                                                  String labelNumber, String showTelFax) {
-        StringBuilder sb = new StringBuilder();
-        sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
-                .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE).append('"').append(LABEL)
-                .append(labelNumber).append("_Entity_Name_02\":\"")
-                .append(nullCheck(addressLabelType.getLabelEntityName02())).append(NEW_LINE)
-                .append(getAddressLines(addressLabelType, labelNumber))
-                .append(getTelFaxLine(addressLabelType, labelNumber, showTelFax)).append('"').append(LBL)
-                .append(labelNumber).append("_Eef\":\"").append(nullCheck(addressLabelType.getLabelEntityReference()))
-                .append(NEW_LINE).append('"').append(LBL).append(labelNumber).append("_Cef\":\"")
-                .append(nullCheck(addressLabelType.getLabelCaseReference())).append('"');
-        return sb;
+        return new StringBuilder().append('"').append(LABEL).append(labelNumber)
+            .append("_Entity_Name_01\":\"")
+            .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE)
+            .append('"').append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
+            .append(nullCheck(addressLabelType.getLabelEntityName02())).append(NEW_LINE)
+            .append(getAddressLines(addressLabelType, labelNumber))
+            .append(getTelFaxLine(addressLabelType, labelNumber, showTelFax))
+            .append('"').append(LBL).append(labelNumber).append("_Eef\":\"")
+            .append(nullCheck(addressLabelType.getLabelEntityReference())).append(NEW_LINE)
+            .append('"').append(LBL).append(labelNumber).append("_Cef\":\"")
+            .append(nullCheck(addressLabelType.getLabelCaseReference())).append('"');
     }
 
     private static StringBuilder getAddressLines(AddressLabelType addressLabelType, String labelNumber) {
@@ -1003,13 +1001,14 @@ public final class DocumentHelper {
 
         // Get all documents with claimant rule 92 no - whether on application creation or in any subsequent response
         // These will only be supporting material as pdfs for rule 92 'no' aren't meant to be generated.
-        for (GenericTseApplicationTypeItem app : ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
+        for (TypeItem<GenericTseApplicationType> app :
+                ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
             GenericTseApplicationType appType = app.getValue();
             if (CLAIMANT_TITLE.equals(appType.getApplicant()) && NO.equals(appType.getCopyToOtherPartyYesOrNo())) {
                 claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));
             }
 
-            for (TseRespondTypeItem response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
+            for (TypeItem<TseRespondType> response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
                 TseRespondType respondType = response.getValue();
                 if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
                     claimantRule92NoDocuments.addAll(

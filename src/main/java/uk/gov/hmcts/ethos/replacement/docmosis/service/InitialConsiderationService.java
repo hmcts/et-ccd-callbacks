@@ -171,8 +171,7 @@ public class InitialConsiderationService {
         validJurisdictionCodes
             .forEach(codeName -> sb.append("<strong>")
                 .append(codeName)
-                .append("</strong>")
-                .append(" - ")
+                .append("</strong> - ")
                 .append(JurisdictionCode.valueOf(codeName).getDescription())
                 .append("<br><br>"));
 

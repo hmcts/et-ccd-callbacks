@@ -11,7 +11,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
@@ -48,7 +49,7 @@ public class RespondNotificationControllerFunctionalTest extends BaseFunctionalT
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(SendNotificationType.builder()
-                    .respondCollection(List.of(PseResponseTypeItem.builder()
+                    .respondCollection(ListTypeItem.from(TypeItem.<PseResponseType>builder()
                         .id(UUID.randomUUID().toString())
                         .value(PseResponseType.builder()
                             .from(RESPONDENT_TITLE)

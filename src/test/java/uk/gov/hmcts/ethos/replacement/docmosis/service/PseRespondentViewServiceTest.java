@@ -6,7 +6,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
@@ -86,7 +86,7 @@ class PseRespondentViewServiceTest {
     @Test
     void initialOrdReqDetailsTableMarkUp_withHearing() {
 
-        PseResponseTypeItem pseResponseTypeItem = PseResponseTypeItem.builder()
+        TypeItem<PseResponseType> pseResponseTypeItem = TypeItem.<PseResponseType>builder()
             .id(UUID.randomUUID().toString())
             .value(PseResponseType.builder()
                 .from(CLAIMANT_TITLE)

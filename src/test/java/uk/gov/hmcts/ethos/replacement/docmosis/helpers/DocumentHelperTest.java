@@ -13,8 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
@@ -2264,7 +2264,7 @@ class DocumentHelperTest {
             CaseData caseData = new CaseData();
             caseData.setDocumentCollection(List.of(doc1, doc2, doc3));
 
-            GenericTseApplicationTypeItem claimantApp = GenericTseApplicationTypeItem.builder()
+            TypeItem<GenericTseApplicationType> claimantApp = TypeItem.<GenericTseApplicationType>builder()
                 .value(GenericTseApplicationType.builder()
                     .applicant(CLAIMANT_TITLE)
                     .copyToOtherPartyYesOrNo(NO)
@@ -2272,8 +2272,8 @@ class DocumentHelperTest {
                     .build())
                 .build();
 
-            List<TseRespondTypeItem> tseRespondTypeItems = List.of(
-                TseRespondTypeItem.builder()
+            ListTypeItem<TseRespondType> tseRespondTypeItems = ListTypeItem.from(
+                TypeItem.<TseRespondType>builder()
                     .value(TseRespondType.builder()
                         .from(CLAIMANT_TITLE)
                         .copyToOtherParty(NO)
@@ -2282,14 +2282,14 @@ class DocumentHelperTest {
                 .build()
             );
 
-            GenericTseApplicationTypeItem claimantResponses = GenericTseApplicationTypeItem.builder()
+            TypeItem<GenericTseApplicationType> claimantResponses = TypeItem.<GenericTseApplicationType>builder()
                 .value(GenericTseApplicationType.builder()
                     .documentUpload(doc1.getValue().getUploadedDocument())
                     .respondCollection(tseRespondTypeItems)
                     .build())
                 .build();
 
-            caseData.setGenericTseApplicationCollection(List.of(claimantApp, claimantResponses));
+            caseData.setGenericTseApplicationCollection(ListTypeItem.from(claimantApp, claimantResponses));
 
             DocumentHelper.setLegalRepVisibleDocuments(caseData);
 

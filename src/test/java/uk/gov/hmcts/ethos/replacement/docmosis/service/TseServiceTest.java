@@ -10,10 +10,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -83,7 +81,7 @@ class TseServiceTest {
         when(documentManagementService.displayDocNameTypeSizeLink(documentTwo.getUploadedDocument(), AUTH_TOKEN))
             .thenReturn("File2 (txt, 1MB)");
 
-        var documents = List.of(GenericTypeItem.from(document), GenericTypeItem.from(documentTwo));
+        var documents = List.of(TypeItem.from(document), TypeItem.from(documentTwo));
         List<String[]> actual = tseService.addDocumentsRows(documents, AUTH_TOKEN);
 
         assertThat(actual).hasSize(4);
@@ -231,12 +229,11 @@ class TseServiceTest {
         return GenericTseApplicationType.builder()
             .applicant(RESPONDENT_TITLE)
             .number("1")
-            .respondCollection(List.of(
-                TseRespondTypeItem.builder()
+            .respondCollection(ListTypeItem.from(TypeItem.<TseRespondType>builder()
                     .id(UUID.randomUUID().toString())
                     .value(setupAdminTseRespondType())
                     .build(),
-                TseRespondTypeItem.builder()
+                TypeItem.<TseRespondType>builder()
                     .id(UUID.randomUUID().toString())
                     .value(setupNonAdminTseRespondType())
                     .build())
@@ -344,8 +341,7 @@ class TseServiceTest {
         void withRule92NoResponseAsLegalRep() {
             CaseData caseData = new CaseData();
 
-            caseData.setGenericTseApplicationCollection(List.of(
-                GenericTseApplicationTypeItem.builder()
+            caseData.setGenericTseApplicationCollection(ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                     .id(UUID.randomUUID().toString())
                     .value(getRespondentAppWithClaimantAndAdminRule92NoResponse())
                     .build())
@@ -396,7 +392,7 @@ class TseServiceTest {
             tseAdminRecordDecisionType1.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType1.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType1.setSelectPartyNotify("Respondent");
-            TseAdminRecordDecisionTypeItem decisionType1 = new TseAdminRecordDecisionTypeItem();
+            TypeItem<TseAdminRecordDecisionType> decisionType1 = new TypeItem<TseAdminRecordDecisionType>();
             decisionType1.setId("1");
             decisionType1.setValue(tseAdminRecordDecisionType1);
 
@@ -409,7 +405,7 @@ class TseServiceTest {
             tseAdminRecordDecisionType2.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType2.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType2.setSelectPartyNotify("Respondent");
-            TseAdminRecordDecisionTypeItem decisionType2 = new TseAdminRecordDecisionTypeItem();
+            TypeItem<TseAdminRecordDecisionType> decisionType2 = new TypeItem<TseAdminRecordDecisionType>();
             decisionType2.setId("2");
             decisionType2.setValue(tseAdminRecordDecisionType2);
 
@@ -422,14 +418,15 @@ class TseServiceTest {
             tseAdminRecordDecisionType3.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType3.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType3.setSelectPartyNotify("Respondent");
-            TseAdminRecordDecisionTypeItem decisionType3 = new TseAdminRecordDecisionTypeItem();
+            TypeItem<TseAdminRecordDecisionType> decisionType3 = new TypeItem<TseAdminRecordDecisionType>();
             decisionType3.setId("3");
             decisionType3.setValue(tseAdminRecordDecisionType3);
 
             CaseData caseData = setupCaseDataWithAnApplication();
-            caseData.getGenericTseApplicationCollection().get(0).getValue().setAdminDecision(List.of(decisionType1,
-                decisionType2, decisionType3));
-            DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                    .setAdminDecision(ListTypeItem.from(decisionType1, decisionType2, decisionType3));
+            DynamicFixedListType listType = DynamicFixedListType
+                    .from(List.of(DynamicValueType.create("1", "")));
             listType.setValue(listType.getListItems().get(0));
             caseData.setTseViewApplicationSelect(listType);
 
@@ -496,8 +493,7 @@ class TseServiceTest {
     private CaseData setupCaseDataWithAnApplication() {
         CaseData caseData = new CaseData();
 
-        caseData.setGenericTseApplicationCollection(List.of(
-            GenericTseApplicationTypeItem.builder()
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(setupTestApplication())
                 .build())
@@ -516,22 +512,18 @@ class TseServiceTest {
             .copyToOtherPartyYesOrNo(NO)
             .copyToOtherPartyText("Details")
             .documentUpload(DocumentFixtures.getUploadedDocumentType("application.docx"))
-            .respondCollection(List.of(
-                TseRespondTypeItem.builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(setupAdminTseRespondType())
-                    .build())
+            .respondCollection(ListTypeItem.from(setupAdminTseRespondType())
             ).build();
     }
 
-    private List<GenericTypeItem<DocumentType>> createDocumentList() {
+    private List<TypeItem<DocumentType>> createDocumentList() {
         DocumentType document = DocumentType.from(DocumentFixtures.getUploadedDocumentType("File1"));
         document.setShortDescription("Description1");
 
         DocumentType documentTwo = DocumentType.from(DocumentFixtures.getUploadedDocumentType("File2"));
         documentTwo.setShortDescription("Description2");
 
-        return List.of(GenericTypeItem.from(document), GenericTypeItem.from(documentTwo));
+        return List.of(TypeItem.from(document), TypeItem.from(documentTwo));
     }
 
     private TseRespondType setupAdminTseRespondType() {

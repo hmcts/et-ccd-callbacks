@@ -56,6 +56,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -89,6 +91,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForC
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
+                   "PMD.TooManyFields", "PMD.CyclomaticComplexity"})
 @ExtendWith(SpringExtension.class)
 class CaseManagementForCaseWorkerServiceTest {
 
@@ -130,7 +135,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private EmailService emailService;
 
     @BeforeEach
-    void setUp() throws Exception {
+    public void setUp() throws Exception {
         scotlandCcdRequest1 = new CCDRequest();
         CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
@@ -640,8 +645,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 + "<font color='Olive' size='5'> ECC </font>"
                 + "<font size='5'> - </font>"
                 + "<font color='SlateGray' size='5'> DIGITAL FILE </font>"
-                + "<font size='5'> - </font>"
-                + "<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
+                + "<font size='5'> - </font><font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
         assertEquals(expected, caseDetails.getCaseData().getFlagsImageAltText());
         //assertEquals("EMP-TRIB-01111111110.jpg", caseDetails.getCaseData().getFlagsImageFileName());
     }
@@ -656,8 +660,8 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-            .getContextClassLoader().getResource(jsonFileName)).toURI())));
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
@@ -693,9 +697,8 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void amendHearingCaseTypeIdSingle() {
         CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            caseManagementForCaseWorkerService.amendHearing(caseData, SINGLE_CASE_TYPE);
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                caseManagementForCaseWorkerService.amendHearing(caseData, SINGLE_CASE_TYPE));
         assertEquals("Unexpected case type id " + SINGLE_CASE_TYPE, exception.getMessage());
     }
 
@@ -853,7 +856,7 @@ class CaseManagementForCaseWorkerServiceTest {
     void midRespondentECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertEquals(1, caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
@@ -866,7 +869,7 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseData(caseData);
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertEquals(2, caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), MID_EVENT_CALLBACK).getRespondentECC().getListItems().size());
@@ -887,7 +890,7 @@ class CaseManagementForCaseWorkerServiceTest {
     void midRespondentECCWithNoRespondentECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         manchesterCcdRequest.getCaseDetails().getCaseData().setRespondentECC(null);
         assertEquals(1, caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
@@ -898,7 +901,7 @@ class CaseManagementForCaseWorkerServiceTest {
     void createECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         CaseData casedata = caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), ABOUT_TO_SUBMIT_EVENT_CALLBACK);
@@ -912,7 +915,7 @@ class CaseManagementForCaseWorkerServiceTest {
     void linkOriginalCaseECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertEquals("11111", caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getCaseRefECC());
@@ -922,7 +925,7 @@ class CaseManagementForCaseWorkerServiceTest {
     void linkOriginalCaseECCCounterClaims() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertEquals("72632632", caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
@@ -939,7 +942,7 @@ class CaseManagementForCaseWorkerServiceTest {
         manchesterCcdRequest.getCaseDetails().getCaseData().setEccCases(Arrays.asList(c1, c2));
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertEquals(c1.getValue().getCounterClaim(), caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
@@ -949,17 +952,17 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    void linkOriginalCaseECCException() throws IOException {
-        when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
-        when(ccdClient.submitEventForCase(
-                anyString(), any(), anyString(), anyString(), any(), anyString()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(Exception.class, () ->
-                caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-                        new ArrayList<>(), SUBMITTED_CALLBACK)
-        );
+    void linkOriginalCaseECCException() {
+        assertThrows(Exception.class, () -> {
+            when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
+                    isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
+                    .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
+            when(ccdClient.submitEventForCase(
+                    anyString(), any(), anyString(), anyString(), any(), anyString()))
+                    .thenThrow(new InternalException(ERROR_MESSAGE));
+            caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                    new ArrayList<>(), SUBMITTED_CALLBACK);
+        });
     }
 
     @Test
@@ -968,7 +971,7 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.getCaseData().getRespondentCollection().get(0).getValue().setResponseReceived(NO);
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
-                .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+                .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         List<String> errors = new ArrayList<>();
         CaseData caseData = caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN, errors, MID_EVENT_CALLBACK);
@@ -983,7 +986,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            assertEquals(NO, respondentSumTypeItem.getValue().getExtensionRequested());
+            assertThat(respondentSumTypeItem.getValue().getExtensionRequested(), is(NO));
         }
     }
 
@@ -1017,6 +1020,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void setEt3ResponseDueDate_doesNotOverideExistingValue() {
+
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         LocalDate localDate = LocalDate.now();
         caseData.setClaimServedDate(localDate.toString());
@@ -1038,7 +1042,7 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setExtensionRequested(YES);
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getExtensionRequested());
+        assertThat(caseData.getRespondentCollection().get(0).getValue().getExtensionRequested(), is(YES));
     }
 
     @Test
@@ -1256,8 +1260,8 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private RepresentedTypeRItem createRepresentedTypeR(String respondentName, String representativeName) {
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-                .respRepName(respondentName)
-                .nameOfRepresentative(representativeName).build();
+            .respRepName(respondentName)
+            .nameOfRepresentative(representativeName).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("111");
         representedTypeRItem.setValue(representedTypeR);
@@ -1272,4 +1276,5 @@ class CaseManagementForCaseWorkerServiceTest {
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
     }
+
 }

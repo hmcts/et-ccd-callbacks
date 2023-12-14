@@ -597,4 +597,15 @@ public class CaseDataBuilder {
         caseData.setCaseSource(caseSource);
         return this;
     }
+
+    public static Address createGenericAddress() {
+        Address address = new Address();
+        address.setAddressLine1("Line 1");
+        address.setAddressLine2("Line 2");
+        address.setAddressLine3("Line 3");
+        address.setPostTown("Town");
+        address.setPostCode("Postcode");
+        address.setCountry("Country");
+        return address;
+    }
 }

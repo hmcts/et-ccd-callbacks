@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class Et1ReppedHelper {
             """;
 
     private Et1ReppedHelper() {
+        super();
         // Access through static methods
     }
 
@@ -82,7 +84,7 @@ public class Et1ReppedHelper {
                 caseData.setEt1ReppedSectionTwo(YES);
             }
             case "et1SectionThree" -> caseData.setEt1ReppedSectionThree(YES);
-            default -> throw new IllegalStateException("Unexpected value: " + section);
+            default -> throw new IllegalArgumentException("Unexpected value: " + section);
         }
         setEt1Statuses(caseData);
     }
@@ -107,7 +109,7 @@ public class Et1ReppedHelper {
      * @return a list of error messages
      */
     public static List<String> validateSingleOption(List<String> options) {
-        if (!options.isEmpty() && options.size() > 1) {
+        if (CollectionUtils.isNotEmpty(options) && options.size() > 1) {
             return List.of("Please select only one option");
         }
         return List.of();
@@ -136,12 +138,15 @@ public class Et1ReppedHelper {
      */
     public static void generateWorkAddressLabel(CaseData caseData) {
         if (caseData.getRespondentAddress() == null) {
-            throw new IllegalStateException("Respondent address is null");
+            throw new NullPointerException("Respondent address is null");
         }
         caseData.setDidClaimantWorkAtSameAddressPreamble(caseData.getRespondentAddress().toString());
     }
 
     private static void setInitialSectionOneData(CaseData caseData) {
+        if (isNullOrEmpty(caseData.getClaimantFirstName()) || isNullOrEmpty(caseData.getClaimantLastName())) {
+            throw new NullPointerException("Claimant name is null or empty");
+        }
         caseData.setClaimant(caseData.getClaimantFirstName() + " " + caseData.getClaimantLastName());
     }
 

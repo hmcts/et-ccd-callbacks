@@ -18,9 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -178,7 +178,7 @@ public class TseAdmReplyService {
                 .build());
 
         if (featureToggleService.isWorkAllocationEnabled()) {
-            response.setDateTime(TseHelper.getCurrentDateTime()); // for Work Allocation DMNs
+            response.setDateTime(Helper.getCurrentDateTime()); // for Work Allocation DMNs
             response.setApplicationType(applicationType.getType()); // for Work Allocation DMNs
         }
 

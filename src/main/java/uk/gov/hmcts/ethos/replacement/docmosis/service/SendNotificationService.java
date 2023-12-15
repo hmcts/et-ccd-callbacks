@@ -129,12 +129,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
 
-        if (caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
-                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
-            sendNotificationType.setNotificationState(NOT_STARTED_YET);
-        } else {
-            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
-        }
+        setStatusForCitizenHub(caseData, sendNotificationType);
 
         sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
         sendNotificationType.setSendNotificationSubjectString(
@@ -149,6 +144,16 @@ public class SendNotificationService {
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
         sendNotificationTypeItem.setValue(sendNotificationType);
         caseData.getSendNotificationCollection().add(sendNotificationTypeItem);
+    }
+
+    private static void setStatusForCitizenHub(CaseData caseData, SendNotificationType sendNotificationType) {
+        if (sendNotificationType.getSendNotificationSubject().contains("Case management orders / requests")
+                && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
+                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
+            sendNotificationType.setNotificationState(NOT_STARTED_YET);
+        } else {
+            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+        }
     }
 
     private static int getNextNotificationNumber(CaseData caseData) {

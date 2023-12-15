@@ -28,6 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -147,7 +148,16 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void testClearSendNotificaitonFields() {
+    void testCreateSendNotificationWhenClaimantShouldBeNotified() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationResponseTribunal("Yes - view document for details");
+        sendNotificationService.createSendNotification(caseData);
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        assertEquals(NOT_STARTED_YET, sendNotificationType.getNotificationState());
+    }
+
+    @Test
+    void testClearSendNotificationFields() {
         sendNotificationService.clearSendNotificationFields(caseData);
 
         assertNull(caseData.getSendNotificationTitle());

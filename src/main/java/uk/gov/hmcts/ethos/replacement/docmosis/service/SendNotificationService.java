@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
@@ -60,7 +61,6 @@ public class SendNotificationService {
     public static final List<String>
             SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER = List.of("Other (General correspondence)",
             "Hearing");
-    private static final String RESPONSE_REQUIRED = "Yes - view document for details";
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     @Value("${template.sendNotification}")
@@ -129,7 +129,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
 
-        if (caseData.getSendNotificationResponseTribunal().equals(RESPONSE_REQUIRED)
+        if (caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
                 && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
             sendNotificationType.setNotificationState(NOT_STARTED_YET);
         } else {

@@ -150,6 +150,7 @@ class SendNotificationServiceTest {
 
     @Test
     void testCreateSendNotificationWhenClaimantShouldBeNotified() {
+        caseData.setSendNotificationSubject(List.of("Case management orders / requests"));
         caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
         caseData.setSendNotificationResponseTribunal(SEND_NOTIFICATION_RESPONSE_REQUIRED);
         sendNotificationService.createSendNotification(caseData);
@@ -159,6 +160,7 @@ class SendNotificationServiceTest {
 
     @Test
     void testCreateSendNotificationWhenRespondentOnlyRequired() {
+        caseData.setSendNotificationSubject(List.of("Case management orders / requests"));
         caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
         caseData.setSendNotificationResponseTribunal(SEND_NOTIFICATION_RESPONSE_REQUIRED);
         sendNotificationService.createSendNotification(caseData);

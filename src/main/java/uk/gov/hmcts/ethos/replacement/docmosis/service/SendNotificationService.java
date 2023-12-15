@@ -33,6 +33,7 @@ import java.util.function.Function;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
@@ -59,6 +60,7 @@ public class SendNotificationService {
     public static final List<String>
             SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER = List.of("Other (General correspondence)",
             "Hearing");
+    private static final String RESPONSE_REQUIRED = "Yes - view document for details";
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     @Value("${template.sendNotification}")
@@ -126,7 +128,13 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
-        sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+
+        if (caseData.getSendNotificationResponseTribunal().equals(RESPONSE_REQUIRED)
+                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
+            sendNotificationType.setNotificationState(NOT_STARTED_YET);
+        } else {
+            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+        }
 
         sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
         sendNotificationType.setSendNotificationSubjectString(
@@ -141,7 +149,6 @@ public class SendNotificationService {
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
         sendNotificationTypeItem.setValue(sendNotificationType);
         caseData.getSendNotificationCollection().add(sendNotificationTypeItem);
-
     }
 
     private static int getNextNotificationNumber(CaseData caseData) {

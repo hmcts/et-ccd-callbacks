@@ -52,6 +52,8 @@ public class InitialConsiderationData {
     private String cvpFinalDetails;
     @JsonProperty("cvpPreliminaryDetails")
     private String cvpPreliminaryDetails;
+    @JsonProperty("etICPrelimHearingYesNo")
+    private String etICPrelimHearingYesNo;
     @JsonProperty("preliminaryHearingType")
     private List<String> preliminaryHearingType;
     @JsonProperty("preliminaryHearingPurpose")
@@ -152,5 +154,7 @@ public class InitialConsiderationData {
     private String icCompletedBy;
     @JsonProperty("icDateCompleted")
     private String icDateCompleted;
+    @JsonProperty("icListingPreliminaryHearing")
+    private String icListingPreliminaryHearing;
 
 }

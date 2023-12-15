@@ -25,7 +25,8 @@ public final class InitialConsiderationHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
-    private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
+    //private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
+    private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
 
     private InitialConsiderationHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -74,6 +75,8 @@ public final class InitialConsiderationHelper {
                         .map(EtICListForPreliminaryHearing::getEtICGiveDetailsOfHearingNotice).orElse(null))
                 .preliminaryHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
                         .map(EtICListForPreliminaryHearing::getEtICLengthOfPrelimHearing).orElse(null))
+                .etICPrelimHearingYesNo(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                        .map(EtICSeekComments::getEtICPrelimHearingYesNo).orElse(null))
                 //final
                 .finalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
                         .map(EtICListForFinalHearing::getEtICTypeOfFinalHearing).orElse(null))
@@ -144,6 +147,7 @@ public final class InitialConsiderationHelper {
                 .icDdaDisabilityIssues(defaultIfEmpty(caseData.getIcDdaDisabilityIssues(), null))
                 .icOrderForFurtherInformation(defaultIfEmpty(caseData.getIcOrderForFurtherInformation(), null))
                 .icOtherIssuesOrFinalOrders(defaultIfEmpty(caseData.getIcOtherIssuesOrFinalOrders(), null))
+                .icListingPreliminaryHearing(defaultIfEmpty(caseData.getIcListingPreliminaryHearing(), null))
                 .icDateCompleted(
                         defaultIfEmpty(caseData.getIcDateCompleted(),
                                 LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))

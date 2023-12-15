@@ -52,12 +52,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
+    public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
     public static final List<String>
             SEND_NOTIFICATION_SUBJECTS = List.of("Claimant / Respondent details",
             "Judgment", "Claim (ET1)",
             "Response (ET3)",
             "Employer Contract Claim",
-            "Case management orders / requests");
+            CASE_MANAGEMENT_ORDERS_REQUESTS);
     public static final List<String>
             SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER = List.of("Other (General correspondence)",
             "Hearing");
@@ -147,7 +148,7 @@ public class SendNotificationService {
     }
 
     private static void setStatusForCitizenHub(CaseData caseData, SendNotificationType sendNotificationType) {
-        if (sendNotificationType.getSendNotificationSubject().contains("Case management orders / requests")
+        if (sendNotificationType.getSendNotificationSubject().contains(CASE_MANAGEMENT_ORDERS_REQUESTS)
                 && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
                 && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
             sendNotificationType.setNotificationState(NOT_STARTED_YET);

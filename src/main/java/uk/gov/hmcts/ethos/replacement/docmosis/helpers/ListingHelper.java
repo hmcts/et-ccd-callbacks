@@ -110,58 +110,8 @@ public final class ListingHelper {
 
             listingType.setJurisdictionCodesList(BulkHelper.getJurCodesCollectionWithHide(
                     caseData.getJurCodesCollection()));
-            listingType.setHearingType(isNullOrEmpty(hearingType.getHearingType()) ? " " :
-                    hearingType.getHearingType());
             listingType.setPositionType(isNullOrEmpty(caseData.getPositionType()) ? " " : caseData.getPositionType());
-
-            if (hearingType.hasHearingJudge()) {
-                listingType.setHearingJudgeName(hearingType.getJudge().getSelectedLabel());
-            } else {
-                listingType.setHearingJudgeName(" ");
-            }
-            if (hearingType.hasHearingEmployeeMember()) {
-                listingType.setHearingEEMember(hearingType.getHearingEEMember().getSelectedLabel());
-            } else {
-                listingType.setHearingEEMember(" ");
-            }
-            if (hearingType.hasHearingEmployerMember()) {
-                listingType.setHearingERMember(hearingType.getHearingERMember().getSelectedLabel());
-            } else {
-                listingType.setHearingERMember(" ");
-            }
-            listingType.setHearingClerk(dateListedType.getHearingClerk() != null
-                    ? dateListedType.getHearingClerk().getSelectedLabel()
-                    : " ");
-            listingType.setHearingPanel(
-                    isNullOrEmpty(hearingType.getHearingSitAlone()) ? " " : hearingType.getHearingSitAlone());
-            listingType.setHearingFormat(CollectionUtils.isNotEmpty(hearingType.getHearingFormat())
-                    ? String.join(", ", hearingType.getHearingFormat())
-                    : " ");
-            listingType.setJudicialMediation(
-                    isNullOrEmpty(hearingType.getJudicialMediation()) || NO.equals(hearingType.getJudicialMediation())
-                    ? " "
-                    : hearingType.getJudicialMediation());
-
-            log.info("getVenueFromDateListedType");
-            listingType.setCauseListVenue(getVenueFromDateListedType(dateListedType));
-
-            log.info("getHearingRoom");
-            listingType.setHearingRoom(getHearingRoom(dateListedType));
-
-            log.info("getHearingNotes");
-            listingType.setHearingNotes(
-                    isNullOrEmpty(hearingType.getHearingNotes()) ? " " : hearingType.getHearingNotes());
-
-            log.info("getHearingDuration");
-            listingType.setHearingDay(index + 1 + " of " + hearingCollectionSize);
-            listingType.setEstHearingLength(!isNullOrEmpty(DocumentHelper.getHearingDuration(hearingType))
-                    ? DocumentHelper.getHearingDuration(hearingType)
-                    : " ");
-
-            listingType.setHearingReadingDeliberationMembersChambers(isNullOrEmpty(
-                    dateListedType.getHearingTypeReadingDeliberation()) || !SCOTLAND_HEARING_LIST.contains(
-                    dateListedType.getHearingTypeReadingDeliberation()) ? " " :
-                    dateListedType.getHearingTypeReadingDeliberation());
+            hearingData(hearingType, dateListedType, index, hearingCollectionSize, listingType);
 
             log.info("End getListingTypeFromCaseData");
             return getClaimantRespondentDetails(listingType, listingData, caseData);
@@ -175,6 +125,65 @@ public final class ListingHelper {
             log.error("hearingCollectionSize: " + hearingCollectionSize);
             return listingType;
         }
+    }
+
+    private static void hearingData(HearingType hearingType, DateListedType dateListedType, int index,
+                                  int hearingCollectionSize, ListingType listingType) {
+        listingType.setHearingType(isNullOrEmpty(hearingType.getHearingType()) ? " " :
+                hearingType.getHearingType());
+
+        if (hearingType.hasHearingJudge()) {
+            listingType.setHearingJudgeName(hearingType.getJudge().getSelectedLabel());
+        } else {
+            listingType.setHearingJudgeName(" ");
+        }
+        if (hearingType.hasHearingEmployeeMember()) {
+            listingType.setHearingEEMember(hearingType.getHearingEEMember().getSelectedLabel());
+        } else {
+            listingType.setHearingEEMember(" ");
+        }
+        if (hearingType.hasHearingEmployerMember()) {
+            listingType.setHearingERMember(hearingType.getHearingERMember().getSelectedLabel());
+        } else {
+            listingType.setHearingERMember(" ");
+        }
+        listingType.setHearingClerk(dateListedType.getHearingClerk() != null
+                ? dateListedType.getHearingClerk().getSelectedLabel()
+                : " ");
+        listingType.setHearingPanel(
+                isNullOrEmpty(hearingType.getHearingSitAlone()) ? " " : hearingType.getHearingSitAlone());
+        listingType.setHearingFormat(CollectionUtils.isNotEmpty(hearingType.getHearingFormat())
+                ? String.join(", ", hearingType.getHearingFormat())
+                : " ");
+        listingType.setJudicialMediation(
+                isNullOrEmpty(hearingType.getJudicialMediation()) || NO.equals(hearingType.getJudicialMediation())
+                ? " "
+                : hearingType.getJudicialMediation());
+
+        log.info("getVenueFromDateListedType");
+        listingType.setCauseListVenue(getVenueFromDateListedType(dateListedType));
+
+        log.info("getHearingRoom");
+        listingType.setHearingRoom(getHearingRoom(dateListedType));
+
+        log.info("getHearingNotes");
+        listingType.setHearingNotes(
+                isNullOrEmpty(hearingType.getHearingNotes()) ? " " : hearingType.getHearingNotes());
+
+        log.info("getHearingDuration");
+        listingType.setHearingDay(index + 1 + " of " + hearingCollectionSize);
+        listingType.setEstHearingLength(!isNullOrEmpty(DocumentHelper.getHearingDuration(hearingType))
+                ? DocumentHelper.getHearingDuration(hearingType)
+                : " ");
+
+        deliberationType(dateListedType, listingType);
+    }
+
+    private static void deliberationType(DateListedType dateListedType, ListingType listingType) {
+        listingType.setHearingReadingDeliberationMembersChambers(isNullOrEmpty(
+                dateListedType.getHearingTypeReadingDeliberation()) || !SCOTLAND_HEARING_LIST.contains(
+                dateListedType.getHearingTypeReadingDeliberation()) ? " " :
+                dateListedType.getHearingTypeReadingDeliberation());
     }
 
     private static String getHearingRoom(DateListedType dateListedType) {
@@ -201,18 +210,10 @@ public final class ListingHelper {
         listingType.setClaimantRepresentative(" ");
         listingType.setRespondentRepresentative(" ");
 
-        boolean isPublicType = listingData.getHearingDocType() != null
-                && listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                && listingData.getHearingDocETCL().equals(HEARING_ETCL_PUBLIC);
-        boolean isPressListType = listingData.getHearingDocType() != null
-                && listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                && listingData.getHearingDocETCL().equals(HEARING_ETCL_PRESS_LIST);
-        boolean rule50d = caseData.getRestrictedReporting() != null
-                && caseData.getRestrictedReporting().getImposed() != null
-                && caseData.getRestrictedReporting().getImposed().equals(YES);
-        boolean rule50b = caseData.getRestrictedReporting() != null
-                && caseData.getRestrictedReporting().getRule503b() != null
-                && caseData.getRestrictedReporting().getRule503b().equals(YES);
+        boolean isPublicType = isPublicType(listingData);
+        boolean isPressListType = isPressListType(listingData);
+        boolean rule50d = isRule50d(caseData);
+        boolean rule50b = isRule50b(caseData);
         if (rule50b && isPublicType || rule50d && isPublicType) {
             listingType.setClaimantName(" ");
             listingType.setRespondent(" ");
@@ -220,52 +221,94 @@ public final class ListingHelper {
             listingType.setClaimantName(RULE_50_APPLIES);
             listingType.setRespondent(RULE_50_APPLIES);
         } else {
-            if (isNullOrEmpty(caseData.getClaimantCompany())) {
-                log.info("Claimant name");
-                listingType.setClaimantName(caseData.getClaimantIndType() != null
-                        && caseData.getClaimantIndType().getClaimantLastName() != null
-                        ? caseData.getClaimantIndType().claimantFullName()
-                        : " ");
-            } else {
-                log.info("Company claimant");
-                listingType.setClaimantName(caseData.getClaimantCompany());
-            }
-            log.info("Claimant address");
-            listingType.setClaimantTown(caseData.getClaimantType() != null
-                    && caseData.getClaimantType().getClaimantAddressUK() != null
-                    && caseData.getClaimantType().getClaimantAddressUK().getPostTown() != null
-                    ? caseData.getClaimantType().getClaimantAddressUK().getPostTown()
-                    : " ");
-            listingType.setRespondent(caseData.getRespondentCollection() != null
-                    && !caseData.getRespondentCollection().isEmpty()
-                    && caseData.getRespondentCollection().get(0).getValue() != null
-                    ? caseData.getRespondentCollection().get(0).getValue().getRespondentName()
-                    : " ");
-            listingType.setRespondentTown(caseData.getRespondentCollection() != null
-                    && !caseData.getRespondentCollection().isEmpty()
-                    && caseData.getRespondentCollection().get(0).getValue() != null
-                    && DocumentHelper.getRespondentAddressET3(
-                    caseData.getRespondentCollection().get(0).getValue()) != null
-                    && DocumentHelper.getRespondentAddressET3(
-                    caseData.getRespondentCollection().get(0).getValue()).getPostTown() != null
-                    ? DocumentHelper.getRespondentAddressET3(
-                    caseData.getRespondentCollection().get(0).getValue()).getPostTown()
-                    : " ");
-            log.info("getRespOthersName");
-            listingType.setRespondentOthers(
-                    isNullOrEmpty(getRespOthersName(caseData)) ? " " : getRespOthersName(caseData));
-            listingType.setClaimantRepresentative(caseData.getRepresentativeClaimantType() != null
-                    && caseData.getRepresentativeClaimantType().getNameOfOrganisation() != null
-                    ? caseData.getRepresentativeClaimantType().getNameOfOrganisation()
-                    : " ");
-            listingType.setRespondentRepresentative(caseData.getRepCollection() != null
-                    && !caseData.getRepCollection().isEmpty()
-                    && caseData.getRepCollection().get(0).getValue() != null
-                    && caseData.getRepCollection().get(0).getValue().getNameOfOrganisation() != null
-                    ? caseData.getRepCollection().get(0).getValue().getNameOfOrganisation()
-                    : " ");
+            nonRestrictedListing(listingType, caseData);
         }
         return listingType;
+    }
+
+    private static void nonRestrictedListing(ListingType listingType, CaseData caseData) {
+        claimantData(listingType, caseData);
+        respondentData(listingType, caseData);
+        claimantRepData(listingType, caseData);
+        respondentRepData(listingType, caseData);
+    }
+
+    private static void respondentRepData(ListingType listingType, CaseData caseData) {
+        listingType.setRespondentRepresentative(caseData.getRepCollection() != null
+                                                && !caseData.getRepCollection().isEmpty()
+                                                && caseData.getRepCollection().get(0).getValue() != null
+                                                && caseData.getRepCollection().get(0).getValue().getNameOfOrganisation() != null
+                ? caseData.getRepCollection().get(0).getValue().getNameOfOrganisation()
+                : " ");
+    }
+
+    private static void claimantRepData(ListingType listingType, CaseData caseData) {
+        listingType.setClaimantRepresentative(caseData.getRepresentativeClaimantType() != null
+                                              && caseData.getRepresentativeClaimantType().getNameOfOrganisation() != null
+                ? caseData.getRepresentativeClaimantType().getNameOfOrganisation()
+                : " ");
+    }
+
+    private static void respondentData(ListingType listingType, CaseData caseData) {
+        listingType.setRespondent(caseData.getRespondentCollection() != null
+                                  && !caseData.getRespondentCollection().isEmpty()
+                                  && caseData.getRespondentCollection().get(0).getValue() != null
+                ? caseData.getRespondentCollection().get(0).getValue().getRespondentName()
+                : " ");
+        listingType.setRespondentTown(caseData.getRespondentCollection() != null
+                                      && !caseData.getRespondentCollection().isEmpty()
+                                      && caseData.getRespondentCollection().get(0).getValue() != null
+                                      && DocumentHelper.getRespondentAddressET3(
+                caseData.getRespondentCollection().get(0).getValue()) != null
+                                      && DocumentHelper.getRespondentAddressET3(
+                caseData.getRespondentCollection().get(0).getValue()).getPostTown() != null
+                ? DocumentHelper.getRespondentAddressET3(
+                caseData.getRespondentCollection().get(0).getValue()).getPostTown()
+                : " ");
+        log.info("getRespOthersName");
+        listingType.setRespondentOthers(
+                isNullOrEmpty(getRespOthersName(caseData)) ? " " : getRespOthersName(caseData));
+    }
+
+    private static void claimantData(ListingType listingType, CaseData caseData) {
+        if (isNullOrEmpty(caseData.getClaimantCompany())) {
+            log.info("Claimant name");
+            listingType.setClaimantName(caseData.getClaimantIndType() != null
+                                        && caseData.getClaimantIndType().getClaimantLastName() != null
+                    ? caseData.getClaimantIndType().claimantFullName()
+                    : " ");
+        } else {
+            log.info("Company claimant");
+            listingType.setClaimantName(caseData.getClaimantCompany());
+        }
+        log.info("Claimant address");
+        listingType.setClaimantTown(caseData.getClaimantType() != null
+                                    && caseData.getClaimantType().getClaimantAddressUK() != null
+                                    && caseData.getClaimantType().getClaimantAddressUK().getPostTown() != null
+                ? caseData.getClaimantType().getClaimantAddressUK().getPostTown()
+                : " ");
+    }
+
+    private static boolean isRule50b(CaseData caseData) {
+        return caseData.getRestrictedReporting() != null && caseData.getRestrictedReporting()
+                                                                    .getRule503b() != null && caseData.getRestrictedReporting()
+                       .getRule503b().equals(YES);
+    }
+
+    private static boolean isRule50d(CaseData caseData) {
+        return caseData.getRestrictedReporting() != null && caseData.getRestrictedReporting()
+                                                                    .getImposed() != null && caseData.getRestrictedReporting()
+                       .getImposed().equals(YES);
+    }
+
+    private static boolean isPressListType(ListingData listingData) {
+        return listingData.getHearingDocType() != null && listingData.getHearingDocType().equals(
+                HEARING_DOC_ETCL) && listingData.getHearingDocETCL().equals(HEARING_ETCL_PRESS_LIST);
+    }
+
+    private static boolean isPublicType(ListingData listingData) {
+        return listingData.getHearingDocType() != null && listingData.getHearingDocType().equals(
+                HEARING_DOC_ETCL) && listingData.getHearingDocETCL().equals(HEARING_ETCL_PUBLIC);
     }
 
     public static StringBuilder buildListingDocumentContent(ListingData listingData, String accessKey,
@@ -529,7 +572,7 @@ public final class ListingHelper {
 
     private static String extractHearingNotes(ListingType listingType) {
         if (!isNullOrEmpty(listingType.getHearingNotes())) {
-            return listingType.getHearingNotes().replaceAll("\n", " - ");
+            return listingType.getHearingNotes().replace("\n", " - ");
         }
         return "";
     }

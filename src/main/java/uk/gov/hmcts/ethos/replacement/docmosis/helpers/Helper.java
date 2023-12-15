@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -72,7 +71,7 @@ public final class Helper {
     public static String nullCheck(String value) {
         Optional<String> opt = Optional.ofNullable(value);
         if (opt.isPresent()) {
-            return value.replaceAll("\"", "'");
+            return value.replace("\"", "'");
         } else {
             return "";
         }
@@ -227,32 +226,30 @@ public final class Helper {
     }
 
     public static void updatePostponedDate(CaseData caseData) {
-
-        if (caseData.getHearingCollection() != null) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-
-                if (hearingTypeItem.getValue() != null
-                    && hearingTypeItem.getValue().getHearingDateCollection() != null) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-
-                        DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (dateListedType != null) {
-                            if (isHearingStatusPostponed(dateListedType)
-                                && dateListedType.getPostponedDate() == null) {
-                                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
-                            }
-                            if (dateListedType.getPostponedDate() != null
-                                && (!isHearingStatusPostponed(dateListedType)
-                                    || dateListedType.getHearingStatus() == null)) {
-                                dateListedType.setPostponedDate(null);
-                            }
-                        }
-                    }
-                }
-            }
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            return;
         }
 
+        caseData.getHearingCollection().stream()
+                .filter(hearingTypeItem -> hearingTypeItem.getValue() != null
+                                           && hearingTypeItem.getValue().getHearingDateCollection() != null)
+                .flatMap(hearingTypeItem -> hearingTypeItem.getValue().getHearingDateCollection().stream()).forEach(
+                        Helper::checkPostponedHearing);
+    }
+
+    private static void checkPostponedHearing(DateListedTypeItem dateListedTypeItem) {
+        DateListedType dateListedType = dateListedTypeItem.getValue();
+        if (dateListedType != null) {
+            if (isHearingStatusPostponed(dateListedType)
+                && dateListedType.getPostponedDate() == null) {
+                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
+            }
+            if (dateListedType.getPostponedDate() != null
+                && (!isHearingStatusPostponed(dateListedType)
+                    || dateListedType.getHearingStatus() == null)) {
+                dateListedType.setPostponedDate(null);
+            }
+        }
     }
 
     private static boolean isHearingStatusPostponed(DateListedType dateListedType) {

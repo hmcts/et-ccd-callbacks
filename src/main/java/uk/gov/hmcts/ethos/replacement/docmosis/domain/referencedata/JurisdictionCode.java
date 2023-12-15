@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.DISCRIMINATION_PREFIX;
+
 @AllArgsConstructor
 public enum JurisdictionCode {
     ADG("Suffer a detriment and/or dismissal resulting from a failure to allow an employee to be accompanied"
@@ -102,12 +104,9 @@ public enum JurisdictionCode {
         + "failure of employer to make reasonable adjustments"),
     DOD("Suffered a detriment and/or dismissal resulting from requiring time off for other (non-work but not "
         + "Health and Safety) duties, study, training or seeking work"),
-    RRD("Discrimination, including indirect discrimination, discrimination based on association or perception,"
-        + " harassment or victimisation on grounds of race or ethnic origin"),
-    SXD("Discrimination, including indirect discrimination, discrimination based on association or perception,"
-        + " harassment or victimisation on grounds of sex, marriage and civil partnership or gender reassignment"),
-    DSO("Discrimination, including indirect discrimination, discrimination based on association or perception,"
-        + " harassment or victimisation on grounds of sexual orientation"),
+    RRD(DISCRIMINATION_PREFIX + " of race or ethnic origin"),
+    SXD(DISCRIMINATION_PREFIX + " of sex, marriage and civil partnership or gender reassignment"),
+    DSO(DISCRIMINATION_PREFIX + " of sexual orientation"),
     MAT("Suffer a detriment and/or dismissal on grounds of pregnancy, childbirth or maternity "),
     RPT("Failure to pay a redundancy payment"),
     WA("Failure of employer to pay or unauthorised deductions have been made (including Parental Bereavement Pay)"),

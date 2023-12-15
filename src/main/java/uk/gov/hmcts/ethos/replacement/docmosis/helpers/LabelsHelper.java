@@ -416,32 +416,33 @@ public final class LabelsHelper {
 
             }
 
-            if (addressLabelsSelectionTypeMSL.contains(RESPONDENTS_ADDRESS__LABEL)) {
+            generateLabel(addressLabelsSelectionTypeMSL, RESPONDENTS_ADDRESS__LABEL,
+                    "Adding: RESPONDENTS_ADDRESS__LABEL",
+                    LabelsHelper.getRespondentsAddressLabelsData(labelPayloadEvent.getLabelPayloadES(), YES),
+                    addressLabelTypeItems);
 
-                log.info("Adding: RESPONDENTS_ADDRESS__LABEL");
-
-                List<AddressLabelTypeItem> addressLabelTypeItemsAux =
-                        LabelsHelper.getRespondentsAddressLabelsData(labelPayloadEvent.getLabelPayloadES(), YES);
-                if (!addressLabelTypeItemsAux.isEmpty()) {
-                    addressLabelTypeItems.addAll(addressLabelTypeItemsAux);
-                }
-            }
-
-            if (addressLabelsSelectionTypeMSL.contains(RESPONDENTS_REPS_ADDRESS__LABEL)) {
-
-                log.info("Adding: RESPONDENTS_REPS_ADDRESS__LABEL");
-
-                List<AddressLabelTypeItem> addressLabelTypeItemsAux =
-                        LabelsHelper.getRespondentsRepsAddressLabelsData(labelPayloadEvent.getLabelPayloadES(), YES);
-                if (!addressLabelTypeItemsAux.isEmpty()) {
-                    addressLabelTypeItems.addAll(addressLabelTypeItemsAux);
-                }
-            }
+            generateLabel(addressLabelsSelectionTypeMSL, RESPONDENTS_REPS_ADDRESS__LABEL,
+                    "Adding: RESPONDENTS_REPS_ADDRESS__LABEL",
+                    LabelsHelper.getRespondentsRepsAddressLabelsData(labelPayloadEvent.getLabelPayloadES(), YES),
+                    addressLabelTypeItems);
 
         }
 
         return addressLabelTypeItems;
 
+    }
+
+    private static void generateLabel(List<String> addressLabelsSelectionTypeMSL, String multiSelectOption,
+                                      String msg, List<AddressLabelTypeItem> labelPayloadEvent,
+                                      List<AddressLabelTypeItem> addressLabelTypeItems) {
+        if (addressLabelsSelectionTypeMSL.contains(multiSelectOption)) {
+
+            log.info(msg);
+
+            if (!labelPayloadEvent.isEmpty()) {
+                addressLabelTypeItems.addAll(labelPayloadEvent);
+            }
+        }
     }
 
     public static List<AddressLabelTypeItem> getSelectedAddressLabelsMultiple(MultipleData multipleData) {

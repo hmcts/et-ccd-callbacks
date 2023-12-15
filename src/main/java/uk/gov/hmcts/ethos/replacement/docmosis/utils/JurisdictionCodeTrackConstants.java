@@ -19,6 +19,9 @@ public final class JurisdictionCodeTrackConstants {
     public static final String TRACK_STANDARD = "Standard";
     public static final String TRACK_SHORT = "Short";
     public static final String TRACK_NO = "No track";
+    public static final String DISCRIMINATION_PREFIX =
+            "Discrimination, including indirect discrimination, discrimination based on association or perception, " +
+            "harassment or victimisation on grounds";
 
     private JurisdictionCodeTrackConstants() {
     }

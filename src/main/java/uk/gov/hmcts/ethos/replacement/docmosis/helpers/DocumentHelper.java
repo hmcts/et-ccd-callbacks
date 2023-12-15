@@ -168,30 +168,9 @@ public final class DocumentHelper {
         StringBuilder sb = new StringBuilder();
         RepresentedTypeC representedTypeC = caseData.getRepresentativeClaimantType();
         Optional<ClaimantIndType> claimantIndType = Optional.ofNullable(caseData.getClaimantIndType());
-        if (representedTypeC != null && caseData.getClaimantRepresentedQuestion() != null &&  caseData
+        if (representedTypeC != null && caseData.getClaimantRepresentedQuestion() != null && caseData
                 .getClaimantRepresentedQuestion().equals(YES)) {
-            sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(representedTypeC.getNameOfRepresentative()))
-                    .append(NEW_LINE).append("\"claimant_rep_organisation\":\"")
-                    .append(nullCheck(representedTypeC.getNameOfOrganisation())).append(NEW_LINE);
-            if (representedTypeC.getRepresentativeAddress() != null) {
-                sb.append(getClaimantOrRepAddressUK(representedTypeC.getRepresentativeAddress()));
-            } else {
-                sb.append(getClaimantOrRepAddressUK(new Address()));
-            }
-            sb.append("\"claimant_reference\":\"").append(nullCheck(representedTypeC.getRepresentativeReference()))
-                    .append(NEW_LINE);
-            Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
-            if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
-                    .equals(COMPANY_TYPE_CLAIMANT)) {
-                sb.append(CLAIMANT_FULL_NAME).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE)
-                        .append(CLAIMANT).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
-            } else if (claimantIndType.isPresent()) {
-                sb.append(CLAIMANT_FULL_NAME).append(nullCheck(claimantIndType.get().claimantFullName()))
-                        .append(NEW_LINE).append(CLAIMANT).append(nullCheck(claimantIndType.get().claimantFullName()))
-                        .append(NEW_LINE);
-            } else {
-                sb.append(CLAIMANT_FULL_NAME).append(NEW_LINE).append(CLAIMANT).append(NEW_LINE);
-            }
+            getClaimantRepData(caseData, sb, representedTypeC, claimantIndType);
         } else {
             Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
             if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
@@ -199,19 +178,18 @@ public final class DocumentHelper {
                 sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE)
                         .append(CLAIMANT_FULL_NAME).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE)
                         .append(CLAIMANT).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
+            } else if (claimantIndType.isPresent()) {
+                sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(claimantIndType.get().claimantFullName()))
+                    .append(NEW_LINE).append(CLAIMANT_FULL_NAME)
+                    .append(nullCheck(claimantIndType.get().claimantFullName())).append(NEW_LINE)
+                    .append(CLAIMANT).append(nullCheck(claimantIndType.get().claimantFullName()))
+                    .append(NEW_LINE);
             } else {
-                if (claimantIndType.isPresent()) {
-                    sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(claimantIndType.get().claimantFullName()))
-                            .append(NEW_LINE).append(CLAIMANT_FULL_NAME)
-                            .append(nullCheck(claimantIndType.get().claimantFullName())).append(NEW_LINE)
-                            .append(CLAIMANT).append(nullCheck(claimantIndType.get().claimantFullName()))
-                            .append(NEW_LINE);
-                } else {
-                    sb.append(CLAIMANT_OR_REP_FULL_NAME).append(NEW_LINE).append(CLAIMANT_FULL_NAME).append(NEW_LINE)
-                            .append(CLAIMANT).append(NEW_LINE).append("\"claimant_rep_organisation\":\"")
-                            .append(NEW_LINE);
-                }
+                sb.append(CLAIMANT_OR_REP_FULL_NAME).append(NEW_LINE).append(CLAIMANT_FULL_NAME).append(NEW_LINE)
+                        .append(CLAIMANT).append(NEW_LINE).append("\"claimant_rep_organisation\":\"")
+                        .append(NEW_LINE);
             }
+
             Optional<ClaimantType> claimantType = Optional.ofNullable(caseData.getClaimantType());
             if (claimantType.isPresent()) {
                 sb.append(getClaimantOrRepAddressUK(claimantType.get().getClaimantAddressUK()));
@@ -226,6 +204,32 @@ public final class DocumentHelper {
             sb.append(getClaimantAddressUK(new Address()));
         }
         return sb;
+    }
+
+    private static void getClaimantRepData(CaseData caseData, StringBuilder sb, RepresentedTypeC representedTypeC,
+                                  Optional<ClaimantIndType> claimantIndType) {
+        sb.append(CLAIMANT_OR_REP_FULL_NAME).append(nullCheck(representedTypeC.getNameOfRepresentative()))
+                .append(NEW_LINE).append("\"claimant_rep_organisation\":\"")
+                .append(nullCheck(representedTypeC.getNameOfOrganisation())).append(NEW_LINE);
+        if (representedTypeC.getRepresentativeAddress() != null) {
+            sb.append(getClaimantOrRepAddressUK(representedTypeC.getRepresentativeAddress()));
+        } else {
+            sb.append(getClaimantOrRepAddressUK(new Address()));
+        }
+        sb.append("\"claimant_reference\":\"").append(nullCheck(representedTypeC.getRepresentativeReference()))
+                .append(NEW_LINE);
+        Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
+        if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
+                .equals(COMPANY_TYPE_CLAIMANT)) {
+            sb.append(CLAIMANT_FULL_NAME).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE)
+                    .append(CLAIMANT).append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
+        } else if (claimantIndType.isPresent()) {
+            sb.append(CLAIMANT_FULL_NAME).append(nullCheck(claimantIndType.get().claimantFullName()))
+                    .append(NEW_LINE).append(CLAIMANT).append(nullCheck(claimantIndType.get().claimantFullName()))
+                    .append(NEW_LINE);
+        } else {
+            sb.append(CLAIMANT_FULL_NAME).append(NEW_LINE).append(CLAIMANT).append(NEW_LINE);
+        }
     }
 
     private static StringBuilder getRespondentAddressUK(Address address) {
@@ -252,7 +256,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentData(CaseData caseData) {
-        StringBuilder sb = new StringBuilder();
         List<RespondentSumTypeItem> respondentSumTypeItemList = CollectionUtils.isNotEmpty(
                 caseData.getRespondentCollection())
                 ? caseData.getRespondentCollection() : new ArrayList<>();
@@ -267,68 +270,28 @@ public final class DocumentHelper {
         RespondentSumType respondentToBeShown = new RespondentSumType();
 
         for (RespondentSumTypeItem respondentSumTypeItem: respondentSumTypeItemList) {
-            responseContinue = isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())
-                    || YES.equals(respondentSumTypeItem.getValue().getResponseContinue());
-            responseNotStruckOut = isNullOrEmpty(respondentSumTypeItem.getValue().getResponseStruckOut())
-                    || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO);
+            responseContinue = isResponseContinue(respondentSumTypeItem);
+            responseNotStruckOut = isResponseNotStruckOut(respondentSumTypeItem);
 
             if (responseContinue && responseNotStruckOut) {
                 respondentToBeShown = respondentSumTypeItem.getValue();
                 break;
             }
         }
-
-        if (!responseContinue) {
-            log.error("Atleast one respondent should have response continuing for case: "
-                    + caseData.getEthosCaseReference());
-        }
-
-        if (!responseNotStruckOut) {
-            log.error("Atleast one respondent should have response not struck out for case: "
-                    + caseData.getEthosCaseReference());
-        }
-
-        if (respondentToBeShown.equals(new RespondentSumType())) {
-            log.error("No respondent found whose response is continuing and is not struck out for case: "
-                    + caseData.getEthosCaseReference());
-        }
+        
+        checkIfOneRespondentIsShown(caseData, responseContinue, responseNotStruckOut, respondentToBeShown);
 
         List<RepresentedTypeRItem> representedTypeRList = caseData.getRepCollection();
         RespondentSumType finalRespondentToBeShown = respondentToBeShown;
         Optional<RepresentedTypeRItem> representedTypeRItem = Optional.empty();
+        StringBuilder sb = new StringBuilder();
+        respondentRepData(caseData, representedTypeRList, responseNotStruckOut, responseContinue, 
+                finalRespondentToBeShown, representedTypeRItem, sb);
+        respondentData(caseData, sb, finalRespondentToBeShown);
+        return sb;
+    }
 
-        if (CollectionUtils.isNotEmpty(representedTypeRList) && responseNotStruckOut && responseContinue
-                && !finalRespondentToBeShown.equals(new RespondentSumType())) {
-            representedTypeRItem = representedTypeRList.stream()
-                    .filter(a -> a.getValue().getRespRepName().equals(
-                            finalRespondentToBeShown.getRespondentName())).findFirst();
-        }
-
-        if (representedTypeRItem.isPresent()) {
-            RepresentedTypeR representedTypeR = representedTypeRItem.get().getValue();
-            sb.append(RESPONDENT_OR_REP_FULL_NAME).append(nullCheck(representedTypeR
-                    .getNameOfRepresentative())).append(NEW_LINE);
-            if (representedTypeR.getRepresentativeAddress() != null) {
-                sb.append(getRespondentOrRepAddressUK(representedTypeR.getRepresentativeAddress()));
-            } else {
-                sb.append(getRespondentOrRepAddressUK(new Address()));
-            }
-            sb.append("\"respondent_reference\":\"").append(nullCheck(representedTypeR.getRepresentativeReference()))
-                    .append(NEW_LINE).append("\"respondent_rep_organisation\":\"")
-                    .append(nullCheck(representedTypeR.getNameOfOrganisation())).append(NEW_LINE);
-
-        } else {
-            if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
-                    && responseNotStruckOut && responseContinue
-                    && !finalRespondentToBeShown.equals(new RespondentSumType())) {
-                sb.append(RESPONDENT_OR_REP_FULL_NAME).append(nullCheck(finalRespondentToBeShown.getRespondentName()))
-                        .append(NEW_LINE)
-                        .append(getRespondentOrRepAddressUK(getRespondentAddressET3(finalRespondentToBeShown)));
-            } else {
-                sb.append(RESPONDENT_OR_REP_FULL_NAME).append(NEW_LINE).append("\"respondent_rep_organisation\":\"")
-                        .append(NEW_LINE).append(getRespondentOrRepAddressUK(new Address()));
-            }
-        }
+    private static void respondentData(CaseData caseData, StringBuilder sb, RespondentSumType finalRespondentToBeShown) {
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
             sb.append("\"respondent_full_name\":\"").append(nullCheck(
                             isNullOrEmpty(finalRespondentToBeShown.getResponseContinue()) || YES.equals(
@@ -353,7 +316,73 @@ public final class DocumentHelper {
                     .append("\"Respondent\":\"").append(NEW_LINE).append("\"resp_others\":\"").append(NEW_LINE)
                     .append("\"resp_address\":\"").append(NEW_LINE);
         }
-        return sb;
+    }
+
+    private static void respondentRepData(CaseData caseData, List<RepresentedTypeRItem> representedTypeRList,
+                                  boolean responseNotStruckOut, boolean responseContinue,
+                                  RespondentSumType finalRespondentToBeShown,
+                                  Optional<RepresentedTypeRItem> representedTypeRItem, StringBuilder sb) {
+        if (CollectionUtils.isNotEmpty(representedTypeRList) && responseNotStruckOut && responseContinue
+            && !finalRespondentToBeShown.equals(new RespondentSumType())) {
+            representedTypeRItem = representedTypeRList.stream()
+                    .filter(a -> a.getValue().getRespRepName().equals(
+                            finalRespondentToBeShown.getRespondentName())).findFirst();
+        }
+
+        if (representedTypeRItem.isPresent()) {
+            RepresentedTypeR representedTypeR = representedTypeRItem.get().getValue();
+            sb.append(RESPONDENT_OR_REP_FULL_NAME).append(nullCheck(representedTypeR
+                    .getNameOfRepresentative())).append(NEW_LINE);
+            if (representedTypeR.getRepresentativeAddress() != null) {
+                sb.append(getRespondentOrRepAddressUK(representedTypeR.getRepresentativeAddress()));
+            } else {
+                sb.append(getRespondentOrRepAddressUK(new Address()));
+            }
+            sb.append("\"respondent_reference\":\"").append(nullCheck(representedTypeR.getRepresentativeReference()))
+                    .append(NEW_LINE).append("\"respondent_rep_organisation\":\"")
+                    .append(nullCheck(representedTypeR.getNameOfOrganisation())).append(NEW_LINE);
+
+        } else {
+            if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
+                && responseNotStruckOut && responseContinue
+                && !finalRespondentToBeShown.equals(new RespondentSumType())) {
+                sb.append(RESPONDENT_OR_REP_FULL_NAME).append(nullCheck(finalRespondentToBeShown.getRespondentName()))
+                        .append(NEW_LINE)
+                        .append(getRespondentOrRepAddressUK(getRespondentAddressET3(finalRespondentToBeShown)));
+            } else {
+                sb.append(RESPONDENT_OR_REP_FULL_NAME).append(NEW_LINE).append("\"respondent_rep_organisation\":\"")
+                        .append(NEW_LINE).append(getRespondentOrRepAddressUK(new Address()));
+            }
+        }
+    }
+
+    private static void checkIfOneRespondentIsShown(CaseData caseData, boolean responseContinue, boolean responseNotStruckOut,
+                                                    RespondentSumType respondentToBeShown) {
+        if (!responseContinue) {
+            log.error("Atleast one respondent should have response continuing for case: "
+                      + caseData.getEthosCaseReference());
+        }
+
+        if (!responseNotStruckOut) {
+            log.error("Atleast one respondent should have response not struck out for case: "
+                      + caseData.getEthosCaseReference());
+        }
+
+        if (respondentToBeShown.equals(new RespondentSumType())) {
+            log.error("No respondent found whose response is continuing and is not struck out for case: "
+                      + caseData.getEthosCaseReference());
+        }
+    }
+
+    private static boolean isResponseNotStruckOut(RespondentSumTypeItem respondentSumTypeItem) {
+        return isNullOrEmpty(
+                respondentSumTypeItem.getValue().getResponseStruckOut()) || respondentSumTypeItem.getValue()
+                       .getResponseStruckOut().equals(NO);
+    }
+
+    private static boolean isResponseContinue(RespondentSumTypeItem respondentSumTypeItem) {
+        return isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue()) || YES.equals(
+                respondentSumTypeItem.getValue().getResponseContinue());
     }
 
     private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {

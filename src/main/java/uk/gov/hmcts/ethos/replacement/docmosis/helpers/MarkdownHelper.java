@@ -28,14 +28,14 @@ public final class MarkdownHelper {
             throw new IllegalArgumentException("header array should contain only two items");
         }
 
-        return String.format("|%s|%s|\r\n|--|--|\r\n%s", header[0], header[1], createTwoColumnRows(rows));
+        return String.format("|%s|%s|\r%n|--|--|\r%n%s", header[0], header[1], createTwoColumnRows(rows));
     }
 
     // Formats data for use in a two column table. Ignores rows if any cell is null.
     private static String createTwoColumnRows(List<String[]> rows) {
         return rows.stream()
             .filter(columns -> columns[1] != null)
-            .map(columns -> String.format("|%s|%s|\r\n", columns[0], columns[1]))
+            .map(columns -> String.format("|%s|%s|\r%n", columns[0], columns[1]))
             .collect(Collectors.joining());
     }
 

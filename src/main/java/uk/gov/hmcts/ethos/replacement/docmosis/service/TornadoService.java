@@ -351,7 +351,7 @@ public class TornadoService {
             }
             case "Initial Consideration.pdf" -> {
                 return InitialConsiderationHelper.getDocumentRequest(
-                        caseData, tornadoConnection.getAccessKey());
+                        caseData, tornadoConnection.getAccessKey(),caseTypeId);
             }
             case TSE_FILE_NAME -> {
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());

@@ -19,12 +19,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @Slf4j
 public final class InitialConsiderationHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
+    private static final String IC_SUMMARY_EW_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
     private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
 
     private InitialConsiderationHelper() {
@@ -34,29 +36,38 @@ public final class InitialConsiderationHelper {
     /**
      * This method generates the data in a JSON format stored in a String which allows Tornado to process the
      * information.
-     *
-     * @param caseData  contains all the case data
+     * @param caseData contains all the case data
      * @param accessKey contains the authentication token
+     * @param caseTypeId contains Case Type ID for England Wales or Scotland
      * @return will either return a list which contains an error message if no respondents were found or will return an
-     *         empty list showing that there were no errors
+     *      empty list showing that there were no errors
      * @throws JsonProcessingException if the JSON cannot be generated correctly, an error would be thrown. This could
-     *                                 be due to an illegal character potentially existing in the data
+     *      be due to an illegal character potentially existing in the data
      */
-    public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getDocumentRequest(CaseData caseData, String accessKey, String caseTypeId)
+            throws JsonProcessingException {
+        if (caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)) {
+            return getDocumentRequestEW(caseData, accessKey);
+        } else {
+            return getDocumentRequestSC(caseData, accessKey);
+        }
+    }
+
+    private static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
                 .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
                 .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
-                .hearingListed(caseData.getEtICHearingListed())
+                .hearingListed(Optional.ofNullable(caseData.getEtICHearingListed()).orElse(null))
                 .hearingPostpone(defaultIfEmpty(caseData.getEtICPostponeGiveDetails(), null))
                 .hearingConvertF2f(defaultIfEmpty(caseData.getEtICConvertF2fGiveDetails(), null))
                 .hearingConvertFinal(defaultIfEmpty(caseData.getEtICConvertPreliminaryGiveDetails(), null))
                 .hearingExtend(defaultIfEmpty(caseData.getEtICExtendDurationGiveDetails(), null))
                 .hearingOther(defaultIfEmpty(caseData.getEtICOtherGiveDetails(), null))
                 .otherDirections(defaultIfEmpty(caseData.getEtICHearingAnyOtherDirections(), null))
-                .hearingNotListed(caseData.getEtICHearingNotListedList())
+                .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
                 //cvp
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
@@ -111,7 +122,7 @@ public final class InitialConsiderationHelper {
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information
-                .furtherInformation(caseData.getEtICFurtherInformation())
+                .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
                 .furtherInfoGiveDetails(defaultIfEmpty(caseData.getEtICFurtherInformationGiveDetails(), null))
                 .furtherInfoTimeToComply(defaultIfEmpty(caseData.getEtICFurtherInformationTimeToComply(), null))
                 .r27ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
@@ -136,6 +147,24 @@ public final class InitialConsiderationHelper {
                         .map(EtInitialConsiderationRule28::getEtICRule28NumberOfDays).orElse(null))
                 .furtherInfoAnyOtherDirections(
                         defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
+                .icDateCompleted(
+                        defaultIfEmpty(caseData.getIcDateCompleted(),
+                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
+                .icCompletedBy(
+                        defaultIfEmpty(caseData.getIcCompletedBy(), null))
+                .build();
+        InitialConsiderationDocument document = InitialConsiderationDocument.builder()
+                .accessKey(accessKey)
+                .outputName(IC_OUTPUT_NAME)
+                .templateName(IC_SUMMARY_SC_TEMPLATE_NAME)
+                .data(data).build();
+
+        return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    private static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
+        InitialConsiderationData data = InitialConsiderationData.builder()
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .icReceiptET3FormIssues(defaultIfEmpty(caseData.getIcReceiptET3FormIssues(), null))
                 .icRespondentsNameIdentityIssues(defaultIfEmpty(caseData.getIcRespondentsNameIdentityIssues(), null))
                 .icJurisdictionCodeIssues(defaultIfEmpty(caseData.getIcJurisdictionCodeIssues(), null))
@@ -153,10 +182,11 @@ public final class InitialConsiderationHelper {
                 .icCompletedBy(
                         defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
+
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
                 .outputName(IC_OUTPUT_NAME)
-                .templateName(IC_SUMMARY_SC_TEMPLATE_NAME)
+                .templateName(IC_SUMMARY_EW_TEMPLATE_NAME)
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);

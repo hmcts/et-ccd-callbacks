@@ -25,8 +25,7 @@ public final class InitialConsiderationHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
-    //private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
-    private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
+    private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
 
     private InitialConsiderationHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.elasticsearch.common.Strings;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;

@@ -151,7 +151,7 @@ public class TseRespondentReplyService {
     void saveReplyToApplication(CaseData caseData, boolean isRespondingToTribunal) {
         GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
 
-        if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+        if (isEmpty(genericTseApplicationType.getRespondCollection())) {
             genericTseApplicationType.setRespondCollection(new ArrayList<>());
         }
         List<TseRespondTypeItem> respondCollection = genericTseApplicationType.getRespondCollection();

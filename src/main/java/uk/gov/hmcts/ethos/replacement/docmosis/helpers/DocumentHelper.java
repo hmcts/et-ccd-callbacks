@@ -90,7 +90,7 @@ public final class DocumentHelper {
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
         // Start building the instruction
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
                 .append(OUTPUT_FILE_NAME).append(NEW_LINE);
 
@@ -135,7 +135,7 @@ public final class DocumentHelper {
                 .append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28)).append(NEW_LINE)
                 .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
                 .append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference()))
-                .append(NEW_LINE).append("}\n").append("}\n");
+                .append(NEW_LINE).append("}\n}\n");
 
         return sb;
     }

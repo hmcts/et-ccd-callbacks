@@ -274,7 +274,7 @@ public final class ListingHelper {
         StringBuilder sb = new StringBuilder();
 
         // Start building the instruction
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
                 .append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
                 .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n")
@@ -292,17 +292,16 @@ public final class ListingHelper {
             sb.append(getDocumentData(listingData, templateName, caseType));
         }
 
-        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n")
-                .append("}\n").append("}\n");
+        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
         return sb;
     }
 
     private static StringBuilder getLogo(String caseType) {
         StringBuilder sb = new StringBuilder();
         if (caseType.equals(SCOTLAND_LISTING_CASE_TYPE_ID)) {
-            sb.append("\"listing_logo\":\"").append("[userImage:").append("schmcts.png]").append(NEW_LINE);
+            sb.append("\"listing_logo\":\"[userImage:schmcts.png]").append(NEW_LINE);
         } else {
-            sb.append("\"listing_logo\":\"").append("[userImage:").append("enhmcts.png]").append(NEW_LINE);
+            sb.append("\"listing_logo\":\"[userImage:enhmcts.png]").append(NEW_LINE);
         }
         return sb;
     }

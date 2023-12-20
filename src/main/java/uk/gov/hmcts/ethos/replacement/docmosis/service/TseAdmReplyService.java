@@ -117,7 +117,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void updateApplicationState(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -138,7 +138,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void saveTseAdmReplyDataFromCaseData(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -147,7 +147,7 @@ public class TseAdmReplyService {
             return;
         }
 
-        if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
+        if (isEmpty(applicationType.getRespondCollection())) {
             applicationType.setRespondCollection(new ArrayList<>());
         }
 

@@ -73,7 +73,7 @@ public final class ReportDocHelper {
         log.info("Building {} report document data", listingData.getReportType());
 
         StringBuilder sb = new StringBuilder();
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
                 .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
 
@@ -159,7 +159,7 @@ public final class ReportDocHelper {
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
         sb.append("\"Report_Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE).append("\"Today_date\":\"")
-                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n").append("}\n").append("}\n");
+                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
         return sb;
     }
 
@@ -532,7 +532,7 @@ public final class ReportDocHelper {
                         .append(claimServedTypeItemsListSize).append(NEW_LINE);
             }
             reportContent.append("\"Date_Of_Receipt\":\"").append(claimServedTypeItemsListSize).append(NEW_LINE)
-                    .append("\"Date_Of_Service\":\"").append(claimServedTypeItemsListSize).append("\"}").append(",\n");
+                    .append("\"Date_Of_Service\":\"").append(claimServedTypeItemsListSize).append("\"},\n");
         } else {
             for (int i = 0; i < claimServedTypeItemsCount; i++) {
                 reportContent.append(getServedClaimsReportRow(claimServedTypeItems.get(i).getValue(), dayNumber));

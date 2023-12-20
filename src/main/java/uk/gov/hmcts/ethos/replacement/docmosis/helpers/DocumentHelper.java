@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
@@ -339,7 +338,7 @@ public final class DocumentHelper {
                                 new RespondentSumType())
                             ? getRespondentAddressUK(getRespondentAddressET3(finalRespondentToBeShown)) : "");
 
-            if (Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
+            if (isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
                     || YES.equals(finalRespondentToBeShown.getResponseContinue())) {
                 sb.append("\"Respondent\":\"").append(caseData.getRespondentCollection().size() > 1 ? "1. " : "")
                         .append(nullCheck(finalRespondentToBeShown.getRespondentName()))

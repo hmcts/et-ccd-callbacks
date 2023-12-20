@@ -34,7 +34,7 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder addMemberDaysReportSummaryHeader(MemberDaysReportData reportData) {
-        StringBuilder summaryHeaderContent = new StringBuilder();
+        StringBuilder summaryHeaderContent = new StringBuilder(70);
 
         if (reportData == null) {
             return summaryHeaderContent;
@@ -92,7 +92,7 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder getMemberDayReportDetailRow(MemberDaysReportDetail reportDetail) {
-        StringBuilder detailRowContent = new StringBuilder();
+        StringBuilder detailRowContent = new StringBuilder(190);
         detailRowContent.append("{\n\"Detail_Hearing_Date\":\"").append(nullCheck(reportDetail.getHearingDate()))
                 .append(NEW_LINE).append("\"Employee_Member\":\"").append(nullCheck(reportDetail.getEmployeeMember()))
                 .append(NEW_LINE).append("\"Employer_Member\":\"").append(nullCheck(reportDetail.getEmployerMember()))

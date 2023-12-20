@@ -271,7 +271,7 @@ public final class ListingHelper {
     public static StringBuilder buildListingDocumentContent(ListingData listingData, String accessKey,
                                                             String templateName, UserDetails userDetails,
                                                             String caseType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(150);
 
         // Start building the instruction
         sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
@@ -347,7 +347,7 @@ public final class ListingHelper {
     }
 
     private static StringBuilder getCaseCauseListByDate(ListingData listingData, String caseType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(40);
         Iterator<Map.Entry<String, List<ListingTypeItem>>> entries = getEntriesByDate(sb, listingData);
         while (entries.hasNext()) {
             Map.Entry<String, List<ListingTypeItem>> listingEntry = entries.next();
@@ -441,7 +441,7 @@ public final class ListingHelper {
 
     private static StringBuilder getListByRoomOrVenue(List<ListingTypeItem> collection, ListingData listingData,
                                                       String caseType, boolean byRoom) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(30);
         TreeMap<String, List<ListingTypeItem>> sortedMap = byRoom
                 ? getListHearingsByRoomWithNotAllocated(collection)
                 : getListHearingsByVenueWithNotAllocated(listingData);
@@ -489,7 +489,7 @@ public final class ListingHelper {
     }
 
     private static StringBuilder getListingTypeRow(ListingType listingType, String caseType, ListingData listingData) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(550);
         sb.append("{\"Judge\":\"").append(nullCheck(extractHearingJudgeName(listingType)))
                 .append(NEW_LINE)
                 .append(getCourtListingData(listingData)).append(getLogo(caseType)).append("\"ERMember\":\"")
@@ -545,7 +545,7 @@ public final class ListingHelper {
     }
 
     private static StringBuilder getCourtListingData(ListingData listingData) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(80);
         if (listingData.getTribunalCorrespondenceAddress() != null) {
             sb.append("\"Court_addressLine1\":\"")
                     .append(nullCheck(listingData.getTribunalCorrespondenceAddress().getAddressLine1()))

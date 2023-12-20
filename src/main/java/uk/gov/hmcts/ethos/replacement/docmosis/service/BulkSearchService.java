@@ -235,7 +235,7 @@ public class BulkSearchService {
         for (SubmitEvent submitEvent : submitEvents) {
             CaseData caseData = submitEvent.getCaseData();
             if (caseIds.contains(caseData.getEthosCaseReference()) && checkErrors
-                    && !Strings.isNullOrEmpty(caseData.getMultipleReference())) {
+                    && !isNullOrEmpty(caseData.getMultipleReference())) {
                 if (creationFlag) {
                     log.info("Creation");
                     alreadyTakenIds.add(caseData.getEthosCaseReference());

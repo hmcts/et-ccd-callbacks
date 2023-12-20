@@ -106,7 +106,7 @@ public class EventValidationService {
         List.of(JURISDICTION_OUTCOME_NOT_ALLOCATED, JURISDICTION_OUTCOME_INPUT_IN_ERROR);
 
     private boolean isReceiptDateEarlier(String date, String error, List<String> errors, LocalDate dateOfReceipt) {
-        if (Strings.isNullOrEmpty(date)) {
+        if (isNullOrEmpty(date)) {
             return false;
         }
         if (dateOfReceipt.isAfter(LocalDate.parse(date))) {
@@ -318,7 +318,7 @@ public class EventValidationService {
             return;
         }
 
-        if (Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
+        if (isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
             return;
         }
 

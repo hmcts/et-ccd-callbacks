@@ -256,7 +256,7 @@ public class ListingService {
     public String getSelectedOfficeForPrintLists(CaseData caseData) {
         if (caseData.getPrintHearingDetails().getListingVenue() != null) {
             return caseData.getManagingOffice();
-        } else if (!Strings.isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
+        } else if (!isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
             return caseData.getPrintHearingDetails().getListingVenueScotland();
         } else {
             throw new IllegalStateException("Unable to get selected office from "

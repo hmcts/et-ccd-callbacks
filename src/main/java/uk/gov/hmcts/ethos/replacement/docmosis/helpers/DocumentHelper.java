@@ -135,7 +135,7 @@ public final class DocumentHelper {
                 .append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28)).append(NEW_LINE)
                 .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
                 .append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference()))
-                .append(NEW_LINE).append("}\n").append("}\n");
+                .append(NEW_LINE).append("}\n}\n");
 
         return sb;
     }
@@ -338,7 +338,7 @@ public final class DocumentHelper {
                                 new RespondentSumType())
                             ? getRespondentAddressUK(getRespondentAddressET3(finalRespondentToBeShown)) : "");
 
-            if (Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
+            if (isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
                     || YES.equals(finalRespondentToBeShown.getResponseContinue())) {
                 sb.append("\"Respondent\":\"").append(caseData.getRespondentCollection().size() > 1 ? "1. " : "")
                         .append(nullCheck(finalRespondentToBeShown.getRespondentName()))

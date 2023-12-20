@@ -490,8 +490,7 @@ public final class ListingHelper {
     }
 
     private static StringBuilder getListingTypeRow(ListingType listingType, String caseType, ListingData listingData) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"Judge\":\"").append(nullCheck(extractHearingJudgeName(listingType)))
+        return new StringBuilder().append("{\"Judge\":\"").append(nullCheck(extractHearingJudgeName(listingType)))
                 .append(NEW_LINE)
                 .append(getCourtListingData(listingData)).append(getLogo(caseType)).append("\"ERMember\":\"")
                 .append(nullCheck(listingType.getHearingERMember())).append(NEW_LINE).append("\"EEMember\":\"")
@@ -509,8 +508,8 @@ public final class ListingHelper {
                 .append(nullCheck(listingType.getClaimantTown())).append(NEW_LINE)
                 .append("\"claimant_representative\":\"").append(nullCheck(listingType.getClaimantRepresentative()))
                 .append(NEW_LINE).append("\"Respondent\":\"").append(nullCheck(listingType.getRespondent()))
-                .append(NEW_LINE);
-        sb.append("\"resp_others\":\"").append(nullCheck(getRespondentOthersWithLineBreaks(listingType)))
+                .append(NEW_LINE)
+                .append("\"resp_others\":\"").append(nullCheck(getRespondentOthersWithLineBreaks(listingType)))
                 .append(NEW_LINE).append("\"respondent_town\":\"").append(nullCheck(listingType.getRespondentTown()))
                 .append(NEW_LINE).append("\"Hearing_location\":\"").append(nullCheck(listingType.getCauseListVenue()))
                 .append(NEW_LINE).append("\"Hearing_room\":\"").append(nullCheck(listingType.getHearingRoom()))
@@ -524,7 +523,6 @@ public final class ListingHelper {
                 .append("\"Hearing_format\":\"").append(nullCheck(listingType.getHearingFormat())).append(NEW_LINE)
                 .append("\"respondent_representative\":\"").append(nullCheck(listingType.getRespondentRepresentative()))
                 .append("\"}");
-        return sb;
     }
 
     private static String extractHearingNotes(ListingType listingType) {

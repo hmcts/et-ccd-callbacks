@@ -166,19 +166,14 @@ public class MultipleScheduleService {
 
         DocumentInfo documentInfo = new DocumentInfo();
 
-        if (!multipleObjectsFiltered.keySet().isEmpty()) {
-
+        if (multipleObjectsFiltered.isEmpty()) {
+            errors.add(NO_CASES_SEARCHED);
+        } else {
             documentInfo = excelDocManagementService.writeAndUploadScheduleDocument(userToken,
                     multipleObjectsFiltered, multipleDetails, schedulePayloads);
-
-        } else {
-
-            errors.add(NO_CASES_SEARCHED);
-
         }
 
         return documentInfo;
-
     }
 
 }

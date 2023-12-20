@@ -367,16 +367,13 @@ public final class BulkHelper {
     }
 
     public static StringBuilder buildScheduleDocumentContent(BulkData bulkData, String accessKey) {
-        StringBuilder sb = new StringBuilder();
-        // Start building the instruction
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
-                .append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName())).append(FILE_EXTENSION)
-                .append(NEW_LINE).append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE)
-                .append("\"data\":{\n").append("\"Multiple_No\":\"").append(bulkData.getMultipleReference())
+        return new StringBuilder().append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+                .append("\"templateName\":\"").append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName()))
+                .append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"").append(OUTPUT_FILE_NAME)
+                .append(NEW_LINE).append("\"data\":{\n\"Multiple_No\":\"").append(bulkData.getMultipleReference())
                 .append(NEW_LINE).append("\"Multiple_title\":\"").append(bulkData.getBulkCaseTitle()).append(NEW_LINE)
                 .append(getDocumentData(bulkData)).append("\"Today_date\":\"")
-                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n").append("}\n").append("}\n");
-        return sb;
+                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
     }
 
     private static StringBuilder getDocumentData(BulkData bulkData) {

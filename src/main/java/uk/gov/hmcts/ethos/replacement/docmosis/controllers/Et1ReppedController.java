@@ -18,6 +18,7 @@ import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -38,11 +39,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService
 public class Et1ReppedController {
     private final VerifyTokenService verifyTokenService;
     private final Et1ReppedService et1ReppedService;
-    private static final String TRIAGE_ERROR_MESSAGE = """
-            The postcode you entered is not included under the early adopter sites yet. Please use the ET1 claim form
-            linked on this page or copy the following into your browser:
-            https://www.claim-employment-tribunals.service.gov.uk/
-            """;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -94,7 +90,7 @@ public class Et1ReppedController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = List.of(TRIAGE_ERROR_MESSAGE);
+        List<String> errors = List.of(ET1ReppedConstants.TRIAGE_ERROR_MESSAGE);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -117,7 +113,7 @@ public class Et1ReppedController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et1ReppedHelper.setCreateDraftData(caseData);
+        Et1ReppedHelper.setCreateDraftData(caseData, ccdRequest.getCaseDetails().getCaseId());
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -204,10 +200,8 @@ public class Et1ReppedController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        String eventId = ccdRequest.getEventId();
-        Et1ReppedHelper.setEt1SectionStatuses(caseData, eventId);
-        return getCallbackRespEntityNoErrors(caseData);
+        Et1ReppedHelper.setEt1SectionStatuses(ccdRequest);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantWorked", consumes = APPLICATION_JSON_VALUE)
@@ -384,7 +378,7 @@ public class Et1ReppedController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantPensionContribution());
+        List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantNewJob());
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -452,5 +446,30 @@ public class Et1ReppedController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.generateWorkAddressLabel(caseData);
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/sectionCompleted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for claimant worked question")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> sectionCompleted(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(caseData)
+                .confirmation_body(
+                        Et1ReppedHelper.getSectionCompleted(caseData, ccdRequest.getCaseDetails().getCaseId()))
+                .build());
     }
 }

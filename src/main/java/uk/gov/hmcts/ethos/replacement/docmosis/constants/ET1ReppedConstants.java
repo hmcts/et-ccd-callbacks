@@ -27,13 +27,18 @@ public class ET1ReppedConstants {
                                                                                   
             """;
     public static final String LABEL = """
-       Steps to making a claim | Status
-       -|-
-       [ET1 Section 1 - Claimant details](/cases/case-details/%s/trigger/et1SectionOne/et1SectionOne1)                 | %s
-       [ET1 Section 2 - Employment and respondent details](/cases/case-details/%s/trigger/et1SectionTwo/et1SectionTwo1) | %s
-       [ET1 Section 3 - Details of the claim](/cases/case-details/%s/trigger/et1SectionThree/et1SectionThree1)             | %s
-       [Submit claim](/cases/case-details/%s/trigger/submitEt1Draft/submitEt1Draft1)                                     |  %s
-           """;
+   Steps to making a claim | Status | Date completed
+   -|-|-
+   [ET1 Section 1 - Claimant details](/cases/case-details/%s/trigger/et1SectionOne/et1SectionOne1)|%s|%s
+   [ET1 Section 2 - Employment and respondent details](/cases/case-details/%s/trigger/et1SectionTwo/et1SectionTwo1)|%s|%s
+   [ET1 Section 3 - Details of the claim](/cases/case-details/%s/trigger/et1SectionThree/et1SectionThree1)|%s|%s
+        """;
+
+    public static final String ET1_SUBMIT_AVAILABLE =
+            "[Submit claim](/cases/case-details/%s/trigger/submitEt1Draft/submitEt1Draft1) "
+            + "|  <strong class=\"govuk-tag govuk-tag--blue\">Available</strong>\n";
+    public static final String ET1_SUBMIT_UNAVAILABLE =
+            "Submit claim |  <strong class=\"govuk-tag govuk-tag--grey\">Unavailable</strong>\n";
     public static final String NOT_COMPLETED = "<strong class=\"govuk-tag govuk-tag--red\">Not completed</strong><br>";
     public static final String COMPLETED = "<strong class=\"govuk-tag govuk-tag--turquoise\">Completed</strong><br>";
     public static final String UNAVAILABLE = "<strong class=\"govuk-tag govuk-tag--grey\">Unavailable</strong><br>";

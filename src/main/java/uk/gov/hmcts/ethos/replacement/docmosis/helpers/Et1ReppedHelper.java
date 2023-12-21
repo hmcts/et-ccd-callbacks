@@ -5,12 +5,13 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.listingFormatLocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.AVAILABLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.COMPLETED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.INDIVIDUAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NOT_COMPLETED;
@@ -18,7 +19,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstan
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.RESPONDENT_PREAMBLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.SECTION_COMPLETE_LABEL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.TAB_PRE_LABEL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.UNAVAILABLE;
 
 public class Et1ReppedHelper {
 
@@ -47,15 +47,21 @@ public class Et1ReppedHelper {
     }
 
     private static String et1ClaimStatus(CaseData caseData, String caseId) {
-        return ET1ReppedConstants.LABEL.formatted(
+        String formatted = ET1ReppedConstants.LABEL.formatted(
                 caseId,
                 sectionCompleted(caseData.getEt1ReppedSectionOne()),
+                listingFormatLocalDate(caseData.getEt1SectionOneDateCompleted()),
                 caseId,
                 sectionCompleted(caseData.getEt1ReppedSectionTwo()),
+                listingFormatLocalDate(caseData.getEt1SectionTwoDateCompleted()),
                 caseId,
                 sectionCompleted(caseData.getEt1ReppedSectionThree()),
-                caseId,
-                allSectionsCompleted(caseData));
+                listingFormatLocalDate(caseData.getEt1SectionThreeDateCompleted()));
+        String submitSection = allSectionsCompleted(caseData)
+                ? ET1ReppedConstants.ET1_SUBMIT_AVAILABLE.formatted(caseId)
+                : ET1ReppedConstants.ET1_SUBMIT_UNAVAILABLE;
+        return formatted + submitSection;
+
     }
 
     public static void setEt1SectionStatuses(CCDRequest ccdRequest) {
@@ -65,12 +71,17 @@ public class Et1ReppedHelper {
             case "et1SectionOne" -> {
                 setInitialSectionOneData(caseData);
                 caseData.setEt1ReppedSectionOne(YES);
+                caseData.setEt1SectionOneDateCompleted(LocalDate.now().toString());
             }
             case "et1SectionTwo" -> {
                 setInitialSectionTwoData(caseData);
                 caseData.setEt1ReppedSectionTwo(YES);
+                caseData.setEt1SectionTwoDateCompleted(LocalDate.now().toString());
             }
-            case "et1SectionThree" -> caseData.setEt1ReppedSectionThree(YES);
+            case "et1SectionThree" -> {
+                caseData.setEt1ReppedSectionThree(YES);
+                caseData.setEt1SectionThreeDateCompleted(LocalDate.now().toString());
+            }
             default -> throw new IllegalArgumentException("Unexpected value: " + eventId);
         }
         setEt1Statuses(caseData, ccdRequest.getCaseDetails().getCaseId());
@@ -82,14 +93,13 @@ public class Et1ReppedHelper {
                 : COMPLETED;
     }
 
-    private static String allSectionsCompleted(CaseData caseData) {
+    private static boolean allSectionsCompleted(CaseData caseData) {
         return (!isNullOrEmpty(caseData.getEt1ReppedSectionOne())
                 && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionOne()))
                 && (!isNullOrEmpty(caseData.getEt1ReppedSectionTwo())
                 && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionTwo()))
                 && (!isNullOrEmpty(caseData.getEt1ReppedSectionThree())
-                && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionThree()))
-                ? AVAILABLE : UNAVAILABLE;
+                && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionThree()));
     }
 
     /**

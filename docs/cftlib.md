@@ -216,4 +216,5 @@ export ROLE_ASSIGNMENT_URL="http://host.docker.internal:4096"
 export CFTLIB_HOST="http://host.docker.internal" # Use your WSL IP if host.docker.internal doesn't work
 export CAMUNDA_NEXUS_PASSWORD="<redacted>"
 export CFTLIB_EXTRA_COMPOSE_FILES="wa-docker-compose.yml"
+export SERVICE_AUTH_PROVIDER_API_BASE_URL="http://localhost:8489"
 ```

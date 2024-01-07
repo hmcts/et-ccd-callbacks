@@ -454,13 +454,14 @@ bootWithCCD {
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data'
 
     // ccd-data-store-api
-    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,aac_manage_case_assignment,ccd_case_document_am_api,am_role_assignment_service,et_cos,et_msg_handler,et_sya_api'
+    environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
 
     // ccd-definition-store-api
+    environment 'DEFINITION_STORE_S2S_AUTHORISED_SERVICES', 'ccd_data,ccd_gw,ccd_admin,aac_manage_case_assignment,wa_task_management_api,wa_task_monitor,wa_case_event_handler'
     environment 'WELSH_TRANSLATION_ENABLED', 'false'
 
     // ccd-case-document-am-api
@@ -469,7 +470,6 @@ bootWithCCD {
 
     // xui-manage-cases
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
-    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
 
     // xui-manage-org

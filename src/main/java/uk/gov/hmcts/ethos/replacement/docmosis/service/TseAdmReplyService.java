@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -117,7 +116,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void updateApplicationState(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -138,7 +137,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void saveTseAdmReplyDataFromCaseData(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -147,7 +146,7 @@ public class TseAdmReplyService {
             return;
         }
 
-        if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
+        if (isEmpty(applicationType.getRespondCollection())) {
             applicationType.setRespondCollection(new ArrayList<>());
         }
 

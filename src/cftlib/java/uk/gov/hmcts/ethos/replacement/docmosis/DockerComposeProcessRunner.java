@@ -3,10 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Objects;
-import java.util.Optional;
 
 import static java.io.File.separator;
 

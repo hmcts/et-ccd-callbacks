@@ -26,13 +26,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_ROLES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_WA;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_WA_TASK_OFFICER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CCD_DOCKER_DEFAULT_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CCD_IMPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CTSC_TEAM_LEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CWD_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CWD_USER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_HEARING_CENTRE_ADMIN;
@@ -42,7 +40,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANDWALES_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANGWALES_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ET_CASEADMIN_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ET_DEV_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ET_SYSTEM_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.HEARING_CENTRE_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.HEARING_CENTRE_TEAM_LEADER;

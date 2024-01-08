@@ -33,17 +33,22 @@ final class DockerComposeProcessRunner {
         for (String file : composeFiles) {
             String path = String.join(separator, basePath, file);
 
-            Process process = new ProcessBuilder("docker", "compose", "-f", path, "up", "-d").inheritIO().start();
-
-            int code = process.waitFor();
-
-            if (code != 0) {
-                log.error("****** Failed to start services in {} ******", file);
-                log.info("Exit value: {}", code);
-                return;
-            }
-
-            log.info("Successfully started services in {}", file);
+            startDockerCompose(path, file);
         }
+    }
+
+    @SneakyThrows
+    static void startDockerCompose(String path, String file) {
+        Process process = new ProcessBuilder("docker", "compose", "-f", path, "up", "-d").inheritIO().start();
+
+        int code = process.waitFor();
+
+        if (code != 0) {
+            log.error("****** Failed to start services in {} ******", file);
+            log.info("Exit value: {}", code);
+            return;
+        }
+
+        log.info("Successfully started services in {}", file);
     }
 }

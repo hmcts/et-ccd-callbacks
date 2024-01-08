@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -185,7 +184,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void checkResponseContinue(RespondentSumTypeItem respondentSumTypeItem) {
-        if (Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())) {
+        if (isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())) {
             respondentSumTypeItem.getValue().setResponseContinue(YES);
         }
     }
@@ -203,25 +202,25 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void resetResponseRespondentAddress(RespondentSumTypeItem respondentSumTypeItem) {
-        if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine1())) {
+        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine1())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine1("");
         }
-        if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine2())) {
+        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine2())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine2("");
         }
-        if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine3())) {
+        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine3())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine3("");
         }
-        if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCountry())) {
+        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCountry())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setCountry("");
         }
-        if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCounty())) {
+        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCounty())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setCounty("");
         }
-        if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostCode())) {
+        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostCode())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostCode("");
         }
-        if (!Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown())) {
+        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown())) {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("");
         }
     }
@@ -283,7 +282,7 @@ public class CaseManagementForCaseWorkerService {
             for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
                 DateListedType dateListedType = dateListedTypeItem.getValue();
                 if (HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
-                        && !Strings.isNullOrEmpty(dateListedType.getListedDate())) {
+                        && !isNullOrEmpty(dateListedType.getListedDate())) {
                     dates.add(dateListedType.getListedDate());
                 }
             }
@@ -404,7 +403,7 @@ public class CaseManagementForCaseWorkerService {
     private void addHearingsInPastWarning(DateListedTypeItem dateListedTypeItem, CaseData caseData) {
         LocalDate date = LocalDateTime.parse(
                 dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
-        if ((Strings.isNullOrEmpty(dateListedTypeItem.getValue().getHearingStatus())
+        if ((isNullOrEmpty(dateListedTypeItem.getValue().getHearingStatus())
                 || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
                 && date.isBefore(LocalDate.now())) {
             caseData.setListedDateInPastWarning(YES);
@@ -594,7 +593,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void setCaseManagementLocation(CaseData caseData) {
         String managingOfficeName = caseData.getManagingOffice();
-        if (Strings.isNullOrEmpty(managingOfficeName)) {
+        if (isNullOrEmpty(managingOfficeName)) {
             log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
             return;
         }

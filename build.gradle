@@ -483,7 +483,7 @@ bootWithCCD {
     //environment 'SERVICEBUS_FAKE', 'true'
 }
 
-pmdMain.maxFailures = 422
+pmdMain.maxFailures = 324
 pmdTest.maxFailures = 227
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

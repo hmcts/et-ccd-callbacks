@@ -3,7 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.wa;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.search.aggregations.support.ValuesSource;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -55,7 +58,7 @@ public class BFActionsScheduledTasks {
                 .size(MAX_ES_SIZE)
                 .query(new BoolQueryBuilder()
                         .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
-                        .must(new TermQueryBuilder("data.bfActions.value.bfDate", now))
+                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(now).includeUpper(true))
                         .mustNot(new TermQueryBuilder("data.waRule21ReferralSent", YES))
                         .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served")))
                 .toString();

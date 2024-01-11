@@ -32,7 +32,7 @@ public class BFActionsScheduledTasks {
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
 
-    @Scheduled(cron="${cron.bfActionTask}")
+    @Scheduled(cron = "${cron.bfActionTask}")
     public void createTasksForBFDates() {
         log.info("Checking for expired BFDates");
 

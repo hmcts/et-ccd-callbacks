@@ -45,15 +45,14 @@ class BFActionsScheduledTasksTest {
     @Test
     void testCreateTasksForBFDates_success() throws IOException, URISyntaxException {
         String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
-        SubmitEvent obj = new ObjectMapper().readValue(resource, SubmitEvent.class);
-
-        CaseData caseData = obj.getCaseData();
+        SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
 
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(obj));
+                .thenReturn(List.of(submitEvent));
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
                 .thenReturn(new ArrayList<>());
 
+        CaseData caseData = submitEvent.getCaseData();
         bfActionsScheduledTasks.createTasksForBFDates();
 
         assertThat(caseData.getWaRule21ReferralSent(), is(YES));

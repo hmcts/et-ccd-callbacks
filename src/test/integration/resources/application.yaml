@@ -141,3 +141,5 @@ launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   env: ${LAUNCH_DARKLY_ENV:default}
 
+cron:
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 0 1 1 ? 2000}

@@ -14,12 +14,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -32,30 +29,18 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 public class BFActionsScheduledTasks {
-    private final AuthTokenGenerator authTokenGenerator;
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
 
-    @Scheduled(fixedRate = 1000 * 60)
+    @Scheduled(cron="${cron.bfActionTask}")
     public void createTasksForBFDates() {
-        log.warn("Scheduled log at " + new SimpleDateFormat("HH:mm:ss").format(new Date()));
+        log.info("Checking for expired BFDates");
 
         String now = UtilHelper.formatCurrentDate2(LocalDate.now().plusDays(-1));
-        log.warn(now);
-
-        String query = new SearchSourceBuilder()
-                .size(MAX_ES_SIZE)
-                .query(new BoolQueryBuilder()
-                        .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
-                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(now).includeUpper(true))
-                        .mustNot(new TermQueryBuilder("data.waRule21ReferralSent", YES))
-                        .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served")))
-                .toString();
+        String query = buildQueryForExpiredBFActionsWithNoResponse(now);
 
         String adminUserToken = adminUserService.getAdminUserToken();
-        String authToken = authTokenGenerator.generate();
-        log.warn("auth: " + adminUserToken);
-        log.warn("s2s: " + authToken);
+
         try {
             List<SubmitEvent> englandCases =
                     ccdClient.buildAndGetElasticSearchRequest(adminUserToken, ENGLANDWALES_CASE_TYPE_ID, query);
@@ -65,10 +50,20 @@ public class BFActionsScheduledTasks {
             englandCases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, ENGLANDWALES_CASE_TYPE_ID));
             scotlandCases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, SCOTLAND_CASE_TYPE_ID));
 
-            log.warn("There were " + (englandCases.size() + scotlandCases.size()) + " results returned");
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+    }
+
+    private String buildQueryForExpiredBFActionsWithNoResponse(String now) {
+        return new SearchSourceBuilder()
+                .size(MAX_ES_SIZE)
+                .query(new BoolQueryBuilder()
+                        .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
+                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(now).includeUpper(true))
+                        .mustNot(new TermQueryBuilder("data.waRule21ReferralSent", YES))
+                        .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served")))
+                .toString();
     }
 
     private void triggerTaskEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId) {
@@ -81,7 +76,7 @@ public class BFActionsScheduledTasks {
 
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
                     "EMPLOYMENT", returnedRequest, String.valueOf(submitEvent.getCaseId()));
-            log.error("Called WA_REVIEW_RULE21_REFERRAL for " + submitEvent.getCaseId());
+            log.info("Called WA_REVIEW_RULE21_REFERRAL for " + submitEvent.getCaseId());
         } catch (IOException e) {
             log.error(e.getMessage());
         }

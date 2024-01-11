@@ -192,3 +192,74 @@ Execute the following command to remove all docker resources created by the CFTl
 ```bash
 ./bin/cftlib-clean.sh
 ```
+
+## Work Allocation
+
+Rudimentary support has been added for WA but related pods are not spun up by default (to save system resources when not needed).
+
+Add 'wa-docker-compose.yml' to the `CFTLIB_EXTRA_COMPOSE_FILES` environment variable. This can be done directly in the build.gradle file or wherever you prefer to set env vars (ie, ~/.bashrc)
+
+Example in .bashrc
+
+```bash
+export CFTLIB_EXTRA_COMPOSE_FILES="wa-docker-compose.yml"
+```
+
+in `build.gradle`
+
+```gradle
+bootWithCCD {
+    ...
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', 'wa-docker-compose.yml'
+}
+```
+
+**Note: CFTLIB_EXTRA_COMPOSE_FILES takes a comma seperated string of docker compose yaml files that get executed at boot**
+
+Other functionality ported over from ecm-ccd-docker is not automated and requires extra steps. After CFTLib boot is finished:
+
+```bash
+./bin/add-role-assignment.sh
+```
+
+then in the `et-wa-task-configuration` repo
+
+```bash
+./scripts/camunda-deployment.sh
+```
+
+The following env vars also need to be in place for WA related pods (WIP):
+
+**NOTE: Some values have been redacted - these can be looked up on azure or asking a teammate**
+
+```bash
+export WA_CAMUNDA_NEXUS_USER="<redacted>"
+export WA_CAMUNDA_NEXUS_PASSWORD="<redacted>"
+export WA_SYSTEM_USERNAME="wa-system-user@fake.hmcts.net"
+export WA_SYSTEM_PASSWORD="Password"
+export WA_CASEOFFICER_USERNAME="et.caseadmin@hmcts.net"
+export WA_CASEOFFICER_PASSWORD="Password"
+
+export CAMUNDA_URL="http://localhost:8999/engine-rest"
+
+export AZURE_SERVICE_BUS_CONNECTION_STRING="<redacted>"
+export AZURE_SERVICE_BUS_TOPIC_NAME="et-case-event-handler-topic-sessions-ft"
+export AZURE_SERVICE_BUS_SUBSCRIPTION_NAME="<redacted>"
+export AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME="<redacted>"
+export AZURE_SERVICE_BUS_MESSAGE_AUTHOR="<redacted>"
+
+export ET_COS_DB_PASSWORD="postgres"
+export DB_URL="localhost:6432"
+
+export IDAM_SIMULATOR_BASE_URL="http://host.docker.internal:5062"
+export DB_EXTERNAL_PORT=6432
+
+export S2S_URL="http://host.docker.internal:8489"
+export CCD_URL="http://host.docker.internal:4452"
+export ROLE_ASSIGNMENT_URL="http://host.docker.internal:4096"
+
+export CFTLIB_HOST="http://host.docker.internal" # Use your WSL IP if host.docker.internal doesn't work
+export CAMUNDA_NEXUS_PASSWORD="<redacted>"
+export CFTLIB_EXTRA_COMPOSE_FILES="wa-docker-compose.yml"
+export SERVICE_AUTH_PROVIDER_API_BASE_URL="http://localhost:8489"
+```

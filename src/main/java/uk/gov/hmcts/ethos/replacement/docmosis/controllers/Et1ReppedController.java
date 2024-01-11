@@ -18,6 +18,7 @@ import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService
 public class Et1ReppedController {
     private final VerifyTokenService verifyTokenService;
     private final Et1ReppedService et1ReppedService;
+    private final CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -227,7 +229,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantWorking", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant working question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -249,7 +251,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantWrittenNoticePeriod", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant written notice period question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -271,7 +273,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantWorkingNoticePeriod", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant working notice period question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -293,7 +295,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantNoLongerWorking", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant no longer working question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -315,7 +317,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantPay", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant pay question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -337,7 +339,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantPensionBenefits", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant pension benefits question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -361,7 +363,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantNewJob", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant new job question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -383,7 +385,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/validateClaimantNewJobPay", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for claimant new job pay question")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -405,7 +407,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/generateRespondentPreamble", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for generating respondent preamble label")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -427,7 +429,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionTwo/generateWorkAddressLabel", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for generating work address label")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -449,7 +451,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionCompleted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant worked question")
+    @Operation(summary = "callback handler for section completed")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -471,5 +473,78 @@ public class Et1ReppedController {
                 .confirmation_body(
                         Et1ReppedHelper.getSectionCompleted(caseData, ccdRequest.getCaseDetails().getCaseId()))
                 .build());
+    }
+
+    @PostMapping(value = "/sectionThree/validateWhistleblowing", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for validating whistleblowing question")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateWhistleblowing(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getWhistleblowingYesNo());
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/sectionThree/validateLinkedCases", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for validating LinkedCases question")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateLinkedCases(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getLinkedCasesYesNo());
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    // TODO More for the configs but event needs to be published for Work Allocation.
+    @PostMapping(value = "/submitClaim", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for ET1 Submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> submitClaim(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
+        et1ReppedService.addDefaultData(caseDetails);
+        et1ReppedService.addClaimantRepresentativeDetails(caseDetails.getCaseData(), userToken);
+        caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
+        et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
+        // TODO do we need to send an email?
+        Et1ReppedHelper.clearEt1ReppedCreationFields(caseDetails.getCaseData());
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

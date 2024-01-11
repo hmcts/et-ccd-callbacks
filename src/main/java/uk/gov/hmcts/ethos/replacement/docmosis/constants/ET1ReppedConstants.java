@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
+import java.util.List;
+import java.util.Map;
+
 public class ET1ReppedConstants {
     public static final String TRIAGE_ERROR_MESSAGE = """
             The postcode you entered is not included under the early adopter sites yet. Please use the ET1 claim form
@@ -49,6 +52,15 @@ public class ET1ReppedConstants {
                            <hr>
                            <p>You can amend the details of each respondent before you submit the claim.<p>
                            """;
+    public static final List<String> TITLES = List.of("Mr", "Mrs", "Miss", "Ms", "Mx", "Other");
+    public static final String WEEKS = "Weeks";
+    public static final String MONTHS = "Months";
+    public static final String WORKING = "Working";
+    public static final String NOTICE = "Notice";
+    public static final String NO_LONGER_WORKING = "No longer working";
+    public static final Map<String, String> PAY_PERIODS = Map.of("Weekly", WEEKS,
+            "Monthly", MONTHS,
+            "Annual", "Annual");
 
     private ET1ReppedConstants() {
         // Access through static methods

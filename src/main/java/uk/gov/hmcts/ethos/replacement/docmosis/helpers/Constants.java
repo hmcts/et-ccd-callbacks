@@ -65,6 +65,7 @@ public class Constants {
     public static final String REPLY_TO_APPLICATION = "Reply to application";
     public static final String TSE_ADMIN_CORRESPONDENCE = "Tse admin correspondence";
     public static final String RESPONDENT_CORRESPONDENCE = "Respondent correspondence";
+    public static final String UNEXPECTED_VALUE = "Unexpected value: ";
 
     private Constants() {
 

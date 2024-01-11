@@ -197,4 +197,4 @@ launchdarkly:
   env: ${LAUNCH_DARKLY_ENV:default}
 
 cron:
-  bfActionTask: ${CRON_BFACTION_TASK:0 0 0 1 1 ? 2000}
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 3 29 2 ?}

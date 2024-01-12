@@ -6,6 +6,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -18,12 +19,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Component
@@ -33,6 +32,12 @@ public class BFActionsScheduledTasks {
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
     private final FeatureToggleService featureToggleService;
+
+    @Value("${cron.caseTypeId}")
+    private String caseTypeId;
+
+    @Value("${cron.maxCasesPerSearch}")
+    private int maxCases;
 
     @Scheduled(cron = "${cron.bfActionTask}")
     public void createTasksForBFDates() {
@@ -47,23 +52,22 @@ public class BFActionsScheduledTasks {
 
         String adminUserToken = adminUserService.getAdminUserToken();
 
-        try {
-            List<SubmitEvent> englandCases =
-                    ccdClient.buildAndGetElasticSearchRequest(adminUserToken, ENGLANDWALES_CASE_TYPE_ID, query);
-            List<SubmitEvent> scotlandCases =
-                    ccdClient.buildAndGetElasticSearchRequest(adminUserToken, SCOTLAND_CASE_TYPE_ID, query);
+        String[] caseTypeIds = caseTypeId.split(",");
 
-            englandCases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, ENGLANDWALES_CASE_TYPE_ID));
-            scotlandCases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, SCOTLAND_CASE_TYPE_ID));
+        Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
+            try {
+                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
 
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+                cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        });
     }
 
     private String buildQueryForExpiredBFActionsWithNoResponse(String now) {
         return new SearchSourceBuilder()
-                .size(MAX_ES_SIZE)
+                .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
                         .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(now).includeUpper(true))
@@ -81,7 +85,10 @@ public class BFActionsScheduledTasks {
             caseData.setWaRule21ReferralSent(YES);
 
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
-                    "EMPLOYMENT", returnedRequest, String.valueOf(submitEvent.getCaseId()));
+                    returnedRequest.getCaseDetails().getJurisdiction(), returnedRequest,
+                    String.valueOf(submitEvent.getCaseId())
+            );
+
             log.info("Called WA_REVIEW_RULE21_REFERRAL for " + submitEvent.getCaseId());
         } catch (IOException e) {
             log.error(e.getMessage());

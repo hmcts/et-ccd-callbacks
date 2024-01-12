@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -15,7 +16,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -45,21 +45,26 @@ class BFActionsScheduledTasksTest {
     public void setUp() {
         bfActionsScheduledTasks = new BFActionsScheduledTasks(adminUserService, ccdClient, featureToggleService);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        ReflectionTestUtils.setField(bfActionsScheduledTasks, "caseTypeId", "ET_EnglandWales,ET_Scotland");
+        ReflectionTestUtils.setField(bfActionsScheduledTasks, "maxCases", 10);
     }
 
     @Test
     void testCreateTasksForBFDates_success() throws IOException, URISyntaxException {
         String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
+        SubmitEvent submitEvent2 = new ObjectMapper().readValue(resource, SubmitEvent.class);
 
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
                 .thenReturn(List.of(submitEvent));
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
-                .thenReturn(new ArrayList<>());
+                .thenReturn(List.of(submitEvent2));
 
         CaseData caseData = submitEvent.getCaseData();
+        CaseData caseData2 = submitEvent2.getCaseData();
         bfActionsScheduledTasks.createTasksForBFDates();
 
         assertThat(caseData.getWaRule21ReferralSent(), is(YES));
+        assertThat(caseData2.getWaRule21ReferralSent(), is(YES));
     }
 }

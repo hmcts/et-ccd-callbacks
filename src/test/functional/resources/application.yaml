@@ -19,4 +19,6 @@ launchdarkly:
   env: ${LAUNCH_DARKLY_ENV:default}
 
 cron:
-  bfActionTask: ${CRON_BFACTION_TASK:0 0 3 29 2 ?}
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
+  caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}

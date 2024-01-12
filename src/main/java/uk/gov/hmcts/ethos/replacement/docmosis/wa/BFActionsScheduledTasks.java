@@ -84,9 +84,9 @@ public class BFActionsScheduledTasks {
             CaseData caseData = submitEvent.getCaseData();
             caseData.setWaRule21ReferralSent(YES);
 
+            String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
-                    returnedRequest.getCaseDetails().getJurisdiction(), returnedRequest,
-                    String.valueOf(submitEvent.getCaseId())
+                    jurisdiction, returnedRequest, String.valueOf(submitEvent.getCaseId())
             );
 
             log.info("Called WA_REVIEW_RULE21_REFERRAL for " + submitEvent.getCaseId());

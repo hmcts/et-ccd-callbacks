@@ -65,12 +65,12 @@ public class BFActionsScheduledTasks {
         });
     }
 
-    private String buildQueryForExpiredBFActionsWithNoResponse(String now) {
+    private String buildQueryForExpiredBFActionsWithNoResponse(String yesterday) {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
-                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(now).includeUpper(true))
+                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday).includeUpper(true))
                         .mustNot(new TermQueryBuilder("data.waRule21ReferralSent", YES))
                         .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served")))
                 .toString();

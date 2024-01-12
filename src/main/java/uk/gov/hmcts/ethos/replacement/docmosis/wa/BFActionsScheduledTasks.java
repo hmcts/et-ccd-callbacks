@@ -42,8 +42,8 @@ public class BFActionsScheduledTasks {
 
         log.info("Checking for expired BFDates");
 
-        String now = UtilHelper.formatCurrentDate2(LocalDate.now().plusDays(-1));
-        String query = buildQueryForExpiredBFActionsWithNoResponse(now);
+        String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
+        String query = buildQueryForExpiredBFActionsWithNoResponse(yesterday);
 
         String adminUserToken = adminUserService.getAdminUserToken();
 

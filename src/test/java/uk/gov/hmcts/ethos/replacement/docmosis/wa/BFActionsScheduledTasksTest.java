@@ -10,6 +10,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
 import java.io.IOException;
@@ -37,9 +38,13 @@ class BFActionsScheduledTasksTest {
     @MockBean
     private CcdClient ccdClient;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     public void setUp() {
-        bfActionsScheduledTasks = new BFActionsScheduledTasks(adminUserService, ccdClient);
+        bfActionsScheduledTasks = new BFActionsScheduledTasks(adminUserService, ccdClient, featureToggleService);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
     }
 
     @Test

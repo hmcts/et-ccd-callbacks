@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -31,9 +32,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class BFActionsScheduledTasks {
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
+    private final FeatureToggleService featureToggleService;
 
     @Scheduled(cron = "${cron.bfActionTask}")
     public void createTasksForBFDates() {
+        if (!featureToggleService.isWorkAllocationEnabled()) {
+            return;
+        }
+
         log.info("Checking for expired BFDates");
 
         String now = UtilHelper.formatCurrentDate2(LocalDate.now().plusDays(-1));

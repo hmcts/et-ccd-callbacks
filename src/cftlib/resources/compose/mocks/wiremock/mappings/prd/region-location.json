@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/refdata/location/workallocation/region-location",
+    "bodyPatterns": [
+      {
+        "equalToJson": "{\"serviceIds\":[\"EMPLOYMENT\"]}",
+        "ignoreArrayOrder": true,
+        "ignoreExtraElements": true
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "prd/region-location.json"
+  }
+}

@@ -470,6 +470,7 @@ bootWithCCD {
 
     // xui-manage-cases
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
+    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
 
     // xui-manage-org

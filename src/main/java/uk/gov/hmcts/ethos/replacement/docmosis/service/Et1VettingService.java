@@ -4,7 +4,9 @@ import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_CERT_LIST_DISPLAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ACAS;
@@ -89,6 +92,21 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
             initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
         populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
+        initialEt1ReasonableAdjustments(caseDetails);
+    }
+
+    private static void initialEt1ReasonableAdjustments(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (!ObjectUtils.isEmpty(caseData.getClaimantHearingPreference())
+            && !StringUtils.isEmpty(caseData.getClaimantHearingPreference().getReasonableAdjustments())) {
+            if (YES.equals(caseData.getClaimantHearingPreference().getReasonableAdjustments())) {
+                caseData.setEt1ReasonableAdjustmentsQuestion(YES);
+            } else {
+                caseData.setEt1ReasonableAdjustmentsQuestion(NO);
+            }
+            caseData.setEt1ReasonableAdjustmentsTextArea(
+                caseData.getClaimantHearingPreference().getReasonableAdjustmentsDetail());
+        }
     }
 
     /**

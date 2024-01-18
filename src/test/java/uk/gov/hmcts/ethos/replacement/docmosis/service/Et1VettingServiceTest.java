@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -35,6 +36,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LEEDS;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LONDON_CENTRAL;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
@@ -410,6 +413,41 @@ class Et1VettingServiceTest {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
                 .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_ClaimantHearingPreferenceIsNull_Et1ReasonableAdjustmentsQuestionReturnNull() {
+        caseDetails.getCaseData().setClaimantHearingPreference(null);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1ReasonableAdjustmentsQuestion()).isNull();
+        assertThat(caseDetails.getCaseData().getEt1ReasonableAdjustmentsTextArea()).isNull();
+    }
+
+    @Test
+    void initialBeforeYouStart_ReasonableAdjustmentsIsNull_Et1ReasonableAdjustmentsQuestionReturnNull() {
+        caseDetails.getCaseData().setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseDetails.getCaseData().getClaimantHearingPreference().setReasonableAdjustments(null);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1ReasonableAdjustmentsQuestion()).isNull();
+        assertThat(caseDetails.getCaseData().getEt1ReasonableAdjustmentsTextArea()).isNull();
+    }
+
+    @Test
+    void initialBeforeYouStart_ReasonableAdjustmentsIsYes_Et1ReasonableAdjustmentsQuestionReturnYes() {
+        caseDetails.getCaseData().setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseDetails.getCaseData().getClaimantHearingPreference().setReasonableAdjustments(YES);
+        caseDetails.getCaseData().getClaimantHearingPreference().setReasonableAdjustmentsDetail("Detail");
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1ReasonableAdjustmentsQuestion()).isEqualTo(YES);
+        assertThat(caseDetails.getCaseData().getEt1ReasonableAdjustmentsTextArea()).isEqualTo("Detail");
+    }
+
+    @Test
+    void initialBeforeYouStart_ReasonableAdjustmentsIsNo_Et1ReasonableAdjustmentsQuestionReturnNo() {
+        caseDetails.getCaseData().setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseDetails.getCaseData().getClaimantHearingPreference().setReasonableAdjustments(NO);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1ReasonableAdjustmentsQuestion()).isEqualTo(NO);
     }
 
     @Test

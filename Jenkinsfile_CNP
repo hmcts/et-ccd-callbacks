@@ -114,7 +114,6 @@ withPipeline(type, product, component) {
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.ET_COS_URL = "https://et-cos-staging.aat.platform.hmcts.net/"
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
-    sh 'yarn playwright install'
   }
 
   afterAlways('smoketest:aat') {

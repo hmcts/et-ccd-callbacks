@@ -80,7 +80,6 @@ withPipeline(type, product, component) {
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
-    sh 'yarn playwright install'
   }
 
   afterAlways('smoketest:preview') {
@@ -127,6 +126,9 @@ withPipeline(type, product, component) {
             reportFiles : "et-e2e-result.html",
             reportName : "ET E2E Smoke test report"
     ]
+    sh """
+       yarn playwright install
+    """
   }
 
   afterAlways('functionalTest:aat') {

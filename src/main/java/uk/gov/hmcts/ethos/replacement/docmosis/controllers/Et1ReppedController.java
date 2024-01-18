@@ -15,15 +15,18 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.dwp.regex.InvalidPostcodeException;
+import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +44,7 @@ public class Et1ReppedController {
     private final VerifyTokenService verifyTokenService;
     private final Et1ReppedService et1ReppedService;
     private final CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -519,7 +523,7 @@ public class Et1ReppedController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
-    // TODO More for the configs but event needs to be published for Work Allocation.
+    // TODO More for the configs but event needs to be published for Work Allocation to show ET1 Vetting task.
     @PostMapping(value = "/submitClaim", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "callback handler for ET1 Submission")
     @ApiResponses(value = {
@@ -531,7 +535,8 @@ public class Et1ReppedController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> submitClaim(
-            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken)
+            throws PdfServiceException {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -546,5 +551,33 @@ public class Et1ReppedController {
         // TODO do we need to send an email?
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseDetails.getCaseData());
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for ET1 Submitted page")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> et1ReppedSubmitted(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) throws IOException {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_header("<h1>You have submitted the ET1 claim</h1>")
+                .confirmation_body("""
+                                   <h3>What happens next</h3>
+                                   
+                                   The tribunal will send you updates as the claim progresses.
+                                   """)
+                .build());
     }
 }

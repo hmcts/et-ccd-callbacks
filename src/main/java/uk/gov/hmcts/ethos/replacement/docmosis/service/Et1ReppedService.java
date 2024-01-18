@@ -3,19 +3,26 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.dwp.regex.InvalidPostcodeException;
+import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
+import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.time.LocalDate;
@@ -34,12 +41,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 @Slf4j
 @RequiredArgsConstructor
 public class Et1ReppedService {
-    private final AuthTokenGenerator authTokenGenerator;
-
     private final AcasService acasService;
+    private final AuthTokenGenerator authTokenGenerator;
     private final DocumentManagementService documentManagementService;
     private final JurisdictionCodesMapperService jurisdictionCodesMapperService;
+    private final OrganisationClient organisationClient;
+    private final PdfService pdfService;
     private final PostcodeToOfficeService postcodeToOfficeService;
+    private final TornadoService tornadoService;
     private final TribunalOfficesService tribunalOfficesService;
     private final UserIdamService userIdamService;
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
@@ -66,10 +75,6 @@ public class Et1ReppedService {
         return YES;
     }
 
-    private void getS2SAuthToken() {
-        System.out.println(authTokenGenerator.generate());
-    }
-
     /**
      * Adds some base data to the case.
      * @param caseDetails the case details
@@ -88,7 +93,7 @@ public class Et1ReppedService {
      * @param caseDetails the case details
      * @param userToken the user token
      */
-    public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
+    public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) throws PdfServiceException {
         DocumentTypeItem et1 = createEt1(caseDetails, userToken);
         List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(), userToken);
         addDocsToClaim(caseDetails.getCaseData(), et1, acasCertificates);
@@ -96,8 +101,10 @@ public class Et1ReppedService {
 
     private void addDocsToClaim(CaseData caseData, DocumentTypeItem et1,
                                 List<DocumentTypeItem> acasCertificates) {
-        ArrayList<DocumentTypeItem> documentList = new ArrayList<>();
-        documentList.add(et1);
+        List<DocumentTypeItem> documentList = new ArrayList<>();
+        if (!ObjectUtils.isEmpty(et1)) {
+            documentList.add(et1);
+        }
         if (caseData.getEt1SectionThreeDocumentUpload() != null) {
             UploadedDocumentType et1Attachment = caseData.getEt1SectionThreeDocumentUpload();
             et1Attachment.setCategoryId("C12");
@@ -108,9 +115,24 @@ public class Et1ReppedService {
         caseData.setDocumentCollection(documentList);
     }
 
-    private DocumentTypeItem createEt1(CaseDetails caseDetails, String userToken) {
-        DocumentTypeItem et1 = new DocumentTypeItem();
-        return et1;
+    private DocumentTypeItem createEt1(CaseDetails caseDetails, String userToken) throws PdfServiceException {
+        byte[] pdf = pdfService.convertCaseToPdf(caseDetails.getCaseData(), "ET1_2222.pdf");
+        if (ObjectUtils.isEmpty(pdf)) {
+            throw new PdfServiceException("Failed to create ET1 PDF", new NullPointerException());
+        }
+        DocumentInfo documentInfo = tornadoService.createDocumentInfoFromBytes(
+                userToken,
+                pdf,
+                getEt1DocumentName(caseDetails.getCaseData()),
+                caseDetails.getCaseTypeId());
+
+        UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(documentInfo);
+        uploadedDocumentType.setCategoryId("C11");
+        return createDocumentTypeItem(uploadedDocumentType, "ET1");
+    }
+
+    private String getEt1DocumentName(CaseData caseData) {
+        return "ET1 - " + caseData.getClaimant() + ".pdf";
     }
 
     private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {
@@ -161,7 +183,46 @@ public class Et1ReppedService {
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         claimantRepresentative.setNameOfRepresentative(userDetails.getFirstName() + " " + userDetails.getLastName());
         claimantRepresentative.setRepresentativeEmailAddress(userDetails.getEmail());
-        // TODO figure out if we can get claimant organisation name
+        claimantRepresentative.setRepresentativeReference(caseData.getRepresentativeReferenceNumber());
+        claimantRepresentative.setRepresentativePreference(
+                CollectionUtils.isEmpty(caseData.getRepresentativeContactPreference())
+                        ? null
+                        : caseData.getRepresentativeContactPreference().get(0));
+        claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
+        OrganisationsResponse organisationDetails = getOrganisationDetailsFromUserId(userToken, userDetails.getUid());
+        if (!ObjectUtils.isEmpty(organisationDetails)) {
+            claimantRepresentative.setNameOfOrganisation(organisationDetails.getName());
+            claimantRepresentative.setRepresentativeAddress(getOrganisationAddress(organisationDetails));
+        }
+        caseData.setClaimantRepresentedQuestion(YES);
         caseData.setRepresentativeClaimantType(claimantRepresentative);
+    }
+
+    @NotNull
+    private static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
+        Address organisationAddress = new Address();
+        organisationAddress.setAddressLine1(organisationDetails.getContactInformation().get(0).getAddressLine1());
+        organisationAddress.setAddressLine2(organisationDetails.getContactInformation().get(0).getAddressLine2());
+        organisationAddress.setAddressLine3(organisationDetails.getContactInformation().get(0).getAddressLine3());
+        organisationAddress.setPostCode(organisationDetails.getContactInformation().get(0).getPostCode());
+        organisationAddress.setPostTown(organisationDetails.getContactInformation().get(0).getTownCity());
+        organisationAddress.setCounty(organisationDetails.getContactInformation().get(0).getCounty());
+        organisationAddress.setCountry(organisationDetails.getContactInformation().get(0).getCountry());
+        return organisationAddress;
+    }
+
+    private OrganisationsResponse getOrganisationDetailsFromUserId(String userToken, String userId) {
+        try {
+            ResponseEntity<OrganisationsResponse> response =
+                    organisationClient.retrieveOrganisationDetailsByUserId(userToken,
+                            authTokenGenerator.generate(),
+                            userId);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            }
+        } catch (Exception e) {
+            log.error("Failed to retrieve organisation details", e);
+        }
+        return null;
     }
 }

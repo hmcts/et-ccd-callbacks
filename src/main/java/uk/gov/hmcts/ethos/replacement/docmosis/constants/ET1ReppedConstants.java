@@ -61,6 +61,8 @@ public class ET1ReppedConstants {
     public static final Map<String, String> PAY_PERIODS = Map.of("Weekly", WEEKS,
             "Monthly", MONTHS,
             "Annual", "Annual");
+    public static final String OTHER = "Other";
+    public static final String NOT_SURE = "Not sure";
 
     private ET1ReppedConstants() {
         // Access through static methods

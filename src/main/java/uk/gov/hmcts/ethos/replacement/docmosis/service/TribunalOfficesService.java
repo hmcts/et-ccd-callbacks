@@ -25,9 +25,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.SCOTLAND_OFFIC
 @Service
 @Slf4j
 public class TribunalOfficesService {
-    private final PostcodeToOfficeService postcodeToOfficeService;
-
     private final TribunalOfficesConfiguration config;
+    private final PostcodeToOfficeService postcodeToOfficeService;
     public static final String UNASSIGNED_OFFICE = "Unassigned";
 
     public TribunalOffice getTribunalOffice(String officeName) {

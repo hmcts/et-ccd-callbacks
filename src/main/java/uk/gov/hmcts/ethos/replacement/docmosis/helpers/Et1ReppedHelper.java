@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.CreateRespondentType;
 import uk.gov.hmcts.et.common.model.ccd.types.NewEmploymentType;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 
@@ -33,8 +32,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstan
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MONTHS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NOTICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NOT_COMPLETED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NOT_SURE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NO_LONGER_WORKING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.PAY_PERIODS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.RESPONDENT_PREAMBLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.SECTION_COMPLETE_LABEL;
@@ -203,7 +204,6 @@ public class Et1ReppedHelper {
     public static void setEt1SubmitData(CaseData caseData) {
         addClaimantInformation(caseData);
         addRespondentInformation(caseData);
-        addClaimantRepresentativeInformation(caseData);
         addClaimDetails(caseData);
     }
 
@@ -229,7 +229,7 @@ public class Et1ReppedHelper {
                 }
             }
         });
-        if (!caseData.getClaimSuccessful().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(caseData.getClaimSuccessful())) {
             claimantRequestType.setClaimOutcome(caseData.getClaimSuccessful());
             claimantRequestType.getClaimOutcome().forEach(claimOutcome -> {
                 if (claimOutcome.equals("compensation")) {
@@ -245,24 +245,20 @@ public class Et1ReppedHelper {
         caseData.setClaimantRequests(claimantRequestType);
     }
 
-    private static void addClaimantRepresentativeInformation(CaseData caseData) {
-        RepresentedTypeC representedTypeC = new RepresentedTypeC();
-        representedTypeC.setRepresentativeReference(caseData.getRepresentativeReferenceNumber());
-        representedTypeC.setRepresentativePreference(caseData.getRepresentativeContactPreference().isEmpty()
-                ? null
-                : caseData.getRepresentativeContactPreference().get(0));
-        representedTypeC.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
-    }
-
     private static void addRespondentInformation(CaseData caseData) {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(getRespondentNameFromType(caseData.getRespondentType(),
                 caseData.getRespondentFirstName(), caseData.getRespondentLastName(),
                 caseData.getRespondentOrganisationName()));
         respondentSumType.setRespondentType(caseData.getRespondentType());
-        respondentSumType.setRespondentOrganisation(caseData.getRespondentOrganisationName());
-        respondentSumType.setRespondentFirstName(caseData.getRespondentFirstName());
-        respondentSumType.setRespondentLastName(caseData.getRespondentLastName());
+        if (INDIVIDUAL.equals(caseData.getRespondentType())) {
+            respondentSumType.setRespondentFirstName(caseData.getRespondentFirstName());
+            respondentSumType.setRespondentLastName(caseData.getRespondentLastName());
+        } else if (ORGANISATION.equals(caseData.getRespondentType())) {
+            respondentSumType.setRespondentOrganisation(caseData.getRespondentOrganisationName());
+        } else {
+            throw new IllegalArgumentException(UNEXPECTED_VALUE + caseData.getRespondentType());
+        }
         respondentSumType.setRespondentAddress(caseData.getRespondentAddress());
         respondentSumType.setRespondentAcasQuestion(caseData.getRespondentAcasYesNo());
         respondentSumType.setRespondentAcas(caseData.getRespondentAcasNumber());
@@ -296,9 +292,15 @@ public class Et1ReppedHelper {
                 respondentDetails.getRespondentFirstName(), respondentDetails.getRespondentLastName(),
                 respondentDetails.getRespondentOrganisation()));
         respondentSumType.setRespondentType(respondentDetails.getRespondentType());
-        respondentSumType.setRespondentOrganisation(respondentDetails.getRespondentOrganisation());
-        respondentSumType.setRespondentFirstName(respondentDetails.getRespondentFirstName());
-        respondentSumType.setRespondentLastName(respondentDetails.getRespondentLastName());
+        if (INDIVIDUAL.equals(respondentDetails.getRespondentType())) {
+            respondentSumType.setRespondentFirstName(respondentDetails.getRespondentFirstName());
+            respondentSumType.setRespondentLastName(respondentDetails.getRespondentLastName());
+        } else if (ORGANISATION.equals(respondentDetails.getRespondentType())) {
+            respondentSumType.setRespondentOrganisation(respondentDetails.getRespondentOrganisation());
+
+        } else {
+            throw new IllegalArgumentException(UNEXPECTED_VALUE + respondentDetails.getRespondentType());
+        }
         respondentSumType.setRespondentAddress(respondentDetails.getRespondentAddress());
         respondentSumType.setRespondentAcasQuestion(respondentDetails.getRespondentAcasQuestion());
         respondentSumType.setRespondentAcas(respondentDetails.getRespondentAcas());
@@ -331,6 +333,9 @@ public class Et1ReppedHelper {
 
     private static NewEmploymentType claimantNewEmployment(CaseData caseData) {
         NewEmploymentType newEmploymentType = new NewEmploymentType();
+        if (CollectionUtils.isEmpty(caseData.getClaimantNewJob()) || caseData.getClaimantNewJob().get(0).equals(NO)) {
+            return newEmploymentType;
+        }
         newEmploymentType.setNewJob(getFirstListItem(caseData.getClaimantNewJob()));
         newEmploymentType.setNewlyEmployedFrom(caseData.getClaimantNewJobStartDate());
         newEmploymentType.setNewPayBeforeTax(caseData.getClaimantNewJobPayBeforeTax());
@@ -357,12 +362,14 @@ public class Et1ReppedHelper {
         claimantOtherType.setClaimantAverageWeeklyHours(caseData.getClaimantAverageWeeklyWorkHours());
         claimantOtherType.setClaimantPayBeforeTax(caseData.getClaimantPayBeforeTax());
         claimantOtherType.setClaimantPayAfterTax(caseData.getClaimantPayAfterTax());
-        claimantOtherType.setClaimantPayCycle(caseData.getClaimantPayType().isEmpty()
-                                              || caseData.getClaimantPayType().get(0).equals("Not sure")
+        claimantOtherType.setClaimantPayCycle(CollectionUtils.isEmpty(caseData.getClaimantPayType())
+                                              || caseData.getClaimantPayType().get(0).equals(
+                NOT_SURE)
                 ? null
                 : PAY_PERIODS.get(getFirstListItem(caseData.getClaimantPayType())));
-        claimantOtherType.setClaimantPensionContribution(caseData.getClaimantPensionContribution().isEmpty()
-                || caseData.getClaimantPensionContribution().get(0).equals("Not sure")
+        claimantOtherType.setClaimantPensionContribution(
+                CollectionUtils.isEmpty(caseData.getClaimantPensionContribution())
+                || caseData.getClaimantPensionContribution().get(0).equals(NOT_SURE)
                 ? null
                 : caseData.getClaimantPensionContribution().get(0));
         claimantOtherType.setClaimantPensionWeeklyContribution(caseData.getClaimantWeeklyPension());
@@ -372,11 +379,11 @@ public class Et1ReppedHelper {
     }
 
     private static void claimantNoLongerWorking(CaseData caseData, ClaimantOtherType claimantOtherType) {
-        if (caseData.getClaimantNoLongerWorkingQuestion().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(caseData.getClaimantNoLongerWorkingQuestion())) {
             return;
         }
         claimantOtherType.setClaimantNoticePeriod(YES);
-        if (!caseData.getClaimantNoLongerWorking().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(caseData.getClaimantNoLongerWorking())) {
             if (caseData.getClaimantNoLongerWorking().get(0).equals(WEEKS)) {
                 claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
                 claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantNoLongerWorkingWeeks());
@@ -389,7 +396,7 @@ public class Et1ReppedHelper {
 
     private static void claimantNoticePeriod(CaseData caseData, ClaimantOtherType claimantOtherType) {
         claimantOtherType.setClaimantEmployedNoticePeriod(caseData.getClaimantWorkingNoticePeriodEndDate());
-        if (caseData.getClaimantWorkingNoticePeriod().isEmpty()) {
+        if (CollectionUtils.isEmpty(caseData.getClaimantWorkingNoticePeriod())) {
             return;
         }
         if (caseData.getClaimantWorkingNoticePeriod().get(0).equals(WEEKS)) {
@@ -404,7 +411,7 @@ public class Et1ReppedHelper {
     }
 
     private static void claimantStillWorkingNoticePeriod(CaseData caseData, ClaimantOtherType claimantOtherType) {
-        if (caseData.getClaimantStillWorkingNoticePeriod().isEmpty()) {
+        if (CollectionUtils.isEmpty(caseData.getClaimantStillWorkingNoticePeriod())) {
             return;
         }
         if (caseData.getClaimantStillWorkingNoticePeriod().get(0).equals(WEEKS)) {
@@ -433,10 +440,13 @@ public class Et1ReppedHelper {
         claimantIndType.setClaimantLastName(caseData.getClaimantLastName());
         claimantIndType.setClaimantDateOfBirth(caseData.getClaimantDateOfBirth());
         claimantIndType.setClaimantSex(getFirstListItem(caseData.getClaimantSex()));
+        if (isNullOrEmpty(caseData.getClaimantPreferredTitle())) {
+            return claimantIndType;
+        }
         claimantIndType.setClaimantPreferredTitle(TITLES.contains(caseData.getClaimantPreferredTitle())
                 ? caseData.getClaimantPreferredTitle()
-                : "Other");
-        if (claimantIndType.getClaimantPreferredTitle().equals("Other")) {
+                : OTHER);
+        if (claimantIndType.getClaimantPreferredTitle().equals(OTHER)) {
             claimantIndType.setClaimantTitleOther(caseData.getClaimantPreferredTitle());
         }
         return claimantIndType;
@@ -452,8 +462,9 @@ public class Et1ReppedHelper {
     }
 
     private static String reasonableAdjustmentsMapping(List<String> claimantSupportQuestion) {
-        return claimantSupportQuestion.isEmpty() || !claimantSupportQuestion.get(0).equals(YES)
-                                                    && !claimantSupportQuestion.get(0).equals(NO)
+        return CollectionUtils.isEmpty(claimantSupportQuestion)
+               || !claimantSupportQuestion.get(0).equals(YES)
+                  && !claimantSupportQuestion.get(0).equals(NO)
                 ? null
                 : claimantSupportQuestion.get(0);
     }
@@ -538,6 +549,7 @@ public class Et1ReppedHelper {
         caseData.setRespondentAcasNumber(null);
         caseData.setRespondentNoAcasCertificateReason(null);
         caseData.setAddAdditionalRespondentPreamble(null);
+        caseData.setAddAdditionalRespondent(null);
         caseData.setEt1ReppedRespondentCollection(null);
         caseData.setEt1SectionThreeClaimDetails(null);
         caseData.setEt1SectionThreeDocumentUpload(null);

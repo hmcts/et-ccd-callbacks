@@ -456,7 +456,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void dateToCurrentPositionChanged() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
-        caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
+        caseManagementForCaseWorkerService.setDateToCurrentPosition(caseData);
         assertEquals(caseData.getCurrentPosition(), caseData.getPositionType());
         assertEquals(caseData.getDateToPosition(), LocalDate.now().toString());
     }
@@ -464,7 +464,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void dateToCurrentPositionUnChanged() {
         CaseData caseData = scotlandCcdRequest2.getCaseDetails().getCaseData();
-        caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
+        caseManagementForCaseWorkerService.setDateToCurrentPosition(caseData);
         assertEquals(caseData.getCurrentPosition(), caseData.getPositionType());
         assertEquals("2019-11-15", caseData.getDateToPosition());
     }
@@ -473,7 +473,7 @@ class CaseManagementForCaseWorkerServiceTest {
     void dateToCurrentPositionNullPositionType() {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseData.setPositionType(null);
-        caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
+        caseManagementForCaseWorkerService.setDateToCurrentPosition(caseData);
         assertNull(caseData.getPositionType());
         assertNull(caseData.getDateToPosition());
     }
@@ -481,7 +481,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void dateToCurrentPositionNullCurrentPosition() {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
-        caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
+        caseManagementForCaseWorkerService.setDateToCurrentPosition(caseData);
         assertEquals(caseData.getCurrentPosition(), caseData.getPositionType());
         assertEquals(caseData.getDateToPosition(), LocalDate.now().toString());
     }

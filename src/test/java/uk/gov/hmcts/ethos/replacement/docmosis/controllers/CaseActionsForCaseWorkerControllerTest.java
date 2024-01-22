@@ -65,6 +65,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -363,6 +364,8 @@ class CaseActionsForCaseWorkerControllerTest {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
+        when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
+
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -371,6 +374,10 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(defaultValuesReaderService, atLeastOnce()).getCaseData(any(), any());
+        verify(caseManagementForCaseWorkerService, atLeastOnce()).setDateToCurrentPosition(any());
+        verify(caseManagementForCaseWorkerService, atLeastOnce()).setNextListedDate(any());
     }
 
     @Test
@@ -386,6 +393,7 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath("$.errors[0]", is("null Case has not been Accepted.")))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(eventValidationService).validateReceiptDate(any());
     }
 
     @Test
@@ -409,6 +417,11 @@ class CaseActionsForCaseWorkerControllerTest {
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
+        when(eventValidationService.validateActiveRespondents(isA(CaseData.class)))
+                .thenReturn(new ArrayList<>());
+        when(eventValidationService.validateET3ResponseFields(isA(CaseData.class)))
+                .thenReturn(new ArrayList<>());
+
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -417,6 +430,8 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(eventValidationService, atLeastOnce()).validateET3ResponseFields(any());
     }
 
     @Test

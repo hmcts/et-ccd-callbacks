@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
@@ -97,16 +98,23 @@ public class Et1VettingService {
 
     private static void initialEt1ReasonableAdjustments(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        if (!ObjectUtils.isEmpty(caseData.getClaimantHearingPreference())
-            && !StringUtils.isEmpty(caseData.getClaimantHearingPreference().getReasonableAdjustments())) {
-            if (YES.equals(caseData.getClaimantHearingPreference().getReasonableAdjustments())) {
-                caseData.setEt1ReasonableAdjustmentsQuestion(YES);
-            } else {
-                caseData.setEt1ReasonableAdjustmentsQuestion(NO);
-            }
-            caseData.setEt1ReasonableAdjustmentsTextArea(
-                caseData.getClaimantHearingPreference().getReasonableAdjustmentsDetail());
+        ClaimantHearingPreference hearingPreference = caseData.getClaimantHearingPreference();
+        if (ObjectUtils.isEmpty(hearingPreference)) {
+            return;
         }
+
+        String reasonableAdjustments = hearingPreference.getReasonableAdjustments();
+        if (StringUtils.isEmpty(reasonableAdjustments)) {
+            return;
+        }
+
+        if (YES.equals(reasonableAdjustments)) {
+            caseData.setEt1ReasonableAdjustmentsQuestion(YES);
+        } else {
+            caseData.setEt1ReasonableAdjustmentsQuestion(NO);
+        }
+
+        caseData.setEt1ReasonableAdjustmentsTextArea(hearingPreference.getReasonableAdjustmentsDetail());
     }
 
     /**

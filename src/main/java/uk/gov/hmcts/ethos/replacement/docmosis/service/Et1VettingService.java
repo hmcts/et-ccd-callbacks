@@ -99,22 +99,12 @@ public class Et1VettingService {
     private static void initialEt1ReasonableAdjustments(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         ClaimantHearingPreference hearingPreference = caseData.getClaimantHearingPreference();
-        if (ObjectUtils.isEmpty(hearingPreference)) {
-            return;
-        }
-
-        String reasonableAdjustments = hearingPreference.getReasonableAdjustments();
-        if (StringUtils.isEmpty(reasonableAdjustments)) {
-            return;
-        }
-
-        if (YES.equals(reasonableAdjustments)) {
-            caseData.setEt1ReasonableAdjustmentsQuestion(YES);
-        } else {
-            caseData.setEt1ReasonableAdjustmentsQuestion(NO);
-        }
-
-        caseData.setEt1ReasonableAdjustmentsTextArea(hearingPreference.getReasonableAdjustmentsDetail());
+        Optional.ofNullable(hearingPreference)
+                .map(ClaimantHearingPreference::getReasonableAdjustments)
+                .ifPresent(reasonableAdjustment -> {
+                    caseData.setEt1ReasonableAdjustmentsQuestion(YES.equals(reasonableAdjustment) ? YES : NO);
+                    caseData.setEt1ReasonableAdjustmentsTextArea(hearingPreference.getReasonableAdjustmentsDetail());
+                });
     }
 
     /**

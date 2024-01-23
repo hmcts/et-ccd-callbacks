@@ -63,6 +63,9 @@ public final class RolesConstants {
     public static final String REGIONAL_CENTRE_TEAM_LEADER = "regional-centre-team-leader";
 
     //Emails constants
+    public static final String JUDGE_EW_EMAIL = "judge.ew@hmcts.net";
+    public static final String JUDGE_SC_EMAIL = "judge.sc@hmcts.net";
+    public static final String LEGALREP_EMAIL = "legalrep@hmcts.net";
     public static final String CCD_DOCKER_DEFAULT_EMAIL = "ccd.docker.default@hmcts.net";
     public static final String ENGLANDWALES_EMAIL = "englandwales@hmcts.net";
     public static final String SCOTLAND_EMAIL = "scotland@hmcts.net";

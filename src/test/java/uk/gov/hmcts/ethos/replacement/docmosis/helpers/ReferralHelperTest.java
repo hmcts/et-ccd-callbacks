@@ -177,8 +177,8 @@ class ReferralHelperTest {
                 + "shortDescription=null, topLevelDocuments=null, startingClaimDocuments=null, "
                 + "responseClaimDocuments=null, initialConsiderationDocuments=null, caseManagementDocuments=null, "
                 + "withdrawalSettledDocuments=null, hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
-                + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null)), "
-                + "GenericTypeItem(id=2, "
+                + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null"
+                + ", docNumber=null)), GenericTypeItem(id=2, "
                 + "value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType("
                 + "documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl=null, "
                 + "categoryId=null, uploadTimestamp=null), "
@@ -186,7 +186,8 @@ class ReferralHelperTest {
                 + "startingClaimDocuments=null, responseClaimDocuments=null, initialConsiderationDocuments=null, "
                 + "caseManagementDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, j"
                 + "udgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
-                + "documentType=null, dateOfCorrespondence=null))], referralInstruction=Custom instructions for judge, "
+                + "documentType=null, dateOfCorrespondence=null, docNumber=null))], "
+                + "referralInstruction=Custom instructions for judge, "
                 + "referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
                 + "closeReferralGeneralNotes=null, "
@@ -501,7 +502,7 @@ class ReferralHelperTest {
             + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
             + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
             + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null}},"
+            + "dateOfCorrespondence\":null,\"docNumber\":null}},"
             + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
@@ -510,7 +511,7 @@ class ReferralHelperTest {
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null}}],\"referralInstruction\":null,"
+            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null}}],\"referralInstruction\":null,"
             + "\"referralReplyCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
@@ -551,7 +552,8 @@ class ReferralHelperTest {
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,"
             + "\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null}}],\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
+            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null}}],\"replyGeneralNotes\":"
+            + "\"replyNotes\",\"replyBy\":"
             + "\"replyBy\",\"replyDate\":\"" + replyDate + "\",\"replyDateTime\":\"" + replyDateTime + "\","
             + "\"referralSubject\":\"Other\",\"referralNumber\":\"1\"}}]}}";
 

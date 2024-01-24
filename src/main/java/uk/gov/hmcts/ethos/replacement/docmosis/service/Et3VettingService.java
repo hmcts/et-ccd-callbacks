@@ -5,18 +5,25 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_PROCESSING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.intersectProperties;
 
 @Slf4j
@@ -41,9 +48,19 @@ public class Et3VettingService {
         respondent.getValue().setEt3Vetting(copyEt3FieldsFromCaseDataToRespondent(caseData));
         respondent.getValue().getEt3Vetting().setEt3VettingDocument(
                 documentManagementService.addDocumentToDocumentField(documentInfo));
+        addEt3VettingCompletedToDoc(caseData, respondent.getValue().getEt3Vetting().getEt3VettingDocument());
         updateValuesOnObject(caseData, new Et3VettingType());
 
         respondent.getValue().setEt3VettingCompleted(YES);
+    }
+
+    private void addEt3VettingCompletedToDoc(CaseData caseData, UploadedDocumentType et3VettingDocument) {
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+        DocumentTypeItem documentTypeItem = DocumentHelper.createDocumentTypeItemFromTopLevel(et3VettingDocument,
+                RESPONSE_TO_A_CLAIM, ET3_PROCESSING, null);
+        caseData.getDocumentCollection().add(documentTypeItem);
     }
 
     /**

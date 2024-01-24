@@ -417,7 +417,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.4'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.5'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.42'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
@@ -456,7 +456,6 @@ bootWithCCD {
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data'
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', 'wa-docker-compose.yml'
 
     // ccd-data-store-api
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api'

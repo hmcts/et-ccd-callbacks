@@ -237,7 +237,7 @@ class TornadoServiceTest {
 
     @Test
     @SneakyThrows
-    void generateEt1VettingDocument() throws IOException {
+    void generateEt1VettingDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
@@ -245,7 +245,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateTseAdminReplyDocument() throws IOException {
+    @SneakyThrows
+    void generateTseAdminReplyDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "TSE Admin Reply.pdf");
@@ -253,7 +254,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateEt3VettingDocument() throws IOException {
+    @SneakyThrows
+    void generateEt3VettingDocument() {
         mockConnectionSuccess();
         CaseData caseData = new CaseData();
         caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test", "Test", true));
@@ -263,7 +265,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateInConEWDocument() throws IOException {
+    @SneakyThrows
+    void generateInConEWDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
@@ -321,6 +324,7 @@ class TornadoServiceTest {
             dynamicValueType.setLabel("Test label");
             dynamicFixedListType.setValue(dynamicValueType);
             caseData.setSubmitEt3Respondent(dynamicFixedListType);
+            caseData.setEt3ChooseRespondent(dynamicFixedListType);
             tseHelperMockedStatic.when(() -> TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(),
                             null))
                     .thenReturn("");

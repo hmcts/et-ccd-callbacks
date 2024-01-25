@@ -173,8 +173,10 @@ public final class UploadDocumentHelper {
         if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
-                documentTypeItem.getValue().getUploadedDocument().setCategoryId(
-                        DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getTypeOfDocument()));
+                if (!ObjectUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument())) {
+                    documentTypeItem.getValue().getUploadedDocument().setCategoryId(
+                            DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getTypeOfDocument()));
+                }
                 documentTypeItem.getValue().setDocNumber(
                         String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
             }

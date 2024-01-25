@@ -4,6 +4,8 @@ public final class RolesConstants {
     public static final String CASEWORKER = "caseworker";
     public static final String CASEWORKER_ET_PCQEXTRACTOR = CASEWORKER.concat("-et-pcqextractor");
     public static final String CASEWORKER_CAA = CASEWORKER.concat("-caa");
+    public static final String CASEWORKER_WA = CASEWORKER.concat("-wa");
+    public static final String CASEWORKER_WA_TASK_OFFICER = CASEWORKER_WA.concat("-task-officer");
     public static final String CASEWORKER_EMPLOYMENT = CASEWORKER.concat("-employment");
     public static final String CASEWORKER_EMPLOYMENT_API = CASEWORKER_EMPLOYMENT.concat("-api");
     public static final String CASEWORKER_EMPLOYMENT_ENGLANDWALES = CASEWORKER_EMPLOYMENT.concat("-englandwales");
@@ -35,7 +37,35 @@ public final class RolesConstants {
     public static final String RAS_VALIDATION = "caseworker-ras-validation";
     public static final String WA_TASK_CONFIGURATION = "caseworker-wa-task-configuration";
 
+    // Other roles that might be linked to WA
+
+    public static final String CASE_ALLOCATOR = "case-allocator";
+    public static final String CWD_USER = "cwd-user";
+    public static final String CWD_ADMIN = "cwd-admin";
+    public static final String CWD_SYSTEM_USER = "cwd-system-user";
+    public static final String HEARING_CENTRE_ADMIN = "hearing-centre-admin";
+    public static final String HEARING_CENTRE_TEAM_LEADER = "hearing-centre-team-leader";
+    public static final String HEARING_MANAGER = "hearing-manager";
+    public static final String HEARING_VIEWER = "hearing-viewer";
+    public static final String HMCTS_ADMIN = "hmcts-admin";
+    public static final String HMCTS_LEGAL_OPERATIONS = "hmcts-legal-operations";
+    public static final String SENIOR_TRIBUNAL_CASEWORKER = "senior-tribunal-caseworker";
+    public static final String SPECIFIC_ACCESS_APPROVER_ADMIN = "specific-access-approver-admin";
+    public static final String SPECIFIC_ACCESS_APPROVER_LEGAL_OPS = "specific-access-approver-legal-ops";
+    public static final String TASK_SUPERVISOR = "task-supervisor";
+    public static final String TRIBUNAL_CASEWORKER = "tribunal-caseworker";
+    public static final String EMPLOYMENT_TRIBUNAL_CASEWORKER = "employment-tribunal-caseworker";
+    public static final String EMPLOYMENT_HEARING_CENTRE_ADMIN = "employment-hearing-centre-admin";
+    public static final String EMPLOYMENT_SENIOR_TRIBUNAL_CASEWORKER = "employment-senior-tribunal-caseworker";
+    public static final String EMPLOYMENT_HEARING_CENTRE_TEAM_LEADER = "employment-hearing-centre-team-leader";
+    public static final String STAFF_ADMIN = "staff-admin";
+    public static final String CTSC_TEAM_LEADER = "ctsc-team-leader";
+    public static final String REGIONAL_CENTRE_TEAM_LEADER = "regional-centre-team-leader";
+
     //Emails constants
+    public static final String JUDGE_EW_EMAIL = "judge.ew@hmcts.net";
+    public static final String JUDGE_SC_EMAIL = "judge.sc@hmcts.net";
+    public static final String LEGALREP_EMAIL = "legalrep@hmcts.net";
     public static final String CCD_DOCKER_DEFAULT_EMAIL = "ccd.docker.default@hmcts.net";
     public static final String ENGLANDWALES_EMAIL = "englandwales@hmcts.net";
     public static final String SCOTLAND_EMAIL = "scotland@hmcts.net";
@@ -48,6 +78,10 @@ public final class RolesConstants {
     public static final String MCA_NOC_APPROVER_EMAIL = "mca.noc.approver@gmail.com";
     public static final String ACAS_EMAIL = "et@acas.com";
     public static final String ET_SYSTEM_EMAIL = "et.service@hmcts.net";
+    public static final String ROLE_ASSIGNMENT_ADMIN_EMAIL = "role.assignment.admin@gmail.com";
+    public static final String ET_CASEADMIN_EMAIL = "et.caseadmin@hmcts.net";
+    public static final String WA_SYSTEM_USER_EMAIL = "wa-system-user@fake.hmcts.net";
+    public static final String ET_DEV_EMAIL = "et.dev@hmcts.net";
 
     //Paths to definition files
     public static final String ENGLANGWALES_CONFIG_FILE = "/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx";
@@ -59,7 +93,14 @@ public final class RolesConstants {
         CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_ETJUDGE, CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR, CITIZEN, ET_ACAS_API,
         PUI_CASE_MANAGER, PUI_FINANCE_MANAGER, PUI_ORGANISATION_MANAGER, PUI_USER_MANAGER, PUI_CAA, MANAGE_USER,
-        CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN, ACAS_API, GS_PROFILE, RAS_VALIDATION, WA_TASK_CONFIGURATION};
+        CASEWORKER_APPROVER, PRD_AAC_SYSTEM, PRD_ADMIN, ACAS_API, GS_PROFILE, RAS_VALIDATION, WA_TASK_CONFIGURATION,
+        "caseworker-divorce-solicitor", CASEWORKER_WA, CASEWORKER_WA_TASK_OFFICER, CASE_ALLOCATOR, CWD_USER,
+        HEARING_CENTRE_ADMIN, HEARING_CENTRE_TEAM_LEADER, HEARING_MANAGER, HEARING_VIEWER, HMCTS_ADMIN, 
+        HMCTS_LEGAL_OPERATIONS, SENIOR_TRIBUNAL_CASEWORKER, SPECIFIC_ACCESS_APPROVER_ADMIN,
+        SPECIFIC_ACCESS_APPROVER_LEGAL_OPS, TASK_SUPERVISOR, TRIBUNAL_CASEWORKER, EMPLOYMENT_TRIBUNAL_CASEWORKER,
+        EMPLOYMENT_HEARING_CENTRE_ADMIN, EMPLOYMENT_SENIOR_TRIBUNAL_CASEWORKER,
+        EMPLOYMENT_HEARING_CENTRE_TEAM_LEADER, CWD_ADMIN, CWD_SYSTEM_USER, CTSC_TEAM_LEADER,
+        REGIONAL_CENTRE_TEAM_LEADER, "allocated-admin-caseworker" };
 
     private RolesConstants() {
     }

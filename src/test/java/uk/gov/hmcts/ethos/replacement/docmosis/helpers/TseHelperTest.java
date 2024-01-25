@@ -226,25 +226,31 @@ class TseHelperTest {
         docType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
         docType.setDocumentFilename("image.png");
         docType.setDocumentUrl("http://dm-store:8080/documents/1234");
+
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(docType);
+
         GenericTypeItem<DocumentType> item = new GenericTypeItem<>();
         item.setValue(documentType);
         item.setId("78910");
+
         caseData.setTseResponseSupportingMaterial(List.of(item));
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
-        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "",
-                "testBinaryUrl");
+        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
             + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
             + "\"documentCollection\":[{\"id\":\"78910\","
             + "\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"image.png|testBinaryUrl/documents/1234/binary"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234"
             + "\",\"document_filename\":\"image.png\","
-            + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\":null},"
-            + "\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
+            + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
+            + ":null},\"ownerDocument\":null,"
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
+            + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
+            + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
+            + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
+            + "dateOfCorrespondence\":null,\"docNumber\":null}}],\"copy\":\"Yes\","
             + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));

@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
@@ -278,7 +279,8 @@ public class CaseActionsForCaseWorkerController {
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getEcmCaseType() != null
                     && caseData.getEcmCaseType().equals(MULTIPLE_CASE_TYPE) ? YES : NO);
-
+            UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
+            UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
@@ -398,6 +400,8 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+            UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
+            UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
                     userToken, caseData, caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),
@@ -525,6 +529,10 @@ public class CaseActionsForCaseWorkerController {
             nocRespondentHelper.updateWithRespondentIds(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+
+            if (featureToggleService.isHmcEnabled()) {
+                nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+            }
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);

@@ -34,6 +34,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -124,13 +127,35 @@ class CreateReferralControllerTest {
         when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
             .thenReturn(new DocumentInfo());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(emailService, times(1)).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void aboutToSubmit_NoReferentEmail_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+                .thenReturn(new DocumentInfo());
+        CCDRequest noReferentEmailCCDRequest = ccdRequest;
+        noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(noReferentEmailCCDRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
     @Test
@@ -162,6 +187,19 @@ class CreateReferralControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void validateNoReferentEmail_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        CCDRequest noReferentEmailCCDRequest = ccdRequest;
+        noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(noReferentEmailCCDRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
     }
 
     @Test

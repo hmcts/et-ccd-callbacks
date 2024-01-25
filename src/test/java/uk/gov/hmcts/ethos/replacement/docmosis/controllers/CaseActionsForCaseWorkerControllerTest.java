@@ -374,6 +374,23 @@ class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    void amendCaseDetails_noErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(eventValidationService.validateReceiptDate(isA(CaseDetails.class))).thenReturn(new ArrayList<>());
+        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
+        when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
+        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+        mvc.perform(post(AMEND_CASE_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
     void amendCaseDetailsWithErrors() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -453,6 +470,8 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(nocRespondentRepresentativeService, times(1)).updateNonMyHmctsOrgIds(any());
     }
 
     @Test

@@ -171,10 +171,10 @@ public class TimeToFirstHearingReport {
                 + Integer.parseInt(adhocReportType.getNotConFast26wkTotal())
                 + Integer.parseInt(adhocReportType.getNotConNone26wkTotal());
 
-        float totalCasesWithin26WeeksPercent = (totalCases != 0)
-                ? ((float)totalCasesWithin26Weeks / totalCases) * 100 : 0;
-        float totalCasesNotWithin26WeeksPercent = (totalCases != 0)
-                ? ((float)totalCasesNotWithin26Weeks / totalCases) * 100 : 0;
+        float totalCasesWithin26WeeksPercent =
+                (totalCases == 0) ? 0 : ((float) totalCasesWithin26Weeks / totalCases) * 100;
+        float totalCasesNotWithin26WeeksPercent =
+                (totalCases == 0) ? 0 : ((float) totalCasesNotWithin26Weeks / totalCases) * 100;
 
         adhocReportType.setTotalCases(String.valueOf(totalCases));
         adhocReportType.setTotal26wk(String.valueOf(totalCasesWithin26Weeks));

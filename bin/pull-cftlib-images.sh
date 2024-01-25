@@ -16,4 +16,5 @@ docker pull docker.elastic.co/elasticsearch/elasticsearch:7.11.1
 docker pull hmctspublic.azurecr.io/xui/webapp:latest
 # Download XUI Manage Organisations
 docker pull hmctspublic.azurecr.io/xui/mo-webapp:latest
-
+# Download logstash
+docker pull docker.elastic.co/logstash/logstash:7.16.1

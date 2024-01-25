@@ -75,6 +75,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -556,36 +558,9 @@ class RespondentTellSomethingElseServiceTest {
         DocumentType actualDocumentType = documentCollection.get(0).getValue();
 
         assertThat(documentCollection.size(), is(1));
+        System.out.println(actualDocumentType);
         assertEquals(selectedApplication, actualDocumentType.getShortDescription());
-        assertEquals("Respondent correspondence", actualDocumentType.getTypeOfDocument());
 
-        assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
-        assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));
-        assertThat(caseData.getResTseCopyToOtherPartyTextArea(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox1(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox2(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox3(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox4(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox5(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox6(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox7(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox8(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox9(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox10(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox11(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox12(), is(nullValue()));
-        assertThat(caseData.getResTseDocument1(), is(nullValue()));
-        assertThat(caseData.getResTseDocument2(), is(nullValue()));
-        assertThat(caseData.getResTseDocument3(), is(nullValue()));
-        assertThat(caseData.getResTseDocument4(), is(nullValue()));
-        assertThat(caseData.getResTseDocument5(), is(nullValue()));
-        assertThat(caseData.getResTseDocument6(), is(nullValue()));
-        assertThat(caseData.getResTseDocument7(), is(nullValue()));
-        assertThat(caseData.getResTseDocument8(), is(nullValue()));
-        assertThat(caseData.getResTseDocument9(), is(nullValue()));
-        assertThat(caseData.getResTseDocument10(), is(nullValue()));
-        assertThat(caseData.getResTseDocument11(), is(nullValue()));
-        assertThat(caseData.getResTseDocument12(), is(nullValue()));
     }
 
     @Test
@@ -839,10 +814,48 @@ class RespondentTellSomethingElseServiceTest {
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         DocumentType actual = documentCollection.get(0).getValue();
 
-        DocumentType expected = DocumentType.builder().typeOfDocument("Respondent correspondence")
-            .shortDescription("Amend response").build();
+        DocumentType expected = DocumentType.builder()
+                .shortDescription("Amend response")
+                .dateOfCorrespondence(LocalDate.now().toString())
+                .topLevelDocuments(CASE_MANAGEMENT)
+                .caseManagementDocuments(APP_TO_AMEND_RESPONSE)
+                .documentType(APP_TO_AMEND_RESPONSE)
+                .build();
 
         Assertions.assertThat(documentCollection).hasSize(1);
         Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void clearApplicationData() {
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
+        tseService.clearApplicationData(caseData);
+        assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
+        assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));
+        assertThat(caseData.getResTseCopyToOtherPartyTextArea(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox1(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox2(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox3(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox4(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox5(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox6(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox7(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox8(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox9(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox10(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox11(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox12(), is(nullValue()));
+        assertThat(caseData.getResTseDocument1(), is(nullValue()));
+        assertThat(caseData.getResTseDocument2(), is(nullValue()));
+        assertThat(caseData.getResTseDocument3(), is(nullValue()));
+        assertThat(caseData.getResTseDocument4(), is(nullValue()));
+        assertThat(caseData.getResTseDocument5(), is(nullValue()));
+        assertThat(caseData.getResTseDocument6(), is(nullValue()));
+        assertThat(caseData.getResTseDocument7(), is(nullValue()));
+        assertThat(caseData.getResTseDocument8(), is(nullValue()));
+        assertThat(caseData.getResTseDocument9(), is(nullValue()));
+        assertThat(caseData.getResTseDocument10(), is(nullValue()));
+        assertThat(caseData.getResTseDocument11(), is(nullValue()));
+        assertThat(caseData.getResTseDocument12(), is(nullValue()));
     }
 }

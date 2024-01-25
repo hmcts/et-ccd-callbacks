@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -72,6 +73,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE
 
 @ExtendWith(SpringExtension.class)
 class TornadoServiceTest {
+    @MockBean
+    private TseService tseService;
     private TornadoService tornadoService;
     private TornadoConnection tornadoConnection;
     private DocumentManagementService documentManagementService;
@@ -94,7 +97,7 @@ class TornadoServiceTest {
         mockVenueAddressReaderService();
 
         tornadoService = new TornadoService(tornadoConnection, documentManagementService,
-                userIdamService, defaultValuesReaderService, venueAddressReaderService);
+                userIdamService, defaultValuesReaderService, venueAddressReaderService, tseService);
     }
 
     @Test
@@ -252,8 +255,10 @@ class TornadoServiceTest {
     @Test
     void generateEt3VettingDocument() throws IOException {
         mockConnectionSuccess();
+        CaseData caseData = new CaseData();
+        caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test", "Test", true));
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
+                caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
         verifyDocumentInfo(documentInfo);
     }
 

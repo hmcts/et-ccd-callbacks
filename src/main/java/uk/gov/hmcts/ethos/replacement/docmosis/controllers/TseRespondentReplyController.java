@@ -221,7 +221,8 @@ public class TseRespondentReplyController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseDetails, userToken);
+        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, userToken,
+                caseDetails.getCaseTypeId());
         tseRespondentReplyService.respondentReplyToTse(userToken, caseDetails, caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

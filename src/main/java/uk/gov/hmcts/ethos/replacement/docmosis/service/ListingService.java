@@ -393,9 +393,8 @@ public class ListingService {
 
     private boolean isListingDateValid(ListingData listingData, DateListedTypeItem dateListedTypeItem) {
         boolean dateRange = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        String dateListed = !isNullOrEmpty(dateListedTypeItem.getValue().getListedDate())
-                ? dateListedTypeItem.getValue().getListedDate()
-                : "";
+        String dateListed = isNullOrEmpty(dateListedTypeItem.getValue().getListedDate()) ? "" :
+                dateListedTypeItem.getValue().getListedDate();
         if (dateRange) {
             String dateToSearchFrom = listingData.getListingDateFrom();
             String dateToSearchTo = listingData.getListingDateTo();

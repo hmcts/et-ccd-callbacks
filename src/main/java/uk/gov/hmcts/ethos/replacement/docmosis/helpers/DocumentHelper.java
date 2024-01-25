@@ -956,6 +956,11 @@ public final class DocumentHelper {
         DocumentType documentType = documentTypeItem.getValue();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setShortDescription(shortDescription);
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(
+                uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(typeOfDocument));
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, typeOfDocument);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
         return documentTypeItem;
     }
 
@@ -968,6 +973,27 @@ public final class DocumentHelper {
     public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
                                                           String typeOfDocument) {
         return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
+    }
+
+    /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param topLevel top level document
+     * @param secondLevel second level document
+     * @return DocumentTypeItem
+     */
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel,
+                                                          String shortDescription) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setShortDescription(shortDescription);
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
     }
 
     /**

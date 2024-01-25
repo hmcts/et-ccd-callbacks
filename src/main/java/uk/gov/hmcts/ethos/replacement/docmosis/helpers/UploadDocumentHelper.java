@@ -175,6 +175,8 @@ public final class UploadDocumentHelper {
                 DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
                 documentTypeItem.getValue().getUploadedDocument().setCategoryId(
                         DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getTypeOfDocument()));
+                documentTypeItem.getValue().setDocNumber(
+                        String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
             }
         }
     }

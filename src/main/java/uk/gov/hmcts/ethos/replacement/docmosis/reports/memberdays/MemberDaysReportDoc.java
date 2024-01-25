@@ -35,7 +35,7 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder addMemberDaysReportSummaryHeader(MemberDaysReportData reportData) {
-        StringBuilder summaryHeaderContent = new StringBuilder();
+        StringBuilder summaryHeaderContent = new StringBuilder(70);
 
         if (reportData == null) {
             return summaryHeaderContent;

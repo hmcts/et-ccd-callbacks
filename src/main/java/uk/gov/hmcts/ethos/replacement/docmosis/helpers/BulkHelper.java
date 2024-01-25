@@ -390,7 +390,7 @@ public final class BulkHelper {
     }
 
     private static StringBuilder getScheduleData(List<SearchTypeItem> searchTypeItems) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(25);
         sb.append("\"multiple\":[\n");
         for (int i = 0; i < searchTypeItems.size(); i++) {
             sb.append(getMultipleTypeRow(searchTypeItems.get(i).getValue()));
@@ -403,7 +403,7 @@ public final class BulkHelper {
     }
 
     private static StringBuilder getMultipleTypeRow(SearchType searchType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(220);
         sb.append("{\"Claimant\":\"").append(nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
                 .append("\"Current_position\":\"").append(nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE)
                 .append("\"Case_No\":\"").append(nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE)

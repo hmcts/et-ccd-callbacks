@@ -97,6 +97,18 @@ public class TseService {
         caseData.setGenericTseApplicationCollection(tseApplicationCollection);
     }
 
+    /**
+     * Clears the existing TSE data from CaseData to ensure fields will be empty when user
+     * starts a new application in the same case.
+     *
+     * @param caseData contains all the case data.
+     */
+    public void clearApplicationData(CaseData caseData) {
+        caseData.setClaimantTse(null);
+        clearRespondentTseDataFromCaseData(caseData);
+
+    }
+
     private void addClaimantData(CaseData caseData, GenericTseApplicationType application) {
         application.setApplicant(CLAIMANT_TITLE);
 
@@ -108,7 +120,6 @@ public class TseService {
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
         application.setApplicationState(IN_PROGRESS);
 
-        caseData.setClaimantTse(null);
     }
 
     private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {
@@ -120,7 +131,6 @@ public class TseService {
         application.setApplicationState(NOT_STARTED_YET);
         addSupportingMaterialToDocumentCollection(caseData, application);
 
-        clearRespondentTseDataFromCaseData(caseData);
     }
 
     private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application) {
@@ -129,11 +139,19 @@ public class TseService {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
 
-            caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItem(
-                application.getDocumentUpload(),
-                "Respondent correspondence",
-                application.getType()
+            String applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
+                            application.getType());
+            String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(applicationDoc);
+
+            application.getDocumentUpload().setDocumentFilename("Application %s - %s - Attachment.pdf".formatted(
+                    application.getNumber(),
+                    applicationDoc
             ));
+
+            caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItemFromTopLevel(
+                    application.getDocumentUpload(), topLevel, applicationDoc, application.getType()
+            ));
+
         }
     }
 
@@ -181,7 +199,7 @@ public class TseService {
      *
      * @param caseData contains all the case data
      */
-    private static int getNextApplicationNumber(CaseData caseData) {
+    public static int getNextApplicationNumber(CaseData caseData) {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return 1;
         }
@@ -386,5 +404,16 @@ public class TseService {
         UploadedDocumentType uploadedDocument = document.getUploadedDocument();
         String nameTypeSizeLink = documentManagementService.displayDocNameTypeSizeLink(uploadedDocument, authToken);
         return MarkdownHelper.addRowsForDocument(document, nameTypeSizeLink);
+    }
+
+    /**
+     * Returns a formatted document name for a TSE application.
+     * @param caseData parent object for all case data
+     * @return formatted document name
+     */
+    public String getTseDocumentName(CaseData caseData) {
+        return String.format("Application %d - %s.pdf",
+                getNextApplicationNumber(caseData) - 1,
+                caseData.getResTseSelectApplication());
     }
 }

@@ -2,11 +2,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -49,7 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_FILE_NAME;
 
@@ -354,13 +355,18 @@ public class RespondentTellSomethingElseService {
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
-            caseData.getDocumentCollection().add(createDocumentTypeItem(
-                documentManagementService.addDocumentToDocumentField(
-                    tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_FILE_NAME)
-                ),
-                "Respondent correspondence",
-                caseData.getResTseSelectApplication()
+            String applicationDocMapping =
+                    DocumentHelper.respondentApplicationToDocType(caseData.getResTseSelectApplication());
+            String topLevel = DocumentHelper.getTopLevelDocument(applicationDocMapping);
+            caseData.getDocumentCollection().add(createDocumentTypeItemFromTopLevel(
+                    documentManagementService.addDocumentToDocumentField(
+                            tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_FILE_NAME)
+                    ),
+                    topLevel,
+                    applicationDocMapping,
+                    caseData.getResTseSelectApplication()
             ));
+
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

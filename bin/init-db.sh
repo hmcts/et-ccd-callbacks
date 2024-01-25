@@ -8,10 +8,17 @@ if [ -z "$DB_URL" ] || [ -z "$ET_COS_DB_PASSWORD" ]; then
   exit 1
 fi
 
-psql ${DB_URL} -v ON_ERROR_STOP=1 --username postgres --set USERNAME=et_cos --set PASSWORD=${ET_COS_DB_PASSWORD} <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username postgres --set USERNAME=et_cos --set PASSWORD=$ET_COS_DB_PASSWORD <<-EOSQL
   CREATE USER :USERNAME WITH PASSWORD ':PASSWORD';
-  CREATE DATABASE et_cos
+EOSQL
+
+for service in et_cos camunda role_assignment wa_workflow_api cft_task_db wa_case_event_messages_db; do
+  echo "Database $service: Creating..."
+psql ${DB_URL} -v ON_ERROR_STOP=1 --username postgres --set USERNAME=et_cos --set PASSWORD=${ET_COS_DB_PASSWORD} --set DATABASE=$service <<-EOSQL
+  CREATE DATABASE :DATABASE
     WITH OWNER = :USERNAME
     ENCODING = 'UTF-8'
     CONNECTION LIMIT = -1;
 EOSQL
+  echo "Database $service: Created"
+done

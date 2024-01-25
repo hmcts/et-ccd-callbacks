@@ -85,11 +85,11 @@ public final class DocumentHelper {
                                                      MultipleData multipleData,
                                                      DefaultValues allocatedCourtAddress,
                                                      VenueAddressReaderService venueAddressReaderService) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(260);
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
         // Start building the instruction
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
                 .append(OUTPUT_FILE_NAME).append(NEW_LINE);
 
@@ -140,7 +140,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getClaimantAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(150);
         sb.append("\"claimant_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"claimant_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
                 .append("\"claimant_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
@@ -151,7 +151,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("\"claimant_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"claimant_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
                 .append(NEW_LINE).append("\"claimant_or_rep_addressLine3\":\"")
@@ -227,7 +227,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(170);
         sb.append("\"respondent_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"respondent_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
                 .append("\"respondent_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
@@ -238,7 +238,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(210);
         sb.append("\"respondent_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"respondent_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
                 .append(NEW_LINE).append("\"respondent_or_rep_addressLine3\":\"")
@@ -355,7 +355,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(20);
         AtomicInteger atomicInteger = new AtomicInteger(2);
         List<String> respOthers = caseData.getRespondentCollection()
                 .stream()
@@ -372,7 +372,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespAddress(CaseData caseData) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(25);
         AtomicInteger atomicInteger = new AtomicInteger(1);
         int size = caseData.getRespondentCollection().size();
         List<String> respAddressList = caseData.getRespondentCollection()
@@ -749,7 +749,7 @@ public final class DocumentHelper {
         List<AddressLabelTypeItem> copiedAddressLabelCollection =
                 getCopiedAddressLabels(selectedAddressLabelCollection, numberOfCopies);
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(40);
         sb.append("\"address_labels_page\":[\n");
 
         boolean startingLabelAboveOne = true;
@@ -796,7 +796,7 @@ public final class DocumentHelper {
 
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
                                                  String labelNumber, String showTelFax) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(70);
         sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE).append('"').append(LABEL)
                 .append(labelNumber).append("_Entity_Name_02\":\"")
@@ -955,6 +955,11 @@ public final class DocumentHelper {
         DocumentType documentType = documentTypeItem.getValue();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setShortDescription(shortDescription);
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(
+                uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(typeOfDocument));
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, typeOfDocument);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
         return documentTypeItem;
     }
 
@@ -967,6 +972,27 @@ public final class DocumentHelper {
     public static DocumentTypeItem createDocumentTypeItem(UploadedDocumentType uploadedDocumentType,
                                                           String typeOfDocument) {
         return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
+    }
+
+    /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param topLevel top level document
+     * @param secondLevel second level document
+     * @return DocumentTypeItem
+     */
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel,
+                                                          String shortDescription) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setShortDescription(shortDescription);
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
     }
 
     /**

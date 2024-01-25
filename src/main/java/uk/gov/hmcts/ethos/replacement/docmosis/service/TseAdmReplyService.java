@@ -2,9 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -65,7 +65,7 @@ public class TseAdmReplyService {
     private final TornadoService tornadoService;
     private final TseService tseService;
     private final FeatureToggleService featureToggleService;
-    
+
     @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
     @Value("${template.tse.admin.reply.respondent}")
@@ -117,7 +117,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void updateApplicationState(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -138,7 +138,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void saveTseAdmReplyDataFromCaseData(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -149,6 +149,7 @@ public class TseAdmReplyService {
 
         if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
             applicationType.setRespondCollection(new ListTypeItem<TseRespondType>());
+
         }
 
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();

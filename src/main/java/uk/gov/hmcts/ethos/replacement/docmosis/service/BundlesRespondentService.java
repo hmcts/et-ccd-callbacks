@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -58,8 +60,10 @@ public class BundlesRespondentService {
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             return;
         }
+
         DynamicFixedListType listType = DynamicFixedListType.from(caseData.getHearingCollection().stream()
                 .map(this::createValueType)
+                .filter(Objects::nonNull)
                 .toList()
         );
 
@@ -67,7 +71,7 @@ public class BundlesRespondentService {
     }
 
     private DynamicValueType createValueType(HearingTypeItem hearingTypeItem) {
-        var earliestHearing = HearingsHelper.mapEarliest(hearingTypeItem);
+        DateListedTypeItem earliestHearing = HearingsHelper.mapEarliest(hearingTypeItem);
         if (earliestHearing == null) {
             return null;
         }

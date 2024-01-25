@@ -390,7 +390,7 @@ public final class ReferralHelper {
      */
     public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         ReferralTypeData data;
-        if (caseData.getReferentEmail() != null) {
+        if (caseData.getReferentEmail() != null || caseData.getSelectReferral() == null) {
             data = newReferralRequest(caseData);
         } else {
             data = existingReferralRequest(caseData);

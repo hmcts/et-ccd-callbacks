@@ -355,7 +355,7 @@ public final class LabelsHelper {
 
         StringBuilder sb = new StringBuilder();
         sb.append(nullCheck(address.getAddressLine1()))
-                .append(!isNullOrEmpty(nullCheck(address.getAddressLine2())) && !sb.isEmpty() ? ", " : "")
+                .append(isNullOrEmpty(nullCheck(address.getAddressLine2())) || sb.isEmpty() ? "" : ", ")
                 .append(nullCheck(address.getAddressLine2()))
                 .append(!isNullOrEmpty(nullCheck(address.getAddressLine3())) && !sb.isEmpty() ? ", " : "")
                 .append(nullCheck(address.getAddressLine3()))

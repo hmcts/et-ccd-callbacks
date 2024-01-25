@@ -271,10 +271,10 @@ public final class ListingHelper {
     public static StringBuilder buildListingDocumentContent(ListingData listingData, String accessKey,
                                                             String templateName, UserDetails userDetails,
                                                             String caseType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(150);
 
         // Start building the instruction
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE)
                 .append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
                 .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n")
@@ -292,17 +292,16 @@ public final class ListingHelper {
             sb.append(getDocumentData(listingData, templateName, caseType));
         }
 
-        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n")
-                .append("}\n").append("}\n");
+        sb.append("\"Today_date\":\"").append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
         return sb;
     }
 
     private static StringBuilder getLogo(String caseType) {
         StringBuilder sb = new StringBuilder();
         if (caseType.equals(SCOTLAND_LISTING_CASE_TYPE_ID)) {
-            sb.append("\"listing_logo\":\"").append("[userImage:").append("schmcts.png]").append(NEW_LINE);
+            sb.append("\"listing_logo\":\"[userImage:schmcts.png]").append(NEW_LINE);
         } else {
-            sb.append("\"listing_logo\":\"").append("[userImage:").append("enhmcts.png]").append(NEW_LINE);
+            sb.append("\"listing_logo\":\"[userImage:enhmcts.png]").append(NEW_LINE);
         }
         return sb;
     }
@@ -348,7 +347,7 @@ public final class ListingHelper {
     }
 
     private static StringBuilder getCaseCauseListByDate(ListingData listingData, String caseType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(40);
         Iterator<Map.Entry<String, List<ListingTypeItem>>> entries = getEntriesByDate(sb, listingData);
         while (entries.hasNext()) {
             Map.Entry<String, List<ListingTypeItem>> listingEntry = entries.next();
@@ -442,7 +441,7 @@ public final class ListingHelper {
 
     private static StringBuilder getListByRoomOrVenue(List<ListingTypeItem> collection, ListingData listingData,
                                                       String caseType, boolean byRoom) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(30);
         TreeMap<String, List<ListingTypeItem>> sortedMap = byRoom
                 ? getListHearingsByRoomWithNotAllocated(collection)
                 : getListHearingsByVenueWithNotAllocated(listingData);
@@ -490,7 +489,8 @@ public final class ListingHelper {
     }
 
     private static StringBuilder getListingTypeRow(ListingType listingType, String caseType, ListingData listingData) {
-        return new StringBuilder().append("{\"Judge\":\"").append(nullCheck(extractHearingJudgeName(listingType)))
+        return new StringBuilder(550).append("{\"Judge\":\"")
+                .append(nullCheck(extractHearingJudgeName(listingType)))
                 .append(NEW_LINE)
                 .append(getCourtListingData(listingData)).append(getLogo(caseType)).append("\"ERMember\":\"")
                 .append(nullCheck(listingType.getHearingERMember())).append(NEW_LINE).append("\"EEMember\":\"")
@@ -544,7 +544,7 @@ public final class ListingHelper {
     }
 
     private static StringBuilder getCourtListingData(ListingData listingData) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(80);
         if (listingData.getTribunalCorrespondenceAddress() != null) {
             sb.append("\"Court_addressLine1\":\"")
                     .append(nullCheck(listingData.getTribunalCorrespondenceAddress().getAddressLine1()))

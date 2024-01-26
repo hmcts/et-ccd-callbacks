@@ -23,7 +23,7 @@ public class DigitalCaseFileService {
     private final BundleApiClient bundleApiClient;
     private final AuthTokenGenerator authTokenGenerator;
 
-    @Value("${bundle.config.default}")
+    @Value("${em-ccd-orchestrator.config.default}")
     private String defaultBundle;
 
     public List<Bundle> createCaseFileRequest(CaseDetails caseDetails, String userToken) {

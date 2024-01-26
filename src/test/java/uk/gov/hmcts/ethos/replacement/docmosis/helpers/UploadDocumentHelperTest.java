@@ -176,6 +176,7 @@ public class UploadDocumentHelperTest {
         UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
         assertNotNull(caseData.getDocumentCollection());
         assertEquals(documentType, caseData.getDocumentCollection().get(0).getValue().getDocumentType());
+        assertEquals("1", caseData.getDocumentCollection().get(0).getValue().getDocNumber());
     }
 
     private static Stream<Arguments> setDocumentTypeForDocumentCollection() {

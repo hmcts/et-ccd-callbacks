@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -114,7 +115,7 @@ public final class UploadDocumentHelper {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentType documentType = documentTypeItem.getValue();
                 if (isNullOrEmpty(documentType.getTopLevelDocuments())
-                        && (!isNullOrEmpty(documentType.getTypeOfDocument()))) {
+                        && !isNullOrEmpty(documentType.getTypeOfDocument())) {
                     mapLegacyDocTypeToNewDocType(documentType);
                 }
             }
@@ -173,8 +174,12 @@ public final class UploadDocumentHelper {
         if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
-                documentTypeItem.getValue().getUploadedDocument().setCategoryId(
-                        DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getTypeOfDocument()));
+                if (!ObjectUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument())) {
+                    documentTypeItem.getValue().getUploadedDocument().setCategoryId(
+                            DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getTypeOfDocument()));
+                }
+                documentTypeItem.getValue().setDocNumber(
+                        String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
             }
         }
     }

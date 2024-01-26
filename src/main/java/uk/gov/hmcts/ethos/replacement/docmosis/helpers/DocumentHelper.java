@@ -778,8 +778,8 @@ public final class DocumentHelper {
         return sb;
     }
 
-    private static int getPageLabelNumber(int startingLabel, int i) {
-        int pageLabelNumber = i + 1;
+    private static int getPageLabelNumber(int startingLabel, int currentNumber) {
+        int pageLabelNumber = currentNumber + 1;
 
         if (startingLabel > 1) {
             pageLabelNumber += startingLabel - 1;

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.FileNameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -142,10 +143,11 @@ public class TseService {
             String applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
                             application.getType());
             String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(applicationDoc);
-
-            application.getDocumentUpload().setDocumentFilename("Application %s - %s - Attachment.pdf".formatted(
+            String extension = FileNameUtils.getExtension(application.getDocumentUpload().getDocumentFilename());
+            application.getDocumentUpload().setDocumentFilename("Application %s - %s - Attachment.%s".formatted(
                     application.getNumber(),
-                    applicationDoc
+                    applicationDoc,
+                    extension
             ));
 
             caseData.getDocumentCollection().add(DocumentHelper.createDocumentTypeItemFromTopLevel(

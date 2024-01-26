@@ -289,6 +289,6 @@ public final class TseHelper {
     }
 
     private static String hasSupportingDocs(ListTypeItem<DocumentType> supportDocList) {
-        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+        return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 }

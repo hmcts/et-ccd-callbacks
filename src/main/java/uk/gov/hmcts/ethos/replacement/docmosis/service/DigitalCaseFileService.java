@@ -1,54 +1,49 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.et.common.model.bundle.BundleCreateResponse;
+import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
+import uk.gov.hmcts.et.common.model.bundle.BundleDocument;
+import uk.gov.hmcts.et.common.model.bundle.BundleDocumentDetails;
+import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RequiredArgsConstructor
 @Service
 public class DigitalCaseFileService {
-
-    private final BundleApiClient bundleApiClient;
     private final AuthTokenGenerator authTokenGenerator;
+    private final BundleApiClient bundleApiClient;
+    private static final String DOCUMENT_INDEX_NAME = "%s - %s - %s";
 
     @Value("${em-ccd-orchestrator.config.default}")
     private String defaultBundle;
 
-    public List<Bundle> createCaseFileRequest(CaseDetails caseDetails, String userToken) {
-        setBundleConfig(caseDetails.getCaseData());
-        BundleCreateResponse bundleCreateResponse = createBundle(userToken, authTokenGenerator.generate(),
-                bundleRequestMapper(caseDetails));
-        setCustomBundleValues(caseDetails, bundleCreateResponse);
-        return bundleCreateResponse.getData().getCaseBundles();
-    }
-
-    private static void setCustomBundleValues(CaseDetails caseDetails, BundleCreateResponse bundleCreateResponse) {
-        for (Bundle bundle : bundleCreateResponse.getData().getCaseBundles()) {
-            bundle.value().setEligibleForStitching(YES);
-            bundle.value().setFileName(
-                    caseDetails.getCaseData().getEthosCaseReference().replace("/", "-") + "-DCF");
-        }
-    }
-
-    private BundleCreateResponse createBundle(String authorization, String serviceAuthorization,
-                                              BundleCreateRequest bundleCreateRequest) {
-        return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
+    public List<Bundle> createCaseFileRequest(CaseData caseData) {
+        setBundleConfig(caseData);
+        return createBundleData(caseData);
     }
 
     public List<Bundle> stitchCaseFile(CaseDetails caseDetails, String userToken) {
         setBundleConfig(caseDetails.getCaseData());
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getCaseBundles())) {
+            caseDetails.getCaseData().setCaseBundles(createBundleData(caseDetails.getCaseData()));
+        }
         BundleCreateResponse bundleCreateResponse = stitchCaseFile(userToken, authTokenGenerator.generate(),
                 bundleRequestMapper(caseDetails));
         return bundleCreateResponse.getData().getCaseBundles();
@@ -74,6 +69,50 @@ public class DigitalCaseFileService {
         if (isNullOrEmpty(caseData.getBundleConfiguration())) {
             caseData.setBundleConfiguration(defaultBundle);
         }
+    }
+
+    private List<Bundle> createBundleData(CaseData caseData) {
+        Bundle bundle = Bundle.builder()
+                .value(createBundleDetails(caseData))
+                .build();
+        return List.of(bundle);
+    }
+
+    private BundleDetails createBundleDetails(CaseData caseData) {
+        List<BundleDocumentDetails> caseDocs = getDocsForDcf(caseData);
+        List<BundleDocument> bundleDocuments = caseDocs.stream()
+                .map(bundleDocumentDetails -> BundleDocument.builder()
+                        .value(bundleDocumentDetails)
+                        .build())
+                .toList();
+
+        return BundleDetails.builder()
+                .id(UUID.randomUUID().toString())
+                .title("ET - DCF")
+                .eligibleForStitching(YES)
+                .eligibleForCloning(NO)
+                .fileName(caseData.getEthosCaseReference().replace("/", "-") + "-DCF")
+                .hasTableOfContents(YES)
+                .pageNumberFormat("numberOfPages")
+                .documents(bundleDocuments)
+                .build();
+    }
+
+    private List<BundleDocumentDetails> getDocsForDcf(CaseData caseData) {
+        return caseData.getDocumentCollection().stream()
+                .map(GenericTypeItem::getValue)
+                .filter(doc -> doc.getUploadedDocument() != null && (CollectionUtils.isEmpty(
+                        doc.getExcludeFromDcf()) || !YES.equals(doc.getExcludeFromDcf().get(0))))
+                .map(doc -> BundleDocumentDetails.builder()
+                        .name(DOCUMENT_INDEX_NAME.formatted(doc.getDocNumber(), doc.getDocumentType(),
+                                doc.getUploadedDocument().getDocumentFilename()))
+                        .sourceDocument(DocumentLink.builder()
+                                .documentUrl(doc.getUploadedDocument().getDocumentUrl())
+                                .documentBinaryUrl(doc.getUploadedDocument().getDocumentBinaryUrl())
+                                .documentFilename(doc.getUploadedDocument().getDocumentFilename())
+                                .build())
+                        .build())
+                .toList();
     }
 }
 

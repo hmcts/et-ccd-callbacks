@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
@@ -57,13 +56,12 @@ public class DigitalCaseFileController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         // Convert doc type from legacy to new before bundling
-        UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseDetails.getCaseData());
-        UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseDetails.getCaseData());
-        caseDetails.getCaseData().setCaseBundles(null);
-        caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseDetails, userToken));
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+        UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
+        UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
+        caseData.setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseData));
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(path = "/aboutToSubmit", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)

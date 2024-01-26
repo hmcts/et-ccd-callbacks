@@ -267,7 +267,7 @@ class HearingDetailServiceTest {
     private HearingSelectionService mockHearingSelectionService() {
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
             "Hearing ");
-        when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
+        when(hearingSelectionService.getHearingDetailsSelection(isA(CaseData.class))).thenReturn(hearings);
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId(UUID.randomUUID().toString());
         dateListedTypeItem.setValue(selectedListing);

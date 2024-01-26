@@ -148,7 +148,7 @@ public class TseAdmReplyService {
         }
 
         if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
-            applicationType.setRespondCollection(new ListTypeItem<TseRespondType>());
+            applicationType.setRespondCollection(new ListTypeItem<>());
 
         }
 

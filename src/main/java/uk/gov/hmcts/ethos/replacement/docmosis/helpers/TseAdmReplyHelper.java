@@ -111,7 +111,7 @@ public final class TseAdmReplyHelper {
     private static List<TypeItem<DocumentType>> getUploadedDocList(
             ListTypeItem<DocumentType> docTypeList) {
         if (docTypeList == null) {
-            return new ListTypeItem<DocumentType>();
+            return new ListTypeItem<>();
         }
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
     }

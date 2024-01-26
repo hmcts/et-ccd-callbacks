@@ -69,7 +69,7 @@ public class TseService {
 
     public void createApplication(CaseData caseData, boolean isClaimant) {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
-            caseData.setGenericTseApplicationCollection(new ListTypeItem<GenericTseApplicationType>());
+            caseData.setGenericTseApplicationCollection(new ListTypeItem<>());
         }
 
         GenericTseApplicationType application = new GenericTseApplicationType();
@@ -86,7 +86,7 @@ public class TseService {
             addRespondentData(caseData, application);
         }
 
-        TypeItem<GenericTseApplicationType> tseApplicationTypeItem = new TypeItem<GenericTseApplicationType>();
+        TypeItem<GenericTseApplicationType> tseApplicationTypeItem = new TypeItem<>();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());
         tseApplicationTypeItem.setValue(application);
 

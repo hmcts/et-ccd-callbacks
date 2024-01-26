@@ -15,7 +15,7 @@ public final class DocumentUtil {
     public static ListTypeItem<DocumentType> generateUploadedDocumentListFromDocumentList(
             ListTypeItem<DocumentType> documentList) {
 
-        ListTypeItem<DocumentType> uploadedDocumentList = new ListTypeItem<DocumentType>();
+        ListTypeItem<DocumentType> uploadedDocumentList = new ListTypeItem<>();
         documentList.forEach(doc -> {
             TypeItem<DocumentType> genTypeItems = new TypeItem<>();
             DocumentType docType = new DocumentType();

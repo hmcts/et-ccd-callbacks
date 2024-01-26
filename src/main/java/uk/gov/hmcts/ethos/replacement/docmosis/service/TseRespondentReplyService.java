@@ -174,7 +174,7 @@ public class TseRespondentReplyService {
         GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
 
         if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            genericTseApplicationType.setRespondCollection(new ListTypeItem<TseRespondType>());
+            genericTseApplicationType.setRespondCollection(new ListTypeItem<>());
         }
         List<TypeItem<TseRespondType>> respondCollection = genericTseApplicationType.getRespondCollection();
 

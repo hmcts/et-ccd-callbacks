@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -278,7 +277,7 @@ public class RespondentTellSomethingElseService {
 
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(genericApplicationList)) {
+        if (isEmpty(genericApplicationList)) {
             return EMPTY_TABLE_MESSAGE;
         }
 

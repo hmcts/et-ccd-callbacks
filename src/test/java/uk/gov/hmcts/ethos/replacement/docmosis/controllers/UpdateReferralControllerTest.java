@@ -159,6 +159,34 @@ class UpdateReferralControllerTest {
     }
 
     @Test
+    void aboutToSubmitNoUpdateReferentEmailAddress_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId(UUID.randomUUID().toString());
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("respondent Name");
+        respondentSumTypeItem.setValue(respondentSumType);
+        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(
+                List.of(respondentSumTypeItem));
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setUpdateIsUrgent("Yes");
+        caseData.setUpdateReferentEmail("");
+        caseData.setUpdateReferralSubject("subject");
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
+        when(emailService.getExuiCaseLink(any())).thenReturn("dummyLink");
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
     void referralStatusNotCorrect() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();

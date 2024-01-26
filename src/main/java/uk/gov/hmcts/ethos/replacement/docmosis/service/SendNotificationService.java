@@ -67,10 +67,10 @@ public class SendNotificationService {
     private String claimantSendNotificationHearingOtherTemplateId;
     @Value("${template.respondentSendNotificationHearingOther}")
     private String respondentSendNotificationHearingOtherTemplateId;
-    @Value("${template.bundles.claimantSubmittedNotificationForClaimant}")
+    @Value("${template.bundles.respondentSubmittedNotificationForClaimant}")
     private String bundlesSubmittedNotificationForClaimantTemplateId;
-    @Value("${template.bundles.claimantSubmittedNotificationForRespondent}")
-    private String bundlesSubmittedNotificationForRespondentTemplateId;
+    @Value("${template.bundles.respondentSubmittedNotificationForTribunal}")
+    private String bundlesSubmittedNotificationForTribunalTemplateId;
 
     private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";
 
@@ -318,7 +318,7 @@ public class SendNotificationService {
         );
         emailData.remove(LINK_TO_CITIZEN_HUB);
         emailData.put(EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseId));
-        emailService.sendEmail(bundlesSubmittedNotificationForRespondentTemplateId,
+        emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData
         );

@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicLetters;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
@@ -169,7 +170,8 @@ public class DocumentGenerationController {
             documentGenerationService.updateBfActions(documentInfo, caseDetails.getCaseData());
             caseDetails.getCaseData().setDocMarkUp(documentInfo.getMarkUp());
             documentGenerationService.clearUserChoices(caseDetails);
-
+            UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseDetails.getCaseData());
+            UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseDetails.getCaseData());
             SignificantItem significantItem = Helper.generateSignificantItem(documentInfo, errors);
 
             if (errors.isEmpty()) {

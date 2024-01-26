@@ -109,10 +109,10 @@ template:
     noResponse: d2caad87-2bab-4bc0-b598-01f1a7341f9e
 
   bundles:
-    claimantSubmittedNotificationForClaimant:
+    respondentSubmittedNotificationForClaimant:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
-    claimantSubmittedNotificationForRespondent:
-      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+    respondentSubmittedNotificationForTribunal:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
 
   claimantSendNotificationHearingOther: ${CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
 
@@ -146,3 +146,7 @@ launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   env: ${LAUNCH_DARKLY_ENV:default}
 
+cron:
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
+  caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}

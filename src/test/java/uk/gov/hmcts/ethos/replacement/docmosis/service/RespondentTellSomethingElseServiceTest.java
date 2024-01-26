@@ -553,6 +553,7 @@ class RespondentTellSomethingElseServiceTest {
         DocumentType actualDocumentType = documentCollection.get(0).getValue();
 
         assertThat(documentCollection.size(), is(1));
+        System.out.println(actualDocumentType);
         assertEquals(selectedApplication, actualDocumentType.getShortDescription());
 
     }
@@ -778,7 +779,7 @@ class RespondentTellSomethingElseServiceTest {
                 .topLevelDocuments(CASE_MANAGEMENT)
                 .caseManagementDocuments(APP_TO_AMEND_RESPONSE)
                 .documentType(APP_TO_AMEND_RESPONSE)
-                .dateOfCorrespondence(LocalDate.now().toString()).build();
+                .build();
 
         Assertions.assertThat(documentCollection).hasSize(1);
         Assertions.assertThat(actual).isEqualTo(expected);

@@ -1009,27 +1009,6 @@ public final class DocumentHelper {
     }
 
     /**
-     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
-     * @param uploadedDocumentType UploadedDocumentType to be added
-     * @param topLevel top level document
-     * @param secondLevel second level document
-     * @return DocumentTypeItem
-     */
-    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
-                                                          String topLevel,
-                                                          String secondLevel,
-                                                          String shortDescription) {
-        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
-        DocumentType documentType = documentTypeItem.getValue();
-        documentType.setShortDescription(shortDescription);
-        documentType.setDateOfCorrespondence(LocalDate.now().toString());
-        documentType.setTopLevelDocuments(topLevel);
-        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
-        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
-        return documentTypeItem;
-    }
-
-    /**
      *  Filter documents that only the legal rep should be able to see.
      */
     public static void setLegalRepVisibleDocuments(CaseData caseData) {

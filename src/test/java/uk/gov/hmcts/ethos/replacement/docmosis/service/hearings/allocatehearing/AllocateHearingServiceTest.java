@@ -235,6 +235,7 @@ class AllocateHearingServiceTest {
         HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
             "Hearing ");
+        when(hearingSelectionService.getHearingDetailsSelection(isA(CaseData.class))).thenReturn(hearings);
 
         when(hearingSelectionService.getSelectedHearingAllocateHearing(isA(CaseData.class)))
                 .thenReturn(selectedHearing);

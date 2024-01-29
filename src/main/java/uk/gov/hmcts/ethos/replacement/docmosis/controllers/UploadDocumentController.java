@@ -51,6 +51,31 @@ public class UploadDocumentController {
         this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
     }
 
+    @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Convert's the legacy style of docs into the new doc naming system")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
     /**
      * Called at the end of Upload Document event, conditionally sends an email if the case is rejected and a
      * rejection document has been uploaded.
@@ -80,6 +105,8 @@ public class UploadDocumentController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
+
+        UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
         caseManagementForCaseWorkerService.addClaimantDocuments(caseData);
         if (UploadDocumentHelper.shouldSendRejectionEmail(caseDetails)) {
             String citizenCaseLink = emailService.getCitizenCaseLink(caseDetails.getCaseId());

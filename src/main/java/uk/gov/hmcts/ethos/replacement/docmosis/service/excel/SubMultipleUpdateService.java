@@ -119,10 +119,12 @@ public class SubMultipleUpdateService {
         multipleDetails.getCaseData().setSubMultipleCollection(
                 multipleDetails.getCaseData().getSubMultipleCollection().stream()
                         .map(subMultipleTypeItem ->
-                                !subMultipleTypeItem.getValue().getSubMultipleName().equals(existingSubMultipleName)
-                                        ? subMultipleTypeItem
-                                        : updateSubMultipleName(subMultipleTypeItem, newSubMultipleName))
-                        .toList());
+                                subMultipleTypeItem.getValue().getSubMultipleName().equals(existingSubMultipleName)
+                                        ? updateSubMultipleName(subMultipleTypeItem, newSubMultipleName)
+                                        : subMultipleTypeItem
+                        )
+                        .toList()
+        );
 
         log.info("Generating the multiple object list with the new sub multiple name updated");
 

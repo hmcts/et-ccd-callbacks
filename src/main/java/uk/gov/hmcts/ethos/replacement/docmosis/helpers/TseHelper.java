@@ -322,11 +322,12 @@ public final class TseHelper {
             documentType.setShortDescription(defaultIfEmpty(document.getValue().getShortDescription(), ""));
             UploadedDocumentType uploadedDocument = new UploadedDocumentType();
             documentType.setUploadedDocument(uploadedDocument);
-            documentType.getUploadedDocument().setDocumentBinaryUrl(
-                    document.getValue().getUploadedDocument().getDocumentFilename()
+            documentType.setTornadoEmbeddedPdfUrl(document.getValue().getUploadedDocument().getDocumentFilename()
                     + "|" + getDownloadableDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl(),
-                            ccdGatewayBaseUrl)
-            );
+                    ccdGatewayBaseUrl));
+            documentType.getUploadedDocument().setDocumentBinaryUrl(
+                    getDownloadableDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl(),
+                    ccdGatewayBaseUrl));
             documents.add(documentType);
         }
 

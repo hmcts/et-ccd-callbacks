@@ -18,17 +18,15 @@ public final class DocumentUtil {
 
         List<GenericTypeItem<DocumentType>> uploadedDocumentList = new ArrayList<>();
         documentList.forEach(doc -> {
-            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
             DocumentType docType = new DocumentType();
             docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-
+            docType.setTornadoEmbeddedPdfUrl(doc.getValue().getUploadedDocument().getDocumentFilename()
+                    + "|" + getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
+                    ccdGatewayBaseUrl));
             docType.getUploadedDocument().setDocumentBinaryUrl(
-                    doc.getValue().getUploadedDocument().getDocumentFilename()
-                            + "|"
-                            + getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
-                            ccdGatewayBaseUrl)
-            );
-
+                    getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
+                    ccdGatewayBaseUrl));
+            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
             genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
             genTypeItems.setValue(docType);
             uploadedDocumentList.add(genTypeItems);

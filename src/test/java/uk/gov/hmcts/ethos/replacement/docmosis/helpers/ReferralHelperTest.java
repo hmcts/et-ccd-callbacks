@@ -178,7 +178,7 @@ class ReferralHelperTest {
                 + "responseClaimDocuments=null, initialConsiderationDocuments=null, caseManagementDocuments=null, "
                 + "withdrawalSettledDocuments=null, hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
                 + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null"
-                + ", docNumber=null)), GenericTypeItem(id=2, "
+                + ", docNumber=null, tornadoEmbeddedPdfUrl=null)), GenericTypeItem(id=2, "
                 + "value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType("
                 + "documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl=null, "
                 + "categoryId=null, uploadTimestamp=null), "
@@ -186,7 +186,7 @@ class ReferralHelperTest {
                 + "startingClaimDocuments=null, responseClaimDocuments=null, initialConsiderationDocuments=null, "
                 + "caseManagementDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, j"
                 + "udgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
-                + "documentType=null, dateOfCorrespondence=null, docNumber=null))], "
+                + "documentType=null, dateOfCorrespondence=null, docNumber=null, tornadoEmbeddedPdfUrl=null))], "
                 + "referralInstruction=Custom instructions for judge, "
                 + "referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
@@ -487,32 +487,28 @@ class ReferralHelperTest {
         setReferralReplyData();
         caseData.setReferentEmail("info@test.com");
 
-        String expectedDocumentSummaryNew = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
-            + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
-            + "\"caseNumber\":null,\"referralDate\":\"" + Helper.getCurrentDate()
-            + "\",\"referredBy\":null,\"referCaseTo\":null,"
-            + "\"referentEmail\":\"info@test.com\",\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
-            + "\"referralSubject\":null,\"referralDetails\":null,"
-            + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
-            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
-            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\""
-            + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
-            + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
-            + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null,\"docNumber\":null}},"
-            + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
-            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
-            + ":null},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
-            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
-            + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
-            + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null}}],\"referralInstruction\":null,"
-            + "\"referralReplyCollection\":null}}";
+        String expectedDocumentSummaryNew = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067.docx\","
+                + "\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
+                + "\"caseNumber\":null,\"referralDate\":\"30 Jan 2024\",\"referredBy\":null,\"referCaseTo\":null,"
+                + "\"referentEmail\":\"info@test.com\",\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
+                + "\"referralSubject\":null,\"referralDetails\":null,\"referralDocument\":[{\"id\":\"1\",\"value\""
+                + ":{\"typeOfDocument\":null,\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
+                + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+                + "\"upload_timestamp\":null},\"ownerDocument\":null,\"creationDate\":null,\"shortDescription\":null,"
+                + "\"topLevelDocuments\":null,\"startingClaimDocuments\":null,\"responseClaimDocuments\":null,"
+                + "\"initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,"
+                + "\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments"
+                + "\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,"
+                + "\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null}},{\"id\":\"2\","
+                + "\"value\":{\"typeOfDocument\":null,\"uploadedDocument\":{\"document_binary_url\":"
+                + "\"binaryUrl/documents/\",\"document_filename\":\"testFileName\",\"document_url\":null,"
+                + "\"category_id\":null,\"upload_timestamp\":null},\"ownerDocument\":null,\"creationDate\":null,"
+                + "\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":null,"
+                + "\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
+                + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\""
+                + ":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,"
+                + "\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null}}],"
+                + "\"referralInstruction\":null,\"referralReplyCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryNew, result);
@@ -552,10 +548,10 @@ class ReferralHelperTest {
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,"
             + "\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null}}],\"replyGeneralNotes\":"
-            + "\"replyNotes\",\"replyBy\":"
-            + "\"replyBy\",\"replyDate\":\"" + replyDate + "\",\"replyDateTime\":\"" + replyDateTime + "\","
-            + "\"referralSubject\":\"Other\",\"referralNumber\":\"1\"}}]}}";
+            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null}}]"
+            + ",\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":\"replyBy\",\"replyDate\":\"" + replyDate + "\""
+            + ",\"replyDateTime\":\"" + replyDateTime + "\",\"referralSubject\":\"Other\",\"referralNumber\""
+            + ":\"1\"}}]}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);

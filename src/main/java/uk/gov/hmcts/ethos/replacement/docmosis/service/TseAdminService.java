@@ -14,7 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
@@ -86,7 +86,7 @@ public class TseAdminService {
             applicationType.setAdminDecision(new ListTypeItem<>());
         }
 
-        TseAdminRecordDecisionType decision = TseAdminRecordDecisionType.builder()
+        TseAdminRecordDecision decision = TseAdminRecordDecision.builder()
             .date(UtilHelper.formatCurrentDate(LocalDate.now()))
             .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
             .decision(caseData.getTseAdminDecision())
@@ -102,7 +102,7 @@ public class TseAdminService {
             .build();
 
         applicationType.getAdminDecision().add(
-            TypeItem.<TseAdminRecordDecisionType>builder()
+            TypeItem.<TseAdminRecordDecision>builder()
                 .id(UUID.randomUUID().toString())
                 .value(decision)
                 .build()

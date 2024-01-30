@@ -17,7 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
@@ -108,7 +108,7 @@ class RespondNotificationServiceTest {
         DynamicValueType dynamicValueType = DynamicValueType.create(uuid, "sendNotification");
         caseData.setSelectNotificationDropdown(DynamicFixedListType.of(dynamicValueType));
 
-        SendNotificationType notificationType = new SendNotificationType();
+        SendNotification notificationType = new SendNotification();
         notificationType.setSendNotificationTitle("test");
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(uuid);
@@ -157,7 +157,7 @@ class RespondNotificationServiceTest {
         DynamicValueType dynamicValueType = DynamicValueType.create(uuid, "sendNotification");
         caseData.setSelectNotificationDropdown(DynamicFixedListType.of(dynamicValueType));
 
-        SendNotificationType notificationType = new SendNotificationType();
+        SendNotification notificationType = new SendNotification();
         notificationType.setSendNotificationTitle("test");
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(uuid);
@@ -191,7 +191,7 @@ class RespondNotificationServiceTest {
 
     @Test
     void testGetRespondNotificationMarkdownRequiredFields() {
-        SendNotificationType notificationType = new SendNotificationType();
+        SendNotification notificationType = new SendNotification();
         notificationType.setDate("01-JAN-1970");
         notificationType.setSendNotificationTitle("title");
         notificationType.setSendNotificationLetter("no");
@@ -258,7 +258,7 @@ class RespondNotificationServiceTest {
         var respondNotificationTypeItemList = new ListTypeItem<RespondNotificationType>();
         respondNotificationTypeItemList.add(respondNotificationTypeItem);
 
-        SendNotificationType notificationType = new SendNotificationType();
+        SendNotification notificationType = new SendNotification();
         notificationType.setRespondNotificationTypeCollection(respondNotificationTypeItemList);
         notificationType.setDate("01-JAN-1970");
         notificationType.setSendNotificationTitle("title");
@@ -320,7 +320,7 @@ class RespondNotificationServiceTest {
         documentTypeItem.setValue(createDocument("TEST2.DOC", "TEST DOC"));
         documentTypeItems.add(documentTypeItem);
 
-        SendNotificationType notificationType = new SendNotificationType();
+        SendNotification notificationType = new SendNotification();
         notificationType.setDate("01-JAN-1970");
         notificationType.setSendNotificationTitle("title");
         notificationType.setSendNotificationLetter("no");
@@ -407,7 +407,7 @@ class RespondNotificationServiceTest {
         caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
         caseData.setRespondNotificationResponseRequired(NO);
         caseDetails.setCaseData(caseData);
-        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        SendNotification sendNotification = SendNotification.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
         verify(emailService, times(1)).sendEmail(eq("noResponseTemplateId"),
             eq(CLAIMANT_EMAIL), any());
@@ -423,7 +423,7 @@ class RespondNotificationServiceTest {
         caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
         caseData.setRespondNotificationResponseRequired(NO);
         caseDetails.setCaseData(caseData);
-        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        SendNotification sendNotification = SendNotification.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
         verify(emailService, times(1)).sendEmail(eq("noResponseTemplateId"),
             eq(CLAIMANT_EMAIL), any());
@@ -440,7 +440,7 @@ class RespondNotificationServiceTest {
         caseData.setRespondNotificationResponseRequired(NO);
         caseData.getClaimantType().setClaimantEmailAddress(null);
         caseDetails.setCaseData(caseData);
-        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        SendNotification sendNotification = SendNotification.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
         verify(emailService, times(0)).sendEmail(eq("noResponseTemplateId"),
             eq(CLAIMANT_EMAIL), any());
@@ -456,7 +456,7 @@ class RespondNotificationServiceTest {
         caseData.setRespondNotificationPartyToNotify(RESPONDENT_ONLY);
         caseData.setRespondNotificationResponseRequired(YES);
         caseDetails.setCaseData(caseData);
-        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        SendNotification sendNotification = SendNotification.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
         verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
             eq(CLAIMANT_EMAIL), any());
@@ -473,7 +473,7 @@ class RespondNotificationServiceTest {
         caseData.setRespondNotificationResponseRequired(YES);
         caseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
         caseDetails.setCaseData(caseData);
-        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        SendNotification sendNotification = SendNotification.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
         verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
             eq(CLAIMANT_EMAIL), any());

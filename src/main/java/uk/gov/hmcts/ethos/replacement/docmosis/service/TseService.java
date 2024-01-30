@@ -10,8 +10,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
@@ -264,7 +264,7 @@ public class TseService {
      */
     public List<String[]> formatApplicationResponses(GenericTseApplicationType application, String authToken,
                                              boolean isRespondentView) {
-        ListTypeItem<TseRespondType> respondCollection = application.getRespondCollection();
+        ListTypeItem<TseRespond> respondCollection = application.getRespondCollection();
         if (isEmpty(respondCollection)) {
             return Collections.emptyList();
         }
@@ -273,7 +273,7 @@ public class TseService {
         String applicant = application.getApplicant().toLowerCase(Locale.ENGLISH);
 
         return respondCollection.stream()
-                .map(TypeItem<TseRespondType>::getValue)
+                .map(TypeItem<TseRespond>::getValue)
                 .map(o -> ADMIN.equals(o.getFrom())
                         ? formatAdminReply(o, respondCount.incrementAndReturnValue(), authToken)
                         : formatNonAdminReply(o, respondCount.incrementAndReturnValue(), applicant,
@@ -282,7 +282,7 @@ public class TseService {
             .toList();
     }
 
-    private List<String[]> getSingleDecisionMarkdown(TseAdminRecordDecisionType decision, String authToken) {
+    private List<String[]> getSingleDecisionMarkdown(TseAdminRecordDecision decision, String authToken) {
         List<String[]> rows = new ArrayList<>(List.of(
             MD_TABLE_EMPTY_LINE,
             MD_TABLE_EMPTY_LINE,
@@ -306,13 +306,13 @@ public class TseService {
     }
 
     private List<String[]> formatApplicationDecisions(GenericTseApplicationType application, String authToken) {
-        ListTypeItem<TseAdminRecordDecisionType> adminDecision = application.getAdminDecision();
+        ListTypeItem<TseAdminRecordDecision> adminDecision = application.getAdminDecision();
         if (adminDecision == null) {
             return Collections.emptyList();
         }
 
         return adminDecision.stream()
-            .sorted(Comparator.comparing((TypeItem<TseAdminRecordDecisionType> d) -> d.getValue().getDate()).reversed())
+            .sorted(Comparator.comparing((TypeItem<TseAdminRecordDecision> d) -> d.getValue().getDate()).reversed())
             .limit(2)
             .map(d -> getSingleDecisionMarkdown(d.getValue(), authToken))
             .flatMap(Collection::stream)
@@ -327,7 +327,7 @@ public class TseService {
      * @param authToken user token for getting document metadata
      * @return Two columned Markdown table detailing the admin response
      */
-    List<String[]> formatAdminReply(TseRespondType reply, int count, String authToken) {
+    List<String[]> formatAdminReply(TseRespond reply, int count, String authToken) {
         List<String[]> rows = new ArrayList<>(List.of(
                 MD_TABLE_EMPTY_LINE,
                 MD_TABLE_EMPTY_LINE,
@@ -360,7 +360,7 @@ public class TseService {
      * @param isRespondentView determines if it is the Respondent viewing the responses
      * @return Two columned Markdown table detailing the admin response
      */
-    private List<String[]> formatNonAdminReply(TseRespondType reply, int count, String applicant, String authToken,
+    private List<String[]> formatNonAdminReply(TseRespond reply, int count, String applicant, String authToken,
                                        boolean isRespondentView) {
         String from = reply.getFrom();
         String copyToOtherParty = reply.getCopyToOtherParty();

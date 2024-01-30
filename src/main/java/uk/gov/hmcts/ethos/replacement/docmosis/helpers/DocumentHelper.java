@@ -29,7 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -1034,8 +1034,8 @@ public final class DocumentHelper {
                 claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));
             }
 
-            for (TypeItem<TseRespondType> response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
-                TseRespondType respondType = response.getValue();
+            for (TypeItem<TseRespond> response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
+                TseRespond respondType = response.getValue();
                 if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
                     claimantRule92NoDocuments.addAll(
                         respondType.getSupportingMaterial().stream()

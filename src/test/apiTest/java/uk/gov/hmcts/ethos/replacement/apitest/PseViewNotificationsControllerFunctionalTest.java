@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -40,7 +40,7 @@ public class PseViewNotificationsControllerFunctionalTest extends BaseFunctional
         caseData.setSendNotificationCollection(List.of(
                 SendNotificationTypeItem.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(SendNotificationType.builder()
+                        .value(SendNotification.builder()
                                 .number("1")
                                 .date("5 Aug 2022")
                                 .sendNotificationTitle("View notice of hearing")

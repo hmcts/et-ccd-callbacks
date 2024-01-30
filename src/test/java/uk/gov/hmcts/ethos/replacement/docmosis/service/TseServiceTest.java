@@ -13,8 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 
 import java.util.List;
@@ -95,7 +95,7 @@ class TseServiceTest {
     class FormatAdminReply {
         @Test
         void withAllData() {
-            TseRespondType reply = setupAdminTseRespondType();
+            TseRespond reply = setupAdminTseRespondType();
             List<String[]> actual = tseService.formatAdminReply(reply, 1, AUTH_TOKEN);
 
             List<String[]> expected = List.of(
@@ -124,7 +124,7 @@ class TseServiceTest {
 
         @Test
         void withMissingData() {
-            TseRespondType reply = setupAdminTseRespondType();
+            TseRespond reply = setupAdminTseRespondType();
             reply.setAddDocument(null);
             reply.setRequestMadeBy(null);
             List<String[]> actual = tseService.formatAdminReply(reply, 1, AUTH_TOKEN);
@@ -230,11 +230,11 @@ class TseServiceTest {
             .applicant(RESPONDENT_TITLE)
             .number("1")
             .respondCollection(ListTypeItem.from(
-                TypeItem.<TseRespondType>builder()
+                TypeItem.<TseRespond>builder()
                     .id(UUID.randomUUID().toString())
                     .value(setupAdminTseRespondType())
                     .build(),
-                TypeItem.<TseRespondType>builder()
+                TypeItem.<TseRespond>builder()
                     .id(UUID.randomUUID().toString())
                     .value(setupNonAdminTseRespondType())
                     .build())
@@ -385,7 +385,7 @@ class TseServiceTest {
 
         @Test
         void withResponseAndDecisions() {
-            TseAdminRecordDecisionType tseAdminRecordDecisionType1 = new TseAdminRecordDecisionType();
+            TseAdminRecordDecision tseAdminRecordDecisionType1 = new TseAdminRecordDecision();
             tseAdminRecordDecisionType1.setDecision("Granted");
             tseAdminRecordDecisionType1.setDate("2023-01-01");
             tseAdminRecordDecisionType1.setTypeOfDecision("Judgment");
@@ -394,11 +394,11 @@ class TseServiceTest {
             tseAdminRecordDecisionType1.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType1.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType1.setSelectPartyNotify("Respondent");
-            TypeItem<TseAdminRecordDecisionType> decisionType1 = new TypeItem<>();
+            TypeItem<TseAdminRecordDecision> decisionType1 = new TypeItem<>();
             decisionType1.setId("1");
             decisionType1.setValue(tseAdminRecordDecisionType1);
 
-            TseAdminRecordDecisionType tseAdminRecordDecisionType2 = new TseAdminRecordDecisionType();
+            TseAdminRecordDecision tseAdminRecordDecisionType2 = new TseAdminRecordDecision();
             tseAdminRecordDecisionType2.setDecision("Granted");
             tseAdminRecordDecisionType2.setDate("2023-01-02");
             tseAdminRecordDecisionType2.setTypeOfDecision("Judgment");
@@ -407,11 +407,11 @@ class TseServiceTest {
             tseAdminRecordDecisionType2.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType2.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType2.setSelectPartyNotify("Respondent");
-            TypeItem<TseAdminRecordDecisionType> decisionType2 = new TypeItem<>();
+            TypeItem<TseAdminRecordDecision> decisionType2 = new TypeItem<>();
             decisionType2.setId("2");
             decisionType2.setValue(tseAdminRecordDecisionType2);
 
-            TseAdminRecordDecisionType tseAdminRecordDecisionType3 = new TseAdminRecordDecisionType();
+            TseAdminRecordDecision tseAdminRecordDecisionType3 = new TseAdminRecordDecision();
             tseAdminRecordDecisionType3.setDecision("Granted");
             tseAdminRecordDecisionType3.setDate("2023-01-03");
             tseAdminRecordDecisionType3.setTypeOfDecision("Judgment");
@@ -420,7 +420,7 @@ class TseServiceTest {
             tseAdminRecordDecisionType3.setDecisionMadeBy("Judge");
             tseAdminRecordDecisionType3.setDecisionMadeByFullName("John Doe");
             tseAdminRecordDecisionType3.setSelectPartyNotify("Respondent");
-            TypeItem<TseAdminRecordDecisionType> decisionType3 = new TypeItem<>();
+            TypeItem<TseAdminRecordDecision> decisionType3 = new TypeItem<>();
             decisionType3.setId("3");
             decisionType3.setValue(tseAdminRecordDecisionType3);
 
@@ -515,7 +515,7 @@ class TseServiceTest {
             .copyToOtherPartyText("Details")
             .documentUpload(DocumentFixtures.getUploadedDocumentType("application.docx"))
             .respondCollection(ListTypeItem.from(
-                TypeItem.<TseRespondType>builder()
+                TypeItem.<TseRespond>builder()
                     .id(UUID.randomUUID().toString())
                     .value(setupAdminTseRespondType())
                     .build())
@@ -532,8 +532,8 @@ class TseServiceTest {
         return ListTypeItem.from(TypeItem.from(document), TypeItem.from(documentTwo));
     }
 
-    private TseRespondType setupAdminTseRespondType() {
-        return TseRespondType.builder()
+    private TseRespond setupAdminTseRespondType() {
+        return TseRespond.builder()
             .enterResponseTitle("Title")
             .date("2000-01-01")
             .dateTime("2000-01-01T10:20:30.555")
@@ -553,8 +553,8 @@ class TseServiceTest {
             .build();
     }
 
-    private TseRespondType setupNonAdminTseRespondType() {
-        return TseRespondType.builder()
+    private TseRespond setupNonAdminTseRespondType() {
+        return TseRespond.builder()
             .date("2000-01-01")
             .dateTime("2000-01-01T10:20:30.555")
             .from(CLAIMANT_TITLE)

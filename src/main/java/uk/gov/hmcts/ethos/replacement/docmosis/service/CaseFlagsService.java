@@ -10,7 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
 
 import java.util.Arrays;
 import java.util.List;
@@ -115,9 +115,9 @@ public class CaseFlagsService {
                 .anyMatch(this::hasGrantedDecision);
     }
 
-    private boolean hasGrantedDecision(List<TypeItem<TseAdminRecordDecisionType>> list) {
+    private boolean hasGrantedDecision(List<TypeItem<TseAdminRecordDecision>> list) {
         return list.stream()
-                .map(TypeItem<TseAdminRecordDecisionType>::getValue)
+                .map(TypeItem<TseAdminRecordDecision>::getValue)
                 .filter(o -> o.getDecision() != null)
                 .anyMatch(o -> o.getDecision().startsWith(GRANTED));
     }

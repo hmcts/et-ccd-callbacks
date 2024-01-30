@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -65,10 +65,10 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()
             .setRespondCollection(ListTypeItem.from(
-                TypeItem.<TseRespondType>builder()
+                TypeItem.<TseRespond>builder()
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
                     .value(
-                        TseRespondType.builder()
+                        TseRespond.builder()
                             .from(CLAIMANT_TITLE)
                             .date("16-May-1996")
                             .dateTime("1996-05-16T10:20:30.555")

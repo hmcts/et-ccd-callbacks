@@ -24,8 +24,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
@@ -140,10 +140,10 @@ class TseAdminServiceTest {
     }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {
-        TypeItem<TseRespondType> claimantReply = TypeItem.<TseRespondType>builder()
+        TypeItem<TseRespond> claimantReply = TypeItem.<TseRespond>builder()
             .id(UUID.randomUUID().toString())
             .value(
-                TseRespondType.builder()
+                TseRespond.builder()
                     .from(CLAIMANT_TITLE)
                     .date("23 December 2022")
                     .dateTime("2022-12-23T10:20:30.555")
@@ -156,10 +156,10 @@ class TseAdminServiceTest {
                     .build()
             ).build();
 
-        TypeItem<TseRespondType> adminReply = TypeItem.<TseRespondType>builder()
+        TypeItem<TseRespond> adminReply = TypeItem.<TseRespond>builder()
             .id(UUID.randomUUID().toString())
             .value(
-                TseRespondType.builder()
+                TseRespond.builder()
                     .from(ADMIN)
                     .date("24 December 2022")
                     .dateTime("2022-12-24T10:20:30.555")
@@ -236,7 +236,7 @@ class TseAdminServiceTest {
         assertThat(app.getApplicationState())
             .isEqualTo("notViewedYet");
 
-        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
+        TseAdminRecordDecision actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -298,7 +298,7 @@ class TseAdminServiceTest {
         assertThat(app.getApplicationState())
             .isEqualTo("notViewedYet");
 
-        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
+        TseAdminRecordDecision actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -356,7 +356,7 @@ class TseAdminServiceTest {
         assertThat(app.getApplicationState())
             .isEqualTo("notViewedYet");
 
-        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
+        TseAdminRecordDecision actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));

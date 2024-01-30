@@ -10,7 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -113,7 +113,7 @@ class SendNotificationServiceTest {
     void testCreateSendNotification() {
 
         sendNotificationService.createSendNotification(caseData);
-        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotification sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
 
         assertEquals("title", sendNotificationType.getSendNotificationTitle());
         assertEquals("no", sendNotificationType.getSendNotificationLetter());
@@ -142,7 +142,7 @@ class SendNotificationServiceTest {
     void testCreateSendNotificationWhenRespondentShouldBeNotified() {
         caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
         sendNotificationService.createSendNotification(caseData);
-        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotification sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
         assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
     }
 

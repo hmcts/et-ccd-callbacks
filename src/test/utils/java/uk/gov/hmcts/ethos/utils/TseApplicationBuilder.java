@@ -2,8 +2,8 @@ package uk.gov.hmcts.ethos.utils;
 
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 // todo remove this in favor of GenericTseApplicationType's superbuilder with lombok
@@ -77,12 +77,12 @@ public class TseApplicationBuilder {
         return this;
     }
 
-    public TseApplicationBuilder withRespondCollection(ListTypeItem<TseRespondType> respondCollection) {
+    public TseApplicationBuilder withRespondCollection(ListTypeItem<TseRespond> respondCollection) {
         genericTseApplicationType.setRespondCollection(respondCollection);
         return this;
     }
 
-    public TseApplicationBuilder withDecisionCollection(ListTypeItem<TseAdminRecordDecisionType> decisionCollection) {
+    public TseApplicationBuilder withDecisionCollection(ListTypeItem<TseAdminRecordDecision> decisionCollection) {
         genericTseApplicationType.setAdminDecision(decisionCollection);
         return this;
     }

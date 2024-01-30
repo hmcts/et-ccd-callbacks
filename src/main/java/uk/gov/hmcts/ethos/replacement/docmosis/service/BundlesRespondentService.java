@@ -14,7 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingBundle;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -123,7 +123,7 @@ public class BundlesRespondentService {
     }
 
     /**
-     * Creates a HearingBundleType and adds to the Bundles collection on CaseData.
+     * Creates a HearingBundle and adds to the Bundles collection on CaseData.
      */
     public void addToBundlesCollection(CaseData caseData) {
         if (caseData.getBundlesRespondentCollection() == null) {
@@ -139,7 +139,7 @@ public class BundlesRespondentService {
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("d MMMM yyyy HH:mm");
         caseData.getBundlesRespondentCollection().add(
-            TypeItem.from(HearingBundleType.builder()
+            TypeItem.from(HearingBundle.builder()
                 .agreedDocWith(agreedDocsWith)
                 .agreedDocWithBut(caseData.getBundlesRespondentAgreedDocWithBut())
                 .agreedDocWithNo(caseData.getBundlesRespondentAgreedDocWithNo())

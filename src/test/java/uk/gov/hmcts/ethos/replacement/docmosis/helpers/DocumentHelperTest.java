@@ -19,7 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -2279,9 +2279,9 @@ class DocumentHelperTest {
                     .build())
                 .build();
 
-            ListTypeItem<TseRespondType> tseRespondTypeItems = ListTypeItem.from(
-                TypeItem.<TseRespondType>builder()
-                    .value(TseRespondType.builder()
+            ListTypeItem<TseRespond> tseRespondTypeItems = ListTypeItem.from(
+                TypeItem.<TseRespond>builder()
+                    .value(TseRespond.builder()
                         .from(CLAIMANT_TITLE)
                         .copyToOtherParty(NO)
                         .supportingMaterial(ListTypeItem.from(doc2, doc3))

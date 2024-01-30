@@ -25,7 +25,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -191,7 +191,7 @@ class TseRespondentReplyServiceTest {
 
             tseRespondentReplyService.saveReplyToApplication(caseData, false);
 
-            TseRespondType replyType = caseData.getGenericTseApplicationCollection().get(0)
+            TseRespond replyType = caseData.getGenericTseApplicationCollection().get(0)
                     .getValue().getRespondCollection().get(0).getValue();
 
             String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());

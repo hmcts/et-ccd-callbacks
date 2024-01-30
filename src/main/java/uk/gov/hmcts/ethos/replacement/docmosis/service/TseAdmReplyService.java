@@ -17,7 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
@@ -155,7 +155,7 @@ public class TseAdmReplyService {
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
         String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
 
-        TseRespondType response = TseRespondType.builder()
+        TseRespond response = TseRespond.builder()
                 .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .from(ADMIN)
                 .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
@@ -173,7 +173,7 @@ public class TseAdmReplyService {
                 .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
                 .build();
 
-        applicationType.getRespondCollection().add(TypeItem.<TseRespondType>builder()
+        applicationType.getRespondCollection().add(TypeItem.<TseRespond>builder()
                 .id(UUID.randomUUID().toString())
                 .value(response)
                 .build());

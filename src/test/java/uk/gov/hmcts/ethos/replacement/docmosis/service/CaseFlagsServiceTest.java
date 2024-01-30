@@ -11,7 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -112,8 +112,8 @@ class CaseFlagsServiceTest {
 
     @Test
     void setPrivateHearingFlag_shouldBeTruthy_whenRestrictPublicityTseApplicationIsGranted() {
-        ListTypeItem<TseAdminRecordDecisionType> granted = ListTypeItem.from(TypeItem
-                .<TseAdminRecordDecisionType>builder().value(TseAdminRecordDecisionType.builder()
+        ListTypeItem<TseAdminRecordDecision> granted = ListTypeItem.from(TypeItem
+                .<TseAdminRecordDecision>builder().value(TseAdminRecordDecision.builder()
                 .decision("Granted")
                 .build())
                 .build());
@@ -134,8 +134,8 @@ class CaseFlagsServiceTest {
 
     @Test
     void setPrivateHearingFlag_shouldBeFalsy_whenRestrictPublicityTseApplicationIsRejected() {
-        ListTypeItem<TseAdminRecordDecisionType> granted = ListTypeItem.from(TypeItem
-                .<TseAdminRecordDecisionType>builder().value(TseAdminRecordDecisionType.builder()
+        ListTypeItem<TseAdminRecordDecision> granted = ListTypeItem.from(TypeItem
+                .<TseAdminRecordDecision>builder().value(TseAdminRecordDecision.builder()
                 .decision("Refused")
                 .build())
                 .build());

@@ -3,8 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
@@ -74,7 +74,7 @@ public final class PseHelper {
      * @param sendNotificationType Target SendNotification Subject
      * @return Hearing, case management order or request Markup
      */
-    public static String formatOrdReqDetails(SendNotificationType sendNotificationType) {
+    public static String formatOrdReqDetails(SendNotification sendNotificationType) {
         List<String[]> rows = new ArrayList<>(List.of(
             new String[]{"Notification", sendNotificationType.getSendNotificationTitle()},
             new String[]{"Hearing", getSendNotificationSelectHearing(sendNotificationType)},
@@ -103,7 +103,7 @@ public final class PseHelper {
         return MarkdownHelper.createTwoColumnTable(new String[]{"View Application", ""}, rows);
     }
 
-    public static List<String[]> getSendNotificationUploadDocumentList(SendNotificationType sendNotificationType) {
+    public static List<String[]> getSendNotificationUploadDocumentList(SendNotification sendNotificationType) {
 
         if (sendNotificationType.getSendNotificationUploadDocument() == null) {
             return new ArrayList<>();
@@ -114,7 +114,7 @@ public final class PseHelper {
             .toList();
     }
 
-    private static String getSendNotificationSelectHearing(SendNotificationType sendNotificationType) {
+    private static String getSendNotificationSelectHearing(SendNotification sendNotificationType) {
         return Optional.ofNullable(sendNotificationType.getSendNotificationSelectHearing())
             .map(hearing -> hearing.getSelectedLabel())
             .orElse("");
@@ -125,7 +125,7 @@ public final class PseHelper {
      * @param sendNotificationType Send Notification Type with Response(s)
      * @return Response(s) Markup
      */
-    public static String formatRespondDetails(SendNotificationType sendNotificationType) {
+    public static String formatRespondDetails(SendNotification sendNotificationType) {
         if (CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
             return "";
         }
@@ -135,8 +135,8 @@ public final class PseHelper {
             .collect(Collectors.joining(""));
     }
 
-    private static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
-        var supportingMaterial = pseResponseType.getSupportingMaterial();
+    private static String formatClaimantReply(PseResponse pseResponse, int respondCount) {
+        var supportingMaterial = pseResponse.getSupportingMaterial();
         String supportingMaterialString = "";
         if (supportingMaterial != null) {
             supportingMaterialString = supportingMaterial.stream()
@@ -153,15 +153,15 @@ public final class PseHelper {
         return String.format(
                 CLAIMANT_REPLY_MARKUP,
                 respondCount,
-                pseResponseType.getFrom(),
-                pseResponseType.getDate(),
-                pseResponseType.getResponse(),
+                pseResponse.getFrom(),
+                pseResponse.getDate(),
+                pseResponse.getResponse(),
                 supportingMaterialString,
-                pseResponseType.getCopyToOtherParty(),
-                NO.equals(pseResponseType.getCopyToOtherParty())
+                pseResponse.getCopyToOtherParty(),
+                NO.equals(pseResponse.getCopyToOtherParty())
                         ? String.format(
                         RULE92_DETAILS_MARKUP,
-                        pseResponseType.getCopyNoGiveDetails())
+                        pseResponse.getCopyNoGiveDetails())
                         : ""
         );
     }

@@ -28,7 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
@@ -290,7 +290,7 @@ class TseAdmReplyServiceTest {
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
-        TseRespondType actual =
+        TseRespond actual =
             caseData.getGenericTseApplicationCollection().get(0).getValue()
                 .getRespondCollection().get(0).getValue();
 
@@ -391,7 +391,7 @@ class TseAdmReplyServiceTest {
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
-        TseRespondType actual =
+        TseRespond actual =
             caseData.getGenericTseApplicationCollection().get(0).getValue()
                 .getRespondCollection().get(0).getValue();
 
@@ -446,7 +446,7 @@ class TseAdmReplyServiceTest {
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
-        TseRespondType actual =
+        TseRespond actual =
             caseData.getGenericTseApplicationCollection().get(0).getValue()
                 .getRespondCollection().get(0).getValue();
 

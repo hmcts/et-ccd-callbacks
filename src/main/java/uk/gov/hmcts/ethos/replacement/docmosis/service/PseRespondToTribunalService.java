@@ -15,8 +15,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
@@ -107,7 +107,7 @@ public class PseRespondToTribunalService {
             || BOTH_PARTIES.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify());
     }
 
-    private boolean isNoRespondentReply(List<TypeItem<PseResponseType>> pseResponseTypeItems) {
+    private boolean isNoRespondentReply(List<TypeItem<PseResponse>> pseResponseTypeItems) {
         return CollectionUtils.isEmpty(pseResponseTypeItems)
             || pseResponseTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
     }
@@ -117,7 +117,7 @@ public class PseRespondToTribunalService {
      * @param caseData contains all the case data
      */
     public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
-        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        SendNotification sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
         return formatOrdReqDetails(sendNotificationType) + formatRespondDetails(sendNotificationType);
     }
 
@@ -141,18 +141,18 @@ public class PseRespondToTribunalService {
      * @param caseData contains all the case data
      */
     public void addRespondentResponseToJON(CaseData caseData) {
-        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
-        List<TypeItem<PseResponseType>> responses = sendNotificationType.getRespondCollection();
+        SendNotification sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        List<TypeItem<PseResponse>> responses = sendNotificationType.getRespondCollection();
         if (CollectionUtils.isEmpty(responses)) {
             sendNotificationType.setRespondCollection(new ListTypeItem<>());
             responses = sendNotificationType.getRespondCollection();
         }
 
         responses.add(
-            TypeItem.<PseResponseType>builder()
+            TypeItem.<PseResponse>builder()
                 .id(UUID.randomUUID().toString())
                 .value(
-                    PseResponseType.builder()
+                    PseResponse.builder()
                         .from(RESPONDENT_TITLE)
                         .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                         .response(caseData.getPseRespondentOrdReqResponseText())
@@ -193,7 +193,7 @@ public class PseRespondToTribunalService {
 
     private Map<String, String> buildPersonalisationNo(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        SendNotification sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
@@ -203,7 +203,7 @@ public class PseRespondToTribunalService {
         );
     }
 
-    private String getHearingDate(CaseData caseData, SendNotificationType sendNotificationType) {
+    private String getHearingDate(CaseData caseData, SendNotification sendNotificationType) {
         if (sendNotificationType.getSendNotificationSelectHearing() == null) {
             return "";
         }
@@ -270,7 +270,7 @@ public class PseRespondToTribunalService {
 
     private Map<String, String> buildPersonalisationAdmin(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        SendNotification sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 APPLICATION, sendNotificationType.getSendNotificationTitle(),
@@ -300,14 +300,14 @@ public class PseRespondToTribunalService {
      * @return Submitted Body String
      */
     public String getSubmittedBody(CaseData caseData) {
-        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        SendNotification sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
         if (sendNotificationType == null || CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
             return SUBMITTED_BODY;
         }
 
-        List<TypeItem<PseResponseType>> respondCollection = sendNotificationType.getRespondCollection();
+        List<TypeItem<PseResponse>> respondCollection = sendNotificationType.getRespondCollection();
 
-        PseResponseType response = respondCollection.get(respondCollection.size() - 1).getValue();
+        PseResponse response = respondCollection.get(respondCollection.size() - 1).getValue();
         return String.format(SUBMITTED_BODY, YES.equals(response.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : "");
     }
 

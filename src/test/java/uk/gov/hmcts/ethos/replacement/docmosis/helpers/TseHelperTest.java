@@ -20,7 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -142,9 +142,9 @@ class TseHelperTest {
     @Test
     void populateSelectApplicationDropdown_withRespondentReply_returnsNothing() {
         caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondCollection(ListTypeItem.from(TypeItem.<TseRespondType>builder()
+            .setRespondCollection(ListTypeItem.from(TypeItem.<TseRespond>builder()
                 .id(UUID.randomUUID().toString())
-                .value(TseRespondType.builder()
+                .value(TseRespond.builder()
                     .from(RESPONDENT_TITLE)
                     .build())
                 .build()));

@@ -12,7 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -106,10 +106,10 @@ class TseAdmCloseServiceTest {
     }
 
     private static GenericTseApplicationType getTseAppType() {
-        TypeItem<TseAdminRecordDecisionType> recordDecisionTypeItem = TypeItem.<TseAdminRecordDecisionType>builder()
+        TypeItem<TseAdminRecordDecision> recordDecisionTypeItem = TypeItem.<TseAdminRecordDecision>builder()
             .id(UUID.randomUUID().toString())
             .value(
-                TseAdminRecordDecisionType.builder()
+                TseAdminRecordDecision.builder()
                     .date("23 December 2022")
                     .enterNotificationTitle("Response Details")
                     .decision("decision")

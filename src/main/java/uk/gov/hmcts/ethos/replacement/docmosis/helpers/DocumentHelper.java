@@ -74,6 +74,7 @@ public final class DocumentHelper {
     public static final String HEARING_TIME = "\"Hearing_time\":\"";
     public static final String HEARING_DATE_TIME = "\"Hearing_date_time\":\"";
     public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
+    private static final int INITIAL_OFFSET = 1;
 
     private DocumentHelper() {
     }
@@ -779,10 +780,10 @@ public final class DocumentHelper {
     }
 
     private static int getPageLabelNumber(int startingLabel, int currentNumber) {
-        int pageLabelNumber = currentNumber + 1;
+        int pageLabelNumber = currentNumber + INITIAL_OFFSET;
 
         if (startingLabel > 1) {
-            pageLabelNumber += startingLabel - 1;
+            pageLabelNumber += startingLabel - INITIAL_OFFSET;
         }
 
         if (pageLabelNumber > ADDRESS_LABELS_PAGE_SIZE) {

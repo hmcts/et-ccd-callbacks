@@ -10,6 +10,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 public class DigitalCaseFileHelper {
 
     private DigitalCaseFileHelper() {
@@ -21,7 +23,8 @@ public class DigitalCaseFileHelper {
      * @param caseData data
      */
     public static void addDcfToDocumentCollection(CaseData caseData) {
-        Optional<Bundle> stitchedFile = caseData.getCaseBundles().stream()
+        Optional<Bundle> stitchedFile = emptyIfNull(caseData.getCaseBundles())
+                .stream()
                 .filter(bundle -> bundle.value().getStitchedDocument() != null)
                 .findFirst();
         if (stitchedFile.isEmpty()) {

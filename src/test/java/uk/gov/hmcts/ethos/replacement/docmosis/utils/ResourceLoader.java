@@ -44,10 +44,6 @@ public final class ResourceLoader {
         return JSON_MAPPER.fromJson(json, ListingDetails.class);
     }
 
-    public static BundleCreateResponse createBundleServiceRequests() throws URISyntaxException, IOException {
-        return JSON_MAPPER.fromJson(getResource("createBundleServiceRequest.json"), BundleCreateResponse.class);
-    }
-
     public static BundleCreateResponse stitchBundleRequest() throws URISyntaxException, IOException {
         return JSON_MAPPER.fromJson(getResource("stitchBundleRequest.json"), BundleCreateResponse.class);
     }

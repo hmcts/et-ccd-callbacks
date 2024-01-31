@@ -39,8 +39,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHM
 class DigitalCaseFileControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String SELECT_BUNDLE_URL = "/bundle/selectBundle";
-    private static final String ABOUT_TO_SUBMIT_URL = "/bundle/aboutToSubmit";
+    private static final String SELECT_BUNDLE_URL = "/dcf/selectDcf";
+    private static final String ABOUT_TO_SUBMIT_URL = "/dcf/aboutToSubmit";
 
     @MockBean
     private BundleApiClient bundleApiClient;
@@ -57,6 +57,7 @@ class DigitalCaseFileControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("123456/2021")
                 .withClaimantIndType("First", "Last")
                 .withEthosCaseReference("123456/2021")
                 .withDocumentCollection(ET1)
@@ -69,7 +70,6 @@ class DigitalCaseFileControllerTest {
                 .withCaseId("1234")
                 .build();
 
-        caseData.setEthosCaseReference("123456/2021");
         UploadDocumentHelperTest.attachDocumentToCollection(caseData, ET1_ATTACHMENT);
 
     }
@@ -77,8 +77,6 @@ class DigitalCaseFileControllerTest {
     @Test
     void selectBundle_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(bundleApiClient.createBundleServiceRequest(anyString(), anyString(), any()))
-                .thenReturn(ResourceLoader.createBundleServiceRequests());
         mockMvc.perform(post(SELECT_BUNDLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)

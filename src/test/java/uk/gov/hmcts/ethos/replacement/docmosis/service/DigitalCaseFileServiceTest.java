@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 
 @ExtendWith(SpringExtension.class)
 class DigitalCaseFileServiceTest {
@@ -39,20 +41,19 @@ class DigitalCaseFileServiceTest {
     private DigitalCaseFileService digitalCaseFileService;
     private CaseData caseData;
     private CaseDetails caseDetails;
-    private String authToken = "Bearer token";
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
-        digitalCaseFileService = new DigitalCaseFileService(bundleApiClient, authTokenGenerator);
+        digitalCaseFileService = new DigitalCaseFileService(authTokenGenerator, bundleApiClient);
         caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
                 .withDocumentCollection(ET1)
+                .withDocumentCollection(ET1_ATTACHMENT)
                 .build();
+        caseData.getDocumentCollection().get(1).getValue().setExcludeFromDcf(List.of(YES));
         caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId("1234123412341234");
-        when(bundleApiClient.createBundleServiceRequest(any(), any(), any()))
-                .thenReturn(ResourceLoader.createBundleServiceRequests());
         when(bundleApiClient.stitchBundle(any(), any(), any()))
                 .thenReturn(ResourceLoader.stitchBundleRequest());
         when(authTokenGenerator.generate()).thenReturn("authToken");
@@ -62,13 +63,15 @@ class DigitalCaseFileServiceTest {
 
     @Test
     void createBundleRequest() {
-        caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseDetails, authToken));
-        assertNotNull(caseDetails.getCaseData().getCaseBundles());
+        caseData.setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseData));
+        assertNotNull(caseData.getCaseBundles());
+        assertEquals(1, caseData.getCaseBundles().get(0).value().getDocuments().size());
         assertEquals(YES, caseDetails.getCaseData().getCaseBundles().get(0).value().getEligibleForStitching());
     }
 
     @Test
     void stitchBundleRequest() {
+        String authToken = "Bearer token";
         caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.stitchCaseFile(caseDetails, authToken));
         assertNotNull(caseDetails.getCaseData().getCaseBundles());
         assertNotNull(caseDetails.getCaseData().getCaseBundles().get(0).value().getStitchedDocument());

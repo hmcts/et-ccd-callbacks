@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
@@ -87,6 +88,12 @@ class PseRespondentViewServiceTest {
     @Test
     void initialOrdReqDetailsTableMarkUp_withHearing() {
 
+        DocumentTypeItem documentItem = createDocumentTypeItem("My claimant hearing agenda.pdf",
+                "ca35bccd-f507-4243-9133-f6081fb0fe5e", null);
+
+        ListTypeItem<DocumentType> supportingMaterialItems = new ListTypeItem<>();
+        supportingMaterialItems.add(documentItem);
+
         TypeItem<PseResponse> pseResponseTypeItem = TypeItem.<PseResponse>builder()
             .id(UUID.randomUUID().toString())
             .value(PseResponse.builder()
@@ -94,8 +101,7 @@ class PseRespondentViewServiceTest {
                 .date("10 Aug 2022")
                 .response("Response text entered")
                 .hasSupportingMaterial(YES)
-                .supportingMaterial(List.of(createDocumentTypeItem("My claimant hearing agenda.pdf",
-                    "ca35bccd-f507-4243-9133-f6081fb0fe5e", null)))
+                .supportingMaterial(supportingMaterialItems)
                 .copyToOtherParty(YES)
                 .build())
             .build();

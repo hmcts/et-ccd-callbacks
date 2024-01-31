@@ -269,6 +269,10 @@ class PseRespondToTribunalServiceTest {
 
     @Test
     void initialOrdReqDetailsTableMarkUp_withHearing() {
+        DocumentTypeItem documentTypeItem = createDocumentTypeItem(
+                "My claimant hearing agenda.pdf", "ca35bccd-f507-4243-9133-f6081fb0fe5e");
+        ListTypeItem<DocumentType> documentTypeItems = new ListTypeItem<>();
+        documentTypeItems.add(documentTypeItem);
 
         TypeItem<PseResponse> pseResponseTypeItem = TypeItem.<PseResponse>builder()
             .id(UUID.randomUUID().toString())
@@ -277,8 +281,7 @@ class PseRespondToTribunalServiceTest {
                 .date("10 Aug 2022")
                 .response("Response text entered")
                 .hasSupportingMaterial(YES)
-                .supportingMaterial(List.of(createDocumentTypeItem("My claimant hearing agenda.pdf",
-                    "ca35bccd-f507-4243-9133-f6081fb0fe5e")))
+                .supportingMaterial(documentTypeItems)
                 .copyToOtherParty(YES)
                 .build())
             .build();

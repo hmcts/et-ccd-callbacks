@@ -142,7 +142,7 @@ public class PseRespondToTribunalService {
      */
     public void addRespondentResponseToJON(CaseData caseData) {
         SendNotification sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
-        List<TypeItem<PseResponse>> responses = sendNotificationType.getRespondCollection();
+        ListTypeItem<PseResponse> responses = sendNotificationType.getRespondCollection();
         if (CollectionUtils.isEmpty(responses)) {
             sendNotificationType.setRespondCollection(new ListTypeItem<>());
             responses = sendNotificationType.getRespondCollection();
@@ -305,7 +305,7 @@ public class PseRespondToTribunalService {
             return SUBMITTED_BODY;
         }
 
-        List<TypeItem<PseResponse>> respondCollection = sendNotificationType.getRespondCollection();
+        ListTypeItem<PseResponse> respondCollection = sendNotificationType.getRespondCollection();
 
         PseResponse response = respondCollection.get(respondCollection.size() - 1).getValue();
         return String.format(SUBMITTED_BODY, YES.equals(response.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : "");

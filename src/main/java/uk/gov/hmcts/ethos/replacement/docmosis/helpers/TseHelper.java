@@ -318,11 +318,12 @@ public final class TseHelper {
         }
         List<DocumentType> documents = new ArrayList<>();
         for (GenericTypeItem<DocumentType> document : documentList) {
-            document.getValue().setShortDescription(defaultIfEmpty(document.getValue().getShortDescription(), ""));
+            document.getValue().setShortDescription(defaultIfEmpty(document.getValue().getShortDescription(),
+                    ""));
             if (ObjectUtils.isNotEmpty(document.getValue().getUploadedDocument())) {
-                document.getValue().setTornadoEmbeddedPdfUrl(document.getValue().getUploadedDocument().getDocumentFilename()
-                        + "|" + getDownloadableDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl(),
-                        ccdGatewayBaseUrl));
+                document.getValue().setTornadoEmbeddedPdfUrl(document.getValue().getUploadedDocument()
+                        .getDocumentFilename() + "|" + getDownloadableDocumentURL(document.getValue()
+                                .getUploadedDocument().getDocumentUrl(), ccdGatewayBaseUrl));
             }
             documents.add(document.getValue());
         }

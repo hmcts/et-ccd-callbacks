@@ -248,7 +248,7 @@ class TseHelperTest {
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
         String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "",
                 "testBinaryUrl");
-        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
+        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-04696.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
             + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
             + "\"documentCollection\":[{\"id\":\"78910\","

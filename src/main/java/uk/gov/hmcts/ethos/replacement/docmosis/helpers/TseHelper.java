@@ -72,7 +72,7 @@ public final class TseHelper {
             + "afresh", "Reconsider a judgment", "Withdraw my claim");
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
-    private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
+    private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-04696.docx";
     private static final String TSE_ADMIN_DECISION_RESPONSE_REQUIRED_MESSAGE = "Yes - view document for details";
     private static final String TSE_ADMIN_DECISION_TEMPLATE_NAME = "EM-TRB-EGW-ENG-03914.docx";
     private static final String TSE_ADMIN_DECISION_OUTPUT_FILE_NAME = "%s_%s_decision.pdf";

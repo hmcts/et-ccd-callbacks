@@ -101,7 +101,7 @@ class TseAdmReplyHelperTest {
                 "testBinaryUrl");
 
         assertNotNull(actual);
-        assertThat(actual.contains("EM-TRB-EGW-ENG-000991.docx"), is(Boolean.TRUE));
+        assertThat(actual.contains("EM-TRB-EGW-ENG-000992.docx"), is(Boolean.TRUE));
     }
 
     @Test

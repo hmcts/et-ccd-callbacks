@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 
 public final class TseAdmReplyHelper {
     private static final String TSE_ADMIN_REPLY_OUTPUT_NAME = "%s Reply.pdf";
-    private static final String TSE_ADMIN_REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-000991.docx";
+    private static final String TSE_ADMIN_REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-000992.docx";
 
     private TseAdmReplyHelper() {
         // Sonar Lint: Utility classes should not have public constructors

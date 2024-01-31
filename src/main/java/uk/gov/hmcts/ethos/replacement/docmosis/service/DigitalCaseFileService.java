@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -34,11 +35,22 @@ public class DigitalCaseFileService {
     @Value("${em-ccd-orchestrator.config.default}")
     private String defaultBundle;
 
+    /**
+     * Creates a request to create a case file.
+     * @param caseData data
+     * @return list of bundles
+     */
     public List<Bundle> createCaseFileRequest(CaseData caseData) {
         setBundleConfig(caseData);
         return createBundleData(caseData);
     }
 
+    /**
+     * Creates a case file.
+     * @param caseDetails data
+     * @param userToken token
+     * @return list of bundles
+     */
     public List<Bundle> stitchCaseFile(CaseDetails caseDetails, String userToken) {
         setBundleConfig(caseDetails.getCaseData());
         if (CollectionUtils.isEmpty(caseDetails.getCaseData().getCaseBundles())) {
@@ -101,8 +113,7 @@ public class DigitalCaseFileService {
     private List<BundleDocumentDetails> getDocsForDcf(CaseData caseData) {
         return caseData.getDocumentCollection().stream()
                 .map(GenericTypeItem::getValue)
-                .filter(doc -> doc.getUploadedDocument() != null && (CollectionUtils.isEmpty(
-                        doc.getExcludeFromDcf()) || !YES.equals(doc.getExcludeFromDcf().get(0))))
+                .filter(doc -> doc.getUploadedDocument() != null && isExcludedFromDcf(doc))
                 .map(doc -> BundleDocumentDetails.builder()
                         .name(DOCUMENT_INDEX_NAME.formatted(doc.getDocNumber(), doc.getDocumentType(),
                                 doc.getUploadedDocument().getDocumentFilename()))
@@ -113,6 +124,10 @@ public class DigitalCaseFileService {
                                 .build())
                         .build())
                 .toList();
+    }
+
+    private static boolean isExcludedFromDcf(DocumentType doc) {
+        return CollectionUtils.isEmpty(doc.getExcludeFromDcf()) || !YES.equals(doc.getExcludeFromDcf().get(0));
     }
 }
 

@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/bundle")
+@RequestMapping("/dcf")
 public class DigitalCaseFileController {
 
     private final DigitalCaseFileService digitalCaseFileService;
@@ -37,8 +37,8 @@ public class DigitalCaseFileController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
-    @PostMapping(path = "/selectBundle", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
-    @Operation(description = "Create bundle")
+    @PostMapping(path = "/selectDcf", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    @Operation(description = "Select DCF configuration and documents")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -47,7 +47,7 @@ public class DigitalCaseFileController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> createBundle(@RequestBody CCDRequest ccdRequest,
+    public ResponseEntity<CCDCallbackResponse> selectDcf(@RequestBody CCDRequest ccdRequest,
                                                             @RequestHeader(value = HttpHeaders.AUTHORIZATION)
                                                             String userToken) {
 
@@ -57,7 +57,7 @@ public class DigitalCaseFileController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        // Convert doc type from legacy to new before bundling
+        // Convert doc type from legacy to new before dcf
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
         UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
         caseData.setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseData));
@@ -65,7 +65,7 @@ public class DigitalCaseFileController {
     }
 
     @PostMapping(path = "/aboutToSubmit", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
-    @Operation(description = "Stitch bundle")
+    @Operation(description = "Stitch DCF")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
                 content = {
@@ -74,7 +74,7 @@ public class DigitalCaseFileController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> stitchBundle(@RequestBody CCDRequest ccdRequest,
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(@RequestBody CCDRequest ccdRequest,
                                                             @RequestHeader(value = HttpHeaders.AUTHORIZATION)
                                                             String userToken) {
 
@@ -85,7 +85,7 @@ public class DigitalCaseFileController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setCaseBundles(digitalCaseFileService.stitchCaseFile(ccdRequest.getCaseDetails(), userToken));
-        DigitalCaseFileHelper.addBundleToDocumentCollection(caseData);
+        DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
         caseData.setCaseBundles(null);
         return getCallbackRespEntityNoErrors(caseData);
     }

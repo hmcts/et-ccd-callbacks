@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 
@@ -18,20 +19,16 @@ public final class DocumentUtil {
 
         List<GenericTypeItem<DocumentType>> uploadedDocumentList = new ArrayList<>();
         documentList.forEach(doc -> {
-            DocumentType docType = new DocumentType();
-            docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-            docType.setTornadoEmbeddedPdfUrl(doc.getValue().getUploadedDocument().getDocumentFilename()
-                    + "|" + getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
-                    ccdGatewayBaseUrl));
-            docType.getUploadedDocument().setDocumentBinaryUrl(
-                    getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
-                    ccdGatewayBaseUrl));
+            if (ObjectUtils.isNotEmpty(doc.getValue().getUploadedDocument())) {
+                doc.getValue().setTornadoEmbeddedPdfUrl(doc.getValue().getUploadedDocument().getDocumentFilename()
+                        + "|" + getDownloadableDocumentURL(doc.getValue().getUploadedDocument().getDocumentUrl(),
+                        ccdGatewayBaseUrl));
+            }
             GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
             genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
-            genTypeItems.setValue(docType);
+            genTypeItems.setValue(doc.getValue());
             uploadedDocumentList.add(genTypeItems);
         });
-
         return uploadedDocumentList;
     }
 

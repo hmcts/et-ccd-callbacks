@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseDecisionData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseDecisionDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
@@ -318,17 +318,13 @@ public final class TseHelper {
         }
         List<DocumentType> documents = new ArrayList<>();
         for (GenericTypeItem<DocumentType> document : documentList) {
-            DocumentType documentType = new DocumentType();
-            documentType.setShortDescription(defaultIfEmpty(document.getValue().getShortDescription(), ""));
-            UploadedDocumentType uploadedDocument = new UploadedDocumentType();
-            documentType.setUploadedDocument(uploadedDocument);
-            documentType.setTornadoEmbeddedPdfUrl(document.getValue().getUploadedDocument().getDocumentFilename()
-                    + "|" + getDownloadableDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl(),
-                    ccdGatewayBaseUrl));
-            documentType.getUploadedDocument().setDocumentBinaryUrl(
-                    getDownloadableDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl(),
-                    ccdGatewayBaseUrl));
-            documents.add(documentType);
+            document.getValue().setShortDescription(defaultIfEmpty(document.getValue().getShortDescription(), ""));
+            if (ObjectUtils.isNotEmpty(document.getValue().getUploadedDocument())) {
+                document.getValue().setTornadoEmbeddedPdfUrl(document.getValue().getUploadedDocument().getDocumentFilename()
+                        + "|" + getDownloadableDocumentURL(document.getValue().getUploadedDocument().getDocumentUrl(),
+                        ccdGatewayBaseUrl));
+            }
+            documents.add(document.getValue());
         }
 
         return documents;

@@ -132,7 +132,7 @@ public class DigitalCaseFileService {
         String docFileName = isNullOrEmpty(doc.getUploadedDocument().getDocumentFilename())
                 ? ""
                 : " - " + doc.getUploadedDocument().getDocumentFilename();
-        return doc.getDocNumber()  + docType + " - " + docFileName;
+        return doc.getDocNumber()  + docType + docFileName;
     }
 
     private static boolean isExcludedFromDcf(DocumentType doc) {

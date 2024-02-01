@@ -18,6 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,7 +134,11 @@ public class DigitalCaseFileService {
         String docFileName = isNullOrEmpty(doc.getUploadedDocument().getDocumentFilename())
                 ? ""
                 : " - " + doc.getUploadedDocument().getDocumentFilename();
-        return doc.getDocNumber()  + docType + docFileName;
+        String docDate = isNullOrEmpty(doc.getDateOfCorrespondence())
+                ? ""
+                : " - " + LocalDate.parse(doc.getDateOfCorrespondence())
+                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        return doc.getDocNumber()  + docType + docFileName + docDate;
     }
 
     private static boolean isExcludedFromDcf(DocumentType doc) {

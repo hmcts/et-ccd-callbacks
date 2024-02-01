@@ -50,6 +50,7 @@ class DigitalCaseFileServiceTest {
                 .withDocumentCollection(ET1)
                 .withDocumentCollection(ET1_ATTACHMENT)
                 .build();
+        caseData.getDocumentCollection().get(0).getValue().setDateOfCorrespondence("2000-01-01");
         caseData.getDocumentCollection().get(1).getValue().setExcludeFromDcf(List.of(YES));
         caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);

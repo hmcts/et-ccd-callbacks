@@ -244,9 +244,13 @@ class TseHelperTest {
             + "\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234"
             + "\",\"document_filename\":\"image.png\","
-            + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\":null},"
-            + "\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
+            + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
+            + ":null},\"ownerDocument\":null,"
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
+            + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
+            + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
+            + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
+            + "dateOfCorrespondence\":null,\"docNumber\":null}}],\"copy\":\"Yes\","
             + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));

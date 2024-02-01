@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.elasticsearch.common.Strings;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -102,7 +101,7 @@ public final class SessionDaysReport {
 
     private boolean sessionExists(String judgeName, String date, List<List<String>> sessionsList) {
         String dateFormatted = LocalDateTime.parse(date, OLD_DATE_TIME_PATTERN).toLocalDate().toString();
-        if (!Strings.isNullOrEmpty(judgeName) && !Strings.isNullOrEmpty(dateFormatted)) {
+        if (!isNullOrEmpty(judgeName) && !isNullOrEmpty(dateFormatted)) {
             List<String> judgeDate = List.of(judgeName, dateFormatted);
             if (sessionsList.contains(judgeDate)) {
                 return true;
@@ -146,7 +145,7 @@ public final class SessionDaysReport {
     private SessionDaysReportSummary2 getReportSummary2Item(
             DateListedType dateListedType, List<SessionDaysReportSummary2> sessionDaysReportSummary2List) {
         Optional<SessionDaysReportSummary2> item = sessionDaysReportSummary2List.stream()
-                .filter(i -> !Strings.isNullOrEmpty(i.getDate())
+                .filter(i -> !isNullOrEmpty(i.getDate())
                         && areDatesEqual(i.getDate(), dateListedType.getListedDate())).findFirst();
         if (item.isPresent()) {
             return item.get();
@@ -293,7 +292,7 @@ public final class SessionDaysReport {
         String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
 
         reportDetail.setHearingJudge(
-                Strings.isNullOrEmpty(judgeName)
+                isNullOrEmpty(judgeName)
                         ? "* Not Allocated" : judgeName);
         JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
         setJudgeType(judgeStatus, reportDetail);

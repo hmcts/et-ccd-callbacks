@@ -196,4 +196,7 @@ launchdarkly:
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
 
-
+cron:
+  caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
+  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}

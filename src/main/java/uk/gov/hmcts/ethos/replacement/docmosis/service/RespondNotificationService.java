@@ -29,6 +29,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.UUID.randomUUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -95,6 +97,11 @@ public class RespondNotificationService {
 
         if (YES.equals(responseRequired) && whoRespond != null && !RESPONDENT_ONLY.equals(whoRespond)) {
             respondNotificationType.setIsClaimantResponseDue(YES);
+            respondNotificationType.setState(NOT_STARTED_YET);
+            sendNotificationType.setNotificationState(NOT_STARTED_YET);
+        } else {
+            respondNotificationType.setState(NOT_VIEWED_YET);
+            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
         }
 
         GenericTypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new GenericTypeItem<>();

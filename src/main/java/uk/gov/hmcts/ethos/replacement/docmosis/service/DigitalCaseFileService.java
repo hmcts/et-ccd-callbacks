@@ -115,8 +115,7 @@ public class DigitalCaseFileService {
                 .map(GenericTypeItem::getValue)
                 .filter(doc -> doc.getUploadedDocument() != null && isExcludedFromDcf(doc))
                 .map(doc -> BundleDocumentDetails.builder()
-                        .name(DOCUMENT_INDEX_NAME.formatted(doc.getDocNumber(), doc.getDocumentType(),
-                                doc.getUploadedDocument().getDocumentFilename()))
+                        .name(getDocumentName(doc))
                         .sourceDocument(DocumentLink.builder()
                                 .documentUrl(doc.getUploadedDocument().getDocumentUrl())
                                 .documentBinaryUrl(doc.getUploadedDocument().getDocumentBinaryUrl())
@@ -124,6 +123,16 @@ public class DigitalCaseFileService {
                                 .build())
                         .build())
                 .toList();
+    }
+
+    private static String getDocumentName(DocumentType doc) {
+        String docType = isNullOrEmpty(doc.getTypeOfDocument())
+                ? ""
+                : " - " + doc.getTypeOfDocument();
+        String docFileName = isNullOrEmpty(doc.getUploadedDocument().getDocumentFilename())
+                ? ""
+                : " - " + doc.getUploadedDocument().getDocumentFilename();
+        return doc.getDocNumber()  + docType + " - " + docFileName;
     }
 
     private static boolean isExcludedFromDcf(DocumentType doc) {

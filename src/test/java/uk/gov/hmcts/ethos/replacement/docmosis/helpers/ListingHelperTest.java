@@ -1393,9 +1393,7 @@ class ListingHelperTest {
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId(UUID.randomUUID().toString());
         DateListedType dateListedType = new DateListedType();
-        if (!scotland) {
-            dateListedType.setHearingVenueDay(new DynamicFixedListType(office));
-        } else {
+        if (scotland) {
             dateListedType.setHearingVenueDayScotland(office);
             final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(office);
             switch (tribunalOffice) {
@@ -1414,6 +1412,8 @@ class ListingHelperTest {
                 default:
                     break;
             }
+        } else {
+            dateListedType.setHearingVenueDay(new DynamicFixedListType(office));
         }
         dateListedTypeItem.setValue(dateListedType);
         return dateListedTypeItem;

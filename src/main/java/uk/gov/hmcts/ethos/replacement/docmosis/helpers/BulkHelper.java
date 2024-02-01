@@ -367,16 +367,13 @@ public final class BulkHelper {
     }
 
     public static StringBuilder buildScheduleDocumentContent(BulkData bulkData, String accessKey) {
-        StringBuilder sb = new StringBuilder();
-        // Start building the instruction
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
-                .append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName())).append(FILE_EXTENSION)
-                .append(NEW_LINE).append("\"outputName\":\"").append(OUTPUT_FILE_NAME).append(NEW_LINE)
-                .append("\"data\":{\n").append("\"Multiple_No\":\"").append(bulkData.getMultipleReference())
+        return new StringBuilder().append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE)
+                .append("\"templateName\":\"").append(BulkHelper.getScheduleDocName(bulkData.getScheduleDocName()))
+                .append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"").append(OUTPUT_FILE_NAME)
+                .append(NEW_LINE).append("\"data\":{\n\"Multiple_No\":\"").append(bulkData.getMultipleReference())
                 .append(NEW_LINE).append("\"Multiple_title\":\"").append(bulkData.getBulkCaseTitle()).append(NEW_LINE)
                 .append(getDocumentData(bulkData)).append("\"Today_date\":\"")
-                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n").append("}\n").append("}\n");
-        return sb;
+                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
     }
 
     private static StringBuilder getDocumentData(BulkData bulkData) {
@@ -391,7 +388,7 @@ public final class BulkHelper {
     }
 
     private static StringBuilder getScheduleData(List<SearchTypeItem> searchTypeItems) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(25);
         sb.append("\"multiple\":[\n");
         for (int i = 0; i < searchTypeItems.size(); i++) {
             sb.append(getMultipleTypeRow(searchTypeItems.get(i).getValue()));
@@ -404,7 +401,7 @@ public final class BulkHelper {
     }
 
     private static StringBuilder getMultipleTypeRow(SearchType searchType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(220);
         sb.append("{\"Claimant\":\"").append(nullCheck(searchType.getClaimantSurnameS())).append(NEW_LINE)
                 .append("\"Current_position\":\"").append(nullCheck(searchType.getCurrentPositionS())).append(NEW_LINE)
                 .append("\"Case_No\":\"").append(nullCheck(searchType.getEthosCaseReferenceS())).append(NEW_LINE)

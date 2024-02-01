@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -256,7 +255,7 @@ public class ListingService {
     public String getSelectedOfficeForPrintLists(CaseData caseData) {
         if (caseData.getPrintHearingDetails().getListingVenue() != null) {
             return caseData.getManagingOffice();
-        } else if (!Strings.isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
+        } else if (!isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
             return caseData.getPrintHearingDetails().getListingVenueScotland();
         } else {
             throw new IllegalStateException("Unable to get selected office from "
@@ -394,9 +393,8 @@ public class ListingService {
 
     private boolean isListingDateValid(ListingData listingData, DateListedTypeItem dateListedTypeItem) {
         boolean dateRange = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        String dateListed = !isNullOrEmpty(dateListedTypeItem.getValue().getListedDate())
-                ? dateListedTypeItem.getValue().getListedDate()
-                : "";
+        String dateListed = isNullOrEmpty(dateListedTypeItem.getValue().getListedDate()) ? "" :
+                dateListedTypeItem.getValue().getListedDate();
         if (dateRange) {
             String dateToSearchFrom = listingData.getListingDateFrom();
             String dateToSearchTo = listingData.getListingDateTo();

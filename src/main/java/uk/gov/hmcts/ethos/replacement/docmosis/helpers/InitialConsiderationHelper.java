@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
@@ -11,15 +12,18 @@ import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
 import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationDocument;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
 
 @Slf4j
 public final class InitialConsiderationHelper {
@@ -187,5 +191,20 @@ public final class InitialConsiderationHelper {
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    public static void addToDocumentCollection(CaseData caseData) {
+        if (caseData.getEtInitialConsiderationDocument() == null) {
+            return;
+        }
+
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+
+        DocumentTypeItem documentTypeItem =
+                DocumentHelper.createDocumentTypeItemFromTopLevel(caseData.getEtInitialConsiderationDocument(),
+                        INITIAL_CONSIDERATION, INITIAL_CONSIDERATION, null);
+        caseData.getDocumentCollection().add(documentTypeItem);
     }
 }

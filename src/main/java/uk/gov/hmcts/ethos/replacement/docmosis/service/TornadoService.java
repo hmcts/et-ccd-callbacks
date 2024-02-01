@@ -44,6 +44,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.ET1_VETTING_OUTPUT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 
 @Slf4j
@@ -63,6 +64,7 @@ public class TornadoService {
     private final UserIdamService userIdamService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final VenueAddressReaderService venueAddressReaderService;
+    private final TseService tseService;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -237,7 +239,7 @@ public class TornadoService {
     }
 
     private static boolean isCustomDocName(String documentName) {
-        return documentName.contains("ET3") || documentName.contains("ACAS");
+        return documentName.contains("ET3") || documentName.contains("ACAS") || documentName.contains("ET1 Vetting");
     }
 
     private byte[] getBytesFromInputStream(ByteArrayOutputStream os, InputStream is) throws IOException {
@@ -283,6 +285,7 @@ public class TornadoService {
                     ? String.format("%s - " + ET3_RESPONSE_PDF, caseData.getSubmitEt3Respondent().getSelectedLabel())
                     : documentName;
             connection = createConnection();
+
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             byte[] bytes = getDocumentByteArray(connection);
             return createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
@@ -339,9 +342,12 @@ public class TornadoService {
             throws JsonProcessingException {
         switch (documentName) {
             case "ET1 Vetting.pdf" -> {
+                dmStoreDocumentName = String.format(ET1_VETTING_OUTPUT_NAME, caseData.getClaimant());
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case "ET3 Processing.pdf" -> {
+                dmStoreDocumentName = String.format("ET3 Processing - %s.pdf",
+                        caseData.getEt3ChooseRespondent().getSelectedLabel());
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case ET3_RESPONSE_PDF -> {
@@ -354,6 +360,7 @@ public class TornadoService {
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
             case TSE_FILE_NAME -> {
+                dmStoreDocumentName = tseService.getTseDocumentName(caseData);
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case "Referral Summary.pdf" -> {

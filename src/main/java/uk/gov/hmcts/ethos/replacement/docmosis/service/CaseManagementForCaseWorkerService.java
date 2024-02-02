@@ -89,6 +89,11 @@ public class CaseManagementForCaseWorkerService {
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
     public static final String ORGANISATION = "Organisation";
 
+    public static final String SUPPLEMENTARY_DATA_ERROR = "Call to Supplementary Data API failed for %s";
+
+    public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
+    public static final String CASE_MANAGEMENT_CODE = "Employment";
+
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,
@@ -113,6 +118,7 @@ public class CaseManagementForCaseWorkerService {
         dateToCurrentPosition(caseData);
         flagsImageFileNameDefaults(caseData);
         setGlobalSearchDefaults(caseData);
+        setWorkAllocationDefaults(caseData);
     }
 
     public void setGlobalSearchDefaults(CaseData caseData) {
@@ -122,6 +128,13 @@ public class CaseManagementForCaseWorkerService {
         setCaseNameHmctsInternal(caseData);
         setCaseManagementLocation(caseData);
         setCaseManagementCategory(caseData);
+    }
+
+    public void setWorkAllocationDefaults(CaseData caseData) {
+        if (!featureToggleService.isWorkAllocationEnabled()) {
+            return;
+        }
+        setHmctsCaseCategory(caseData);
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -559,8 +572,7 @@ public class CaseManagementForCaseWorkerService {
                                       Map<String, Map<String, Object>> payloadData) throws IOException {
         Map<String, Object> payload = Maps.newHashMap();
         payload.put("supplementary_data_updates", payloadData);
-        String errorMessage = String.format("Call to Supplementary Data API failed for %s",
-                caseDetails.getCaseId());
+        String errorMessage = String.format(SUPPLEMENTARY_DATA_ERROR, caseDetails.getCaseId());
 
         try {
             String adminUserToken = adminUserService.getAdminUserToken();
@@ -588,7 +600,9 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void setCaseManagementCategory(CaseData caseData) {
-        caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
+        caseData.setCaseManagementCategory(
+                DynamicFixedListType.from(CASE_MANAGEMENT_LABEL, CASE_MANAGEMENT_CODE, true)
+        );
     }
 
     private void setCaseManagementLocation(CaseData caseData) {
@@ -607,6 +621,10 @@ public class CaseManagementForCaseWorkerService {
                 .baseLocation(tribunalLocations.getEpimmsId())
                 .region(tribunalLocations.getRegionId())
                 .build());
+    }
+
+    private void setHmctsCaseCategory(CaseData caseData) {
+        caseData.setHmctsCaseCategory(CASE_MANAGEMENT_LABEL);
     }
 
     public void setPublicCaseName(CaseData caseData) {

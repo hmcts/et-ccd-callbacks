@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
@@ -91,7 +92,7 @@ public class CaseActionsForCaseWorkerController {
     private static final String TWO_HUNDRED = "200";
     private static final String FOUR_HUNDRED = "400";
     private static final String FIVE_HUNDRED = "500";
-    
+
     private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -288,7 +289,8 @@ public class CaseActionsForCaseWorkerController {
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getEcmCaseType() != null
                     && caseData.getEcmCaseType().equals(MULTIPLE_CASE_TYPE) ? YES : NO);
-
+            UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
+            UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);

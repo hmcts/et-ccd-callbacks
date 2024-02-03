@@ -1004,7 +1004,9 @@ public final class DocumentHelper {
             return;
         }
 
-        List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
+        List<String> docTypes = List.of("ET1 Vetting", "ET3 Processing", "Initial Consideration",
+                "App for a Witness Order - C", "Referral/Judicial Direction", "COT3", "Other",
+                "Contact the tribunal about something else - C", "Tribunal case file", "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
             .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
             .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(

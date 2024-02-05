@@ -299,7 +299,7 @@ integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 
 ext {
-    junitJupiterVersion = '5.10.1'
+    junitJupiterVersion = '5.10.2'
     log4JVersion = '2.22.1'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
@@ -340,7 +340,7 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.3'
+    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.4'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.3'
 
@@ -394,7 +394,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'com.github.hmcts:fortify-client:1.4.0:all', {
+    testImplementation 'com.github.hmcts:fortify-client:1.4.1:all', {
         exclude module: 'commons-io'
     }
 
@@ -410,7 +410,7 @@ dependencies {
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
-    testImplementation(platform('org.junit:junit-bom:5.10.1'))
+    testImplementation(platform('org.junit:junit-bom:5.10.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.4'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
@@ -423,7 +423,7 @@ dependencies {
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.10.1'
+    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.10.2'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.0.4'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath

@@ -106,7 +106,7 @@ public class DigitalCaseFileService {
                 .eligibleForStitching(YES)
                 .eligibleForCloning(NO)
                 .fileName(caseData.getEthosCaseReference().replace("/", "-") + "-DCF")
-                .hasTableOfContents(YES)
+                .hasTableOfContents(NO)
                 .pageNumberFormat("numberOfPages")
                 .documents(bundleDocuments)
                 .build();

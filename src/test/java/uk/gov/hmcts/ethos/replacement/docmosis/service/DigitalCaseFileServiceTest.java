@@ -68,6 +68,7 @@ class DigitalCaseFileServiceTest {
         assertNotNull(caseData.getCaseBundles());
         assertEquals(1, caseData.getCaseBundles().get(0).value().getDocuments().size());
         assertEquals(YES, caseDetails.getCaseData().getCaseBundles().get(0).value().getEligibleForStitching());
+        System.out.println(caseData);
     }
 
     @Test

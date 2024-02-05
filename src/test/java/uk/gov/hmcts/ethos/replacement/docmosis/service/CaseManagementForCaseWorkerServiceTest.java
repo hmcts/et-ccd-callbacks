@@ -221,6 +221,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn(TribunalOffice.valueOfOfficeName("Edinburgh"));
         when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getEdinburghCourtLocations());
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
@@ -285,6 +286,13 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertEquals("Anton Juliet Rodriguez vs Antonio Vazquez", caseData.getCaseNameHmctsInternal());
+    }
+
+    @Test
+    void caseDataDefaultsHmctsCaseCategory() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertEquals("Employment Tribunals", caseData.getHmctsCaseCategory());
     }
 
     @Test

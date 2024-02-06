@@ -442,6 +442,8 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
 
+        caseFlagsService.setupCaseFlags(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -494,6 +496,8 @@ public class CaseActionsForCaseWorkerController {
         if (featureToggleService.isHmcEnabled()) {
             caseManagementForCaseWorkerService.setPublicCaseName(caseData);
         }
+
+        caseFlagsService.setupCaseFlags(caseData);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 

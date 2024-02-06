@@ -21,18 +21,18 @@ public class CaseLookupService {
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
 
-    public CaseData getLeadCaseFromMultipleAsAdmin(MultipleDetails caseDetails) throws Exception {
+    public CaseData getLeadCaseFromMultipleAsAdmin(MultipleDetails caseDetails) throws IOException {
         String adminToken = adminUserService.getAdminUserToken();
         return getLeadCaseFromMultiple(caseDetails, adminToken);
     }
 
-    public CaseData getLeadCaseFromMultiple(MultipleDetails caseDetails, String auth) throws Exception {
+    public CaseData getLeadCaseFromMultiple(MultipleDetails caseDetails, String auth) throws IOException {
         MultipleData caseData = caseDetails.getCaseData();
         Pattern pattern = Pattern.compile("(\\d{16})");
         Matcher matcher = pattern.matcher(caseData.getLeadCase());
 
         if (!matcher.find()) {
-            throw new Exception("Could not find 16 digit case id for lead case");
+            throw new IllegalArgumentException("Could not find 16 digit case id for lead case");
         }
 
         String caseId = matcher.group(1);

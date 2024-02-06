@@ -43,7 +43,7 @@ class CaseLookupServiceTest {
     }
 
     @Test
-    void getLeadCaseFromMultipleAsAdmin_success() throws Exception {
+    void getLeadCaseFromMultipleAsAdmin_success() throws IOException {
         MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID + MULTIPLE);
         MultipleData multipleData = new MultipleData();

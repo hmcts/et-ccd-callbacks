@@ -59,7 +59,6 @@ class DigitalCaseFileControllerTest {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
                 .withClaimantIndType("First", "Last")
-                .withEthosCaseReference("123456/2021")
                 .withDocumentCollection(ET1)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

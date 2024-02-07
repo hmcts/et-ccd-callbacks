@@ -390,9 +390,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/ui@npm:0.7.0":
-  version: 0.7.0
-  resolution: "@codeceptjs/ui@npm:0.7.0"
+"@codeceptjs/ui@npm:0.7.1":
+  version: 0.7.1
+  resolution: "@codeceptjs/ui@npm:0.7.1"
   dependencies:
     "@codeceptjs/configure": ^0.8.0
     axios: ^0.24.0
@@ -412,7 +412,7 @@ __metadata:
     codeceptjs: ^3.2.2
   bin:
     codecept-ui: bin/codecept-ui.js
-  checksum: 915e3b68fce797b644a43bc3db8c2bdf4bdec08fa887a05b4c9774f07676acc43a25c9a0c893875fb73506a89e0dd120191d6e22e4ba1d87c5e8fb16c6874b04
+  checksum: 484b0d6a3b0b09fc88d297ec18a5bb64781fedf5267dce7f77f37d7c3bb6fe9a37789789a4d22db5c3705a88c8ddc44ab91788ea381ce3e9b9733685a1f40e4c
   languageName: node
   linkType: hard
 
@@ -5560,7 +5560,7 @@ __metadata:
     "@babel/eslint-parser": ^7.17.0
     "@codeceptjs/configure": 0.10.0
     "@codeceptjs/examples": 1.2.1
-    "@codeceptjs/ui": 0.7.0
+    "@codeceptjs/ui": 0.7.1
     "@hmcts/nodejs-logging": 4.0.4
     "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^7.1.5

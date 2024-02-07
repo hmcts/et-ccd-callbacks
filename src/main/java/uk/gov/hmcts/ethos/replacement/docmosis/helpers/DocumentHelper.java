@@ -13,11 +13,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -30,7 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -75,6 +74,7 @@ public final class DocumentHelper {
     public static final String HEARING_TIME = "\"Hearing_time\":\"";
     public static final String HEARING_DATE_TIME = "\"Hearing_date_time\":\"";
     public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
+    private static final int INITIAL_OFFSET = 1;
 
     private DocumentHelper() {
     }
@@ -779,11 +779,11 @@ public final class DocumentHelper {
         return sb;
     }
 
-    private static int getPageLabelNumber(int startingLabel, int i) {
-        int pageLabelNumber = i + 1;
+    private static int getPageLabelNumber(int startingLabel, int currentNumber) {
+        int pageLabelNumber = currentNumber + INITIAL_OFFSET;
 
         if (startingLabel > 1) {
-            pageLabelNumber += startingLabel - 1;
+            pageLabelNumber += startingLabel - INITIAL_OFFSET;
         }
 
         if (pageLabelNumber > ADDRESS_LABELS_PAGE_SIZE) {
@@ -1028,14 +1028,15 @@ public final class DocumentHelper {
 
         // Get all documents with claimant rule 92 no - whether on application creation or in any subsequent response
         // These will only be supporting material as pdfs for rule 92 'no' aren't meant to be generated.
-        for (GenericTseApplicationTypeItem app : ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
+        for (TypeItem<GenericTseApplicationType> app : ListUtils
+                .emptyIfNull(caseData.getGenericTseApplicationCollection())) {
             GenericTseApplicationType appType = app.getValue();
             if (CLAIMANT_TITLE.equals(appType.getApplicant()) && NO.equals(appType.getCopyToOtherPartyYesOrNo())) {
                 claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));
             }
 
-            for (TseRespondTypeItem response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
-                TseRespondType respondType = response.getValue();
+            for (TypeItem<TseRespond> response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
+                TseRespond respondType = response.getValue();
                 if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
                     claimantRule92NoDocuments.addAll(
                         respondType.getSupportingMaterial().stream()

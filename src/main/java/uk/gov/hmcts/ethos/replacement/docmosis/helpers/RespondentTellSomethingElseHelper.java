@@ -6,7 +6,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
@@ -42,7 +43,7 @@ public final class RespondentTellSomethingElseHelper {
             throws JsonProcessingException {
 
         RespondentTSEApplicationTypeData selectedAppData = getSelectedApplicationType(caseData);
-        GenericTseApplicationTypeItem lastApp = getCurrentGenericTseApplicationTypeItem(caseData);
+        TypeItem<GenericTseApplicationType> lastApp = getCurrentGenericTseApplicationTypeItem(caseData);
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
             .resTseApplicant(RESPONDENT_TITLE)
@@ -64,7 +65,7 @@ public final class RespondentTellSomethingElseHelper {
 
     }
 
-    private static GenericTseApplicationTypeItem getCurrentGenericTseApplicationTypeItem(CaseData caseData) {
+    private static TypeItem<GenericTseApplicationType> getCurrentGenericTseApplicationTypeItem(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return null;
         }

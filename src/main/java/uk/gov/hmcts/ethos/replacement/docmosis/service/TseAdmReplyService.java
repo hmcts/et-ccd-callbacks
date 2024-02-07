@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -11,12 +12,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
@@ -64,7 +65,7 @@ public class TseAdmReplyService {
     private final TornadoService tornadoService;
     private final TseService tseService;
     private final FeatureToggleService featureToggleService;
-    
+
     @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
     @Value("${template.tse.admin.reply.respondent}")
@@ -102,7 +103,7 @@ public class TseAdmReplyService {
     }
 
     private boolean addDocumentMissing(CaseData caseData) {
-        List<GenericTypeItem<DocumentType>> documents = caseData.getTseAdmReplyAddDocument();
+        List<TypeItem<DocumentType>> documents = caseData.getTseAdmReplyAddDocument();
         if (NEITHER.equals(caseData.getTseAdmReplyIsCmoOrRequest()) || isNotEmpty(documents)) {
             return false;
         }
@@ -146,14 +147,15 @@ public class TseAdmReplyService {
             return;
         }
 
-        if (isEmpty(applicationType.getRespondCollection())) {
-            applicationType.setRespondCollection(new ArrayList<>());
+        if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
+            applicationType.setRespondCollection(new ListTypeItem<>());
+
         }
 
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
         String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
 
-        TseRespondType response = TseRespondType.builder()
+        TseRespond response = TseRespond.builder()
                 .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .from(ADMIN)
                 .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
@@ -171,7 +173,7 @@ public class TseAdmReplyService {
                 .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
                 .build();
 
-        applicationType.getRespondCollection().add(TseRespondTypeItem.builder()
+        applicationType.getRespondCollection().add(TypeItem.<TseRespond>builder()
                 .id(UUID.randomUUID().toString())
                 .value(response)
                 .build());

@@ -6,9 +6,11 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -38,7 +40,7 @@ class PseRespondentViewServiceTest {
         caseData.setSendNotificationCollection(List.of(
                 SendNotificationTypeItem.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(SendNotificationType.builder()
+                        .value(SendNotification.builder()
                                 .number("1")
                                 .sendNotificationTitle("View notice of hearing")
                                 .sendNotificationSubject(List.of("Other (General correspondence)"))
@@ -49,7 +51,7 @@ class PseRespondentViewServiceTest {
                         .build(),
                 SendNotificationTypeItem.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(SendNotificationType.builder()
+                        .value(SendNotification.builder()
                                 .number("2")
                                 .sendNotificationTitle("Submit hearing agenda")
                                 .sendNotificationSubject(List.of("Other (General correspondence)"))
@@ -60,7 +62,7 @@ class PseRespondentViewServiceTest {
                         .build(),
                 SendNotificationTypeItem.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(SendNotificationType.builder()
+                        .value(SendNotification.builder()
                                 .number("3")
                                 .sendNotificationTitle("Send Notification Title")
                                 .sendNotificationSubject(List.of("Other (General correspondence)"))
@@ -86,15 +88,20 @@ class PseRespondentViewServiceTest {
     @Test
     void initialOrdReqDetailsTableMarkUp_withHearing() {
 
-        PseResponseTypeItem pseResponseTypeItem = PseResponseTypeItem.builder()
+        DocumentTypeItem documentItem = createDocumentTypeItem("My claimant hearing agenda.pdf",
+                "ca35bccd-f507-4243-9133-f6081fb0fe5e", null);
+
+        ListTypeItem<DocumentType> supportingMaterialItems = new ListTypeItem<>();
+        supportingMaterialItems.add(documentItem);
+
+        TypeItem<PseResponse> pseResponseTypeItem = TypeItem.<PseResponse>builder()
             .id(UUID.randomUUID().toString())
-            .value(PseResponseType.builder()
+            .value(PseResponse.builder()
                 .from(CLAIMANT_TITLE)
                 .date("10 Aug 2022")
                 .response("Response text entered")
                 .hasSupportingMaterial(YES)
-                .supportingMaterial(List.of(createDocumentTypeItem("My claimant hearing agenda.pdf",
-                    "ca35bccd-f507-4243-9133-f6081fb0fe5e", null)))
+                .supportingMaterial(supportingMaterialItems)
                 .copyToOtherParty(YES)
                 .build())
             .build();
@@ -102,7 +109,7 @@ class PseRespondentViewServiceTest {
         caseData.setSendNotificationCollection(List.of(
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
+                .value(SendNotification.builder()
                     .number("1")
                     .date("5 Aug 2022")
                     .sendNotificationTitle("View notice of hearing")
@@ -121,7 +128,7 @@ class PseRespondentViewServiceTest {
                     .sendNotificationFullName("Mr Lee Gal Officer")
                     .sendNotificationAdditionalInfo("Additional Info")
                     .sendNotificationNotify(BOTH_PARTIES)
-                    .respondCollection(List.of(pseResponseTypeItem))
+                    .respondCollection(ListTypeItem.from(pseResponseTypeItem))
                     .build())
                 .build()
         ));
@@ -176,7 +183,7 @@ class PseRespondentViewServiceTest {
         caseData.setSendNotificationCollection(List.of(
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
+                .value(SendNotification.builder()
                     .number("1")
                     .date("5 Aug 2022")
                     .sendNotificationTitle("View notice of hearing")

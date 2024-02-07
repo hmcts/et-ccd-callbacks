@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 
 import java.util.List;
@@ -75,7 +75,7 @@ public class PseRespondentViewService {
     }
 
     private String viewNotificationsFormatRow(SendNotificationTypeItem sendNotificationTypeItem) {
-        SendNotificationType notification = sendNotificationTypeItem.getValue();
+        SendNotification notification = sendNotificationTypeItem.getValue();
 
         return String.format(TABLE_ROW_MARKDOWN,
                 notification.getNumber(),
@@ -101,7 +101,7 @@ public class PseRespondentViewService {
         if (sendNotificationTypeItem == null) {
             return "";
         }
-        SendNotificationType sendNotificationType = sendNotificationTypeItem.getValue();
+        SendNotification sendNotificationType = sendNotificationTypeItem.getValue();
         return formatOrdReqDetails(sendNotificationType)
             + formatRespondDetails(sendNotificationType);
     }

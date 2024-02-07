@@ -16,7 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
@@ -105,7 +105,7 @@ public class SendNotificationService {
         if (caseData.getSendNotificationCollection() == null) {
             caseData.setSendNotificationCollection(new ArrayList<>());
         }
-        SendNotificationType sendNotificationType = new SendNotificationType();
+        SendNotification sendNotificationType = new SendNotification();
         sendNotificationType.setNumber(String.valueOf(getNextNotificationNumber(caseData)));
         sendNotificationType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
         sendNotificationType.setSendNotificationTitle(caseData.getSendNotificationTitle());
@@ -253,7 +253,7 @@ public class SendNotificationService {
         return document;
     }
 
-    private String getSendNotificationDocumentsMarkdown(SendNotificationType sendNotification) {
+    private String getSendNotificationDocumentsMarkdown(SendNotification sendNotification) {
         if (sendNotification.getSendNotificationUploadDocument() == null) {
             return BLANK_DOCUMENT_MARKDOWN;
         }
@@ -264,7 +264,7 @@ public class SendNotificationService {
         return String.join("\r\n", documents);
     }
 
-    public String getSendNotificationMarkDown(SendNotificationType sendNotification) {
+    public String getSendNotificationMarkDown(SendNotification sendNotification) {
 
         Optional<DynamicFixedListType> sendNotificationSelectHearing
                 = Optional.ofNullable(sendNotification.getSendNotificationSelectHearing());

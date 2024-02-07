@@ -22,9 +22,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -136,10 +137,11 @@ class TseRespondentReplyServiceTest {
                 .copyToOtherPartyYesOrNo(YES).details("Text").applicationState("notStartedYet")
                 .number("1").responsesCount("0").status(OPEN_STATE).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem =
+                TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString()).value(genericTseApplicationType).build();
 
-        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
 
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
@@ -189,7 +191,7 @@ class TseRespondentReplyServiceTest {
 
             tseRespondentReplyService.saveReplyToApplication(caseData, false);
 
-            TseRespondType replyType = caseData.getGenericTseApplicationCollection().get(0)
+            TseRespond replyType = caseData.getGenericTseApplicationCollection().get(0)
                     .getValue().getRespondCollection().get(0).getValue();
 
             String dateNow = UtilHelper.formatCurrentDate(LocalDate.now());
@@ -213,8 +215,8 @@ class TseRespondentReplyServiceTest {
 
         @Test
         void saveReplyToApplication_withTribunalResponse_setRespondentResponseRequired() {
-            GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
-            caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+            TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
+            caseData.setGenericTseApplicationCollection(ListTypeItem.from(genericTseApplicationTypeItem));
 
             caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
@@ -421,7 +423,7 @@ class TseRespondentReplyServiceTest {
         GenericTseApplicationType applicationType = GenericTseApplicationType.builder()
                 .respondentResponseRequired(respondentResponseRequired ? YES : NO).build();
 
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        TypeItem<GenericTseApplicationType> genericTseApplicationTypeItem = new TypeItem<>();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
         genericTseApplicationTypeItem.setValue(applicationType);
 

@@ -11,10 +11,11 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
-import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -54,10 +55,10 @@ public class PseRespondToTribunalControllerFunctionalTest extends BaseFunctional
         caseData.setSendNotificationCollection(List.of(
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .respondCollection(List.of(PseResponseTypeItem.builder()
+                .value(SendNotification.builder()
+                    .respondCollection(ListTypeItem.from(TypeItem.<PseResponse>builder()
                         .id(UUID.randomUUID().toString())
-                        .value(PseResponseType.builder()
+                        .value(PseResponse.builder()
                             .from(RESPONDENT_TITLE)
                             .copyToOtherParty(YES)
                             .build())
@@ -73,7 +74,7 @@ public class PseRespondToTribunalControllerFunctionalTest extends BaseFunctional
         caseData.setSendNotificationCollection(List.of(
                 SendNotificationTypeItem.builder()
                         .id(UUID.randomUUID().toString())
-                        .value(SendNotificationType.builder()
+                        .value(SendNotification.builder()
                                 .number("1")
                                 .date("5 Aug 2022")
                                 .sendNotificationTitle("View notice of hearing")

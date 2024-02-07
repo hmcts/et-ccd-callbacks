@@ -148,17 +148,17 @@ class SessionDaysTest {
                 HEARING_TYPE_JUDICIAL_RECONSIDERATION,
                 HEARING_TYPE_JUDICIAL_REMEDY);
 
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        ListingData listingData = new ListingData();
         for (String invalidHearingType : invalidHearingTypes) {
-            CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
             CaseData caseData = caseDataBuilder
                     .withHearing("1", invalidHearingType, "Judge Doris", null, null, null, null)
                     .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
+            SessionDays sessionDays = new SessionDays(listingData, caseData);
 
-            ListingData listingData = new ListingData();
             listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
             listingData.setListingDate("2021-07-02");
-            SessionDays sessionDays = new SessionDays(listingData, caseData);
             assertNull(sessionDays.getLatestDisposedHearingSession());
         }
     }

@@ -73,9 +73,9 @@ class ScotlandVenueSelectionServiceTest {
     void testCreateVenueSelectionNoSelectedVenue() {
         VenueService venueService = mockVenueService();
 
+        ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
             DateListedType selectedListing = createSelectedListing(tribunalOffice, null);
-            ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
             DynamicFixedListType actualResult = venueSelectionService.createVenueSelection(tribunalOffice,
                     selectedListing);
 
@@ -88,11 +88,11 @@ class ScotlandVenueSelectionServiceTest {
     void testCreateVenueSelectionWithSelectedVenue() {
         VenueService venueService = mockVenueService();
 
+        ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
             DynamicValueType selectedVenue = createWithSelectedIndex(tribunalOffice, 2);
             DateListedType selectedListing = createSelectedListing(tribunalOffice,
                     DynamicFixedListType.of(selectedVenue));
-            ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
             DynamicFixedListType actualResult = venueSelectionService.createVenueSelection(tribunalOffice,
                     selectedListing);
 
@@ -143,9 +143,9 @@ class ScotlandVenueSelectionServiceTest {
     private CaseData createCaseDataWithHearings() {
         CaseData caseData = new CaseData();
         caseData.setHearingCollection(new ArrayList<>());
+        HearingType hearingType = new HearingType();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         for (int i = 0; i < 3; i++) {
-            HearingType hearingType = new HearingType();
-            HearingTypeItem hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setValue(hearingType);
             caseData.getHearingCollection().add(hearingTypeItem);
         }
@@ -159,15 +159,14 @@ class ScotlandVenueSelectionServiceTest {
                                                                 DynamicValueType selectedGlasgow) {
         CaseData caseData = new CaseData();
         caseData.setHearingCollection(new ArrayList<>());
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        HearingType hearingType = new HearingType();
         for (int i = 0; i < 3; i++) {
-            HearingType hearingType = new HearingType();
-
             hearingType.setHearingAberdeen(DynamicFixedListType.of(selectedAberdeen));
             hearingType.setHearingDundee(DynamicFixedListType.of(selectedDundee));
             hearingType.setHearingEdinburgh(DynamicFixedListType.of(selectedEdinburgh));
             hearingType.setHearingGlasgow(DynamicFixedListType.of(selectedGlasgow));
 
-            HearingTypeItem hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setValue(hearingType);
             caseData.getHearingCollection().add(hearingTypeItem);
         }

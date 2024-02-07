@@ -9,12 +9,12 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
@@ -83,10 +83,10 @@ public class TseAdminService {
         applicationType.setApplicationState(NOT_VIEWED_YET);
 
         if (CollectionUtils.isEmpty(applicationType.getAdminDecision())) {
-            applicationType.setAdminDecision(new ArrayList<>());
+            applicationType.setAdminDecision(new ListTypeItem<>());
         }
 
-        TseAdminRecordDecisionType decision = TseAdminRecordDecisionType.builder()
+        TseAdminRecordDecision decision = TseAdminRecordDecision.builder()
             .date(UtilHelper.formatCurrentDate(LocalDate.now()))
             .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
             .decision(caseData.getTseAdminDecision())
@@ -102,14 +102,14 @@ public class TseAdminService {
             .build();
 
         applicationType.getAdminDecision().add(
-            TseAdminRecordDecisionTypeItem.builder()
+            TypeItem.<TseAdminRecordDecision>builder()
                 .id(UUID.randomUUID().toString())
                 .value(decision)
                 .build()
         );
     }
 
-    private List<GenericTypeItem<DocumentType>> getResponseRequiredDocYesOrNo(CaseData caseData) {
+    private ListTypeItem<DocumentType> getResponseRequiredDocYesOrNo(CaseData caseData) {
         if (YES.equals(caseData.getTseAdminIsResponseRequired())) {
             return caseData.getTseAdminResponseRequiredYesDoc();
         }

@@ -15,18 +15,17 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecision;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespond;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
@@ -109,7 +108,7 @@ class TseAdminServiceTest {
         GenericTseApplicationType application = getGenericTseApplicationTypeItemBuild();
 
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(application)
                 .build())
@@ -141,26 +140,26 @@ class TseAdminServiceTest {
     }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {
-        TseRespondTypeItem claimantReply = TseRespondTypeItem.builder()
+        TypeItem<TseRespond> claimantReply = TypeItem.<TseRespond>builder()
             .id(UUID.randomUUID().toString())
             .value(
-                TseRespondType.builder()
+                TseRespond.builder()
                     .from(CLAIMANT_TITLE)
                     .date("23 December 2022")
                     .dateTime("2022-12-23T10:20:30.555")
                     .response("Response Details")
                     .hasSupportingMaterial(YES)
-                    .supportingMaterial(List.of(
+                    .supportingMaterial(ListTypeItem.from(
                         createDocumentTypeItem("image.png"),
                         createDocumentTypeItem("Form.pdf")))
                     .copyToOtherParty(YES)
                     .build()
             ).build();
 
-        TseRespondTypeItem adminReply = TseRespondTypeItem.builder()
+        TypeItem<TseRespond> adminReply = TypeItem.<TseRespond>builder()
             .id(UUID.randomUUID().toString())
             .value(
-                TseRespondType.builder()
+                TseRespond.builder()
                     .from(ADMIN)
                     .date("24 December 2022")
                     .dateTime("2022-12-24T10:20:30.555")
@@ -184,15 +183,12 @@ class TseAdminServiceTest {
             .withDate("13 December 2022")
             .withDocumentUpload(createUploadedDocumentType("document.txt"))
             .withStatus(OPEN_STATE)
-            .withRespondCollection(List.of(
-                claimantReply,
-                adminReply
-            ))
+            .withRespondCollection(ListTypeItem.from(claimantReply, adminReply))
             .build();
     }
 
-    private List<GenericTypeItem<DocumentType>> createDocumentList(String fileName) {
-        return List.of(GenericTypeItem.from(DocumentType.from(createUploadedDocumentType(fileName))));
+    private ListTypeItem<DocumentType> createDocumentList(String fileName) {
+        return ListTypeItem.from(TypeItem.from(DocumentType.from(createUploadedDocumentType(fileName))));
     }
 
     private static UploadedDocumentType createUploadedDocumentType(String fileName) {
@@ -212,7 +208,7 @@ class TseAdminServiceTest {
     @Test
     void saveTseAdminDataFromCaseData_Judgment_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+            ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("2")
@@ -228,7 +224,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Granted");
         caseData.setTseAdminTypeOfDecision("Judgment");
         caseData.setTseAdminAdditionalInformation("Additional information");
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        ListTypeItem<DocumentType> documentList = createDocumentList("document.txt");
         caseData.setTseAdminResponseRequiredNoDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Legal officer");
         caseData.setTseAdminDecisionMadeByFullName("Legal Officer Full Name");
@@ -240,7 +236,7 @@ class TseAdminServiceTest {
         assertThat(app.getApplicationState())
             .isEqualTo("notViewedYet");
 
-        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
+        TseAdminRecordDecision actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -271,7 +267,7 @@ class TseAdminServiceTest {
     @Test
     void saveTseAdminDataFromCaseData_CmoYes_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("3")
@@ -290,7 +286,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        ListTypeItem<DocumentType> documentList = createDocumentList("document.txt");
         caseData.setTseAdminResponseRequiredYesDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
@@ -302,7 +298,7 @@ class TseAdminServiceTest {
         assertThat(app.getApplicationState())
             .isEqualTo("notViewedYet");
 
-        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
+        TseAdminRecordDecision actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -333,7 +329,7 @@ class TseAdminServiceTest {
     @Test
     void saveTseAdminDataFromCaseData_CmoNo_SaveString() {
         caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
+                ListTypeItem.from(TypeItem.<GenericTseApplicationType>builder()
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("4")
@@ -348,7 +344,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Refused");
         caseData.setTseAdminTypeOfDecision(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdminIsResponseRequired(NO);
-        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        ListTypeItem<DocumentType> documentList = createDocumentList("document.txt");
         caseData.setTseAdminResponseRequiredNoDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
@@ -360,7 +356,7 @@ class TseAdminServiceTest {
         assertThat(app.getApplicationState())
             .isEqualTo("notViewedYet");
 
-        TseAdminRecordDecisionType actual = app.getAdminDecision().get(0).getValue();
+        TseAdminRecordDecision actual = app.getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
             .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));

@@ -10,11 +10,12 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotification;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -71,10 +72,10 @@ public class RespondNotificationService {
      * @param caseData caseData contains the notification details
      * @param sendNotificationType the notificationType where the data will be stored
      */
-    private void createRespondNotification(CaseData caseData, SendNotificationType sendNotificationType) {
+    private void createRespondNotification(CaseData caseData, SendNotification sendNotificationType) {
 
         if (sendNotificationType.getRespondNotificationTypeCollection() == null) {
-            sendNotificationType.setRespondNotificationTypeCollection(new ArrayList<>());
+            sendNotificationType.setRespondNotificationTypeCollection(new ListTypeItem<>());
         }
 
         RespondNotificationType respondNotificationType = new RespondNotificationType();
@@ -97,7 +98,7 @@ public class RespondNotificationService {
             respondNotificationType.setIsClaimantResponseDue(YES);
         }
 
-        GenericTypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new GenericTypeItem<>();
+        TypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new TypeItem<>();
         respondNotificationTypeGenericTypeItem.setId(String.valueOf(randomUUID()));
         respondNotificationTypeGenericTypeItem.setValue(respondNotificationType);
         sendNotificationType.getRespondNotificationTypeCollection().add(respondNotificationTypeGenericTypeItem);
@@ -152,7 +153,7 @@ public class RespondNotificationService {
      * @param sendNotificationType notification
      * @return markdown of responses
      */
-    private String getRespondNotificationMarkdown(SendNotificationType sendNotificationType) {
+    private String getRespondNotificationMarkdown(SendNotification sendNotificationType) {
         var respondNotificationTypeCollection = sendNotificationType.getRespondNotificationTypeCollection();
         if (respondNotificationTypeCollection == null) {
             return "";
@@ -183,7 +184,7 @@ public class RespondNotificationService {
         if (sendNotification.isEmpty()) {
             return "";
         }
-        SendNotificationType sendNotificationType = sendNotification.get().getValue();
+        SendNotification sendNotificationType = sendNotification.get().getValue();
         return String.join("\r\n",
             sendNotificationService.getSendNotificationMarkDown(sendNotificationType),
                 getRespondNotificationMarkdown(sendNotificationType));
@@ -216,7 +217,7 @@ public class RespondNotificationService {
      * @param caseDetails - caseDetails
      * @param sendNotificationType - the notification containing the details of the response
      */
-    public void sendNotifyEmails(CaseDetails caseDetails, SendNotificationType sendNotificationType) {
+    public void sendNotifyEmails(CaseDetails caseDetails, SendNotification sendNotificationType) {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         if (NO.equals(caseData.getRespondNotificationResponseRequired())) {
@@ -271,7 +272,7 @@ public class RespondNotificationService {
                 + "details");
             return;
         }
-        SendNotificationType sendNotificationType = sendNotificationTypeItemOptional.get().getValue();
+        SendNotification sendNotificationType = sendNotificationTypeItemOptional.get().getValue();
         createRespondNotification(caseData, sendNotificationType);
         sendNotifyEmails(caseDetails, sendNotificationType);
         clearRespondNotificationFields(caseData);

@@ -9,12 +9,11 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingBundle;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -190,7 +189,7 @@ class BundlesRespondentServiceTest {
 
     @Test
     void addToBundlesCollection_addsBundlesObject() {
-        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        ListTypeItem<HearingBundle> collection = new ListTypeItem<>();
         englandCaseData.setBundlesRespondentCollection(collection);
 
         String respondentsDocumentsOnly = "Respondent's documents only";
@@ -208,7 +207,7 @@ class BundlesRespondentServiceTest {
         englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
 
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
-        HearingBundleType actual = collection.get(0).getValue();
+        HearingBundle actual = collection.get(0).getValue();
 
         assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));
         assertThat(actual.getAgreedDocWith(), is(YES));
@@ -224,7 +223,7 @@ class BundlesRespondentServiceTest {
 
     @Test
     void addToBundlesCollection_addsCorrectReason() {
-        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        ListTypeItem<HearingBundle> collection = new ListTypeItem<>();
         englandCaseData.setBundlesRespondentCollection(collection);
 
         String respondentsDocumentsOnly = "Respondent's documents only";
@@ -242,7 +241,7 @@ class BundlesRespondentServiceTest {
         englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
 
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
-        HearingBundleType actual = collection.get(0).getValue();
+        HearingBundle actual = collection.get(0).getValue();
         String expectedAgreedDocsWith = "No, we have not agreed and I want to provide my own documents";
 
         assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));

@@ -26,10 +26,11 @@ public class MemberDaysReportDoc {
         MemberDaysReportData reportData = (MemberDaysReportData) listingData;
         StringBuilder sb = ListingHelper.getListingDate(reportData);
         sb.append(REPORT_OFFICE).append(nullCheck(reportData.getOffice())).append(NEW_LINE)
-                .append(addMemberDaysReportSummaryHeader(reportData)).append("\"memberDaySummaryItems\":[\n")
-                .append(addMemberDaysReportSummary(reportData.getMemberDaySummaryItems())).append("],\n")
-                .append("\"reportDetails\":[\n").append(addMemberDaysReportDetails(reportData.getReportDetails()))
-                .append("],\n");
+            .append(addMemberDaysReportSummaryHeader(reportData))
+            .append("\"memberDaySummaryItems\":[\n")
+            .append(addMemberDaysReportSummary(reportData.getMemberDaySummaryItems())).append("],\n")
+            .append("\"reportDetails\":[\n").append(addMemberDaysReportDetails(reportData.getReportDetails()))
+            .append("],\n");
         return sb;
     }
 
@@ -41,9 +42,8 @@ public class MemberDaysReportDoc {
         }
 
         summaryHeaderContent.append("\"Total_Full_Days\":\"").append(nullCheck(reportData.getFullDaysTotal()))
-                .append(NEW_LINE).append("\"Total_Half_Days\":\"").append(nullCheck(reportData.getHalfDaysTotal()))
-                .append(NEW_LINE).append("\"Total_Days\":\"").append(nullCheck(reportData.getTotalDays()))
-                .append(NEW_LINE);
+            .append(NEW_LINE).append("\"Total_Half_Days\":\"").append(nullCheck(reportData.getHalfDaysTotal()))
+            .append(NEW_LINE).append("\"Total_Days\":\"").append(nullCheck(reportData.getTotalDays())).append(NEW_LINE);
 
         return summaryHeaderContent;
     }
@@ -92,18 +92,19 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder getMemberDayReportDetailRow(MemberDaysReportDetail reportDetail) {
-        StringBuilder detailRowContent = new StringBuilder(190);
+        StringBuilder detailRowContent = new StringBuilder();
         detailRowContent.append("{\n\"Detail_Hearing_Date\":\"").append(nullCheck(reportDetail.getHearingDate()))
-                .append(NEW_LINE).append("\"Employee_Member\":\"").append(nullCheck(reportDetail.getEmployeeMember()))
-                .append(NEW_LINE).append("\"Employer_Member\":\"").append(nullCheck(reportDetail.getEmployerMember()))
-                .append(NEW_LINE).append("\"Case_Reference\":\"").append(nullCheck(reportDetail.getCaseReference()))
-                .append(NEW_LINE).append("\"Hearing_Number\":\"").append(nullCheck(reportDetail.getHearingNumber()))
-                .append(NEW_LINE).append("\"Hearing_Type\":\"").append(nullCheck(reportDetail.getHearingType()))
-                .append(NEW_LINE).append("\"Hearing_Clerk\":\"").append(nullCheck(reportDetail.getHearingClerk()))
-                .append(NEW_LINE);
+            .append(NEW_LINE).append("\"Employee_Member\":\"").append(nullCheck(reportDetail.getEmployeeMember()))
+            .append(NEW_LINE).append("\"Employer_Member\":\"").append(nullCheck(reportDetail.getEmployerMember()))
+            .append(NEW_LINE).append("\"Case_Reference\":\"").append(nullCheck(reportDetail.getCaseReference()))
+            .append(NEW_LINE).append("\"Hearing_Number\":\"").append(nullCheck(reportDetail.getHearingNumber()))
+            .append(NEW_LINE).append("\"Hearing_Type\":\"").append(nullCheck(reportDetail.getHearingType()))
+            .append(NEW_LINE).append("\"Hearing_Clerk\":\"").append(nullCheck(reportDetail.getHearingClerk()))
+            .append(NEW_LINE);
         double durationInMinutes = Double.parseDouble(reportDetail.getHearingDuration());
         detailRowContent.append("\"Hearing_Duration\":\"")
-                .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes)))).append("\"\n}");
+                .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
+                .append("\"\n}");
         return detailRowContent;
     }
 }

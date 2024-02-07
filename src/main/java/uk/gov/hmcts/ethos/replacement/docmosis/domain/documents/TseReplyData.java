@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class TseReplyData {
     @JsonProperty("supportingYesNo")
     private String supportingYesNo;
     @JsonProperty("documentCollection")
-    private List<GenericTypeItem<DocumentType>> documentCollection;
+    private List<TypeItem<DocumentType>> documentCollection;
     @JsonProperty("copy")
     private String copy;
     @JsonProperty("response")

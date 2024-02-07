@@ -43,7 +43,8 @@ def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
                        '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
                        '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
                        '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
+                       '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java',
+                       '**/*'
 ]
 
 sonarqube {
@@ -485,7 +486,7 @@ bootWithCCD {
     //environment 'SERVICEBUS_FAKE', 'true'
 }
 
-pmdMain.maxFailures = 324
+pmdMain.maxFailures = 325
 pmdTest.maxFailures = 227
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

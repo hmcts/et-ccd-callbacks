@@ -1006,8 +1006,9 @@ public final class DocumentHelper {
         }
 
         List<String> docTypes = List.of("ET1 Vetting", "ET3 Processing", "Initial Consideration",
-                "App for a Witness Order - C", "Referral/Judicial Direction", "COT3", "Other",
-                "Contact the tribunal about something else - C", "Tribunal case file", "Referral/Judicial direction");
+                "App for a Witness Order - C", "Referral/Judicial Direction", "COT3", "Other", "Rejection of Claim",
+                "Claim rejected", "Contact the tribunal about something else - C", "Tribunal case file",
+                "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
                 .filter(d -> ObjectUtils.isNotEmpty(d.getValue().getUploadedDocument()))
                 .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))

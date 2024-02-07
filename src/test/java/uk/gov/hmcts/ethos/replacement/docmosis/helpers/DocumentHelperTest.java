@@ -2256,6 +2256,8 @@ class DocumentHelperTest {
                     getDocumentTypeItem("Hidden", "Other"),
                     getDocumentTypeItem("Hidden", "Contact the tribunal about something else - C"),
                     getDocumentTypeItem("Hidden", "Tribunal case file"),
+                    getDocumentTypeItem("Hidden", "Rejection of Claim"),
+                    getDocumentTypeItem("Hidden", "Claim rejected"),
                     getDocumentTypeItem("Visible", null))
             );
 

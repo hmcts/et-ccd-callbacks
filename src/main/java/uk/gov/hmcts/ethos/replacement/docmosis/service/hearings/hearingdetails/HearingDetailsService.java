@@ -30,7 +30,7 @@ public class HearingDetailsService {
 
     public void initialiseHearingDetails(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelection(caseData));
+        dynamicFixedListType.setListItems(hearingSelectionService.getHearingDetailsSelection(caseData));
         caseData.setHearingDetailsHearing(dynamicFixedListType);
     }
 

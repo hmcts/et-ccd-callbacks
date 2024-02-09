@@ -176,7 +176,7 @@ public final class UploadDocumentHelper {
                 DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
                 if (!ObjectUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument())) {
                     documentTypeItem.getValue().getUploadedDocument().setCategoryId(
-                            DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getTypeOfDocument()));
+                            DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getDocumentType()));
                 }
                 documentTypeItem.getValue().setDocNumber(
                         String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));

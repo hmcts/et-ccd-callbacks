@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -50,6 +51,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
+    public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
     public static final List<String>
             SEND_NOTIFICATION_SUBJECTS = List.of("Claimant / Respondent details",
             "Judgment", "Claim (ET1)",
@@ -152,6 +154,27 @@ public class SendNotificationService {
     }
 
     public void clearSendNotificationFields(CaseData caseData) {
+        caseData.setSendNotificationTitle(null);
+        caseData.setSendNotificationLetter(null);
+        caseData.setSendNotificationUploadDocument(null);
+        caseData.setSendNotificationSubject(null);
+        caseData.setSendNotificationAdditionalInfo(null);
+        caseData.setSendNotificationNotify(null);
+        caseData.setSendNotificationSelectHearing(null);
+        caseData.setSendNotificationCaseManagement(null);
+        caseData.setSendNotificationResponseTribunal(null);
+        caseData.setSendNotificationWhoCaseOrder(null);
+        caseData.setSendNotificationSelectParties(null);
+        caseData.setSendNotificationFullName(null);
+        caseData.setSendNotificationFullName2(null);
+        caseData.setSendNotificationDecision(null);
+        caseData.setSendNotificationDetails(null);
+        caseData.setSendNotificationRequestMadeBy(null);
+        caseData.setSendNotificationEccQuestion(null);
+        caseData.setSendNotificationWhoCaseOrder(null);
+    }
+
+    public void clearSendNotificationFields(MultipleData caseData) {
         caseData.setSendNotificationTitle(null);
         caseData.setSendNotificationLetter(null);
         caseData.setSendNotificationUploadDocument(null);

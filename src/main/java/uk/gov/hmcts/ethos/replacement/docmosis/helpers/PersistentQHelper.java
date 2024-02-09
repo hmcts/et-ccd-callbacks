@@ -75,7 +75,7 @@ public final class PersistentQHelper {
                                                     List<String> errors, String multipleRef, String confirmation,
                                                     CreateUpdatesBusSender createUpdatesBusSender, String updateSize,
                                                     String multipleReferenceLinkMarkUp
-                                                    ) {
+    ) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
         if (ethosCaseRefCollection.isEmpty()) {
             log.warn("Case Ref collection is empty");

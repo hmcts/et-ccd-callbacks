@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.helpers.CreateUpdatesHelper;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.SendNotificationsDto;
+import uk.gov.hmcts.ecm.common.model.servicebus.SendNotificationsMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.ecm.common.servicebus.ServiceBusSender;
 
@@ -59,4 +61,35 @@ public class CreateUpdatesBusSender {
         );
     }
 
+    public void sendNotificationUpdatesToQueue(SendNotificationsDto sendNotificationsDto,
+                                               DataModelParent dataModelParent,
+                                               List<String> errors,
+                                               String updateSize) {
+        log.info("Started sending messages to create-updates queue");
+        AtomicInteger successCount = new AtomicInteger(0);
+
+        List<SendNotificationsMsg> createUpdatesMsgList =
+                CreateUpdatesHelper.getCreateUpdatesMessagesCollection(
+                        sendNotificationsDto,
+                        dataModelParent,
+                        500,
+                        updateSize);
+
+        createUpdatesMsgList.forEach(sendNotificationsMsg -> {
+            try {
+                serviceBusSender.sendMessage(sendNotificationsMsg);
+                log.info("SENT -----> " + sendNotificationsMsg.toString());
+                successCount.incrementAndGet();
+            } catch (Exception e) {
+                log.error("Error sending messages to create-updates queue", e);
+                errors.add(ERROR_MESSAGE);
+            }
+        });
+
+        log.warn(
+                "Finished sending messages to create-updates queue. Successful: {}. Failures {}.",
+                successCount.get(),
+                createUpdatesMsgList.size() - successCount.get()
+        );
+    }
 }

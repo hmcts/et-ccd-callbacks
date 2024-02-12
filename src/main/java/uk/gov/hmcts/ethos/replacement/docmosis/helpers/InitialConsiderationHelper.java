@@ -212,11 +212,16 @@ public final class InitialConsiderationHelper {
                         .map(EtICListForPreliminaryHearing::getEtICGiveDetailsOfHearingNotice).orElse(null))
                 .preliminaryHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
                         .map(EtICListForPreliminaryHearing::getEtICLengthOfPrelimHearing).orElse(null))
+                .preliminaryHearingLengthType(Optional.ofNullable(
+                        caseData.getEtICHearingNotListedListForPrelimHearing())
+                        .map(EtICListForPreliminaryHearing::getPrelimHearingLengthNumType).orElse(null))
                 //final
                 .finalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
                         .map(EtICListForFinalHearing::getEtICTypeOfFinalHearing).orElse(null))
                 .finalHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
                         .map(EtICListForFinalHearing::getEtICLengthOfFinalHearing).orElse(null))
+                .finalHearingLengthType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
+                        .map(EtICListForFinalHearing::getFinalHearingLengthNumType).orElse(null))
                 //udl
                 .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcejSitAlone).orElse(null))
@@ -244,14 +249,17 @@ public final class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
+
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
 
                 // Further Information
                 .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
 
-                .furtherInfoGiveDetails(defaultIfEmpty(caseData.getEtICFurtherInformationGiveDetails(), null))
-                .furtherInfoTimeToComply(defaultIfEmpty(caseData.getEtICFurtherInformationTimeToComply(), null))
+                .furtherInfoGiveDetails(Optional.ofNullable(caseData.getEtICFurtherInfoAnswers())
+                        .map(EtICFurtherInfoAnswers::getEtICFurtherInformationGiveDetails).orElse(null))
+                .furtherInfoTimeToComply(Optional.ofNullable(caseData.getEtICFurtherInfoAnswers())
+                        .map(EtICFurtherInfoAnswers::getEtICFurtherInformationTimeToComply).orElse(null))
 
                 .r27ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
                         .map(EtInitialConsiderationRule27::getEtICRule27ClaimToBe).orElse(null))

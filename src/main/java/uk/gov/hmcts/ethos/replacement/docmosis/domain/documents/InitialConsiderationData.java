@@ -64,10 +64,16 @@ public class InitialConsiderationData {
     private String preliminaryHearingNotice;
     @JsonProperty("preliminaryHearingLength")
     private String preliminaryHearingLength;
+    @JsonProperty("preliminaryHearingLengthType")
+    private String preliminaryHearingLengthType;
+
     @JsonProperty("finalHearingType")
     private List<String> finalHearingType;
     @JsonProperty("finalHearingLength")
     private String finalHearingLength;
+    @JsonProperty("finalHearingLengthType")
+    private String finalHearingLengthType;
+
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;
     @JsonProperty("udlReasons")

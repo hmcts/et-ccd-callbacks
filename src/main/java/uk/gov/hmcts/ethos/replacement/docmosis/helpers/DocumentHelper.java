@@ -1073,10 +1073,10 @@ public final class DocumentHelper {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             return;
         }
-
-	    caseData.getDocumentCollection().forEach(documentTypeItem -> {
-		    DocumentType documentType = documentTypeItem.getValue();
-		    documentType.setDocNumber(String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
-	    });
+        caseData.getDocumentCollection().forEach(documentTypeItem -> {
+            DocumentType documentType = documentTypeItem.getValue();
+            documentType.setDocNumber(String.valueOf(caseData.getDocumentCollection()
+                                                             .indexOf(documentTypeItem) + 1));
+        });
     }
 }

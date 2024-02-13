@@ -718,5 +718,4 @@ public final class ReferralHelper {
         return String.format(REFERRAL_DOCUMENT_NAME, referral.getReferralNumber(), referral.getReferralSubject());
     }
 
-
 }

@@ -668,4 +668,17 @@ class ReferralHelperTest {
         hearingTypeItem.setValue(hearingType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
     }
+
+    @Test
+    void addReferralDocumentToDocumentCollection() {
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        caseData.getReferralCollection().get(0).getValue().setReferralDocument(List.of(createDocumentType("1")));
+        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
+        selectReferralList.setValue(new DynamicValueType());
+        selectReferralList.getValue().setCode("1");
+        caseData.setSelectReferral(selectReferralList);
+        ReferralHelper.addReferralDocumentToDocumentCollection(caseData);
+        assertEquals(1, caseData.getDocumentCollection().size());
+
+    }
 }

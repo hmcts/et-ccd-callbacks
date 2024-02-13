@@ -672,7 +672,9 @@ class ReferralHelperTest {
     @Test
     void addReferralDocumentToDocumentCollection() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        caseData.getReferralCollection().get(0).getValue().setReferralDocument(List.of(createDocumentType("1")));
+        UploadedDocumentType doc = UploadedDocumentType.builder().documentFilename("fileName").documentUrl("url")
+                .documentBinaryUrl("binaryUrl").build();
+        caseData.getReferralCollection().get(0).getValue().setReferralSummaryPdf(doc);
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");

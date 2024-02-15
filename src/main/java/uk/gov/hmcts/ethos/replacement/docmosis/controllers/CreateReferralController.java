@@ -181,13 +181,11 @@ public class CreateReferralController {
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                 this.documentManagementService.addDocumentToDocumentField(documentInfo));
 
-        String caseLink = null;
-        if (StringUtils.isEmpty(caseData.getMultipleReference())) {
-            caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
-        }
+        String caseLink;
 
         if (StringUtils.isNotEmpty(
                 caseData.getReferentEmail()) && StringUtils.isEmpty(caseData.getMultipleReference())) {
+            caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
             emailService.sendEmail(
                     referralTemplateId,
                     caseData.getReferentEmail(),

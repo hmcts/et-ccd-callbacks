@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.elasticsearch.common.Strings;
 import org.webjars.NotFoundException;
@@ -410,7 +411,9 @@ public final class ReferralHelper {
      */
     private static ReferralTypeData newReferralRequest(CaseData caseData) {
         return ReferralTypeData.builder()
-                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .caseNumber(defaultIfEmpty(StringUtils.isNotBlank(caseData.getMultipleReference())
+                        ? caseData.getMultipleReference()
+                        : caseData.getEthosCaseReference(), null))
                 .referralDate(Helper.getCurrentDate())
                 .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))

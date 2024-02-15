@@ -519,6 +519,43 @@ class ReferralHelperTest {
     }
 
     @Test
+    void documentRequestNewReferralOnMultiple() throws JsonProcessingException {
+        setReferralReplyData();
+        caseData.setReferentEmail("info@test.com");
+        caseData.setMultipleReference("123456");
+
+        String expectedDocumentSummaryNew = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
+            + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
+            + "\"caseNumber\":\"123456\",\"referralDate\":\"" + Helper.getCurrentDate()
+            + "\",\"referredBy\":null,\"referCaseTo\":null,"
+            + "\"referentEmail\":\"info@test.com\",\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
+            + "\"referralSubject\":null,\"referralDetails\":null,"
+            + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,"
+            + "\"upload_timestamp\":null},\"ownerDocument\":null,"
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
+            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\""
+            + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
+            + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
+            + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
+            + "dateOfCorrespondence\":null,\"docNumber\":null}},"
+            + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
+            + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
+            + ":null},\"ownerDocument\":null,"
+            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
+            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
+            + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
+            + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
+            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null}}],\"referralInstruction\":null,"
+            + "\"referralReplyCollection\":null}}";
+
+        String result = ReferralHelper.getDocumentRequest(caseData, "key");
+        assertEquals(expectedDocumentSummaryNew, result);
+    }
+
+    @Test
     void documentRequestExistingReferral() throws JsonProcessingException {
         ReferralType referralType = createReferralTypeItem().getValue();
 

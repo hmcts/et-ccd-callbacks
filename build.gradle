@@ -413,7 +413,7 @@ dependencies {
     testImplementation(platform('org.junit:junit-bom:5.10.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.5'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
 
     // Contract Tests
@@ -432,7 +432,7 @@ dependencies {
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.15.1'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 
-    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.7.0'
+    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.10.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 

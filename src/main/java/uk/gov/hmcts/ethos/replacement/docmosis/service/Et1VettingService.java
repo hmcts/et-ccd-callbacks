@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
@@ -27,11 +28,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_CERT_LIST_DISPLAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ACAS;
@@ -89,6 +92,18 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
             initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
         populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
+        initialEt1ReasonableAdjustments(caseDetails);
+    }
+
+    private static void initialEt1ReasonableAdjustments(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        ClaimantHearingPreference hearingPreference = caseData.getClaimantHearingPreference();
+        Optional.ofNullable(hearingPreference)
+                .map(ClaimantHearingPreference::getReasonableAdjustments)
+                .ifPresent(reasonableAdjustment -> {
+                    caseData.setEt1ReasonableAdjustmentsQuestion(YES.equals(reasonableAdjustment) ? YES : NO);
+                    caseData.setEt1ReasonableAdjustmentsTextArea(hearingPreference.getReasonableAdjustmentsDetail());
+                });
     }
 
     /**

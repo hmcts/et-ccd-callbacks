@@ -22,6 +22,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_API;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_ENGLANDWALES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_ETJUDGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_ROLES;
@@ -48,6 +50,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.HEARING_VIE
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.HMCTS_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.HMCTS_LEGAL_OPERATIONS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.IDAM_SYSTEM_USER_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.JUDGE_EW_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.JUDGE_SC_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.LEGALREP_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.MCA_NOC_APPROVER_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.MCA_SYSTEM_IDAM_ACC_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PRD_AAC_SYSTEM;
@@ -189,6 +194,23 @@ public class CftlibConfig implements CFTLibConfigurer {
             CCD_IMPORT);
 
         // Create test users in the idam simulator.
+        lib.createIdamUser(JUDGE_EW_EMAIL,
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_EMPLOYMENT_ETJUDGE,
+                CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES);
+
+        lib.createIdamUser(JUDGE_SC_EMAIL,
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_EMPLOYMENT_ETJUDGE,
+                CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND);
+
+        lib.createIdamUser(LEGALREP_EMAIL,
+                CASEWORKER,
+                CASEWORKER_EMPLOYMENT,
+                CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
+
         lib.createIdamUser(ENGLANDWALES_EMAIL,
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,

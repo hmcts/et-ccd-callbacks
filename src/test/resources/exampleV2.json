@@ -135,6 +135,19 @@
           }
         }
       ],
+      "documentCollection": [
+        {
+          "id": "12121",
+          "value": {
+            "typeOfDocument": "ET1",
+            "uploadedDocument": {
+              "document_url": "http://test.com/random-uuid",
+              "document_binary_url": "http://test.com/random-uuid/binary",
+              "document_filename": "Filename"
+            }
+          }
+        }
+      ],
       "respondentCollection": [
         {
           "id": "32342342",

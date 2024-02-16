@@ -4,22 +4,28 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.EtICFurtherInfoAnswers;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
 import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationDocument;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
 
 @Slf4j
 public final class InitialConsiderationHelper {
@@ -54,12 +60,17 @@ public final class InitialConsiderationHelper {
     }
 
     private static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {
+        String formattedNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
                 .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
+
                 .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
+
                 .hearingListed(Optional.ofNullable(caseData.getEtICHearingListed()).orElse(null))
                 .hearingPostpone(defaultIfEmpty(caseData.getEtICPostponeGiveDetails(), null))
                 .hearingConvertF2f(defaultIfEmpty(caseData.getEtICConvertF2fGiveDetails(), null))
@@ -67,6 +78,7 @@ public final class InitialConsiderationHelper {
                 .hearingExtend(defaultIfEmpty(caseData.getEtICExtendDurationGiveDetails(), null))
                 .hearingOther(defaultIfEmpty(caseData.getEtICOtherGiveDetails(), null))
                 .otherDirections(defaultIfEmpty(caseData.getEtICHearingAnyOtherDirections(), null))
+
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
                 //cvp
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
@@ -75,6 +87,8 @@ public final class InitialConsiderationHelper {
                         .map(EtICSeekComments::getEtICFinalHearingDetails).orElse(null))
                 .cvpPreliminaryDetails(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICPrelimHearingDetails).orElse(null))
+                .cvpPreliminaryYesNo(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                        .map(EtICSeekComments::getEtICPrelimHearingYesNo).orElse(null))
                 //preliminary
                 .preliminaryHearingType(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
@@ -121,8 +135,10 @@ public final class InitialConsiderationHelper {
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information
                 .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
+
                 .furtherInfoGiveDetails(defaultIfEmpty(caseData.getEtICFurtherInformationGiveDetails(), null))
                 .furtherInfoTimeToComply(defaultIfEmpty(caseData.getEtICFurtherInformationTimeToComply(), null))
+
                 .r27ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
                         .map(EtInitialConsiderationRule27::getEtICRule27ClaimToBe).orElse(null))
                 .r27WhichPart(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
@@ -135,6 +151,7 @@ public final class InitialConsiderationHelper {
                         .map(EtInitialConsiderationRule27::getEtICRule27DirectionReason).orElse(null))
                 .r27NumberOfDays(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
                         .map(EtInitialConsiderationRule27::getEtICRule27NumberOfDays).orElse(null))
+
                 .r28ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
                         .map(EtInitialConsiderationRule28::getEtICRule28ClaimToBe).orElse(null))
                 .r28WhichPart(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
@@ -143,13 +160,12 @@ public final class InitialConsiderationHelper {
                         .map(EtInitialConsiderationRule28::getEtICRule28DirectionReason).orElse(null))
                 .r28NumberOfDays(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
                         .map(EtInitialConsiderationRule28::getEtICRule28NumberOfDays).orElse(null))
+
                 .furtherInfoAnyOtherDirections(
                         defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
-                .icDateCompleted(
-                        defaultIfEmpty(caseData.getIcDateCompleted(),
-                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
-                .icCompletedBy(
-                        defaultIfEmpty(caseData.getIcCompletedBy(), null))
+                // Common
+                .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
+                .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
@@ -161,8 +177,122 @@ public final class InitialConsiderationHelper {
     }
 
     private static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
+        String formattedNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+
+                // New values
+                .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
+                .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
+
+                .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
+                .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
+
+                // Hearing Listed
+                .hearingListed(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICHearingListed).orElse(null))
+                .hearingExtend(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
+                .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))
+                .otherDirections(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections).orElse(null))
+
+                // Hearing NOT Listed
+                .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
+                //video hearing
+                .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                        .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
+                .cvpFinalDetails(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                        .map(EtICSeekComments::getEtICFinalHearingDetails).orElse(null))
+                .cvpPreliminaryDetails(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                        .map(EtICSeekComments::getEtICPrelimHearingDetails).orElse(null))
+                .cvpPreliminaryYesNo(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                        .map(EtICSeekComments::getEtICPrelimHearingYesNo).orElse(null))
+                //preliminary
+                .preliminaryHearingType(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
+                                .map(EtICListForPreliminaryHearing::getEtICTypeOfPreliminaryHearing).orElse(null))
+                .preliminaryHearingPurpose(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
+                        .map(EtICListForPreliminaryHearing::getEtICPurposeOfPreliminaryHearing).orElse(null))
+                .preliminaryHearingNotice(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
+                        .map(EtICListForPreliminaryHearing::getEtICGiveDetailsOfHearingNotice).orElse(null))
+                .preliminaryHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
+                        .map(EtICListForPreliminaryHearing::getEtICLengthOfPrelimHearing).orElse(null))
+                .preliminaryHearingLengthType(Optional.ofNullable(
+                        caseData.getEtICHearingNotListedListForPrelimHearing())
+                        .map(EtICListForPreliminaryHearing::getPrelimHearingLengthNumType).orElse(null))
+                //final
+                .finalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
+                        .map(EtICListForFinalHearing::getEtICTypeOfFinalHearing).orElse(null))
+                .finalHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
+                        .map(EtICListForFinalHearing::getEtICLengthOfFinalHearing).orElse(null))
+                .finalHearingLengthType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
+                        .map(EtICListForFinalHearing::getFinalHearingLengthNumType).orElse(null))
+                //udl
+                .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcejSitAlone).orElse(null))
+                .udlReasons(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlGiveReasons).orElse(null))
+                .udlDisputeOnFacts(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlDisputeOnFacts).orElse(null))
+                .udlLittleOrNoAgreement(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlLittleOrNoAgreement).orElse(null))
+                .udlIssueOfLawArising(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlIssueOfLawArising).orElse(null))
+                .udlViewsOfParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlViewsOfParties).orElse(null))
+                .udlNoViewsExpressedByParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlNoViewsExpressedByParties).orElse(null))
+                .udlConcurrentProceedings(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlConcurrentProceedings).orElse(null))
+                .udlOther(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlOther).orElse(null))
+                .udlHearingFormat(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlHearFormat).orElse(null))
+                .udlCVPIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlCvpIssue).orElse(null))
+                .udlFinalF2FIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
+                .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
+
+                .hearingNotListedOtherDirections(
+                        defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
+
+                // Further Information
+                .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
+
+                .furtherInfoGiveDetails(Optional.ofNullable(caseData.getEtICFurtherInfoAnswers())
+                        .map(EtICFurtherInfoAnswers::getEtICFurtherInformationGiveDetails).orElse(null))
+                .furtherInfoTimeToComply(Optional.ofNullable(caseData.getEtICFurtherInfoAnswers())
+                        .map(EtICFurtherInfoAnswers::getEtICFurtherInformationTimeToComply).orElse(null))
+
+                .r27ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
+                        .map(EtInitialConsiderationRule27::getEtICRule27ClaimToBe).orElse(null))
+                .r27WhichPart(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
+                        .map(EtInitialConsiderationRule27::getEtICRule27WhichPart).orElse(null))
+                .r27Direction(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
+                        .map(EtInitialConsiderationRule27::getEtICRule27Direction).orElse(null))
+                .r27DirectionReason(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
+                        .map(EtInitialConsiderationRule27::getEtICRule27DirectionReason).orElse(null))
+                .r27NumberOfDays(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
+                        .map(EtInitialConsiderationRule27::getEtICRule27NumberOfDays).orElse(null))
+
+                .r28ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
+                        .map(EtInitialConsiderationRule28::getEtICRule28ClaimToBe).orElse(null))
+                .r28WhichPart(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
+                        .map(EtInitialConsiderationRule28::getEtICRule28WhichPart).orElse(null))
+                .r28DirectionReason(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
+                        .map(EtInitialConsiderationRule28::getEtICRule28DirectionReason).orElse(null))
+                .r28NumberOfDays(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
+                        .map(EtInitialConsiderationRule28::getEtICRule28NumberOfDays).orElse(null))
+
+                .furtherInfoAnyOtherDirections(
+                        defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
+
+                // Backward Compatibility values
                 .icReceiptET3FormIssues(defaultIfEmpty(caseData.getIcReceiptET3FormIssues(), null))
                 .icRespondentsNameIdentityIssues(defaultIfEmpty(caseData.getIcRespondentsNameIdentityIssues(), null))
                 .icJurisdictionCodeIssues(defaultIfEmpty(caseData.getIcJurisdictionCodeIssues(), null))
@@ -173,11 +303,9 @@ public final class InitialConsiderationHelper {
                 .icDdaDisabilityIssues(defaultIfEmpty(caseData.getIcDdaDisabilityIssues(), null))
                 .icOrderForFurtherInformation(defaultIfEmpty(caseData.getIcOrderForFurtherInformation(), null))
                 .icOtherIssuesOrFinalOrders(defaultIfEmpty(caseData.getIcOtherIssuesOrFinalOrders(), null))
-                .icDateCompleted(
-                        defaultIfEmpty(caseData.getIcDateCompleted(),
-                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
-                .icCompletedBy(
-                        defaultIfEmpty(caseData.getIcCompletedBy(), null))
+                // Common
+                .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
+                .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
@@ -187,5 +315,20 @@ public final class InitialConsiderationHelper {
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    public static void addToDocumentCollection(CaseData caseData) {
+        if (caseData.getEtInitialConsiderationDocument() == null) {
+            return;
+        }
+
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+
+        DocumentTypeItem documentTypeItem =
+                DocumentHelper.createDocumentTypeItemFromTopLevel(caseData.getEtInitialConsiderationDocument(),
+                        INITIAL_CONSIDERATION, INITIAL_CONSIDERATION, null);
+        caseData.getDocumentCollection().add(documentTypeItem);
     }
 }

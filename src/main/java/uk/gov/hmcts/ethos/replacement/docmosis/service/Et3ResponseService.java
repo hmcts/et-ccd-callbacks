@@ -128,7 +128,9 @@ public class Et3ResponseService {
             documentTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
         }
 
-        documents.addAll(documentList);
+        if (!documentList.isEmpty()) {
+            documents.addAll(documentList);
+        }
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
             documents.add(createDocumentTypeItem(caseData.getEt3ResponseEmployerClaimDocument(), ET3_ATTACHMENT));

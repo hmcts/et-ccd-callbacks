@@ -62,13 +62,8 @@ public class TornadoService {
     private static final String ET3_PROCESSING_PDF = "ET3 Processing.pdf";
     private static final String ET3_RESPONSE_PDF = "ET3 Response.pdf";
     private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
-    public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
     public static final String REFERRAL_SUMMARY_PDF = "Referral Summary.pdf";
-    public static final String TSE_REPLY = "TSE Reply.pdf";
-    public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
-
     private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
-
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
     private final UserIdamService userIdamService;

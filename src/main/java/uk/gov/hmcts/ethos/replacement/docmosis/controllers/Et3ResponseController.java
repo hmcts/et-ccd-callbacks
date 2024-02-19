@@ -175,6 +175,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

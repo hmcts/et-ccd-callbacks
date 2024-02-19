@@ -82,10 +82,16 @@ class TornadoServiceTest {
     private DefaultValuesReaderService defaultValuesReaderService;
     private VenueAddressReaderService venueAddressReaderService;
     private MockHttpURLConnection mockConnection;
+    private OAuth2Configuration oauth2Configuration;
+
     private static final String AUTH_TOKEN = "a-test-auth-token";
     private static final String DOCUMENT_INFO_MARKUP = "<a>some test markup</a>";
     private static final String DUMMY_PDF = "dummy.pdf";
     private OAuth2Configuration oauth2Configuration;
+    private static final String ET1_VETTING_PDF = "ET1 Vetting.pdf";
+    private static final String TSE_ADMIN_REPLY_PDF = "TSE Admin Reply.pdf";
+    private static final String ET3_PROCESSING_PDF = "ET3 Processing.pdf";
+    private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
 
     @BeforeEach
     @SneakyThrows
@@ -240,7 +246,7 @@ class TornadoServiceTest {
     void generateEt1VettingDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET1_VETTING_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -249,7 +255,7 @@ class TornadoServiceTest {
     void generateTseAdminReplyDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "TSE Admin Reply.pdf");
+                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, TSE_ADMIN_REPLY_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -260,7 +266,7 @@ class TornadoServiceTest {
         CaseData caseData = new CaseData();
         caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test", "Test", true));
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
+                caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET3_PROCESSING_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -269,7 +275,7 @@ class TornadoServiceTest {
     void generateInConEWDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -278,7 +284,7 @@ class TornadoServiceTest {
     void generateInConSCDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, "Initial Consideration.pdf");
+                new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -371,6 +377,13 @@ class TornadoServiceTest {
                     "decision.pdf");
             assertThat(bytes.length, is(0));
         }
+    void generateDocumentAsBytes() throws IOException {
+        mockConnectionSuccess();
+        byte[] bytes = tornadoService.generateEventDocumentBytes(
+                new CaseData(),
+                ENGLANDWALES_CASE_TYPE_ID,
+                INITIAL_CONSIDERATION_PDF);
+        assertThat(bytes.length, is(0));
     }
 
     private void createUserService() {

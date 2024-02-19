@@ -115,7 +115,7 @@ public class CaseManagementForCaseWorkerService {
         claimantDefaults(caseData);
         respondentDefaults(caseData);
         struckOutDefaults(caseData);
-        dateToCurrentPosition(caseData);
+        setDateToCurrentPosition(caseData);
         flagsImageFileNameDefaults(caseData);
         setGlobalSearchDefaults(caseData);
         setWorkAllocationDefaults(caseData);
@@ -254,7 +254,7 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    public void dateToCurrentPosition(CaseData caseData) {
+    public void setDateToCurrentPosition(CaseData caseData) {
         if (!isNullOrEmpty(caseData.getPositionType()) && positionChanged(caseData)) {
             caseData.setDateToPosition(LocalDate.now().toString());
             caseData.setCurrentPosition(caseData.getPositionType());

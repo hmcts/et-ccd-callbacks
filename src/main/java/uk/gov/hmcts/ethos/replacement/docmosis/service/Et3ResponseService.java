@@ -139,6 +139,7 @@ public class Et3ResponseService {
         if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
             DocumentTypeItem docTypeItem = createDocumentTypeItem(caseData.getEt3ResponseRespondentSupportDocument(),
                     ET3_ATTACHMENT);
+            docTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
             documents.add(docTypeItem);
         }
 

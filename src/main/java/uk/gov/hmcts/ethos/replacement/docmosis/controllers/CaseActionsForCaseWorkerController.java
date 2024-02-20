@@ -402,10 +402,15 @@ public class CaseActionsForCaseWorkerController {
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
+            String caseTypeId = caseDetails.getCaseTypeId();
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
-                    userToken, caseData, caseDetails.getCaseTypeId(),
+                    userToken, caseData, caseTypeId,
                     caseDetails.getJurisdiction(),
                     caseDetails.getCaseId(), errors);
+
+            if (featureToggleService.isWorkAllocationEnabled() && caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
+                caseManagementLocationService.setCaseManagementLocation(caseData);
+            }
         }
 
         return getCallbackRespEntityErrors(errors, caseData);

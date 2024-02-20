@@ -29,7 +29,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -41,7 +40,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
@@ -128,6 +126,8 @@ class CaseManagementForCaseWorkerServiceTest {
     private AdminUserService adminUserService;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private CaseManagementLocationService caseManagementLocationService;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -217,24 +217,14 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setState("Accepted");
         submitEvent.setCaseId(123);
         submitEvent.setCaseData(submitCaseData);
-        when(tribunalOfficesService.getTribunalOffice(any()))
-                .thenReturn(TribunalOffice.valueOfOfficeName("Edinburgh"));
-        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(getEdinburghCourtLocations());
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID, adminUserService);
-    }
-
-    private static CourtLocations getEdinburghCourtLocations() {
-        CourtLocations edinburghLocation = new CourtLocations();
-        edinburghLocation.setEpimmsId("301017");
-        edinburghLocation.setRegion("North West");
-        edinburghLocation.setRegionId("4");
-        return edinburghLocation;
+                tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID, adminUserService,
+                caseManagementLocationService);
     }
 
     private static Address getAddress() {
@@ -260,17 +250,6 @@ class CaseManagementForCaseWorkerServiceTest {
                 assertEquals("", respondentSumTypeItem.getValue().getRespondentOrganisation());
             }
         }
-    }
-
-    @Test
-    void caseDataDefaultsCaseManagementLocation() {
-        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
-        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals(CaseLocation.builder()
-                        .baseLocation("301017")
-                        .region("4")
-                        .build(),
-                caseData.getCaseManagementLocation());
     }
 
     @Test

@@ -22,13 +22,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -79,6 +77,7 @@ public class CaseManagementForCaseWorkerService {
     private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
+    private final CaseManagementLocationService caseManagementLocationService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -101,7 +100,8 @@ public class CaseManagementForCaseWorkerService {
                                               TribunalOfficesService tribunalOfficesService,
                                               FeatureToggleService featureToggleService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
-                                              AdminUserService adminUserService) {
+                                              AdminUserService adminUserService,
+                                              CaseManagementLocationService caseManagementLocationService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
@@ -109,6 +109,7 @@ public class CaseManagementForCaseWorkerService {
         this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
+        this.caseManagementLocationService = caseManagementLocationService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -126,7 +127,7 @@ public class CaseManagementForCaseWorkerService {
             return;
         }
         setCaseNameHmctsInternal(caseData);
-        setCaseManagementLocation(caseData);
+        caseManagementLocationService.setCaseManagementLocation(caseData);
         setCaseManagementCategory(caseData);
     }
 
@@ -603,24 +604,6 @@ public class CaseManagementForCaseWorkerService {
         caseData.setCaseManagementCategory(
                 DynamicFixedListType.from(CASE_MANAGEMENT_LABEL, CASE_MANAGEMENT_CODE, true)
         );
-    }
-
-    private void setCaseManagementLocation(CaseData caseData) {
-        String managingOfficeName = caseData.getManagingOffice();
-        if (isNullOrEmpty(managingOfficeName)) {
-            log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
-            return;
-        }
-
-        CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
-        if (tribunalLocations.getEpimmsId().isBlank()) {
-            log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
-            return;
-        }
-        caseData.setCaseManagementLocation(CaseLocation.builder()
-                .baseLocation(tribunalLocations.getEpimmsId())
-                .region(tribunalLocations.getRegionId())
-                .build());
     }
 
     private void setHmctsCaseCategory(CaseData caseData) {

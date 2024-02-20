@@ -137,7 +137,9 @@ public class Et3ResponseService {
         }
 
         if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
-            documents.add(createDocumentTypeItem(caseData.getEt3ResponseRespondentSupportDocument(), ET3_ATTACHMENT));
+            DocumentTypeItem docTypeItem = createDocumentTypeItem(caseData.getEt3ResponseRespondentSupportDocument(),
+                    ET3_ATTACHMENT);
+            documents.add(docTypeItem);
         }
 
     }

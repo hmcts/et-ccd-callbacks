@@ -19,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocati
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.utils.ResourceUtils.generateCaseDetails;
@@ -87,5 +88,31 @@ class CaseManagementLocationServiceTest {
                         .region("4")
                         .build(),
                 caseData.getCaseManagementLocation());
+    }
+
+    @Test
+    void caseDataDefaultsCaseManagementLocation_nullManagingOfficeName() throws Exception {
+        CCDRequest scotlandCcdRequest1 = new CCDRequest();
+        CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
+        scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
+
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.setManagingOffice(null);
+        caseManagementLocationService.setCaseManagementLocation(caseData);
+        assertNull(caseData.getCaseManagementLocation());
+    }
+
+    @Test
+    void caseDataDefaultsCaseManagementLocation_nullMTribunalOffice() throws Exception {
+        CCDRequest scotlandCcdRequest1 = new CCDRequest();
+        CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
+        scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
+        CourtLocations t = new CourtLocations();
+        t.setEpimmsId("");
+        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(t);
+
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseManagementLocationService.setCaseManagementLocation(caseData);
+        assertNull(caseData.getCaseManagementLocation());
     }
 }

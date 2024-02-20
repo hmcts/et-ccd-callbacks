@@ -73,7 +73,6 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
-    private final TribunalOfficesService tribunalOfficesService;
     private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
@@ -97,7 +96,6 @@ public class CaseManagementForCaseWorkerService {
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,
                                               ClerkService clerkService,
-                                              TribunalOfficesService tribunalOfficesService,
                                               FeatureToggleService featureToggleService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
@@ -105,7 +103,6 @@ public class CaseManagementForCaseWorkerService {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
-        this.tribunalOfficesService = tribunalOfficesService;
         this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;

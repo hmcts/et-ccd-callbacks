@@ -222,9 +222,8 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService,
-                tribunalOfficesService, featureToggleService, HMCTS_SERVICE_ID, adminUserService,
-                caseManagementLocationService);
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
+                adminUserService, caseManagementLocationService);
     }
 
     private static Address getAddress() {

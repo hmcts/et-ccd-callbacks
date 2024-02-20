@@ -107,9 +107,9 @@ class CaseManagementLocationServiceTest {
         CCDRequest scotlandCcdRequest1 = new CCDRequest();
         CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
-        CourtLocations t = new CourtLocations();
-        t.setEpimmsId("");
-        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(t);
+        CourtLocations blankCourtLocation = new CourtLocations();
+        blankCourtLocation.setEpimmsId("");
+        when(tribunalOfficesService.getTribunalLocations(any())).thenReturn(blankCourtLocation);
 
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementLocationService.setCaseManagementLocation(caseData);

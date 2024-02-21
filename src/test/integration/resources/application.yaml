@@ -130,11 +130,6 @@ case-details-url:
   citizen: dummyUrl
   exui: dummyUrl
 
-bundle:
-  api:
-    url: http://localhost:8080
-  config:
-    default: et-dcf-2.yaml
 acas:
   api:
     url: ${ACAS_BASE_URL:https://api-dev-acas-01.azure-api.net/ECCLUAT}

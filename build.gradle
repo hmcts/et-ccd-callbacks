@@ -480,6 +480,12 @@ bootWithCCD {
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
+    // cftlib extra compose files for Work Allocation
+    // The idea is that we can use this env var to boot the WA containers alongside the rest by setting
+    // its value to "wa-docker-compose.yml"
+    // might become more relevant in future, but for now we don't need it
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'

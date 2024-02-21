@@ -977,6 +977,18 @@ public final class DocumentHelper {
         return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
     }
 
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
+    }
+
     /**
      * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
      * @param uploadedDocumentType UploadedDocumentType to be added
@@ -1053,5 +1065,20 @@ public final class DocumentHelper {
             .filter(Optional::isPresent)
             .map(optional -> optional.get().getDocumentBinaryUrl())
             .toList();
+    }
+
+    /**
+     * Add document numbers to each of the docs in the case.
+     * @param caseData CaseData
+     */
+    public static void setDocumentNumbers(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            return;
+        }
+        caseData.getDocumentCollection().forEach(documentTypeItem -> {
+            DocumentType documentType = documentTypeItem.getValue();
+            documentType.setDocNumber(String.valueOf(caseData.getDocumentCollection()
+                                                             .indexOf(documentTypeItem) + 1));
+        });
     }
 }

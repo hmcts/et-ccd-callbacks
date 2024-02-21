@@ -659,7 +659,7 @@ public final class DocumentHelper {
         sectionName = sectionName.replace(".", "_");
         sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!sectionName.equals("")) {
+        if (!sectionName.isEmpty()) {
             sb.append('"').append('t').append(sectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
@@ -668,9 +668,11 @@ public final class DocumentHelper {
 
     private static StringBuilder getCorrespondenceScotData(CorrespondenceScotType correspondenceScotType) {
         String scotSectionName = getScotSectionName(correspondenceScotType);
+        scotSectionName = scotSectionName.replace(".", "_");
+        scotSectionName = scotSectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!scotSectionName.equals("")) {
-            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
+        if (!scotSectionName.isEmpty()) {
+            sb.append('"').append("t_Scot_").append(scotSectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
         return sb;

@@ -262,7 +262,7 @@ class TseHelperTest {
             + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
             + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
             + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\""
-            + ":\"image.png|testBinaryUrl/documents/1234/binary\"}}],\"copy\":\"Yes\","
+            + ":\"image.png|testBinaryUrl/documents/1234/binary\",\"excludeFromDcf\":null}}],\"copy\":\"Yes\","
             + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));

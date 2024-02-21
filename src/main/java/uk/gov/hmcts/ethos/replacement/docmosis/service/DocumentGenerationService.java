@@ -196,7 +196,7 @@ public class DocumentGenerationService {
 
     public boolean areBfActionsForScotlandToBeUpdated(CaseData caseData, String sectionName) {
         if (caseData.getCorrespondenceScotType() != null) {
-            String[] values = {"7", "72", "75", "76", "77.2"};
+            String[] values = {"7", "72", "75", "76", "77.2", "77.2 Reform"};
             return Arrays.asList(values).contains(sectionName);
         }
         return false;

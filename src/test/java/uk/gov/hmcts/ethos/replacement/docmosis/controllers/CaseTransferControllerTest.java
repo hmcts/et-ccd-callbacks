@@ -14,7 +14,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -73,7 +73,7 @@ class CaseTransferControllerTest {
     DefaultValuesReaderService defaultValuesReaderService;
 
     @MockBean
-    CaseManagementLocationCodeService caseManagementLocationCodeService;
+    CaseManagementLocationService caseManagementLocationService;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -385,7 +385,7 @@ class CaseTransferControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseManagementLocationCodeService, times(1))
+        verify(caseManagementLocationService, times(1))
                 .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -403,7 +403,7 @@ class CaseTransferControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseManagementLocationCodeService, times(1))
+        verify(caseManagementLocationService, times(1))
                 .setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
 
     }
@@ -427,7 +427,7 @@ class CaseTransferControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk());
 
-        verify(caseManagementLocationCodeService, times(1))
+        verify(caseManagementLocationService, times(1))
                 .setCaseManagementLocationCode(any());
     }
 }

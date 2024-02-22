@@ -39,6 +39,7 @@ public final class PseHelper {
             "|Details of why you do not want to inform the other party | %s|\r\n";
 
     private static final String DOC_MARKUP = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>\r\n";
+    private static final String ACCEPTANCE_OF_ECC_RESPONSE = "Acceptance of ECC response";
 
     private PseHelper() {
         // Access through static methods
@@ -77,7 +78,6 @@ public final class PseHelper {
     public static String formatOrdReqDetails(SendNotificationType sendNotificationType) {
         List<String[]> rows = new ArrayList<>(List.of(
             new String[]{"Notification", sendNotificationType.getSendNotificationTitle()},
-            new String[]{"Hearing", getSendNotificationSelectHearing(sendNotificationType)},
             new String[]{"Date sent", sendNotificationType.getDate()},
             new String[]{"Sent by", TRIBUNAL},
             new String[]{"Case management order or request?", sendNotificationType.getSendNotificationCaseManagement()},
@@ -85,6 +85,11 @@ public final class PseHelper {
             new String[]{"Party or parties to respond", sendNotificationType.getSendNotificationSelectParties()},
             new String[]{"Additional information", sendNotificationType.getSendNotificationAdditionalInfo()}
         ));
+
+        if (!ACCEPTANCE_OF_ECC_RESPONSE.equals(sendNotificationType.getSendNotificationEccQuestion())) {
+            rows.add(1, new String[]{"Hearing", getSendNotificationSelectHearing(sendNotificationType)});
+        }
+
         rows.addAll(getSendNotificationUploadDocumentList(sendNotificationType));
         String requestMadeBy = CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
             ? sendNotificationType.getSendNotificationWhoCaseOrder()

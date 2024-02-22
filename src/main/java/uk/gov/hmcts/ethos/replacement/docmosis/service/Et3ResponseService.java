@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -41,6 +42,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 public class Et3ResponseService {
 
     public static final String ET3_ATTACHMENT = "ET3 Attachment";
+    public static final String RESPONSE_TO_A_CLAIM = "Response to a Claim";
+    public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response to a Claim.";
     public static final String ET3_CATEGORY_ID = "C18";
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
@@ -119,31 +122,33 @@ public class Et3ResponseService {
                 .map(GenericTypeItem::getId)
                 .collect(Collectors.toCollection(HashSet::new));
 
-        List<DocumentTypeItem> documentList = Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
-                .orElse(List.of())
-                .stream()
-                .filter(o -> !documentSet.contains(o.getId()))
-                .toList();
+        List<DocumentTypeItem> documentList = new ArrayList<>();
+
+        for (DocumentTypeItem o : Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
+                .orElseGet(List::of)) {
+            if (!documentSet.contains(o.getId())) {
+                documentList.add(o);
+            }
+        }
+
         for (DocumentTypeItem documentTypeItem : documentList) {
             documentTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
         }
 
-        if (!documentList.isEmpty()) {
-            documents.addAll(documentList);
-        }
+        documents.addAll(documentList);
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
-            documents.add(createDocumentTypeItem(caseData.getEt3ResponseEmployerClaimDocument(), ET3_ATTACHMENT));
+            documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseEmployerClaimDocument()));
         }
 
         if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
-            DocumentTypeItem docTypeItem = createDocumentTypeItem(caseData.getEt3ResponseRespondentSupportDocument(),
-                    ET3_ATTACHMENT, "test description");
-            docTypeItem.getValue().setCreationDate(LocalDate.now().toString());
-            docTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
-            documents.add(docTypeItem);
+            documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument()));
         }
+    }
 
+    private DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType) {
+        return createDocumentTypeItemFromTopLevel(uploadedDocType, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT,
+                SHORT_DESCRIPTION);
     }
 
     /**

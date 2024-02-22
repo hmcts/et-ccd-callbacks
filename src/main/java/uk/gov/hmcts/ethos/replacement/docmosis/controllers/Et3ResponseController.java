@@ -155,7 +155,8 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/submitSection", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Save answers to the given specific respondent")
+    @Operation(summary = "Saves answers to the given specific respondent and "
+            + "adds attached documents, if any, to the case doc collection.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -1018,21 +1019,24 @@ public final class DocumentHelper {
             return;
         }
 
-        List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
+        List<String> docTypes = List.of("ET1 Vetting", "ET3 Processing", "Initial Consideration",
+                "App for a Witness Order - C", "Referral/Judicial Direction", "COT3", "Other", "Rejection of Claim",
+                "Claim rejected", "Contact the tribunal about something else - C", "Tribunal case file",
+                "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-            .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
-            .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
+                .filter(d -> ObjectUtils.isNotEmpty(d.getValue().getUploadedDocument()))
+                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
+                .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
                 d.getValue().getUploadedDocument().getDocumentBinaryUrl())
-            )
-            .toList());
+            ).toList());
     }
 
     private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
-        String typeOfDocument = documentType.getTypeOfDocument();
-        if (typeOfDocument == null) {
+        String typeOfDocument = ObjectUtils.isNotEmpty(documentType.getDocumentType())
+                ? documentType.getDocumentType() : documentType.getTypeOfDocument();
+        if (ObjectUtils.isEmpty(typeOfDocument)) {
             return false;
         }
-
         return types.contains(typeOfDocument);
     }
 

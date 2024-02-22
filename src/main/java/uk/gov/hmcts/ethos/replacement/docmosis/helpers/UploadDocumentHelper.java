@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,17 +172,23 @@ public final class UploadDocumentHelper {
     }
 
     public static void setDocumentTypeForDocumentCollection(CaseData caseData) {
-        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
-            for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
-                DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
-                if (!ObjectUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument())) {
-                    documentTypeItem.getValue().getUploadedDocument().setCategoryId(
-                            DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getDocumentType()));
-                }
-                documentTypeItem.getValue().setDocNumber(
-                        String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
-            }
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            return;
         }
+        caseData.getDocumentCollection().forEach(documentTypeItem -> {
+            DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
+
+            if (!ObjectUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument())) {
+                UploadedDocumentType documentType = documentTypeItem.getValue().getUploadedDocument();
+                documentType.setCategoryId(
+                        DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getDocumentType()));
+                documentTypeItem.getValue().setUploadedDocument(documentType);
+            }
+
+            documentTypeItem.getValue().setDocNumber(
+                    String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
+        });
+
     }
 
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -659,7 +660,7 @@ public final class DocumentHelper {
         sectionName = sectionName.replace(".", "_");
         sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!sectionName.equals("")) {
+        if (!sectionName.isEmpty()) {
             sb.append('"').append('t').append(sectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
@@ -668,9 +669,11 @@ public final class DocumentHelper {
 
     private static StringBuilder getCorrespondenceScotData(CorrespondenceScotType correspondenceScotType) {
         String scotSectionName = getScotSectionName(correspondenceScotType);
+        scotSectionName = scotSectionName.replace(".", "_");
+        scotSectionName = scotSectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!scotSectionName.equals("")) {
-            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
+        if (!scotSectionName.isEmpty()) {
+            sb.append('"').append("t_Scot_").append(scotSectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
         return sb;
@@ -975,6 +978,18 @@ public final class DocumentHelper {
         return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
     }
 
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
+    }
+
     /**
      * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
      * @param uploadedDocumentType UploadedDocumentType to be added
@@ -1004,21 +1019,24 @@ public final class DocumentHelper {
             return;
         }
 
-        List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
+        List<String> docTypes = List.of("ET1 Vetting", "ET3 Processing", "Initial Consideration",
+                "App for a Witness Order - C", "Referral/Judicial Direction", "COT3", "Other", "Rejection of Claim",
+                "Claim rejected", "Contact the tribunal about something else - C", "Tribunal case file",
+                "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-            .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
-            .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
+                .filter(d -> ObjectUtils.isNotEmpty(d.getValue().getUploadedDocument()))
+                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
+                .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
                 d.getValue().getUploadedDocument().getDocumentBinaryUrl())
-            )
-            .toList());
+            ).toList());
     }
 
     private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
-        String typeOfDocument = documentType.getTypeOfDocument();
-        if (typeOfDocument == null) {
+        String typeOfDocument = ObjectUtils.isNotEmpty(documentType.getDocumentType())
+                ? documentType.getDocumentType() : documentType.getTypeOfDocument();
+        if (ObjectUtils.isEmpty(typeOfDocument)) {
             return false;
         }
-
         return types.contains(typeOfDocument);
     }
 
@@ -1051,5 +1069,20 @@ public final class DocumentHelper {
             .filter(Optional::isPresent)
             .map(optional -> optional.get().getDocumentBinaryUrl())
             .toList();
+    }
+
+    /**
+     * Add document numbers to each of the docs in the case.
+     * @param caseData CaseData
+     */
+    public static void setDocumentNumbers(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            return;
+        }
+        caseData.getDocumentCollection().forEach(documentTypeItem -> {
+            DocumentType documentType = documentTypeItem.getValue();
+            documentType.setDocNumber(String.valueOf(caseData.getDocumentCollection()
+                                                             .indexOf(documentTypeItem) + 1));
+        });
     }
 }

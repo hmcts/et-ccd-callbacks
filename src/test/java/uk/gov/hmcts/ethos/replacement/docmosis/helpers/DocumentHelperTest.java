@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -42,6 +43,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures.getDocumentTypeItem;
 
@@ -2246,10 +2250,19 @@ class DocumentHelperTest {
 
             caseData.setDocumentCollection(List.of(
                 getDocumentTypeItem("Visible", "ET1"),
-                getDocumentTypeItem("Hidden", "Tribunal case file"),
-                getDocumentTypeItem("Hidden", "Other"),
-                getDocumentTypeItem("Hidden", "Referral/Judicial direction"),
-                getDocumentTypeItem("Visible", null))
+                    getDocumentTypeItem("Hidden", "ET1 Vetting"),
+                    getDocumentTypeItem("Hidden", "ET3 Processing"),
+                    getDocumentTypeItem("Hidden", "Initial Consideration"),
+                    getDocumentTypeItem("Hidden", "App for a Witness Order - C"),
+                    getDocumentTypeItem("Hidden", "Referral/Judicial direction"),
+                    getDocumentTypeItem("Hidden", "Referral/Judicial Direction"),
+                    getDocumentTypeItem("Hidden", "COT3"),
+                    getDocumentTypeItem("Hidden", "Other"),
+                    getDocumentTypeItem("Hidden", "Contact the tribunal about something else - C"),
+                    getDocumentTypeItem("Hidden", "Tribunal case file"),
+                    getDocumentTypeItem("Hidden", "Rejection of Claim"),
+                    getDocumentTypeItem("Hidden", "Claim rejected"),
+                    getDocumentTypeItem("Visible", null))
             );
 
             DocumentHelper.setLegalRepVisibleDocuments(caseData);
@@ -2302,5 +2315,16 @@ class DocumentHelperTest {
 
             assertThat(caseData.getLegalrepDocumentCollection()).isEmpty();
         }
+    }
+
+    @Test
+    void setDocumentNumbers() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withDocumentCollection(ET1)
+                .withDocumentCollection(ET1_ATTACHMENT)
+                .withDocumentCollection(ACAS_CERTIFICATE)
+                .build();
+        DocumentHelper.setDocumentNumbers(caseData);
+        caseData.getDocumentCollection().forEach(d -> assertThat(d.getValue().getDocNumber()).isNotNull());
     }
 }

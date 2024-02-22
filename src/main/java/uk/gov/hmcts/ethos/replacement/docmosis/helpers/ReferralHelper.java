@@ -5,10 +5,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.elasticsearch.common.Strings;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
+import uk.gov.hmcts.ecm.common.model.helper.DocumentConstants;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -48,6 +51,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 
 @Slf4j
 public final class ReferralHelper {
@@ -103,6 +107,7 @@ public final class ReferralHelper {
     private static final String REPLY_REFERRAL_REP = "Reply by";
 
     private static final String REPLY_REFERRAL_REF = "Referred by";
+    private static final String REFERRAL_DOCUMENT_NAME = "Referral %s - %s.pdf";
 
     private ReferralHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -689,4 +694,28 @@ public final class ReferralHelper {
     private static String getEmailFlag(String isUrgent) {
         return YES.equals(isUrgent) ? "URGENT" : "";
     }
+
+    public static void addReferralDocumentToDocumentCollection(CaseData caseData) {
+        ReferralType referral = getSelectedReferral(caseData);
+        UploadedDocumentType referralDocument = referral.getReferralSummaryPdf();
+        if (ObjectUtils.isEmpty(referralDocument)) {
+            return;
+        }
+
+        referralDocument.setDocumentFilename(getReferralDocumentName(referral));
+        referralDocument.setCategoryId(DocumentCategory.REFERRAL_JUDICIAL_DIRECTION.getId());
+
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+
+        caseData.getDocumentCollection().add(createDocumentTypeItemFromTopLevel(referralDocument,
+                DocumentConstants.CASE_MANAGEMENT, DocumentConstants.REFERRAL_JUDICIAL_DIRECTION, null));
+        DocumentHelper.setDocumentNumbers(caseData);
+    }
+
+    private static String getReferralDocumentName(ReferralType referral) {
+        return String.format(REFERRAL_DOCUMENT_NAME, referral.getReferralNumber(), referral.getReferralSubject());
+    }
+
 }

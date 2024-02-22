@@ -208,7 +208,6 @@ public class Et3ResponseController {
                 .build());
     }
 
-
     /**
      * Generates ET3 Response document and add the ET3 Fields to each respondent.
      *

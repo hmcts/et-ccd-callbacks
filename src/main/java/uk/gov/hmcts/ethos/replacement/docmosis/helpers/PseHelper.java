@@ -39,6 +39,7 @@ public final class PseHelper {
             "|Details of why you do not want to inform the other party | %s|\r\n";
 
     private static final String DOC_MARKUP = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>\r\n";
+    private static final String ACCEPTANCE_OF_ECC_RESPONSE = "Acceptance of ECC response";
 
     private PseHelper() {
         // Access through static methods
@@ -85,7 +86,7 @@ public final class PseHelper {
             new String[]{"Additional information", sendNotificationType.getSendNotificationAdditionalInfo()}
         ));
 
-        if (!"Acceptance of ECC response".equals(sendNotificationType.getSendNotificationEccQuestion())) {
+        if (!ACCEPTANCE_OF_ECC_RESPONSE.equals(sendNotificationType.getSendNotificationEccQuestion())) {
             rows.add(1, new String[]{"Hearing", getSendNotificationSelectHearing(sendNotificationType)});
         }
 

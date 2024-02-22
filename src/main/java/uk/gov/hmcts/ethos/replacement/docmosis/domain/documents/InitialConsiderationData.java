@@ -25,7 +25,7 @@ public class InitialConsiderationData {
     @JsonProperty("hearingAlreadyListed")
     private String hearingAlreadyListed;
 
-    //Scotland
+    //Scotland & EngWales
 
     //Hearing listed
     @JsonProperty("hearingListed")
@@ -46,12 +46,16 @@ public class InitialConsiderationData {
     //Hearing not listed
     @JsonProperty("hearingNotListed")
     private List<String> hearingNotListed;
+
     @JsonProperty("cvpHearingType")
     private List<String> cvpHearingType;
     @JsonProperty("cvpFinalDetails")
     private String cvpFinalDetails;
     @JsonProperty("cvpPreliminaryDetails")
     private String cvpPreliminaryDetails;
+    @JsonProperty("cvpPreliminaryYesNo")
+    private String cvpPreliminaryYesNo;
+
     @JsonProperty("preliminaryHearingType")
     private List<String> preliminaryHearingType;
     @JsonProperty("preliminaryHearingPurpose")
@@ -60,10 +64,16 @@ public class InitialConsiderationData {
     private String preliminaryHearingNotice;
     @JsonProperty("preliminaryHearingLength")
     private String preliminaryHearingLength;
+    @JsonProperty("preliminaryHearingLengthType")
+    private String preliminaryHearingLengthType;
+
     @JsonProperty("finalHearingType")
     private List<String> finalHearingType;
     @JsonProperty("finalHearingLength")
     private String finalHearingLength;
+    @JsonProperty("finalHearingLengthType")
+    private String finalHearingLengthType;
+
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;
     @JsonProperty("udlReasons")
@@ -126,8 +136,7 @@ public class InitialConsiderationData {
     @JsonProperty("furtherInfoAnyOtherDirections")
     private String furtherInfoAnyOtherDirections;
 
-    // Eng Wales
-
+    // Backward Compatibility for Eng/Wales
     @JsonProperty("icReceiptET3FormIssues")
     private String icReceiptET3FormIssues;
     @JsonProperty("icRespondentsNameIdentityIssues")
@@ -148,9 +157,10 @@ public class InitialConsiderationData {
     private String icOrderForFurtherInformation;
     @JsonProperty("icOtherIssuesOrFinalOrders")
     private String icOtherIssuesOrFinalOrders;
+
+    // All
     @JsonProperty("icCompletedBy")
     private String icCompletedBy;
     @JsonProperty("icDateCompleted")
     private String icDateCompleted;
-
 }

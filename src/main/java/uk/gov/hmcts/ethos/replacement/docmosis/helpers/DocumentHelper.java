@@ -660,7 +660,7 @@ public final class DocumentHelper {
         sectionName = sectionName.replace(".", "_");
         sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!sectionName.equals("")) {
+        if (!sectionName.isEmpty()) {
             sb.append('"').append('t').append(sectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
@@ -669,9 +669,11 @@ public final class DocumentHelper {
 
     private static StringBuilder getCorrespondenceScotData(CorrespondenceScotType correspondenceScotType) {
         String scotSectionName = getScotSectionName(correspondenceScotType);
+        scotSectionName = scotSectionName.replace(".", "_");
+        scotSectionName = scotSectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!scotSectionName.equals("")) {
-            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
+        if (!scotSectionName.isEmpty()) {
+            sb.append('"').append("t_Scot_").append(scotSectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
         return sb;
@@ -976,6 +978,18 @@ public final class DocumentHelper {
         return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
     }
 
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
+    }
+
     /**
      * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
      * @param uploadedDocumentType UploadedDocumentType to be added
@@ -1055,5 +1069,20 @@ public final class DocumentHelper {
             .filter(Optional::isPresent)
             .map(optional -> optional.get().getDocumentBinaryUrl())
             .toList();
+    }
+
+    /**
+     * Add document numbers to each of the docs in the case.
+     * @param caseData CaseData
+     */
+    public static void setDocumentNumbers(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            return;
+        }
+        caseData.getDocumentCollection().forEach(documentTypeItem -> {
+            DocumentType documentType = documentTypeItem.getValue();
+            documentType.setDocNumber(String.valueOf(caseData.getDocumentCollection()
+                                                             .indexOf(documentTypeItem) + 1));
+        });
     }
 }

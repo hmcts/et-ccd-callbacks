@@ -2250,10 +2250,19 @@ class DocumentHelperTest {
 
             caseData.setDocumentCollection(List.of(
                 getDocumentTypeItem("Visible", "ET1"),
-                getDocumentTypeItem("Hidden", "Tribunal case file"),
-                getDocumentTypeItem("Hidden", "Other"),
-                getDocumentTypeItem("Hidden", "Referral/Judicial direction"),
-                getDocumentTypeItem("Visible", null))
+                    getDocumentTypeItem("Hidden", "ET1 Vetting"),
+                    getDocumentTypeItem("Hidden", "ET3 Processing"),
+                    getDocumentTypeItem("Hidden", "Initial Consideration"),
+                    getDocumentTypeItem("Hidden", "App for a Witness Order - C"),
+                    getDocumentTypeItem("Hidden", "Referral/Judicial direction"),
+                    getDocumentTypeItem("Hidden", "Referral/Judicial Direction"),
+                    getDocumentTypeItem("Hidden", "COT3"),
+                    getDocumentTypeItem("Hidden", "Other"),
+                    getDocumentTypeItem("Hidden", "Contact the tribunal about something else - C"),
+                    getDocumentTypeItem("Hidden", "Tribunal case file"),
+                    getDocumentTypeItem("Hidden", "Rejection of Claim"),
+                    getDocumentTypeItem("Hidden", "Claim rejected"),
+                    getDocumentTypeItem("Visible", null))
             );
 
             DocumentHelper.setLegalRepVisibleDocuments(caseData);

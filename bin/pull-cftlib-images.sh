@@ -17,4 +17,4 @@ docker pull docker.elastic.co/logstash/logstash:7.16.1
 # Download XUI Manage Cases
 docker pull hmctspublic.azurecr.io/xui/webapp:latest
 # Download XUI Manage Organisations
-docker pull hmctspublic.azurecr.io/xui/mo-webapp:l
+docker pull hmctspublic.azurecr.io/xui/mo-webapp:latest

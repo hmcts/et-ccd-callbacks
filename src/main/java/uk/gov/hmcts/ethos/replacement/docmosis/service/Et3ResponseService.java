@@ -41,7 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 @RequiredArgsConstructor
 public class Et3ResponseService {
 
-    public static final String ET3_ATTACHMENT = "ET3 Attachment";
+    public static final String ET3_ATTACHMENT = "ET3 Attachmentok";
     public static final String RESPONSE_TO_A_CLAIM = "Response to a Claim";
     public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response to a Claim.";
     public static final String ET3_CATEGORY_ID = "C18";

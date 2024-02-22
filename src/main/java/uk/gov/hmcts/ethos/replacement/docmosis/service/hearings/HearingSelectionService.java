@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+
 @Service
 public class HearingSelectionService {
 
@@ -76,16 +78,26 @@ public class HearingSelectionService {
             ).toList();
     }
 
-    public List<DynamicValueType> getHearingSelection(CaseData caseData) {
+    public List<DynamicValueType> getHearingDetailsSelection(CaseData caseData) {
         List<DynamicValueType> values = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearing : caseData.getHearingCollection()) {
                 String code = hearing.getId();
-                String label = String.format("Hearing %s", hearing.getValue().getHearingNumber());
+                String label = getHearingListWithDateWhenListed(hearing);
                 values.add(DynamicValueType.create(code, label));
             }
         }
         return values;
+    }
+
+    private static String getHearingListWithDateWhenListed(HearingTypeItem hearing) {
+        for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
+            if (HEARING_STATUS_LISTED.equals(listing.getValue().getHearingStatus())) {
+                String date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
+                return String.format("Hearing %s, %s", hearing.getValue().getHearingNumber(), date);
+            }
+        }
+        return String.format("Hearing %s", hearing.getValue().getHearingNumber());
     }
 
     public List<DynamicValueType> getHearingSelectionAllocateHearing(CaseData caseData) {

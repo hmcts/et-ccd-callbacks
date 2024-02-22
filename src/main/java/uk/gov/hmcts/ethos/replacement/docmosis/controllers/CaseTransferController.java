@@ -19,7 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -50,7 +50,7 @@ public class CaseTransferController {
     private final CaseTransferDifferentCountryService caseTransferDifferentCountryService;
     private final CaseTransferToEcmService caseTransferToEcmService;
     private final DefaultValuesReaderService defaultValuesReaderService;
-    private final CaseManagementLocationCodeService caseManagementLocationCodeService;
+    private final CaseManagementLocationService caseManagementLocationService;
     private final FeatureToggleService featureToggleService;
 
     public CaseTransferController(VerifyTokenService verifyTokenService,
@@ -58,14 +58,14 @@ public class CaseTransferController {
                                   CaseTransferDifferentCountryService caseTransferDifferentCountryService,
                                   CaseTransferToEcmService caseTransferToEcmService,
                                   DefaultValuesReaderService defaultValuesReaderService,
-                                  CaseManagementLocationCodeService caseManagementLocationCodeService,
+                                  CaseManagementLocationService caseManagementLocationService,
                                   FeatureToggleService featureToggleService) {
         this.verifyTokenService = verifyTokenService;
         this.caseTransferSameCountryService = caseTransferSameCountryService;
         this.caseTransferDifferentCountryService = caseTransferDifferentCountryService;
         this.caseTransferToEcmService = caseTransferToEcmService;
         this.defaultValuesReaderService = defaultValuesReaderService;
-        this.caseManagementLocationCodeService = caseManagementLocationCodeService;
+        this.caseManagementLocationService = caseManagementLocationService;
         this.featureToggleService = featureToggleService;
     }
 
@@ -145,8 +145,9 @@ public class CaseTransferController {
         List<String> errors = caseTransferSameCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
 
-        if (featureToggleService.isHmcEnabled()) {
-            caseManagementLocationCodeService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+        if (featureToggleService.isHmcEnabled() || featureToggleService.isWorkAllocationEnabled()) {
+            caseManagementLocationService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+            caseManagementLocationService.setCaseManagementLocation(ccdRequest.getCaseDetails().getCaseData());
         }
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
@@ -204,7 +205,7 @@ public class CaseTransferController {
         ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
 
         if (featureToggleService.isHmcEnabled()) {
-            caseManagementLocationCodeService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+            caseManagementLocationService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
         }
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
@@ -257,7 +258,7 @@ public class CaseTransferController {
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
         if (featureToggleService.isHmcEnabled()) {
-            caseManagementLocationCodeService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+            caseManagementLocationService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
         }
 
         return getCallbackRespEntityNoErrors(caseData);

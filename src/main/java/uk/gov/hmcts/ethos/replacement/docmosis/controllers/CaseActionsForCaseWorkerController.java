@@ -37,7 +37,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -108,7 +108,7 @@ public class CaseActionsForCaseWorkerController {
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
-    private final CaseManagementLocationCodeService caseManagementLocationCodeService;
+    private final CaseManagementLocationService caseManagementLocationService;
 
     private final NocRespondentHelper nocRespondentHelper;
 
@@ -295,7 +295,7 @@ public class CaseActionsForCaseWorkerController {
             log.info("HMC feature flag is {}", hmcToggle);
             if (hmcToggle) {
                 caseManagementForCaseWorkerService.setPublicCaseName(caseData);
-                caseManagementLocationCodeService.setCaseManagementLocationCode(caseData);
+                caseManagementLocationService.setCaseManagementLocationCode(caseData);
             }
         }
 
@@ -402,10 +402,15 @@ public class CaseActionsForCaseWorkerController {
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
+            String caseTypeId = caseDetails.getCaseTypeId();
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
-                    userToken, caseData, caseDetails.getCaseTypeId(),
+                    userToken, caseData, caseTypeId,
                     caseDetails.getJurisdiction(),
                     caseDetails.getCaseId(), errors);
+
+            if (featureToggleService.isWorkAllocationEnabled() && caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
+                caseManagementLocationService.setCaseManagementLocation(caseData);
+            }
         }
 
         return getCallbackRespEntityErrors(errors, caseData);

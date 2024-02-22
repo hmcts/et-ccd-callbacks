@@ -126,6 +126,7 @@ public class CloseReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        ReferralHelper.addReferralDocumentToDocumentCollection(caseData);
         ReferralHelper.setReferralStatusToClosed(caseData);
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);

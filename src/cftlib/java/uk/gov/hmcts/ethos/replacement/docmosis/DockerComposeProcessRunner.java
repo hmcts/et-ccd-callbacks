@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.io.File.separator;
 
@@ -24,7 +25,8 @@ final class DockerComposeProcessRunner {
      */
     @SneakyThrows
     static void start()  {
-        String strComposeFiles = "docker-compose.yml," + System.getenv("CFTLIB_EXTRA_COMPOSE_FILES");
+        String cftlibExtraComposeFiles = System.getenv("CFTLIB_EXTRA_COMPOSE_FILES");
+        String strComposeFiles = "docker-compose.yml," + Optional.of(cftlibExtraComposeFiles).orElse("");
 
         String[] composeFiles = strComposeFiles.split(",");
         URL compose = Thread.currentThread().getContextClassLoader().getResource("compose");

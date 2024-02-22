@@ -27,7 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -197,7 +197,7 @@ class CaseActionsForCaseWorkerControllerTest {
     @MockBean
     private NocRespondentHelper nocRespondentHelper;
     @MockBean
-    private CaseManagementLocationCodeService caseManagementLocationCodeService;
+    private CaseManagementLocationService caseManagementLocationService;
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent2;
@@ -1733,7 +1733,7 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(caseManagementLocationCodeService, times(1))
+        verify(caseManagementLocationService, times(1))
                 .setCaseManagementLocationCode(any());
     }
 }

@@ -51,7 +51,7 @@ class CaseLookupServiceTest {
         multipleDetails.setCaseData(multipleData);
 
         CaseData caseData = caseLookupService.getLeadCaseFromMultipleAsAdmin(multipleDetails);
-        assertEquals(caseData.getCcdID(), "123");
+        assertEquals("123", caseData.getCcdID());
     }
 
     @Test
@@ -68,7 +68,7 @@ class CaseLookupServiceTest {
     @Test
     void getCaseDataAsAdmin_success() throws IOException {
         CaseData caseData = caseLookupService.getCaseDataAsAdmin(ENGLANDWALES_CASE_TYPE_ID, "1234567812345678");
-        assertEquals(caseData.getCcdID(), "123");
+        assertEquals("123", caseData.getCcdID());
     }
 
     @Test

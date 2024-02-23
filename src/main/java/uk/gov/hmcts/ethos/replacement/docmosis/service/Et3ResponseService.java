@@ -125,7 +125,7 @@ public class Et3ResponseService {
         List<DocumentTypeItem> documentList = new ArrayList<>();
 
         //Respondent Contest Claim - support doc
-        if(caseData.getEt3ResponseRespondentContestClaim() != null) {
+        if (caseData.getEt3ResponseRespondentContestClaim() != null) {
             for (DocumentTypeItem docTypeItem : Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                     .orElseGet(List::of)) {
                 if (!documentSet.contains(docTypeItem.getId())) {
@@ -143,8 +143,8 @@ public class Et3ResponseService {
         }
 
         //Support needed - support doc
-        if (caseData.getEt3ResponseRespondentSupportNeeded() != null &&
-                caseData.getEt3ResponseRespondentSupportDocument() != null) {
+        if (caseData.getEt3ResponseRespondentSupportNeeded() != null
+                && caseData.getEt3ResponseRespondentSupportDocument() != null) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument()));
         }
     }

@@ -124,35 +124,28 @@ public class Et3ResponseService {
 
         List<DocumentTypeItem> documentList = new ArrayList<>();
 
-        for (DocumentTypeItem o : Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
-                .orElseGet(List::of)) {
-            if (!documentSet.contains(o.getId())) {
-                documentList.add(o);
+        //Respondent Contest Claim - support doc
+        if(caseData.getEt3ResponseRespondentContestClaim() != null) {
+            for (DocumentTypeItem docTypeItem : Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
+                    .orElseGet(List::of)) {
+                if (!documentSet.contains(docTypeItem.getId())) {
+                    docTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
+                    documentList.add(docTypeItem);
+                }
             }
-        }
-
-        for (DocumentTypeItem documentTypeItem : documentList) {
-            documentTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
         }
 
         documents.addAll(documentList);
 
+        //ECC support doc
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseEmployerClaimDocument()));
         }
 
-        if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
+        //Support needed - support doc
+        if (caseData.getEt3ResponseRespondentSupportNeeded() != null &&
+                caseData.getEt3ResponseRespondentSupportDocument() != null) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument()));
-        }
-
-        if (caseData.getEt3ResponseContestClaimDocument() != null) {
-            documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument()));
-        }
-
-        if (caseData.getEt3ResponseRespondentContestClaim() != null &&
-                !CollectionUtils.isEmpty(caseData.getEt3ResponseContestClaimDocument())) {
-            caseData.getEt3ResponseContestClaimDocument().get(0).getValue().setTypeOfDocument(ET3_ATTACHMENT);
-            documents.add(caseData.getEt3ResponseContestClaimDocument().get(0));
         }
     }
 

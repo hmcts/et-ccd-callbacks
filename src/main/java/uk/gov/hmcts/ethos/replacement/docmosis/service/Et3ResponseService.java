@@ -143,8 +143,7 @@ public class Et3ResponseService {
         }
 
         //Support needed - support doc
-        if (caseData.getEt3ResponseRespondentSupportNeeded() != null
-                && caseData.getEt3ResponseRespondentSupportDocument() != null) {
+        if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument()));
         }
     }

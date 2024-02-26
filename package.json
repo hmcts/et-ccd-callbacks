@@ -43,7 +43,7 @@
     },
     "devDependencies": {
         "@babel/eslint-parser": "^7.17.0",
-        "@codeceptjs/configure": "0.10.0",
+        "@codeceptjs/configure": "1.0.1",
         "@codeceptjs/examples": "1.2.3",
         "@codeceptjs/ui": "0.7.7",
         "@types/archiver": "^6.0.0",

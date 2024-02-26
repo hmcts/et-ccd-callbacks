@@ -374,6 +374,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@codeceptjs/configure@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@codeceptjs/configure@npm:1.0.1"
+  dependencies:
+    lodash.merge: ^4.6.2
+    lodash.mergewith: ^4.6.2
+  peerDependencies:
+    codeceptjs: ">= 2.3.3"
+  checksum: f570ddc1dba5cd53319cb23a1819723cfdba946b084fb39d84d25e0735300fdfb018ec5d8b1f7718d979cb17468126748d04d96aaeb7e1815694f9baca49dde2
+  languageName: node
+  linkType: hard
+
 "@codeceptjs/detox-helper@npm:1.0.2":
   version: 1.0.2
   resolution: "@codeceptjs/detox-helper@npm:1.0.2"
@@ -5660,7 +5672,7 @@ __metadata:
   resolution: "et-ccd-callbacks@workspace:."
   dependencies:
     "@babel/eslint-parser": ^7.17.0
-    "@codeceptjs/configure": 0.10.0
+    "@codeceptjs/configure": 1.0.1
     "@codeceptjs/examples": 1.2.3
     "@codeceptjs/ui": 0.7.7
     "@hmcts/nodejs-logging": 4.0.4

@@ -150,7 +150,7 @@ public class Et3ResponseService {
     }
 
     private DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType) {
-        return createDocumentTypeItemFromTopLevel(uploadedDocType, ET3_ATTACHMENT, ET3_ATTACHMENT,
+        return createDocumentTypeItemFromTopLevel(uploadedDocType, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT,
                 SHORT_DESCRIPTION);
     }
 

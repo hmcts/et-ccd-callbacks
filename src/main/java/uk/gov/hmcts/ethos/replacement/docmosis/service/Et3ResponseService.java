@@ -10,18 +10,15 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -117,38 +114,41 @@ public class Et3ResponseService {
         }
 
         List<DocumentTypeItem> documents = caseData.getDocumentCollection();
-
-        Set<String> documentSet = documents.stream()
-                .map(GenericTypeItem::getId)
-                .collect(Collectors.toCollection(HashSet::new));
-
-        List<DocumentTypeItem> documentList = new ArrayList<>();
-
         //Respondent Contest Claim - support doc
         if (caseData.getEt3ResponseRespondentContestClaim() != null) {
             for (DocumentTypeItem docTypeItem : Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                     .orElseGet(List::of)) {
-                if (!documentSet.contains(docTypeItem.getId())) {
-                    docTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
-                    documentList.add(docTypeItem);
+                if (!isExistingDoc(documents, docTypeItem.getValue().getUploadedDocument())) {
+                    documents.add(getDocumentTypeItemDetails(docTypeItem.getValue().getUploadedDocument()));
                 }
             }
         }
 
-        documents.addAll(documentList);
-
         //ECC support doc
-        if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
+        if (caseData.getEt3ResponseEmployerClaimDocument() != null
+                && !isExistingDoc(documents, caseData.getEt3ResponseEmployerClaimDocument())) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseEmployerClaimDocument()));
         }
 
         //Support needed - support doc
-        if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
+        if (caseData.getEt3ResponseRespondentSupportDocument() != null
+                && !isExistingDoc(documents, caseData.getEt3ResponseRespondentSupportDocument())) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument()));
         }
     }
 
+    private boolean isExistingDoc(List<DocumentTypeItem> documents, UploadedDocumentType uploadedDocType) {
+        return documents.stream()
+                .anyMatch(doc -> {
+                    UploadedDocumentType uploadedDocument = doc.getValue().getUploadedDocument();
+                    return uploadedDocument.getDocumentBinaryUrl().equals(uploadedDocType.getDocumentBinaryUrl())
+                            && uploadedDocument.getDocumentFilename().equals(uploadedDocType.getDocumentFilename())
+                            && uploadedDocument.getDocumentUrl().equals(uploadedDocType.getDocumentUrl());
+                });
+    }
+
     private DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType) {
+
         return createDocumentTypeItemFromTopLevel(uploadedDocType, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT,
                 SHORT_DESCRIPTION);
     }

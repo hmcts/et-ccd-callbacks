@@ -514,7 +514,7 @@ class EventValidationServiceTest {
                 JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
             errors);
         assertThat(errors.get(0))
-            .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, "blah blah"));
+            .isEqualTo(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, "blah blah"));
     }
 
     @Test
@@ -553,7 +553,7 @@ class EventValidationServiceTest {
                 JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
             errors);
         assertThat(errors.get(0))
-            .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, "blah blah"));
+            .isEqualTo(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, "blah blah"));
     }
 
     @ParameterizedTest

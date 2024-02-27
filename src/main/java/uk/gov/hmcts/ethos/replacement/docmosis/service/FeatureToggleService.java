@@ -47,4 +47,8 @@ public class FeatureToggleService {
     public boolean isEccEnabled() {
         return this.featureToggleApi.isFeatureEnabled("ecc");
     }
+
+    public boolean isMultiplesEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("multiples");
+    }
 }

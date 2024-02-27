@@ -13,13 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
-import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
-import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.ccd.types.*;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -345,14 +339,17 @@ public class EventValidationService {
      */
     private boolean disposedHearingWithSameDisposalDateOfJurisdictionExists(
             List<HearingTypeItem> hearingTypeItems, String disposalDate) {
-        if (ObjectUtils.isNotEmpty(hearingTypeItems)) {
-            for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
-                if (ObjectUtils.isNotEmpty(hearingTypeItem.getValue())
-                        && ObjectUtils.isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())
-                        && hearingDateCollectionHasDisposedHearingWithSameDisposalDateOfJurisdiction(
-                        hearingTypeItem.getValue().getHearingDateCollection(), disposalDate)) {
-                    return true;
-                }
+        if (CollectionUtils.isEmpty(hearingTypeItems)) {
+            return false;
+        }
+        for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
+            HearingType hearingType = hearingTypeItem.getValue();
+            if (ObjectUtils.isEmpty(hearingType) || CollectionUtils.isEmpty(hearingType.getHearingDateCollection())) {
+                continue;
+            }
+            if (hasDisposedHearingWithSameDisposalDateOfJurisdiction(
+                    hearingType.getHearingDateCollection(), disposalDate)) {
+                return true;
             }
         }
         return false;
@@ -366,12 +363,15 @@ public class EventValidationService {
      * @return boolean  if true then at least one of the listed type itemshas
      *                  disposed hearing with the same disposal date of jurisdiction.
      */
-    private boolean hearingDateCollectionHasDisposedHearingWithSameDisposalDateOfJurisdiction(
+    private boolean hasDisposedHearingWithSameDisposalDateOfJurisdiction(
             List<DateListedTypeItem> dateListedTypeItems, String disposalDate) {
         for (DateListedTypeItem dateListedTypeItem : dateListedTypeItems) {
-            if (ObjectUtils.isNotEmpty(dateListedTypeItem.getValue())
-                    && areDatesEqual(disposalDate, dateListedTypeItem.getValue().getListedDate())
-                    && YES.equals(dateListedTypeItem.getValue().getHearingCaseDisposed())) {
+            DateListedType dateListedType = dateListedTypeItem.getValue();
+            if (ObjectUtils.isEmpty(dateListedType)) {
+                continue;
+            }
+            if (areDatesEqual(disposalDate, dateListedType.getListedDate())
+                && YES.equals(dateListedType.getHearingCaseDisposed())) {
                 return true;
             }
         }

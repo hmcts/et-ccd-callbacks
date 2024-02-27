@@ -65,7 +65,7 @@
         "@wdio/sauce-service": "^8.11.2",
         "@wdio/selenium-standalone-service": "^7.26.0",
         "@wdio/types": "^7.26.0",
-        "chai": "4.4.1",
+        "chai": "5.1.0",
         "chai-as-promised": "7.1.1",
         "chai-http": "4.4.0",
         "codeceptjs": "3.5.14",

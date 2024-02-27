@@ -70,6 +70,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_BEFORE_RECEIPT_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -98,6 +99,8 @@ class EventValidationServiceTest {
     private CaseDetails caseDetails3;
     private CaseDetails caseDetails4;
     private CaseDetails caseDetails5;
+    private CaseDetails caseDetails23;
+    private CaseDetails caseDetails24;
     private CaseDetails validHearingStatusCaseCloseEventCaseDetails;
     private CaseDetails invalidHearingStatusCaseCloseEventCaseDetails;
     private CaseDetails validJudgeAllocationCaseDetails;
@@ -123,6 +126,8 @@ class EventValidationServiceTest {
         caseDetails3 = generateCaseDetails("caseDetailsTest3.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
         caseDetails5 = generateCaseDetails("caseDetailsTest5.json");
+        caseDetails23 = generateCaseDetails("caseDetailsTest23.json");
+        caseDetails24 = generateCaseDetails("caseDetailsTest24.json");
         validHearingStatusCaseCloseEventCaseDetails = generateCaseDetails(
                 "CaseCloseEvent_ValidHearingStatusCaseDetails.json");
         invalidHearingStatusCaseCloseEventCaseDetails = generateCaseDetails(
@@ -405,6 +410,23 @@ class EventValidationServiceTest {
     }
 
     @Test
+    void shouldValidateJurisdictionCodesWithDisposedHearingWithSameDisposalDateOfJurisdiction() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(caseDetails23.getCaseData(), errors);
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void shouldValidateJurisdictionCodesWithDisposedHearingWithDifferentDisposalDateOfJurisdiction() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(caseDetails24.getCaseData(), errors);
+
+        assertEquals(1, errors.size());
+        assertEquals(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, "DDA"), errors.get(0));
+    }
+
+    @Test
     void shouldValidateJurisdictionCodesWithUniqueCodes() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(caseDetails2.getCaseData(), errors);
@@ -646,17 +668,17 @@ class EventValidationServiceTest {
                 isRejected, partOfMultiple, errors);
 
         assertEquals(4, errors.size());
-        assertThat(errors).asList().contains(String.format(CLOSING_CASE_WITH_BF_OPEN_ERROR,
+        assertThat(errors).contains(String.format(CLOSING_CASE_WITH_BF_OPEN_ERROR,
                 caseDetails18.getCaseData().getEthosCaseReference()));
         if (partOfMultiple) {
-            assertThat(errors).asList().contains(caseDetails18.getCaseData().getEthosCaseReference()
+            assertThat(errors).contains(caseDetails18.getCaseData().getEthosCaseReference()
                     + " - " + MISSING_JUDGEMENT_JURISDICTION_MESSAGE);
-            assertThat(errors).asList().doesNotContain(caseDetails18.getCaseData().getEthosCaseReference()
+            assertThat(errors).doesNotContain(caseDetails18.getCaseData().getEthosCaseReference()
                     + " - " + CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
         } else {
-            assertThat(errors).asList().contains(MISSING_JURISDICTION_OUTCOME_ERROR_MESSAGE);
-            assertThat(errors).asList().doesNotContain(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
-            assertThat(errors).asList().contains(CLOSING_LISTED_CASE_ERROR);
+            assertThat(errors).contains(MISSING_JURISDICTION_OUTCOME_ERROR_MESSAGE);
+            assertThat(errors).doesNotContain(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
+            assertThat(errors).contains(CLOSING_LISTED_CASE_ERROR);
         }
     }
 

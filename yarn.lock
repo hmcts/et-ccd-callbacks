@@ -411,9 +411,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/ui@npm:1.0.2":
-  version: 1.0.2
-  resolution: "@codeceptjs/ui@npm:1.0.2"
+"@codeceptjs/ui@npm:1.1.1":
+  version: 1.1.1
+  resolution: "@codeceptjs/ui@npm:1.1.1"
   dependencies:
     "@codeceptjs/configure": ^0.8.0
     axios: ^0.24.0
@@ -428,13 +428,13 @@ __metadata:
     express: ^4.18.2
     lodash.clonedeep: ^4.5.0
     nanoid: ^3.3.4
-    socket.io: ^2.3.0
+    socket.io: ^2.4.0
     socket.io-client: ^2.3.0
   peerDependencies:
     codeceptjs: 3.5.14
   bin:
     codecept-ui: bin/codecept-ui.js
-  checksum: 7660028f9603148a05033e699745eee5934ef408707370992c7a457fdbaa754f6c5c788d7db63c289db0db4ab77b572491860f0fb73fdcfcedd1c03fac736808
+  checksum: ae1b1ae47bfcc02f216fa971af7d59419b683da14ec6188b41825742d065d5121d53aed825b5f04a1c62bb44ca82eb4630ddab40621e5d39e2f9986496257279
   languageName: node
   linkType: hard
 
@@ -5680,7 +5680,7 @@ __metadata:
     "@babel/eslint-parser": ^7.17.0
     "@codeceptjs/configure": 1.0.1
     "@codeceptjs/examples": 1.2.3
-    "@codeceptjs/ui": 1.0.2
+    "@codeceptjs/ui": 1.1.1
     "@hmcts/nodejs-logging": 4.0.4
     "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^7.1.5
@@ -12673,7 +12673,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socket.io@npm:^2.3.0":
+"socket.io@npm:^2.4.0":
   version: 2.5.0
   resolution: "socket.io@npm:2.5.0"
   dependencies:

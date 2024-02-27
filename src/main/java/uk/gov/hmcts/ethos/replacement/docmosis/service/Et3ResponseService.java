@@ -105,6 +105,11 @@ public class Et3ResponseService {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             caseData.setDocumentCollection(new ArrayList<>());
         }
+
+        documentTypeItem.getValue().setShortDescription(
+                String.format("%s : %s", SHORT_DESCRIPTION, "ET3 Form Submission."));
+        documentTypeItem.getValue().setDateOfCorrespondence(LocalDate.now().toString());
+        documentTypeItem.getValue().setTopLevelDocuments(RESPONSE_TO_A_CLAIM);
         caseData.getDocumentCollection().add(documentTypeItem);
     }
 
@@ -150,7 +155,7 @@ public class Et3ResponseService {
                 });
     }
 
-    private DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType, String docSubGroup) {
+    private static DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType, String docSubGroup) {
 
         return createDocumentTypeItemFromTopLevel(uploadedDocType, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT,
                 String.format("%s : %s", SHORT_DESCRIPTION, docSubGroup));

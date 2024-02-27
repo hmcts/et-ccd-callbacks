@@ -117,7 +117,7 @@ public final class PseHelper {
     private static String getSendNotificationSelectHearing(SendNotificationType sendNotificationType) {
         return Optional.ofNullable(sendNotificationType.getSendNotificationSelectHearing())
             .map(hearing -> hearing.getSelectedLabel())
-            .orElse("");
+            .orElse(null);
     }
 
     /**

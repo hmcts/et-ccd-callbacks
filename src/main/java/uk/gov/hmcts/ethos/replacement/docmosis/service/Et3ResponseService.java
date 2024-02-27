@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 public class Et3ResponseService {
 
     public static final String ET3_ATTACHMENT = "ET3 Attachment";
-    public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response: ";
+    public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response";
     public static final String ET3_CATEGORY_ID = "C18";
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;

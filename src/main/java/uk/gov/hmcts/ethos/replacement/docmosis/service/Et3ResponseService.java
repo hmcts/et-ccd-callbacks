@@ -155,8 +155,8 @@ public class Et3ResponseService {
                 });
     }
 
-    private static DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType, String docSubGroup) {
-
+    private static DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType,
+                                                               String docSubGroup) {
         return createDocumentTypeItemFromTopLevel(uploadedDocType, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT,
                 String.format("%s : %s", SHORT_DESCRIPTION, docSubGroup));
     }

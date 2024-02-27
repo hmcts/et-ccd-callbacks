@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
@@ -58,6 +60,8 @@ class MultipleHelperServiceTest {
     private CreateUpdatesBusSender createUpdatesBusSender;
     @Mock
     private UserIdamService userIdamService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private MultipleHelperService multipleHelperService;
@@ -91,6 +95,7 @@ class MultipleHelperServiceTest {
                 multipleDetails.getCaseData().getLeadCase(),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEventList.get(0));
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
         multipleHelperService.addLeadMarkUp(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData(),
@@ -98,6 +103,25 @@ class MultipleHelperServiceTest {
                 "");
         assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/1232121232\">21006/2020</a>",
                 multipleDetails.getCaseData().getLeadCase());
+        assertEquals("1232121232", multipleDetails.getCaseData().getLeadCaseId());
+    }
+
+    @Test
+    void addLeadMarkUpMultipleOff() {
+        when(singleCasesReadingService.retrieveSingleCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData().getLeadCase(),
+                multipleDetails.getCaseData().getMultipleSource()))
+                .thenReturn(submitEventList.get(0));
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(false);
+        multipleHelperService.addLeadMarkUp(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData(),
+                multipleDetails.getCaseData().getLeadCase(),
+                "");
+        assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/1232121232\">21006/2020</a>",
+                multipleDetails.getCaseData().getLeadCase());
+        assertNull(multipleDetails.getCaseData().getLeadCaseId());
     }
 
     @Test
@@ -108,6 +132,7 @@ class MultipleHelperServiceTest {
                 multipleDetails.getCaseData().getLeadCase(),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEventList.get(0));
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
         multipleHelperService.addLeadMarkUp(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData(),
@@ -115,6 +140,26 @@ class MultipleHelperServiceTest {
                 "12345");
         assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/12345\">21006/2020</a>",
                 multipleDetails.getCaseData().getLeadCase());
+        assertEquals("12345", multipleDetails.getCaseData().getLeadCaseId());
+    }
+
+    @Test
+    void addLeadMarkUpWithCaseIdMultipleOff() {
+        submitEventList.get(0).setCaseId(12_345L);
+        when(singleCasesReadingService.retrieveSingleCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData().getLeadCase(),
+                multipleDetails.getCaseData().getMultipleSource()))
+                .thenReturn(submitEventList.get(0));
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(false);
+        multipleHelperService.addLeadMarkUp(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData(),
+                multipleDetails.getCaseData().getLeadCase(),
+                "12345");
+        assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/12345\">21006/2020</a>",
+                multipleDetails.getCaseData().getLeadCase());
+        assertNull(multipleDetails.getCaseData().getLeadCaseId());
     }
 
     @Test
@@ -125,13 +170,14 @@ class MultipleHelperServiceTest {
                 multipleDetails.getCaseData().getLeadCase(),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(null);
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
         multipleHelperService.addLeadMarkUp(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData(),
                 multipleDetails.getCaseData().getLeadCase(),
                 "");
         assertEquals("21006/2020", multipleDetails.getCaseData().getLeadCase());
-
+        assertNull(multipleDetails.getCaseData().getLeadCaseId());
     }
 
     @Test

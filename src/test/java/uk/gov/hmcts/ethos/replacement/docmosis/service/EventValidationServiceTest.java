@@ -410,7 +410,7 @@ class EventValidationServiceTest {
     }
 
     @Test
-    void shouldValidateJurisdictionCodesWithDisposedHearingWithSameDisposalDateOfJurisdiction() {
+    void shouldValidateJurisdictionCodesForDisposedHearingWithSameDisposalDateOfJurisdiction() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(caseDetails23.getCaseData(), errors);
 
@@ -418,7 +418,7 @@ class EventValidationServiceTest {
     }
 
     @Test
-    void shouldValidateJurisdictionCodesWithDisposedHearingWithDifferentDisposalDateOfJurisdiction() {
+    void shouldHaveValidationErrorForJurisdictionCodesOfDisposedHearingWithDifferentDisposalDateOfJurisdiction() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(caseDetails24.getCaseData(), errors);
 

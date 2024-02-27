@@ -120,7 +120,7 @@ public class Et3ResponseService {
                     .orElseGet(List::of)) {
                 if (!isExistingDoc(documents, docTypeItem.getValue().getUploadedDocument())) {
                     documents.add(getDocumentTypeItemDetails(docTypeItem.getValue().getUploadedDocument(),
-                            "Respondent Contest Claim Document"));
+                            "Respondent Contest Claim."));
                 }
             }
         }
@@ -129,14 +129,14 @@ public class Et3ResponseService {
         if (caseData.getEt3ResponseEmployerClaimDocument() != null
                 && !isExistingDoc(documents, caseData.getEt3ResponseEmployerClaimDocument())) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseEmployerClaimDocument(),
-                    "Employer Claim Document"));
+                    "Employer Claim."));
         }
 
         //Support needed - support doc
         if (caseData.getEt3ResponseRespondentSupportDocument() != null
                 && !isExistingDoc(documents, caseData.getEt3ResponseRespondentSupportDocument())) {
             documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument(),
-                    "Respondent Support Document"));
+                    "Respondent Support."));
         }
     }
 

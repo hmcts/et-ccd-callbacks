@@ -237,7 +237,7 @@ class TornadoServiceTest {
     void generateEt3VettingDocument() throws IOException {
         mockConnectionSuccess();
         CaseData caseData = new CaseData();
-        caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test", "Test", true));
+        caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test Label", "Test Code", true));
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET3_PROCESSING_PDF);
         verifyDocumentInfo(documentInfo);

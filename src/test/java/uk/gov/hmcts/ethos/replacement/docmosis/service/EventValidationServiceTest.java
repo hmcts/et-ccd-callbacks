@@ -100,7 +100,6 @@ class EventValidationServiceTest {
     private CaseDetails caseDetails4;
     private CaseDetails caseDetails5;
     private CaseDetails caseDetails23;
-    private CaseDetails caseDetails24;
     private CaseDetails validHearingStatusCaseCloseEventCaseDetails;
     private CaseDetails invalidHearingStatusCaseCloseEventCaseDetails;
     private CaseDetails validJudgeAllocationCaseDetails;
@@ -127,7 +126,6 @@ class EventValidationServiceTest {
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
         caseDetails5 = generateCaseDetails("caseDetailsTest5.json");
         caseDetails23 = generateCaseDetails("caseDetailsTest23.json");
-        caseDetails24 = generateCaseDetails("caseDetailsTest24.json");
         validHearingStatusCaseCloseEventCaseDetails = generateCaseDetails(
                 "CaseCloseEvent_ValidHearingStatusCaseDetails.json");
         invalidHearingStatusCaseCloseEventCaseDetails = generateCaseDetails(
@@ -420,7 +418,8 @@ class EventValidationServiceTest {
     @Test
     void shouldHaveValidationErrorForJurisdictionCodesOfDisposedHearingWithDifferentDisposalDateOfJurisdiction() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(caseDetails24.getCaseData(), errors);
+        caseDetails23.getCaseData().getJurCodesCollection().get(0).getValue().setDisposalDate("2024-02-26");
+        eventValidationService.validateJurisdiction(caseDetails23.getCaseData(), errors);
 
         assertEquals(1, errors.size());
         assertEquals(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, "DDA"), errors.get(0));

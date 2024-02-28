@@ -87,7 +87,6 @@
         "nodemon": "3.1.0",
         "nsp": "3.2.1",
         "pa11y": "6.2.3",
-        "phantomjs-prebuilt": "2.1.16",
         "playwright": "^1.35.1",
         "playwright-core": "^1.35.1",
         "proxyquire": "2.1.3",

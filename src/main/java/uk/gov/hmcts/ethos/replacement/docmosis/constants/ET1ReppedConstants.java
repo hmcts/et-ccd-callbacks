@@ -33,7 +33,7 @@ public class ET1ReppedConstants {
    Steps to making a claim | Status | Date completed
    -|-|-
    [ET1 Section 1 - Claimant details](/cases/case-details/%s/trigger/et1SectionOne/et1SectionOne1)|%s|%s
-   [ET1 Section 2 - Employment and respondent details](/cases/case-details/%s/trigger/et1SectionTwo/et1SectionTwo1)|%s|%s
+   [ET1 Section 2 - Employment & respondent details](/cases/case-details/%s/trigger/et1SectionTwo/et1SectionTwo1)|%s|%s
    [ET1 Section 3 - Details of the claim](/cases/case-details/%s/trigger/et1SectionThree/et1SectionThree1)|%s|%s
         """;
 
@@ -44,8 +44,6 @@ public class ET1ReppedConstants {
             "Submit claim |  <strong class=\"govuk-tag govuk-tag--grey\">Unavailable</strong>\n";
     public static final String NOT_COMPLETED = "<strong class=\"govuk-tag govuk-tag--red\">Not completed</strong><br>";
     public static final String COMPLETED = "<strong class=\"govuk-tag govuk-tag--turquoise\">Completed</strong><br>";
-    public static final String UNAVAILABLE = "<strong class=\"govuk-tag govuk-tag--grey\">Unavailable</strong><br>";
-    public static final String AVAILABLE = "<strong class=\"govuk-tag govuk-tag--blue\">Available</strong><br>";
     public static final String RESPONDENT_PREAMBLE = """
                            <h2>Respondent added:</h2>
                             %s

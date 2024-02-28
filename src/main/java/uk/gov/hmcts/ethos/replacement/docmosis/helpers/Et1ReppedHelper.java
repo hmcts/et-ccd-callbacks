@@ -549,7 +549,6 @@ public class Et1ReppedHelper {
         caseData.setRespondentAcasNumber(null);
         caseData.setRespondentNoAcasCertificateReason(null);
         caseData.setAddAdditionalRespondentPreamble(null);
-        caseData.setAddAdditionalRespondent(null);
         caseData.setEt1ReppedRespondentCollection(null);
         caseData.setEt1SectionThreeClaimDetails(null);
         caseData.setEt1SectionThreeDocumentUpload(null);

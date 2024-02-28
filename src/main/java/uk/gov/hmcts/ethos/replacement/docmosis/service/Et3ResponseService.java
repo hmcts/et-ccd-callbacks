@@ -98,7 +98,6 @@ public class Et3ResponseService {
                 }
             }
         }
-
     }
 
     private static void addDocumentToDocCollection(CaseData caseData, DocumentTypeItem documentTypeItem) {

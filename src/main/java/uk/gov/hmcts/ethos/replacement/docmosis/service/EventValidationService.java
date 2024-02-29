@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
@@ -329,11 +331,58 @@ public class EventValidationService {
             return;
         }
 
-        Optional<DateListedTypeItem> hearingTypeItem = findHearingTypeItem(hearingTypeItems, disposalDate);
-
-        if (hearingTypeItem.isEmpty() || !YES.equals(hearingTypeItem.get().getValue().getHearingCaseDisposed())) {
+        if (!disposedHearingWithSameDisposalDateOfJurisdictionExists(hearingTypeItems, disposalDate)) {
             errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
         }
+    }
+
+    /**
+     * Checks if hearing type items has any hearing type which is disposed
+     * and has the same disposal date with the jurisdiction disposal date.
+     * @param hearingTypeItems All hearings
+     * @param disposalDate Disposal date of Jurisdiction
+     * @return boolean  if true then hearing list has disposed hearing with the
+     *                  same disposal date of jurisdiction.
+     */
+    private boolean disposedHearingWithSameDisposalDateOfJurisdictionExists(
+            List<HearingTypeItem> hearingTypeItems, String disposalDate) {
+        if (CollectionUtils.isEmpty(hearingTypeItems)) {
+            return false;
+        }
+        for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
+            HearingType hearingType = hearingTypeItem.getValue();
+            if (ObjectUtils.isEmpty(hearingType) || CollectionUtils.isEmpty(hearingType.getHearingDateCollection())) {
+                continue;
+            }
+            if (hasDisposedHearingWithSameDisposalDateOfJurisdiction(
+                    hearingType.getHearingDateCollection(), disposalDate)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if any of the dateListedTypeItems has any hearing type which is disposed
+     * and has the same disposal date with the jurisdiction disposal date.
+     * @param dateListedTypeItems All dateListedType Items in a hearing
+     * @param disposalDate Disposal date of Jurisdiction
+     * @return boolean  if true then at least one of the listed type itemshas
+     *                  disposed hearing with the same disposal date of jurisdiction.
+     */
+    private boolean hasDisposedHearingWithSameDisposalDateOfJurisdiction(
+            List<DateListedTypeItem> dateListedTypeItems, String disposalDate) {
+        for (DateListedTypeItem dateListedTypeItem : dateListedTypeItems) {
+            DateListedType dateListedType = dateListedTypeItem.getValue();
+            if (ObjectUtils.isEmpty(dateListedType)) {
+                continue;
+            }
+            if (areDatesEqual(disposalDate, dateListedType.getListedDate())
+                && YES.equals(dateListedType.getHearingCaseDisposed())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isDisposalDateBeforeReceiptDate(String disposalDate,
@@ -345,43 +394,6 @@ public class EventValidationService {
             return true;
         }
         return false;
-    }
-
-    private Optional<DateListedTypeItem> findHearingTypeItem(List<HearingTypeItem> hearingItems, String disposalDate) {
-        if (CollectionUtils.isEmpty(hearingItems)) {
-            return Optional.empty();
-        }
-
-        Optional<HearingTypeItem> first = hearingItems.stream()
-            .filter(o -> compareHearingDates(o, disposalDate))
-            .findFirst();
-
-        if (first.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return findHearingDateDate(first.get(), disposalDate);
-    }
-
-    private Optional<DateListedTypeItem> findHearingDateDate(HearingTypeItem hearingTypeItem, String disposalDate) {
-        if (hearingTypeItem.getValue().getHearingDateCollection() == null) {
-            return Optional.empty();
-        }
-
-        return hearingTypeItem.getValue().getHearingDateCollection().stream()
-            .filter(o -> areDatesEqual(disposalDate, o.getValue().getListedDate()))
-            .findFirst();
-    }
-
-    private boolean compareHearingDates(HearingTypeItem hearingTypeItem, String disposalDate) {
-        if (hearingTypeItem.getValue().getHearingDateCollection() == null) {
-            return false;
-        }
-        return hearingTypeItem.getValue()
-                .getHearingDateCollection()
-                .stream()
-                .anyMatch(i -> areDatesEqual(disposalDate,
-                        i.getValue().getListedDate()));
     }
 
     private boolean isDisposalDateInFuture(String disposalDate, List<String> errors, String jurCode) {

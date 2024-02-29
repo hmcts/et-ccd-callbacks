@@ -112,9 +112,11 @@ class Et3ResponseServiceTest {
         caseData.setEt3ResponseEmployerClaimDocument(
                 DocumentFixtures.getUploadedDocumentType("ecc.docx")
         );
+        caseData.setEt3ResponseRespondentSupportNeeded("Yes");
         caseData.setEt3ResponseRespondentSupportDocument(
                 DocumentFixtures.getUploadedDocumentType("support.docx")
         );
+        caseData.setEt3ResponseRespondentContestClaim("Yes");
         caseData.setEt3ResponseContestClaimDocument(
                 List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
         );
@@ -124,6 +126,7 @@ class Et3ResponseServiceTest {
 
     @Test
     void saveRelatedDocumentsToDocumentCollection_doesNotSaveNullDocuments() {
+        caseData.setEt3ResponseRespondentContestClaim("Yes");
         caseData.setEt3ResponseContestClaimDocument(
                 List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
         );
@@ -133,6 +136,7 @@ class Et3ResponseServiceTest {
 
     @Test
     void saveRelatedDocumentsToDocumentCollection_doesNotSaveSameDocumentTwice() {
+        caseData.setEt3ResponseRespondentContestClaim("Yes");
         caseData.setEt3ResponseContestClaimDocument(
                 List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
         );

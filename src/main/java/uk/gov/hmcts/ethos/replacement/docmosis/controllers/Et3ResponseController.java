@@ -155,7 +155,8 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/submitSection", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Save answers to the given specific respondent")
+    @Operation(summary = "Saves answers to the given specific respondent and "
+            + "adds attached documents, if any, to the case doc collection.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -175,6 +176,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -205,7 +207,6 @@ public class Et3ResponseController {
                 .confirmation_body(body)
                 .build());
     }
-
 
     /**
      * Generates ET3 Response document and add the ET3 Fields to each respondent.

@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
@@ -42,6 +43,7 @@ public class MultipleHelperService {
     private final MultipleCasesSendingService multipleCasesSendingService;
     private final CreateUpdatesBusSender createUpdatesBusSender;
     private final UserIdamService userIdamService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -49,8 +51,7 @@ public class MultipleHelperService {
     public void addLeadMarkUp(String userToken, String multipleCaseTypeId, MultipleData multipleData,
                               String newLeadCase, String caseId) {
 
-        if (caseId.equals("")) {
-
+        if (caseId.isEmpty()) {
             SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(
                     userToken,
                     multipleCaseTypeId,
@@ -58,11 +59,15 @@ public class MultipleHelperService {
                     multipleData.getMultipleSource());
 
             if (submitEvent != null) {
-
+                String leadCaseId = String.valueOf(submitEvent.getCaseId());
                 multipleData.setLeadCase(MultiplesHelper.generateMarkUp(
                         ccdGatewayBaseUrl,
-                        String.valueOf(submitEvent.getCaseId()),
+                        leadCaseId,
                         newLeadCase));
+                if (featureToggleService.isMultiplesEnabled()) {
+                    multipleData.setLeadCaseId(leadCaseId);
+                }
+
             } else {
                 log.info("No lead case found for: " + newLeadCase);
             }
@@ -72,8 +77,10 @@ public class MultipleHelperService {
                     ccdGatewayBaseUrl,
                     caseId,
                     newLeadCase));
+            if (featureToggleService.isMultiplesEnabled()) {
+                multipleData.setLeadCaseId(caseId);
+            }
         }
-
     }
 
     public void validateExternalMultipleAndSubMultiple(String userToken, String caseTypeId, String multipleRef,
@@ -104,9 +111,9 @@ public class MultipleHelperService {
     }
 
     public void validateSubMultiple(String subMultipleName,
-                                     List<SubMultipleTypeItem> subMultiples,
-                                     List<String> errors,
-                                     String multipleReference) {
+                                    List<SubMultipleTypeItem> subMultiples,
+                                    List<String> errors,
+                                    String multipleReference) {
 
         if (!isNullOrEmpty(subMultipleName) && !doesSubMultipleExist(subMultiples, subMultipleName)) {
 
@@ -224,8 +231,8 @@ public class MultipleHelperService {
     }
 
     public void sendDetachUpdatesToSinglesWithoutConfirmation(String userToken, MultipleDetails multipleDetails,
-                                                         List<String> errors,
-                                                          SortedMap<String, Object> multipleObjects) {
+                                                              List<String> errors,
+                                                              SortedMap<String, Object> multipleObjects) {
         List<String> multipleObjectsFiltered = new ArrayList<>(multipleObjects.keySet());
         MultipleData multipleData = multipleDetails.getCaseData();
         String username = userIdamService.getUserDetails(userToken).getEmail();
@@ -404,12 +411,12 @@ public class MultipleHelperService {
     }
 
     public void sendUpdatesToSinglesLogic(String userToken, MultipleDetails multipleDetails, List<String> errors,
-                                           String newLeadCase, SortedMap<String, Object> multipleObjects,
-                                           List<String> newEthosCaseRefCollection) {
+                                          String newLeadCase, SortedMap<String, Object> multipleObjects,
+                                          List<String> newEthosCaseRefCollection) {
 
         sendUpdatesToSinglesLogicCheckingLead(userToken, multipleDetails, errors, newLeadCase, multipleObjects);
 
-        MultipleData multipleData  = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         sendCreationUpdatesToSinglesWithoutConfirmation(userToken, multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(), multipleData, errors,
                 newEthosCaseRefCollection, newLeadCase,

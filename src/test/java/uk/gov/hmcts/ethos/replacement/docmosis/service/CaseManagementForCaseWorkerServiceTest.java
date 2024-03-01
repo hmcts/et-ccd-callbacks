@@ -255,8 +255,8 @@ class CaseManagementForCaseWorkerServiceTest {
     void caseDataDefaultsCaseManagementCategory() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals(DynamicFixedListType.from("Employment Tribunals", "Employment", true),
-                caseData.getCaseManagementCategory());
+        assertEquals("Employment Tribunals", caseData.getCaseManagementCategory().getSelectedCode());
+        assertEquals("Employment", caseData.getCaseManagementCategory().getSelectedLabel());
     }
 
     @Test

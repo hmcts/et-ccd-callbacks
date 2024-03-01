@@ -8,18 +8,19 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.elasticsearch.common.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_2;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
@@ -93,14 +96,17 @@ public class ExcelReadingService {
                                                     String subMultiple) throws IOException {
         List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()), List.of(ethosRef));
-        submitEvents.get(0).getCaseData().setSubMultipleName(Strings.isNullOrEmpty(subMultiple) ? " " : subMultiple);
+        String caseId = String.valueOf(submitEvents.get(0).getCaseId());
+
         CCDRequest returnedRequest = ccdClient.startEventForCase(userToken,
+                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()), multipleDetails.getJurisdiction(), caseId);
+
+        CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
+        caseData.setSubMultipleName(defaultIfEmpty(subMultiple, " "));
+
+        ccdClient.submitEventForCase(userToken, caseData,
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
-                multipleDetails.getJurisdiction(), String.valueOf(submitEvents.get(0).getCaseId()));
-        ccdClient.submitEventForCase(userToken,
-                submitEvents.get(0).getCaseData(),
-                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
-                multipleDetails.getJurisdiction(), returnedRequest, String.valueOf(submitEvents.get(0).getCaseId()));
+                multipleDetails.getJurisdiction(), returnedRequest, caseId);
     }
 
     public XSSFSheet checkExcelErrors(String userToken, String documentBinaryUrl, List<String> errors)

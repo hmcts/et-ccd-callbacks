@@ -9,7 +9,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -22,6 +21,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.testcontainers.shaded.org.hamcrest.CoreMatchers.is;
 import static org.testcontainers.shaded.org.hamcrest.MatcherAssert.assertThat;
@@ -62,24 +62,33 @@ class BFActionsScheduledTasksTest {
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
                 .thenReturn(List.of(submitEvent2));
 
-        CaseData caseData = submitEvent.getCaseData();
+        CCDRequest returnedRequest = CCDRequestBuilder.builder()
+                .withCaseData(submitEvent.getCaseData())
+                .build();
+        CCDRequest returnedRequestSct = CCDRequestBuilder.builder()
+                .withCaseData(submitEvent2.getCaseData())
+                .build();
 
-        CCDRequest build = CCDRequestBuilder.builder().withCaseData(caseData).build();
-        build.getCaseDetails().setJurisdiction("EMPLOYMENT");
-
-        when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenReturn(build);
+        when(ccdClient.startEventForCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID),
+                any(), any(), any())).thenReturn(returnedRequest);
+        when(ccdClient.startEventForCase(any(), eq(SCOTLAND_CASE_TYPE_ID),
+                any(), any(), any())).thenReturn(returnedRequestSct);
 
         bfActionsScheduledTasks.createTasksForBFDates();
 
-        assertThat(caseData.getWaRule21ReferralSent(), is(YES));
-        assertThat(submitEvent2.getCaseData().getWaRule21ReferralSent(), is(YES));
+        assertThat(returnedRequest.getCaseDetails().getCaseData().getWaRule21ReferralSent(), is(YES));
+        assertThat(returnedRequestSct.getCaseDetails().getCaseData().getWaRule21ReferralSent(), is(YES));
     }
 
     @Test
-    void testCreateTasksForBFDates_featureOff() throws IOException {
+    void testCreateTasksForBFDates_featureOff() throws IOException, URISyntaxException {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(false);
-        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any())).thenThrow(new IOException());
 
+        String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
+        SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any())).thenReturn(List.of(submitEvent));
         bfActionsScheduledTasks.createTasksForBFDates();
+        verifyNoInteractions(adminUserService);
+        verifyNoInteractions(ccdClient);
     }
 }

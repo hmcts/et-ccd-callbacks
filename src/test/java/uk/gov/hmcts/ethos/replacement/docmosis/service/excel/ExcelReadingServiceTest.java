@@ -9,6 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME;
@@ -118,17 +123,27 @@ class ExcelReadingServiceTest {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("1234");
         submitEvent.setCaseData(caseData);
+        submitEvent.setCaseId(1_234_123_412_341_234L);
         MultipleDetails multipleDetails = new MultipleDetails();
-        multipleDetails.setJurisdiction("EMPLOYMENT");
-        multipleDetails.setCaseTypeId("Leeds_Multiple");
-        when(ccdClient.retrieveCasesElasticSearch(anyString(),
-                anyString(), anyList()))
+        multipleDetails.setJurisdiction(EMPLOYMENT);
+        multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
+
+        when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList()))
                 .thenReturn(List.of(submitEvent));
+
+        CCDRequest returnedRequest = CCDRequestBuilder.builder()
+                .withCaseData(submitEvent.getCaseData())
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
+
+        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(returnedRequest);
+
         excelReadingService.setSubMultipleFieldInSingleCaseData(userToken,
                 multipleDetails,
                 "1234",
                 "subMultiple");
-        assertEquals("subMultiple", caseData.getSubMultipleName());
+        assertEquals("subMultiple", returnedRequest.getCaseDetails().getCaseData().getSubMultipleName());
     }
 
     @Test

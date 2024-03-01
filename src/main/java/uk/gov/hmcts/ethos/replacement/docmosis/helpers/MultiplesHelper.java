@@ -229,6 +229,7 @@ public final class MultiplesHelper {
 
         multipleData.setOfficeMultipleCT(null);
         multipleData.setPositionTypeCT(null);
+        multipleData.setBatchCaseStayed(null);
     }
 
     public static SubMultipleTypeItem createSubMultipleTypeItem(String subMultipleReference, String subMultipleName) {

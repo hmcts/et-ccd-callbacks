@@ -598,6 +598,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void setCaseManagementCategory(CaseData caseData) {
+        // See RET-4733 for reason of order of DynamicFixedListType.from() values
         caseData.setCaseManagementCategory(
                 DynamicFixedListType.from(CASE_MANAGEMENT_LABEL, CASE_MANAGEMENT_CODE, true)
         );

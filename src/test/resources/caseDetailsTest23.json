@@ -1,0 +1,772 @@
+{
+  "case_data": {
+    "positionType": "ET1 Online submission",
+    "et1GovOrMajorQuestion": "No",
+    "claimantRepresentedQuestion": "No",
+    "respondentCollection": [
+      {
+        "id": "e16c1fba-9460-410b-aadd-5a690522cc6f",
+        "value": {
+          "respondent_ACAS": "R124593/44/56",
+          "respondent_name": "WA Test tasks Feb 24",
+          "responseContinue": "Yes",
+          "responseReceived": "No",
+          "responseStruckOut": "No",
+          "extensionRequested": "No",
+          "respondent_address": {
+            "Country": "England",
+            "PostCode": "LS1 6HF",
+            "PostTown": "Leeds",
+            "AddressLine1": "Marks & Spencer Plc, Briggate"
+          },
+          "respondent_ACAS_question": "Yes"
+        }
+      }
+    ],
+    "claimantRequests": {
+      "claim_description": "Work allocation test case - process & task names",
+      "discrimination_claims": [
+        "Age"
+      ]
+    },
+    "et1OnlineSubmission": "Yes",
+    "respondent": "WA Test tasks Feb 24",
+    "preAcceptCase": {
+      "caseAccepted": "Yes",
+      "dateAccepted": "2024-02-27"
+    },
+    "et1VettingCompletedBy": "et caseworker 1",
+    "et1DateCompleted": "27 Feb 2024",
+    "claimantOtherType": {
+      "pastEmployer": "Yes",
+      "stillWorking": "No longer working",
+      "claimant_employed_to": "2024-01-21",
+      "claimant_employed_from": "2019-09-09"
+    },
+    "tribunalCorrespondenceFax": "01264 785136",
+    "managingOffice": "Leeds",
+    "feeGroupReference": "1708945490690996",
+    "claimantDocumentCollection": [
+      {
+        "id": "090b5ee0-669e-4377-98f3-be92758fb6f3",
+        "value": {
+          "docNumber": "1",
+          "documentType": "ET1",
+          "typeOfDocument": "ET1",
+          "shortDescription": "ET1 - Citizen Two",
+          "uploadedDocument": {
+            "category_id": "C11",
+            "document_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/80c6c720-219d-4d32-bba7-25f592e9a7d6",
+            "document_filename": "ET1 - Citizen Two.pdf",
+            "document_binary_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/80c6c720-219d-4d32-bba7-25f592e9a7d6/binary"
+          },
+          "topLevelDocuments": "Starting a Claim",
+          "dateOfCorrespondence": "2024-02-26",
+          "startingClaimDocuments": "ET1"
+        }
+      }
+    ],
+    "et1VettingAcasCertIsYesOrNo1": "Yes",
+    "ethosCaseReference": "6000121/2024",
+    "claimantIndType": {
+      "claimant_last_name": "Two",
+      "claimant_first_names": "Citizen",
+      "claimant_date_of_birth": "1990-09-09"
+    },
+    "claimantHearingPreference": {
+      "contact_language": "English",
+      "hearing_language": "English",
+      "hearing_preferences": [
+        "Video",
+        "Phone"
+      ],
+      "reasonable_adjustments": "No"
+    },
+    "claimant": "Citizen Two",
+    "dateToPosition": "2024-02-26",
+    "multipleFlag": "No",
+    "et1ReasonableAdjustmentsQuestion": "No",
+    "trackType": "Open",
+    "currentPosition": "ET1 Online submission",
+    "receiptDate": "2024-02-26",
+    "caseSource": "ET1 Online",
+    "et1VettingDocument": {
+      "document_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/64668823-d355-4663-8d38-1ce3c61108df",
+      "document_filename": "ET1 Vetting - Citizen Two.pdf",
+      "document_binary_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/64668823-d355-4663-8d38-1ce3c61108df/binary"
+    },
+    "typesOfClaim": [
+      "discrimination"
+    ],
+    "claimantId": "c367a378-2251-4088-ac97-7d9d0a2eb379",
+    "hmctsCaseCategory": "Employment Tribunals",
+    "flagsImageAltText": "<font color='Purple' size='5'> RESERVED </font>",
+    "isLocationCorrect": "Yes",
+    "jurCodesCollection": [
+      {
+        "id": "894512fe-d576-42ed-aaf1-4354a1554e50",
+        "value": {
+          "juridictionCodesList": "DAG"
+        }
+      }
+    ],
+    "caseManagementLocation": {
+      "region": "3",
+      "baseLocation": "36313"
+    },
+    "caseManagementLocationCode": "36313",
+    "tribunalCorrespondenceDX": "DX 742940 Leeds 75",
+    "triageQuestions": {
+      "caseType": "Single",
+      "postcode": "LS16HF",
+      "acasMultiple": "Yes",
+      "typesOfClaim": [
+        "discrimination"
+      ],
+      "claimantRepresentedQuestion": "No"
+    },
+    "et1TribunalRegion": "Leeds",
+    "caseType": "Single",
+    "caseManagementCategory": {
+      "value": {
+        "code": "Employment Tribunals",
+        "label": "Employment"
+      },
+      "list_items": [
+        {
+          "code": "Employment Tribunals",
+          "label": "Employment"
+        }
+      ],
+      "selectedCode": "Employment Tribunals",
+      "selectedLabel": "Employment"
+    },
+    "hearingDetailsHearing": {
+      "value": {
+        "code": "fe632170-7ae3-4108-8b11-a531a8323ce8",
+        "label": "Hearing 2, 27 February 2024 13:00"
+      },
+      "list_items": [
+        {
+          "code": "43c078c3-d0ec-40b4-ac42-0c0da50aa67f",
+          "label": "Hearing 1"
+        },
+        {
+          "code": "fe632170-7ae3-4108-8b11-a531a8323ce8",
+          "label": "Hearing 2, 27 February 2024 13:00"
+        }
+      ],
+      "selectedCode": "fe632170-7ae3-4108-8b11-a531a8323ce8",
+      "selectedLabel": "Hearing 2, 27 February 2024 13:00"
+    },
+    "claimant_TypeOfClaimant": "Individual",
+    "claimantFlags": {
+      "partyName": "Citizen Two",
+      "roleOnCase": "claimant"
+    },
+    "areTheseCodesCorrect": "Yes",
+    "tribunalCorrespondenceEmail": "LeedsET@justice.gov.uk",
+    "hearingCollection": [
+      {
+        "id": "43c078c3-d0ec-40b4-ac42-0c0da50aa67f",
+        "value": {
+          "Hearing_type": "Hearing",
+          "Hearing_stage": "Stage 1",
+          "Hearing_venue": {
+            "value": {
+              "code": "Leeds",
+              "label": "Leeds"
+            },
+            "list_items": [
+              {
+                "code": "Harrogate CJC",
+                "label": "Harrogate CJC"
+              },
+              {
+                "code": "Hull",
+                "label": "Hull"
+              },
+              {
+                "code": "Hull Combined Court Centre",
+                "label": "Hull Combined Court Centre"
+              },
+              {
+                "code": "IAC",
+                "label": "IAC"
+              },
+              {
+                "code": "Leeds",
+                "label": "Leeds"
+              },
+              {
+                "code": "Scarborough",
+                "label": "Scarborough"
+              },
+              {
+                "code": "Sheffield Combi",
+                "label": "Sheffield Combined Court"
+              },
+              {
+                "code": "Teesside ET",
+                "label": "Teesside ET"
+              },
+              {
+                "code": "Wakefield Count",
+                "label": "Wakefield Civil and Family Justice Centre"
+              }
+            ],
+            "selectedCode": "Leeds",
+            "selectedLabel": "Leeds"
+          },
+          "hearingFormat": [
+            "In person"
+          ],
+          "hearingNumber": "1",
+          "hearingSitAlone": "Sit Alone",
+          "judicialMediation": "Yes",
+          "hearingEstLengthNum": "2",
+          "hearingDateCollection": [
+            {
+              "id": "50daf287-2e83-41d6-8f60-26aefb075a0d",
+              "value": {
+                "listedDate": "2024-02-27T10:00:00.000",
+                "Hearing_status": "Vacated",
+                "hearingVenueDay": {
+                  "value": {
+                    "code": "Leeds",
+                    "label": "Leeds"
+                  },
+                  "list_items": [
+                    {
+                      "code": "Harrogate CJC",
+                      "label": "Harrogate CJC"
+                    },
+                    {
+                      "code": "Hull",
+                      "label": "Hull"
+                    },
+                    {
+                      "code": "Hull Combined Court Centre",
+                      "label": "Hull Combined Court Centre"
+                    },
+                    {
+                      "code": "IAC",
+                      "label": "IAC"
+                    },
+                    {
+                      "code": "Leeds",
+                      "label": "Leeds"
+                    },
+                    {
+                      "code": "Scarborough",
+                      "label": "Scarborough"
+                    },
+                    {
+                      "code": "Sheffield Combi",
+                      "label": "Sheffield Combined Court"
+                    },
+                    {
+                      "code": "Teesside ET",
+                      "label": "Teesside ET"
+                    },
+                    {
+                      "code": "Wakefield Count",
+                      "label": "Wakefield Civil and Family Justice Centre"
+                    }
+                  ],
+                  "selectedCode": "Leeds",
+                  "selectedLabel": "Leeds"
+                },
+                "hearingTimingStart": "2024-02-27T10:00:00.000",
+                "hearingTimingFinish": "2024-02-27T12:00:00.000"
+              }
+            }
+          ],
+          "hearingEstLengthNumType": "Hours"
+        }
+      },
+      {
+        "id": "fe632170-7ae3-4108-8b11-a531a8323ce8",
+        "value": {
+          "Hearing_type": "Hearing",
+          "Hearing_stage": "Stage 2",
+          "Hearing_venue": {
+            "value": {
+              "code": "Leeds",
+              "label": "Leeds"
+            },
+            "list_items": [
+              {
+                "code": "Harrogate CJC",
+                "label": "Harrogate CJC"
+              },
+              {
+                "code": "Hull",
+                "label": "Hull"
+              },
+              {
+                "code": "Hull Combined Court Centre",
+                "label": "Hull Combined Court Centre"
+              },
+              {
+                "code": "IAC",
+                "label": "IAC"
+              },
+              {
+                "code": "Leeds",
+                "label": "Leeds"
+              },
+              {
+                "code": "Scarborough",
+                "label": "Scarborough"
+              },
+              {
+                "code": "Sheffield Combi",
+                "label": "Sheffield Combined Court"
+              },
+              {
+                "code": "Teesside ET",
+                "label": "Teesside ET"
+              },
+              {
+                "code": "Wakefield Count",
+                "label": "Wakefield Civil and Family Justice Centre"
+              }
+            ],
+            "selectedCode": "Leeds",
+            "selectedLabel": "Leeds"
+          },
+          "hearingFormat": [
+            "In person"
+          ],
+          "hearingNumber": "2",
+          "hearingSitAlone": "Sit Alone",
+          "judicialMediation": "Yes",
+          "hearingEstLengthNum": "2",
+          "hearingDateCollection": [
+            {
+              "id": "303feca4-7de5-444c-8806-f01e49a7ff0b",
+              "value": {
+                "listedDate": "2024-02-27T13:00:00.000",
+                "Hearing_status": "Heard",
+                "hearingVenueDay": {
+                  "value": {
+                    "code": "Leeds",
+                    "label": "Leeds"
+                  },
+                  "list_items": [
+                    {
+                      "code": "Harrogate CJC",
+                      "label": "Harrogate CJC"
+                    },
+                    {
+                      "code": "Hull",
+                      "label": "Hull"
+                    },
+                    {
+                      "code": "Hull Combined Court Centre",
+                      "label": "Hull Combined Court Centre"
+                    },
+                    {
+                      "code": "IAC",
+                      "label": "IAC"
+                    },
+                    {
+                      "code": "Leeds",
+                      "label": "Leeds"
+                    },
+                    {
+                      "code": "Scarborough",
+                      "label": "Scarborough"
+                    },
+                    {
+                      "code": "Sheffield Combi",
+                      "label": "Sheffield Combined Court"
+                    },
+                    {
+                      "code": "Teesside ET",
+                      "label": "Teesside ET"
+                    },
+                    {
+                      "code": "Wakefield Count",
+                      "label": "Wakefield Civil and Family Justice Centre"
+                    }
+                  ],
+                  "selectedCode": "Leeds",
+                  "selectedLabel": "Leeds"
+                },
+                "Hearing_part_heard": "Yes",
+                "hearingTimingStart": "2024-02-27T13:00:00.000",
+                "hearingCaseDisposed": "Yes",
+                "hearingTimingFinish": "2024-02-27T15:00:00.000",
+                "Hearing_reserved_judgement": "Yes"
+              }
+            }
+          ],
+          "hearingEstLengthNumType": "Hours"
+        }
+      }
+    ],
+    "jurCodesCollection": [
+      {
+        "id" : "1234561",
+        "value" : {
+          "juridictionCodesList": "DDA",
+          "disposalDate": "2024-02-27",
+          "judgmentOutcome": "Successful at hearing"
+        }
+      }
+    ],
+    "isTrackAllocationCorrect": "Yes",
+    "documentCollection": [
+      {
+        "id": "090b5ee0-669e-4377-98f3-be92758fb6f3",
+        "value": {
+          "docNumber": "1",
+          "documentType": "ET1",
+          "typeOfDocument": "ET1",
+          "shortDescription": "ET1 - Citizen Two",
+          "uploadedDocument": {
+            "category_id": "C11",
+            "document_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/80c6c720-219d-4d32-bba7-25f592e9a7d6",
+            "document_filename": "ET1 - Citizen Two.pdf",
+            "document_binary_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/80c6c720-219d-4d32-bba7-25f592e9a7d6/binary"
+          },
+          "topLevelDocuments": "Starting a Claim",
+          "dateOfCorrespondence": "2024-02-26",
+          "startingClaimDocuments": "ET1"
+        }
+      },
+      {
+        "id": "ddd088ea-193d-4761-9047-5a639f016bd6",
+        "value": {
+          "documentType": "ET1 Vetting",
+          "uploadedDocument": {
+            "document_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/64668823-d355-4663-8d38-1ce3c61108df",
+            "document_filename": "ET1 Vetting - Citizen Two.pdf",
+            "document_binary_url": "http://dm-store-demo.service.core-compute-demo.internal/documents/64668823-d355-4663-8d38-1ce3c61108df/binary"
+          },
+          "topLevelDocuments": "Starting a Claim",
+          "dateOfCorrespondence": "2024-02-27",
+          "startingClaimDocuments": "ET1 Vetting"
+        }
+      }
+    ],
+    "et1VideoHearingQuestion": "Yes",
+    "et1VettingCanServeClaimYesOrNo": "Yes",
+    "caseNameHmctsInternal": "Citizen Two vs WA Test tasks Feb 24",
+    "SearchCriteria": {
+      "SearchParties": [
+        {
+          "id": "92743de3-5705-4d20-9f7a-2efc25c07439",
+          "value": {
+            "Name": "Citizen Two",
+            "PostCode": "LS1 6HF",
+            "DateOfBirth": "1990-09-09",
+            "AddressLine1": "Marks & Spencer Plc, Briggate",
+            "EmailAddress": "et.citizen2@hmcts.net"
+          }
+        },
+        {
+          "id": "6d8622e5-22c3-4122-846f-4f0a66657959",
+          "value": {
+            "Name": "WA Test tasks Feb 24",
+            "PostCode": "LS1 6HF",
+            "AddressLine1": "Marks & Spencer Plc, Briggate"
+          }
+        }
+      ],
+      "OtherCaseReferences": [
+        {
+          "id": "f9d5f0e9-f2c0-4841-843b-7077729fa444",
+          "value": "6000121/2024"
+        }
+      ]
+    },
+    "tribunalCorrespondenceTelephone": "0113 245 9741",
+    "respondentFlags": {
+      "partyName": "WA Test tasks Feb 24",
+      "roleOnCase": "respondent"
+    },
+    "claimantWorkAddressQuestion": "Yes",
+    "conciliationTrack": "Open Track",
+    "claimantTaskListChecks": {
+      "claimDetailsCheck": "Yes",
+      "personalDetailsCheck": "Yes",
+      "employmentAndRespondentCheck": "Yes"
+    },
+    "claimantType": {
+      "claimant_addressUK": {
+        "Country": "England",
+        "PostCode": "LS1 6HF",
+        "PostTown": "Leeds",
+        "AddressLine1": "Marks & Spencer Plc, Briggate"
+      },
+      "claimant_email_address": "et.citizen2@hmcts.net",
+      "claimant_contact_preference": "Email"
+    },
+    "hearingDetailsCollection": [
+      {
+        "id": "685b8c3b-9366-4231-9ea1-550771c52cb1",
+        "value": {
+          "hearingDetailsDate": "2024-02-27T13:00:00.000",
+          "hearingDetailsStatus": "Heard",
+          "hearingDetailsPartHeard": "Yes",
+          "hearingDetailsTimingStart": "2024-02-27T13:00:00.000",
+          "hearingDetailsCaseDisposed": "Yes",
+          "hearingDetailsTimingFinish": "2024-02-27T15:00:00.000",
+          "hearingDetailsReservedJudgment": "Yes"
+        }
+      }
+    ],
+    "flagsImageFileName": "EMP-TRIB-00000010000.jpg",
+    "et1SuggestHearingVenue": "No",
+    "publicCaseName": "Citizen Two vs WA Test tasks Feb 24",
+    "targetHearingDate": "2024-08-24"
+  },
+  "data_classification": {
+    "positionType": "PUBLIC",
+    "et1GovOrMajorQuestion": "PUBLIC",
+    "claimantRepresentedQuestion": "PUBLIC",
+    "claimantRequests": {
+      "value": {
+        "claim_description": "PUBLIC",
+        "discrimination_claims": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "et1OnlineSubmission": "PUBLIC",
+    "respondent": "PUBLIC",
+    "preAcceptCase": {
+      "value": {
+        "caseAccepted": "PUBLIC",
+        "dateAccepted": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "et1VettingCompletedBy": "PUBLIC",
+    "et1DateCompleted": "PUBLIC",
+    "claimantOtherType": {
+      "value": {
+        "pastEmployer": "PUBLIC",
+        "stillWorking": "PUBLIC",
+        "claimant_employed_to": "PUBLIC",
+        "claimant_employed_from": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "tribunalCorrespondenceFax": "PUBLIC",
+    "managingOffice": "PUBLIC",
+    "feeGroupReference": "PUBLIC",
+    "claimantDocumentCollection": {
+      "value": [
+        {
+          "id": "090b5ee0-669e-4377-98f3-be92758fb6f3",
+          "value": {
+            "docNumber": "PUBLIC",
+            "documentType": "PUBLIC",
+            "typeOfDocument": "PUBLIC",
+            "shortDescription": "PUBLIC",
+            "uploadedDocument": "PUBLIC",
+            "topLevelDocuments": "PUBLIC",
+            "dateOfCorrespondence": "PUBLIC",
+            "startingClaimDocuments": "PUBLIC"
+          }
+        }
+      ],
+      "classification": "PUBLIC"
+    },
+    "et1VettingAcasCertIsYesOrNo1": "PUBLIC",
+    "ethosCaseReference": "PUBLIC",
+    "claimantIndType": {
+      "value": {
+        "claimant_last_name": "PUBLIC",
+        "claimant_first_names": "PUBLIC",
+        "claimant_date_of_birth": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "claimantHearingPreference": {
+      "value": {
+        "contact_language": "PUBLIC",
+        "hearing_language": "PUBLIC",
+        "hearing_preferences": "PUBLIC",
+        "reasonable_adjustments": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "claimant": "PUBLIC",
+    "dateToPosition": "PUBLIC",
+    "multipleFlag": "PUBLIC",
+    "et1ReasonableAdjustmentsQuestion": "PUBLIC",
+    "trackType": "PUBLIC",
+    "currentPosition": "PUBLIC",
+    "receiptDate": "PUBLIC",
+    "caseSource": "PUBLIC",
+    "et1VettingDocument": "PUBLIC",
+    "typesOfClaim": "PUBLIC",
+    "claimantId": "PUBLIC",
+    "hmctsCaseCategory": "PUBLIC",
+    "flagsImageAltText": "PUBLIC",
+    "isLocationCorrect": "PUBLIC",
+    "jurCodesCollection": {
+      "value": [
+        {
+          "id": "894512fe-d576-42ed-aaf1-4354a1554e50",
+          "value": {
+            "juridictionCodesList": "PUBLIC"
+          }
+        }
+      ],
+      "classification": "PUBLIC"
+    },
+    "caseManagementLocation": {
+      "value": {
+        "region": "PUBLIC",
+        "baseLocation": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "caseManagementLocationCode": "PUBLIC",
+    "tribunalCorrespondenceDX": "PUBLIC",
+    "triageQuestions": {
+      "value": {
+        "caseType": "PUBLIC",
+        "postcode": "PUBLIC",
+        "acasMultiple": "PUBLIC",
+        "typesOfClaim": "PUBLIC",
+        "claimantRepresentedQuestion": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "et1TribunalRegion": "PUBLIC",
+    "caseType": "PUBLIC",
+    "caseManagementCategory": "PUBLIC",
+    "hearingDetailsHearing": "PUBLIC",
+    "claimant_TypeOfClaimant": "PUBLIC",
+    "claimantFlags": {
+      "value": {
+        "partyName": "PUBLIC",
+        "roleOnCase": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "areTheseCodesCorrect": "PUBLIC",
+    "tribunalCorrespondenceEmail": "PUBLIC",
+    "isTrackAllocationCorrect": "PUBLIC",
+    "documentCollection": {
+      "value": [
+        {
+          "id": "090b5ee0-669e-4377-98f3-be92758fb6f3",
+          "value": {
+            "docNumber": "PUBLIC",
+            "documentType": "PUBLIC",
+            "typeOfDocument": "PUBLIC",
+            "shortDescription": "PUBLIC",
+            "uploadedDocument": "PUBLIC",
+            "topLevelDocuments": "PUBLIC",
+            "dateOfCorrespondence": "PUBLIC",
+            "startingClaimDocuments": "PUBLIC"
+          }
+        },
+        {
+          "id": "ddd088ea-193d-4761-9047-5a639f016bd6",
+          "value": {
+            "documentType": "PUBLIC",
+            "uploadedDocument": "PUBLIC",
+            "topLevelDocuments": "PUBLIC",
+            "dateOfCorrespondence": "PUBLIC",
+            "startingClaimDocuments": "PUBLIC"
+          }
+        }
+      ],
+      "classification": "PUBLIC"
+    },
+    "et1VideoHearingQuestion": "PUBLIC",
+    "et1VettingCanServeClaimYesOrNo": "PUBLIC",
+    "caseNameHmctsInternal": "PUBLIC",
+    "SearchCriteria": {
+      "value": {
+        "SearchParties": {
+          "value": [
+            {
+              "id": "92743de3-5705-4d20-9f7a-2efc25c07439",
+              "value": {
+                "Name": "PUBLIC",
+                "PostCode": "PUBLIC",
+                "DateOfBirth": "PUBLIC",
+                "AddressLine1": "PUBLIC",
+                "EmailAddress": "PUBLIC"
+              }
+            },
+            {
+              "id": "6d8622e5-22c3-4122-846f-4f0a66657959",
+              "value": {
+                "Name": "PUBLIC",
+                "PostCode": "PUBLIC",
+                "AddressLine1": "PUBLIC"
+              }
+            }
+          ],
+          "classification": "PUBLIC"
+        },
+        "OtherCaseReferences": {
+          "value": [
+            {
+              "id": "f9d5f0e9-f2c0-4841-843b-7077729fa444",
+              "classification": "PUBLIC"
+            }
+          ],
+          "classification": "PUBLIC"
+        }
+      },
+      "classification": "PUBLIC"
+    },
+    "tribunalCorrespondenceTelephone": "PUBLIC",
+    "respondentFlags": {
+      "value": {
+        "partyName": "PUBLIC",
+        "roleOnCase": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "claimantWorkAddressQuestion": "PUBLIC",
+    "conciliationTrack": "PUBLIC",
+    "claimantTaskListChecks": {
+      "value": {
+        "claimDetailsCheck": "PUBLIC",
+        "personalDetailsCheck": "PUBLIC",
+        "employmentAndRespondentCheck": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "claimantType": {
+      "value": {
+        "claimant_addressUK": {
+          "value": {
+            "Country": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "AddressLine1": "PUBLIC"
+          },
+          "classification": "PUBLIC"
+        },
+        "claimant_email_address": "PUBLIC",
+        "claimant_contact_preference": "PUBLIC"
+      },
+      "classification": "PUBLIC"
+    },
+    "flagsImageFileName": "PUBLIC",
+    "et1SuggestHearingVenue": "PUBLIC",
+    "publicCaseName": "PUBLIC",
+    "targetHearingDate": "PUBLIC"
+  },
+  "supplementary_data": {
+    "HMCTSServiceId": "BHA1"
+  },
+  "after_submit_callback_response": null,
+  "callback_response_status_code": null,
+  "callback_response_status": null,
+  "delete_draft_response_status_code": null,
+  "delete_draft_response_status": null
+}

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -25,14 +23,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public final class UpdateDataModelBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger(UpdateDataModelBuilder.class);
-
     private UpdateDataModelBuilder() {
         // Access through static methods
     }
 
     public static UpdateDataModel build(MultipleData multipleData, CaseData caseData) {
-        log.error("CASE STAYED IS " + multipleData.getBatchCaseStayed());
         return UpdateDataModel.builder()
                 .managingOffice(multipleData.getManagingOffice())
                 .fileLocation(DynamicFixedListType.getSelectedValue(multipleData.getFileLocation()).orElse(null))

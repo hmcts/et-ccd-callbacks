@@ -439,7 +439,6 @@ class PseRespondToTribunalServiceTest {
             |View Application||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
-            |Hearing||\r
             |Date sent|5 Aug 2022|\r
             |Sent by|Tribunal|\r
             |Case management order or request?|Request|\r

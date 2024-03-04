@@ -30,7 +30,7 @@ class BundlesRespondentControllerFunctionalTest extends BaseFunctionalTest {
             .build();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setBundlesRespondentAgreedDocWith(YES);
-        caseData.setBundlesRespondentSelectHearing(DynamicFixedListType.from("hearing 1", "1", true));
+        caseData.setBundlesRespondentSelectHearing(DynamicFixedListType.from("1", "hearing 1", true));
         caseData.setBundlesRespondentWhatDocuments(YES);
         caseData.setBundlesRespondentWhoseDocuments(YES);
     }

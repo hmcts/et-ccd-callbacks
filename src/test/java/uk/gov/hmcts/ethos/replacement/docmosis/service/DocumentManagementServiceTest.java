@@ -352,7 +352,7 @@ class DocumentManagementServiceTest {
     }
 
     @Test
-    void addUploadedDocsToCaseDocCollection_EmptyUploadDocCollection() {
+    void addUploadedDocsToCaseDocCollection_WithNullUploadDocCollection() {
         CaseData caseData = new CaseData();
         caseData.setUploadDocumentCollection(new ArrayList<>());
 

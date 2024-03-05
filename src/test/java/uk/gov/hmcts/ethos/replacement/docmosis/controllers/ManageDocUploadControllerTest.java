@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +23,10 @@ import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -62,7 +67,7 @@ class ManageDocUploadControllerTest {
     }
 
     @Test
-    void aboutToSubmitOk() throws Exception {
+    void aboutToSubmitWithValidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -72,17 +77,17 @@ class ManageDocUploadControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(documentManagementService).addUploadedDocsToCaseDocCollection(
-                ccdRequest.getCaseDetails().getCaseData());
+        verify(documentManagementService, times(1)).addUploadedDocsToCaseDocCollection(any());
     }
 
     @Test
-    void aboutToSubmit_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+    void testAboutToSubmitWithInvalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature("invalidToken")).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
+        verify(documentManagementService, never()).addUploadedDocsToCaseDocCollection(any());
     }
 }

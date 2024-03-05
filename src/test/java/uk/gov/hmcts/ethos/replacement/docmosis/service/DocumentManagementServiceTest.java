@@ -293,7 +293,7 @@ class DocumentManagementServiceTest {
     }
 
     @Test
-    void addUploadedDocsToCaseDocCollection_ExistingDocCollection() {
+    void addUploadedDocsToCaseDocCollection_DocumentCollection_NotNull() {
         DocumentTypeItem doc1 = new DocumentTypeItem();
         DocumentType dt = new DocumentType();
         dt.setTopLevelDocuments("ET3");
@@ -352,18 +352,7 @@ class DocumentManagementServiceTest {
     }
 
     @Test
-    void addUploadedDocsToCaseDocCollection_WithNullUploadDocCollection() {
-        CaseData caseData = new CaseData();
-        caseData.setUploadDocumentCollection(new ArrayList<>());
-
-        documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
-
-        assertEquals(0, caseData.getUploadDocumentCollection().size());
-        assertNull(caseData.getDocumentCollection());
-    }
-
-    @Test
-    void addUploadedDocsToCaseDocCollection_WithNullCaseDocCollection() {
+    void addUploadedDocsToCaseDocCollection_DocumentCollection_Null() {
         DocumentTypeItem doc1 = new DocumentTypeItem();
         DocumentType dt = new DocumentType();
         dt.setTopLevelDocuments("ET1 Vetting");

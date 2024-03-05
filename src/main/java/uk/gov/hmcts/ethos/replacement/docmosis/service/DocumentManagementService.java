@@ -266,10 +266,6 @@ public class DocumentManagementService {
      */
     public void addUploadedDocsToCaseDocCollection(CaseData caseData) {
 
-        if (caseData.getUploadDocumentCollection().isEmpty()) {
-            return;
-        }
-
         //If doc collection is empty, initialise it
         if (caseData.getDocumentCollection() == null) {
             caseData.setDocumentCollection(new ArrayList<>());

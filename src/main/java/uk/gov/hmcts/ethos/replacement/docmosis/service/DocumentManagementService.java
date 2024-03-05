@@ -19,8 +19,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.DocumentDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -40,7 +43,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Collections.singletonList;
+import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument;
+import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 @Service
 @Slf4j
@@ -251,6 +258,38 @@ public class DocumentManagementService {
             throw new DocumentManagementException(
                     String.format("Unable to get document details %s from document management", documentId), ex);
         }
+    }
+
+    /**
+     * Adds all uploaded documents to the case's document collection.
+     * @param caseData case that provides both document collections(uploaded and case doc collections)
+     */
+    public void addUploadedDocsToCaseDocCollection(CaseData caseData) {
+
+        if (caseData.getUploadDocumentCollection().isEmpty()) {
+            return;
+        }
+
+        //If doc collection is empty, initialise it
+        if (caseData.getDocumentCollection() == null) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+
+        caseData.getUploadDocumentCollection().forEach(
+                uploadDoc -> {
+                    DocumentType uploadedDocType = uploadDoc.getValue();
+                    setDocumentTypeForDocument(uploadedDocType);
+                    setSecondLevelDocumentFromType(uploadedDocType, uploadedDocType.getDocumentType());
+                    DocumentTypeItem docTypeItem = createDocumentTypeItemFromTopLevel(
+                            uploadedDocType.getUploadedDocument(),
+                            uploadedDocType.getTopLevelDocuments(),
+                            uploadedDocType.getDocumentType(),
+                            String.format("%s : %s", uploadedDocType.getShortDescription(),
+                                    uploadedDocType.getTopLevelDocuments()));
+                    docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
+                    caseData.getDocumentCollection().add(docTypeItem);
+                    setDocumentNumbers(caseData);
+                });
     }
 
     private HttpHeaders getResponseHeaders() {

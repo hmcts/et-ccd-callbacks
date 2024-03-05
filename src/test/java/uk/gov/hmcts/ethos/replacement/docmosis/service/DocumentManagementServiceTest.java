@@ -23,6 +23,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.DocumentDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
@@ -41,11 +43,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -89,7 +93,7 @@ class DocumentManagementServiceTest {
     private static final String AUTH_TOKEN = "Bearer authToken";
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         file = createTestFile();
         markup =
                 "<a target=\"_blank\" href=\"null/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\">Document</a>";
@@ -245,5 +249,104 @@ class DocumentManagementServiceTest {
         LocalDate servingDate = LocalDate.parse(caseData.getClaimServedDate());
         LocalDate et3DueDate = LocalDate.parse(caseData.getEt3DueDate());
         assertThat(et3DueDate).isEqualTo(servingDate.plusDays(28));
+    }
+
+    @Test
+    void addUploadedDocsToCaseDocCollection_WithNullDateOfCorrespondence() {
+        DocumentTypeItem doc1 = new DocumentTypeItem();
+        DocumentType dt = new DocumentType();
+        dt.setTopLevelDocuments("ET1 Vetting");
+        doc1.setValue(dt);
+        UploadedDocumentType uploadedDocType1 = new UploadedDocumentType();
+        uploadedDocType1.setDocumentUrl("test doc url");
+        uploadedDocType1.setDocumentFilename("test file name");
+        uploadedDocType1.setDocumentBinaryUrl("test binary doc url");
+        doc1.getValue().setUploadedDocument(uploadedDocType1);
+
+        doc1.getValue().setDocNumber("18");
+        doc1.getValue().setTopLevelDocuments("ET1 Vetting");
+        doc1.getValue().setTypeOfDocument("ET1 being vetted");
+        CaseData caseData = new CaseData();
+        caseData.setUploadDocumentCollection(new ArrayList<>());
+        caseData.getUploadDocumentCollection().add(doc1);
+
+        DocumentType dt4 = new DocumentType();
+        DocumentTypeItem doc4 = new DocumentTypeItem();
+        doc4.setValue(dt4);
+        UploadedDocumentType uploadedDocType4 = new UploadedDocumentType();
+        uploadedDocType4.setDocumentUrl("test doc url 4");
+        uploadedDocType4.setDocumentFilename("test file name 4");
+        uploadedDocType4.setDocumentBinaryUrl("test binary doc url 4");
+
+        doc4.getValue().setUploadedDocument(uploadedDocType4);
+        doc4.getValue().setDateOfCorrespondence("2024-03-04");
+        doc4.getValue().setDocNumber("3");
+        doc4.getValue().setTopLevelDocuments("ET3");
+        doc4.getValue().setTypeOfDocument("ET3 reconsidered");
+        caseData.setDocumentCollection(new ArrayList<>());
+        caseData.getDocumentCollection().add(doc4);
+
+        documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
+
+        assertEquals(2, caseData.getDocumentCollection().size());
+        assertNull(caseData.getDocumentCollection().get(1).getValue().getDateOfCorrespondence());
+    }
+
+    @Test
+    void addUploadedDocsToCaseDocCollection_ExistingDocCollection() {
+        DocumentTypeItem doc1 = new DocumentTypeItem();
+        DocumentType dt = new DocumentType();
+        dt.setTopLevelDocuments("ET3");
+        doc1.setValue(dt);
+
+        UploadedDocumentType uploadedDocType1 = new UploadedDocumentType();
+        uploadedDocType1.setDocumentUrl("test doc url");
+        uploadedDocType1.setDocumentFilename("test file name");
+        uploadedDocType1.setDocumentBinaryUrl("test binary doc url");
+        doc1.getValue().setUploadedDocument(uploadedDocType1);
+        doc1.getValue().setDateOfCorrespondence("2024-03-04");
+        doc1.getValue().setDocNumber("2");
+        doc1.getValue().setTopLevelDocuments("ET3");
+        doc1.getValue().setTypeOfDocument("ET3 being vetted");
+
+        //docs that already existing in collection
+        UploadedDocumentType uploadedDocType2 = new UploadedDocumentType();
+        uploadedDocType2.setDocumentUrl("test doc url 2");
+        uploadedDocType2.setDocumentFilename("test file name 2");
+        uploadedDocType2.setDocumentBinaryUrl("test binary doc url 2");
+        DocumentTypeItem doc2 = new DocumentTypeItem();
+        DocumentType dt2 = new DocumentType();
+        doc2.setValue(dt2);
+        doc2.getValue().setUploadedDocument(uploadedDocType2);
+        doc2.getValue().setDateOfCorrespondence("2024-03-04");
+        doc2.getValue().setDocNumber("1");
+        doc2.getValue().setTopLevelDocuments("ET3");
+        doc2.getValue().setTypeOfDocument("ET3 Accepted");
+
+        UploadedDocumentType uploadedDocType3 = new UploadedDocumentType();
+        uploadedDocType3.setDocumentUrl("test doc url 3");
+        uploadedDocType3.setDocumentFilename("test file name 3");
+        uploadedDocType3.setDocumentBinaryUrl("test binary doc url 3");
+
+        DocumentTypeItem doc3 = new DocumentTypeItem();
+        DocumentType dt3 = new DocumentType();
+        doc3.setValue(dt3);
+        doc3.getValue().setUploadedDocument(uploadedDocType3);
+        doc3.getValue().setDateOfCorrespondence("2024-03-04");
+        doc3.getValue().setDocNumber("2");
+        doc3.getValue().setTopLevelDocuments("ET3");
+        doc3.getValue().setTypeOfDocument("ET3 rejected");
+
+        CaseData caseData = new CaseData();
+        caseData.setDocumentCollection(new ArrayList<>());
+        caseData.getDocumentCollection().add(doc2);
+        caseData.getDocumentCollection().add(doc3);
+        caseData.setUploadDocumentCollection(new ArrayList<>());
+        caseData.getUploadDocumentCollection().add(doc1);
+        documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
+
+        assertEquals(3, caseData.getDocumentCollection().size());
+        assertEquals("2024-03-04",
+                caseData.getDocumentCollection().get(2).getValue().getDateOfCorrespondence());
     }
 }

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class UpdateDataModelBuilderTest {
@@ -204,6 +205,16 @@ class UpdateDataModelBuilderTest {
                 SELECT_NONE_VALUE, UNKNOWN_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
         assertNull(updateDataModel.getRepresentedType());
+    }
+
+    @Test
+    void build_withBatchCaseStayed() {
+        MultipleData multipleData = createMultipleData(
+                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE,
+                SELECT_NONE_VALUE, SELECT_NONE_VALUE);
+        multipleData.setBatchCaseStayed(YES);
+        UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
+        assertEquals(YES, updateDataModel.getBatchCaseStayed());
     }
 
     private MultipleData createMultipleData(String claimantRepresentative,

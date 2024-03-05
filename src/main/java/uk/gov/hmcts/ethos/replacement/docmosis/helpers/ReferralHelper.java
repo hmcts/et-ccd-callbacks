@@ -415,10 +415,11 @@ public final class ReferralHelper {
      * @return a referral object which can then be mapped into the pdf doc
      */
     private static ReferralTypeData newReferralRequest(CaseData caseData) {
+        String caseNumber = StringUtils.isBlank(caseData.getMultipleReference())
+                ? caseData.getEthosCaseReference()
+                : caseData.getMultipleReference();
         return ReferralTypeData.builder()
-                .caseNumber(defaultIfEmpty(StringUtils.isNotBlank(caseData.getMultipleReference())
-                        ? caseData.getMultipleReference()
-                        : caseData.getEthosCaseReference(), null))
+                .caseNumber(defaultIfEmpty(caseNumber, null))
                 .referralDate(Helper.getCurrentDate())
                 .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))

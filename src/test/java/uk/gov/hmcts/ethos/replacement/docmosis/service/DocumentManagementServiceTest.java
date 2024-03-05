@@ -348,5 +348,44 @@ class DocumentManagementServiceTest {
         assertEquals(3, caseData.getDocumentCollection().size());
         assertEquals("2024-03-04",
                 caseData.getDocumentCollection().get(2).getValue().getDateOfCorrespondence());
+
+    }
+
+    @Test
+    void addUploadedDocsToCaseDocCollection_EmptyUploadDocCollection() {
+        CaseData caseData = new CaseData();
+        caseData.setUploadDocumentCollection(new ArrayList<>());
+
+        documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
+
+        assertEquals(0, caseData.getUploadDocumentCollection().size());
+        assertNull(caseData.getDocumentCollection());
+    }
+
+    @Test
+    void addUploadedDocsToCaseDocCollection_WithNullCaseDocCollection() {
+        DocumentTypeItem doc1 = new DocumentTypeItem();
+        DocumentType dt = new DocumentType();
+        dt.setTopLevelDocuments("ET1 Vetting");
+        doc1.setValue(dt);
+        UploadedDocumentType uploadedDocType1 = new UploadedDocumentType();
+        uploadedDocType1.setDocumentUrl("test doc url");
+        uploadedDocType1.setDocumentFilename("test file name");
+        uploadedDocType1.setDocumentBinaryUrl("test binary doc url");
+        doc1.getValue().setUploadedDocument(uploadedDocType1);
+
+        doc1.getValue().setDocNumber("38");
+        doc1.getValue().setTopLevelDocuments("ET1 Vetting");
+        doc1.getValue().setTypeOfDocument("ET1 vetted");
+        CaseData caseData = new CaseData();
+        caseData.setUploadDocumentCollection(new ArrayList<>());
+        caseData.getUploadDocumentCollection().add(doc1);
+
+        documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
+
+        assertEquals(1, caseData.getDocumentCollection().size());
+        assertNotNull(caseData.getDocumentCollection());
+        assertNull(caseData.getDocumentCollection().get(0).getValue().getDateOfCorrespondence());
     }
 }
+

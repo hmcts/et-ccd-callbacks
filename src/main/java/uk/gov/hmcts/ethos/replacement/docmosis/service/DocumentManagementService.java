@@ -271,7 +271,7 @@ public class DocumentManagementService {
             caseData.setDocumentCollection(new ArrayList<>());
         }
 
-        caseData.getUploadDocumentCollection().forEach(
+        caseData.getAddDocumentCollection().forEach(
                 uploadDoc -> {
                     DocumentType uploadedDocType = uploadDoc.getValue();
                     setDocumentTypeForDocument(uploadedDocType);

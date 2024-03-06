@@ -25,13 +25,13 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
- * REST controller for the Upload Document event page.
+ * REST controller for the Add Document event page.
  */
 @Slf4j
-@RequestMapping("/manageDocUpload")
+@RequestMapping("/addDocument")
 @RequiredArgsConstructor
 @RestController
-public class ManageDocUploadController {
+public class AddDocumentController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
     private final DocumentManagementService documentManagementService;
@@ -66,7 +66,7 @@ public class ManageDocUploadController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
-        caseData.getUploadDocumentCollection().clear();
+        caseData.getAddDocumentCollection().clear();
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

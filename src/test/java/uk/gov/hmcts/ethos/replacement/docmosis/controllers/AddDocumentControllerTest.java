@@ -33,11 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({ManageDocUploadController.class, JsonMapper.class})
-class ManageDocUploadControllerTest {
+@WebMvcTest({AddDocumentController.class, JsonMapper.class})
+class AddDocumentControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ABOUT_TO_SUBMIT_URL = "/manageDocUpload/aboutToSubmit";
+    private static final String ABOUT_TO_SUBMIT_URL = "/addDocument/aboutToSubmit";
 
     @MockBean
     private DocumentManagementService documentManagementService;
@@ -56,7 +56,7 @@ class ManageDocUploadControllerTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.setCaseId("345544321");
-        caseDetails.getCaseData().setUploadDocumentCollection(new ArrayList<>());
+        caseDetails.getCaseData().setAddDocumentCollection(new ArrayList<>());
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())

@@ -267,8 +267,8 @@ class DocumentManagementServiceTest {
         doc1.getValue().setTopLevelDocuments("ET1 Vetting");
         doc1.getValue().setTypeOfDocument("ET1 being vetted");
         CaseData caseData = new CaseData();
-        caseData.setUploadDocumentCollection(new ArrayList<>());
-        caseData.getUploadDocumentCollection().add(doc1);
+        caseData.setAddDocumentCollection(new ArrayList<>());
+        caseData.getAddDocumentCollection().add(doc1);
 
         DocumentType dt4 = new DocumentType();
         DocumentTypeItem doc4 = new DocumentTypeItem();
@@ -341,8 +341,8 @@ class DocumentManagementServiceTest {
         caseData.setDocumentCollection(new ArrayList<>());
         caseData.getDocumentCollection().add(doc2);
         caseData.getDocumentCollection().add(doc3);
-        caseData.setUploadDocumentCollection(new ArrayList<>());
-        caseData.getUploadDocumentCollection().add(doc1);
+        caseData.setAddDocumentCollection(new ArrayList<>());
+        caseData.getAddDocumentCollection().add(doc1);
         documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
 
         assertEquals(3, caseData.getDocumentCollection().size());
@@ -367,8 +367,8 @@ class DocumentManagementServiceTest {
         doc1.getValue().setTopLevelDocuments("ET1 Vetting");
         doc1.getValue().setTypeOfDocument("ET1 vetted");
         CaseData caseData = new CaseData();
-        caseData.setUploadDocumentCollection(new ArrayList<>());
-        caseData.getUploadDocumentCollection().add(doc1);
+        caseData.setAddDocumentCollection(new ArrayList<>());
+        caseData.getAddDocumentCollection().add(doc1);
 
         documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
 

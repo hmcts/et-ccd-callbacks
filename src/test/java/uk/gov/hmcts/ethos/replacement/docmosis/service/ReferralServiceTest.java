@@ -8,6 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.io.IOException;
 
@@ -16,7 +17,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 class ReferralServiceTest {
@@ -28,12 +32,14 @@ class ReferralServiceTest {
     private UserIdamService userIdamService;
     @MockBean
     private TornadoService tornadoService;
+    @MockBean
+    private CaseLookupService caseLookupService;
 
     private DocumentInfo documentInfo;
 
     @BeforeEach
     void setUp() {
-        referralService = new ReferralService(emailService, userIdamService, tornadoService);
+        referralService = new ReferralService(emailService, userIdamService, tornadoService, caseLookupService);
 
         documentInfo = DocumentInfo.builder()
             .description("Referral Summary.pdf")
@@ -59,5 +65,26 @@ class ReferralServiceTest {
         assertThrows(DocumentManagementException.class,
             () -> referralService.generateCRDocument(new CaseData(), "",
             ""));
+    }
+
+    @Test
+    void populateHearingDetailsFromLeadCase_returnHtml() throws IOException {
+        String caseId = "123";
+        MultipleData multipleData = MultipleData.builder().leadCaseId(caseId).build();
+        when(caseLookupService.getCaseDataAsAdmin(anyString(), anyString())).thenReturn(new CaseData());
+        String response = referralService.populateHearingDetailsFromLeadCase(multipleData, ENGLANDWALES_CASE_TYPE_ID);
+        
+        assertThat(response, is(""));
+        verify(caseLookupService, times(1)).getCaseDataAsAdmin(ENGLANDWALES_CASE_TYPE_ID, caseId);
+    }
+
+    @Test
+    void populateHearingDetailsFromLeadCase_noLeadCaseId() throws IOException {
+        MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
+        when(caseLookupService.getCaseDataAsAdmin(anyString(), anyString())).thenReturn(new CaseData());
+        
+        assertThrows(IllegalArgumentException.class, () -> 
+            referralService.populateHearingDetailsFromLeadCase(multipleData, ENGLANDWALES_CASE_TYPE_ID)
+        );
     }
 }

@@ -22,10 +22,10 @@ spring:
     url: jdbc:postgresql://localhost:6432/et_cos
 
 ccd:
-  data-store-api-url: http://172.19.164.106:4452
+  data-store-api-url: http://localhost:4452
 
 case_document_am:
-  url: http://172.19.164.106:4455
+  url: http://localhost:4455
 
 feature:
   secure-doc-store:

@@ -13,25 +13,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.model.servicebus.SendNotificationsDto;
-import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.MultiplesSendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 
 @Slf4j
@@ -39,8 +38,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class MultipleSendNotificationController {
+    private final MultiplesSendNotificationService multiplesSendNotificationService;
     private final SendNotificationService sendNotificationService;
-    private final CreateUpdatesBusSender createUpdatesBusSender;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
@@ -80,7 +79,7 @@ public class MultipleSendNotificationController {
     }
 
     /**
-     * Send Notification about to submit.
+     * Send Notification about to submit from the Multiple.
      *
      * @param multipleRequest holds the request and case data
      * @param userToken       used for authorization
@@ -108,29 +107,49 @@ public class MultipleSendNotificationController {
 
         MultipleDetails caseDetails = multipleRequest.getCaseDetails();
         MultipleData caseData = caseDetails.getCaseData();
+        List<String> errors = multiplesSendNotificationService.sendNotificationToSingles(
+                caseData,
+                caseDetails,
+                userToken
+        );
 
-        SendNotificationType sendNotificationType = new SendNotificationType();
-        log.warn("About to submit" + sendNotificationType.getSendNotificationTitle());
-        NotificationHelper.setSendNotificationValues(caseData, sendNotificationType);
-        sendNotificationService.clearSendNotificationFields(caseData);
-        List<String> ethosCaseRefCollection = new ArrayList<>();
-        caseData.getCaseIdCollection().forEach(caseId -> ethosCaseRefCollection.add(caseId.getValue().toString()));
-        SendNotificationsDto sendNotificationsDto =
-                SendNotificationsDto.builder()
-                        .caseTypeId(caseDetails.getCaseTypeId())
-                        .jurisdiction(caseDetails.getJurisdiction())
-                        .multipleRef(caseData.getMultipleReference())
-                        .ethosCaseRefCollection(ethosCaseRefCollection)
-                        .sendNotification(sendNotificationType).build();
-
-        DataModelParent dataModelParent = PersistentQHelper.getDetachDataModel();
-
-        List<String> errors = new ArrayList<>();
-        createUpdatesBusSender.sendNotificationUpdatesToQueue(sendNotificationsDto,
-                dataModelParent,
-                errors,
-                String.valueOf(ethosCaseRefCollection.size()));
+        multiplesSendNotificationService.clearSendNotificationFields(caseData);
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
+    }
+
+    /**
+     * Send Notification about to submit for single case.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToSubmitSingle", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "aboutToSubmit")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitSingle(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        sendNotificationService.createSendNotification(caseData);
+        sendNotificationService.clearSendNotificationFields(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**

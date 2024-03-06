@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -13,10 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,15 +22,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_RESPONSE_REQUIRED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.CASE_MANAGEMENT_ORDERS_REQUESTS;
 
 @Slf4j
 public final class NotificationHelper {
@@ -208,83 +197,5 @@ public final class NotificationHelper {
             return respondent.getRespondentEmail();
         }
         return null;
-    }
-
-    public static void setSendNotificationValues(CaseData caseData, SendNotificationType sendNotificationType) {
-        sendNotificationType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
-        sendNotificationType.setSendNotificationTitle(caseData.getSendNotificationTitle());
-        sendNotificationType.setSendNotificationLetter(caseData.getSendNotificationLetter());
-        sendNotificationType.setSendNotificationUploadDocument(caseData.getSendNotificationUploadDocument());
-        sendNotificationType.setSendNotificationSubject(caseData.getSendNotificationSubject());
-        sendNotificationType.setSendNotificationAdditionalInfo(caseData.getSendNotificationAdditionalInfo());
-        sendNotificationType.setSendNotificationNotify(caseData.getSendNotificationNotify());
-        sendNotificationType.setSendNotificationSelectHearing(caseData.getSendNotificationSelectHearing());
-        sendNotificationType.setSendNotificationCaseManagement(caseData.getSendNotificationCaseManagement());
-        sendNotificationType.setSendNotificationResponseTribunal(caseData.getSendNotificationResponseTribunal());
-        sendNotificationType.setSendNotificationWhoCaseOrder(caseData.getSendNotificationWhoCaseOrder());
-        sendNotificationType.setSendNotificationSelectParties(caseData.getSendNotificationSelectParties());
-        sendNotificationType.setSendNotificationFullName(caseData.getSendNotificationFullName());
-        sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
-        sendNotificationType.setSendNotificationDecision(caseData.getSendNotificationDecision());
-        sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
-        sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
-        sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
-        sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
-
-        if (sendNotificationType.getSendNotificationSubject().contains(CASE_MANAGEMENT_ORDERS_REQUESTS)
-                && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
-                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
-            sendNotificationType.setNotificationState(NOT_STARTED_YET);
-        } else {
-            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
-        }
-
-        sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
-        sendNotificationType.setSendNotificationSubjectString(
-                String.join(", ", caseData.getSendNotificationSubject())
-        );
-        sendNotificationType.setSendNotificationResponsesCount("0");
-        sendNotificationType.setSendNotificationResponseTribunalTable(
-                NO.equals(caseData.getSendNotificationResponseTribunal()) ? NO : YES
-        );
-    }
-
-    public static void setSendNotificationValues(MultipleData caseData, SendNotificationType sendNotificationType) {
-        sendNotificationType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
-        sendNotificationType.setSendNotificationTitle(caseData.getSendNotificationTitle());
-        sendNotificationType.setSendNotificationLetter(caseData.getSendNotificationLetter());
-        sendNotificationType.setSendNotificationUploadDocument(caseData.getSendNotificationUploadDocument());
-        sendNotificationType.setSendNotificationSubject(caseData.getSendNotificationSubject());
-        sendNotificationType.setSendNotificationAdditionalInfo(caseData.getSendNotificationAdditionalInfo());
-        sendNotificationType.setSendNotificationNotify(caseData.getSendNotificationNotify());
-        sendNotificationType.setSendNotificationSelectHearing(caseData.getSendNotificationSelectHearing());
-        sendNotificationType.setSendNotificationCaseManagement(caseData.getSendNotificationCaseManagement());
-        sendNotificationType.setSendNotificationResponseTribunal(caseData.getSendNotificationResponseTribunal());
-        sendNotificationType.setSendNotificationWhoCaseOrder(caseData.getSendNotificationWhoCaseOrder());
-        sendNotificationType.setSendNotificationSelectParties(caseData.getSendNotificationSelectParties());
-        sendNotificationType.setSendNotificationFullName(caseData.getSendNotificationFullName());
-        sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
-        sendNotificationType.setSendNotificationDecision(caseData.getSendNotificationDecision());
-        sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
-        sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
-        sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
-        sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
-
-        if (sendNotificationType.getSendNotificationSubject().contains(CASE_MANAGEMENT_ORDERS_REQUESTS)
-                && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
-                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
-            sendNotificationType.setNotificationState(NOT_STARTED_YET);
-        } else {
-            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
-        }
-
-        sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
-        sendNotificationType.setSendNotificationSubjectString(
-                String.join(", ", caseData.getSendNotificationSubject())
-        );
-        sendNotificationType.setSendNotificationResponsesCount("0");
-        sendNotificationType.setSendNotificationResponseTribunalTable(
-                NO.equals(caseData.getSendNotificationResponseTribunal()) ? NO : YES
-        );
     }
 }

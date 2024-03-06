@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -51,7 +50,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
-    public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
     public static final List<String>
             SEND_NOTIFICATION_SUBJECTS = List.of("Claimant / Respondent details",
             "Judgment", "Claim (ET1)",
@@ -138,6 +136,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationResponseTribunalTable(
                 NO.equals(caseData.getSendNotificationResponseTribunal()) ? NO : YES
         );
+        sendNotificationType.setSendNotificationNotifyLeadCase(caseData.getSendNotificationNotifyLeadCase());
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
@@ -172,27 +171,7 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
         caseData.setSendNotificationEccQuestion(null);
         caseData.setSendNotificationWhoCaseOrder(null);
-    }
-
-    public void clearSendNotificationFields(MultipleData caseData) {
-        caseData.setSendNotificationTitle(null);
-        caseData.setSendNotificationLetter(null);
-        caseData.setSendNotificationUploadDocument(null);
-        caseData.setSendNotificationSubject(null);
-        caseData.setSendNotificationAdditionalInfo(null);
-        caseData.setSendNotificationNotify(null);
-        caseData.setSendNotificationSelectHearing(null);
-        caseData.setSendNotificationCaseManagement(null);
-        caseData.setSendNotificationResponseTribunal(null);
-        caseData.setSendNotificationWhoCaseOrder(null);
-        caseData.setSendNotificationSelectParties(null);
-        caseData.setSendNotificationFullName(null);
-        caseData.setSendNotificationFullName2(null);
-        caseData.setSendNotificationDecision(null);
-        caseData.setSendNotificationDetails(null);
-        caseData.setSendNotificationRequestMadeBy(null);
-        caseData.setSendNotificationEccQuestion(null);
-        caseData.setSendNotificationWhoCaseOrder(null);
+        caseData.setSendNotificationNotifyLeadCase(null);
     }
 
     /**
@@ -224,8 +203,14 @@ public class SendNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
         String caseId = caseDetails.getCaseId();
+        String whoToNotify = caseData.getSendNotificationNotify();
 
-        if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
+        if (whoToNotify.equals("Lead case") || whoToNotify.equals("Lead and sub cases")) {
+            // TODO send emails when notification comes from multiple
+            return;
+        }
+
+        if (!RESPONDENT_ONLY.equals(whoToNotify)) {
 
             if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
                 emailService.sendEmail(sendNotificationTemplateId,
@@ -240,7 +225,7 @@ public class SendNotificationService {
             }
         }
 
-        if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
+        if (!CLAIMANT_ONLY.equals(whoToNotify)) {
 
             if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
                 Map<String, String> personalisation = buildPersonalisation(caseDetails,

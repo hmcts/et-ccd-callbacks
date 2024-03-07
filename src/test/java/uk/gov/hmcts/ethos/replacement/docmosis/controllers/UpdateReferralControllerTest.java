@@ -85,7 +85,7 @@ class UpdateReferralControllerTest {
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
         caseData.setReferralSubject("ET1");
-        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
+        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);

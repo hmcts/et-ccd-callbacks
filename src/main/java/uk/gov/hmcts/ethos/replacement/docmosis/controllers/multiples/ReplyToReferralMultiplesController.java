@@ -41,7 +41,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
 
@@ -130,7 +129,7 @@ public class ReplyToReferralMultiplesController {
     })
     public ResponseEntity<MultipleCallbackResponse> initHearingDetailsForReplyToReferral(
         @RequestBody MultipleRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -138,7 +137,10 @@ public class ReplyToReferralMultiplesController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
+        var details = ccdRequest.getCaseDetails();
+        MultipleData caseData = details.getCaseData();
+        var leadCase = caseLookupService.getCaseDataAsAdmin(details.getCaseTypeId().replace(MULTIPLE, ""), caseData.getLeadCaseId());
+        caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData, leadCase));
         return multipleResponse(caseData, null);
     }
 
@@ -213,8 +215,6 @@ public class ReplyToReferralMultiplesController {
         MultipleData caseData = caseDetails.getCaseData();
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
 
-        log.error(new ObjectMapper().writeValueAsString(caseData));
-
         String referralCode = caseData.getSelectReferral().getValue().getCode();
 
         String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
@@ -223,8 +223,7 @@ public class ReplyToReferralMultiplesController {
         CaseData leadCase = caseLookupService.getCaseDataAsAdmin(caseDetails.getCaseTypeId().replace(MULTIPLE, ""), caseData.getLeadCaseId());
         DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseDetails.getCaseTypeId());
 
-        ReferralType referral = caseData.getReferralCollection()
-            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+        ReferralType referral = ReferralHelper.getSelectedReferral(caseData);
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
         String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());

@@ -91,8 +91,6 @@ public class CreateReferralController {
         @RequestBody GenericCCDRequest<?> ccdRequest,
         @RequestHeader("Authorization") String userToken) throws Exception {
 
-        log.error(new ObjectMapper().writeValueAsString(ccdRequest));
-
         log.info("ABOUT TO START CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -174,8 +172,8 @@ public class CreateReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralDetails(
-        @RequestBody CCDRequest ccdRequest,
+    public ResponseEntity<?> aboutToSubmitReferralDetails(
+        @RequestBody GenericCCDRequest<?> ccdRequest,
         @RequestHeader("Authorization") String userToken) {
         log.info("ABOUT TO SUBMIT CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
@@ -184,8 +182,7 @@ public class CreateReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
+        CaseData caseData = new ObjectMapper().convertValue(ccdRequest.getCaseDetails().getCaseData(), CaseData.class);
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
             caseData.setReferralSubject("Party not responded/complied");
         }
@@ -205,7 +202,7 @@ public class CreateReferralController {
 
         if (StringUtils.isNotEmpty(
                 caseData.getReferentEmail()) && StringUtils.isEmpty(caseData.getMultipleReference())) {
-            caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
+            caseLink = emailService.getExuiCaseLink(ccdRequest.getCaseDetails().getCaseId());
             emailService.sendEmail(
                     referralTemplateId,
                     caseData.getReferentEmail(),
@@ -221,6 +218,12 @@ public class CreateReferralController {
         }
 
         clearReferralDataFromCaseData(caseData);
+
+        if (ccdRequest.getCaseDetails().getCaseTypeId().endsWith(MULTIPLE)) {
+            MultipleData multipleData = new ObjectMapper().convertValue(ccdRequest.getCaseDetails().getCaseData(), MultipleData.class);
+            multipleData.setReferralCollection(caseData.getReferralCollection());
+            return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -46,6 +46,22 @@ public class ReferralService {
     }
 
     /**
+     * Uses {@link TornadoService} to generate a pdf to display a summary of data for the created referral.
+     * @param caseData in which the referral type is extracted from
+     * @param userToken jwt used for authorization
+     * @param caseTypeId e.g. ET_EnglandWales
+     * @return {@link DocumentInfo} object populated with pdf data
+     */
+    public DocumentInfo generateDocument(MultipleData caseData, CaseData leadCase, String userToken, String caseTypeId) {
+        try {
+            var doc = ReferralHelper.getDocumentRequest(caseData, leadCase, caseTypeId);
+            return tornadoService.generateEventDocument(userToken, doc, caseTypeId, "Referral Summary.pdf");
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getMultipleReference()), e);
+        }
+    }
+
+    /**
      * Looks up the lead case and uses {@link ReferralHelper} to populate the hearing details.
      * @param data Multiple case type case data
      * @param singleCaseTypeId e.g. ET_EnglandWales

@@ -54,6 +54,7 @@ public final class UpdateDataModelBuilder {
                 .judgementType(getJudgementType(multipleData, caseData))
                 .representedType(getRespondentRepType(multipleData, caseData))
                 .isFixCase(getFixCase(multipleData))
+                .batchCaseStayed(multipleData.getBatchCaseStayed())
                 .build();
     }
 

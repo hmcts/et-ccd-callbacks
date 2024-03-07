@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.elasticsearch.common.Strings;
 import org.webjars.NotFoundException;
@@ -414,8 +415,11 @@ public final class ReferralHelper {
      * @return a referral object which can then be mapped into the pdf doc
      */
     private static ReferralTypeData newReferralRequest(CaseData caseData) {
+        String caseNumber = StringUtils.isBlank(caseData.getMultipleReference())
+                ? caseData.getEthosCaseReference()
+                : caseData.getMultipleReference();
         return ReferralTypeData.builder()
-                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .caseNumber(defaultIfEmpty(caseNumber, null))
                 .referralDate(Helper.getCurrentDate())
                 .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))

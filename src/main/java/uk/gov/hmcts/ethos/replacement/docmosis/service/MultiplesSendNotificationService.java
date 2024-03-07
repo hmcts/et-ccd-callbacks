@@ -21,12 +21,22 @@ public class MultiplesSendNotificationService {
     private final CreateUpdatesBusSender createUpdatesBusSender;
     private final UserIdamService userIdamService;
 
-    public List<String> sendNotificationToSingles(MultipleData multipleData,
-                                                  MultipleDetails caseDetails,
-                                                  String userToken) {
+    public void sendNotificationToSingles(MultipleData multipleData,
+                                          MultipleDetails caseDetails,
+                                          String userToken,
+                                          List<String> errors) {
 
-        SendNotificationType sendNotificationType = createSendNotificationType(multipleData);
         List<String> ethosCaseRefCollection = new ArrayList<>();
+        if ("Lead case".equals(multipleData.getSendNotificationNotify())) {
+            ethosCaseRefCollection.add(multipleData.getLeadEthosCaseRef());
+        } else {
+            // TODO Read excel file to send to all cases on multiple
+            log.info("TODO");
+        }
+
+        if (ethosCaseRefCollection.isEmpty()) {
+            return;
+        }
         CreateUpdatesDto sendNotificationsDto = getCreateUpdatesDto(
                 multipleData,
                 caseDetails,
@@ -34,34 +44,25 @@ public class MultiplesSendNotificationService {
                 ethosCaseRefCollection
         );
 
+        SendNotificationType sendNotificationType = createSendNotificationType(multipleData);
         DataModelParent dataModelParent = PersistentQHelper.getSendNotificationDataModel(sendNotificationType);
-        List<String> errors = new ArrayList<>();
         createUpdatesBusSender.sendUpdatesToQueue(
                 sendNotificationsDto,
                 dataModelParent,
                 errors,
                 String.valueOf(ethosCaseRefCollection.size()));
-
-        return errors;
     }
 
-    private CreateUpdatesDto getCreateUpdatesDto(MultipleData caseData,
+    private CreateUpdatesDto getCreateUpdatesDto(MultipleData multipleData,
                                                  MultipleDetails caseDetails,
                                                  String userToken,
                                                  List<String> ethosCaseRefCollection) {
-        if (caseData.getSendNotificationNotify().equals("Lead case")) {
-
-            ethosCaseRefCollection.add(caseData.getLeadEthosCaseRef());
-        } else {
-            // TODO Read excel file to send to all cases on multiple
-            log.info("TODO");
-        }
 
         String username = userIdamService.getUserDetails(userToken).getEmail();
         return CreateUpdatesDto.builder()
                 .caseTypeId(caseDetails.getCaseTypeId())
                 .jurisdiction(caseDetails.getJurisdiction())
-                .multipleRef(caseData.getMultipleReference())
+                .multipleRef(multipleData.getMultipleReference())
                 .ethosCaseRefCollection(ethosCaseRefCollection)
                 .username(username)
                 .build();

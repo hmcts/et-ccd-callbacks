@@ -14,15 +14,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.MultiplesSendNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.ArrayList;
@@ -30,7 +26,6 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 
 @Slf4j
@@ -39,7 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class MultipleSendNotificationController {
     private final MultiplesSendNotificationService multiplesSendNotificationService;
-    private final SendNotificationService sendNotificationService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
@@ -107,49 +101,16 @@ public class MultipleSendNotificationController {
 
         MultipleDetails caseDetails = multipleRequest.getCaseDetails();
         MultipleData caseData = caseDetails.getCaseData();
-        List<String> errors = multiplesSendNotificationService.sendNotificationToSingles(
+        List<String> errors = new ArrayList<>();
+        multiplesSendNotificationService.sendNotificationToSingles(
                 caseData,
                 caseDetails,
-                userToken
+                userToken,
+                errors
         );
 
         multiplesSendNotificationService.clearSendNotificationFields(caseData);
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
-    }
-
-    /**
-     * Send Notification about to submit for single case.
-     *
-     * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
-     * @return Callback response entity with case data attached.
-     */
-    @PostMapping(value = "/aboutToSubmitSingle", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "aboutToSubmit")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitSingle(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
-        sendNotificationService.createSendNotification(caseData);
-        sendNotificationService.clearSendNotificationFields(caseData);
-
-        return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**

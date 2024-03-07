@@ -201,14 +201,13 @@ public class SendNotificationService {
      */
     public void sendNotifyEmails(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
-        String caseId = caseDetails.getCaseId();
         String whoToNotify = caseData.getSendNotificationNotify();
-
         if (whoToNotify.equals("Lead case") || whoToNotify.equals("Lead and sub cases")) {
             // TODO send emails when notification comes from multiple
             return;
         }
+        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        String caseId = caseDetails.getCaseId();
 
         if (!RESPONDENT_ONLY.equals(whoToNotify)) {
 

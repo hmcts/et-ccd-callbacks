@@ -1,16 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import uk.gov.hmcts.ethos.replacement.docmosis.config.interceptors.RequestInterceptor;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
+import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

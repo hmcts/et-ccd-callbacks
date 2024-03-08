@@ -20,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -43,16 +42,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
-class RespondentTellSomethingElseControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String VALIDATE_GIVE_DETAILS = "/respondentTSE/validateGiveDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondentTSE/aboutToSubmit";
     private static final String DISPLAY_TABLE_URL = "/respondentTSE/displayTable";
     private static final String COMPLETE_APPLICATION_URL = "/respondentTSE/completeApplication";
     private static final String ABOUT_TO_START_URL = "/respondentTSE/aboutToStart";
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @MockBean
     private RespondentTellSomethingElseService resTseService;
@@ -67,7 +62,9 @@ class RespondentTellSomethingElseControllerTest {
     private MockedStatic mockHelper;
 
     @BeforeEach
-    void setUp() {
+    @Override
+    void setUp() throws Exception {
+        super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("test")
             .withClaimant("claimant")

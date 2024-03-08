@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -29,16 +28,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({BundlesRespondentController.class, JsonMapper.class})
-class BundlesRespondentControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class BundlesRespondentControllerTest extends BaseControllerTest {
+
     private static final String ABOUT_TO_START_URL = "/bundlesRespondent/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/bundlesRespondent/aboutToSubmit";
     private static final String MID_POPULATE_HEARINGS_URL = "/bundlesRespondent/midPopulateHearings";
     private static final String MID_VALIDATE_UPLOAD_URL = "/bundlesRespondent/midValidateUpload";
     private static final String SUBMITTED_URL = "/bundlesRespondent/submitted";
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @MockBean
     private BundlesRespondentService bundlesRespondentService;
@@ -58,7 +54,9 @@ class BundlesRespondentControllerTest {
     private MockMvc mockMvc;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(CaseDataBuilder.builder().build())
             .build();

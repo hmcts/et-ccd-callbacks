@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -27,16 +26,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseFlagsController.class, JsonMapper.class})
-class CaseFlagsControllerTest {
+class CaseFlagsControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_SUBMIT_URL = "/caseFlags/aboutToSubmit";
 
     @MockBean
     private CaseFlagsService caseFlagsService;
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +40,9 @@ class CaseFlagsControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

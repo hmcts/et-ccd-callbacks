@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -30,9 +29,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondNotificationController.class, JsonMapper.class})
-class RespondNotificationControllerTest {
+class RespondNotificationControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/respondNotification/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondNotification/aboutToSubmit";
     private static final String MID_GET_NOTIFICATION_URL = "/respondNotification/midGetNotification";
@@ -41,8 +39,6 @@ class RespondNotificationControllerTest {
 
     @MockBean
     private RespondNotificationService respondNotificationService;
-    @MockBean
-    private VerifyTokenService verifyTokenService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -50,7 +46,9 @@ class RespondNotificationControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

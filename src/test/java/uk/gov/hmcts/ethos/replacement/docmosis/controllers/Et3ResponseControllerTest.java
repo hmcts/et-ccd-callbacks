@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -34,8 +33,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3ResponseController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
-class Et3ResponseControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class Et3ResponseControllerTest extends BaseControllerTest {
+
     private static final String ABOUT_TO_START_URL = "/et3Response/aboutToStart";
     private static final String PROCESSING_COMPLETE_URL = "/et3Response/processingComplete";
     private static final String MID_EMPLOYMENT_DATES_URL = "/et3Response/midEmploymentDates";
@@ -49,8 +48,6 @@ class Et3ResponseControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
     @MockBean
-    private VerifyTokenService verifyTokenService;
-    @MockBean
     private Et3ResponseService  et3ResponseService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
@@ -59,7 +56,9 @@ class Et3ResponseControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()

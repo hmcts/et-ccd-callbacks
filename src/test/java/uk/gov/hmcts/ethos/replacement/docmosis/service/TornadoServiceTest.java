@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
@@ -377,6 +378,17 @@ class TornadoServiceTest {
                     INITIAL_CONSIDERATION_PDF);
             assertThat(bytes.length, is(0));
         }
+    }
+
+    @Test
+    void generateDocument_success() throws IOException {
+        mockConnectionSuccess();
+        var document = TornadoDocument.builder().templateName("template.docx").data(DOCUMENT_INFO_MARKUP).build();
+        DocumentInfo documentInfo = tornadoService.generateDocument(
+            AUTH_TOKEN, document, INITIAL_CONSIDERATION_PDF, ENGLANDWALES_CASE_TYPE_ID);
+
+        verifyDocumentInfo(documentInfo);
+        assertEquals(INITIAL_CONSIDERATION_PDF, documentInfo.getDescription());
     }
 
     private void createUserService() {

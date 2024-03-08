@@ -13,16 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.generic.GenericCCDRequest;
-import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
@@ -30,7 +24,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -101,25 +94,17 @@ public class UploadDocumentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<?> aboutToSubmitReferralReply(
-        @RequestBody GenericCCDRequest<?> ccdRequest,
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralReply(
+        @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        
-        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        Object data = ccdRequest.getCaseDetails().getCaseData();
 
-        if (caseTypeId.endsWith(MULTIPLE)) {
-            MultipleData multipleData = new ObjectMapper().convertValue(data, MultipleData.class);
-            return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
-        }
-
-        CaseDetails caseDetails = new ObjectMapper().convertValue(ccdRequest.getCaseDetails(), CaseDetails.class);
-        CaseData caseData =  caseDetails.getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
 
         UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
         caseManagementForCaseWorkerService.addClaimantDocuments(caseData);

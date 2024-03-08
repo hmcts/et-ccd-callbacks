@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -33,17 +32,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseTransferMultiplesController.class, JsonMapper.class})
-class CaseTransferMultiplesControllerTest {
-
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class CaseTransferMultiplesControllerTest extends BaseControllerTest {
 
     private static final String INIT_TRANSFER_TO_SCOTLAND_URL = "/caseTransferMultiples/initTransferToScotland";
     private static final String INIT_TRANSFER_TO_ENGLANDWALES_URL = "/caseTransferMultiples/initTransferToEnglandWales";
     private static final String CASE_TRANSFER_SAME_COUNTRY_URL = "/caseTransferMultiples/transferSameCountry";
     private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransferMultiples/transferDifferentCountry";
-
-    @MockBean
-    VerifyTokenService verifyTokenService;
 
     @MockBean
     MultipleTransferSameCountryService multipleTransferSameCountryService;

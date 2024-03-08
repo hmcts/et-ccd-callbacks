@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -40,9 +39,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ReferenceDataController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class ReferenceDataControllerTest {
+class ReferenceDataControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String HEARING_VENUE_REFERENCE_DATA = "/hearingVenueReferenceData";
     private static final String DATE_LISTED_REFERENCE_DATA = "/dateListedReferenceData";
 
@@ -51,9 +49,6 @@ class ReferenceDataControllerTest {
 
     @MockBean
     private ReferenceService referenceService;
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -66,7 +61,9 @@ class ReferenceDataControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         submitEvent = new SubmitEvent();

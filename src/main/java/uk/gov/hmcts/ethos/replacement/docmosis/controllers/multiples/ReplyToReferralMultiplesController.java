@@ -78,7 +78,7 @@ public class ReplyToReferralMultiplesController {
     /**
      * Called for the first page of the Reply to Referral event.
      * Populates the Referral select dropdown.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
@@ -94,16 +94,16 @@ public class ReplyToReferralMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToStart(
-        @RequestBody MultipleRequest ccdRequest,
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
-        log.info("ABOUT TO START REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ABOUT TO START REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
+        MultipleData caseData = request.getCaseDetails().getCaseData();
         caseData.setIsJudge(ReferralHelper.isJudge(userIdamService.getUserDetails(userToken).getRoles()));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
         return multipleResponse(caseData, null);
@@ -112,7 +112,7 @@ public class ReplyToReferralMultiplesController {
     /**
      * Called for the second page of the Reply Referral event.
      * Populates the Referral hearing and reply detail's section on the page.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
@@ -128,16 +128,16 @@ public class ReplyToReferralMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> initHearingDetailsForReplyToReferral(
-        @RequestBody MultipleRequest ccdRequest,
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) throws IOException {
-        log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var details = ccdRequest.getCaseDetails();
+        var details = request.getCaseDetails();
         MultipleData caseData = details.getCaseData();
         var leadCase = caseLookupService.getCaseDataAsAdmin(details.getCaseTypeId().replace(MULTIPLE, ""), caseData.getLeadCaseId());
         caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData, leadCase));
@@ -146,7 +146,7 @@ public class ReplyToReferralMultiplesController {
 
     /**
      * Called for the email validation of the Reply Referral event.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
@@ -162,14 +162,14 @@ public class ReplyToReferralMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> validateReplyToEmail(
-        @RequestBody MultipleRequest ccdRequest,
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
-        log.info("VALIDATE REPLY TO EMAIL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("VALIDATE REPLY TO EMAIL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
+        MultipleData caseData = request.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
 
         if (StringUtils.isNotEmpty(caseData.getReplyToEmailAddress())) {
@@ -186,7 +186,7 @@ public class ReplyToReferralMultiplesController {
     /**
      * Called at the end of Reply Referral event, takes the information saved in case data and stores it in the
      * referral reply collection.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      * @throws IOException 
@@ -203,15 +203,15 @@ public class ReplyToReferralMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralReply(
-        @RequestBody MultipleRequest ccdRequest,
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) throws IOException {
-        log.info("ABOUT TO SUBMIT REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ABOUT TO SUBMIT REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        MultipleDetails caseDetails = ccdRequest.getCaseDetails();
+        MultipleDetails caseDetails = request.getCaseDetails();
         MultipleData caseData = caseDetails.getCaseData();
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
 
@@ -236,7 +236,7 @@ public class ReplyToReferralMultiplesController {
             );
 
             log.info("Event: Referral Reply Email sent. "
-                    + ". EventId: " + ccdRequest.getEventId()
+                    + ". EventId: " + request.getEventId()
                     + ". Referral code: " + referralCode
                     + ". Emailed at: " + DateTime.now());
 
@@ -250,7 +250,7 @@ public class ReplyToReferralMultiplesController {
     /**
      * Called after submitting a reply to referral event.
      *
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
@@ -261,16 +261,16 @@ public class ReplyToReferralMultiplesController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<MultipleCallbackResponse> completeReplyToReferral(
-        @RequestBody MultipleRequest ccdRequest,
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
-        log.info("COMPLETE REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("COMPLETE REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         String body = String.format(REPLY_REFERRAL_BODY,
-            ccdRequest.getCaseDetails().getCaseId());
+            request.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
             .confirmation_body(body)

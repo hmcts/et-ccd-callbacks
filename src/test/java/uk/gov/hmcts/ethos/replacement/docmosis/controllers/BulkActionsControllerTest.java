@@ -34,7 +34,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkSearchService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkUpdateService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentGenerationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SubMultipleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -62,9 +61,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(BulkActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class BulkActionsControllerTest {
+class BulkActionsControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String CREATION_BULK_URL = "/createBulk";
     private static final String CREATION_BULK_ES_URL = "/createBulkES";
     private static final String SEARCH_BULK_URL = "/searchBulk";
@@ -106,9 +104,6 @@ class BulkActionsControllerTest {
     @MockBean
     private SubMultipleService subMultipleService;
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
-
     private MockMvc mvc;
     private JsonNode requestContent;
     private BulkCasesPayload bulkCasesPayload;
@@ -122,7 +117,9 @@ class BulkActionsControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         List<SubmitEvent> submitEvents;
@@ -527,6 +524,7 @@ class BulkActionsControllerTest {
 
     @Test
     void createBulkCaseError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -536,6 +534,7 @@ class BulkActionsControllerTest {
 
     @Test
     void createBulkCaseESError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -545,6 +544,7 @@ class BulkActionsControllerTest {
 
     @Test
     void createSearchBulkCaseError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SEARCH_BULK_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -554,6 +554,7 @@ class BulkActionsControllerTest {
 
     @Test
     void midSearchBulkCaseError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -563,6 +564,7 @@ class BulkActionsControllerTest {
 
     @Test
     void updateBulkError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -572,6 +574,7 @@ class BulkActionsControllerTest {
 
     @Test
     void updateBulkCaseError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_CASE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -581,6 +584,7 @@ class BulkActionsControllerTest {
 
     @Test
     void generateBulkLetterError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -590,6 +594,7 @@ class BulkActionsControllerTest {
 
     @Test
     void midCreateSubMultipleError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_CREATE_SUB_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -599,6 +604,7 @@ class BulkActionsControllerTest {
 
     @Test
     void subMultipleDynamicListError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_DYNAMIC_LIST_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -608,6 +614,7 @@ class BulkActionsControllerTest {
 
     @Test
     void createSubMultipleError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_SUB_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -617,6 +624,7 @@ class BulkActionsControllerTest {
 
     @Test
     void filterDefaultedAllDynamicListError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_ALL_DYNAMIC_LIST_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -626,6 +634,7 @@ class BulkActionsControllerTest {
 
     @Test
     void filterDefaultedNoneDynamicListError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_NONE_DYNAMIC_LIST_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -635,6 +644,7 @@ class BulkActionsControllerTest {
 
     @Test
     void midUpdateSubMultipleError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -644,6 +654,7 @@ class BulkActionsControllerTest {
 
     @Test
     void updateSubMultipleError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -653,6 +664,7 @@ class BulkActionsControllerTest {
 
     @Test
     void deleteSubMultipleError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DELETE_SUB_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -662,6 +674,7 @@ class BulkActionsControllerTest {
 
     @Test
     void generateBulkScheduleError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -671,6 +684,7 @@ class BulkActionsControllerTest {
 
     @Test
     void preAcceptBulkError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_BULK_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)

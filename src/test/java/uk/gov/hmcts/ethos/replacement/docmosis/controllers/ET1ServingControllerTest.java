@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
@@ -32,16 +31,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ET1ServingController.class, JsonMapper.class})
-class ET1ServingControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class ET1ServingControllerTest extends BaseControllerTest {
+
     private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
     private static final String ABOUT_TO_SUBMIT_URL = "/et1Serving/aboutToSubmit";
     private static final String SUBMITTED_URL = "/et1Serving/submitted";
 
     private CCDRequest ccdRequest;
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
     @MockBean
     private ServingService servingService;
     @Autowired
@@ -50,7 +47,9 @@ class ET1ServingControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    void setUp() {
+    @Override
+    void setUp() throws Exception {
+        super.setUp();
         CaseData caseData = new CaseData();
         caseData.setServingDocumentCollection(new ArrayList<>());
         caseData.setRespondentCollection(new ArrayList<>());

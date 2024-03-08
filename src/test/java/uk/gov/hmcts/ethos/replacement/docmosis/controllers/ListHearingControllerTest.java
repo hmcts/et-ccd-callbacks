@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandVenueSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.VenueSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -29,10 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ListHearingController.class, JsonMapper.class})
-class ListHearingControllerTest {
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
+class ListHearingControllerTest extends BaseControllerTest {
 
     @MockBean
     private VenueSelectionService venueSelectionService;

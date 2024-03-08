@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -34,14 +33,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_O
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({UploadDocumentController.class, JsonMapper.class})
-class UploadDocumentControllerTest {
+class UploadDocumentControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/uploadDocument/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/uploadDocument/aboutToSubmit";
-    
-    @MockBean
-    private VerifyTokenService verifyTokenService;
+
     @MockBean
     private EmailService emailService;
     @MockBean
@@ -53,7 +49,9 @@ class UploadDocumentControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         when(emailService.getCitizenCaseLink(any())).thenReturn("");
 
         CaseDetails caseDetails = CaseDataBuilder.builder()

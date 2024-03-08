@@ -15,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -36,16 +35,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHM
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({DigitalCaseFileController.class, JsonMapper.class})
-class DigitalCaseFileControllerTest {
+class DigitalCaseFileControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String SELECT_BUNDLE_URL = "/dcf/selectDcf";
     private static final String ABOUT_TO_SUBMIT_URL = "/dcf/aboutToSubmit";
 
     @MockBean
     private BundleApiClient bundleApiClient;
-    @MockBean
-    private VerifyTokenService verifyTokenService;
     @MockBean
     private DigitalCaseFileService digitalCaseFileService;
     @Autowired
@@ -55,7 +51,9 @@ class DigitalCaseFileControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
                 .withClaimantIndType("First", "Last")

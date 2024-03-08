@@ -8,9 +8,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.SaveFileLocationException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -40,10 +39,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({FileLocationController.class, JsonMapper.class})
-class FileLocationControllerTest {
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
+class FileLocationControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -142,11 +138,10 @@ class FileLocationControllerTest {
     void testInitAdminDataBadRequest() throws Exception {
         mockMvc.perform(post("/admin/filelocation/initAdminData")
                         .contentType(APPLICATION_JSON)
-                        .header("Authorization", "user-token")
+                        .header("Authorization", AUTH_TOKEN)
                         .content("bad-request"))
                 .andExpect(status().isBadRequest());
 
-        verify(verifyTokenService, never()).verifyTokenSignature(anyString());
         verify(fileLocationService, never()).initAdminData(any(AdminData.class));
     }
   

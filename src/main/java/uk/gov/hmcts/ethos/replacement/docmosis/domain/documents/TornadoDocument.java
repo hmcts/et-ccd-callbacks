@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

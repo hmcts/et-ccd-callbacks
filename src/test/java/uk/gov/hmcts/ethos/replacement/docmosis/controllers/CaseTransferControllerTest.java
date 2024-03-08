@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService;
@@ -44,9 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesSer
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseTransferController.class, JsonMapper.class})
-class CaseTransferControllerTest {
-
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class CaseTransferControllerTest extends BaseControllerTest {
 
     private static final String INIT_TRANSFER_TO_SCOTLAND_URL = "/caseTransfer/initTransferToScotland";
     private static final String INIT_TRANSFER_TO_ENGLANDWALES_URL = "/caseTransfer/initTransferToEnglandWales";
@@ -56,9 +53,6 @@ class CaseTransferControllerTest {
     private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransfer/transferDifferentCountry";
     private static final String CASE_TRANSFER_TO_ECM = "/caseTransfer/transferToEcm";
     private static final String ASSIGN_CASE = "/caseTransfer/assignCase";
-
-    @MockBean
-    VerifyTokenService verifyTokenService;
 
     @MockBean
     CaseTransferSameCountryService caseTransferSameCountryService;
@@ -85,7 +79,9 @@ class CaseTransferControllerTest {
     MockMvc mockMvc;
 
     @BeforeEach
-    void setUp() {
+    @Override
+    void setUp() throws Exception {
+        super.setUp();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
     }
 

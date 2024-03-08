@@ -16,7 +16,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -32,9 +31,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseViewApplicationsController.class, JsonMapper.class})
-class TseViewApplicationsControllerTest {
+class TseViewApplicationsControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String MID_POPULATE_CHOOSE_APPLICATION_URL =
             "/viewRespondentTSEApplications/midPopulateChooseApplication";
 
@@ -47,8 +45,6 @@ class TseViewApplicationsControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private VerifyTokenService verifyTokenService;
-    @MockBean
     private UserIdamService userIdamService;
     @Autowired
     private JsonMapper jsonMapper;
@@ -60,7 +56,9 @@ class TseViewApplicationsControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("9876")
             .withClaimantType("testing@test.com")

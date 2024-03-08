@@ -22,7 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -44,17 +43,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({InitialConsiderationController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
-class InitialConsiderationControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class InitialConsiderationControllerTest extends BaseControllerTest {
+
     private static final String COMPLETE_INITIAL_CONSIDERATION_URL = "/completeInitialConsideration";
     private static final String START_INITIAL_CONSIDERATION_URL = "/startInitialConsideration";
     private static final String SUBMIT_INITIAL_CONSIDERATION_URL = "/submitInitialConsideration";
 
     @Autowired
     private WebApplicationContext applicationContext;
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @MockBean
     private InitialConsiderationService initialConsiderationService;
@@ -82,7 +78,9 @@ class InitialConsiderationControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
 

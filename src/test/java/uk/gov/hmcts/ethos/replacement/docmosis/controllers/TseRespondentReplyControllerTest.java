@@ -15,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -38,9 +37,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseRespondentReplyController.class, JsonMapper.class})
-class TseRespondentReplyControllerTest {
+class TseRespondentReplyControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/tseResponse/aboutToStart";
     private static final String MID_POPULATE_REPLY_URL = "/tseResponse/midPopulateReply";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseResponse/aboutToSubmit";
@@ -53,15 +51,15 @@ class TseRespondentReplyControllerTest {
     private JsonMapper jsonMapper;
 
     @MockBean
-    private VerifyTokenService verifyTokenService;
-    @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
 
     private MockedStatic<Helper> mockHelper;
     private CCDRequest ccdRequest;
 
     @BeforeEach
+    @Override
     void setUp() throws Exception {
+        super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("9876")
             .withClaimantType("person@email.com")

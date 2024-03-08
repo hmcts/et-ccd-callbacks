@@ -5530,14 +5530,15 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-mocha@npm:^10.1.0":
-  version: 10.3.0
-  resolution: "eslint-plugin-mocha@npm:10.3.0"
+  version: 10.4.1
+  resolution: "eslint-plugin-mocha@npm:10.4.1"
   dependencies:
     eslint-utils: ^3.0.0
+    globals: ^13.24.0
     rambda: ^7.4.0
   peerDependencies:
     eslint: ">=7.0.0"
-  checksum: 9d2c552a3e18ba45e3c9a96ab94ae1ba5fad28a0bd9f57ddfc3ecabe609eb1a012803903aa4b544c263091269104e095b4e26e0b4dc5828be886559d103ee891
+  checksum: 26076c832899608de1f960325c4cfb4520cc644280e58879cec83596e699196c43568d67bf71880a1bd22fd1a59879645cf1690ba422ee40cbc24b77c3bfdda3
   languageName: node
   linkType: hard
 
@@ -5801,9 +5802,9 @@ __metadata:
     sonarqube-scanner: 3.3.0
     superagent-proxy: 3.0.0
     supertest: 6.3.4
-    totp-generator: 0.0.14
+    totp-generator: 1.0.0
     unirest: 0.6.0
-    uuid: 8.3.2
+    uuid: 9.0.1
     watch: 1.0.2
     webdriverio: 8.32.4
     when: 3.7.8
@@ -7129,6 +7130,15 @@ __metadata:
   dependencies:
     type-fest: ^0.20.2
   checksum: ad1ecf914bd051325faad281d02ea2c0b1df5d01bd94d368dcc5513340eac41d14b3c61af325768e3c7f8d44576e72780ec0b6f2d366121f8eec6e03c3a3b97a
+  languageName: node
+  linkType: hard
+
+"globals@npm:^13.24.0":
+  version: 13.24.0
+  resolution: "globals@npm:13.24.0"
+  dependencies:
+    type-fest: ^0.20.2
+  checksum: 56066ef058f6867c04ff203b8a44c15b038346a62efbc3060052a1016be9f56f4cf0b2cd45b74b22b81e521a889fc7786c73691b0549c2f3a6e825b3d394f43c
   languageName: node
   linkType: hard
 
@@ -8860,10 +8870,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jssha@npm:^3.1.2":
-  version: 3.3.0
-  resolution: "jssha@npm:3.3.0"
-  checksum: 82aeb4cd55149e3293f82c701fce7a276a61164fd2d989b82f963c9544b2b7792b78b4382c7d695fa0049f84e49e516f501073f3a80cb0cabb12f3bde1713a58
+"jssha@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "jssha@npm:3.3.1"
+  checksum: 4f2b636305710d5275d5e48a323ceaed80b6400fd545321fccdb4e904392a7b808fa79cdf355073766a290d731756eb5bd5ceb2341cc53e57b686c7bb3a18488
   languageName: node
   linkType: hard
 
@@ -13640,12 +13650,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"totp-generator@npm:0.0.14":
-  version: 0.0.14
-  resolution: "totp-generator@npm:0.0.14"
+"totp-generator@npm:1.0.0":
+  version: 1.0.0
+  resolution: "totp-generator@npm:1.0.0"
   dependencies:
-    jssha: ^3.1.2
-  checksum: e68c57849ca259a49a6470900e92a89f372de559c3c528f92e0e631655b17e8477a341ec1d870924235d59c249b7614bb01847f2e29118d52e241629cd230026
+    jssha: ^3.3.1
+  checksum: 5d8865c4683ddadb8934b4b871cc3090972f8b782fc9c0c017bef3932336846d51d6359bed4b1afe1600149c26f123f9aa257738387a877e2ca828b3c64e7b60
   languageName: node
   linkType: hard
 
@@ -14185,15 +14195,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:8.3.2, uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
-  languageName: node
-  linkType: hard
-
 "uuid@npm:9.0, uuid@npm:9.0.1, uuid@npm:^9.0.0":
   version: 9.0.1
   resolution: "uuid@npm:9.0.1"
@@ -14218,6 +14219,15 @@ __metadata:
   bin:
     uuid: ./bin/uuid
   checksum: 58de2feed61c59060b40f8203c0e4ed7fd6f99d42534a499f1741218a1dd0c129f4aa1de797bcf822c8ea5da7e4137aa3673431a96dae729047f7aca7b27866f
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 

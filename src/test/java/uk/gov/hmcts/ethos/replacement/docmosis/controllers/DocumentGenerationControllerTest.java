@@ -22,7 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentGenerationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -47,9 +46,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(DocumentGenerationController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class DocumentGenerationControllerTest {
+class DocumentGenerationControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String MID_ADDRESS_LABELS_URL = "/midAddressLabels";
     private static final String MID_SELECTED_ADDRESS_LABELS_URL = "/midSelectedAddressLabels";
     private static final String MID_VALIDATE_ADDRESS_LABELS_URL = "/midValidateAddressLabels";
@@ -70,9 +68,6 @@ class DocumentGenerationControllerTest {
     @MockBean
     private DefaultValuesReaderService defaultValuesReaderService;
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
-
     private MockMvc mvc;
     private SubmitEvent submitEvent;
     private JsonNode requestContent;
@@ -84,7 +79,9 @@ class DocumentGenerationControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         submitEvent = new SubmitEvent();

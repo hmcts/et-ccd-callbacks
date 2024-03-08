@@ -44,7 +44,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentati
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -82,9 +81,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CaseActionsForCaseWorkerController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class CaseActionsForCaseWorkerControllerTest {
+class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String CREATION_CASE_URL = "/createCase";
     private static final String RETRIEVE_CASE_URL = "/retrieveCase";
     private static final String RETRIEVE_CASES_URL = "/retrieveCases";
@@ -149,9 +147,6 @@ class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private SingleReferenceService singleReferenceService;
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @MockBean
     private EventValidationService eventValidationService;
@@ -224,7 +219,9 @@ class CaseActionsForCaseWorkerControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
 

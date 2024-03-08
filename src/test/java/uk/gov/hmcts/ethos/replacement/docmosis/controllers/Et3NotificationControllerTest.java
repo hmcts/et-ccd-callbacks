@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -36,14 +35,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3NotificationController.class, JsonMapper.class})
-class Et3NotificationControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class Et3NotificationControllerTest extends BaseControllerTest {
+
     private static final String MID_UPLOAD_DOCUMENTS_URL = "/et3Notification/midUploadDocuments";
     private static final String SUBMITTED_URL = "/et3Notification/submitted";
     private CCDRequest ccdRequest;
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
     @MockBean
     private ServingService servingService;
     @MockBean
@@ -54,7 +51,9 @@ class Et3NotificationControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    void setUp() {
+    @Override
+    void setUp() throws Exception {
+        super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")

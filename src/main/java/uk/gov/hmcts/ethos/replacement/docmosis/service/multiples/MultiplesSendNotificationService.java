@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
 import java.util.ArrayList;

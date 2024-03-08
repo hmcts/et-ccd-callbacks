@@ -136,7 +136,6 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationResponseTribunalTable(
                 NO.equals(caseData.getSendNotificationResponseTribunal()) ? NO : YES
         );
-        sendNotificationType.setSendNotificationNotifyLeadCase(caseData.getSendNotificationNotifyLeadCase());
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
@@ -171,7 +170,6 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
         caseData.setSendNotificationEccQuestion(null);
         caseData.setSendNotificationWhoCaseOrder(null);
-        caseData.setSendNotificationNotifyLeadCase(null);
     }
 
     /**
@@ -201,15 +199,10 @@ public class SendNotificationService {
      */
     public void sendNotifyEmails(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        String whoToNotify = caseData.getSendNotificationNotify();
-        if (whoToNotify.equals("Lead case") || whoToNotify.equals("Lead and sub cases")) {
-            // TODO send emails when notification comes from multiple
-            return;
-        }
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
         String caseId = caseDetails.getCaseId();
 
-        if (!RESPONDENT_ONLY.equals(whoToNotify)) {
+        if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
 
             if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
                 emailService.sendEmail(sendNotificationTemplateId,
@@ -224,7 +217,7 @@ public class SendNotificationService {
             }
         }
 
-        if (!CLAIMANT_ONLY.equals(whoToNotify)) {
+        if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
 
             if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
                 Map<String, String> personalisation = buildPersonalisation(caseDetails,

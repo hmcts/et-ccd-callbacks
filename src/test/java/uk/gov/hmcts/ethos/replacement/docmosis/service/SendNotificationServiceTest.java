@@ -61,7 +61,8 @@ class SendNotificationServiceTest {
     @BeforeEach
     public void setUp() {
         emailService = spy(new EmailUtils());
-        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
+        sendNotificationService = new SendNotificationService(hearingSelectionService,
+                emailService);
         ReflectionTestUtils.setField(sendNotificationService,
                 SEND_NOTIFICATION_TEMPLATE_ID,
                 "sendNotificationTemplateId");
@@ -147,7 +148,7 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void testClearSendNotificaitonFields() {
+    void testClearSendNotificationFields() {
         sendNotificationService.clearSendNotificationFields(caseData);
 
         assertNull(caseData.getSendNotificationTitle());

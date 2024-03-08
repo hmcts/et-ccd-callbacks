@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
 import java.util.ArrayList;

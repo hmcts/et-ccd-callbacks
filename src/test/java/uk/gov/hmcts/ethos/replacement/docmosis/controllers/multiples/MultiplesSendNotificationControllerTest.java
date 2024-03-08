@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +13,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.MultiplesSendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesSendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({MultipleSendNotificationController.class, JsonMapper.class})
-class MultipleSendNotificationControllerTest {
+@WebMvcTest({MultiplesSendNotificationController.class, JsonMapper.class})
+class MultiplesSendNotificationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_SUBMIT_URL = "/multipleSendNotification/aboutToSubmit";

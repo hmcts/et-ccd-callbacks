@@ -56,6 +56,8 @@ class RespondNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private EmailService emailService;
     private RespondNotificationService respondNotificationService;

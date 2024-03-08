@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,8 +18,8 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.MultiplesSendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesSendNotificationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/multipleSendNotification")
 @RestController
 @RequiredArgsConstructor
-public class MultipleSendNotificationController {
+public class MultiplesSendNotificationController {
     private final MultiplesSendNotificationService multiplesSendNotificationService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

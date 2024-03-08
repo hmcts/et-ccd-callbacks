@@ -157,6 +157,10 @@ public final class ReferralHelper {
         caseData.setUpdateReferralDocument(referral.getReferralDocument());
     }
 
+    public static String populateHearingDetails(CaseData caseData) {
+        return populateHearingDetails(caseData.getHearingCollection(), caseData.getConciliationTrack());
+    }
+
     /**
      * Formats the hearing details into HTML for ExUI to display. It's expected that there are at least one hearing
      * already created before this event is started. Hearing details should contain the hearing date, hearing

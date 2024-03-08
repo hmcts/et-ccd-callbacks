@@ -134,8 +134,8 @@ class ReferralHelperTest {
                 HEARING_STATUS_POSTPONED, false)
             .build();
 
-        assertThat(ReferralHelper.populateHearingDetails(caseData))
-                .isEqualTo(expectedSingleHearingDetails);
+        assertThat(ReferralHelper.populateHearingDetails(caseData.getHearingCollection(),
+                caseData.getConciliationTrack())).isEqualTo(expectedSingleHearingDetails);
     }
 
     @Test
@@ -151,8 +151,8 @@ class ReferralHelperTest {
                 HEARING_STATUS_HEARD, false)
             .build();
 
-        assertThat(ReferralHelper.populateHearingDetails(caseData))
-            .isEqualTo(expectedMultipleHearingDetails);
+        assertThat(ReferralHelper.populateHearingDetails(caseData.getHearingCollection(),
+                caseData.getConciliationTrack())).isEqualTo(expectedMultipleHearingDetails);
     }
 
     @Test

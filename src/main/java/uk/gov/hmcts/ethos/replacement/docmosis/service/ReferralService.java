@@ -55,7 +55,7 @@ public class ReferralService {
     public DocumentInfo generateDocument(MultipleData caseData, CaseData leadCase, String userToken, String caseTypeId) {
         try {
             var doc = ReferralHelper.getDocumentRequest(caseData, leadCase, caseTypeId);
-            return tornadoService.generateEventDocument(userToken, doc, "Referral Summary.pdf", caseTypeId);
+            return tornadoService.generateDocument(userToken, doc, "Referral Summary.pdf", caseTypeId);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getMultipleReference()), e);
         }

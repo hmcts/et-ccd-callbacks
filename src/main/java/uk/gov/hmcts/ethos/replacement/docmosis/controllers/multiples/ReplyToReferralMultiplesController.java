@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -29,7 +26,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.annotations.ApiResponsesMultiples;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
@@ -39,15 +35,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * REST controller for the ReplyToReferral event.
@@ -57,7 +53,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ReplyToReferralMultiplesController {
-    private final VerifyTokenService verifyTokenService;
     private final UserIdamService userIdamService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
@@ -69,7 +64,6 @@ public class ReplyToReferralMultiplesController {
     private String referralTemplateId;
 
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String REPLY_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have recorded your reply. You can view it in the "
@@ -85,7 +79,15 @@ public class ReplyToReferralMultiplesController {
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for referral reply")
-    @ApiResponsesMultiples
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = MultipleCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     public ResponseEntity<MultipleCallbackResponse> aboutToStart(
         @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
@@ -105,7 +107,7 @@ public class ReplyToReferralMultiplesController {
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/initHearingAndReferralDetails", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for reply to referral event")
+    @Operation(summary = "populate hearing and referral details for reply to referral event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -119,11 +121,6 @@ public class ReplyToReferralMultiplesController {
         @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         var details = request.getCaseDetails();
         MultipleData caseData = details.getCaseData();
@@ -139,7 +136,7 @@ public class ReplyToReferralMultiplesController {
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/validateReplyToEmail", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for referral create")
+    @Operation(summary = "validates email address")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -153,10 +150,7 @@ public class ReplyToReferralMultiplesController {
         @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
         log.info("VALIDATE REPLY TO EMAIL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+
         MultipleData caseData = request.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
 
@@ -180,7 +174,7 @@ public class ReplyToReferralMultiplesController {
      * @throws IOException 
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "")
+    @Operation(summary = "creates the reply to referral")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -194,10 +188,6 @@ public class ReplyToReferralMultiplesController {
         @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("ABOUT TO SUBMIT REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         MultipleDetails caseDetails = request.getCaseDetails();
         MultipleData caseData = caseDetails.getCaseData();
@@ -252,10 +242,6 @@ public class ReplyToReferralMultiplesController {
         @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
         log.info("COMPLETE REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         String body = String.format(REPLY_REFERRAL_BODY,
             request.getCaseDetails().getCaseId());

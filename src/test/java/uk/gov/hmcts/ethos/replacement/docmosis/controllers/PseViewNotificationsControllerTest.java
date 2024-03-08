@@ -40,7 +40,7 @@ class PseViewNotificationsControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);

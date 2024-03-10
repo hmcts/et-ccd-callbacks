@@ -3,23 +3,27 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
@@ -86,5 +90,28 @@ class ReferralServiceTest {
         assertThrows(IllegalArgumentException.class, () -> 
             referralService.populateHearingDetailsFromLeadCase(multipleData, ENGLANDWALES_CASE_TYPE_ID)
         );
+    }
+
+    @Test
+    void generateDocument_exception() throws IOException {
+        MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
+        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString())).thenThrow(IOException.class);
+
+        assertThrows(Exception.class, () ->
+                referralService.generateDocument(multipleData, new CaseData(), "", ENGLANDWALES_BULK_CASE_TYPE_ID)
+        );
+    }
+
+    @Test
+    void generateDocument_success() throws IOException {
+        MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
+        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString()))
+                .thenReturn(DocumentInfo.builder().build());
+
+        ArgumentCaptor<TornadoDocument> doc = ArgumentCaptor.forClass(TornadoDocument.class);
+        referralService.generateDocument(multipleData, new CaseData(), "", ENGLANDWALES_BULK_CASE_TYPE_ID);
+
+        verify(tornadoService).generateDocument(any(), doc.capture(), any(), any());
+        assertEquals("Referral Summary.pdf", doc.getValue().getOutputName());
     }
 }

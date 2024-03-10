@@ -597,7 +597,6 @@ public final class ReferralHelper {
 
     /**
      * Create fields for referral dropdown selector.
-     * @param caseData contains all the case data
      */
     public static DynamicFixedListType populateSelectReferralDropdown(List<ReferralTypeItem> referrals) {
         if (CollectionUtils.isEmpty(referrals)) {

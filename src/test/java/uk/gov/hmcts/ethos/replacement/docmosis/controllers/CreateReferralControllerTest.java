@@ -15,11 +15,8 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.ccd.GenericTypeCaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.generic.GenericCCDRequest;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
@@ -37,7 +34,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,8 +42,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 
 @ExtendWith(SpringExtension.class)
@@ -74,7 +68,6 @@ class CreateReferralControllerTest {
     @Autowired
     private JsonMapper jsonMapper;
     private CCDRequest ccdRequest;
-    private GenericCCDRequest<MultipleData> multipleRequest;
 
     @BeforeEach
     void setUp() {
@@ -99,32 +92,6 @@ class CreateReferralControllerTest {
                 .withCaseData(caseData)
                 .withCaseId("123")
                 .build();
-
-        ccdRequest.getCaseDetails().setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        multipleRequest = new GenericCCDRequest<>();
-        MultipleData multipleData = MultipleData.builder().build();
-        multipleData.setLeadCaseId("123");
-        multipleRequest.setCaseDetails(new GenericTypeCaseDetails<>());
-        multipleRequest.getCaseDetails().setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
-        multipleRequest.getCaseDetails().setCaseData(multipleData);
-    }
-
-    @Test
-    void initReferralHearingDetailsMultiple_Success() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(referralService.populateHearingDetailsFromLeadCase(any(), any())).thenReturn("html");
-
-        mockMvc.perform(post(START_CREATE_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(multipleRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-            .andExpect(jsonPath("$.data.referralHearingDetails", notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        verify(referralService, times(1)).populateHearingDetailsFromLeadCase(any(), eq(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test

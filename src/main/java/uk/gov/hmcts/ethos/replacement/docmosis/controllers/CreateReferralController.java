@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,10 +21,8 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.generic.GenericCCDRequest;
-import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
@@ -38,7 +35,6 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
@@ -86,29 +82,16 @@ public class CreateReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<?> initReferralHearingDetails(
-        @RequestBody GenericCCDRequest<?> ccdRequest,
-        @RequestHeader("Authorization") String userToken) throws Exception {
-
+    public ResponseEntity<CCDCallbackResponse> initReferralHearingDetails(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
         log.info("ABOUT TO START CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        Object data = ccdRequest.getCaseDetails().getCaseData();
-
-        if (caseTypeId.endsWith(MULTIPLE)) {
-            MultipleData multipleData = new ObjectMapper().convertValue(data, MultipleData.class);
-            String singleCaseTypeId = caseTypeId.replace(MULTIPLE, "");
-
-            String hearingDetails = referralService.populateHearingDetailsFromLeadCase(multipleData, singleCaseTypeId);
-            multipleData.setReferralHearingDetails(hearingDetails);
-            return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
-        }
-
-        CaseData caseData = new ObjectMapper().convertValue(data, CaseData.class);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -171,8 +154,8 @@ public class CreateReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<?> aboutToSubmitReferralDetails(
-        @RequestBody GenericCCDRequest<?> ccdRequest,
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralDetails(
+        @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
         log.info("ABOUT TO SUBMIT CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
@@ -181,7 +164,8 @@ public class CreateReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = new ObjectMapper().convertValue(ccdRequest.getCaseDetails().getCaseData(), CaseData.class);
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
             caseData.setReferralSubject("Party not responded/complied");
         }
@@ -201,7 +185,7 @@ public class CreateReferralController {
 
         if (StringUtils.isNotEmpty(
                 caseData.getReferentEmail()) && StringUtils.isEmpty(caseData.getMultipleReference())) {
-            caseLink = emailService.getExuiCaseLink(ccdRequest.getCaseDetails().getCaseId());
+            caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
             emailService.sendEmail(
                     referralTemplateId,
                     caseData.getReferentEmail(),
@@ -217,13 +201,6 @@ public class CreateReferralController {
         }
 
         clearReferralDataFromCaseData(caseData);
-
-        if (ccdRequest.getCaseDetails().getCaseTypeId().endsWith(MULTIPLE)) {
-            var details = ccdRequest.getCaseDetails();
-            MultipleData multipleData = new ObjectMapper().convertValue(details.getCaseData(), MultipleData.class);
-            multipleData.setReferralCollection(caseData.getReferralCollection());
-            return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
-        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -433,7 +433,8 @@ public final class ReferralHelper {
      * @param caseData the case in which we extract the referral type
      * @return stringified json data for pdf document
      */
-    public static TornadoDocument<?> getDocumentRequest(MultipleData caseData, CaseData leadCase, String accessKey) {
+    public static TornadoDocument<ReferralTypeData> getDocumentRequest(MultipleData caseData, CaseData leadCase,
+                                                                       String accessKey) {
         ReferralTypeData data;
         if (caseData.getReferentEmail() != null || caseData.getSelectReferral() == null) {
             data = newReferralRequest(caseData, leadCase);

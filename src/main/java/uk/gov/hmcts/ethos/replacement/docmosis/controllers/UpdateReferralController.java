@@ -83,7 +83,7 @@ public class UpdateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData.getHearingCollection(), caseData.getConciliationTrack()));
+        caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
         return getCallbackRespEntityNoErrors(caseData);
     }

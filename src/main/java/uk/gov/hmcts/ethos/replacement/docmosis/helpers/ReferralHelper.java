@@ -131,7 +131,7 @@ public final class ReferralHelper {
      * Populates Hearing, Referral and Replies details. For judges only hearing and referral details will be displayed.
      */
     public static String populateHearingReferralDetails(CaseData caseData) {
-        return populateHearingDetails(caseData.getHearingCollection(), caseData.getConciliationTrack())
+        return populateHearingDetails(caseData)
                 + populateReferralDetails(caseData, caseData)
                 + populateReplyDetails(caseData, caseData);
     }
@@ -140,7 +140,7 @@ public final class ReferralHelper {
      * Populates Hearing, Referral and Replies details. For judges only hearing and referral details will be displayed.
      */
     public static String populateHearingReferralDetails(MultipleData caseData, CaseData leadCase) {
-        return populateHearingDetails(leadCase.getHearingCollection(), leadCase.getConciliationTrack())
+        return populateHearingDetails(leadCase)
                 + populateReferralDetails(caseData, leadCase)
                 + populateReplyDetails(caseData, leadCase);
     }
@@ -157,16 +157,13 @@ public final class ReferralHelper {
         caseData.setUpdateReferralDocument(referral.getReferralDocument());
     }
 
-    public static String populateHearingDetails(CaseData caseData) {
-        return populateHearingDetails(caseData.getHearingCollection(), caseData.getConciliationTrack());
-    }
-
     /**
      * Formats the hearing details into HTML for ExUI to display. It's expected that there are at least one hearing
      * already created before this event is started. Hearing details should contain the hearing date, hearing
      * type and the track type for each hearing.
      */
-    public static String populateHearingDetails(List<HearingTypeItem> hearingCollection, String conciliationTrack) {
+    public static String populateHearingDetails(CaseData caseData) {
+        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
         if (CollectionUtils.isEmpty(hearingCollection)) {
             return "";
         }
@@ -183,7 +180,7 @@ public final class ReferralHelper {
                                 singleHearing ? "" : ++count,
                                 UtilHelper.formatLocalDate(hearingDates.getValue().getListedDate()),
                                 hearing.getValue().getHearingType(),
-                                getConciliationTrackName(conciliationTrack))
+                                getConciliationTrackName(caseData.getConciliationTrack()))
                 );
             }
         }
@@ -415,7 +412,8 @@ public final class ReferralHelper {
         if (caseData.getReferentEmail() != null || caseData.getSelectReferral() == null) {
             data = newReferralRequest(caseData);
         } else {
-            data = existingReferralRequest(caseData);
+            ReferralType referral = getSelectedReferral(caseData);
+            data = existingReferralRequest(caseData.getHearingCollection(), caseData.getEthosCaseReference(), referral);
         }
         ReferralTypeDocument document = ReferralTypeDocument.builder()
                 .accessKey(accessKey)
@@ -493,19 +491,17 @@ public final class ReferralHelper {
 
     /**
      * Creates a referral using the existing selected Referral.
-     * @param caseData contains selected referral
      * @return a referral object which can then be mapped into the pdf doc
      */
-    private static ReferralTypeData existingReferralRequest(CaseData caseData) {
-        ReferralType referral = getSelectedReferral(caseData);
+    private static ReferralTypeData existingReferralRequest(List<HearingTypeItem> hearings, String caseId, ReferralType referral) {
         return ReferralTypeData.builder()
-                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .caseNumber(defaultIfEmpty(caseId, null))
                 .referralDate(Helper.getCurrentDate())
                 .referredBy(defaultIfEmpty(referral.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(referral.getReferCaseTo(), null))
                 .referentEmail(defaultIfEmpty(referral.getReferentEmail(), null))
                 .urgent(defaultIfEmpty(referral.getIsUrgent(), null))
-                .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
+                .nextHearingDate(getNearestHearingToReferral(hearings, "None"))
                 .referralSubject(defaultIfEmpty(referral.getReferralSubject(), null))
                 .referralDetails(defaultIfEmpty(referral.getReferralDetails(), null))
                 .referralDocument(referral.getReferralDocument())
@@ -522,30 +518,16 @@ public final class ReferralHelper {
      */
     private static ReferralTypeData existingReferralRequest(MultipleData caseData, CaseData leadCase) {
         ReferralType referral = getSelectedReferral(caseData);
-        return ReferralTypeData.builder()
-                .caseNumber(defaultIfEmpty(caseData.getMultipleReference(), null))
-                .referralDate(Helper.getCurrentDate())
-                .referredBy(defaultIfEmpty(referral.getReferredBy(), null))
-                .referCaseTo(defaultIfEmpty(referral.getReferCaseTo(), null))
-                .referentEmail(defaultIfEmpty(referral.getReferentEmail(), null))
-                .urgent(defaultIfEmpty(referral.getIsUrgent(), null))
-                .nextHearingDate(getNearestHearingToReferral(leadCase, "None"))
-                .referralSubject(defaultIfEmpty(referral.getReferralSubject(), null))
-                .referralDetails(defaultIfEmpty(referral.getReferralDetails(), null))
-                .referralDocument(referral.getReferralDocument())
-                .referralInstruction(defaultIfEmpty(referral.getReferralInstruction(), null))
-                .referralReplyCollection(referral.getReferralReplyCollection())
-                .referralStatus(referral.getReferralStatus())
-                .referralReplyCollection(referral.getReferralReplyCollection()).build();
+        return existingReferralRequest(leadCase.getHearingCollection(), caseData.getMultipleReference(), referral);
     }
 
     /**
      * Gets the next hearing date from the referral, returns "None" if no suitable hearing date exists.
-     * @param caseData contains all the case data
+     * @param hearingCollection list of hearings
      * @return Returns next hearing date in "dd MMM yyyy" format or "None"
      */
-    public static String getNearestHearingToReferral(CaseData caseData, String defaultValue) {
-        String earliestFutureHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
+    public static String getNearestHearingToReferral(List<HearingTypeItem> hearingCollection, String defaultValue) {
+        String earliestFutureHearingDate = HearingsHelper.getEarliestFutureHearingDate(hearingCollection);
 
         if (earliestFutureHearingDate == null) {
             return defaultValue;
@@ -558,6 +540,15 @@ public final class ReferralHelper {
             log.info("Failed to parse hearing date when creating new referral");
             return defaultValue;
         }
+    }
+
+    /**
+     * Gets the next hearing date from the referral, returns "None" if no suitable hearing date exists.
+     * @param caseData contains all the case data
+     * @return Returns next hearing date in "dd MMM yyyy" format or "None"
+     */
+    public static String getNearestHearingToReferral(CaseData caseData, String defaultValue) {
+        return getNearestHearingToReferral(caseData.getHearingCollection(), defaultValue);
     }
 
     /**
@@ -718,7 +709,7 @@ public final class ReferralHelper {
         personalisation.put(DATE, getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("body", isNew ? EMAIL_BODY_NEW : EMAIL_BODY_REPLY);
         personalisation.put("refNumber", referralNumber);
-        personalisation.put("subject", getReferralSubject(caseData, isNew));
+        personalisation.put("subject", defaultIfEmpty(getReferralSubject(caseData, isNew), ""));
         personalisation.put("username", username);
         personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
         personalisation.put(LINK_TO_EXUI, linkToExui);
@@ -731,26 +722,27 @@ public final class ReferralHelper {
      * @param caseData Contains all the case data.
      * @param referralNumber The number of the referral.
      * @param username Name of the user making or replying to this referral.
-     * @param linkToExui link to Exui with the caseId as a parameter
+     * @param exuiLink link to Exui with the caseId as a parameter
      * @param isNew Flag for if this is a new referral.
      */
     public static Map<String, String> buildPersonalisation(MultipleData caseData, CaseData leadCase,
-            String referralNumber, boolean isNew, String username, String linkToExui) {
+            String referralNumber, boolean isNew, String username, String exuiLink) {
 
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getMultipleReference());
-        personalisation.put(EMAIL_FLAG, getEmailFlag(isNew ? caseData.getIsUrgent() : caseData.getIsUrgentReply()));
         personalisation.put(CLAIMANT, leadCase.getClaimant());
         personalisation.put(RESPONDENTS, getRespondentNames(leadCase));
         personalisation.put(DATE, getNearestHearingToReferral(leadCase, "Not set"));
-        personalisation.put("body", isNew ? EMAIL_BODY_NEW : EMAIL_BODY_REPLY);
         personalisation.put("refNumber", referralNumber);
         personalisation.put("username", username);
         personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
-        personalisation.put(LINK_TO_EXUI, linkToExui);
+        personalisation.put(LINK_TO_EXUI, exuiLink);
 
         if (isNew) {
+            personalisation.put("body", EMAIL_BODY_NEW);
             personalisation.put("subject", caseData.getReferralSubject());
+            personalisation.put(EMAIL_FLAG, getEmailFlag(caseData.getIsUrgent()));
+            return personalisation;
         }
 
         ReferralType selectedReferral = getSelectedReferral(caseData);
@@ -760,6 +752,8 @@ public final class ReferralHelper {
         }
 
         personalisation.put("subject", selectedReferral.getReferralSubject());
+        personalisation.put(EMAIL_FLAG, getEmailFlag(caseData.getIsUrgentReply()));
+        personalisation.put("body", EMAIL_BODY_REPLY);
 
         return personalisation;
     }

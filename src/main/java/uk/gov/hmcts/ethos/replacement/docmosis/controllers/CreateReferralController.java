@@ -110,7 +110,7 @@ public class CreateReferralController {
         }
 
         CaseData caseData = new ObjectMapper().convertValue(data, CaseData.class);
-        caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData.getHearingCollection(), caseData.getConciliationTrack()));
+        caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

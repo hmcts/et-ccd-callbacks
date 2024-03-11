@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -134,8 +135,7 @@ class ReferralHelperTest {
                 HEARING_STATUS_POSTPONED, false)
             .build();
 
-        assertThat(ReferralHelper.populateHearingDetails(caseData.getHearingCollection(),
-                caseData.getConciliationTrack())).isEqualTo(expectedSingleHearingDetails);
+        assertThat(ReferralHelper.populateHearingDetails(caseData)).isEqualTo(expectedSingleHearingDetails);
     }
 
     @Test
@@ -151,8 +151,7 @@ class ReferralHelperTest {
                 HEARING_STATUS_HEARD, false)
             .build();
 
-        assertThat(ReferralHelper.populateHearingDetails(caseData.getHearingCollection(),
-                caseData.getConciliationTrack())).isEqualTo(expectedMultipleHearingDetails);
+        assertThat(ReferralHelper.populateHearingDetails(caseData)).isEqualTo(expectedMultipleHearingDetails);
     }
 
     @Test
@@ -262,6 +261,27 @@ class ReferralHelperTest {
     }
 
     @Test
+    void populateHearingReferralDetails_SingleReply_MultipleCaseType() {
+        String replyDate = Helper.getCurrentDate();
+        String replyDateTime = Helper.getCurrentDateTime();
+
+        ReferralType referral = new ReferralType();
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
+        referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setId("1");
+        referralTypeItem.setValue(referral);
+
+        MultipleData multipleCase = new MultipleData();
+        multipleCase.setReferralCollection(List.of(referralTypeItem));
+        multipleCase.setSelectReferral(new DynamicFixedListType("1"));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+
+        assertEquals(String.format(expectedHearingReferralDetailsSingleReply, replyDate),
+                ReferralHelper.populateHearingReferralDetails(multipleCase, caseData));
+    }
+
+    @Test
     void populateHearingReferralDetails_MultipleReplies() {
         String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
@@ -279,6 +299,30 @@ class ReferralHelperTest {
 
         assertEquals(String.format(expectedHearingReferralDetailsMultipleReplies, replyDate, replyDate),
                 ReferralHelper.populateHearingReferralDetails(caseData));
+    }
+
+    @Test
+    void populateHearingReferralDetails_MultipleReplies_MultipleCaseType() {
+        String replyDate = Helper.getCurrentDate();
+        String replyDateTime = Helper.getCurrentDateTime();
+
+        ReferralType referral = new ReferralType();
+        referral.setReferralReplyCollection(List.of(
+                createReferralReplyTypeItem("1", replyDate, replyDateTime),
+                createReferralReplyTypeItem("2", replyDate, replyDateTime)));
+        referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setId("1");
+        referralTypeItem.setValue(referral);
+
+        MultipleData multipleCase = new MultipleData();
+        multipleCase.setReferralCollection(List.of(referralTypeItem));
+        multipleCase.setSelectReferral(new DynamicFixedListType("1"));
+
+        caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
+
+        assertEquals(String.format(expectedHearingReferralDetailsMultipleReplies, replyDate, replyDate),
+                ReferralHelper.populateHearingReferralDetails(multipleCase, caseData));
     }
 
     @Test
@@ -480,6 +524,57 @@ class ReferralHelperTest {
         );
 
         assertEquals(getExpectedPersonalisation(), actual);
+    }
+
+    @Test
+    void buildPersonalisation_multiple() {
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        caseData.setClaimant("claimant");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("123");
+        caseDetails.setCaseData(caseData);
+
+        MultipleData multipleData = new MultipleData();
+        multipleData.setMultipleReference("caseRef");
+        multipleData.setReferralCollection(caseData.getReferralCollection());
+        multipleData.setIsUrgent("Yes");
+        multipleData.setReferralSubject("ET1");
+
+        Map<String, String> actual = ReferralHelper.buildPersonalisation(
+                multipleData, caseDetails.getCaseData(), "1", true, "First Last", "linkToExui"
+        );
+
+        assertEquals(getExpectedPersonalisation(), actual);
+    }
+
+    @Test
+    void buildPersonalisation_multipleReply() {
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        caseData.setClaimant("claimant");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("123");
+        caseDetails.setCaseData(caseData);
+
+        MultipleData multipleData = new MultipleData();
+        multipleData.setMultipleReference("caseRef");
+        multipleData.setReferralCollection(caseData.getReferralCollection());
+        multipleData.setIsUrgentReply("Yes");
+        multipleData.setReferralSubject("ET1");
+        multipleData.setSelectReferral(new DynamicFixedListType("1"));
+        multipleData.getReferralCollection().get(0).getValue().setReferralSubject("ET1");
+
+        Map<String, String> actual = ReferralHelper.buildPersonalisation(
+                multipleData, caseDetails.getCaseData(), "1", false, "First Last", "linkToExui"
+        );
+
+        var expected = getExpectedPersonalisation();
+        expected.put("body", "You have a reply to a referral on this case.");
+        expected.put("replyReferral", "Reply by");
+        assertEquals(expected, actual);
     }
 
     @Test

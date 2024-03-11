@@ -75,7 +75,7 @@ public class ReferralService {
         }
 
         CaseData caseData = caseLookupService.getCaseDataAsAdmin(singleCaseTypeId, leadId);
-        return ReferralHelper.populateHearingDetails(caseData.getHearingCollection(), caseData.getConciliationTrack());
+        return ReferralHelper.populateHearingDetails(caseData);
     }
 
     public void sendEmail(CaseDetails caseDetails, String referralNumber, boolean isNew, String userToken) {

@@ -112,6 +112,11 @@ public final class ReferralHelper {
 
     private static final String REPLY_REFERRAL_REF = "Referred by";
     private static final String REFERRAL_DOCUMENT_NAME = "Referral %s - %s.pdf";
+    private static final String NOT_SET = "Not set";
+    private static final String REF_NUMBER = "refNumber";
+    private static final String SUBJECT = "subject";
+    private static final String USERNAME = "username";
+    private static final String REPLY_REFERRAL = "replyReferral";
 
     private ReferralHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -428,7 +433,7 @@ public final class ReferralHelper {
      * @param caseData the case in which we extract the referral type
      * @return stringified json data for pdf document
      */
-    public static TornadoDocument getDocumentRequest(MultipleData caseData, CaseData leadCase, String accessKey) {
+    public static TornadoDocument<?> getDocumentRequest(MultipleData caseData, CaseData leadCase, String accessKey) {
         ReferralTypeData data;
         if (caseData.getReferentEmail() != null || caseData.getSelectReferral() == null) {
             data = newReferralRequest(caseData, leadCase);
@@ -709,12 +714,12 @@ public final class ReferralHelper {
         personalisation.put(EMAIL_FLAG, getEmailFlag(isNew ? caseData.getIsUrgent() : caseData.getIsUrgentReply()));
         personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put(RESPONDENTS, getRespondentNames(caseData));
-        personalisation.put(DATE, getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put(DATE, getNearestHearingToReferral(caseData, NOT_SET));
         personalisation.put("body", isNew ? EMAIL_BODY_NEW : EMAIL_BODY_REPLY);
-        personalisation.put("refNumber", referralNumber);
-        personalisation.put("subject", defaultIfEmpty(getReferralSubject(caseData, isNew), ""));
-        personalisation.put("username", username);
-        personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
+        personalisation.put(REF_NUMBER, referralNumber);
+        personalisation.put(SUBJECT, defaultIfEmpty(getReferralSubject(caseData, isNew), ""));
+        personalisation.put(USERNAME, username);
+        personalisation.put(REPLY_REFERRAL, isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
         personalisation.put(LINK_TO_EXUI, linkToExui);
         return personalisation;
     }
@@ -735,15 +740,15 @@ public final class ReferralHelper {
         personalisation.put(CASE_NUMBER, caseData.getMultipleReference());
         personalisation.put(CLAIMANT, leadCase.getClaimant());
         personalisation.put(RESPONDENTS, getRespondentNames(leadCase));
-        personalisation.put(DATE, getNearestHearingToReferral(leadCase, "Not set"));
-        personalisation.put("refNumber", referralNumber);
-        personalisation.put("username", username);
-        personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
+        personalisation.put(DATE, getNearestHearingToReferral(leadCase, NOT_SET));
+        personalisation.put(REF_NUMBER, referralNumber);
+        personalisation.put(USERNAME, username);
+        personalisation.put(REPLY_REFERRAL, isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
         personalisation.put(LINK_TO_EXUI, exuiLink);
 
         if (isNew) {
             personalisation.put("body", EMAIL_BODY_NEW);
-            personalisation.put("subject", caseData.getReferralSubject());
+            personalisation.put(SUBJECT, caseData.getReferralSubject());
             personalisation.put(EMAIL_FLAG, getEmailFlag(caseData.getIsUrgent()));
             return personalisation;
         }
@@ -754,7 +759,7 @@ public final class ReferralHelper {
             throw new NotFoundException("Referral not found");
         }
 
-        personalisation.put("subject", selectedReferral.getReferralSubject());
+        personalisation.put(SUBJECT, selectedReferral.getReferralSubject());
         personalisation.put(EMAIL_FLAG, getEmailFlag(caseData.getIsUrgentReply()));
         personalisation.put("body", EMAIL_BODY_REPLY);
 
@@ -769,12 +774,12 @@ public final class ReferralHelper {
         personalisation.put(EMAIL_FLAG, caseData.getUpdateIsUrgent());
         personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put(RESPONDENTS, getRespondentNames(caseData));
-        personalisation.put(DATE, getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put(DATE, getNearestHearingToReferral(caseData, NOT_SET));
         personalisation.put("body", EMAIL_BODY_NEW);
-        personalisation.put("refNumber", referralNumber);
-        personalisation.put("subject", caseData.getUpdateReferralSubject());
-        personalisation.put("username", username);
-        personalisation.put("replyReferral", REPLY_REFERRAL_REF);
+        personalisation.put(REF_NUMBER, referralNumber);
+        personalisation.put(SUBJECT, caseData.getUpdateReferralSubject());
+        personalisation.put(USERNAME, username);
+        personalisation.put(REPLY_REFERRAL, REPLY_REFERRAL_REF);
         personalisation.put(LINK_TO_EXUI, linkToExui);
         return personalisation;
     }

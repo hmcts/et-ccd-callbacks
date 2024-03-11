@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,59 +18,60 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.buildPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
 
-
 /**
- * REST controller for the Referral Reply event pages, formats data appropriately for rendering on the front end.
+ * REST controller for the ReplyToReferral event.
  */
 @Slf4j
-@RequestMapping("/replyReferral")
-@RequiredArgsConstructor
+@RequestMapping("/multiples/replyReferral")
 @RestController
-public class ReplyToReferralController {
-    private final VerifyTokenService verifyTokenService;
+@RequiredArgsConstructor
+public class ReplyToReferralMultiplesController {
     private final UserIdamService userIdamService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
+    private final CaseLookupService caseLookupService;
+
     @Value("${template.referral}")
     private String referralTemplateId;
+
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
     private static final String REPLY_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have recorded your reply. You can view it in the "
         + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
 
+
     /**
      * Called for the first page of the Reply to Referral event.
      * Populates the Referral select dropdown.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
@@ -80,85 +81,76 @@ public class ReplyToReferralController {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
                 @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    schema = @Schema(implementation = MultipleCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToStart(
-        @RequestBody CCDRequest ccdRequest,
+    public ResponseEntity<MultipleCallbackResponse> aboutToStart(
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
-        log.info("ABOUT TO START REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+        log.info("ABOUT TO START REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        MultipleData caseData = request.getCaseDetails().getCaseData();
         caseData.setIsJudge(ReferralHelper.isJudge(userIdamService.getUserDetails(userToken).getRoles()));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
-        return getCallbackRespEntityNoErrors(caseData);
+        return multipleResponse(caseData, null);
     }
 
     /**
      * Called for the second page of the Reply Referral event.
      * Populates the Referral hearing and reply detail's section on the page.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/initHearingAndReferralDetails", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for reply to referral event")
+    @Operation(summary = "populate hearing and referral details for reply to referral event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
                 @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    schema = @Schema(implementation = MultipleCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> initHearingDetailsForReplyToReferral(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
-        log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+    public ResponseEntity<MultipleCallbackResponse> initHearingDetailsForReplyToReferral(
+        @RequestBody MultipleRequest request,
+        @RequestHeader("Authorization") String userToken) throws IOException {
+        log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData));
-        return getCallbackRespEntityNoErrors(caseData);
+        MultipleDetails details = request.getCaseDetails();
+        MultipleData caseData = details.getCaseData();
+        String caseTypeId = details.getCaseTypeId().replace(MULTIPLE, "");
+        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(caseTypeId, caseData.getLeadCaseId());
+        caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData, leadCase));
+        return multipleResponse(caseData, null);
     }
 
     /**
      * Called for the email validation of the Reply Referral event.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/validateReplyToEmail", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for referral create")
+    @Operation(summary = "validates email address")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
                 @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    schema = @Schema(implementation = MultipleCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> validateReplyToEmail(
-        @RequestBody CCDRequest ccdRequest,
+    public ResponseEntity<MultipleCallbackResponse> validateReplyToEmail(
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
-        log.info("VALIDATE REPLY TO EMAIL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        log.info("VALIDATE REPLY TO EMAIL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
+
+        MultipleData caseData = request.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
 
         if (StringUtils.isNotEmpty(caseData.getReplyToEmailAddress())) {
@@ -169,96 +161,92 @@ public class ReplyToReferralController {
             }
         }
 
-        return getCallbackRespEntityErrors(errors, caseData);
+        return multipleResponse(caseData, errors);
     }
 
     /**
      * Called at the end of Reply Referral event, takes the information saved in case data and stores it in the
      * referral reply collection.
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "")
+    @Operation(summary = "creates the reply to referral")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
                 @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    schema = @Schema(implementation = MultipleCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralReply(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
-        log.info("ABOUT TO SUBMIT REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+    public ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralReply(
+        @RequestBody MultipleRequest request,
+        @RequestHeader("Authorization") String userToken) throws IOException {
+        log.info("ABOUT TO SUBMIT REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
+        MultipleDetails caseDetails = request.getCaseDetails();
+        MultipleData caseData = caseDetails.getCaseData();
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
+
         String referralCode = caseData.getSelectReferral().getValue().getCode();
 
         String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
         ReferralHelper.createReferralReply(caseData, name, featureToggleService.isWorkAllocationEnabled());
 
-        DocumentInfo documentInfo = referralService.generateCRDocument(caseData, userToken,
-            caseDetails.getCaseTypeId());
+        String caseTypeId = caseDetails.getCaseTypeId();
+        String singleCaseTypeId = caseTypeId.replace(MULTIPLE, "");
+        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(singleCaseTypeId, caseData.getLeadCaseId());
+        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
 
-        ReferralType referral = caseData.getReferralCollection()
-            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+        ReferralType referral = ReferralHelper.getSelectedReferral(caseData);
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
         String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
+
         if (StringUtils.isNotEmpty(caseData.getReplyToEmailAddress())) {
             emailService.sendEmail(
                     referralTemplateId,
                     caseData.getReplyToEmailAddress(),
-                    ReferralHelper.buildPersonalisation(caseData, referralCode, false, userDetails.getName(), caseLink)
+                    buildPersonalisation(caseData, leadCase, referralCode, false, userDetails.getName(), caseLink)
             );
 
             log.info("Event: Referral Reply Email sent. "
-                    + ". EventId: " + ccdRequest.getEventId()
+                    + ". EventId: " + request.getEventId()
                     + ". Referral code: " + referralCode
                     + ". Emailed at: " + DateTime.now());
 
         }
 
         clearReferralReplyDataFromCaseData(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+
+        return multipleResponse(caseData, null);
     }
 
     /**
      * Called after submitting a reply to referral event.
      *
-     * @param ccdRequest holds the request and case data
+     * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
     @PostMapping(value = "/completeReplyToReferral", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the reply to referral event flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @Content(mediaType = "application/json", schema = @Schema(implementation = MultipleCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeReplyToReferral(
-        @RequestBody CCDRequest ccdRequest,
+    public ResponseEntity<MultipleCallbackResponse> completeReplyToReferral(
+        @RequestBody MultipleRequest request,
         @RequestHeader("Authorization") String userToken) {
-        log.info("COMPLETE REPLY TO REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+        log.info("COMPLETE REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
         String body = String.format(REPLY_REFERRAL_BODY,
-            ccdRequest.getCaseDetails().getCaseId());
+            request.getCaseDetails().getCaseId());
 
-        return ResponseEntity.ok(CCDCallbackResponse.builder()
+        return ResponseEntity.ok(MultipleCallbackResponse.builder()
             .confirmation_body(body)
             .build());
     }

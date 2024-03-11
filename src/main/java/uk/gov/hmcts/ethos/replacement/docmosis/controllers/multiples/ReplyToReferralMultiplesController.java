@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -33,16 +32,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.buildPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
 
 /**
@@ -122,9 +120,10 @@ public class ReplyToReferralMultiplesController {
         @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("INIT HEARING AND REFERRAL DETAILS ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
-        var details = request.getCaseDetails();
+        MultipleDetails details = request.getCaseDetails();
         MultipleData caseData = details.getCaseData();
-        var leadCase = caseLookupService.getCaseDataAsAdmin(details.getCaseTypeId().replace(MULTIPLE, ""), caseData.getLeadCaseId());
+        String caseTypeId = details.getCaseTypeId().replace(MULTIPLE, "");
+        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(caseTypeId, caseData.getLeadCaseId());
         caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData, leadCase));
         return multipleResponse(caseData, null);
     }
@@ -171,7 +170,6 @@ public class ReplyToReferralMultiplesController {
      * @param request holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
-     * @throws IOException 
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "creates the reply to referral")
@@ -198,8 +196,10 @@ public class ReplyToReferralMultiplesController {
         String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
         ReferralHelper.createReferralReply(caseData, name, featureToggleService.isWorkAllocationEnabled());
 
-        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(caseDetails.getCaseTypeId().replace(MULTIPLE, ""), caseData.getLeadCaseId());
-        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseDetails.getCaseTypeId());
+        String caseTypeId = caseDetails.getCaseTypeId();
+        String singleCaseTypeId = caseTypeId.replace(MULTIPLE, "");
+        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(singleCaseTypeId, caseData.getLeadCaseId());
+        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
 
         ReferralType referral = ReferralHelper.getSelectedReferral(caseData);
 
@@ -210,7 +210,7 @@ public class ReplyToReferralMultiplesController {
             emailService.sendEmail(
                     referralTemplateId,
                     caseData.getReplyToEmailAddress(),
-                    ReferralHelper.buildPersonalisation(caseData, leadCase, referralCode, false, userDetails.getName(), caseLink)
+                    buildPersonalisation(caseData, leadCase, referralCode, false, userDetails.getName(), caseLink)
             );
 
             log.info("Event: Referral Reply Email sent. "

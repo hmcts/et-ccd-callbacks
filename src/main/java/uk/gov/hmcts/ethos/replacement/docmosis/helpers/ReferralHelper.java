@@ -413,7 +413,7 @@ public final class ReferralHelper {
             data = newReferralRequest(caseData);
         } else {
             ReferralType referral = getSelectedReferral(caseData);
-            data = existingReferralRequest(caseData.getHearingCollection(), caseData.getEthosCaseReference(), referral);
+            data = rebuildReferral(caseData.getHearingCollection(), caseData.getEthosCaseReference(), referral);
         }
         ReferralTypeDocument document = ReferralTypeDocument.builder()
                 .accessKey(accessKey)
@@ -491,11 +491,14 @@ public final class ReferralHelper {
 
     /**
      * Creates a referral using the existing selected Referral.
+     * @param hearings the list of hearings on a case
+     * @param id the case id
+     * @param referral the referral to rebuild
      * @return a referral object which can then be mapped into the pdf doc
      */
-    private static ReferralTypeData existingReferralRequest(List<HearingTypeItem> hearings, String caseId, ReferralType referral) {
+    private static ReferralTypeData rebuildReferral(List<HearingTypeItem> hearings, String id, ReferralType referral) {
         return ReferralTypeData.builder()
-                .caseNumber(defaultIfEmpty(caseId, null))
+                .caseNumber(defaultIfEmpty(id, null))
                 .referralDate(Helper.getCurrentDate())
                 .referredBy(defaultIfEmpty(referral.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(referral.getReferCaseTo(), null))
@@ -518,7 +521,7 @@ public final class ReferralHelper {
      */
     private static ReferralTypeData existingReferralRequest(MultipleData caseData, CaseData leadCase) {
         ReferralType referral = getSelectedReferral(caseData);
-        return existingReferralRequest(leadCase.getHearingCollection(), caseData.getMultipleReference(), referral);
+        return rebuildReferral(leadCase.getHearingCollection(), caseData.getMultipleReference(), referral);
     }
 
     /**

@@ -85,7 +85,8 @@ class TseAdmReplyHelperTest {
         expectedDocumentInfo.setDescription(documentType);
         String correspondenceType = "correspondenceType";
 
-        when(tornadoService.generateEventDocument(any(CaseData.class), any(), any(), any())).thenReturn(expectedDocumentInfo);
+        when(tornadoService.generateEventDocument(any(CaseData.class), any(), any(), any()))
+            .thenReturn(expectedDocumentInfo);
         DocumentTypeItem actual  = TseAdmReplyHelper.getDocumentTypeItem(documentManagementService, tornadoService,
                 caseDetails, "testToken", documentType, correspondenceType);
 

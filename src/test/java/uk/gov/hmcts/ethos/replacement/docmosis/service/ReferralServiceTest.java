@@ -95,7 +95,8 @@ class ReferralServiceTest {
     @Test
     void generateDocument_exception() throws IOException {
         MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
-        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString())).thenThrow(IOException.class);
+        when(tornadoService.generateDocument(anyString(), any(), anyString(), anyString()))
+            .thenThrow(IOException.class);
 
         assertThrows(Exception.class, () ->
                 referralService.generateDocument(multipleData, new CaseData(), "", ENGLANDWALES_BULK_CASE_TYPE_ID)

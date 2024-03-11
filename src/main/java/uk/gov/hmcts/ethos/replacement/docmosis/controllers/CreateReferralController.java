@@ -22,7 +22,6 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.generic.GenericCCDRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
@@ -220,7 +219,8 @@ public class CreateReferralController {
         clearReferralDataFromCaseData(caseData);
 
         if (ccdRequest.getCaseDetails().getCaseTypeId().endsWith(MULTIPLE)) {
-            MultipleData multipleData = new ObjectMapper().convertValue(ccdRequest.getCaseDetails().getCaseData(), MultipleData.class);
+            var details = ccdRequest.getCaseDetails();
+            MultipleData multipleData = new ObjectMapper().convertValue(details.getCaseData(), MultipleData.class);
             multipleData.setReferralCollection(caseData.getReferralCollection());
             return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
         }

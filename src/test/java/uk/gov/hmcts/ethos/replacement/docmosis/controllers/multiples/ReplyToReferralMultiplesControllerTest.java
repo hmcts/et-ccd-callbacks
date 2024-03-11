@@ -14,7 +14,6 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
@@ -32,9 +31,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
-import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -59,7 +56,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 @WebMvcTest({ReplyToReferralMultiplesController.class, JsonMapper.class})
 class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String START_REPLY_REFERRAL_URL = "/multiples/replyReferral/aboutToStart";
-    private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = "/multiples/replyReferral/initHearingAndReferralDetails";
+    private static final String MID_HEARING_DETAILS_URL = "/multiples/replyReferral/initHearingAndReferralDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/multiples/replyReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/multiples/replyReferral/completeReplyToReferral";
     private static final String VALIDATE_EMAIL_URL = "/multiples/replyReferral/validateReplyToEmail";
@@ -81,14 +78,13 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     @Autowired
     private JsonMapper jsonMapper;
     private MultipleRequest request;
-    private CaseData caseData;
 
     @BeforeEach
     @Override
     protected void setUp() throws Exception {
-      super.setUp();
+        super.setUp();
         when(emailService.getExuiCaseLink(any())).thenReturn("exui");
-        caseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
                 "length num", "type", "Yes")
             .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
@@ -100,7 +96,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
                 Constants.HEARING_STATUS_HEARD,
                 true)
             .build();
-
 
         List<HearingTypeItem> hearings = new ArrayList<>();
         caseData.setHearingCollection(hearings);
@@ -119,7 +114,8 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
         request.setCaseDetails(multipleDetails);
 
         multipleData.setReferralCollection(List.of(createReferralTypeItem()));
-        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(multipleData.getReferralCollection());
+        DynamicFixedListType selectReferralList = 
+            ReferralHelper.populateSelectReferralDropdown(multipleData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         multipleData.setSelectReferral(selectReferralList);
@@ -163,7 +159,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     @Test
     void initHearingAndReferralDetails_Success() throws Exception {
 
-        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+        mockMvc.perform(post(MID_HEARING_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(request)))
@@ -202,7 +198,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     @Test
     void initHearingAndReferralDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
+        mockMvc.perform(post(MID_HEARING_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(request)))
@@ -243,7 +239,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
 
     @Test
     void validateReplyToEmail_tokenOk() throws Exception {
-
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -254,7 +249,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
 
     @Test
     void validateNoReplyToEmail_tokenOk() throws Exception {
-      request.getCaseDetails().getCaseData().setReplyToEmailAddress("");
+        request.getCaseDetails().getCaseData().setReplyToEmailAddress("");
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

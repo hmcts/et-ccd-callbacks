@@ -13,7 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesSendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -31,15 +31,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({MultiplesSendNotificationController.class, JsonMapper.class})
-class MultiplesSendNotificationControllerTest {
+class MultiplesSendNotificationControllerTest extends BaseControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ABOUT_TO_SUBMIT_URL = "/multipleSendNotification/aboutToSubmit";
-    private static final String ABOUT_TO_START_URL = "/multipleSendNotification/aboutToStart";
-    private static final String SUBMITTED_URL = "/multipleSendNotification/submitted";
+    private static final String ABOUT_TO_SUBMIT_URL = "/multiples/sendNotification/aboutToSubmit";
+    private static final String ABOUT_TO_START_URL = "/multiples/sendNotification/aboutToStart";
+    private static final String SUBMITTED_URL = "/multiples/sendNotification/submitted";
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
     @MockBean
     private MultiplesSendNotificationService multiplesSendNotificationService;
 
@@ -57,7 +55,8 @@ class MultiplesSendNotificationControllerTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUpTests() throws Exception {
+        super.setUp();
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
     }

@@ -22,7 +22,7 @@ public class BaseControllerTest {
     public VerifyTokenService verifyTokenService;
 
     @BeforeEach
-    void setUp() throws Exception {
+    protected void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
     }

@@ -63,7 +63,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseData caseData = new CaseData();
         caseData.setManagingOffice("Manchester");

@@ -79,13 +79,13 @@ public class CreateReferralController {
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for referral create")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+              content = {
+                  @Content(mediaType = "application/json",
+                              schema = @Schema(implementation = CCDCallbackResponse.class))
+              }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<?> initReferralHearingDetails(
             @RequestBody GenericCCDRequest<?> ccdRequest,
@@ -124,13 +124,13 @@ public class CreateReferralController {
     @PostMapping(value = "/validateReferentEmail", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for referral create")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+              content = {
+                  @Content(mediaType = "application/json",
+                              schema = @Schema(implementation = CCDCallbackResponse.class))
+              }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> validateReferentEmail(
             @RequestBody CCDRequest ccdRequest,
@@ -235,9 +235,9 @@ public class CreateReferralController {
     @PostMapping(value = "/completeCreateReferral", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the reply to referral event flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeCreateReferral(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {

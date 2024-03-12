@@ -52,6 +52,8 @@ class CreateReferralControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/createReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/createReferral/completeCreateReferral";
     private static final String VALIDATE_EMAIL_URL = "/createReferral/validateReferentEmail";
+    private static final String CASE_TYPE_ID_SINGLE = "12345";
+    private static final String CASE_TYPE_ID_MULTIPLE = "12345_Multiple";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -96,6 +98,7 @@ class CreateReferralControllerTest {
 
     @Test
     void initReferralHearingDetails_Success() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -120,6 +123,7 @@ class CreateReferralControllerTest {
 
     @Test
     void aboutToSubmit_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -139,14 +143,14 @@ class CreateReferralControllerTest {
 
     @Test
     void aboutToSubmit_multiple() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_MULTIPLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
-        CCDRequest multipleReferralCCDRequest = ccdRequest;
-        multipleReferralCCDRequest.getCaseDetails().getCaseData().setMultipleReference("012345");
+        ccdRequest.getCaseDetails().getCaseData().setMultipleReference("012345");
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -160,6 +164,7 @@ class CreateReferralControllerTest {
 
     @Test
     void aboutToSubmit_NoReferentEmail_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -191,6 +196,7 @@ class CreateReferralControllerTest {
 
     @Test
     void completeCreateReferral_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -212,6 +218,7 @@ class CreateReferralControllerTest {
 
     @Test
     void validateNoReferentEmail_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CCDRequest noReferentEmailCCDRequest = ccdRequest;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
@@ -225,6 +232,7 @@ class CreateReferralControllerTest {
 
     @Test
     void validateReferentEmail_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)

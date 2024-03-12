@@ -52,6 +52,8 @@ class CreateReferralControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/createReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/createReferral/completeCreateReferral";
     private static final String VALIDATE_EMAIL_URL = "/createReferral/validateReferentEmail";
+    private static final String CASE_TYPE_ID_SINGLE = "12345";
+    private static final String CASE_TYPE_ID_MULTIPLE = "12345_Multiple";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -73,15 +75,15 @@ class CreateReferralControllerTest {
     void setUp() {
         when(emailService.getExuiCaseLink(any())).thenReturn("exui");
         CaseData caseData = CaseDataBuilder.builder()
-            .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
-                TribunalOffice.ABERDEEN, "venue")
-            .withHearingSession(
-                0,
-                "hearingNumber",
-                "2019-11-25T12:11:00.000",
-                Constants.HEARING_STATUS_HEARD,
-                true)
-            .build();
+                .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
+                        TribunalOffice.ABERDEEN, "venue")
+                .withHearingSession(
+                        0,
+                        "hearingNumber",
+                        "2019-11-25T12:11:00.000",
+                        Constants.HEARING_STATUS_HEARD,
+                        true)
+                .build();
         caseData.setEthosCaseReference("caseRef");
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
@@ -96,36 +98,38 @@ class CreateReferralControllerTest {
 
     @Test
     void initReferralHearingDetails_Success() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-            .andExpect(jsonPath("$.data.referralHearingDetails", notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.data.referralHearingDetails", notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
     void initReferralHearingDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void aboutToSubmit_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
-            .thenReturn(new DocumentInfo());
+                .thenReturn(new DocumentInfo());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -139,14 +143,14 @@ class CreateReferralControllerTest {
 
     @Test
     void aboutToSubmit_multiple() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_MULTIPLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
-        CCDRequest multipleReferralCCDRequest = ccdRequest;
-        multipleReferralCCDRequest.getCaseDetails().getCaseData().setMultipleReference("012345");
+        ccdRequest.getCaseDetails().getCaseData().setMultipleReference("012345");
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -160,6 +164,7 @@ class CreateReferralControllerTest {
 
     @Test
     void aboutToSubmit_NoReferentEmail_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -183,35 +188,37 @@ class CreateReferralControllerTest {
     void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void completeCreateReferral_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.confirmation_body", notNullValue()));
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_body", notNullValue()));
     }
 
     @Test
     void completeCreateReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void validateNoReferentEmail_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CCDRequest noReferentEmailCCDRequest = ccdRequest;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
@@ -225,23 +232,24 @@ class CreateReferralControllerTest {
 
     @Test
     void validateReferentEmail_tokenOk() throws Exception {
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE_ID_SINGLE);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
     }
 
     @Test
     void validateReferentEmail_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
     }
 
     private RespondentSumTypeItem createRespondentType() {

@@ -108,9 +108,29 @@ class CreateReferralMultiplesControllerTest {
     }
 
     @Test
+    void initReferralHearingDetails_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(START_CREATE_REFERRAL_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void initReferralHearingDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(request)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void initAboutToSubmit_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
@@ -151,6 +171,27 @@ class CreateReferralMultiplesControllerTest {
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(noReferentEmailCCDRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void aboutToSubmit_ReferentEmail_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
+        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
+                .thenReturn(new DocumentInfo());
+        MultipleRequest referentEmailCCDRequest = request;
+        referentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("Tester@testco.com");
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(referentEmailCCDRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))

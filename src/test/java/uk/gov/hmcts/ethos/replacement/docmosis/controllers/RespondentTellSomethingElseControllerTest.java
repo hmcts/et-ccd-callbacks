@@ -63,7 +63,7 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("test")

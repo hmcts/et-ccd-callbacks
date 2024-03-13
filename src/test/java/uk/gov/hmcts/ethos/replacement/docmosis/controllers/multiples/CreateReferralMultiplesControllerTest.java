@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -26,15 +27,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -45,8 +45,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CreateReferralMultiplesController.class, JsonMapper.class})
@@ -74,6 +73,7 @@ class CreateReferralMultiplesControllerTest {
     private MultipleRequest request;
     @MockBean
     private CaseLookupService caseLookupService;
+    private CCDRequest ccdRequest;
 
     @BeforeEach
     protected void setUp() throws Exception {
@@ -93,8 +93,11 @@ class CreateReferralMultiplesControllerTest {
         caseData.setIsUrgent("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setReferentEmail("test@gmail.com");
-        caseData.setReferralSubject("ET1");
         MultipleData multipleData = MultipleData.builder().build();
+        ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseId("123")
+                .build();
         request = new MultipleRequest();
         MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(multipleData);
@@ -105,6 +108,19 @@ class CreateReferralMultiplesControllerTest {
         userDetails.setRoles(List.of("role1"));
         when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
         when(caseLookupService.getCaseDataAsAdmin(any(), any())).thenReturn(caseData);
+    }
+
+    @Test
+    void initReferralHearingDetails_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(START_CREATE_REFERRAL_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
@@ -233,7 +249,7 @@ class CreateReferralMultiplesControllerTest {
     @Test
     void validateNoReferentEmail_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        MultipleRequest noReferentEmailCCDRequest = request;
+        CCDRequest noReferentEmailCCDRequest = ccdRequest;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
@@ -249,7 +265,7 @@ class CreateReferralMultiplesControllerTest {
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(request)))
+                        .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
     }
@@ -260,7 +276,7 @@ class CreateReferralMultiplesControllerTest {
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(request)))
+                        .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
     }
 

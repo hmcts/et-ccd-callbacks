@@ -15,7 +15,9 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -35,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -281,6 +284,33 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void validateReferentEmail_WithDocumentUploadErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        MultipleData caseData = new MultipleData();
+        caseData.setReferentEmail("test@example.com");
+        DocumentType documentTypeWithError = new DocumentType();
+        documentTypeWithError.setShortDescription("Test description");
+        documentTypeWithError.setUploadedDocument(null);
+        DocumentTypeItem documentTypeItemWithError = new DocumentTypeItem();
+        documentTypeItemWithError.setValue(documentTypeWithError);
+        List<DocumentTypeItem> referralDocumentWithError = List.of(documentTypeItemWithError);
+        caseData.setReferralDocument(referralDocumentWithError);
+
+        MultipleRequest ccdRequestWithError = new MultipleRequest();
+        ccdRequestWithError.setCaseDetails(new MultipleDetails());
+        ccdRequestWithError.getCaseDetails().setCaseData(caseData);
+
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithError)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0]", is(
+                        "Short description is added but document is not uploaded.")));
     }
 
     private RespondentSumTypeItem createRespondentType() {

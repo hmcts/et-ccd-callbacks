@@ -388,7 +388,7 @@ dependencies {
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.2.6'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.8.0'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

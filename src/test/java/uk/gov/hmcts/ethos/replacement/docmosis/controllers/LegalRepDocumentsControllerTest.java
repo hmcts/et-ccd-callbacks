@@ -5,13 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -26,13 +24,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({LegalRepDocumentsController.class, JsonMapper.class})
-class LegalRepDocumentsControllerTest {
+class LegalRepDocumentsControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/legalrepDocuments/aboutToStart";
-    
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,7 +35,9 @@ class LegalRepDocumentsControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
-    void setUp() throws Exception {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

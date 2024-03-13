@@ -30,7 +30,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkSearchService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkUpdateService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -56,9 +55,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(PersistentQueueActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class PersistentQueueActionsControllerTest {
+class PersistentQueueActionsControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String AFTER_SUBMITTED_PQ_BULK_URL = "/afterSubmittedBulkPQ";
     private static final String PRE_ACCEPT_PQ_BULK_URL = "/preAcceptBulkPQ";
     private static final String UPDATE_BULK_CASE_PQ_URL = "/updateBulkCasePQ";
@@ -75,9 +73,6 @@ class PersistentQueueActionsControllerTest {
     @MockBean
     private BulkSearchService bulkSearchService;
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
-
     private MockMvc mvc;
     private JsonNode requestContent;
     private BulkCasesPayload bulkCasesPayload;
@@ -90,7 +85,9 @@ class PersistentQueueActionsControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         List<SubmitEvent> submitEvents;

@@ -8,9 +8,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.StaffImportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -31,10 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({StaffImportController.class, JsonMapper.class})
-class StaffImportControllerTest {
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
+class StaffImportControllerTest extends BaseControllerTest {
 
     @MockBean
     private StaffImportService staffImportService;
@@ -90,7 +87,7 @@ class StaffImportControllerTest {
     void testImportBadRequest() throws Exception {
         mockMvc.perform(post("/admin/staff/import")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "some-token")
+                        .header("Authorization", AUTH_TOKEN)
                         .content("error"))
                 .andExpect(status().isBadRequest());
         verify(staffImportService, never()).importStaff(isA(AdminData.class), isA(String.class));

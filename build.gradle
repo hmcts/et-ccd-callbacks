@@ -336,7 +336,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version:'1.4.2'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'3.4.3'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'3.6.0'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.4'
@@ -382,13 +382,13 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.107.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.107.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.6.1'
-    implementation group: 'com.squareup.okio', name: 'okio', version: '3.8.0'
+    implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.0'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.2.6'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.8.0'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

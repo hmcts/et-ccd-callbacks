@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
@@ -17,9 +16,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 
@@ -31,15 +28,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 public class MultipleUploadDocumentController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final VerifyTokenService verifyTokenService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     public MultipleUploadDocumentController(
-                                    VerifyTokenService verifyTokenService,
                                     CaseManagementForCaseWorkerService caseManagementForCaseWorkerService) {
-
-        this.verifyTokenService = verifyTokenService;
         this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
     }
 
@@ -55,12 +47,7 @@ public class MultipleUploadDocumentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToStart(
-            @RequestBody MultipleRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+            @RequestBody MultipleRequest ccdRequest) {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
 
@@ -72,7 +59,6 @@ public class MultipleUploadDocumentController {
     /**
      * Called at the end of Upload Document event.
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -86,13 +72,7 @@ public class MultipleUploadDocumentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralReply(
-            @RequestBody MultipleRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+            @RequestBody MultipleRequest ccdRequest) {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
 

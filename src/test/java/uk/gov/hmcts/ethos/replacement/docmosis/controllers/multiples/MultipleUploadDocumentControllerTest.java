@@ -16,9 +16,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -36,14 +36,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_O
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({MultipleUploadDocumentController.class, JsonMapper.class})
-class MultipleUploadDocumentControllerTest {
+class MultipleUploadDocumentControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/multiples/uploadDocument/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/multiples/uploadDocument/aboutToSubmit";
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
     @MockBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @Autowired
@@ -53,8 +50,10 @@ class MultipleUploadDocumentControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
-    void setUp() {
+    @Override
+    protected void setUp() throws Exception {
 
+        super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withClaimantIndType("First", "Last")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);

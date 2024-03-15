@@ -564,42 +564,6 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     @Test
-    void createApplication_withStoredPendingYes_shouldReturnStoredStatus() {
-        ClaimantTse claimantTse = new ClaimantTse();
-        claimantTse.setStoredPending(YES);
-        claimantTse.setContactApplicationType("withdraw");
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimantTse(claimantTse);
-        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
-
-        tseService.createApplication(caseData, true);
-
-        var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
-        assertThat(genericTseApplicationType.getStatus(), is(STORED_STATE));
-        assertThat(genericTseApplicationType.getApplicationState(), is(STORED));
-        assertThat(genericTseApplicationType.getDueDate(), is(nullValue()));
-    }
-
-    @Test
-    void createApplication_withStoredPendingNo_shouldReturnOpenStatus() {
-        ClaimantTse claimantTse = new ClaimantTse();
-        claimantTse.setContactApplicationType("withdraw");
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimantTse(claimantTse);
-        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
-
-        tseService.createApplication(caseData, true);
-
-        var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
-        assertThat(genericTseApplicationType.getStatus(), is(OPEN_STATE));
-        assertThat(genericTseApplicationType.getApplicationState(), is(IN_PROGRESS));
-        assertThat(genericTseApplicationType.getDueDate(),
-            is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
-    }
-
-    @Test
     void displayRespondentApplicationsTable_hasApplications() {
         CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
         caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());

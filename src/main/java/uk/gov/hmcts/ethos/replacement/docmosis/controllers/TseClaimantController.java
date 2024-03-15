@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseStoreService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -30,6 +31,7 @@ public class TseClaimantController {
 
     private final VerifyTokenService verifyTokenService;
     private final TseService tseService;
+    private final TseStoreService tseStoreService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -55,6 +57,34 @@ public class TseClaimantController {
 
         if (caseDetails.getCaseData().getClaimantTse() != null) {
             tseService.createApplication(caseDetails.getCaseData(), true);
+            tseService.clearApplicationData(caseDetails.getCaseData());
+        }
+
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    @PostMapping(value = "/aboutToStore", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStoreRespondentTSE(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+
+        if (caseDetails.getCaseData().getClaimantTse() != null) {
+            tseStoreService.storeClaimantApplication(caseDetails.getCaseData());
             tseService.clearApplicationData(caseDetails.getCaseData());
         }
 

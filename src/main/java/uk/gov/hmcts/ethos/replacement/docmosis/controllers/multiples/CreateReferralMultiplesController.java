@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -82,7 +81,8 @@ public class CreateReferralMultiplesController {
     public ResponseEntity<MultipleCallbackResponse> initReferralHearingDetails(
             @RequestBody MultipleRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("ABOUT TO START CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ABOUT TO START CREATE MULTIPLES REFERRAL ---> "
+                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -114,7 +114,7 @@ public class CreateReferralMultiplesController {
     public ResponseEntity<MultipleCallbackResponse> validateReferentEmail(
             @RequestBody MultipleRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("VALIDATE REFERENT EMAIL CREATE REFERRAL ---> " + LOG_MESSAGE
+        log.info("VALIDATE REFERENT EMAIL CREATE MULTIPLES REFERRAL ---> " + LOG_MESSAGE
                 + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -156,7 +156,8 @@ public class CreateReferralMultiplesController {
     public ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralDetails(
             @RequestBody MultipleRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("ABOUT TO SUBMIT CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ABOUT TO SUBMIT CREATE MULTIPLES REFERRAL ---> "
+                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -178,11 +179,6 @@ public class CreateReferralMultiplesController {
                 caseData,
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                 this.documentManagementService.addDocumentToDocumentField(documentInfo));
-
-        log.info("Event: Referral Email sent. "
-                    + ". EventId: " + ccdRequest.getEventId()
-                    + ". Referral number: " + referralNumber
-                    + ". Emailed at: " + DateTime.now());
 
         clearReferralDataFromCaseData(caseData);
 
@@ -209,7 +205,7 @@ public class CreateReferralMultiplesController {
     public ResponseEntity<MultipleCallbackResponse> completeCreateReferral(
             @RequestBody MultipleRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("COMPLETE CREATE REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("COMPLETE CREATE MULTIPLES REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

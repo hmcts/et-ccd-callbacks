@@ -17,7 +17,6 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleDocGenerationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleLetterService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService;
@@ -44,9 +43,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MultipleDocGenerationController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class MultipleDocGenerationControllerTest {
+class MultipleDocGenerationControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String PRINT_SCHEDULE_URL = "/printSchedule";
     private static final String PRINT_LETTER_URL = "/printLetter";
     private static final String PRINT_DOCUMENT_CONFIRMATION_URL = "/printDocumentConfirmation";
@@ -64,9 +62,6 @@ class MultipleDocGenerationControllerTest {
     private MultipleScheduleService multipleScheduleService;
 
     @MockBean
-    private VerifyTokenService verifyTokenService;
-
-    @MockBean
     private MultipleDocGenerationService multipleDocGenerationService;
 
     private MockMvc mvc;
@@ -80,7 +75,9 @@ class MultipleDocGenerationControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         documentInfo = new DocumentInfo();

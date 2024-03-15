@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 
 import java.util.List;
@@ -96,6 +97,10 @@ public final class CallbackRespHelper {
                     .build());
 
         }
+    }
+
+    public static ResponseEntity<MultipleCallbackResponse> multipleResponse(MultipleData data, List<String> errors) {
+        return ResponseEntity.ok(MultipleCallbackResponse.builder().errors(errors).data(data).build());
     }
 
 }

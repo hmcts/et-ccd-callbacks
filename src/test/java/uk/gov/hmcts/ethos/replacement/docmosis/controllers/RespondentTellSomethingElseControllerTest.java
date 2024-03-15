@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -49,17 +47,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
-class RespondentTellSomethingElseControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String VALIDATE_GIVE_DETAILS = "/respondentTSE/validateGiveDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondentTSE/aboutToSubmit";
     private static final String DISPLAY_TABLE_URL = "/respondentTSE/displayTable";
     private static final String COMPLETE_APPLICATION_URL = "/respondentTSE/completeApplication";
     private static final String ABOUT_TO_START_URL = "/respondentTSE/aboutToStart";
     private static final String SHOW_ERROR_URL = "/respondentTSE/showError";
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @MockBean
     private RespondentTellSomethingElseService resTseService;
@@ -74,7 +68,9 @@ class RespondentTellSomethingElseControllerTest {
     private MockedStatic mockHelper;
 
     @BeforeEach
-    void setUp() {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("test")
             .withClaimant("claimant")
@@ -127,7 +123,7 @@ class RespondentTellSomethingElseControllerTest {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 

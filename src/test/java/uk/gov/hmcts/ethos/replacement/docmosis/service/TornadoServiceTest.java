@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
@@ -237,7 +238,7 @@ class TornadoServiceTest {
     void generateEt3VettingDocument() throws IOException {
         mockConnectionSuccess();
         CaseData caseData = new CaseData();
-        caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test", "Test", true));
+        caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test Code", "Test Label", true));
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET3_PROCESSING_PDF);
         verifyDocumentInfo(documentInfo);
@@ -286,6 +287,17 @@ class TornadoServiceTest {
                 ENGLANDWALES_CASE_TYPE_ID,
                 INITIAL_CONSIDERATION_PDF);
         assertThat(bytes.length, is(0));
+    }
+
+    @Test
+    void generateDocument_success() throws IOException {
+        mockConnectionSuccess();
+        var document = TornadoDocument.builder().templateName("template.docx").data(DOCUMENT_INFO_MARKUP).build();
+        DocumentInfo documentInfo = tornadoService.generateDocument(
+            AUTH_TOKEN, document, INITIAL_CONSIDERATION_PDF, ENGLANDWALES_CASE_TYPE_ID);
+
+        verifyDocumentInfo(documentInfo);
+        assertEquals(INITIAL_CONSIDERATION_PDF, documentInfo.getDescription());
     }
 
     private void createUserService() {

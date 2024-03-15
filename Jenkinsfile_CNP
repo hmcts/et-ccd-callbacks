@@ -82,7 +82,6 @@ withPipeline(type, product, component) {
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     sh """
        yarn install
-       yarn playwright install
     """
   }
 
@@ -119,7 +118,6 @@ withPipeline(type, product, component) {
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     sh """
        yarn install
-       yarn playwright install
     """
   }
 

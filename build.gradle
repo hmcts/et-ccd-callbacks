@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.springframework.boot' version '2.7.18'
-    id 'org.owasp.dependencycheck' version '9.0.9'
+    id 'org.owasp.dependencycheck' version '9.0.10'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
     id 'io.freefair.lombok' version '8.6'
@@ -304,7 +304,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '9.0.86'
+    tomcatEmbedVersion = '9.0.87'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -355,7 +355,7 @@ dependencies {
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.1'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.2'
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
@@ -363,7 +363,7 @@ dependencies {
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.2'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.12'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'

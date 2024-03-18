@@ -28,11 +28,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.CASE_MANAGEMENT_ORDERS_REQUESTS;
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -147,7 +150,36 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void testClearSendNotificaitonFields() {
+    void testCreateSendNotificationWhenClaimantShouldBeNotified() {
+        caseData.setSendNotificationSubject(List.of(CASE_MANAGEMENT_ORDERS_REQUESTS));
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationResponseTribunal(SEND_NOTIFICATION_RESPONSE_REQUIRED);
+        sendNotificationService.createSendNotification(caseData);
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        assertEquals(NOT_STARTED_YET, sendNotificationType.getNotificationState());
+    }
+
+    @Test
+    void testCreateSendNotificationWhenRespondentOnlyRequired() {
+        caseData.setSendNotificationSubject(List.of(CASE_MANAGEMENT_ORDERS_REQUESTS));
+        caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
+        caseData.setSendNotificationResponseTribunal(SEND_NOTIFICATION_RESPONSE_REQUIRED);
+        sendNotificationService.createSendNotification(caseData);
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
+    }
+
+    @Test
+    void testCreateSendNotificationWhenCmoAndNoResponseRequired() {
+        caseData.setSendNotificationSubject(List.of(CASE_MANAGEMENT_ORDERS_REQUESTS));
+        caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
+        sendNotificationService.createSendNotification(caseData);
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
+    }
+
+    @Test
+    void testClearSendNotificationFields() {
         sendNotificationService.clearSendNotificationFields(caseData);
 
         assertNull(caseData.getSendNotificationTitle());

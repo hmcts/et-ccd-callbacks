@@ -43,6 +43,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -90,7 +92,7 @@ class RespondNotificationServiceTest {
     }
 
     @Test
-    void testCreateAndClearRespondNotification() throws IllegalAccessException {
+    void testCreateAndClearRespondNotification() {
         caseData.setRespondNotificationTitle("title");
         caseData.setRespondNotificationAdditionalInfo("info");
         caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
@@ -126,6 +128,8 @@ class RespondNotificationServiceTest {
         assertEquals(NO, respondNotificationType.getRespondNotificationResponseRequired());
         assertEquals(CLAIMANT_ONLY, respondNotificationType.getRespondNotificationWhoRespond());
         assertEquals("John Doe", respondNotificationType.getRespondNotificationFullName());
+        assertEquals(NOT_VIEWED_YET, respondNotificationType.getState());
+        assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
 
         assertNull(caseData.getRespondNotificationTitle());
         assertNull(caseData.getRespondNotificationAdditionalInfo());
@@ -139,7 +143,7 @@ class RespondNotificationServiceTest {
     }
 
     @Test
-    void testCreateAndClearRespondNotification_withClaimantResponseDue() throws IllegalAccessException {
+    void testCreateAndClearRespondNotification_withClaimantResponseDue() {
         caseData.setRespondNotificationTitle("title");
         caseData.setRespondNotificationAdditionalInfo("info");
         caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
@@ -176,6 +180,8 @@ class RespondNotificationServiceTest {
         assertEquals(CLAIMANT_ONLY, respondNotificationType.getRespondNotificationWhoRespond());
         assertEquals("John Doe", respondNotificationType.getRespondNotificationFullName());
         assertEquals(YES, respondNotificationType.getIsClaimantResponseDue());
+        assertEquals(NOT_STARTED_YET, respondNotificationType.getState());
+        assertEquals(NOT_STARTED_YET, sendNotificationType.getNotificationState());
 
         assertNull(caseData.getRespondNotificationTitle());
         assertNull(caseData.getRespondNotificationAdditionalInfo());

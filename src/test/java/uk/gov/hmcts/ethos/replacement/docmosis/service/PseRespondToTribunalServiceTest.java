@@ -347,6 +347,51 @@ class PseRespondToTribunalServiceTest {
             is(expected));
     }
 
+    @Test
+    void initialOrdReqDetailsTableMarkUp_acceptanceOfECCResponse() {
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .date("5 Aug 2022")
+                                .sendNotificationTitle("Acceptance")
+                                .sendNotificationLetter(NO)
+                                .sendNotificationSubject(List.of("Employer Contract Claim"))
+                                .sendNotificationEccQuestion("Acceptance of ECC response")
+                                .sendNotificationResponseTribunal("Yes - view document for details")
+                                .sendNotificationSelectParties(BOTH_PARTIES)
+                                .sendNotificationWhoCaseOrder("Legal Officer")
+                                .sendNotificationFullName("Mr Lee Gal Officer")
+                                .sendNotificationAdditionalInfo("Additional Info")
+                                .sendNotificationNotify(BOTH_PARTIES)
+                                .build())
+                        .build()
+        ));
+
+        caseData.setPseRespondentSelectOrderOrRequest(
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
+
+        String expected = """
+            |View Application||\r
+            |--|--|\r
+            |Notification|Acceptance|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Is a response required?|Yes - view document for details|\r
+            |Party or parties to respond|Both parties|\r
+            |Additional information|Additional Info|\r
+            |Name|Mr Lee Gal Officer|\r
+            |What is the ECC notification?|Acceptance of ECC response|\r
+            |Sent to|Both parties|\r
+            """;
+
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+                is(expected));
+    }
+
     private DocumentTypeItem createDocumentTypeItem(String fileName, String uuid) {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setId(UUID.randomUUID().toString());

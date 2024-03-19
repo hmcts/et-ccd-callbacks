@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -95,6 +98,34 @@ public class TornadoService {
             throw e;
         } finally {
             closeConnection(conn);
+        }
+    }
+
+    /**
+     * Generates a document through Tornado.
+     * @param userToken contains the user authentication token
+     * @param document contains the data needed to generate the PDF
+     * @param documentName name of the document
+     * @param caseTypeId caseTypeId of the case this document belongs to
+     * @return DocumentInfo which contains the URL and markup of the uploaded document
+     * @throws IOException thrown when Tornado fails to create the document for any reason
+     */
+    public DocumentInfo generateDocument(String userToken, TornadoDocument<?> document, String documentName, 
+        String caseTypeId) throws IOException {
+
+        HttpURLConnection connection = null;
+        try {
+            connection = createConnection();
+            document.setAccessKey(tornadoConnection.getAccessKey());
+            String content = new ObjectMapper().writeValueAsString(document);
+            buildDocumentInstruction(connection, content);
+            byte[] bytes = getDocumentByteArray(connection);
+            return createDocumentInfoFromBytes(userToken, bytes, documentName, caseTypeId);
+        } catch (IOException exception) {
+            log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
+            throw exception;
+        } finally {
+            closeConnection(connection);
         }
     }
 
@@ -326,6 +357,14 @@ public class TornadoService {
             throw exception;
         } finally {
             closeConnection(connection);
+        }
+    }
+
+    private void buildDocumentInstruction(HttpURLConnection connection, String content) throws IOException {
+        OutputStream outputStream = connection.getOutputStream();
+        try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+            writer.write(content);
+            writer.flush();
         }
     }
 

@@ -22,7 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.FixMultipleCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCloseEventValidationService;
@@ -67,9 +66,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ExcelActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class ExcelActionsControllerTest {
+class ExcelActionsControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String CREATE_MULTIPLE_URL = "/createMultiple";
     private static final String AMEND_MULTIPLE_URL = "/amendMultiple";
     private static final String AMEND_MULTIPLE_API_URL = "/amendMultipleAPI";
@@ -116,9 +114,6 @@ class ExcelActionsControllerTest {
 
     @MockBean
     private MultipleUploadService multipleUploadService;
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @MockBean
     private MultipleDynamicListFlagsService multipleDynamicListFlagsService;
@@ -175,7 +170,9 @@ class ExcelActionsControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         DocumentInfo documentInfo = new DocumentInfo();

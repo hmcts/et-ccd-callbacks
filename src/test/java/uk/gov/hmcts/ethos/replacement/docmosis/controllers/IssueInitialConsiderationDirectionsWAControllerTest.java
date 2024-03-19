@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -15,7 +14,6 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -32,8 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({IssueInitialConsiderationDirectionsWAController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
-class IssueInitialConsiderationDirectionsWAControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class IssueInitialConsiderationDirectionsWAControllerTest extends BaseControllerTest {
 
     private static final String START_INITIAL_CONSIDERATION_DIRECTIONS_UR =
             "/startIssueInitialConsiderationDirectionsWA";
@@ -45,9 +42,6 @@ class IssueInitialConsiderationDirectionsWAControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
-
     private MockMvc mvc;
 
     private CCDRequest ccdRequest;
@@ -56,7 +50,9 @@ class IssueInitialConsiderationDirectionsWAControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    void setUp() throws Exception {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()

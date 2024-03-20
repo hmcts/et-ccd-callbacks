@@ -46,8 +46,7 @@ import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.*;
 
 @Service
 @Slf4j
@@ -274,6 +273,9 @@ public class DocumentManagementService {
         caseData.getAddDocumentCollection().forEach(
                 uploadDoc -> {
                     DocumentType uploadedDocType = uploadDoc.getValue();
+                    // todo: get index
+                    Integer indexToAdd = Integer.valueOf(uploadedDocType.getShortDescription());
+
                     setDocumentTypeForDocument(uploadedDocType);
                     setSecondLevelDocumentFromType(uploadedDocType, uploadedDocType.getDocumentType());
                     DocumentTypeItem docTypeItem = createDocumentTypeItemFromTopLevel(
@@ -283,9 +285,10 @@ public class DocumentManagementService {
                             String.format("%s : %s", uploadedDocType.getShortDescription(),
                                     uploadedDocType.getTopLevelDocuments()));
                     docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
-                    caseData.getDocumentCollection().add(docTypeItem);
-                    setDocumentNumbers(caseData);
+//                    caseData.getDocumentCollection().add(docTypeItem);
+                    addDocumentToCollectionAtIndex(caseData.getDocumentCollection(), docTypeItem, indexToAdd);
                 });
+        setDocumentNumbers(caseData);
     }
 
     private HttpHeaders getResponseHeaders() {

@@ -1085,4 +1085,18 @@ public final class DocumentHelper {
                                                              .indexOf(documentTypeItem) + 1));
         });
     }
+
+    /**
+     * Add document to the document collection based on the provided index.
+     * @param docTypeItem document type item
+     * @param indexToAdd index of the document to be added
+     */
+    public static void addDocumentToCollectionAtIndex(List<DocumentTypeItem> documentCollection,
+                                                      DocumentTypeItem docTypeItem, Integer indexToAdd) {
+        if (indexToAdd >= 0 && indexToAdd <= documentCollection.size()) {
+            documentCollection.add(indexToAdd, docTypeItem);
+        } else {
+            documentCollection.add(docTypeItem);
+        }
+    }
 }

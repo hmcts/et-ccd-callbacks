@@ -51,7 +51,6 @@ class SendNotificationServiceTest {
 
     @Captor
     ArgumentCaptor<Map<String, String>> personalisationCaptor;
-    private static final String SEND_NOTIFICATION_TEMPLATE_ID = "sendNotificationTemplateId";
     private static final String CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID =
             "claimantSendNotificationTemplateId";
     private static final String RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID =

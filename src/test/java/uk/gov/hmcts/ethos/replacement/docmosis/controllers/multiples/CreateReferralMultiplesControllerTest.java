@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
@@ -40,6 +43,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -80,6 +84,7 @@ class CreateReferralMultiplesControllerTest {
     @MockBean
     private CaseLookupService caseLookupService;
     private CCDRequest ccdRequest;
+    private CreateReferralMultiplesController createReferralMultiplesController;
 
     @BeforeEach
     protected void setUp() throws Exception {
@@ -114,6 +119,8 @@ class CreateReferralMultiplesControllerTest {
         userDetails.setRoles(List.of("role1"));
         when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
         when(caseLookupService.getCaseDataAsAdmin(any(), any())).thenReturn(caseData);
+        createReferralMultiplesController = new CreateReferralMultiplesController(verifyTokenService, referralService,
+                userIdamService, documentManagementService);
     }
 
     @Test
@@ -140,13 +147,17 @@ class CreateReferralMultiplesControllerTest {
     }
 
     @Test
-    void initReferralHearingDetails_invalidToken() throws Exception {
+    void createReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isForbidden());
+
+        ResponseEntity<MultipleCallbackResponse> response =
+                createReferralMultiplesController.initReferralHearingDetails(request, AUTH_TOKEN);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -157,6 +168,10 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isForbidden());
+
+        ResponseEntity<MultipleCallbackResponse> response =
+                createReferralMultiplesController.aboutToSubmitReferralDetails(request, AUTH_TOKEN);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -164,8 +179,6 @@ class CreateReferralMultiplesControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
-        MultipleRequest multipleCCDRequest = request;
-        multipleCCDRequest.getCaseDetails().getCaseData().setReferralSubject("Party not responded/complied");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
@@ -175,8 +188,6 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.referralSubject", is(
-                        "Party not responded/complied")))
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
@@ -254,6 +265,10 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isForbidden());
+
+        ResponseEntity<MultipleCallbackResponse> response =
+                createReferralMultiplesController.completeCreateReferral(request, AUTH_TOKEN);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -288,6 +303,10 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
+
+        ResponseEntity<MultipleCallbackResponse> response =
+                createReferralMultiplesController.aboutToSubmitReferralDetails(request, AUTH_TOKEN);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test

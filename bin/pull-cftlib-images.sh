@@ -24,5 +24,3 @@ docker pull hmctspublic.azurecr.io/xui/mo-webapp:latest
 docker pull mcr.microsoft.com/azure-storage/azurite:latest
 # Download wiremock latest version
 docker pull wiremock/wiremock:latest
-# Download dm-store latest version
- docker pull hmctspublic.azurecr.io/dm/store:latest

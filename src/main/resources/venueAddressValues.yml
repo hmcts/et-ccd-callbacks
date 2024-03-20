@@ -135,7 +135,7 @@ venue-addresses:
       - venue: Leeds
         address: 4th Floor, City Exchange, 11 Albion Street, Leeds, LS1 5ES
       - venue: Leeds Westgate
-        address: 6 Westgate, Grace St, Leeds, LS1 2RP
+        address: 2nd Floor, West Gate, 6 Grace Street, Leeds, LS1 2RP
       - venue: Scarborough
         address: Scarborough
       - venue: Sheffield Combi
@@ -248,6 +248,8 @@ venue-addresses:
         address: Hereford Court
       - venue: Leicester
         address: Leicester
+      - venue: North Staffordshire Justice Centre
+        address: The Court House, Ryecroft, Newcastle-under-Lyme, ST5 2AA
       - venue: Stoke
         address: Stoke
       - venue: STOKE (Hanley)

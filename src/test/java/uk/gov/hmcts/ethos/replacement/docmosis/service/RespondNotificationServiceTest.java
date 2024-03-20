@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -56,7 +57,7 @@ class RespondNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
 
     private EmailService emailService;
@@ -68,7 +69,7 @@ class RespondNotificationServiceTest {
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyMap());
 
         SendNotificationService sendNotificationService =
-            new SendNotificationService(hearingSelectionService, emailService);
+            new SendNotificationService(hearingSelectionService, emailService, featureToggleService);
 
         respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
 

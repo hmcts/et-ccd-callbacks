@@ -164,6 +164,8 @@ class CreateReferralMultiplesControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
+        MultipleRequest multipleCCDRequest = request;
+        multipleCCDRequest.getCaseDetails().getCaseData().setReferralSubject("Party not responded/complied");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
                 .thenReturn(new DocumentInfo());
@@ -173,6 +175,8 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.referralSubject", is(
+                        "Party not responded/complied")))
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));

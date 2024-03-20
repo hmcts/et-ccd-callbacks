@@ -429,7 +429,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.15.1'
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'

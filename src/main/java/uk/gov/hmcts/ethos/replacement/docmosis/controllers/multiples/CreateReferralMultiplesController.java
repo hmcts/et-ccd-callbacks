@@ -169,7 +169,6 @@ public class CreateReferralMultiplesController {
             caseData.setReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData.getReferralCollection()));
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         DocumentInfo documentInfo = referralService.generateCRDocument(caseData,

@@ -311,7 +311,7 @@ ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'com.google.guava', version: '33.0.0-jre') {
+        dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
             entry 'guava'
         }
         dependencySet(group: 'io.netty', version: '4.1.107.Final') {
@@ -361,7 +361,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.2'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.3'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
@@ -388,7 +388,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.2.6'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.3.0'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.0'
 
@@ -431,7 +431,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.15.1'
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'

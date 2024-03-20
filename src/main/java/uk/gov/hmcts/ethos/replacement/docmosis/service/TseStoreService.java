@@ -41,7 +41,7 @@ public class TseStoreService {
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = getToStoreTseApplicationTypeItem(caseData);
 
-        List<GenericTseApplicationTypeItem> tseApplicationCollection = caseData.getGenericTseApplicationCollection();
+        List<GenericTseApplicationTypeItem> tseApplicationCollection = caseData.getTseApplicationStoredCollection();
         tseApplicationCollection.add(tseApplicationTypeItem);
 
         caseData.setTseApplicationStoredCollection(tseApplicationCollection);

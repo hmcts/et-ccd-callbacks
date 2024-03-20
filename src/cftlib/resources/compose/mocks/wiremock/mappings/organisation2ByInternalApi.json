@@ -1,10 +1,10 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/commondata/caseflags/service-id=BHA1",
+    "urlPath": "/refdata/internal/v1/organisations",
     "queryParameters": {
-      "flag-type": {
-        "equalTo": "PARTY"
+      "id": {
+        "equalTo": "Q1KOKP2"
       }
     }
   },
@@ -13,6 +13,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/party-flags.json"
+    "bodyFileName": "organisation2.json"
   }
 }

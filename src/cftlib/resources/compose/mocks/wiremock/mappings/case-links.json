@@ -1,13 +1,13 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/external/v1/organisations"
+    "urlPath": "/refdata/commondata/lov/categories/CaseLinkingReasonCode"
   },
   "response": {
     "status": 200,
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/organisation1.json"
+    "bodyFileName": "case-links.json"
   }
 }

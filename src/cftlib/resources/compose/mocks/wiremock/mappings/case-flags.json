@@ -1,10 +1,10 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/external/v1/organisations/users",
+    "urlPath": "/refdata/commondata/caseflags/service-id=BHA1",
     "queryParameters": {
-      "returnRoles": {
-        "equalTo": "false"
+      "flag-type": {
+        "equalTo": "CASE"
       }
     }
   },
@@ -13,6 +13,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/users.json"
+    "bodyFileName": "case-flags.json"
   }
 }

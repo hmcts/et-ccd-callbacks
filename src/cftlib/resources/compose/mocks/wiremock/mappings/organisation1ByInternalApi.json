@@ -4,7 +4,7 @@
     "urlPath": "/refdata/internal/v1/organisations",
     "queryParameters": {
       "id": {
-        "equalTo": "Q1KOKP2"
+        "equalTo": "79ZRSOU"
       }
     }
   },
@@ -13,6 +13,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/organisation2.json"
+    "bodyFileName": "organisation1.json"
   }
 }

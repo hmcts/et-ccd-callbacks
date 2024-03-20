@@ -1,0 +1,8 @@
+Getting all active organisations that has address: http://localhost:8765/refdata/external/v1/organisations/status/ACTIVE?address=true
+Getting all active users without their roles: http://localhost:8765/refdata/external/v1/organisations/users?status=Active&returnRoles=false
+Getting all flags where service-id is BHA1 and flag-type=CASE: http://localhost:8765/refdata/commondata/caseflags/service-id=BHA1?flag-type=CASE
+Getting all case links: http://localhost:8765/refdata/commondata/lov/categories/CaseLinkingReasonCode
+Getting all venues where service code is BHA1: http://localhost:8765/refdata/location/court-venues/services?service_code=BHA1
+Checking wiremock health: http://localhost:8765/health
+Getting specific organisation users without their roles: http://localhost:8765/refdata/internal/v1/organisations/79ZRSOU/users?returnRoles=false
+

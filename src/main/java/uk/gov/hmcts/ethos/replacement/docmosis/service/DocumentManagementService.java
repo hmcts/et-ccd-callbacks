@@ -284,8 +284,8 @@ public class DocumentManagementService {
                                     uploadedDocType.getTopLevelDocuments()));
                     docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
                     caseData.getDocumentCollection().add(docTypeItem);
-                    setDocumentNumbers(caseData);
                 });
+        setDocumentNumbers(caseData);
     }
 
     private HttpHeaders getResponseHeaders() {

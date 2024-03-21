@@ -263,8 +263,8 @@ class DocumentManagementServiceTest {
         uploadedDocType1.setDocumentBinaryUrl("test binary doc url");
         doc1.getValue().setUploadedDocument(uploadedDocType1);
 
-        doc1.getValue().setDocNumber("18");
-        doc1.getValue().setDocumentIndex("18");
+        doc1.getValue().setDocNumber("1");
+        doc1.getValue().setDocumentIndex("1");
         doc1.getValue().setTopLevelDocuments("ET1 Vetting");
         doc1.getValue().setTypeOfDocument("ET1 being vetted");
         CaseData caseData = new CaseData();
@@ -281,8 +281,8 @@ class DocumentManagementServiceTest {
 
         doc4.getValue().setUploadedDocument(uploadedDocType4);
         doc4.getValue().setDateOfCorrespondence("2024-03-04");
-        doc4.getValue().setDocNumber("3");
-        doc1.getValue().setDocumentIndex("3");
+        doc4.getValue().setDocNumber("2");
+        doc1.getValue().setDocumentIndex("2");
         doc4.getValue().setTopLevelDocuments("ET3");
         doc4.getValue().setTypeOfDocument("ET3 reconsidered");
         caseData.setDocumentCollection(new ArrayList<>());
@@ -368,8 +368,8 @@ class DocumentManagementServiceTest {
         uploadedDocType1.setDocumentBinaryUrl("test binary doc url");
         doc1.getValue().setUploadedDocument(uploadedDocType1);
 
-        doc1.getValue().setDocNumber("38");
-        doc1.getValue().setDocumentIndex("38");
+        doc1.getValue().setDocNumber("1");
+        doc1.getValue().setDocumentIndex("1");
         doc1.getValue().setTopLevelDocuments("ET1 Vetting");
         doc1.getValue().setTypeOfDocument("ET1 vetted");
         CaseData caseData = new CaseData();

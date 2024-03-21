@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -1089,10 +1090,14 @@ public final class DocumentHelper {
     /**
      * Add document to the document collection based on the provided index.
      * @param docTypeItem document type item
-     * @param indexToAdd index of the document to be added
+     * @param indexToAddString index of the document to be added
      */
     public static void addDocumentToCollectionAtIndex(List<DocumentTypeItem> documentCollection,
-                                                      DocumentTypeItem docTypeItem, Integer indexToAdd) {
+                                                      DocumentTypeItem docTypeItem, String indexToAddString) {
+        int indexToAdd = -1;
+        if (StringUtils.isNotEmpty(indexToAddString)) {
+            indexToAdd = Integer.parseInt(indexToAddString);
+        }
         if (indexToAdd >= 0 && indexToAdd <= documentCollection.size()) {
             documentCollection.add(indexToAdd - 1, docTypeItem);
         } else {

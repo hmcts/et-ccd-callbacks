@@ -1094,7 +1094,7 @@ public final class DocumentHelper {
     public static void addDocumentToCollectionAtIndex(List<DocumentTypeItem> documentCollection,
                                                       DocumentTypeItem docTypeItem, Integer indexToAdd) {
         if (indexToAdd >= 0 && indexToAdd <= documentCollection.size()) {
-            documentCollection.add(indexToAdd, docTypeItem);
+            documentCollection.add(indexToAdd - 1, docTypeItem);
         } else {
             documentCollection.add(docTypeItem);
         }

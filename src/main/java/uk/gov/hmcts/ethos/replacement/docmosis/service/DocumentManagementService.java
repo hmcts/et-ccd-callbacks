@@ -46,7 +46,9 @@ import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.*;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.addDocumentToCollectionAtIndex;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 @Service
 @Slf4j

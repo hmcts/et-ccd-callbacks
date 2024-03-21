@@ -147,7 +147,7 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void testClearSendNotificaitonFields() {
+    void testClearSendNotificationFields() {
         sendNotificationService.clearSendNotificationFields(caseData);
 
         assertNull(caseData.getSendNotificationTitle());

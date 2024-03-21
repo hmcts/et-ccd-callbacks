@@ -32,6 +32,7 @@ applicationinsights-agent-*.jar
 **/.DS_Store
 
 src/test/functional/resources/documents/*
+src/test/resources/PreHearingDepositData.xlsx
 node_modules/
 example.docx
 document.docx

@@ -91,6 +91,10 @@ class DocumentManagementServiceTest {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String AUTH_TOKEN = "Bearer authToken";
+    private static final String docFileName1 = "DOC_FILE_NAME_1";
+    private static final String docFileName2 = "DOC_FILE_NAME_2";
+    private static final String docFileName3 = "DOC_FILE_NAME_3";
+
 
     @BeforeEach
     void setUp() {
@@ -387,7 +391,6 @@ class DocumentManagementServiceTest {
     void addUploadedDocsToCaseDocCollection_WithDocumentIndex() {
         DocumentTypeItem doc1 = new DocumentTypeItem();
         DocumentType dt = new DocumentType();
-        String docFileName1 = "DOC_FILE_NAME_1";
         dt.setTopLevelDocuments("ET1 Vetting");
         doc1.setValue(dt);
         UploadedDocumentType uploadedDocType1 = new UploadedDocumentType();
@@ -405,7 +408,6 @@ class DocumentManagementServiceTest {
 
         DocumentType dt4 = new DocumentType();
         DocumentTypeItem doc4 = new DocumentTypeItem();
-        String docFileName2 = "DOC_FILE_NAME_2";
         doc4.setValue(dt4);
         UploadedDocumentType uploadedDocType4 = new UploadedDocumentType();
         uploadedDocType4.setDocumentUrl("test doc url 4");
@@ -432,7 +434,6 @@ class DocumentManagementServiceTest {
     void addUploadedDocsToCaseDocCollection_WithoutDocumentIndex() {
         DocumentTypeItem doc1 = new DocumentTypeItem();
         DocumentType dt = new DocumentType();
-        String docFileName1 = "DOC_FILE_NAME_1";
         dt.setTopLevelDocuments("ET1 Vetting");
         doc1.setValue(dt);
         UploadedDocumentType uploadedDocType1 = new UploadedDocumentType();
@@ -450,7 +451,6 @@ class DocumentManagementServiceTest {
 
         DocumentType dt2 = new DocumentType();
         DocumentTypeItem doc2 = new DocumentTypeItem();
-        String docFileName2 = "DOC_FILE_NAME_2";
         doc2.setValue(dt2);
         UploadedDocumentType uploadedDocType2 = new UploadedDocumentType();
         uploadedDocType2.setDocumentUrl("test doc url 4");
@@ -465,7 +465,6 @@ class DocumentManagementServiceTest {
 
         DocumentType dt4 = new DocumentType();
         DocumentTypeItem doc4 = new DocumentTypeItem();
-        String docFileName3 = "DOC_FILE_NAME_3";
         doc4.setValue(dt4);
         UploadedDocumentType uploadedDocType4 = new UploadedDocumentType();
         uploadedDocType4.setDocumentUrl("test doc url 4");

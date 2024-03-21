@@ -282,7 +282,6 @@ public class DocumentManagementService {
                             String.format("%s : %s", uploadedDocType.getShortDescription(),
                                     uploadedDocType.getTopLevelDocuments()));
                     docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
-
                     Integer indexToAdd = Integer.valueOf(uploadedDocType.getDocumentIndex());
                     addDocumentToCollectionAtIndex(caseData.getDocumentCollection(), docTypeItem, indexToAdd);
                 });

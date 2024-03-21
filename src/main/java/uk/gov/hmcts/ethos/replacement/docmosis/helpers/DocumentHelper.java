@@ -1094,14 +1094,15 @@ public final class DocumentHelper {
      */
     public static void addDocumentToCollectionAtIndex(List<DocumentTypeItem> documentCollection,
                                                       DocumentTypeItem docTypeItem, String indexToAddString) {
-        int indexToAdd = -1;
         if (StringUtils.isNotEmpty(indexToAddString)) {
-            indexToAdd = Integer.parseInt(indexToAddString);
-        }
-        if (indexToAdd >= 0 && indexToAdd <= documentCollection.size()) {
-            documentCollection.add(indexToAdd - 1, docTypeItem);
+            int indexToAdd = Integer.parseInt(indexToAddString);
+            if (indexToAdd > 0 && indexToAdd <= documentCollection.size() + 1) {
+                documentCollection.add(indexToAdd - 1, docTypeItem);
+            } else {
+                throw new IllegalArgumentException("Index that you entered is invalid");
+            }
         } else {
-            documentCollection.add(docTypeItem);
+            documentCollection.add(docTypeItem);   
         }
     }
 }

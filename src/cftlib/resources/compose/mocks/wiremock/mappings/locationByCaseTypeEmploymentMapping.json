@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/refdata/location/orgServices?ccdCaseType=EMPLOYMENT"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "locationByCaseTypeMappingResponse.json"
+  }
+}

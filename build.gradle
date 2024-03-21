@@ -488,6 +488,11 @@ bootWithCCD {
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'
+
+    // Update to have wiremock run instead of rd-location-ref-api
+    environment 'SERVICES_LOCATION_REF_API_URL', 'http://host.docker.internal:8765'
+    // Update to have wiremock run instead of rs-common-data-api
+    environment 'SERVICES_PRD_COMMONDATA_API', 'http://host.docker.internal:8765'
 }
 
 pmdMain.maxFailures = 324

@@ -1,0 +1,20 @@
+[
+  {
+    "jurisdiction": "Employment Tribunerals",
+    "service_id": 43,
+    "org_unit": "HMCTS",
+    "business_area": "Civil, Family and Tribunals",
+    "sub_business_area": "Tribunals",
+    "service_description": "Employment Claims",
+    "service_code": "BHA1",
+    "service_short_description": "Employment Claims",
+    "ccd_service_name": "EMPLOYMENT",
+    "last_update": "2020-11-02T16:28:37.259752",
+    "ccd_case_types": [
+      "ET_EnglandWales",
+      "ET_EnglandWales_Multiple",
+      "ET_Scotland",
+      "ET_Scotland_Multiple"
+    ]
+  }
+]

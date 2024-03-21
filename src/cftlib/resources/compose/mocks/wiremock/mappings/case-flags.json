@@ -5,6 +5,9 @@
     "queryParameters": {
       "flag-type": {
         "equalTo": "CASE"
+      },
+      "welsh-required": {
+        "equalTo": "Y"
       }
     }
   },

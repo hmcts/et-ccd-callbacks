@@ -273,9 +273,6 @@ public class DocumentManagementService {
         caseData.getAddDocumentCollection().forEach(
                 uploadDoc -> {
                     DocumentType uploadedDocType = uploadDoc.getValue();
-                    // todo: get index
-                    Integer indexToAdd = Integer.valueOf(uploadedDocType.getShortDescription());
-
                     setDocumentTypeForDocument(uploadedDocType);
                     setSecondLevelDocumentFromType(uploadedDocType, uploadedDocType.getDocumentType());
                     DocumentTypeItem docTypeItem = createDocumentTypeItemFromTopLevel(
@@ -285,7 +282,8 @@ public class DocumentManagementService {
                             String.format("%s : %s", uploadedDocType.getShortDescription(),
                                     uploadedDocType.getTopLevelDocuments()));
                     docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
-//                    caseData.getDocumentCollection().add(docTypeItem);
+
+                    Integer indexToAdd = Integer.valueOf(uploadedDocType.getDocumentIndex());
                     addDocumentToCollectionAtIndex(caseData.getDocumentCollection(), docTypeItem, indexToAdd);
                 });
         setDocumentNumbers(caseData);

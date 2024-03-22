@@ -91,9 +91,9 @@ class DocumentManagementServiceTest {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String AUTH_TOKEN = "Bearer authToken";
-    private static final String docFileName1 = "DOC_FILE_NAME_1";
-    private static final String docFileName2 = "DOC_FILE_NAME_2";
-    private static final String docFileName3 = "DOC_FILE_NAME_3";
+    private static final String DOC_FILE_NAME_1 = "DOC_FILE_NAME_1";
+    private static final String DOC_FILE_NAME_2 = "DOC_FILE_NAME_2";
+    private static final String DOC_FILE_NAME_3 = "DOC_FILE_NAME_3";
 
     @BeforeEach
     void setUp() {
@@ -394,7 +394,7 @@ class DocumentManagementServiceTest {
         doc1.setValue(dt);
         UploadedDocumentType uploadedDocType1 = new UploadedDocumentType();
         uploadedDocType1.setDocumentUrl("test doc url");
-        uploadedDocType1.setDocumentFilename(docFileName1);
+        uploadedDocType1.setDocumentFilename(DOC_FILE_NAME_1);
         uploadedDocType1.setDocumentBinaryUrl("test binary doc url");
         doc1.getValue().setUploadedDocument(uploadedDocType1);
 
@@ -410,7 +410,7 @@ class DocumentManagementServiceTest {
         doc4.setValue(dt4);
         UploadedDocumentType uploadedDocType4 = new UploadedDocumentType();
         uploadedDocType4.setDocumentUrl("test doc url 4");
-        uploadedDocType4.setDocumentFilename(docFileName2);
+        uploadedDocType4.setDocumentFilename(DOC_FILE_NAME_2);
         uploadedDocType4.setDocumentBinaryUrl("test binary doc url 4");
 
         doc4.getValue().setUploadedDocument(uploadedDocType4);
@@ -423,9 +423,9 @@ class DocumentManagementServiceTest {
         documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
 
         assertEquals(2, caseData.getDocumentCollection().size());
-        assertEquals(docFileName1,
+        assertEquals(DOC_FILE_NAME_1,
                 caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename());
-        assertEquals(docFileName2,
+        assertEquals(DOC_FILE_NAME_2,
                 caseData.getDocumentCollection().get(1).getValue().getUploadedDocument().getDocumentFilename());
     }
 
@@ -437,7 +437,7 @@ class DocumentManagementServiceTest {
         doc1.setValue(dt);
         UploadedDocumentType uploadedDocType1 = new UploadedDocumentType();
         uploadedDocType1.setDocumentUrl("test doc url");
-        uploadedDocType1.setDocumentFilename(docFileName1);
+        uploadedDocType1.setDocumentFilename(DOC_FILE_NAME_1);
         uploadedDocType1.setDocumentBinaryUrl("test binary doc url");
         doc1.getValue().setUploadedDocument(uploadedDocType1);
 
@@ -453,7 +453,7 @@ class DocumentManagementServiceTest {
         doc2.setValue(dt2);
         UploadedDocumentType uploadedDocType2 = new UploadedDocumentType();
         uploadedDocType2.setDocumentUrl("test doc url 4");
-        uploadedDocType2.setDocumentFilename(docFileName2);
+        uploadedDocType2.setDocumentFilename(DOC_FILE_NAME_2);
         uploadedDocType2.setDocumentBinaryUrl("test binary doc url 4");
 
         doc2.getValue().setUploadedDocument(uploadedDocType2);
@@ -467,7 +467,7 @@ class DocumentManagementServiceTest {
         doc4.setValue(dt4);
         UploadedDocumentType uploadedDocType4 = new UploadedDocumentType();
         uploadedDocType4.setDocumentUrl("test doc url 4");
-        uploadedDocType4.setDocumentFilename(docFileName3);
+        uploadedDocType4.setDocumentFilename(DOC_FILE_NAME_3);
         uploadedDocType4.setDocumentBinaryUrl("test binary doc url 4");
 
         doc4.getValue().setUploadedDocument(uploadedDocType4);
@@ -480,11 +480,11 @@ class DocumentManagementServiceTest {
         documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
 
         assertEquals(3, caseData.getDocumentCollection().size());
-        assertEquals(docFileName1,
+        assertEquals(DOC_FILE_NAME_1,
                 caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename());
-        assertEquals(docFileName3,
+        assertEquals(DOC_FILE_NAME_3,
                 caseData.getDocumentCollection().get(1).getValue().getUploadedDocument().getDocumentFilename());
-        assertEquals(docFileName2,
+        assertEquals(DOC_FILE_NAME_2,
                 caseData.getDocumentCollection().get(2).getValue().getUploadedDocument().getDocumentFilename());
     }
 }

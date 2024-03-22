@@ -41,10 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.STORED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.STORED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 
 @Slf4j
@@ -103,6 +100,18 @@ public class TseService {
     }
 
     /**
+     * Remove item from TseApplicationStoredCollection.
+     *
+     * @param caseData contains all the case data.
+     */
+    public void removeStoredApplication(CaseData caseData) {
+        String applicationId = caseData.getClaimantTse().getStoredApplicationId();
+        if (applicationId != null) {
+            caseData.getTseApplicationStoredCollection().removeIf(item -> item.getId().equals(applicationId));
+        }
+    }
+
+    /**
      * Clears the existing TSE data from CaseData to ensure fields will be empty when user
      * starts a new application in the same case.
      *
@@ -125,13 +134,6 @@ public class TseService {
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
         application.setApplicationState(IN_PROGRESS);
 
-        if (YES.equals(claimantTse.getStoredPending())) {
-            application.setStatus(STORED_STATE);
-            application.setApplicationState(STORED);
-            application.setDueDate(null);
-        }
-
-        caseData.setClaimantTse(null);
     }
 
     private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {

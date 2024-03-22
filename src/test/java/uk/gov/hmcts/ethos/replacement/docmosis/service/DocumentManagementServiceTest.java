@@ -95,7 +95,6 @@ class DocumentManagementServiceTest {
     private static final String docFileName2 = "DOC_FILE_NAME_2";
     private static final String docFileName3 = "DOC_FILE_NAME_3";
 
-
     @BeforeEach
     void setUp() {
         file = createTestFile();

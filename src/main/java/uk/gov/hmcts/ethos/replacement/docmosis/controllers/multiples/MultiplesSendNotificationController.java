@@ -34,7 +34,7 @@ public class MultiplesSendNotificationController {
     private final MultiplesSendNotificationService multiplesSendNotificationService;
 
     /**
-     * Send Notification about to start.
+     * Send Notification about to start with hearing details from lead case.
      *
      * @param multipleRequest holds the request and case data
      * @return Callback response entity with case data attached.
@@ -52,10 +52,13 @@ public class MultiplesSendNotificationController {
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToStart(@RequestBody MultipleRequest multipleRequest)
             throws IOException {
-
         List<String> errors = new ArrayList<>();
-        multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleRequest.getCaseDetails());
-
+        try {
+            multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleRequest.getCaseDetails());
+        } catch (Exception e) {
+            log.error(e.toString());
+            errors.add("Failed to retrieve hearing details from lead case");
+        }
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
     }
 

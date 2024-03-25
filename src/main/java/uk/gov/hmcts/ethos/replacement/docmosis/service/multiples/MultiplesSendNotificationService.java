@@ -45,7 +45,8 @@ public class MultiplesSendNotificationService {
                 multipleDetails.getCaseTypeId().replace(MULTIPLE, ""),
                 multipleData.getLeadCaseId());
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelectionSortedByDateTime(leadCaseData));
+        var x = hearingSelectionService.getHearingSelectionSortedByDateTime(leadCaseData);
+        dynamicFixedListType.setListItems(x);
         multipleData.setSendNotificationSelectHearing(dynamicFixedListType);
     }
 

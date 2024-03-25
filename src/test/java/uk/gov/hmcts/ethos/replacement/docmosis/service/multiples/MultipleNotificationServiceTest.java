@@ -15,18 +15,21 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDetailsGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 
 @ExtendWith(SpringExtension.class)
@@ -46,8 +49,7 @@ class MultipleNotificationServiceTest {
     @MockBean
     CaseLookupService caseLookupService;
 
-    @MockBean
-    HearingSelectionService hearingSelectionService;
+    private HearingSelectionService hearingSelectionService;
 
     private MultiplesSendNotificationService multiplesSendNotificationService;
     private MultipleDetails multipleDetails;
@@ -57,6 +59,7 @@ class MultipleNotificationServiceTest {
 
     @BeforeEach
     public void setUp() {
+        hearingSelectionService = new HearingSelectionService();
         multiplesSendNotificationService =
                 new MultiplesSendNotificationService(createUpdatesBusSender,
                         userIdamService,
@@ -64,12 +67,25 @@ class MultipleNotificationServiceTest {
                         caseLookupService,
                         hearingSelectionService);
         multipleDetails = new MultipleDetails();
+        multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleDataForNotification());
         userToken = "authString";
         errors = new ArrayList<>();
         UserDetails user = new UserDetails();
         user.setEmail(EMAIL);
         when(userIdamService.getUserDetails(userToken)).thenReturn(user);
+    }
+
+    @Test
+    void verifyMultipleDataIsSetWithHearingsFromLead() throws Exception {
+        var caseDetails = CaseDetailsGenerator.generateCaseDetails("caseDetailsTest21.json");
+        hearingSelectionService = new HearingSelectionService();
+        when(caseLookupService.getCaseDataAsAdmin(any(), any())).thenReturn(caseDetails.getCaseData());
+
+        multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleDetails);
+
+        int hearingsSize = multipleDetails.getCaseData().getSendNotificationSelectHearing().getListItems().size();
+        assertEquals(9, hearingsSize);
     }
 
     @Test

@@ -432,26 +432,10 @@ public final class ReferralHelper {
         ListTypeItem<UpdateReferralType> updateReferralCollection = referral.getUpdateReferralCollection();
         updateReferralCollection.add(GenericTypeItem.from(UUID.randomUUID().toString(), updateReferralType));
         referral.setUpdateReferralCollection(updateReferralCollection);
-        updateOriginalMultiplesReferral(multipleData, userFullName);
+        updateOriginalReferral(multipleData, userFullName);
     }
 
-    private static void updateOriginalReferral(CaseData caseData, String userFullName) {
-        ReferralType referral = caseData.getReferralCollection()
-                .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
-
-        referral.setReferCaseTo(caseData.getUpdateReferCaseTo());
-        referral.setIsUrgent(caseData.getUpdateIsUrgent());
-        referral.setReferralSubject(caseData.getUpdateReferralSubject());
-        referral.setReferralSubjectSpecify(caseData.getUpdateReferralSubjectSpecify());
-        referral.setReferralDetails(caseData.getUpdateReferralDetails());
-        referral.setReferralDocument(caseData.getUpdateReferralDocument());
-        referral.setReferralInstruction(caseData.getUpdateReferralInstruction());
-        referral.setReferralDate(Helper.getCurrentDate());
-        referral.setReferentEmail(caseData.getUpdateReferentEmail());
-        referral.setReferredBy(userFullName);
-    }
-
-    private static void updateOriginalMultiplesReferral(MultipleData caseData, String userFullName) {
+    private static void updateOriginalReferral(BaseCaseData caseData, String userFullName) {
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 

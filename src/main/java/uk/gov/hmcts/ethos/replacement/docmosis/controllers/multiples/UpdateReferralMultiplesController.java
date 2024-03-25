@@ -34,7 +34,7 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearMultiplesReferralDataFromCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearUpdateReferralDataFromCaseData;
 
 /**
@@ -175,7 +175,7 @@ public class UpdateReferralMultiplesController {
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
         clearUpdateReferralDataFromCaseData(caseData);
-        clearMultiplesReferralDataFromCaseData(multipleData);
+        clearReferralDataFromCaseData(multipleData);
         return multipleResponse(multipleData, null);
     }
 

@@ -467,7 +467,7 @@ class ReferralHelperTest {
         multipleData.setIsUrgent("Yes");
         multipleData.setReferralInstruction("Instruction");
         multipleData.setReferralSubjectSpecify("Subject Specify");
-        ReferralHelper.clearMultiplesReferralDataFromCaseData(multipleData);
+        ReferralHelper.clearReferralDataFromCaseData(multipleData);
         assertNull(multipleData.getReferCaseTo());
         assertNull(multipleData.getReferralSubject());
         assertNull(multipleData.getReferralDetails());

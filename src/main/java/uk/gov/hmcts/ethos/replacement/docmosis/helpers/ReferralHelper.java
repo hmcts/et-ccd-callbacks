@@ -609,26 +609,7 @@ public final class ReferralHelper {
      * creating a new referral.
      * @param caseData contains all the case data
      */
-    public static void clearReferralDataFromCaseData(CaseData caseData) {
-        caseData.setReferralHearingDetails(null);
-        caseData.setReferCaseTo(null);
-        caseData.setReferentEmail(null);
-        caseData.setIsUrgent(null);
-        caseData.setReferralSubject(null);
-        caseData.setReferralSubjectSpecify(null);
-        caseData.setReferralDetails(null);
-        caseData.setReferralDocument(null);
-        caseData.setReferralInstruction(null);
-        caseData.setReferredBy(null);
-        caseData.setReferralDate(null);
-    }
-
-    /**
-     * Resets the case data fields relating to creating a multiples referral so that they won't be auto populated when
-     * creating a new referral.
-     * @param caseData contains all the case data
-     */
-    public static void clearMultiplesReferralDataFromCaseData(MultipleData caseData) {
+    public static void clearReferralDataFromCaseData(BaseCaseData caseData) {
         caseData.setReferralHearingDetails(null);
         caseData.setReferCaseTo(null);
         caseData.setReferentEmail(null);

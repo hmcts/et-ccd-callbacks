@@ -93,6 +93,7 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
+        caseData.setSelectReferral(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -183,8 +184,8 @@ public class CreateReferralController {
 
         String caseLink;
 
-        if (StringUtils.isNotEmpty(
-                caseData.getReferentEmail()) && StringUtils.isEmpty(caseData.getMultipleReference())) {
+        if (StringUtils.isNotEmpty(caseData.getReferentEmail())
+                && StringUtils.isEmpty(caseData.getMultipleReference())) {
             caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
             emailService.sendEmail(
                     referralTemplateId,

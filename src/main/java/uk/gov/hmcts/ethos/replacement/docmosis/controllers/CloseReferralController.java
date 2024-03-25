@@ -63,7 +63,7 @@ public class CloseReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -50,7 +50,7 @@ class UploadDocumentControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         when(emailService.getCitizenCaseLink(any())).thenReturn("");
 

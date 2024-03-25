@@ -10,11 +10,13 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DetachDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.PreAcceptDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.RejectDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.ResetStateDataModel;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.SendNotificationDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
@@ -75,7 +77,7 @@ public final class PersistentQHelper {
                                                     List<String> errors, String multipleRef, String confirmation,
                                                     CreateUpdatesBusSender createUpdatesBusSender, String updateSize,
                                                     String multipleReferenceLinkMarkUp
-                                                    ) {
+    ) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
         if (ethosCaseRefCollection.isEmpty()) {
             log.warn("Case Ref collection is empty");
@@ -184,6 +186,12 @@ public final class PersistentQHelper {
                 .ccdGatewayBaseUrl(ccdGatewayBaseUrl)
                 .reasonForCT(reasonForCT)
                 .sourceEthosCaseReference(sourceEthosCaseReference)
+                .build();
+    }
+
+    public static SendNotificationDataModel getSendNotificationDataModel(SendNotificationType sendNotificationType) {
+        return SendNotificationDataModel.builder()
+                .sendNotification(sendNotificationType)
                 .build();
     }
 }

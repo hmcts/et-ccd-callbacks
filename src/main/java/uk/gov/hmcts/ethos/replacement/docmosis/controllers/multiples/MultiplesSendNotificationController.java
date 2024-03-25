@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesSendNotificationService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +50,11 @@ public class MultiplesSendNotificationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<MultipleCallbackResponse> aboutToStart(@RequestBody MultipleRequest multipleRequest) {
+    public ResponseEntity<MultipleCallbackResponse> aboutToStart(@RequestBody MultipleRequest multipleRequest)
+            throws IOException {
 
         List<String> errors = new ArrayList<>();
-        // TODO: Get hearing details from lead case as part of RET-4711
+        multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleRequest.getCaseDetails());
 
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
     }

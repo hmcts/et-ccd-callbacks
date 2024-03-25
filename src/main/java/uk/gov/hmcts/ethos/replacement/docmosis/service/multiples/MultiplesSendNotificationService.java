@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeMultiple;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -12,14 +14,18 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_LEAD;
 
@@ -30,6 +36,18 @@ public class MultiplesSendNotificationService {
     private final CreateUpdatesBusSender createUpdatesBusSender;
     private final UserIdamService userIdamService;
     private final ExcelReadingService excelReadingService;
+    private final CaseLookupService caseLookupService;
+    private final HearingSelectionService hearingSelectionService;
+
+    public void setHearingDetailsFromLeadCase(MultipleDetails multipleDetails) throws IOException {
+        MultipleData multipleData = multipleDetails.getCaseData();
+        CaseData leadCaseData = caseLookupService.getCaseDataAsAdmin(
+                multipleDetails.getCaseTypeId().replace(MULTIPLE, ""),
+                multipleData.getLeadCaseId());
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelectionSortedByDateTime(leadCaseData));
+        multipleData.setSendNotificationSelectHearing(dynamicFixedListType);
+    }
 
     public void sendNotificationToSingles(MultipleData multipleData,
                                           MultipleDetails caseDetails,

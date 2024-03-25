@@ -93,7 +93,6 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
-        caseData.setSelectReferral(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

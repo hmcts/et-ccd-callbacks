@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ class MultipleNotificationServiceTest {
     @MockBean
     UserIdamService userIdamService;
 
+    @MockBean
+    ExcelReadingService excelReadingService;
+
     private MultiplesSendNotificationService multiplesSendNotificationService;
     private MultipleDetails multipleDetails;
     private String userToken;
@@ -42,7 +46,7 @@ class MultipleNotificationServiceTest {
     @BeforeEach
     public void setUp() {
         multiplesSendNotificationService =
-                new MultiplesSendNotificationService(createUpdatesBusSender, userIdamService);
+                new MultiplesSendNotificationService(createUpdatesBusSender, userIdamService, excelReadingService);
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleDataForNotification());
         userToken = "authString";

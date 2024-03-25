@@ -8,6 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 
 @ExtendWith(SpringExtension.class)
 class MultipleNotificationServiceTest {
@@ -67,6 +71,29 @@ class MultipleNotificationServiceTest {
 
         verify(createUpdatesBusSender, times(1))
                 .sendUpdatesToQueue(any(), any(), any(), eq("1"));
+
+    }
+
+    @Test
+    void verifyNotificationIsSentOnceForAllCases() {
+        SortedMap<String, Object> sortedMap = new TreeMap<>();
+        MultipleObject multipleObject1 = MultipleObject.builder().ethosCaseRef("6000001/2024").build();
+        MultipleObject multipleObject2 = MultipleObject.builder().ethosCaseRef("6000001/2023").build();
+        sortedMap.put("A", multipleObject1);
+        sortedMap.put("B", multipleObject2);
+        var caseData = multipleDetails.getCaseData();
+        caseData.setSendNotificationNotify(SEND_NOTIFICATION_ALL);
+        when(excelReadingService.readExcel(any(), any(), any(), any(), any())).thenReturn(sortedMap);
+
+        multiplesSendNotificationService.sendNotificationToSingles(
+                multipleDetails.getCaseData(),
+                multipleDetails,
+                userToken,
+                errors
+        );
+
+        verify(createUpdatesBusSender, times(1))
+                .sendUpdatesToQueue(any(), any(), any(), eq("2"));
 
     }
 

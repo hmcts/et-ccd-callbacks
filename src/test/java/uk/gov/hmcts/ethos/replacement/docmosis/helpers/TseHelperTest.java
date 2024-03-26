@@ -250,7 +250,8 @@ class TseHelperTest {
             + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
             + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
             + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],\"copy\":\"Yes\","
+            + "dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,"
+            + "\"documentIndex\":null}}],\"copy\":\"Yes\","
             + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));

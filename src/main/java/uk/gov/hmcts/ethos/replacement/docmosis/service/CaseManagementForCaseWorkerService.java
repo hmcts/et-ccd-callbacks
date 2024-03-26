@@ -27,6 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -154,7 +155,7 @@ public class CaseManagementForCaseWorkerService {
         addClaimantDocuments(caseData);
     }
 
-    public void addClaimantDocuments(CaseData caseData) {
+    public void addClaimantDocuments(BaseCaseData caseData) {
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
         List<String> claimantDocs = List.of(ET1_DOC_TYPE, ET1_ATTACHMENT_DOC_TYPE, ACAS_DOC_TYPE);

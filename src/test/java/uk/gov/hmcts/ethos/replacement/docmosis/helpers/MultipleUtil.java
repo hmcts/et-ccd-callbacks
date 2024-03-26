@@ -382,6 +382,30 @@ public final class MultipleUtil {
         return multipleData;
     }
 
+    public static MultipleData getMultipleDataForNotification() {
+        MultipleData multipleData = getMultipleData();
+        multipleData.setLeadEthosCaseRef("21006/2020");
+        multipleData.setLeadCaseId("11111111");
+        multipleData.setSendNotificationTitle("title");
+        multipleData.setSendNotificationLetter("no");
+        multipleData.setSendNotificationUploadDocument(new ArrayList<>());
+        multipleData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
+        multipleData.setSendNotificationAdditionalInfo("info");
+        multipleData.setSendNotificationNotify("Lead case");
+        multipleData.setSendNotificationNotifyLeadCase("Both parties");
+        multipleData.setSendNotificationSelectHearing(null);
+        multipleData.setSendNotificationCaseManagement("");
+        multipleData.setSendNotificationResponseTribunal("no");
+        multipleData.setSendNotificationWhoCaseOrder("Judge");
+        multipleData.setSendNotificationSelectParties("Both parties");
+        multipleData.setSendNotificationFullName("John Doe");
+        multipleData.setSendNotificationFullName2("John Doe");
+        multipleData.setSendNotificationDecision("Other");
+        multipleData.setSendNotificationDetails("details");
+        multipleData.setSendNotificationRequestMadeBy("Judge");
+        return multipleData;
+    }
+
     public static void setDocumentCollection(MultipleData multipleData) {
         CaseImporterFile caseImporterFile = new CaseImporterFile();
         caseImporterFile.setUploadedDocument(getUploadedDocumentType());

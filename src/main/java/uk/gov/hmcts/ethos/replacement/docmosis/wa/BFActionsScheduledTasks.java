@@ -34,7 +34,7 @@ public class BFActionsScheduledTasks {
     private final FeatureToggleService featureToggleService;
 
     @Value("${cron.caseTypeId}")
-    private String caseTypeId;
+    private String caseTypeIdsString;
 
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
@@ -52,7 +52,7 @@ public class BFActionsScheduledTasks {
 
         String adminUserToken = adminUserService.getAdminUserToken();
 
-        String[] caseTypeIds = caseTypeId.split(",");
+        String[] caseTypeIds = caseTypeIdsString.split(",");
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
@@ -81,7 +81,10 @@ public class BFActionsScheduledTasks {
             CCDRequest returnedRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId,
                     "EMPLOYMENT", String.valueOf(submitEvent.getCaseId()), "WA_REVIEW_RULE21_REFERRAL");
 
-            CaseData caseData = submitEvent.getCaseData();
+            CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
+            if (caseData.getWaRule21ReferralSent() != null && caseData.getWaRule21ReferralSent().equals(YES)) {
+                return;
+            }
             caseData.setWaRule21ReferralSent(YES);
 
             String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();

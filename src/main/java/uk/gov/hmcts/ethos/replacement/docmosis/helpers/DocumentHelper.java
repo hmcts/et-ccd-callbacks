@@ -1099,7 +1099,7 @@ public final class DocumentHelper {
             if (indexToAdd > 0 && indexToAdd <= documentCollection.size() + 1) {
                 documentCollection.add(indexToAdd - 1, docTypeItem);
             } else {
-                throw new IllegalArgumentException("Index that you entered is invalid");
+                throw new IllegalArgumentException("The document number is invalid");
             }
         } else {
             documentCollection.add(docTypeItem);   

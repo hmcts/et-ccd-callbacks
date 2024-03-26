@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.wa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
@@ -57,8 +58,11 @@ public class BFActionsScheduledTasks {
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                while (!CollectionUtils.isEmpty(cases)) {
+                    cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
+                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                }
 
-                cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

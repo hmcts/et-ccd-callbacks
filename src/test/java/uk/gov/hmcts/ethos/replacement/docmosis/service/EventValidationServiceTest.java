@@ -913,7 +913,6 @@ class EventValidationServiceTest {
         caseData.setReferralCollection(List.of(closedReferral));
         List<String> errors = new ArrayList<>();
         eventValidationService.validateCaseBeforeCloseEvent(caseData, false, false, errors);
-        System.out.println(errors);
         assertTrue(errors.isEmpty());
     }
 }

@@ -62,13 +62,7 @@ class SendNotificationServiceTest {
 
     @BeforeEach
     public void setUp() {
-/*        emailService = spy(new TestEmailUtil());
-        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
-        ReflectionTestUtils.setField(sendNotificationService,
-                SEND_NOTIFICATION_TEMPLATE_ID,
-                "sendNotificationTemplateId");
-*/
-        emailService = spy(new EmailUtils());
+        emailService = spy(new TestEmailUtil());
         sendNotificationService = new SendNotificationService(hearingSelectionService,
                 emailService, featureToggleService);
         ReflectionTestUtils.setField(sendNotificationService,

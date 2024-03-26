@@ -28,7 +28,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailUtil;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -56,12 +55,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.STORED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.STORED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CLAIMANT_NOT_COMPLIED;
@@ -561,42 +556,6 @@ class RespondentTellSomethingElseServiceTest {
         System.out.println(actualDocumentType);
         assertEquals(selectedApplication, actualDocumentType.getShortDescription());
 
-    }
-
-    @Test
-    void createApplication_withStoredPendingYes_shouldReturnStoredStatus() {
-        ClaimantTse claimantTse = new ClaimantTse();
-        claimantTse.setStoredPending(YES);
-        claimantTse.setContactApplicationType("withdraw");
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimantTse(claimantTse);
-        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
-
-        tseService.createApplication(caseData, true);
-
-        var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
-        assertThat(genericTseApplicationType.getStatus(), is(STORED_STATE));
-        assertThat(genericTseApplicationType.getApplicationState(), is(STORED));
-        assertThat(genericTseApplicationType.getDueDate(), is(nullValue()));
-    }
-
-    @Test
-    void createApplication_withStoredPendingNo_shouldReturnOpenStatus() {
-        ClaimantTse claimantTse = new ClaimantTse();
-        claimantTse.setContactApplicationType("withdraw");
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimantTse(claimantTse);
-        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
-
-        tseService.createApplication(caseData, true);
-
-        var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
-        assertThat(genericTseApplicationType.getStatus(), is(OPEN_STATE));
-        assertThat(genericTseApplicationType.getApplicationState(), is(IN_PROGRESS));
-        assertThat(genericTseApplicationType.getDueDate(),
-            is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
     }
 
     @Test

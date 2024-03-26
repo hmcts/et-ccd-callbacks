@@ -1,10 +1,10 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/location/court-venues/services",
+    "urlPath": "/refdata/internal/v1/organisations",
     "queryParameters": {
-      "service_code": {
-        "equalTo": "BHA1"
+      "id": {
+        "equalTo": "H2156A0"
       }
     }
   },
@@ -13,6 +13,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/court-venues.json"
+    "bodyFileName": "organisation3.json"
   }
 }

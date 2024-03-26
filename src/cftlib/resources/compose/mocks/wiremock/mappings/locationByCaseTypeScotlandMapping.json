@@ -1,13 +1,13 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/internal/v1/organisations"
+    "url": "/refdata/location/orgServices?ccdCaseType=ET_Scotland"
   },
   "response": {
     "status": 200,
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/activeOrganisations.json"
+    "bodyFileName": "locationByCaseTypeMappingResponse.json"
   }
 }

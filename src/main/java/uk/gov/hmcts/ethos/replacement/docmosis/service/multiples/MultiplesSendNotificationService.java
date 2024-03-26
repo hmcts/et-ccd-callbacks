@@ -79,7 +79,6 @@ public class MultiplesSendNotificationService {
         sendNotificationType.setSendNotificationSubject(multipleData.getSendNotificationSubject());
         sendNotificationType.setSendNotificationAdditionalInfo(multipleData.getSendNotificationAdditionalInfo());
         sendNotificationType.setSendNotificationNotify(multipleData.getSendNotificationNotify());
-        sendNotificationType.setSendNotificationNotifyLeadCase(multipleData.getSendNotificationNotifyLeadCase());
         sendNotificationType.setSendNotificationSelectHearing(multipleData.getSendNotificationSelectHearing());
         sendNotificationType.setSendNotificationCaseManagement(multipleData.getSendNotificationCaseManagement());
         sendNotificationType.setSendNotificationResponseTribunal(multipleData.getSendNotificationResponseTribunal());

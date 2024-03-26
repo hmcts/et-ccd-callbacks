@@ -52,9 +52,7 @@ services:
     container_name: wiremock
     image: wiremock/wiremock:latest
     volumes:
-      - ./mocks/wiremock:/home/wiremock:rw
-      - ./mocks/wiremock/mappings/prd:/home/wiremock/mappings/prd:rw
-      - ./mocks/wiremock/__files/prd:/home/wiremock/__files/prd:rw
+      - ./mocks/wiremock:/home/wiremock
     ports:
       - "8765:8080"
     command:

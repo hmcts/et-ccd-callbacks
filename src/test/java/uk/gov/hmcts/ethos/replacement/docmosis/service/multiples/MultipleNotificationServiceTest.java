@@ -80,12 +80,14 @@ class MultipleNotificationServiceTest {
     void verifyMultipleDataIsSetWithHearingsFromLead() throws Exception {
         var caseDetails = CaseDetailsGenerator.generateCaseDetails("caseDetailsTest21.json");
         hearingSelectionService = new HearingSelectionService();
+        List<String> errors = new ArrayList<>();
         when(caseLookupService.getCaseDataAsAdmin(any(), any())).thenReturn(caseDetails.getCaseData());
 
-        multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleDetails);
+        multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleDetails, errors);
 
         int hearingsSize = multipleDetails.getCaseData().getSendNotificationSelectHearing().getListItems().size();
         assertEquals(9, hearingsSize);
+        assertEquals(0, errors.size());
     }
 
     @Test

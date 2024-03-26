@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeMultiple;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -39,15 +39,20 @@ public class MultiplesSendNotificationService {
     private final CaseLookupService caseLookupService;
     private final HearingSelectionService hearingSelectionService;
 
-    public void setHearingDetailsFromLeadCase(MultipleDetails multipleDetails) throws IOException {
-        MultipleData multipleData = multipleDetails.getCaseData();
-        CaseData leadCaseData = caseLookupService.getCaseDataAsAdmin(
-                multipleDetails.getCaseTypeId().replace(MULTIPLE, ""),
-                multipleData.getLeadCaseId());
-        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        var x = hearingSelectionService.getHearingSelectionSortedByDateTime(leadCaseData);
-        dynamicFixedListType.setListItems(x);
-        multipleData.setSendNotificationSelectHearing(dynamicFixedListType);
+    public void setHearingDetailsFromLeadCase(MultipleDetails multipleDetails, List<String> errors) {
+        try {
+            MultipleData multipleData = multipleDetails.getCaseData();
+            CaseData leadCaseData = caseLookupService.getCaseDataAsAdmin(
+                    multipleDetails.getCaseTypeId().replace(MULTIPLE, ""),
+                    multipleData.getLeadCaseId());
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+            List<DynamicValueType> hearings = hearingSelectionService.getHearingSelectionSortedByDateTime(leadCaseData);
+            dynamicFixedListType.setListItems(hearings);
+            multipleData.setSendNotificationSelectHearing(dynamicFixedListType);
+        } catch (Exception e) {
+            log.error(e.toString());
+            errors.add("Failed to retrieve hearing details from lead case");
+        }
     }
 
     public void sendNotificationToSingles(MultipleData multipleData,

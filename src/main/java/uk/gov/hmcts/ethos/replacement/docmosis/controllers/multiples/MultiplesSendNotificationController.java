@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesSendNotificationService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,15 +49,9 @@ public class MultiplesSendNotificationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<MultipleCallbackResponse> aboutToStart(@RequestBody MultipleRequest multipleRequest)
-            throws IOException {
+    public ResponseEntity<MultipleCallbackResponse> aboutToStart(@RequestBody MultipleRequest multipleRequest) {
         List<String> errors = new ArrayList<>();
-        try {
-            multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleRequest.getCaseDetails());
-        } catch (Exception e) {
-            log.error(e.toString());
-            errors.add("Failed to retrieve hearing details from lead case");
-        }
+        multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleRequest.getCaseDetails(), errors);
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
     }
 

@@ -18,6 +18,7 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -58,11 +59,11 @@ class BFActionsScheduledTasksTest {
         String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent));
+                .thenReturn(List.of(submitEvent)).thenReturn(new ArrayList<>());
 
         SubmitEvent submitEvent2 = new ObjectMapper().readValue(resource, SubmitEvent.class);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent2));
+                .thenReturn(List.of(submitEvent2)).thenReturn(new ArrayList<>());
 
         CaseData caseData = submitEvent.getCaseData();
 

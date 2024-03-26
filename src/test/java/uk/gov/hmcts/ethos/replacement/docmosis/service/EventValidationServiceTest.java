@@ -14,11 +14,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -71,6 +73,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_BEFORE_RECEIPT_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.OPEN_REFERRAL_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -865,5 +868,52 @@ class EventValidationServiceTest {
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(caseWithNoHearings, errors);
         assertThat(errors)
                 .isEmpty();
+    }
+
+    @Test
+    void shouldReturnErrorWithOpenReferral() {
+        ReferralType referralType = new ReferralType();
+        referralType.setReferralStatus("Awaiting Instructions");
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setValue(referralType);
+        caseData.setReferralCollection(List.of(referralTypeItem));
+        List<String> errors = new ArrayList<>();
+
+        eventValidationService.validateCaseBeforeCloseEvent(caseData, false, false, errors);
+
+        assertTrue(errors.contains(OPEN_REFERRAL_ERROR_MESSAGE));
+    }
+
+    @Test
+    void shouldReturnErrorWithOpenAndClosedReferrals() {
+        ReferralType referralType = new ReferralType();
+        referralType.setReferralStatus("Awaiting Instructions");
+        ReferralTypeItem openReferral = new ReferralTypeItem();
+        openReferral.setValue(referralType);
+
+        ReferralType referralType2 = new ReferralType();
+        referralType2.setReferralStatus("Closed");
+        ReferralTypeItem closedReferral = new ReferralTypeItem();
+        closedReferral.setValue(referralType2);
+
+        caseData.setReferralCollection(List.of(openReferral, closedReferral));
+        List<String> errors = new ArrayList<>();
+
+        eventValidationService.validateCaseBeforeCloseEvent(caseData, false, false, errors);
+        assertTrue(errors.contains(OPEN_REFERRAL_ERROR_MESSAGE));
+    }
+
+    @Test
+    void shouldReturnNoErrorsWithClosedReferrals() {
+        caseData = caseDetails17.getCaseData();
+        ReferralType referralType = new ReferralType();
+        referralType.setReferralStatus("Closed");
+        ReferralTypeItem closedReferral = new ReferralTypeItem();
+        closedReferral.setValue(referralType);
+        caseData.setReferralCollection(List.of(closedReferral));
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateCaseBeforeCloseEvent(caseData, false, false, errors);
+        System.out.println(errors);
+        assertTrue(errors.isEmpty());
     }
 }

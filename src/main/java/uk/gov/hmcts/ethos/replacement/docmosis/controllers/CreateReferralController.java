@@ -92,6 +92,7 @@ public class CreateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        clearReferralDataFromCaseData(caseData);
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }

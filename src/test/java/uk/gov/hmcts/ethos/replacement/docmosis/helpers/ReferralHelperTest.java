@@ -244,17 +244,17 @@ class ReferralHelperTest {
 
     @Test
     void populateHearingReferralDetails_SingleReply() {
-        String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
-        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDateTime)));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+        String replyDate = Helper.getCurrentDate();
 
         assertEquals(String.format(expectedHearingReferralDetailsSingleReply, replyDate),
                 ReferralHelper.populateHearingReferralDetails(caseData));
@@ -262,11 +262,10 @@ class ReferralHelperTest {
 
     @Test
     void populateHearingReferralDetails_SingleReply_MultipleCaseType() {
-        String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
 
         ReferralType referral = new ReferralType();
-        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDateTime)));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
@@ -276,6 +275,7 @@ class ReferralHelperTest {
         multipleCase.setReferralCollection(List.of(referralTypeItem));
         multipleCase.setSelectReferral(new DynamicFixedListType("1"));
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+        String replyDate = Helper.getCurrentDate();
 
         assertEquals(String.format(expectedHearingReferralDetailsSingleReply, replyDate),
                 ReferralHelper.populateHearingReferralDetails(multipleCase, caseData));
@@ -283,19 +283,19 @@ class ReferralHelperTest {
 
     @Test
     void populateHearingReferralDetails_MultipleReplies() {
-        String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(
-                createReferralReplyTypeItem("1", replyDate, replyDateTime),
-                createReferralReplyTypeItem("2", replyDate, replyDateTime)));
+                createReferralReplyTypeItem("1", replyDateTime),
+                createReferralReplyTypeItem("2", replyDateTime)));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
+        String replyDate = Helper.getCurrentDate();
 
         assertEquals(String.format(expectedHearingReferralDetailsMultipleReplies, replyDate, replyDate),
                 ReferralHelper.populateHearingReferralDetails(caseData));
@@ -303,13 +303,12 @@ class ReferralHelperTest {
 
     @Test
     void populateHearingReferralDetails_MultipleReplies_MultipleCaseType() {
-        String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
 
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(
-                createReferralReplyTypeItem("1", replyDate, replyDateTime),
-                createReferralReplyTypeItem("2", replyDate, replyDateTime)));
+                createReferralReplyTypeItem("1", replyDateTime),
+                createReferralReplyTypeItem("2", replyDateTime)));
         referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
@@ -318,6 +317,7 @@ class ReferralHelperTest {
         MultipleData multipleCase = new MultipleData();
         multipleCase.setReferralCollection(List.of(referralTypeItem));
         multipleCase.setSelectReferral(new DynamicFixedListType("1"));
+        String replyDate = Helper.getCurrentDate();
 
         caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
 
@@ -367,56 +367,17 @@ class ReferralHelperTest {
     }
 
     @Test
-    void updateOriginalReferral() {
-        caseData.setSelectReferral(new DynamicFixedListType("1"));
-        caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        caseData.setUpdateReferCaseTo("Judge");
-        caseData.setUpdateReferralSubject("Subject");
-        caseData.setUpdateReferralDetails("Details");
-        caseData.setUpdateIsUrgent("Yes");
-        caseData.setUpdateReferralInstruction("Instruction");
-        caseData.setUpdateReferralSubjectSpecify("Subject Specify");
-        ReferralHelper.updateReferral(caseData, "FullName");
-        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
-        assertEquals("Judge", referral.getReferCaseTo());
-        assertEquals("Subject", referral.getReferralSubject());
-        assertEquals("Details", referral.getReferralDetails());
-        assertEquals("Yes", referral.getIsUrgent());
-        assertEquals("Instruction", referral.getReferralInstruction());
-        assertEquals("Subject Specify", referral.getReferralSubjectSpecify());
-    }
-
-    @Test
-    void clearUpdateReferralDataFromCaseData() {
-        caseData.setUpdateReferCaseTo("Judge");
-        caseData.setUpdateReferralSubject("Subject");
-        caseData.setUpdateReferralDetails("Details");
-        caseData.setUpdateReferentEmail("Email");
-        caseData.setUpdateIsUrgent("Yes");
-        caseData.setUpdateReferralInstruction("Instruction");
-        caseData.setUpdateReferralSubjectSpecify("Subject Specify");
-        ReferralHelper.clearUpdateReferralDataFromCaseData(caseData);
-        assertNull(caseData.getUpdateReferCaseTo());
-        assertNull(caseData.getUpdateReferralSubject());
-        assertNull(caseData.getUpdateReferralDetails());
-        assertNull(caseData.getUpdateReferentEmail());
-        assertNull(caseData.getUpdateIsUrgent());
-        assertNull(caseData.getUpdateReferralInstruction());
-        assertNull(caseData.getUpdateReferralSubjectSpecify());
-    }
-
-    @Test
     void populateHearingReferralDetails_NullReferralDocLink() {
-        String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
-        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDateTime)));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+        String replyDate = Helper.getCurrentDate();
 
         assertEquals(String.format(expectedHearingReferralDetailsSingleReply, replyDate)
                         .replace(singleHearingDetailsNullDoc, ""),
@@ -609,7 +570,7 @@ class ReferralHelperTest {
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],"
-            + "\"referralInstruction\":null,\"referralReplyCollection\":null}}";
+            + "\"referralInstruction\":null,\"referralReplyCollection\":null,\"updateReferralCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryNew, result);
@@ -646,7 +607,7 @@ class ReferralHelperTest {
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],"
-            + "\"referralInstruction\":null,\"referralReplyCollection\":null}}";
+            + "\"referralInstruction\":null,\"referralReplyCollection\":null,\"updateReferralCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryNew, result);
@@ -655,25 +616,23 @@ class ReferralHelperTest {
     @Test
     void documentRequestExistingReferral() throws JsonProcessingException {
         ReferralType referralType = createReferralTypeItem().getValue();
-
-        String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
-
-        referralType.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDate, replyDateTime)));
+        referralType.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1", replyDateTime)));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setValue(referralType);
         caseData.setReferralCollection(List.of(referralTypeItem));
 
-        DynamicFixedListType selectReferralList = 
+        DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
+        String replyDate = referralType.getReferralDate();
 
         String expectedDocumentSummaryExisting = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
             + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
-            + "\"caseNumber\":null,\"referralDate\":\"" + replyDate
-            + "\",\"referredBy\":null,\"referCaseTo\":null,"
+            + "\"caseNumber\":null,\"referralDate\":" + replyDate
+            + ",\"referredBy\":null,\"referCaseTo\":null,"
             + "\"referentEmail\":null,\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
             + "\"referralSubject\":\"Other\",\"referralDetails\":null,"
             + "\"referralDocument\":null,\"referralInstruction\":null,\"referralReplyCollection\":[{\"id\":\"1\","
@@ -689,8 +648,8 @@ class ReferralHelperTest {
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],"
             + "\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
-            + "\"replyBy\",\"replyDate\":\"" + replyDate + "\",\"replyDateTime\":\"" + replyDateTime + "\","
-            + "\"referralSubject\":\"Other\",\"referralNumber\":\"1\"}}]}}";
+            + "\"replyBy\",\"replyDate\":\"" + Helper.getCurrentDate() + "\",\"replyDateTime\":\"" + replyDateTime
+            + "\",\"referralSubject\":\"Other\",\"referralNumber\":\"1\"}}],\"updateReferralCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);
@@ -768,9 +727,9 @@ class ReferralHelperTest {
         return document;
     }
 
-    private ReferralReplyTypeItem createReferralReplyTypeItem(String id, String replyDate, String replyDateTime) {
+    private ReferralReplyTypeItem createReferralReplyTypeItem(String id, String replyDateTime) {
         ReferralReplyType referralReplyType = new ReferralReplyType();
-        referralReplyType.setReplyDate(replyDate);
+        referralReplyType.setReplyDate(Helper.getCurrentDate());
         referralReplyType.setReplyBy("replyBy");
         referralReplyType.setReplyGeneralNotes("replyNotes");
         referralReplyType.setIsUrgentReply("isUrgent");

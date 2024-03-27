@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -99,6 +101,8 @@ public class EventValidationService {
     public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "The date entered does not match any of the "
         + "disposed hearing days on this case. Please check the hearing details"
         + " for jurisdiction code %s.";
+    public static final String OPEN_REFERRAL_ERROR_MESSAGE = "This case contains one or more open referrals. "
+        + "To enable this case to be closed, please close the open referrals.";
     private static final int THIRTY_DAYS = 30;
     public static final int MAX_RESPONDENTS = 10;
     private static final List<String> HEARING_DISPOSALS = List.of(JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING,
@@ -655,12 +659,26 @@ public class EventValidationService {
 
     public List<String> validateCaseBeforeCloseEvent(CaseData caseData, boolean isRejected, boolean partOfMultiple,
                                                      List<String> errors) {
+        validateOpenReferrals(caseData, errors);
         validateJurisdictionOutcome(caseData, isRejected, partOfMultiple, errors);
         validateJudgementsHasJurisdiction(caseData, partOfMultiple, errors);
         validateHearingStatusForCaseCloseEvent(caseData, errors);
         validateHearingJudgeAllocationForCaseCloseEvent(caseData, errors);
         errors.addAll(CaseCloseValidator.validateBfActionsForCaseCloseEvent(caseData));
         return errors;
+    }
+
+    private void validateOpenReferrals(CaseData caseData, List<String> errors) {
+        if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
+            return;
+        }
+        boolean openReferrals = caseData.getReferralCollection().stream()
+                .map(ReferralTypeItem::getValue)
+                .anyMatch(referralType -> !"Closed".equals(defaultIfEmpty(referralType.getReferralStatus(), "")));
+
+        if (openReferrals) {
+            errors.add(OPEN_REFERRAL_ERROR_MESSAGE);
+        }
     }
 
     public void validateJurisdictionOutcome(CaseData caseData, boolean isRejected, boolean partOfMultiple,

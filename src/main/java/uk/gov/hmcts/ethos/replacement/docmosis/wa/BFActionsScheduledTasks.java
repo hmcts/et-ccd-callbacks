@@ -58,7 +58,7 @@ public class BFActionsScheduledTasks {
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                while (!CollectionUtils.isEmpty(cases)) {
+                while (CollectionUtils.isNotEmpty(cases)) {
                     cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 }

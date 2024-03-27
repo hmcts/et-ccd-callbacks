@@ -63,7 +63,7 @@ class BFActionsScheduledTasksTest {
 
         SubmitEvent submitEvent2 = new ObjectMapper().readValue(resource, SubmitEvent.class);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent2)).thenReturn(new ArrayList<>());
+                .thenReturn(List.of(submitEvent2)).thenReturn(null);
 
         CaseData caseData = submitEvent.getCaseData();
 

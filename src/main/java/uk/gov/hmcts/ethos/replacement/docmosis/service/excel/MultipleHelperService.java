@@ -387,6 +387,7 @@ public class MultipleHelperService {
         boolean leadCaseChanged = !oldLeadCase.equals(newLeadCase);
 
         if (leadCaseChanged && StringUtils.isNotBlank(oldLeadCase)) {
+
             log.info("Multiple {}: Sending update to {} as this is no longer the lead case", multipleRef, oldLeadCase);
 
             String multipleReferenceLink = getFullLinkMarkUp(multipleDetails.getCaseId(),

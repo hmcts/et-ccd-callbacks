@@ -87,7 +87,6 @@ class AcasServiceTest {
     @Test
     void getAcasCertificate() throws JsonProcessingException {
         errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN);
-        System.out.println(errors);
         assertEquals(0, errors.size());
     }
 

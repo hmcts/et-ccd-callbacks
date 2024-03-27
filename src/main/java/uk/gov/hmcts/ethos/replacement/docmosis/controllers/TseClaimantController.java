@@ -55,6 +55,7 @@ public class TseClaimantController {
 
         if (caseDetails.getCaseData().getClaimantTse() != null) {
             tseService.createApplication(caseDetails.getCaseData(), true);
+            tseService.removeStoredApplication(caseDetails.getCaseData());
             tseService.clearApplicationData(caseDetails.getCaseData());
         }
 

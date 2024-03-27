@@ -2,12 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -16,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -28,14 +32,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_DECISION_FILE_NAME;
 
 @Slf4j
 @Service
@@ -44,11 +54,17 @@ public class TseAdminService {
     public static final String NOT_VIEWED_YET = "notViewedYet";
 
     private final EmailService emailService;
+    private final TornadoService tornadoService;
     private final TseService tseService;
+    private final DocumentManagementService documentManagementService;
     @Value("${template.tse.admin.record-a-decision.claimant}")
     private String tseAdminRecordClaimantTemplateId;
     @Value("${template.tse.admin.record-a-decision.respondent}")
     private String tseAdminRecordRespondentTemplateId;
+    @Value("${ccd_gateway_base_url}")
+    private String ccdGatewayBaseUrl;
+
+    private static final String DECISION_DOC_GEN_ERROR = "Failed to generate decision document for case id: %s";
 
     /**
      * Initial Application and Respond details table.
@@ -71,7 +87,7 @@ public class TseAdminService {
      * @param caseData in which the case details are extracted from
      */
     public void saveTseAdminDataFromCaseData(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -82,7 +98,7 @@ public class TseAdminService {
 
         applicationType.setApplicationState(NOT_VIEWED_YET);
 
-        if (CollectionUtils.isEmpty(applicationType.getAdminDecision())) {
+        if (isEmpty(applicationType.getAdminDecision())) {
             applicationType.setAdminDecision(new ArrayList<>());
         }
 
@@ -118,26 +134,22 @@ public class TseAdminService {
 
     /**
      * Uses {@link EmailService} to generate an email.
-     * @param caseId used in email link to case
-     * @param caseData in which the case details are extracted from
+     * @param caseDetails used to get case Id, case ethos reference number and decision pdf file binary URL
      */
-    public void sendEmailToClaimant(String caseId, CaseData caseData) {
-        String caseNumber = caseData.getEthosCaseReference();
-
+    public void sendEmailToClaimant(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
         List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
-
         // if claimant only or both parties: send Claimant Decision Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
                 || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             String claimantName = caseData.getClaimantIndType().claimantFullNames();
 
-            if (claimantEmail != null) {
+            if (StringUtils.isNotBlank(claimantEmail)) {
                 TSEAdminEmailRecipientsData claimantDetails =
                     new TSEAdminEmailRecipientsData(tseAdminRecordClaimantTemplateId,
                             claimantEmail);
                 claimantDetails.setRecipientName(claimantName);
-
                 emailsToSend.add(claimantDetails);
             }
         }
@@ -146,7 +158,7 @@ public class TseAdminService {
             emailService.sendEmail(
                 emailRecipient.getRecipientTemplate(),
                 emailRecipient.getRecipientEmail(),
-                buildPersonalisation(caseNumber, caseId, emailRecipient.getRecipientName()));
+                buildPersonalisation(caseDetails.getCaseId(), caseData, emailRecipient.getRecipientName()));
         }
     }
 
@@ -171,18 +183,31 @@ public class TseAdminService {
             return;
         }
 
-        Map<String, String> personalisation = buildPersonalisation(caseData.getEthosCaseReference(),
-                caseDetails.getCaseId(), respondent.getRespondentName());
+        Map<String, String> personalisation = buildPersonalisation(caseDetails.getCaseId(),
+                caseData, respondent.getRespondentName());
 
         emailService.sendEmail(tseAdminRecordRespondentTemplateId, respondentEmail, personalisation);
     }
 
-    private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
+    private Map<String, String> buildPersonalisation(String caseId, CaseData caseData, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put(CASE_NUMBER, caseNumber);
+        personalisation.put(CASE_NUMBER, defaultIfEmpty(caseData.getEthosCaseReference(), ""));
         personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseId));
         personalisation.put("name", recipientName);
+        String decisionDocumentURL = "";
+        if (isNotEmpty(caseData.getDocumentCollection())) {
+            DocumentTypeItem documentTypeItem =
+                    caseData.getDocumentCollection().get(caseData.getDocumentCollection().size() - 1);
+            if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())
+                    && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
+                    && isNotBlank(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+                decisionDocumentURL = TseHelper.getDownloadableDocumentURL(
+                        documentTypeItem.getValue().getUploadedDocument().getDocumentUrl(), ccdGatewayBaseUrl);
+            }
+        }
+        personalisation.put("linkToDecisionFile", decisionDocumentURL);
+
         return personalisation;
     }
 
@@ -205,6 +230,42 @@ public class TseAdminService {
         caseData.setTseAdminDecisionMadeBy(null);
         caseData.setTseAdminDecisionMadeByFullName(null);
         caseData.setTseAdminSelectPartyNotify(null);
+    }
+
+    /**
+     * Creates a pdf copy of the Decision from Tribunal and adds it to the case doc collection.
+     *
+     * @param caseData details of the case from which required fields are extracted
+     * @param userToken autherisation token to use for generating an event document
+     * @param caseTypeId case type to use for generating an event document
+     */
+    public void addTseAdminDecisionPdfToDocCollection(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            if (isEmpty(caseData.getDocumentCollection())) {
+                caseData.setDocumentCollection(new ArrayList<>());
+            }
+            if (isNullOrEmpty(caseTypeId)) {
+                log.error("Error while creating case document: Case Type ID can not be null or empty");
+                throw new DocumentManagementException(
+                        "Error while creating case document: Case Type ID can not be null or empty");
+            }
+
+            DocumentInfo document = tornadoService.generateEventDocument(caseData, userToken, caseTypeId,
+                    TSE_ADMIN_DECISION_FILE_NAME);
+
+            DocumentTypeItem docItem = createDocumentTypeItem(
+                    documentManagementService.addDocumentToDocumentField(
+                            document),
+                    "Referral/Judicial direction",
+                    caseData.getResTseSelectApplication()
+            );
+
+            caseData.getDocumentCollection().add(docItem);
+
+        } catch (Exception e) {
+            throw new DocumentManagementException(
+                    String.format(DECISION_DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 
 }

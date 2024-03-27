@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -24,8 +28,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
@@ -48,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
@@ -76,13 +87,15 @@ class TornadoServiceTest {
 
     private static final String AUTH_TOKEN = "a-test-auth-token";
     private static final String DOCUMENT_INFO_MARKUP = "<a>some test markup</a>";
+    private static final String DUMMY_PDF = "dummy.pdf";
     private static final String ET1_VETTING_PDF = "ET1 Vetting.pdf";
     private static final String TSE_ADMIN_REPLY_PDF = "TSE Admin Reply.pdf";
     private static final String ET3_PROCESSING_PDF = "ET3 Processing.pdf";
     private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
 
     @BeforeEach
-    public void setUp() throws IOException {
+    @SneakyThrows
+    public void setUp() {
         createUserService();
         mockTornadoConnection();
         mockDocumentManagement();
@@ -94,7 +107,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void documentGenerationNoTornadoConnectionShouldThrowException() throws IOException {
+    @SneakyThrows
+    void documentGenerationNoTornadoConnectionShouldThrowException() {
         CaseData caseData = new CaseData();
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
@@ -105,7 +119,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void listingGenerationNoTornadoConnectionShouldThrowException() throws IOException {
+    @SneakyThrows
+    void listingGenerationNoTornadoConnectionShouldThrowException() {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         assertThrows(IOException.class, () ->
@@ -114,7 +129,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void scheduleGenerationNoTornadoConnectionShouldThrowException() throws IOException {
+    @SneakyThrows
+    void scheduleGenerationNoTornadoConnectionShouldThrowException() {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         assertThrows(IOException.class, () ->
@@ -123,7 +139,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenTornadoReturnsErrorResponse() throws IOException {
+    @SneakyThrows
+    void shouldThrowExceptionWhenTornadoReturnsErrorResponse() {
         mockConnectionError();
         CaseData caseData = new CaseData();
 
@@ -134,7 +151,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void shouldCreateDocumentInfoForDocumentGeneration() throws IOException {
+    @SneakyThrows
+    void shouldCreateDocumentInfoForDocumentGeneration() {
         mockConnectionSuccess();
         CaseData caseData = new CaseData();
 
@@ -145,7 +163,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() throws IOException {
+    @SneakyThrows
+    void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() {
         mockConnectionSuccess();
         DefaultValues defaultValues = mock(DefaultValues.class);
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
@@ -164,7 +183,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void shouldCreateDocumentInfoForDocumentGenerationAllocatedOfficeMultiples() throws IOException {
+    @SneakyThrows
+    void shouldCreateDocumentInfoForDocumentGenerationAllocatedOfficeMultiples() {
         mockConnectionSuccess();
         DefaultValues defaultValues = mock(DefaultValues.class);
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
@@ -183,7 +203,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void shouldCreateDocumentInfoForListingGeneration() throws IOException {
+    @SneakyThrows
+    void shouldCreateDocumentInfoForListingGeneration() {
         mockConnectionSuccess();
         ListingData listingData = createListingData();
 
@@ -194,7 +215,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void shouldCreateDocumentInforForScheduleGeneration() throws IOException {
+    @SneakyThrows
+    void shouldCreateDocumentInforForScheduleGeneration() {
         mockConnectionSuccess();
         BulkData bulkData = new BulkData();
         bulkData.setScheduleDocName(LIST_CASES_CONFIG);
@@ -207,7 +229,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void shouldCreateDocumentInfoForReportGeneration() throws IOException {
+    @SneakyThrows
+    void shouldCreateDocumentInfoForReportGeneration() {
         mockConnectionSuccess();
         ListingData listingData = createListingData();
         listingData.setReportType(CLAIMS_ACCEPTED_REPORT);
@@ -219,7 +242,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateEt1VettingDocument() throws IOException {
+    @SneakyThrows
+    void generateEt1VettingDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET1_VETTING_PDF);
@@ -227,7 +251,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateTseAdminReplyDocument() throws IOException {
+    @SneakyThrows
+    void generateTseAdminReplyDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, TSE_ADMIN_REPLY_PDF);
@@ -235,7 +260,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateEt3VettingDocument() throws IOException {
+    @SneakyThrows
+    void generateEt3VettingDocument() {
         mockConnectionSuccess();
         CaseData caseData = new CaseData();
         caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test Code", "Test Label", true));
@@ -245,7 +271,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateInConEWDocument() throws IOException {
+    @SneakyThrows
+    void generateInConEWDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
@@ -253,7 +280,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateInConSCDocument() throws IOException {
+    @SneakyThrows
+    void generateInConSCDocument() {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
@@ -261,7 +289,8 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateDocument_exception() throws IOException {
+    @SneakyThrows
+    void generateDocument_exception() {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         assertThrows(IOException.class, () ->
@@ -271,22 +300,84 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateDocument_noDocumentName() throws IOException {
+    @SneakyThrows
+    void generateDocument_noDocumentName() {
         mockConnectionSuccess();
-
+        CaseData caseData = new CaseData();
         assertThrows(IllegalArgumentException.class, () ->
-                tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null)
+                tornadoService.generateEventDocument(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
+                        null)
         );
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"ET1 Vetting.pdf", "ET3 Processing.pdf", "ET3 Response.pdf", "Initial Consideration.pdf",
+                            "Contact the tribunal.pdf", "Referral Summary.pdf", "TSE Reply.pdf", "decision.pdf",
+                            "dummy.pdf"})
+    @SneakyThrows
+    void generateDocumentAsBytesForTSE(String fileName) {
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class);
+             MockedStatic<Et1VettingHelper> et1VettingHelperMockedStatic = mockStatic(Et1VettingHelper.class);
+             MockedStatic<Et3VettingHelper> et3VettingHelperMockedStatic = mockStatic(Et3VettingHelper.class);
+             MockedStatic<Et3ResponseHelper> et3ResponseHelperMockedStatic = mockStatic(Et3ResponseHelper.class);
+             MockedStatic<ReferralHelper> referralHelperMockedStatic = mockStatic(ReferralHelper.class);
+             MockedStatic<RespondentTellSomethingElseHelper> respondentTellSomethingElseHelperMockedStatic =
+                     mockStatic(RespondentTellSomethingElseHelper.class)) {
+            mockConnectionSuccess();
+            CaseData caseData = new CaseData();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+            DynamicValueType dynamicValueType = new DynamicValueType();
+            dynamicValueType.setLabel("Test label");
+            dynamicFixedListType.setValue(dynamicValueType);
+            caseData.setSubmitEt3Respondent(dynamicFixedListType);
+            caseData.setEt3ChooseRespondent(dynamicFixedListType);
+            tseHelperMockedStatic.when(() -> TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(),
+                            null))
+                    .thenReturn("");
+            tseHelperMockedStatic.when(() -> TseHelper.getReplyDocumentRequest(caseData,
+                    tornadoConnection.getAccessKey(), null)).thenReturn("");
+            et1VettingHelperMockedStatic.when(() -> Et1VettingHelper.getDocumentRequest(caseData,
+                            tornadoConnection.getAccessKey())).thenReturn("");
+            et3VettingHelperMockedStatic.when(() -> Et3VettingHelper.getDocumentRequest(caseData,
+                    tornadoConnection.getAccessKey())).thenReturn("");
+            et3ResponseHelperMockedStatic.when(() -> Et3ResponseHelper.getDocumentRequest(caseData,
+                            tornadoConnection.getAccessKey())).thenReturn("");
+            referralHelperMockedStatic.when(() -> ReferralHelper.getDocumentRequest(caseData,
+                    tornadoConnection.getAccessKey())).thenReturn("");
+            respondentTellSomethingElseHelperMockedStatic.when(() ->
+                    RespondentTellSomethingElseHelper.getDocumentRequest(caseData,
+                            tornadoConnection.getAccessKey())).thenReturn("");
+            if (DUMMY_PDF.equals(fileName)) {
+                assertThrows(IllegalArgumentException.class, () ->
+                        tornadoService.generateEventDocumentBytes(caseData, ENGLANDWALES_CASE_TYPE_ID, fileName));
+            } else {
+                byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, ENGLANDWALES_CASE_TYPE_ID, fileName);
+                assertThat(bytes.length, is(0));
+            }
+
+        }
+    }
+
     @Test
-    void generateDocumentAsBytes() throws IOException {
-        mockConnectionSuccess();
-        byte[] bytes = tornadoService.generateEventDocumentBytes(
-                new CaseData(),
-                ENGLANDWALES_CASE_TYPE_ID,
-                INITIAL_CONSIDERATION_PDF);
-        assertThat(bytes.length, is(0));
+    @SneakyThrows
+    void generateDocumentAsBytesForTSEReply() {
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class)) {
+            mockConnectionSuccess();
+            CaseData caseData = new CaseData();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+            DynamicValueType dynamicValueType = new DynamicValueType();
+            dynamicValueType.setCode("testCode");
+            dynamicFixedListType.setValue(dynamicValueType);
+            caseData.setTseAdminSelectApplication(dynamicFixedListType);
+            tseHelperMockedStatic.when(() -> TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(),
+                            null))
+                    .thenReturn("");
+            byte[] bytes = tornadoService.generateEventDocumentBytes(
+                    new CaseData(),
+                    ENGLANDWALES_CASE_TYPE_ID,
+                    INITIAL_CONSIDERATION_PDF);
+            assertThat(bytes.length, is(0));
+        }
     }
 
     @Test
@@ -353,6 +444,8 @@ class TornadoServiceTest {
         mockConnection.setInputStream(inputStream);
         mockConnection.setOutputStream(outputStream);
         mockConnection.setResponseCode(HTTP_OK);
+        inputStream.close();
+        outputStream.close();
     }
 
     private void mockConnectionError() throws IOException {
@@ -363,6 +456,8 @@ class TornadoServiceTest {
         mockConnection.setErrorStream(mockInputStream);
         mockConnection.setOutputStream(mockOutputStream);
         mockConnection.setResponseCode(HTTP_INTERNAL_ERROR);
+        mockInputStream.close();
+        mockOutputStream.close();
     }
 
     private ListingData createListingData() {

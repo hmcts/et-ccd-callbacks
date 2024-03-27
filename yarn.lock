@@ -1139,12 +1139,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/examples@npm:1.2.3":
-  version: 1.2.3
-  resolution: "@codeceptjs/examples@npm:1.2.3"
+"@codeceptjs/examples@npm:1.2.4":
+  version: 1.2.4
+  resolution: "@codeceptjs/examples@npm:1.2.4"
   dependencies:
     ts-node: 10.9.2
-  checksum: da8c7311ee3d4f8be07b4a3e9428ecebaba6bf598cc717a361d0056a31a6f3a0a902f62efafefea191f9842030b1588fd515b14493babf5a3479572f663c2b93
+  checksum: fc9db012801c70d32a8ed51376d41c5ccbfaec76c6d5a5b92b544660794760a7944fd5e45cfa7e15f10cd0683c5f2d8126c4d05b6c6d37d4c83b088eac176323
   languageName: node
   linkType: hard
 
@@ -7393,7 +7393,7 @@ __metadata:
   dependencies:
     "@babel/eslint-parser": ^7.17.0
     "@codeceptjs/configure": 1.0.1
-    "@codeceptjs/examples": 1.2.3
+    "@codeceptjs/examples": 1.2.4
     "@codeceptjs/ui": 1.1.1
     "@hmcts/nodejs-logging": 4.0.4
     "@types/archiver": ^6.0.0

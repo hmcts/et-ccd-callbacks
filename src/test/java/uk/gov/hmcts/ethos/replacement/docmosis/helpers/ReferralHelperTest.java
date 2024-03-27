@@ -177,7 +177,7 @@ class ReferralHelperTest {
                 + "responseClaimDocuments=null, initialConsiderationDocuments=null, caseManagementDocuments=null, "
                 + "withdrawalSettledDocuments=null, hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
                 + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null"
-                + ", docNumber=null, excludeFromDcf=null)), GenericTypeItem(id=2, "
+                + ", docNumber=null, excludeFromDcf=null, documentIndex=null)), GenericTypeItem(id=2, "
                 + "value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType("
                 + "documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl=null, "
                 + "categoryId=null, uploadTimestamp=null), "
@@ -185,7 +185,8 @@ class ReferralHelperTest {
                 + "startingClaimDocuments=null, responseClaimDocuments=null, initialConsiderationDocuments=null, "
                 + "caseManagementDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, j"
                 + "udgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
-                + "documentType=null, dateOfCorrespondence=null, docNumber=null, excludeFromDcf=null))], "
+                + "documentType=null, dateOfCorrespondence=null, docNumber=null, excludeFromDcf=null, "
+                + "documentIndex=null))], "
                 + "referralInstruction=Custom instructions for judge, "
                 + "referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
@@ -488,7 +489,7 @@ class ReferralHelperTest {
     void setReferralStatusToClosed() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList =
-            ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
+                ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -599,7 +600,7 @@ class ReferralHelperTest {
             + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
             + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
             + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}},"
+            + "dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,\"documentIndex\":null}},"
             + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
@@ -608,7 +609,8 @@ class ReferralHelperTest {
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],"
+            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,"
+            + "\"documentIndex\":null}}],"
             + "\"referralInstruction\":null,\"referralReplyCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
@@ -636,7 +638,7 @@ class ReferralHelperTest {
             + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
             + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
             + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}},"
+            + "dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,\"documentIndex\":null}},"
             + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
@@ -645,7 +647,8 @@ class ReferralHelperTest {
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],"
+            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,"
+            + "\"documentIndex\":null}}],"
             + "\"referralInstruction\":null,\"referralReplyCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
@@ -687,7 +690,8 @@ class ReferralHelperTest {
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,"
             + "\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],"
+            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,"
+            + "\"documentIndex\":null}}],"
             + "\"replyGeneralNotes\":\"replyNotes\",\"replyBy\":"
             + "\"replyBy\",\"replyDate\":\"" + replyDate + "\",\"replyDateTime\":\"" + replyDateTime + "\","
             + "\"referralSubject\":\"Other\",\"referralNumber\":\"1\"}}]}}";

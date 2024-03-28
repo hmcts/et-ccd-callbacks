@@ -4,6 +4,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+
 public class CCDRequestBuilder {
 
     private CaseData caseData = new CaseData();
@@ -41,6 +43,7 @@ public class CCDRequestBuilder {
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(caseId);
+        caseDetails.setJurisdiction(EMPLOYMENT);
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;

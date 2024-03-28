@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -22,6 +21,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -54,11 +54,11 @@ public class BFActionsScheduledTasks {
 
         String[] caseTypeIds = caseTypeId.split(",");
 
-        Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
+        Arrays.stream(caseTypeIds).forEach(caseType -> {
             try {
-                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseType, query);
 
-                cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
+                cases.forEach(o -> triggerTaskEventForCase(adminUserToken, String.valueOf(o.getCaseId()), caseType));
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
@@ -76,20 +76,18 @@ public class BFActionsScheduledTasks {
                 .toString();
     }
 
-    private void triggerTaskEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId) {
+    private void triggerTaskEventForCase(String adminUserToken, String caseId, String caseTypeId) {
         try {
             CCDRequest returnedRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId,
-                    "EMPLOYMENT", String.valueOf(submitEvent.getCaseId()), "WA_REVIEW_RULE21_REFERRAL");
+                    EMPLOYMENT, caseId, "WA_REVIEW_RULE21_REFERRAL");
 
-            CaseData caseData = submitEvent.getCaseData();
-            caseData.setWaRule21ReferralSent(YES);
+            returnedRequest.getCaseDetails().getCaseData().setWaRule21ReferralSent(YES);
 
             String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();
-            ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
-                    jurisdiction, returnedRequest, String.valueOf(submitEvent.getCaseId())
-            );
+            ccdClient.submitEventForCase(adminUserToken, returnedRequest.getCaseDetails().getCaseData(),
+                    caseTypeId, jurisdiction, returnedRequest, caseId);
 
-            log.info("Called WA_REVIEW_RULE21_REFERRAL for " + submitEvent.getCaseId());
+            log.info("Called WA_REVIEW_RULE21_REFERRAL for {}", caseId);
         } catch (IOException e) {
             log.error(e.getMessage());
         }

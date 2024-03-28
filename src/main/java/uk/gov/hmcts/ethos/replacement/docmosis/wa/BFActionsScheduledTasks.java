@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.wa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
@@ -34,7 +35,7 @@ public class BFActionsScheduledTasks {
     private final FeatureToggleService featureToggleService;
 
     @Value("${cron.caseTypeId}")
-    private String caseTypeId;
+    private String caseTypeIdsString;
 
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
@@ -52,13 +53,16 @@ public class BFActionsScheduledTasks {
 
         String adminUserToken = adminUserService.getAdminUserToken();
 
-        String[] caseTypeIds = caseTypeId.split(",");
+        String[] caseTypeIds = caseTypeIdsString.split(",");
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                while (CollectionUtils.isNotEmpty(cases)) {
+                    cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
+                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                }
 
-                cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
@@ -81,7 +85,10 @@ public class BFActionsScheduledTasks {
             CCDRequest returnedRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId,
                     "EMPLOYMENT", String.valueOf(submitEvent.getCaseId()), "WA_REVIEW_RULE21_REFERRAL");
 
-            CaseData caseData = submitEvent.getCaseData();
+            CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
+            if (caseData.getWaRule21ReferralSent() != null && caseData.getWaRule21ReferralSent().equals(YES)) {
+                return;
+            }
             caseData.setWaRule21ReferralSent(YES);
 
             String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();

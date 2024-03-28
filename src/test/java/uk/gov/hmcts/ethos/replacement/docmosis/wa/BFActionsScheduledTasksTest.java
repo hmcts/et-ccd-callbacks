@@ -18,10 +18,13 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testcontainers.shaded.org.hamcrest.CoreMatchers.is;
 import static org.testcontainers.shaded.org.hamcrest.MatcherAssert.assertThat;
@@ -47,7 +50,7 @@ class BFActionsScheduledTasksTest {
     public void setUp() {
         bfActionsScheduledTasks = new BFActionsScheduledTasks(adminUserService, ccdClient, featureToggleService);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
-        ReflectionTestUtils.setField(bfActionsScheduledTasks, "caseTypeId", "ET_EnglandWales,ET_Scotland");
+        ReflectionTestUtils.setField(bfActionsScheduledTasks, "caseTypeIdsString", "ET_EnglandWales,ET_Scotland");
         ReflectionTestUtils.setField(bfActionsScheduledTasks, "maxCases", 10);
     }
 
@@ -56,11 +59,11 @@ class BFActionsScheduledTasksTest {
         String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent));
+                .thenReturn(List.of(submitEvent)).thenReturn(new ArrayList<>());
 
         SubmitEvent submitEvent2 = new ObjectMapper().readValue(resource, SubmitEvent.class);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent2));
+                .thenReturn(List.of(submitEvent2)).thenReturn(null);
 
         CaseData caseData = submitEvent.getCaseData();
 
@@ -71,8 +74,9 @@ class BFActionsScheduledTasksTest {
 
         bfActionsScheduledTasks.createTasksForBFDates();
 
-        assertThat(caseData.getWaRule21ReferralSent(), is(YES));
-        assertThat(submitEvent2.getCaseData().getWaRule21ReferralSent(), is(YES));
+        assertThat(build.getCaseDetails().getCaseData().getWaRule21ReferralSent(), is(YES));
+        assertThat(build.getCaseDetails().getCaseData().getWaRule21ReferralSent(), is(YES));
+        verify(ccdClient, times(1)).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -81,5 +85,6 @@ class BFActionsScheduledTasksTest {
         when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any())).thenThrow(new IOException());
 
         bfActionsScheduledTasks.createTasksForBFDates();
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
     }
 }

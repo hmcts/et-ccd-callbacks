@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.launchdarkly.shaded.com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType;
@@ -265,8 +266,10 @@ public class DocumentManagementService {
      * @param caseData case that provides both document collections(uploaded and case doc collections)
      */
     public void addUploadedDocsToCaseDocCollection(CaseData caseData) {
+        if (caseData.getAddDocumentCollection() == null) {
+            return;
+        }
 
-        //If doc collection is empty, initialise it
         if (caseData.getDocumentCollection() == null) {
             caseData.setDocumentCollection(new ArrayList<>());
         }
@@ -275,13 +278,20 @@ public class DocumentManagementService {
                 uploadDoc -> {
                     DocumentType uploadedDocType = uploadDoc.getValue();
                     setDocumentTypeForDocument(uploadedDocType);
-                    setSecondLevelDocumentFromType(uploadedDocType, uploadedDocType.getDocumentType());
+
+                    if (!isNullOrEmpty(uploadedDocType.getDocumentType())) {
+                        setSecondLevelDocumentFromType(uploadedDocType,
+                                uploadedDocType.getDocumentType());
+                    }
+
+                    String shortDescription = "";
+                    if (!isNullOrEmpty(uploadedDocType.getShortDescription())) {
+                        shortDescription = uploadedDocType.getShortDescription();
+                    }
+
                     DocumentTypeItem docTypeItem = createDocumentTypeItemFromTopLevel(
-                            uploadedDocType.getUploadedDocument(),
-                            uploadedDocType.getTopLevelDocuments(),
-                            uploadedDocType.getDocumentType(),
-                            String.format("%s : %s", uploadedDocType.getShortDescription(),
-                                    uploadedDocType.getTopLevelDocuments()));
+                            uploadedDocType.getUploadedDocument(), uploadedDocType.getTopLevelDocuments(),
+                            uploadedDocType.getDocumentType(), shortDescription);
                     docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
                     caseData.getDocumentCollection().add(docTypeItem);
                 });

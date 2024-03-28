@@ -382,7 +382,7 @@ dependencies {
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.107.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.107.Final'
-    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.6.1'
+    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.6.2'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.0'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
@@ -417,7 +417,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.7'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.8'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.42'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 

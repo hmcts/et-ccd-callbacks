@@ -321,115 +321,115 @@ public class BulkSearchService {
             List<JurCodesTypeItem> jurCodesTypeItemsFilter = bulkData.getJurCodesCollection();
             List<MidSearchTypeItem> midSearchedList = new ArrayList<>();
             if (multipleTypeItemToSearchBy != null && !multipleTypeItemToSearchBy.isEmpty()) {
-                Predicate<MultipleTypeItem> subMultipleDuplicatePredicate = d -> d.getValue() != null
-                        && (d.getValue().getSubMultipleM() == null
-                        || d.getValue().getSubMultipleM().equals(" "));
-                Predicate<MultipleTypeItem> claimantPredicate = d -> d.getValue() != null
-                        && claimantFilter.equals(d.getValue().getClaimantSurnameM());
-                Predicate<MultipleTypeItem> respondentPredicate = d -> d.getValue() != null
-                        && respondentFilter.equals(d.getValue().getRespondentSurnameM());
-                Predicate<MultipleTypeItem> claimantRepPredicate = d -> d.getValue() != null
-                        && claimantRepFilter.equals(d.getValue().getClaimantRepM());
-                Predicate<MultipleTypeItem> respondentRepPredicate = d -> d.getValue() != null
-                        && respondentRepFilter.equals(d.getValue().getRespondentRepM());
-                Predicate<MultipleTypeItem> positionTypePredicate = d -> d.getValue() != null
-                        && positionTypeFilter.equals(d.getValue().getPositionTypeM());
-                Predicate<MultipleTypeItem> flag1Predicate = d -> d.getValue() != null
-                        && flag1Filter.equals(d.getValue().getFlag1M());
-                Predicate<MultipleTypeItem> flag2Predicate = d -> d.getValue() != null
-                        && flag2Filter.equals(d.getValue().getFlag2M());
-                Predicate<MultipleTypeItem> eqpPredicate = d -> d.getValue() != null
-                        && eqpFilter.equals(d.getValue().getEqpm());
-                Predicate<MultipleTypeItem> submissionRefPredicate = d -> d.getValue() != null
-                        && submissionRefFilter.equals(d.getValue().getFeeGroupReferenceM());
-                Predicate<MultipleTypeItem> claimantRepOrgPredicate = d -> d.getValue() != null
-                        && claimantRepOrgFilter.equals(d.getValue().getClaimantRepOrgM());
-                Predicate<MultipleTypeItem> respondentRepOrgPredicate = d -> d.getValue() != null
-                        && respondentRepOrgFilter.equals(d.getValue().getRespondentRepOrgM());
-                Predicate<MultipleTypeItem> statePredicate = d -> d.getValue() != null
-                        && stateFilter.equals(d.getValue().getStateM());
-                Predicate<MultipleTypeItem> jurCodesTypeItemsPredicate = d -> d.getValue() != null
-                        && BulkHelper.containsAllJurCodes(jurCodesTypeItemsFilter,
-                                BulkHelper.getJurCodesListFromString(d.getValue().getJurCodesCollectionM()));
                 List<MultipleTypeItem> searchedList = new ArrayList<>();
                 boolean filtered = false;
                 if (subMultiple) {
+                    Predicate<MultipleTypeItem> subMultipleDuplicatePredicate = d -> d.getValue() != null
+                            && (d.getValue().getSubMultipleM() == null
+                            || d.getValue().getSubMultipleM().equals(" "));
                     searchedList = filterByField(multipleTypeItemToSearchBy, subMultipleDuplicatePredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(claimantFilter)) {
+                    Predicate<MultipleTypeItem> claimantPredicate = d -> d.getValue() != null
+                            && claimantFilter.equals(d.getValue().getClaimantSurnameM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, claimantPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(respondentFilter)) {
+                    Predicate<MultipleTypeItem> respondentPredicate = d -> d.getValue() != null
+                            && respondentFilter.equals(d.getValue().getRespondentSurnameM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, respondentPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(claimantRepFilter)) {
+                    Predicate<MultipleTypeItem> claimantRepPredicate = d -> d.getValue() != null
+                            && claimantRepFilter.equals(d.getValue().getClaimantRepM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, claimantRepPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(respondentRepFilter)) {
+                    Predicate<MultipleTypeItem> respondentRepPredicate = d -> d.getValue() != null
+                            && respondentRepFilter.equals(d.getValue().getRespondentRepM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, respondentRepPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(positionTypeFilter)) {
+                    Predicate<MultipleTypeItem> positionTypePredicate = d -> d.getValue() != null
+                            && positionTypeFilter.equals(d.getValue().getPositionTypeM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, positionTypePredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(flag1Filter)) {
+                    Predicate<MultipleTypeItem> flag1Predicate = d -> d.getValue() != null
+                            && flag1Filter.equals(d.getValue().getFlag1M());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, flag1Predicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(flag2Filter)) {
+                    Predicate<MultipleTypeItem> flag2Predicate = d -> d.getValue() != null
+                            && flag2Filter.equals(d.getValue().getFlag2M());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, flag2Predicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(eqpFilter)) {
+                    Predicate<MultipleTypeItem> eqpPredicate = d -> d.getValue() != null
+                            && eqpFilter.equals(d.getValue().getEqpm());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, eqpPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(submissionRefFilter)) {
+                    Predicate<MultipleTypeItem> submissionRefPredicate = d -> d.getValue() != null
+                            && submissionRefFilter.equals(d.getValue().getFeeGroupReferenceM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, submissionRefPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(claimantRepOrgFilter)) {
+                    Predicate<MultipleTypeItem> claimantRepOrgPredicate = d -> d.getValue() != null
+                            && claimantRepOrgFilter.equals(d.getValue().getClaimantRepOrgM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, claimantRepOrgPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(respondentRepOrgFilter)) {
+                    Predicate<MultipleTypeItem> respondentRepOrgPredicate = d -> d.getValue() != null
+                            && respondentRepOrgFilter.equals(d.getValue().getRespondentRepOrgM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, respondentRepOrgPredicate);
                     filtered = true;
                 }
                 if (!isNullOrEmpty(stateFilter)) {
+                    Predicate<MultipleTypeItem> statePredicate = d -> d.getValue() != null
+                            && stateFilter.equals(d.getValue().getStateM());
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, statePredicate);
                     filtered = true;
                 }
                 if (jurCodesTypeItemsFilter != null && !jurCodesTypeItemsFilter.isEmpty()) {
+                    Predicate<MultipleTypeItem> jurCodesTypeItemsPredicate = d -> d.getValue() != null
+                            && BulkHelper.containsAllJurCodes(jurCodesTypeItemsFilter,
+                            BulkHelper.getJurCodesListFromString(d.getValue().getJurCodesCollectionM()));
                     searchedList = filterByField(filtered
                             ? searchedList
                             : multipleTypeItemToSearchBy, jurCodesTypeItemsPredicate);

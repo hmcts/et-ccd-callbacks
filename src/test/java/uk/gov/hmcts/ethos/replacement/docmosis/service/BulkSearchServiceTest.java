@@ -320,6 +320,72 @@ class BulkSearchServiceTest {
     }
 
     @Test
+    void midCreateSubMultipleCaseBelongsToOtherSubMultipleWithPredicate() {
+        BulkData bulkData = bulkDetails.getCaseData();
+        bulkData.setClaimantSurname("Juan");
+        bulkData.setRespondentSurname("Antonio");
+        bulkData.setClaimantRep("Johnson");
+        bulkData.setRespondentRep("Mike");
+        bulkData.setPositionType("PositionType");
+        bulkData.setFlag1("Flag1");
+        bulkData.setFlag2("Flag2");
+        bulkData.setEqp("EQP");
+        bulkData.setFeeGroupReference("Fee group");
+        bulkData.setClaimantOrg("ClaimantOrg");
+        bulkData.setRespondentOrg("RespondentOrg");
+        bulkData.setSubmissionRef("11111111111");
+        bulkData.setState("Accepted");
+        var multiple = bulkData.getMultipleCollection().get(0);
+        var multipleType = multiple.getValue();
+        multipleType.setClaimantSurnameM("Juan");
+        multipleType.setRespondentSurnameM("Antonio");
+        multipleType.setClaimantRepM("Johnson");
+        multipleType.setRespondentRepM("Mike");
+        multipleType.setPositionTypeM("PositionType");
+        multipleType.setFlag1M("Flag1");
+        multipleType.setFlag2M("Flag2");
+        multipleType.setEqpm("EQP");
+        multipleType.setFeeGroupReferenceM("Fee group");
+        multipleType.setClaimantRepOrgM("ClaimantOrg");
+        multipleType.setRespondentRepOrgM("RespondentOrg");
+        multipleType.setStateM("Accepted");
+
+        bulkData.getMultipleCollection().get(0).getValue().setSubMultipleM("4200001/1");
+        String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null, "
+                + "caseTypeId=Manchester_Multiple, createdDate=null, "
+                + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, "
+                + "multipleReference=1111, multipleReferenceLinkMarkUp=null, feeGroupReference=Fee group, "
+                + "claimantSurname=Juan, "
+                + "respondentSurname=Antonio, claimantRep=Johnson, respondentRep=Mike, ethosCaseReference=222, "
+                + "clerkResponsible=null, fileLocation=null, " + "jurCodesCollection=null, fileLocationV2=null,"
+                + " feeGroupReferenceV2=null, claimantSurnameV2=null," + " respondentSurnameV2=null, "
+                + "multipleReferenceV2=null, "
+                + "clerkResponsibleV2=null, positionTypeV2=null, claimantRepV2=null, respondentRepV2=null, "
+                + "fileLocationGlasgow=null, fileLocationAberdeen=null, " + "fileLocationDundee=null, "
+                + "fileLocationEdinburgh=null, managingOffice=null, subMultipleName=null, "
+                + "subMultipleRef=null, caseIdCollection=null, " + "searchCollection=null, midSearchCollection=[], "
+                + "multipleCollection=[MultipleTypeItem(id=2222, " + "value=MultipleType(caseIDM=null, "
+                + "ethosCaseReferenceM=2222, leadClaimantM=null, multipleReferenceM=null, clerkRespM=null, "
+                + "claimantSurnameM=Juan, respondentSurnameM=Antonio, " + "claimantRepM=Johnson, respondentRepM=Mike,"
+                + " fileLocM=null, receiptDateM=null, positionTypeM=PositionType, " + "feeGroupReferenceM=Fee group,"
+                + " jurCodesCollectionM=null, "
+                + "stateM=Accepted, subMultipleM=4200001/1, subMultipleTitleM=null, currentPositionM=null,"
+                + " claimantAddressLine1M=null,"
+                + " claimantPostCodeM=null, " + "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=Flag1,"
+                + " flag2M=Flag2, eqpm=EQP, " + "respondentRepOrgM=RespondentOrg, claimantRepOrgM=ClaimantOrg))], "
+                + "subMultipleCollection=null, subMultipleDynamicList=null, searchCollectionCount=null, "
+                + "multipleCollectionCount=null,"
+                + " correspondenceType=null, " + "correspondenceScotType=null, selectAll=null, "
+                + "scheduleDocName=null, "
+                + "positionType=PositionType, flag1=Flag1, flag2=Flag2, eqp=EQP, submissionRef=11111111111, "
+                + "claimantOrg=ClaimantOrg, respondentOrg=RespondentOrg, state=Accepted, flag1Update=null, "
+                + "flag2Update=null, eqpUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, "
+                + "filterCases=null, docMarkUp=null, multipleSource=Manually Created))";
+        BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(bulkDetails, true);
+        assertEquals(result, bulkRequestPayload.getBulkDetails().toString());
+    }
+
+    @Test
     void searchCasesByFieldsRequestException() {
         assertThrows(Exception.class, () ->
                 bulkSearchService.midSearchCasesByFieldsRequest(new ArrayList<>(), new BulkDetails(), false)

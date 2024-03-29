@@ -110,18 +110,16 @@ public class CreateBulkComponentTest {
 
     @Test
     public void createBulkEngCaseFromAnotherMultiple() throws IOException {
-        String testData = FileUtils.readFileToString(new File(Constants.TEST_DATA_ENG_BULK1), StandardCharsets.UTF_8);
-        Response response;
-
         testUtil.loadAuthToken();
-
         caseList.clear();
         caseList.add(Constants.TEST_DATA_ENG_BULK1_CASE1);
         caseList.add(Constants.TEST_DATA_ENG_BULK1_CASE2);
         caseList.add(Constants.TEST_DATA_ENG_BULK1_CASE3);
 
         int count = 1;
+        Response response;
         List<String> usedCaseReferences = new ArrayList<>();
+        String testData = FileUtils.readFileToString(new File(Constants.TEST_DATA_ENG_BULK1), StandardCharsets.UTF_8);
         for (String caseDataFilePath : caseList) {
             String ethosCaseReference = testUtil.getUniqueCaseReference(10);
             usedCaseReferences.add(ethosCaseReference);
@@ -150,16 +148,14 @@ public class CreateBulkComponentTest {
 
     @Test
     public void createBulkEngCasesWithStatusSubmitted() throws IOException {
-        Response response;
-        String testData = FileUtils.readFileToString(new File(Constants.TEST_DATA_ENG_BULK1), StandardCharsets.UTF_8);
-
         testUtil.loadAuthToken();
-
         caseList.clear();
         caseList.add(Constants.TEST_DATA_ENG_BULK7_CASE1);
         caseList.add(Constants.TEST_DATA_ENG_BULK7_CASE2);
         caseList.add(Constants.TEST_DATA_ENG_BULK7_CASE3);
 
+        Response response;
+        String testData = FileUtils.readFileToString(new File(Constants.TEST_DATA_ENG_BULK1), StandardCharsets.UTF_8);
         int count = 1;
         for (String caseDataFilePath : caseList) {
             String ethosCaseReference = testUtil.getUniqueCaseReference(10);
@@ -184,15 +180,13 @@ public class CreateBulkComponentTest {
     @Test
     @Ignore
     public void createBulkEngAddCaseFromGlasgow() throws IOException {
-        Response response;
-        String testData = FileUtils.readFileToString(new File(Constants.TEST_DATA_ENG_BULK1), StandardCharsets.UTF_8);
-
         testUtil.loadAuthToken();
-
         caseList.clear();
         caseList.add(Constants.TEST_DATA_ENG_BULK1_CASE1);
         caseList.add(Constants.TEST_DATA_ENG_BULK1_CASE2);
 
+        Response response;
+        String testData = FileUtils.readFileToString(new File(Constants.TEST_DATA_ENG_BULK1), StandardCharsets.UTF_8);
         int count = 1;
         for (String caseDataFilePath : caseList) {
             String ethosCaseReference = testUtil.getUniqueCaseReference(10);

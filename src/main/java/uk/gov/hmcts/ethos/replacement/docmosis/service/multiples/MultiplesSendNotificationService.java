@@ -133,6 +133,9 @@ public class MultiplesSendNotificationService {
         sendNotificationType.setSendNotificationEccQuestion(multipleData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(multipleData.getSendNotificationWhoMadeJudgement());
 
+        // Multiple sender indicator
+        sendNotificationType.setNotificationSentFrom(multipleData.getMultipleReference());
+
         return sendNotificationType;
     }
 

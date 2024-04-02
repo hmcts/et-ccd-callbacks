@@ -389,6 +389,7 @@ class ReferralHelperTest {
 
     @Test
     void clearUpdateReferralDataFromCaseData() {
+        setSelectReferralData();
         caseData.setUpdateReferCaseTo("Judge");
         caseData.setUpdateReferralSubject("Subject");
         caseData.setUpdateReferralDetails("Details");
@@ -396,7 +397,9 @@ class ReferralHelperTest {
         caseData.setUpdateIsUrgent("Yes");
         caseData.setUpdateReferralInstruction("Instruction");
         caseData.setUpdateReferralSubjectSpecify("Subject Specify");
+
         ReferralHelper.clearUpdateReferralDataFromCaseData(caseData);
+        assertNull(caseData.getSelectReferral());
         assertNull(caseData.getUpdateReferCaseTo());
         assertNull(caseData.getUpdateReferralSubject());
         assertNull(caseData.getUpdateReferralDetails());
@@ -426,9 +429,11 @@ class ReferralHelperTest {
 
     @Test
     void clearReferralReplyDataFromCaseData() {
+        setSelectReferralData();
         setReferralReplyData();
-        ReferralHelper.clearReferralReplyDataFromCaseData(caseData);
 
+        ReferralHelper.clearReferralReplyDataFromCaseData(caseData);
+        assertNull(caseData.getSelectReferral());
         assertNull(caseData.getHearingAndReferralDetails());
         assertNull(caseData.getDirectionTo());
         assertNull(caseData.getReplyToEmailAddress());
@@ -489,7 +494,7 @@ class ReferralHelperTest {
     void setReferralStatusToClosed() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList =
-            ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
+                ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -737,6 +742,15 @@ class ReferralHelperTest {
         respondentSumTypeItem.setValue(respondentSumType);
 
         return respondentSumTypeItem;
+    }
+
+    private void setSelectReferralData() {
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        DynamicFixedListType selectReferralList =
+                ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
+        selectReferralList.setValue(new DynamicValueType());
+        selectReferralList.getValue().setCode("1");
+        caseData.setSelectReferral(selectReferralList);
     }
 
     private void setReferralReplyData() {

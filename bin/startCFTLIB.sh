@@ -13,10 +13,6 @@ echo "********KILLING RESIDUAL PROCESSES********"
 echo "********************************************"
 ./bin/kill-residual-processes.sh
 echo "********************************************"
-echo "*******STOPPING ALL DOCKER CONTAINERS*******"
-echo "********************************************"
-docker stop $(docker ps -a -q)
-echo "********************************************"
 echo "****RUNNING CCD CALLBACKS CFTLIB PROFILE****"
 echo "********************************************"
 ./gradlew bootWithCCD

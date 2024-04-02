@@ -107,6 +107,7 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationDecision("Other");
         caseData.setSendNotificationDetails("details");
         caseData.setSendNotificationRequestMadeBy("Judge");
+        caseData.setNotificationSentFrom("60001");
     }
 
     @Test
@@ -136,6 +137,7 @@ class SendNotificationServiceTest {
         assertEquals("Hearing, Judgment", sendNotificationType.getSendNotificationSubjectString());
         assertEquals("0", sendNotificationType.getSendNotificationResponsesCount());
         assertEquals(TRIBUNAL, sendNotificationType.getSendNotificationSentBy());
+        assertEquals("60001", sendNotificationType.getNotificationSentFrom());
     }
 
     @Test

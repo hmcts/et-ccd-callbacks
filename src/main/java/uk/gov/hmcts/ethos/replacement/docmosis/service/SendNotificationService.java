@@ -117,9 +117,8 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
-        sendNotificationType.setNotificationSentFrom(caseData.getNotificationSentFrom());
-
         sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+
         sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
         sendNotificationType.setSendNotificationSubjectString(
                 String.join(", ", caseData.getSendNotificationSubject())
@@ -162,7 +161,6 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
         caseData.setSendNotificationEccQuestion(null);
         caseData.setSendNotificationWhoCaseOrder(null);
-        caseData.setNotificationSentFrom(null);
     }
 
     /**

@@ -585,7 +585,6 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      */
     public static void clearUpdateReferralDataFromCaseData(CaseData caseData) {
-        caseData.setSelectReferral(null);
         caseData.setUpdateReferCaseTo(null);
         caseData.setUpdateReferentEmail(null);
         caseData.setUpdateIsUrgent(null);
@@ -658,7 +657,6 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      */
     public static void clearReferralReplyDataFromCaseData(BaseCaseData caseData) {
-        caseData.setSelectReferral(null);
         caseData.setHearingAndReferralDetails(null);
         caseData.setDirectionTo(null);
         caseData.setReplyToEmailAddress(null);

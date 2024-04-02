@@ -16,7 +16,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeMultiple;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
@@ -189,8 +189,7 @@ public final class PersistentQHelper {
                 .build();
     }
 
-    public static SendNotificationDataModel getSendNotificationDataModel(
-            SendNotificationTypeMultiple sendNotificationType) {
+    public static SendNotificationDataModel getSendNotificationDataModel(SendNotificationType sendNotificationType) {
         return SendNotificationDataModel.builder()
                 .sendNotification(sendNotificationType)
                 .build();

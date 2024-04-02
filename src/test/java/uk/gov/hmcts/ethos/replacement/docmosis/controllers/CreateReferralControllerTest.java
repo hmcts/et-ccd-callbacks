@@ -12,11 +12,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
@@ -28,6 +33,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -88,6 +94,14 @@ class CreateReferralControllerTest {
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setReferentEmail("test@gmail.com");
         caseData.setReferralSubject("ET1");
+
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        DynamicFixedListType selectReferralList =
+                ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
+        selectReferralList.setValue(new DynamicValueType());
+        selectReferralList.getValue().setCode("1");
+        caseData.setSelectReferral(selectReferralList);
+
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("123")
@@ -251,5 +265,15 @@ class CreateReferralControllerTest {
         respondentSumTypeItem.setValue(respondentSumType);
 
         return respondentSumTypeItem;
+    }
+
+    private ReferralTypeItem createReferralTypeItem() {
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        ReferralType referralType = new ReferralType();
+        referralType.setReferralNumber("1");
+        referralType.setReferralSubject("Other");
+        referralTypeItem.setValue(referralType);
+        referralType.setReferralStatus("referralStatus");
+        return referralTypeItem;
     }
 }

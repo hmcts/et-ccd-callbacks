@@ -183,8 +183,8 @@ public class CreateReferralController {
 
         String caseLink;
 
-        if (StringUtils.isNotEmpty(
-                caseData.getReferentEmail()) && StringUtils.isEmpty(caseData.getMultipleReference())) {
+        if (StringUtils.isNotEmpty(caseData.getReferentEmail())
+                && StringUtils.isEmpty(caseData.getMultipleReference())) {
             caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
             emailService.sendEmail(
                     referralTemplateId,

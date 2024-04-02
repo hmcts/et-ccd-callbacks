@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.springframework.boot' version '2.7.18'
-    id 'org.owasp.dependencycheck' version '9.0.10'
+    id 'org.owasp.dependencycheck' version '9.1.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
     id 'io.freefair.lombok' version '8.6'
@@ -314,7 +314,7 @@ dependencyManagement {
         dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.1.107.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.108.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -335,7 +335,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.5.1'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.5.5'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version:'Rule-92_V2-SNAPSHOT'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -346,7 +346,7 @@ dependencies {
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.16.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.65.Final'
     implementation group: 'org.json', name: 'json', version: '20240303'
@@ -379,9 +379,9 @@ dependencies {
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.3'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
-    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.107.Final'
-    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.107.Final'
-    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.6.1'
+    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.108.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.108.Final'
+    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.6.2'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.0'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
@@ -416,19 +416,19 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.7'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.8'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.42'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.10.2'
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.0'
+    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.1'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.15.1'
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.16.0'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'

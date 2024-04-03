@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmReplyService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -29,10 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseAdmReplyController.class, JsonMapper.class})
-class TseAdmReplyControllerTest {
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
+class TseAdmReplyControllerTest extends BaseControllerTest {
 
     @MockBean
     private TseAdmReplyService tseAdmReplyService;
@@ -45,14 +41,15 @@ class TseAdmReplyControllerTest {
 
     private CCDRequest ccdRequest;
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String MID_DETAILS_TABLE = "/tseAdmReply/midDetailsTable";
     private static final String MID_VALIDATE_INPUT = "/tseAdmReply/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmReply/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmReply/submitted";
 
     @BeforeEach
-    void setUp() throws Exception {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("1234")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);

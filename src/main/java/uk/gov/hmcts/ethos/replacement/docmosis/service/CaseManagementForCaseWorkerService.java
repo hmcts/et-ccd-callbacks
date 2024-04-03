@@ -22,13 +22,12 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
+import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -75,10 +74,10 @@ public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
     private final ClerkService clerkService;
-    private final TribunalOfficesService tribunalOfficesService;
     private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
+    private final CaseManagementLocationService caseManagementLocationService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -89,21 +88,26 @@ public class CaseManagementForCaseWorkerService {
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
     public static final String ORGANISATION = "Organisation";
 
+    public static final String SUPPLEMENTARY_DATA_ERROR = "Call to Supplementary Data API failed for %s";
+
+    public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
+    public static final String CASE_MANAGEMENT_CODE = "Employment";
+
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,
                                               ClerkService clerkService,
-                                              TribunalOfficesService tribunalOfficesService,
                                               FeatureToggleService featureToggleService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
-                                              AdminUserService adminUserService) {
+                                              AdminUserService adminUserService,
+                                              CaseManagementLocationService caseManagementLocationService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
-        this.tribunalOfficesService = tribunalOfficesService;
         this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
+        this.caseManagementLocationService = caseManagementLocationService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -113,6 +117,7 @@ public class CaseManagementForCaseWorkerService {
         dateToCurrentPosition(caseData);
         flagsImageFileNameDefaults(caseData);
         setGlobalSearchDefaults(caseData);
+        setWorkAllocationDefaults(caseData);
     }
 
     public void setGlobalSearchDefaults(CaseData caseData) {
@@ -120,8 +125,15 @@ public class CaseManagementForCaseWorkerService {
             return;
         }
         setCaseNameHmctsInternal(caseData);
-        setCaseManagementLocation(caseData);
+        caseManagementLocationService.setCaseManagementLocation(caseData);
         setCaseManagementCategory(caseData);
+    }
+
+    public void setWorkAllocationDefaults(CaseData caseData) {
+        if (!featureToggleService.isWorkAllocationEnabled()) {
+            return;
+        }
+        setHmctsCaseCategory(caseData);
     }
 
     public void claimantDefaults(CaseData caseData) {
@@ -143,7 +155,7 @@ public class CaseManagementForCaseWorkerService {
         addClaimantDocuments(caseData);
     }
 
-    public void addClaimantDocuments(CaseData caseData) {
+    public void addClaimantDocuments(BaseCaseData caseData) {
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         List<DocumentTypeItem> claimantDocumentCollection = new ArrayList<>();
         List<String> claimantDocs = List.of(ET1_DOC_TYPE, ET1_ATTACHMENT_DOC_TYPE, ACAS_DOC_TYPE);
@@ -559,8 +571,7 @@ public class CaseManagementForCaseWorkerService {
                                       Map<String, Map<String, Object>> payloadData) throws IOException {
         Map<String, Object> payload = Maps.newHashMap();
         payload.put("supplementary_data_updates", payloadData);
-        String errorMessage = String.format("Call to Supplementary Data API failed for %s",
-                caseDetails.getCaseId());
+        String errorMessage = String.format(SUPPLEMENTARY_DATA_ERROR, caseDetails.getCaseId());
 
         try {
             String adminUserToken = adminUserService.getAdminUserToken();
@@ -588,25 +599,14 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void setCaseManagementCategory(CaseData caseData) {
-        caseData.setCaseManagementCategory(DynamicFixedListType.from("Employment Tribunals", "Employment", true));
+        // See RET-4733 for reason of order of DynamicFixedListType.from() values
+        caseData.setCaseManagementCategory(
+                DynamicFixedListType.from(CASE_MANAGEMENT_LABEL, CASE_MANAGEMENT_CODE, true)
+        );
     }
 
-    private void setCaseManagementLocation(CaseData caseData) {
-        String managingOfficeName = caseData.getManagingOffice();
-        if (isNullOrEmpty(managingOfficeName)) {
-            log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");
-            return;
-        }
-
-        CourtLocations tribunalLocations = tribunalOfficesService.getTribunalLocations(managingOfficeName);
-        if (tribunalLocations.getEpimmsId().isBlank()) {
-            log.debug("leave `caseManagementLocation` blank since Managing office is un-assigned.");
-            return;
-        }
-        caseData.setCaseManagementLocation(CaseLocation.builder()
-                .baseLocation(tribunalLocations.getEpimmsId())
-                .region(tribunalLocations.getRegionId())
-                .build());
+    private void setHmctsCaseCategory(CaseData caseData) {
+        caseData.setHmctsCaseCategory(CASE_MANAGEMENT_LABEL);
     }
 
     public void setPublicCaseName(CaseData caseData) {

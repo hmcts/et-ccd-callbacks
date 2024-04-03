@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -51,12 +54,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @RequiredArgsConstructor
 @Service("tornadoService")
 public class TornadoService {
-    public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
-    public static final String TSE_REPLY = "TSE Reply.pdf";
-    public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
+
+    private static final String ET1_VETTING_PDF = "ET1 Vetting.pdf";
+    private static final String ET3_PROCESSING_PDF = "ET3 Processing.pdf";
     private static final String ET3_RESPONSE_PDF = "ET3 Response.pdf";
+    private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
+    public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
+    public static final String REFERRAL_SUMMARY_PDF = "Referral Summary.pdf";
+    public static final String TSE_REPLY = "TSE Reply.pdf";
+    public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
+
     private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
 
     private final TornadoConnection tornadoConnection;
@@ -89,6 +98,34 @@ public class TornadoService {
             throw e;
         } finally {
             closeConnection(conn);
+        }
+    }
+
+    /**
+     * Generates a document through Tornado.
+     * @param userToken contains the user authentication token
+     * @param document contains the data needed to generate the PDF
+     * @param documentName name of the document
+     * @param caseTypeId caseTypeId of the case this document belongs to
+     * @return DocumentInfo which contains the URL and markup of the uploaded document
+     * @throws IOException thrown when Tornado fails to create the document for any reason
+     */
+    public DocumentInfo generateDocument(String userToken, TornadoDocument<?> document, String documentName, 
+        String caseTypeId) throws IOException {
+
+        HttpURLConnection connection = null;
+        try {
+            connection = createConnection();
+            document.setAccessKey(tornadoConnection.getAccessKey());
+            String content = new ObjectMapper().writeValueAsString(document);
+            buildDocumentInstruction(connection, content);
+            byte[] bytes = getDocumentByteArray(connection);
+            return createDocumentInfoFromBytes(userToken, bytes, documentName, caseTypeId);
+        } catch (IOException exception) {
+            log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
+            throw exception;
+        } finally {
+            closeConnection(connection);
         }
     }
 
@@ -323,6 +360,14 @@ public class TornadoService {
         }
     }
 
+    private void buildDocumentInstruction(HttpURLConnection connection, String content) throws IOException {
+        OutputStream outputStream = connection.getOutputStream();
+        try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+            writer.write(content);
+            writer.flush();
+        }
+    }
+
     private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
                                           String caseTypeId)
             throws IOException {
@@ -341,11 +386,11 @@ public class TornadoService {
     private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
             throws JsonProcessingException {
         switch (documentName) {
-            case "ET1 Vetting.pdf" -> {
+            case ET1_VETTING_PDF -> {
                 dmStoreDocumentName = String.format(ET1_VETTING_OUTPUT_NAME, caseData.getClaimant());
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
-            case "ET3 Processing.pdf" -> {
+            case ET3_PROCESSING_PDF -> {
                 dmStoreDocumentName = String.format("ET3 Processing - %s.pdf",
                         caseData.getEt3ChooseRespondent().getSelectedLabel());
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
@@ -355,7 +400,7 @@ public class TornadoService {
                         caseData.getSubmitEt3Respondent().getSelectedLabel());
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
-            case "Initial Consideration.pdf" -> {
+            case INITIAL_CONSIDERATION_PDF -> {
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
@@ -363,7 +408,7 @@ public class TornadoService {
                 dmStoreDocumentName = tseService.getTseDocumentName(caseData);
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
-            case "Referral Summary.pdf" -> {
+            case REFERRAL_SUMMARY_PDF -> {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_REPLY -> {

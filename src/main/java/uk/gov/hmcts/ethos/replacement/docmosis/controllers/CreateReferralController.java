@@ -92,6 +92,7 @@ public class CreateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        clearReferralDataFromCaseData(caseData);
         caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -181,13 +182,15 @@ public class CreateReferralController {
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                 this.documentManagementService.addDocumentToDocumentField(documentInfo));
 
-        String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
+        String caseLink;
 
         if (StringUtils.isNotEmpty(caseData.getReferentEmail())) {
+            caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
             emailService.sendEmail(
                     referralTemplateId,
                     caseData.getReferentEmail(),
-                    ReferralHelper.buildPersonalisation(caseData, referralNumber, true, userDetails.getName(),
+                    ReferralHelper.buildPersonalisation(
+                            caseData, referralNumber, true, userDetails.getName(),
                             caseLink)
             );
 

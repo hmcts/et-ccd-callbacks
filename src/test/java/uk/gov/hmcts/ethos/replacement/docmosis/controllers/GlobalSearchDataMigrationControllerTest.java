@@ -17,7 +17,6 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
@@ -36,9 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(GlobalSearchDataMigrationController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class GlobalSearchDataMigrationControllerTest {
+class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String GLOBAL_SEARCH_MIGRATION_SUBMITTED = "/global-search-migration/submitted";
     private static final String GLOBAL_SEARCH_MIGRATION_ABOUT_TO_SUBMIT = "/global-search-migration/about-to-submit";
     private static final String GLOBAL_SEARCH_ROLLBACK_SUBMITTED = "/global-search-rollback/submitted";
@@ -47,8 +45,6 @@ class GlobalSearchDataMigrationControllerTest {
 
     @MockBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -56,7 +52,9 @@ class GlobalSearchDataMigrationControllerTest {
     private MockMvc mvc;
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()

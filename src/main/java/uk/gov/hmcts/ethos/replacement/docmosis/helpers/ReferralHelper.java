@@ -388,23 +388,6 @@ public final class ReferralHelper {
         ListTypeItem<UpdateReferralType> updateReferralCollection = referral.getUpdateReferralCollection();
         updateReferralCollection.add(GenericTypeItem.from(UUID.randomUUID().toString(), updateReferralType));
         referral.setUpdateReferralCollection(updateReferralCollection);
-        updateOriginalReferral(caseData, userFullName);
-    }
-
-    private static void updateOriginalReferral(CaseData caseData, String userFullName) {
-        ReferralType referral = caseData.getReferralCollection()
-                .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
-
-        referral.setReferCaseTo(caseData.getUpdateReferCaseTo());
-        referral.setIsUrgent(caseData.getUpdateIsUrgent());
-        referral.setReferralSubject(caseData.getUpdateReferralSubject());
-        referral.setReferralSubjectSpecify(caseData.getUpdateReferralSubjectSpecify());
-        referral.setReferralDetails(caseData.getUpdateReferralDetails());
-        referral.setReferralDocument(caseData.getUpdateReferralDocument());
-        referral.setReferralInstruction(caseData.getUpdateReferralInstruction());
-        referral.setReferralDate(Helper.getCurrentDate());
-        referral.setReferentEmail(caseData.getUpdateReferentEmail());
-        referral.setReferredBy(userFullName);
     }
 
     /**
@@ -414,7 +397,7 @@ public final class ReferralHelper {
      */
     public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         ReferralTypeData data;
-        if (caseData.getReferentEmail() != null || caseData.getSelectReferral() == null) {
+        if (caseData.getSelectReferral() == null) {
             data = newReferralRequest(caseData);
         } else {
             ReferralType referral = getSelectedReferral(caseData);
@@ -505,7 +488,7 @@ public final class ReferralHelper {
     private static ReferralTypeData rebuildReferral(List<HearingTypeItem> hearings, String id, ReferralType referral) {
         return ReferralTypeData.builder()
                 .caseNumber(defaultIfEmpty(id, null))
-                .referralDate(Helper.getCurrentDate())
+                .referralDate(defaultIfEmpty(referral.getReferralDate(), null))
                 .referredBy(defaultIfEmpty(referral.getReferredBy(), null))
                 .referCaseTo(defaultIfEmpty(referral.getReferCaseTo(), null))
                 .referentEmail(defaultIfEmpty(referral.getReferentEmail(), null))
@@ -517,7 +500,8 @@ public final class ReferralHelper {
                 .referralInstruction(defaultIfEmpty(referral.getReferralInstruction(), null))
                 .referralReplyCollection(referral.getReferralReplyCollection())
                 .referralStatus(referral.getReferralStatus())
-                .referralReplyCollection(referral.getReferralReplyCollection()).build();
+                .updateReferralCollection(referral.getUpdateReferralCollection())
+                .build();
     }
 
     /**
@@ -577,15 +561,6 @@ public final class ReferralHelper {
         caseData.setReferralInstruction(null);
         caseData.setReferredBy(null);
         caseData.setReferralDate(null);
-    }
-
-    /**
-     * Resets the case data fields relating to updating a referral so that they won't be auto-populated when
-     * updating a new referral.
-     * @param caseData contains all the case data
-     */
-    public static void clearUpdateReferralDataFromCaseData(CaseData caseData) {
-        caseData.setSelectReferral(null);
         caseData.setUpdateReferCaseTo(null);
         caseData.setUpdateReferentEmail(null);
         caseData.setUpdateIsUrgent(null);
@@ -594,6 +569,7 @@ public final class ReferralHelper {
         caseData.setUpdateReferralDetails(null);
         caseData.setUpdateReferralDocument(null);
         caseData.setUpdateReferralInstruction(null);
+        caseData.setSelectReferral(null);
     }
 
     /**
@@ -608,7 +584,8 @@ public final class ReferralHelper {
                 .filter(r -> !r.getValue().getReferralStatus().equals(ReferralStatus.CLOSED))
                 .map(r -> DynamicValueType.create(
                         r.getValue().getReferralNumber(),
-                        r.getValue().getReferralNumber() + " " + r.getValue().getReferralSubject())).toList());
+                        r.getValue().getReferralNumber() + " - " + r.getValue().getReferralSubject()))
+                .toList());
     }
 
     /**
@@ -653,7 +630,7 @@ public final class ReferralHelper {
     }
 
     /**
-     * Resets the case data fields relating to replying to a referral so that they won't be auto populated when
+     * Resets the case data fields relating to replying to a referral so that they won't be autopopulated when
      * creating a new referral.
      * @param caseData contains all the case data
      */

@@ -2,11 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
@@ -21,13 +19,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class ReferralService {
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
-    private final EmailService emailService;
-    private final UserIdamService userIdamService;
     private final TornadoService tornadoService;
     private final CaseLookupService caseLookupService;
-
-    @Value("${template.referral}")
-    private String referralTemplateId;
 
     /**
      * Uses {@link TornadoService} to generate a pdf to display a summary of data for the created referral.
@@ -78,18 +71,4 @@ public class ReferralService {
         return ReferralHelper.populateHearingDetails(caseData);
     }
 
-    public void sendEmail(CaseDetails caseDetails, String referralNumber, boolean isNew, String userToken) {
-        CaseData caseData = caseDetails.getCaseData();
-        emailService.sendEmail(
-            referralTemplateId,
-            caseData.getReferentEmail(),
-            ReferralHelper.buildPersonalisation(
-                caseData,
-                referralNumber,
-                isNew,
-                userIdamService.getUserDetails(userToken).getName(),
-                emailService.getExuiCaseLink(caseDetails.getCaseId())
-            )
-        );
-    }
 }

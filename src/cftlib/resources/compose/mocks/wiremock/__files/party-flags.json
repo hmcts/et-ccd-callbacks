@@ -7,16 +7,24 @@
           "hearingRelevant": false,
           "flagComment": false,
           "defaultStatus": "Active",
-          "externallyAvailable": false,
+          "externallyAvailable": true,
           "flagCode": "CATGRY",
+          "isParent": true,
+          "Path": [
+            ""
+          ],
           "childFlags": [
             {
-              "name": "Reasonable adjustment",
+              "name": "Reasonable adjustment (Internal)",
               "hearingRelevant": false,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "CATGRY",
+              "isParent": true,
+              "Path": [
+                "Party"
+              ],
               "childFlags": [
                 {
                   "name": "I need documents in an alternative format",
@@ -25,20 +33,26 @@
                   "defaultStatus": "Active",
                   "externallyAvailable": false,
                   "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
                   "childFlags": [
                     {
                       "name": "Documents in a specified colour",
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0010",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -46,14 +60,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0011",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -61,14 +76,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0012",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -76,14 +92,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0013",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -91,14 +108,15 @@
                       "hearingRelevant": false,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0014",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -106,14 +124,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0015",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -121,14 +140,15 @@
                       "hearingRelevant": false,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0016",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -138,19 +158,15 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "OT0001",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
                       ]
                     }
-                  ],
-                  "isParent": true,
-                  "Path": [
-                    "Party",
-                    "Reasonable adjustment"
                   ]
                 },
                 {
@@ -160,20 +176,26 @@
                   "defaultStatus": "Active",
                   "externallyAvailable": false,
                   "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
                   "childFlags": [
                     {
                       "name": "Guidance on how to complete forms",
                       "hearingRelevant": false,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0017",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help with forms"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -181,14 +203,15 @@
                       "hearingRelevant": false,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0018",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help with forms"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -198,19 +221,15 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "OT0001",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help with forms"
+                      ],
+                      "childFlags": [
                       ]
                     }
-                  ],
-                  "isParent": true,
-                  "Path": [
-                    "Party",
-                    "Reasonable adjustment"
                   ]
                 },
                 {
@@ -220,6 +239,11 @@
                   "defaultStatus": "Active",
                   "externallyAvailable": false,
                   "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
                   "childFlags": [
                     {
                       "name": "Step free / wheelchair access",
@@ -228,12 +252,13 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "RA0019",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -241,14 +266,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0020",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -256,14 +282,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0021",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -271,14 +298,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0022",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -286,14 +314,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0023",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -301,14 +330,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0024",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -316,14 +346,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0025",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -333,19 +364,15 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "OT0001",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
                       ]
                     }
-                  ],
-                  "isParent": true,
-                  "Path": [
-                    "Party",
-                    "Reasonable adjustment"
                   ]
                 },
                 {
@@ -355,20 +382,26 @@
                   "defaultStatus": "Active",
                   "externallyAvailable": false,
                   "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
                   "childFlags": [
                     {
                       "name": "Support worker or carer with me",
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0026",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -376,14 +409,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0027",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -391,14 +425,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0028",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -406,14 +441,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0029",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -423,19 +459,15 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "OT0001",
-                      "childFlags": [],
-                      "isParent": false,
+                      "childFlags": [
+                      ],
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to bring support with me to a hearing"
-                      ]
+                      ],
+                      "isParent": false
                     }
-                  ],
-                  "isParent": true,
-                  "Path": [
-                    "Party",
-                    "Reasonable adjustment"
                   ]
                 },
                 {
@@ -445,20 +477,26 @@
                   "defaultStatus": "Active",
                   "externallyAvailable": false,
                   "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
                   "childFlags": [
                     {
                       "name": "Appropriate lighting",
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0030",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -466,14 +504,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0031",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -481,14 +520,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0032",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -498,12 +538,13 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "RA0033",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -513,19 +554,15 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "OT0001",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
                       ]
                     }
-                  ],
-                  "isParent": true,
-                  "Path": [
-                    "Party",
-                    "Reasonable adjustment"
                   ]
                 },
                 {
@@ -535,6 +572,11 @@
                   "defaultStatus": "Active",
                   "externallyAvailable": false,
                   "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
                   "childFlags": [
                     {
                       "name": "In person hearing",
@@ -543,12 +585,13 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "RA0034",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -558,12 +601,13 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "RA0035",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -573,12 +617,13 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "RA0036",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -588,19 +633,15 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "OT0001",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
                       ]
                     }
-                  ],
-                  "isParent": true,
-                  "Path": [
-                    "Party",
-                    "Reasonable adjustment"
                   ]
                 },
                 {
@@ -610,6 +651,11 @@
                   "defaultStatus": "Active",
                   "externallyAvailable": false,
                   "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
                   "childFlags": [
                     {
                       "name": "I need an Hearing Enhancement System (Hearing/Induction Loop, Infrared Receiver)",
@@ -618,6 +664,12 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "CATGRY",
+                      "isParent": true,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
                       "childFlags": [
                         {
                           "name": "Hearing loop (hearing enhancement system)",
@@ -626,7 +678,6 @@
                           "defaultStatus": "Active",
                           "externallyAvailable": false,
                           "flagCode": "RA0043",
-                          "childFlags": [],
                           "isParent": false,
                           "Path": [
                             "Party",
@@ -634,6 +685,8 @@
                             "I need help communicating and understanding",
                             "I need an Hearing Enhancement System (Hearing",
                             "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
                           ]
                         },
                         {
@@ -643,7 +696,6 @@
                           "defaultStatus": "Active",
                           "externallyAvailable": false,
                           "flagCode": "RA0044",
-                          "childFlags": [],
                           "isParent": false,
                           "Path": [
                             "Party",
@@ -651,6 +703,8 @@
                             "I need help communicating and understanding",
                             "I need an Hearing Enhancement System (Hearing",
                             "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
                           ]
                         },
                         {
@@ -660,7 +714,6 @@
                           "defaultStatus": "Active",
                           "externallyAvailable": false,
                           "flagCode": "RA0045",
-                          "childFlags": [],
                           "isParent": false,
                           "Path": [
                             "Party",
@@ -668,6 +721,8 @@
                             "I need help communicating and understanding",
                             "I need an Hearing Enhancement System (Hearing",
                             "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
                           ]
                         },
                         {
@@ -677,7 +732,6 @@
                           "defaultStatus": "Active",
                           "externallyAvailable": false,
                           "flagCode": "OT0001",
-                          "childFlags": [],
                           "isParent": false,
                           "Path": [
                             "Party",
@@ -685,14 +739,10 @@
                             "I need help communicating and understanding",
                             "I need an Hearing Enhancement System (Hearing",
                             "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
                           ]
                         }
-                      ],
-                      "isParent": true,
-                      "Path": [
-                        "Party",
-                        "Reasonable adjustment",
-                        "I need help communicating and understanding"
                       ]
                     },
                     {
@@ -700,14 +750,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0037",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -717,12 +768,13 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "RA0038",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -730,14 +782,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0039",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -745,14 +798,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0040",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -762,12 +816,13 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "RA0041",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -840,14 +895,15 @@
                       "hearingRelevant": false,
                       "flagComment": false,
                       "defaultStatus": "Requested",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0046",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -855,14 +911,15 @@
                       "hearingRelevant": true,
                       "flagComment": false,
                       "defaultStatus": "Active",
-                      "externallyAvailable": true,
+                      "externallyAvailable": false,
                       "flagCode": "RA0047",
-                      "childFlags": [],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
                       ]
                     },
                     {
@@ -872,126 +929,1155 @@
                       "defaultStatus": "Active",
                       "externallyAvailable": false,
                       "flagCode": "OT0001",
-                      "childFlags": [],
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Reasonable adjustment (External)",
+              "hearingRelevant": false,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "CATGRY",
+              "isParent": true,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+                {
+                  "name": "I need documents in an alternative format",
+                  "hearingRelevant": false,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": true,
+                  "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "childFlags": [
+                    {
+                      "name": "Documents in a specified colour",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0010",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Documents in easy read format",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0011",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Braille documents",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0012",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Documents in large print",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0013",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Audio translation of documents",
+                      "hearingRelevant": false,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0014",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Documents read out to me",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0015",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Information emailed to me",
+                      "hearingRelevant": false,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0016",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Other",
+                      "hearingRelevant": true,
+                      "flagComment": true,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "OT0001",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need documents in an alternative format"
+                      ],
+                      "childFlags": [
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "I need help with forms",
+                  "hearingRelevant": false,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": true,
+                  "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "childFlags": [
+                    {
+                      "name": "Guidance on how to complete forms",
+                      "hearingRelevant": false,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0017",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help with forms"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Support filling in forms",
+                      "hearingRelevant": false,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0018",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help with forms"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Other",
+                      "hearingRelevant": true,
+                      "flagComment": true,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "OT0001",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help with forms"
+                      ],
+                      "childFlags": [
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "I need adjustments to get to, into and around our buildings",
+                  "hearingRelevant": false,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": true,
+                  "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "childFlags": [
+                    {
+                      "name": "Step free / wheelchair access",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0019",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Use of venue wheelchair",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0020",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Parking space close to the venue",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0021",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Accessible toilet",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0022",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Help using a lift",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0023",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "A different type of chair",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0024",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Guiding in the building",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0025",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Other",
+                      "hearingRelevant": true,
+                      "flagComment": true,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "OT0001",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need adjustments to get to, into and around our buildings"
+                      ],
+                      "childFlags": [
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "I need to bring support with me to a hearing",
+                  "hearingRelevant": false,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": true,
+                  "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "childFlags": [
+                    {
+                      "name": "Support worker or carer with me",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0026",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Friend or family with me",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0027",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Assistance / guide dog",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0028",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Therapy animal",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0029",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to bring support with me to a hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Other",
+                      "hearingRelevant": true,
+                      "flagComment": true,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "OT0001",
+                      "childFlags": [
+                      ],
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to bring support with me to a hearing"
+                      ],
+                      "isParent": false
+                    }
+                  ]
+                },
+                {
+                  "name": "I need something to feel comfortable during my hearing",
+                  "hearingRelevant": false,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": true,
+                  "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "childFlags": [
+                    {
+                      "name": "Appropriate lighting",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0030",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Regular breaks",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0031",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Space to be able to get up and move around",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0032",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Private waiting area",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0033",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Other",
+                      "hearingRelevant": true,
+                      "flagComment": true,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "OT0001",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need something to feel comfortable during my hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "I need to request a certain type of hearing",
+                  "hearingRelevant": false,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": true,
+                  "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "childFlags": [
+                    {
+                      "name": "In person hearing",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0034",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Video hearing",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0035",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Phone hearing",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0036",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Other",
+                      "hearingRelevant": true,
+                      "flagComment": true,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "OT0001",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need to request a certain type of hearing"
+                      ],
+                      "childFlags": [
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "I need help communicating and understanding",
+                  "hearingRelevant": false,
+                  "flagComment": false,
+                  "defaultStatus": "Active",
+                  "externallyAvailable": true,
+                  "flagCode": "CATGRY",
+                  "isParent": true,
+                  "Path": [
+                    "Party",
+                    "Reasonable adjustment"
+                  ],
+                  "childFlags": [
+                    {
+                      "name": "I need an Hearing Enhancement System (Hearing/Induction Loop, Infrared Receiver)",
+                      "hearingRelevant": false,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "CATGRY",
+                      "isParent": true,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                        {
+                          "name": "Hearing loop (hearing enhancement system)",
+                          "hearingRelevant": true,
+                          "flagComment": false,
+                          "defaultStatus": "Active",
+                          "externallyAvailable": true,
+                          "flagCode": "RA0043",
+                          "isParent": false,
+                          "Path": [
+                            "Party",
+                            "Reasonable adjustment",
+                            "I need help communicating and understanding",
+                            "I need an Hearing Enhancement System (Hearing",
+                            "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
+                          ]
+                        },
+                        {
+                          "name": "Infrared receiver (hearing enhancement system)",
+                          "hearingRelevant": true,
+                          "flagComment": false,
+                          "defaultStatus": "Active",
+                          "externallyAvailable": true,
+                          "flagCode": "RA0044",
+                          "isParent": false,
+                          "Path": [
+                            "Party",
+                            "Reasonable adjustment",
+                            "I need help communicating and understanding",
+                            "I need an Hearing Enhancement System (Hearing",
+                            "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
+                          ]
+                        },
+                        {
+                          "name": "Induction loop (hearing enhancement system)",
+                          "hearingRelevant": true,
+                          "flagComment": false,
+                          "defaultStatus": "Active",
+                          "externallyAvailable": true,
+                          "flagCode": "RA0045",
+                          "isParent": false,
+                          "Path": [
+                            "Party",
+                            "Reasonable adjustment",
+                            "I need help communicating and understanding",
+                            "I need an Hearing Enhancement System (Hearing",
+                            "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
+                          ]
+                        },
+                        {
+                          "name": "Other",
+                          "hearingRelevant": true,
+                          "flagComment": true,
+                          "defaultStatus": "Active",
+                          "externallyAvailable": true,
+                          "flagCode": "OT0001",
+                          "isParent": false,
+                          "Path": [
+                            "Party",
+                            "Reasonable adjustment",
+                            "I need help communicating and understanding",
+                            "I need an Hearing Enhancement System (Hearing",
+                            "Induction Loop, Infrared Receiver)"
+                          ],
+                          "childFlags": [
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Extra time to think and explain myself",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0037",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Intermediary",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0038",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Speech to text reporter (palantypist)",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0039",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Need to be close to who is speaking",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0040",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Lip speaker",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0041",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Sign Language Interpreter",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0042",
+                      "listOfValuesLength": 12,
+                      "listOfValues": [
+                        {
+                          "key": "ase",
+                          "value": "American Sign Language (ASL)"
+                        },
+                        {
+                          "key": "bfi",
+                          "value": "British Sign Language (BSL)"
+                        },
+                        {
+                          "key": "ils",
+                          "value": "International Sign (IS)"
+                        },
+                        {
+                          "key": "sign-dfr",
+                          "value": "Deaf Relay"
+                        },
+                        {
+                          "key": "sign-dma",
+                          "value": "Deafblind manual alphabet"
+                        },
+                        {
+                          "key": "sign-hos",
+                          "value": "Hands on signing"
+                        },
+                        {
+                          "key": "sign-lps",
+                          "value": "Lipspeaker"
+                        },
+                        {
+                          "key": "sign-mkn",
+                          "value": "Makaton"
+                        },
+                        {
+                          "key": "sign-ntr",
+                          "value": "Notetaker"
+                        },
+                        {
+                          "key": "sign-pst",
+                          "value": "Palantypist / Speech to text"
+                        },
+                        {
+                          "key": "sign-sse",
+                          "value": "Speech Supported English (SSE)"
+                        },
+                        {
+                          "key": "sign-vfs",
+                          "value": "Visual frame signing"
+                        }
+                      ],
                       "isParent": false,
                       "Path": [
                         "Party",
                         "Reasonable adjustment",
                         "I need help communicating and understanding"
                       ]
+                    },
+                    {
+                      "name": "Visit to court or tribunal before the hearing",
+                      "hearingRelevant": false,
+                      "flagComment": false,
+                      "defaultStatus": "Requested",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0046",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Explanation of the court or tribunal and who's in the room at the hearing",
+                      "hearingRelevant": true,
+                      "flagComment": false,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "RA0047",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
+                    },
+                    {
+                      "name": "Other",
+                      "hearingRelevant": true,
+                      "flagComment": true,
+                      "defaultStatus": "Active",
+                      "externallyAvailable": true,
+                      "flagCode": "OT0001",
+                      "isParent": false,
+                      "Path": [
+                        "Party",
+                        "Reasonable adjustment",
+                        "I need help communicating and understanding"
+                      ],
+                      "childFlags": [
+                      ]
                     }
-                  ],
-                  "isParent": true,
-                  "Path": [
-                    "Party",
-                    "Reasonable adjustment"
                   ]
                 }
-              ],
-              "isParent": true,
-              "Path": [
-                "Party"
               ]
             },
             {
-              "name": "Vulnerable user",
+              "name": "Vulnerable user (Internal)",
               "hearingRelevant": false,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0002",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Confidential party/address",
+              "name": "Vulnerable user (External)",
+              "hearingRelevant": false,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0002",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Confidential party/address (Internal)",
               "hearingRelevant": false,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0004",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Unacceptable/disruptive customer behaviour",
+              "name": "Confidential party/address (External)",
+              "hearingRelevant": false,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0004",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Unacceptable/disruptive customer behaviour (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0007",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Vexatious litigant",
+              "name": "Unacceptable/disruptive customer behaviour (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0007",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Vexatious litigant (Internal)",
               "hearingRelevant": false,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0008",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Civil restraint order",
+              "name": "Vexatious litigant (External)",
+              "hearingRelevant": false,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0008",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Civil restraint order (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0009",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Banning order",
+              "name": "Civil restraint order (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0009",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Banning order (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0011",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Audio/Video Evidence",
+              "name": "Banning order (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0011",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Audio/Video Evidence (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0014",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Language Interpreter",
+              "name": "Audio/Video Evidence (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0014",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Language Interpreter (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0015",
               "listOfValuesLength": 191,
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
               "listOfValues": [
                 {
                   "key": "abr",
@@ -1757,55 +2843,871 @@
                   "key": "zza",
                   "value": "Zaza"
                 }
-              ],
-              "isParent": false,
-              "Path": [
-                "Party"
               ]
             },
             {
-              "name": "Death of a Party",
+              "name": "Language Interpreter (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0015",
+              "listOfValuesLength": 191,
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "listOfValues": [
+                {
+                  "key": "abr",
+                  "value": "Brong"
+                },
+                {
+                  "key": "ach",
+                  "value": "Acholi"
+                },
+                {
+                  "key": "afr",
+                  "value": "Afrikaans"
+                },
+                {
+                  "key": "aii",
+                  "value": "Assyrian"
+                },
+                {
+                  "key": "aka",
+                  "value": "Akan"
+                },
+                {
+                  "key": "amh",
+                  "value": "Amharic"
+                },
+                {
+                  "key": "ara",
+                  "value": "Arabic"
+                },
+                {
+                  "key": "ara-ame",
+                  "value": "Arabic Middle Eastern"
+                },
+                {
+                  "key": "ara-ana",
+                  "value": "Arabic North African"
+                },
+                {
+                  "key": "arq",
+                  "value": "Algerian"
+                },
+                {
+                  "key": "aze",
+                  "value": "Azerbajani (aka Nth Azari)"
+                },
+                {
+                  "key": "bal",
+                  "value": "Baluchi"
+                },
+                {
+                  "key": "bam",
+                  "value": "Bambara"
+                },
+                {
+                  "key": "bas",
+                  "value": "Bassa"
+                },
+                {
+                  "key": "bel",
+                  "value": "Belorussian"
+                },
+                {
+                  "key": "bem",
+                  "value": "Benba (Bemba)"
+                },
+                {
+                  "key": "ben",
+                  "value": "Bengali"
+                },
+                {
+                  "key": "ben-bsy",
+                  "value": "Bengali Sylheti"
+                },
+                {
+                  "key": "ber",
+                  "value": "Berber"
+                },
+                {
+                  "key": "bfz",
+                  "value": "Pahari"
+                },
+                {
+                  "key": "bih",
+                  "value": "Bihari"
+                },
+                {
+                  "key": "bin",
+                  "value": "Benin/Edo"
+                },
+                {
+                  "key": "bjs",
+                  "value": "Bajan (West Indian)"
+                },
+                {
+                  "key": "bod",
+                  "value": "Tibetan"
+                },
+                {
+                  "key": "btn",
+                  "value": "Bhutanese"
+                },
+                {
+                  "key": "bul",
+                  "value": "Bulgarian"
+                },
+                {
+                  "key": "byn",
+                  "value": "Bilin"
+                },
+                {
+                  "key": "ceb",
+                  "value": "Cebuano"
+                },
+                {
+                  "key": "ces",
+                  "value": "Czech"
+                },
+                {
+                  "key": "cgg",
+                  "value": "Rukiga"
+                },
+                {
+                  "key": "che",
+                  "value": "Chechen"
+                },
+                {
+                  "key": "cmn",
+                  "value": "Mandarin"
+                },
+                {
+                  "key": "cpe",
+                  "value": "Creole (English)"
+                },
+                {
+                  "key": "cpf",
+                  "value": "Creole (French)"
+                },
+                {
+                  "key": "cpp",
+                  "value": "Creole (Portuguese)"
+                },
+                {
+                  "key": "crp",
+                  "value": "Creole (Spanish)"
+                },
+                {
+                  "key": "ctg",
+                  "value": "Chittagonain"
+                },
+                {
+                  "key": "cym",
+                  "value": "Welsh"
+                },
+                {
+                  "key": "dan",
+                  "value": "Danish"
+                },
+                {
+                  "key": "deu",
+                  "value": "German"
+                },
+                {
+                  "key": "din",
+                  "value": "Dinka"
+                },
+                {
+                  "key": "div",
+                  "value": "Maldivian"
+                },
+                {
+                  "key": "don",
+                  "value": "Toura"
+                },
+                {
+                  "key": "dua",
+                  "value": "Douala"
+                },
+                {
+                  "key": "dyu",
+                  "value": "Dioula"
+                },
+                {
+                  "key": "efi",
+                  "value": "Efik"
+                },
+                {
+                  "key": "ell",
+                  "value": "Greek"
+                },
+                {
+                  "key": "est",
+                  "value": "Estonian"
+                },
+                {
+                  "key": "ewe",
+                  "value": "Ewe"
+                },
+                {
+                  "key": "ewo",
+                  "value": "Ewondo"
+                },
+                {
+                  "key": "fas",
+                  "value": "Farsi"
+                },
+                {
+                  "key": "fat",
+                  "value": "Fanti"
+                },
+                {
+                  "key": "fij",
+                  "value": "Fijian"
+                },
+                {
+                  "key": "fra",
+                  "value": "French"
+                },
+                {
+                  "key": "fra-faf",
+                  "value": "French African"
+                },
+                {
+                  "key": "fra-far",
+                  "value": "French Arabic"
+                },
+                {
+                  "key": "ful",
+                  "value": "Fula"
+                },
+                {
+                  "key": "gaa",
+                  "value": "Ga"
+                },
+                {
+                  "key": "gjk",
+                  "value": "Kachi"
+                },
+                {
+                  "key": "guj",
+                  "value": "Gujarati"
+                },
+                {
+                  "key": "hac",
+                  "value": "Gorani"
+                },
+                {
+                  "key": "hak",
+                  "value": "Hakka"
+                },
+                {
+                  "key": "hau",
+                  "value": "Hausa"
+                },
+                {
+                  "key": "hbs",
+                  "value": "Serbo-Croatian"
+                },
+                {
+                  "key": "heb",
+                  "value": "Hebrew"
+                },
+                {
+                  "key": "her",
+                  "value": "Herero"
+                },
+                {
+                  "key": "hin",
+                  "value": "Hindi"
+                },
+                {
+                  "key": "hnd",
+                  "value": "Hindko"
+                },
+                {
+                  "key": "hun",
+                  "value": "Hungarian"
+                },
+                {
+                  "key": "hye",
+                  "value": "Armenian"
+                },
+                {
+                  "key": "ibb",
+                  "value": "Ibibio"
+                },
+                {
+                  "key": "ibo",
+                  "value": "Igbo (Also Known As Ibo)"
+                },
+                {
+                  "key": "ilo",
+                  "value": "Ilocano"
+                },
+                {
+                  "key": "ind",
+                  "value": "Indonesian"
+                },
+                {
+                  "key": "iso",
+                  "value": "Isoko"
+                },
+                {
+                  "key": "ita",
+                  "value": "Italian"
+                },
+                {
+                  "key": "jam",
+                  "value": "Jamaican"
+                },
+                {
+                  "key": "jav",
+                  "value": "Javanese"
+                },
+                {
+                  "key": "jpn",
+                  "value": "Japanese"
+                },
+                {
+                  "key": "kas",
+                  "value": "Kashmiri"
+                },
+                {
+                  "key": "kat",
+                  "value": "Georgian"
+                },
+                {
+                  "key": "kck",
+                  "value": "Khalanga"
+                },
+                {
+                  "key": "kfr",
+                  "value": "Kutchi"
+                },
+                {
+                  "key": "khm",
+                  "value": "Khmer"
+                },
+                {
+                  "key": "kik",
+                  "value": "Kikuyu"
+                },
+                {
+                  "key": "kin",
+                  "value": "Kinyarwandan"
+                },
+                {
+                  "key": "kir",
+                  "value": "Kyrgyz"
+                },
+                {
+                  "key": "knn",
+                  "value": "Konkani"
+                },
+                {
+                  "key": "kon",
+                  "value": "Kikongo"
+                },
+                {
+                  "key": "kor",
+                  "value": "Korean"
+                },
+                {
+                  "key": "kri",
+                  "value": "Krio (Sierra Leone)"
+                },
+                {
+                  "key": "krn",
+                  "value": "Sarpo"
+                },
+                {
+                  "key": "kru",
+                  "value": "Kru"
+                },
+                {
+                  "key": "kur-kbr",
+                  "value": "Kurdish Bardini"
+                },
+                {
+                  "key": "kur-kkr",
+                  "value": "Kurdish kurmanji"
+                },
+                {
+                  "key": "kur-ksr",
+                  "value": "Kurdish Sorani"
+                },
+                {
+                  "key": "laj",
+                  "value": "Lango"
+                },
+                {
+                  "key": "lav",
+                  "value": "Latvian"
+                },
+                {
+                  "key": "lin",
+                  "value": "Lingala"
+                },
+                {
+                  "key": "lit",
+                  "value": "Lithuanian"
+                },
+                {
+                  "key": "lub",
+                  "value": "Luba (Tshiluba)"
+                },
+                {
+                  "key": "lug",
+                  "value": "Lugandan"
+                },
+                {
+                  "key": "luo",
+                  "value": "Luo"
+                },
+                {
+                  "key": "luo-lah",
+                  "value": "Luo Acholi"
+                },
+                {
+                  "key": "luo-lky",
+                  "value": "Luo Kenyan"
+                },
+                {
+                  "key": "luo-llg",
+                  "value": "Luo Lango"
+                },
+                {
+                  "key": "mal",
+                  "value": "Malayalam"
+                },
+                {
+                  "key": "mar",
+                  "value": "Marathi"
+                },
+                {
+                  "key": "men",
+                  "value": "Mende"
+                },
+                {
+                  "key": "min",
+                  "value": "Mina"
+                },
+                {
+                  "key": "mkd",
+                  "value": "Macedonian"
+                },
+                {
+                  "key": "mku",
+                  "value": "Malinke"
+                },
+                {
+                  "key": "mkw",
+                  "value": "Monokutuba"
+                },
+                {
+                  "key": "mlt",
+                  "value": "Maltese"
+                },
+                {
+                  "key": "mnk",
+                  "value": "Mandinka"
+                },
+                {
+                  "key": "mon",
+                  "value": "Mongolian"
+                },
+                {
+                  "key": "msa",
+                  "value": "Malay"
+                },
+                {
+                  "key": "mya",
+                  "value": "Burmese"
+                },
+                {
+                  "key": "nde",
+                  "value": "Ndebele"
+                },
+                {
+                  "key": "nep",
+                  "value": "Nepali"
+                },
+                {
+                  "key": "nld",
+                  "value": "Dutch"
+                },
+                {
+                  "key": "nld-nfl",
+                  "value": "Flemish"
+                },
+                {
+                  "key": "nld-nwf",
+                  "value": "West Flemish"
+                },
+                {
+                  "key": "nor",
+                  "value": "Norwegian"
+                },
+                {
+                  "key": "nya",
+                  "value": "Chichewa"
+                },
+                {
+                  "key": "nyo",
+                  "value": "Runyoro"
+                },
+                {
+                  "key": "nzi",
+                  "value": "Nzima"
+                },
+                {
+                  "key": "orm",
+                  "value": "Oromo"
+                },
+                {
+                  "key": "pag",
+                  "value": "Pangasinan"
+                },
+                {
+                  "key": "pam",
+                  "value": "Pampangan"
+                },
+                {
+                  "key": "pan",
+                  "value": "Punjabi"
+                },
+                {
+                  "key": "pan-pji",
+                  "value": "Punjabi Indian"
+                },
+                {
+                  "key": "pan-pjp",
+                  "value": "Punjabi Pakistani"
+                },
+                {
+                  "key": "pat",
+                  "value": "Patois"
+                },
+                {
+                  "key": "phr",
+                  "value": "Pothohari"
+                },
+                {
+                  "key": "pol",
+                  "value": "Polish"
+                },
+                {
+                  "key": "por",
+                  "value": "Portuguese"
+                },
+                {
+                  "key": "prs",
+                  "value": "Dari"
+                },
+                {
+                  "key": "pus",
+                  "value": "Pushtu (Also Known As Pashto)"
+                },
+                {
+                  "key": "rmm",
+                  "value": "Roma"
+                },
+                {
+                  "key": "rom",
+                  "value": "Romany"
+                },
+                {
+                  "key": "ron",
+                  "value": "Romanian"
+                },
+                {
+                  "key": "ron-fmo",
+                  "value": "Moldovan"
+                },
+                {
+                  "key": "run",
+                  "value": "Kirundi"
+                },
+                {
+                  "key": "rus",
+                  "value": "Russian"
+                },
+                {
+                  "key": "scl",
+                  "value": "Shina"
+                },
+                {
+                  "key": "sgw",
+                  "value": "Gurage"
+                },
+                {
+                  "key": "sin",
+                  "value": "Sinhalese"
+                },
+                {
+                  "key": "skr",
+                  "value": "Saraiki (Seraiki)"
+                },
+                {
+                  "key": "slk",
+                  "value": "Slovak"
+                },
+                {
+                  "key": "slv",
+                  "value": "Slovenian"
+                },
+                {
+                  "key": "sna",
+                  "value": "Shona"
+                },
+                {
+                  "key": "snd",
+                  "value": "Sindhi"
+                },
+                {
+                  "key": "som",
+                  "value": "Somali"
+                },
+                {
+                  "key": "spa",
+                  "value": "Spanish"
+                },
+                {
+                  "key": "sqi",
+                  "value": "Albanian"
+                },
+                {
+                  "key": "sus",
+                  "value": "Susu"
+                },
+                {
+                  "key": "swa",
+                  "value": "Swahili"
+                },
+                {
+                  "key": "swa-sbv",
+                  "value": "Swahili Bravanese"
+                },
+                {
+                  "key": "swa-skb",
+                  "value": "Swahili Kibajuni"
+                },
+                {
+                  "key": "swe",
+                  "value": "Swedish"
+                },
+                {
+                  "key": "syl",
+                  "value": "Sylheti"
+                },
+                {
+                  "key": "tai",
+                  "value": "Taiwanese"
+                },
+                {
+                  "key": "tam",
+                  "value": "Tamil"
+                },
+                {
+                  "key": "tel",
+                  "value": "Telugu"
+                },
+                {
+                  "key": "tem",
+                  "value": "Temne"
+                },
+                {
+                  "key": "teo",
+                  "value": "Ateso"
+                },
+                {
+                  "key": "tgl",
+                  "value": "Tagalog"
+                },
+                {
+                  "key": "tha",
+                  "value": "Thai"
+                },
+                {
+                  "key": "tig",
+                  "value": "Tigre"
+                },
+                {
+                  "key": "tir",
+                  "value": "Tigrinya"
+                },
+                {
+                  "key": "tsn",
+                  "value": "Setswana"
+                },
+                {
+                  "key": "ttj",
+                  "value": "Rutoro"
+                },
+                {
+                  "key": "tuk",
+                  "value": "Turkmen"
+                },
+                {
+                  "key": "tur",
+                  "value": "Turkish"
+                },
+                {
+                  "key": "twi",
+                  "value": "Twi"
+                },
+                {
+                  "key": "uig",
+                  "value": "Uighur"
+                },
+                {
+                  "key": "ukr",
+                  "value": "Ukrainian"
+                },
+                {
+                  "key": "urd",
+                  "value": "Urdu"
+                },
+                {
+                  "key": "urh",
+                  "value": "Urohobo"
+                },
+                {
+                  "key": "uzb",
+                  "value": "Uzbek"
+                },
+                {
+                  "key": "vie",
+                  "value": "Vietnamese"
+                },
+                {
+                  "key": "vsa",
+                  "value": "Visayan"
+                },
+                {
+                  "key": "wol",
+                  "value": "Wolof"
+                },
+                {
+                  "key": "xho",
+                  "value": "Xhosa"
+                },
+                {
+                  "key": "xog",
+                  "value": "Lusoga"
+                },
+                {
+                  "key": "yor",
+                  "value": "Yoruba"
+                },
+                {
+                  "key": "yue",
+                  "value": "Cantonese"
+                },
+                {
+                  "key": "zag",
+                  "value": "Zaghawa"
+                },
+                {
+                  "key": "zul",
+                  "value": "Zulu"
+                },
+                {
+                  "key": "zza",
+                  "value": "Zaza"
+                }
+              ]
+            },
+            {
+              "name": "Death of a Party (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0016",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Litigation friend",
+              "name": "Death of a Party (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0016",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Litigation friend (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0017",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
               ]
             },
             {
-              "name": "Lacking capacity",
+              "name": "Litigation friend (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0017",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Lacking capacity (Internal)",
               "hearingRelevant": true,
               "flagComment": false,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "PF0018",
-              "childFlags": [],
               "isParent": false,
               "Path": [
                 "Party"
+              ],
+              "childFlags": [
+              ]
+            },
+            {
+              "name": "Lacking capacity (External)",
+              "hearingRelevant": true,
+              "flagComment": false,
+              "defaultStatus": "Active",
+              "externallyAvailable": true,
+              "flagCode": "PF0018",
+              "isParent": false,
+              "Path": [
+                "Party"
+              ],
+              "childFlags": [
               ]
             }
-          ],
-          "isParent": true,
-          "Path": [
-            ""
           ]
         }
       ]

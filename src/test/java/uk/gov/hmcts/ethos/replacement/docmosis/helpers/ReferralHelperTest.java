@@ -572,9 +572,8 @@ class ReferralHelperTest {
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
-            + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null}}],"
-          
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,"
+          
             + "\"documentIndex\":null}}],"
             + "\"referralInstruction\":null,\"referralReplyCollection\":null,\"updateReferralCollection\":null}}";
 

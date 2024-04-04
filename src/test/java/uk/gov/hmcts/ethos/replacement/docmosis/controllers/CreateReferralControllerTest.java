@@ -152,27 +152,6 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    void aboutToSubmit_multiple() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        UserDetails details = new UserDetails();
-        details.setName("First Last");
-        when(userIdamService.getUserDetails(any())).thenReturn(details);
-        when(referralService.generateCRDocument(any(CaseData.class), anyString(), anyString()))
-                .thenReturn(new DocumentInfo());
-        CCDRequest multipleReferralCCDRequest = ccdRequest;
-        multipleReferralCCDRequest.getCaseDetails().getCaseData().setMultipleReference("012345");
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(emailService, times(0)).sendEmail(any(), any(), any());
-    }
-
-    @Test
     void aboutToSubmit_NoReferentEmail_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();

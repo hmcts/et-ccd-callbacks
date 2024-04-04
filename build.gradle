@@ -496,7 +496,7 @@ bootWithCCD {
     environment 'SERVICES_PRD_COMMONDATA_API', 'http://host.docker.internal:8765'
 }
 
-pmdMain.maxFailures = 324
+pmdMain.maxFailures = 323
 pmdTest.maxFailures = 227
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

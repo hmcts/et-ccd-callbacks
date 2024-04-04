@@ -549,7 +549,7 @@ public final class ReferralHelper {
      * creating a new referral.
      * @param caseData contains all the case data
      */
-    public static void clearReferralDataFromCaseData(CaseData caseData) {
+    public static void clearReferralDataFromCaseData(BaseCaseData caseData) {
         caseData.setReferralHearingDetails(null);
         caseData.setReferCaseTo(null);
         caseData.setReferentEmail(null);

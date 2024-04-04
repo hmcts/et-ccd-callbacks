@@ -26,6 +26,7 @@ import java.io.IOException;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 
 @Slf4j
 @RequestMapping("/multiples/closeReferral")
@@ -60,6 +61,7 @@ public class CloseReferralMultiplesController {
             @RequestBody MultipleRequest multipleRequest) {
 
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
+        clearReferralDataFromCaseData(multipleData);
         multipleData.setSelectReferral(
                 ReferralHelper.populateSelectReferralDropdown(multipleData.getReferralCollection())
         );

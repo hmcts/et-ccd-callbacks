@@ -801,7 +801,7 @@ public final class ReferralHelper {
         return YES.equals(isUrgent) ? "URGENT" : "";
     }
 
-    public static void addReferralDocumentToDocumentCollection(CaseData caseData) {
+    public static void addReferralDocumentToDocumentCollection(BaseCaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         UploadedDocumentType referralDocument = referral.getReferralSummaryPdf();
         if (ObjectUtils.isEmpty(referralDocument)) {

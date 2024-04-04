@@ -16,13 +16,18 @@ import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import javax.annotation.Nullable;
 
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.LANGUAGE_INTERPRETER;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ROLE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ROLE_RESPONDENT;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.SIGN_LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_LITIGANT;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VISIBILITY_EXTERNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VISIBILITY_INTERNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -33,10 +38,10 @@ public class CaseFlagsService {
     private static final String GRANTED = "Granted";
 
     public boolean caseFlagsSetupRequired(CaseData caseData) {
-        return caseData.getClaimantFlags() == null
-                || StringUtils.isEmpty(caseData.getClaimantFlags().getRoleOnCase())
-                || caseData.getRespondentFlags() == null
-                || StringUtils.isEmpty(caseData.getRespondentFlags().getRoleOnCase());
+        return caseData.getClaimantInternalFlags() == null
+                || StringUtils.isEmpty(caseData.getClaimantInternalFlags().getRoleOnCase())
+                || caseData.getRespondentInternalFlags() == null
+                || StringUtils.isEmpty(caseData.getRespondentInternalFlags().getRoleOnCase());
     }
 
     /**
@@ -46,16 +51,38 @@ public class CaseFlagsService {
      */
     public void setupCaseFlags(CaseData caseData) {
         caseData.setCaseFlags(CaseFlagsType.builder().build());
+        String claimantGroupId = UUID.randomUUID().toString();
+        String respondentGroupId = UUID.randomUUID().toString();
 
-        caseData.setClaimantFlags(CaseFlagsType.builder()
+        caseData.setClaimantInternalFlags(CaseFlagsType.builder()
                 .partyName(caseData.getClaimant())
-                .roleOnCase("claimant")
+                .roleOnCase(ROLE_CLAIMANT)
+                .groupId(claimantGroupId)
+                .visibility(VISIBILITY_INTERNAL)
                 .build()
         );
 
-        caseData.setRespondentFlags(CaseFlagsType.builder()
+        caseData.setClaimantExternalFlags(CaseFlagsType.builder()
+                .partyName(caseData.getClaimant())
+                .roleOnCase(ROLE_CLAIMANT)
+                .groupId(claimantGroupId)
+                .visibility(VISIBILITY_EXTERNAL)
+                .build()
+        );
+
+        caseData.setRespondentInternalFlags(CaseFlagsType.builder()
                 .partyName(caseData.getRespondent())
-                .roleOnCase("respondent")
+                .roleOnCase(ROLE_RESPONDENT)
+                .groupId(respondentGroupId)
+                .visibility(VISIBILITY_INTERNAL)
+                .build()
+        );
+
+        caseData.setRespondentExternalFlags(CaseFlagsType.builder()
+                .partyName(caseData.getRespondent())
+                .roleOnCase(ROLE_RESPONDENT)
+                .groupId(respondentGroupId)
+                .visibility(VISIBILITY_EXTERNAL)
                 .build()
         );
     }
@@ -67,8 +94,10 @@ public class CaseFlagsService {
      */
     public void rollbackCaseFlags(CaseData caseData) {
         caseData.setCaseFlags(null);
-        caseData.setClaimantFlags(null);
-        caseData.setRespondentFlags(null);
+        caseData.setClaimantInternalFlags(null);
+        caseData.setRespondentInternalFlags(null);
+        caseData.setClaimantExternalFlags(null);
+        caseData.setRespondentExternalFlags(null);
     }
 
     /**
@@ -125,8 +154,8 @@ public class CaseFlagsService {
 
     private ListTypeItem<FlagDetailType> getPartyCaseFlags(CaseData caseData) {
         return ListTypeItem.concat(
-                caseData.getClaimantFlags().getDetails(),
-                caseData.getRespondentFlags().getDetails()
+                caseData.getClaimantInternalFlags().getDetails(),
+                caseData.getRespondentInternalFlags().getDetails()
         );
     }
 

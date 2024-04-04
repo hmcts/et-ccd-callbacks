@@ -24,8 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ROLE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ROLE_RESPONDENT;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.SIGN_LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_LITIGANT;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VISIBILITY_EXTERNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VISIBILITY_INTERNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -60,13 +64,25 @@ class CaseFlagsServiceTest {
         assertThat(caseFlags.getPartyName(), is(nullValue()));
         assertThat(caseFlags.getRoleOnCase(), is(nullValue()));
 
-        CaseFlagsType claimantFlags = caseData.getClaimantFlags();
-        assertThat(claimantFlags.getPartyName(), is(CLAIMANT_NAME));
-        assertThat(claimantFlags.getRoleOnCase(), is("claimant"));
+        CaseFlagsType claimantInternalFlags = caseData.getClaimantInternalFlags();
+        assertThat(claimantInternalFlags.getPartyName(), is(CLAIMANT_NAME));
+        assertThat(claimantInternalFlags.getRoleOnCase(), is(ROLE_CLAIMANT));
+        assertThat(claimantInternalFlags.getVisibility(), is(VISIBILITY_INTERNAL));
 
-        CaseFlagsType respondentFlags = caseData.getRespondentFlags();
-        assertThat(respondentFlags.getPartyName(), is(RESPONDENT_NAME));
-        assertThat(respondentFlags.getRoleOnCase(), is("respondent"));
+        CaseFlagsType respondentInternalFlags = caseData.getRespondentInternalFlags();
+        assertThat(respondentInternalFlags.getPartyName(), is(RESPONDENT_NAME));
+        assertThat(respondentInternalFlags.getRoleOnCase(), is(ROLE_RESPONDENT));
+        assertThat(respondentInternalFlags.getVisibility(), is(VISIBILITY_INTERNAL));
+
+        CaseFlagsType claimantExternalFlags = caseData.getClaimantExternalFlags();
+        assertThat(claimantExternalFlags.getPartyName(), is(CLAIMANT_NAME));
+        assertThat(claimantExternalFlags.getRoleOnCase(), is(ROLE_CLAIMANT));
+        assertThat(claimantExternalFlags.getVisibility(), is(VISIBILITY_EXTERNAL));
+
+        CaseFlagsType respondentExternalFlags = caseData.getRespondentExternalFlags();
+        assertThat(respondentExternalFlags.getPartyName(), is(RESPONDENT_NAME));
+        assertThat(respondentExternalFlags.getRoleOnCase(), is(ROLE_RESPONDENT));
+        assertThat(respondentExternalFlags.getVisibility(), is(VISIBILITY_EXTERNAL));
     }
 
     @Test
@@ -75,14 +91,16 @@ class CaseFlagsServiceTest {
         caseFlagsService.rollbackCaseFlags(caseData);
 
         assertThat(caseData.getCaseFlags(), is(nullValue()));
-        assertThat(caseData.getClaimantFlags(), is(nullValue()));
-        assertThat(caseData.getRespondentFlags(), is(nullValue()));
+        assertThat(caseData.getClaimantInternalFlags(), is(nullValue()));
+        assertThat(caseData.getRespondentInternalFlags(), is(nullValue()));
+        assertThat(caseData.getClaimantExternalFlags(), is(nullValue()));
+        assertThat(caseData.getRespondentExternalFlags(), is(nullValue()));
     }
 
     @Test
     void processNewlySetCaseFlags_shouldSetInterpreterRequiredTrue() {
-        caseData.setRespondentFlags(CaseFlagsType.builder().build());
-        caseData.setClaimantFlags(CaseFlagsType.builder()
+        caseData.setRespondentInternalFlags(CaseFlagsType.builder().build());
+        caseData.setClaimantInternalFlags(CaseFlagsType.builder()
                 .details(
                         ListTypeItem.from(
                                 FlagDetailType.builder()
@@ -98,8 +116,8 @@ class CaseFlagsServiceTest {
 
     @Test
     void processNewlySetCaseFlags_shouldSetAdditionalSecurityFlagTrue() {
-        caseData.setRespondentFlags(CaseFlagsType.builder().build());
-        caseData.setClaimantFlags(CaseFlagsType.builder()
+        caseData.setRespondentInternalFlags(CaseFlagsType.builder().build());
+        caseData.setClaimantInternalFlags(CaseFlagsType.builder()
                 .details(
                         ListTypeItem.from(
                                 FlagDetailType.builder()

@@ -16,8 +16,8 @@
       "caseNotes": "Example note",
       "caseType": "Single",
       "claimant_TypeOfClaimant": "Individual",
-      "claimantFlags": {},
-      "respondentFlags": {},
+      "claimantInternalFlags": {},
+      "respondentInternalFlags": {},
       "claimantCollection": [
         {
           "id": "1121212121",

@@ -3838,7 +3838,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.6.7, axios@npm:^1.6.2":
+"axios@npm:1.6.7":
   version: 1.6.7
   resolution: "axios@npm:1.6.7"
   dependencies:
@@ -7473,7 +7473,7 @@ __metadata:
     request-promise-native: 1.0.9
     require-directory: 2.1.1
     rewire: 7.0.0
-    selenium-standalone: 9.4.0
+    selenium-standalone: 9.5.0
     sinon: 17.0.1
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
@@ -15164,11 +15164,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selenium-standalone@npm:9.4.0":
-  version: 9.4.0
-  resolution: "selenium-standalone@npm:9.4.0"
+"selenium-standalone@npm:9.5.0":
+  version: 9.5.0
+  resolution: "selenium-standalone@npm:9.5.0"
   dependencies:
-    axios: ^1.6.2
     commander: ^8.3.0
     cross-spawn: ^7.0.3
     debug: ^4.3.1
@@ -15188,7 +15187,7 @@ __metadata:
     yauzl: ^3.1.2
   bin:
     selenium-standalone: bin/selenium-standalone
-  checksum: 55cafa559f556e10ad91b45c04ebe34e49d50263b5e1c650b89f4b1edc0aa067c4ceeb252af0a00f90b7db404dac9ffa68157a42fee687a3fa393393ae4252f1
+  checksum: 76092a5021172b946a9a0e73bd9a9d7c1f4051c34d059907b3236447acce2e1fcf0c2b5a45df5e9832e035c2fa35f75f4efc9b21bc5198a4b522303c7511f418
   languageName: node
   linkType: hard
 

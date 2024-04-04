@@ -18,7 +18,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Jurisdiction
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
@@ -41,18 +40,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et1VettingController.class, JsonMapper.class})
-class Et1VettingControllerTest {
+class Et1VettingControllerTest extends BaseControllerTest {
 
     private static final String INIT_CASE_VETTING_ENDPOINT = "/initialiseEt1Vetting";
     private static final String JURISDICTION_CODE_ENDPOINT = "/jurisdictionCodes";
     private static final String HEARING_VENUE_ENDPOINT = "/et1HearingVenue";
     private static final String ET1_PROCESSING_COMPLETE_URL = "/finishEt1Vetting";
     private static final String ET1_VETTING_ABOUT_TO_SUBMIT = "/et1VettingAboutToSubmit";
-    private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
-    @MockBean
-    private VerifyTokenService verifyTokenService;
     @MockBean
     private Et1VettingService et1VettingService;
     @MockBean
@@ -66,7 +62,9 @@ class Et1VettingControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    void setUp() {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         CaseData caseData = new CaseData();
         caseData.setManagingOffice("Manchester");
         addJurCodeToExistingCollection(caseData, JurisdictionCode.DOD.name());

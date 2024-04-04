@@ -267,6 +267,17 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void updateResponseReceivedCounter(CaseData caseData) {
+        RespondentSumType firstRespondent = caseData.getRespondentCollection().get(0).getValue();
+        if (YES.equals(firstRespondent.getResponseReceived())) {
+            firstRespondent.setResponseReceivedCount(
+                    firstRespondent.getResponseReceivedCount() != null
+                            ? firstRespondent.getResponseReceivedCount() + 1
+                            : 1
+            );
+        }
+    }
+
     public void setNextListedDate(CaseData caseData) {
         List<String> dates = new ArrayList<>();
         String nextListedDate = "";

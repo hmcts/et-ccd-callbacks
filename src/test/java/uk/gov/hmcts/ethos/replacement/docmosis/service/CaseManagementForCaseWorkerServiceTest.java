@@ -984,6 +984,46 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
+    void updateResponseReceivedCounter_ResponseReceivedIsNull() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+
+        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+
+        assertEquals(null, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+    }
+
+    @Test
+    void updateResponseReceivedCounter_NoResponseReceived() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.getRespondentCollection().get(0).getValue().setResponseReceived(NO);
+
+        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+
+        assertEquals(null, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+    }
+
+    @Test
+    void updateResponseReceivedCounter_ResponseReceived_FirstTime() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.getRespondentCollection().get(0).getValue().setResponseReceived(YES);
+
+        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+
+        assertEquals(1, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+    }
+
+    @Test
+    void updateResponseReceivedCounter_ResponseReceived_NthTime() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.getRespondentCollection().get(0).getValue().setResponseReceived(YES);
+        caseData.getRespondentCollection().get(0).getValue().setResponseReceivedCount(1);
+
+        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+
+        assertEquals(2, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+    }
+
+    @Test
     void setNextListedDate() {
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId(UUID.randomUUID().toString());

@@ -421,16 +421,39 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
-            .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void amendRespondentDetails_UpdateCounter() throws Exception {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
+                .thenReturn(submitEvent.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
+
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseManagementForCaseWorkerService, times(1)).updateResponseReceivedCounter(any());
     }
 
     @Test

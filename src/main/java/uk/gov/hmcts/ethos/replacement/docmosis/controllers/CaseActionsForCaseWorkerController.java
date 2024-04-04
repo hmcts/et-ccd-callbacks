@@ -494,6 +494,7 @@ public class CaseActionsForCaseWorkerController {
             }
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         }
+
         if (featureToggleService.isGlobalSearchEnabled()) {
             caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
         }
@@ -503,6 +504,12 @@ public class CaseActionsForCaseWorkerController {
         }
 
         caseFlagsService.setupCaseFlags(caseData);
+
+        if (errors.isEmpty()
+            && featureToggleService.isWorkAllocationEnabled()
+            && !isEmpty(caseData.getRespondentCollection())) {
+            caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+        }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 

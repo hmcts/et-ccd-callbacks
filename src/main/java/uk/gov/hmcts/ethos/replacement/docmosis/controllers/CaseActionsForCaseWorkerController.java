@@ -505,11 +505,7 @@ public class CaseActionsForCaseWorkerController {
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        if (errors.isEmpty()
-            && featureToggleService.isWorkAllocationEnabled()
-            && !isEmpty(caseData.getRespondentCollection())) {
-            caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
-        }
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 

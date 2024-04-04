@@ -220,6 +220,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
@@ -984,41 +985,79 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    void updateResponseReceivedCounter_ResponseReceivedIsNull() {
+    void updateWorkAllocationField_Errors() {
+        List<String> errors = new ArrayList<>();
+        errors.add("Test");
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
 
-        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
 
         assertEquals(null, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
     }
 
     @Test
-    void updateResponseReceivedCounter_NoResponseReceived() {
+    void updateWorkAllocationField_FeatureFlagFalse() {
+        List<String> errors = new ArrayList<>();
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(false);
+
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
+
+        assertEquals(null, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+    }
+
+    @Test
+    void updateWorkAllocationField_NoRespondents() {
+        List<String> errors = new ArrayList<>();
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.setRespondentCollection(null);
+
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
+
+        assertEquals(null, caseData.getRespondentCollection());
+    }
+
+    @Test
+    void updateWorkAllocationField_ResponseReceivedIsNull() {
+        List<String> errors = new ArrayList<>();
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
+
+        assertEquals(null, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+    }
+
+    @Test
+    void updateWorkAllocationField_NoResponseReceived() {
+        List<String> errors = new ArrayList<>();
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setResponseReceived(NO);
 
-        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
 
         assertEquals(null, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
     }
 
     @Test
-    void updateResponseReceivedCounter_ResponseReceived_FirstTime() {
+    void updateWorkAllocationField_ResponseReceived_FirstTime() {
+        List<String> errors = new ArrayList<>();
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setResponseReceived(YES);
 
-        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
 
         assertEquals(1, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
     }
 
     @Test
-    void updateResponseReceivedCounter_ResponseReceived_NthTime() {
+    void updateWorkAllocationField_ResponseReceived_NthTime() {
+        List<String> errors = new ArrayList<>();
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setResponseReceived(YES);
         caseData.getRespondentCollection().get(0).getValue().setResponseReceivedCount(1);
 
-        caseManagementForCaseWorkerService.updateResponseReceivedCounter(caseData);
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
 
         assertEquals(2, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
     }

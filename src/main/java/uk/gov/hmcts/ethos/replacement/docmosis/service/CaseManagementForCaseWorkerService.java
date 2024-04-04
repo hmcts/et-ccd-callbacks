@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +46,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static java.util.Collections.singletonMap;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -166,7 +167,7 @@ public class CaseManagementForCaseWorkerService {
                     claimantDocumentCollection.add(documentTypeItem);
                 }
             }
-            if (CollectionUtils.isNotEmpty(claimantDocumentCollection)) {
+            if (isNotEmpty(claimantDocumentCollection)) {
                 caseData.setClaimantDocumentCollection(claimantDocumentCollection);
             }
         }
@@ -267,8 +268,22 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    public void updateResponseReceivedCounter(CaseData caseData) {
-        RespondentSumType firstRespondent = caseData.getRespondentCollection().get(0).getValue();
+    /**
+     * Update Work Allocation specific field.
+     *
+     * @param errors - if there are errors do not update the field
+     * @param caseData - the caseData contains the values for the case
+     */
+    public void updateWorkAllocationField(List<String> errors, CaseData caseData) {
+        if (errors.isEmpty()
+                && featureToggleService.isWorkAllocationEnabled()
+                && !isEmpty(caseData.getRespondentCollection())) {
+            updateResponseReceivedCounter(caseData.getRespondentCollection());
+        }
+    }
+
+    private void updateResponseReceivedCounter(List<RespondentSumTypeItem> respondentCollection) {
+        RespondentSumType firstRespondent = respondentCollection.get(0).getValue();
         if (YES.equals(firstRespondent.getResponseReceived())) {
             firstRespondent.setResponseReceivedCount(
                     firstRespondent.getResponseReceivedCount() != null
@@ -282,7 +297,7 @@ public class CaseManagementForCaseWorkerService {
         List<String> dates = new ArrayList<>();
         String nextListedDate = "";
 
-        if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
+        if (isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 dates.addAll(getListedDates(hearingTypeItem));
             }
@@ -301,7 +316,7 @@ public class CaseManagementForCaseWorkerService {
     private List<String> getListedDates(HearingTypeItem hearingTypeItem) {
         HearingType hearingType = hearingTypeItem.getValue();
         List<String> dates = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
+        if (isNotEmpty(hearingType.getHearingDateCollection())) {
             for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
                 DateListedType dateListedType = dateListedTypeItem.getValue();
                 if (HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
@@ -340,7 +355,7 @@ public class CaseManagementForCaseWorkerService {
 
     public CaseData continuingRespondent(CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+        if (isEmpty(caseData.getRepCollection())) {
             List<RespondentSumTypeItem> continuingRespondent = new ArrayList<>();
             List<RespondentSumTypeItem> notContinuingRespondent = new ArrayList<>();
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
@@ -367,10 +382,10 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+        if (!isEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 HearingType hearingType = hearingTypeItem.getValue();
-                if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                if (!isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
                         DateListedType dateListedType = dateListedTypeItem.getValue();
@@ -388,9 +403,9 @@ public class CaseManagementForCaseWorkerService {
 
     public void midEventAmendHearing(CaseData caseData, List<String> errors) {
         caseData.setListedDateInPastWarning(NO);
-        if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+        if (!isEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                if (!isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
                         addHearingsOnWeekendError(dateListedTypeItem, errors,

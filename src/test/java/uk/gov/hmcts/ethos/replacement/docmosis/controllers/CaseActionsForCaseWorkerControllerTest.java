@@ -453,7 +453,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseManagementForCaseWorkerService, times(1)).updateResponseReceivedCounter(any());
+        verify(caseManagementForCaseWorkerService, times(1)).updateWorkAllocationField(any(), any());
     }
 
     @Test

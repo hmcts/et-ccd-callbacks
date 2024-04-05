@@ -72,6 +72,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     private MultipleRequest request;
 
     @BeforeEach
+    @Override
     protected void setUp() throws Exception {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",

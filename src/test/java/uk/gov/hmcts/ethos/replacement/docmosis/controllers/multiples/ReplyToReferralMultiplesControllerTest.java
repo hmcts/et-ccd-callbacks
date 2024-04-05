@@ -16,10 +16,6 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
@@ -51,6 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ReferralsUtil.createReferralTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ReferralsUtil.createRespondentType;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ReplyToReferralMultiplesController.class, JsonMapper.class})
@@ -266,24 +264,5 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(request)))
             .andExpect(status().isForbidden());
-    }
-
-    private ReferralTypeItem createReferralTypeItem() {
-        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
-        ReferralType referralType = new ReferralType();
-        referralType.setReferralNumber("1");
-        referralType.setReferralSubject("Other");
-        referralTypeItem.setValue(referralType);
-        referralType.setReferralStatus("referralStatus");
-        return referralTypeItem;
-    }
-
-    private RespondentSumTypeItem createRespondentType() {
-        RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName("Andrew Smith");
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(respondentSumType);
-
-        return respondentSumTypeItem;
     }
 }

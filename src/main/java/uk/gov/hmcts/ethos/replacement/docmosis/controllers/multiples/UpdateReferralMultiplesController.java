@@ -57,7 +57,6 @@ public class UpdateReferralMultiplesController {
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
-     * @throws IOException 
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for referral update")
@@ -89,7 +88,6 @@ public class UpdateReferralMultiplesController {
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
-     * @throws IOException 
      */
     @PostMapping(value = "/initHearingAndReferralDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for reply to referral event")
@@ -128,7 +126,6 @@ public class UpdateReferralMultiplesController {
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
-     * @throws IOException 
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "")
@@ -153,7 +150,8 @@ public class UpdateReferralMultiplesController {
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
         String nextHearingDate = getNearestHearingToReferral(leadCase, "None");
-        updateReferral(caseData, String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()), nextHearingDate);
+        String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
+        updateReferral(caseData, name, nextHearingDate);
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 

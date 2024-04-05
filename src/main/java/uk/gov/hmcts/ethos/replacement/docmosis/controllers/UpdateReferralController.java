@@ -142,7 +142,8 @@ public class UpdateReferralController {
         }
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         String nextHearingDate = getNearestHearingToReferral(caseData, "None");
-        updateReferral(caseData, String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()), nextHearingDate);
+        String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
+        updateReferral(caseData, name, nextHearingDate);
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 

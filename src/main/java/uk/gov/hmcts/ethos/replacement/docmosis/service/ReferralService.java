@@ -40,8 +40,8 @@ public class ReferralService {
 
     /**
      * Generates referral summary pdf.
-     * @param caseData A MultipleData object containing information about the cases for which a referral summary will be generated.
-     * @param leadCase The CaseData object representing the lead case that will serve as a reference for the document generation.
+     * @param caseData information about the cases for which a referral summary will be generated.
+     * @param leadCase the lead case that will serve as a reference for the document generation.
      * @param userJwt The JWT token of the user who is requesting to generate the document.
      * @param caseTypeId The ID of the type of case for which the referral summary should be generated.
      * @return A DocumentInfo object representing the generated document.

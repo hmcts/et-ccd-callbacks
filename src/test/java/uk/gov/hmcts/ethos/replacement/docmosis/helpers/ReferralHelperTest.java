@@ -46,6 +46,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 
 class ReferralHelperTest {
     private CaseData caseData;
+    private MultipleData multipleData;
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
     private static final String TRUE = "True";
@@ -54,23 +55,26 @@ class ReferralHelperTest {
     private static final DateTimeFormatter REFERRAL_DATE_PATTERN = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
     private final String expectedSingleHearingDetails = "<hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#"
-        + "09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#0"
-        + "9&#09&#09 N/A</pre><hr>";
+        + "09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09"
+        + "&#09&#09&#09&#09 N/A</pre><hr>";
 
-    private final String expectedMultipleHearingDetails = "<hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#0"
-        + "9&#09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#0"
-        + "9&#09&#09&#09 N/A</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
-        + " 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr>";
+    private final String expectedMultipleHearingDetails = "<hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#09&"
+        + "#09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#"
+        + "09&#09&#09&#09 N/A</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
+        + " 2021<br><br>Hearing &#09&#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre>"
+        + "<hr>";
 
-    private final String expectedHearingReferralDetailsSingleReply = "<hr><h3>Hearing details </h3><pre>Date &nbs"
-        + "p;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &nbsp"
-        + ";&nbsp;&#09&#09&#09&#09&#09 No Track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&"
+    private final String expectedHearingReferralDetailsSingleReply = "<hr><h3>Hearing details </h3><pre>Date &nbsp;"
+        + "&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&#09&nbsp; null<br><br>Type &nbs"
+        + "p;&nbsp;&#09&#09&#09&#09&#09 No Track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&"
         + "#09&"
         + "#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><"
-        + "br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09&#0"
+        + "br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#0"
         + "9&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br><br"
-        + ">Next hearing date &#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &#09&#09&#09&#09&#09&#"
-        + "09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;&#09&"
+        + ">Next hearing date &#09&#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &#09&#09&#09&#09&#09"
+        + "&#"
+        + "09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;&#09"
+        + "&"
         + "#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>Documents &n"
         + "bsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;</pre><hr>"
         + "<h3>Reply </h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Reply to &"
@@ -89,14 +93,17 @@ class ReferralHelperTest {
         + " download>testFileName</a>&nbsp;";
 
     private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
-        + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
+        + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&#09&nbsp; null<br><br>Type "
+        + "&n"
         + "bsp;&nbsp;&#09&#09&#09&#09&#09 Short track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09"
         + "&#09&#"
         + "09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<b"
         + "r><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09"
-        + "&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br>"
-        + "<br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &#09&#09&#09&#09&#0"
-        + "9&#09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;&#0"
+        + "&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br>"
+        + "<br>Next hearing date &#09&#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &#09&#09&#09&#09"
+        + "&#0"
+        + "9&#09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;"
+        + "&#0"
         + "9&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>Documents"
         + " &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;</pre>"
         + "<hr><h3>Reply 1</h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Repl"
@@ -123,6 +130,8 @@ class ReferralHelperTest {
     void setUp() {
         caseData = CaseDataBuilder.builder().build();
         caseData.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
+        multipleData = MultipleData.builder().build();
+        multipleData.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         addHearingToCaseData(caseData);
     }
 
@@ -367,6 +376,27 @@ class ReferralHelperTest {
     }
 
     @Test
+    void updateMultiplesReferral() {
+        multipleData.setSelectReferral(new DynamicFixedListType("1"));
+        multipleData.setReferralCollection(List.of(createReferralTypeItem()));
+        multipleData.setUpdateReferCaseTo("Judge");
+        multipleData.setUpdateReferralSubject("Subject");
+        multipleData.setUpdateReferralDetails("Details");
+        multipleData.setUpdateIsUrgent("Yes");
+        multipleData.setUpdateReferralInstruction("Instruction");
+        multipleData.setUpdateReferralSubjectSpecify("Subject Specify");
+        ReferralHelper.updateMultiplesReferral(multipleData, caseData, "FullName");
+        ReferralType referral = multipleData.getReferralCollection().get(0).getValue();
+        UpdateReferralType updateReferralType = referral.getUpdateReferralCollection().get(0).getValue();
+        assertEquals("Judge", updateReferralType.getUpdateReferCaseTo());
+        assertEquals("Subject", updateReferralType.getUpdateReferralSubject());
+        assertEquals("Details", updateReferralType.getUpdateReferralDetails());
+        assertEquals("Yes", updateReferralType.getUpdateIsUrgent());
+        assertEquals("Instruction", updateReferralType.getUpdateReferralInstruction());
+        assertEquals("Subject Specify", updateReferralType.getUpdateReferralSubjectSpecify());
+    }
+
+    @Test
     void updateOriginalReferral() {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
@@ -406,6 +436,25 @@ class ReferralHelperTest {
     }
 
     @Test
+    void clearMultiplesReferralDataFromCaseData() {
+        multipleData.setReferCaseTo("Judge");
+        multipleData.setReferralSubject("Subject");
+        multipleData.setReferralDetails("Details");
+        multipleData.setReferentEmail("Email");
+        multipleData.setIsUrgent("Yes");
+        multipleData.setReferralInstruction("Instruction");
+        multipleData.setReferralSubjectSpecify("Subject Specify");
+        ReferralHelper.clearReferralDataFromCaseData(multipleData);
+        assertNull(multipleData.getReferCaseTo());
+        assertNull(multipleData.getReferralSubject());
+        assertNull(multipleData.getReferralDetails());
+        assertNull(multipleData.getReferentEmail());
+        assertNull(multipleData.getIsUrgent());
+        assertNull(multipleData.getReferralInstruction());
+        assertNull(multipleData.getReferralSubjectSpecify());
+    }
+
+    @Test
     void populateHearingReferralDetails_NullReferralDocLink() {
         String replyDate = Helper.getCurrentDate();
         String replyDateTime = Helper.getCurrentDateTime();
@@ -441,7 +490,7 @@ class ReferralHelperTest {
     @Test
     void createReferralReply() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        DynamicFixedListType selectReferralList = 
+        DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
@@ -664,7 +713,7 @@ class ReferralHelperTest {
         referralTypeItem.setValue(referralType);
         caseData.setReferralCollection(List.of(referralTypeItem));
 
-        DynamicFixedListType selectReferralList = 
+        DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
@@ -810,7 +859,7 @@ class ReferralHelperTest {
         UploadedDocumentType doc = UploadedDocumentType.builder().documentFilename("fileName").documentUrl("url")
                 .documentBinaryUrl("binaryUrl").build();
         caseData.getReferralCollection().get(0).getValue().setReferralSummaryPdf(doc);
-        DynamicFixedListType selectReferralList = 
+        DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");

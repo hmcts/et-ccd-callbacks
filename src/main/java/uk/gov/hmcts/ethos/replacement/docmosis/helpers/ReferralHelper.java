@@ -69,18 +69,18 @@ public final class ReferralHelper {
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
     private static final String HEARING_DETAILS = "<hr><h3>Hearing details %s</h3>"
             + "<pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Hearing &#09&#09&#09&#09&nbsp; %s"
+            + "<br><br>Hearing &#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 %s</pre>";
 
     private static final String REFERRAL_DETAILS = "<h3>Referral</h3>"
             + "<pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
+            + "<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
-            + "<br><br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 %s"
+            + "<br><br>Next hearing date &#09&#09&#09&#09&#09&#09&#09&#09 %s"
             + "<br><br>Referral subject &#09&#09&#09&#09&#09&#09&#09&#09 %s"
-            + "<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 %s%s%s</pre><hr>";
+            + "<br><br>Details of the referral &#09&#09&#09&#09&#09&#09&#09 %s%s%s</pre><hr>";
 
     private static final String REPLY_DETAILS = "<h3>Reply %s</h3>"
             + "<pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
@@ -100,7 +100,8 @@ public final class ReferralHelper {
 
     private static final String GENERAL_NOTES = "<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s";
 
-    private static final String INSTRUCTIONS = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s";
+    private static final String INSTRUCTIONS
+            = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&#09&#09&#09&nbsp; %s";
 
     private static final String INVALID_EMAIL_ERROR_MESSAGE = "The email address entered is invalid.";
 
@@ -303,7 +304,7 @@ public final class ReferralHelper {
         return caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
     }
-    
+
     /**
      * Gets the number a new referral should be labelled as.
      * @param referrals contains the list of referrals
@@ -391,7 +392,38 @@ public final class ReferralHelper {
         updateOriginalReferral(caseData, userFullName);
     }
 
-    private static void updateOriginalReferral(CaseData caseData, String userFullName) {
+    /**
+     * Updates a multiples referral and adds it to the update referral collection.
+     * @param caseData contains all the case data
+     * @param userFullName Full name of the logged-in user
+     */
+    public static void updateMultiplesReferral(MultipleData multipleData, CaseData caseData, String userFullName) {
+        ReferralType referral = multipleData.getReferralCollection()
+                .get(Integer.parseInt(multipleData.getSelectReferral().getValue().getCode()) - 1).getValue();
+        if (CollectionUtils.isEmpty(referral.getUpdateReferralCollection())) {
+            referral.setUpdateReferralCollection(new ListTypeItem<>());
+        }
+        UpdateReferralType updateReferralType = new UpdateReferralType();
+        updateReferralType.setUpdateReferralNumber(String.valueOf(
+                getNextReferralNumber(referral.getUpdateReferralCollection())));
+        updateReferralType.setUpdateReferCaseTo(multipleData.getUpdateReferCaseTo());
+        updateReferralType.setUpdateIsUrgent(multipleData.getUpdateIsUrgent());
+        updateReferralType.setUpdateReferralSubject(multipleData.getUpdateReferralSubject());
+        updateReferralType.setUpdateReferralSubjectSpecify(multipleData.getUpdateReferralSubjectSpecify());
+        updateReferralType.setUpdateReferralDetails(multipleData.getUpdateReferralDetails());
+        updateReferralType.setUpdateReferralDocument(multipleData.getUpdateReferralDocument());
+        updateReferralType.setUpdateReferralInstruction(multipleData.getUpdateReferralInstruction());
+        updateReferralType.setUpdateReferralDate(Helper.getCurrentDate());
+        updateReferralType.setUpdateReferredBy(userFullName);
+        updateReferralType.setUpdateReferentEmail(multipleData.getUpdateReferentEmail());
+        updateReferralType.setUpdateReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
+        ListTypeItem<UpdateReferralType> updateReferralCollection = referral.getUpdateReferralCollection();
+        updateReferralCollection.add(GenericTypeItem.from(UUID.randomUUID().toString(), updateReferralType));
+        referral.setUpdateReferralCollection(updateReferralCollection);
+        updateOriginalReferral(multipleData, userFullName);
+    }
+
+    private static void updateOriginalReferral(BaseCaseData caseData, String userFullName) {
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 
@@ -565,7 +597,7 @@ public final class ReferralHelper {
      * creating a new referral.
      * @param caseData contains all the case data
      */
-    public static void clearReferralDataFromCaseData(CaseData caseData) {
+    public static void clearReferralDataFromCaseData(BaseCaseData caseData) {
         caseData.setReferralHearingDetails(null);
         caseData.setReferCaseTo(null);
         caseData.setReferentEmail(null);
@@ -735,7 +767,8 @@ public final class ReferralHelper {
      * @param isNew Flag for if this is a new referral.
      */
     public static Map<String, String> buildPersonalisation(MultipleData caseData, CaseData leadCase,
-            String referralNumber, boolean isNew, String username, String exuiLink) {
+                                                           String referralNumber, boolean isNew, String username,
+                                                           String exuiLink) {
 
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseData.getMultipleReference());

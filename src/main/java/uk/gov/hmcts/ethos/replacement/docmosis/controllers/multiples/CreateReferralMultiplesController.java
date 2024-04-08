@@ -81,7 +81,7 @@ public class CreateReferralMultiplesController {
     public ResponseEntity<MultipleCallbackResponse> initReferralHearingDetails(
             @RequestBody MultipleRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("ABOUT TO START CREATE MULTIPLES REFERRAL ---> "
+        log.info("ABOUT TO START CREATE MULTIPLES REFERRAL TEST ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

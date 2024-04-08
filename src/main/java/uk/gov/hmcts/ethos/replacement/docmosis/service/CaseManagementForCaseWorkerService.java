@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -286,9 +287,9 @@ public class CaseManagementForCaseWorkerService {
         RespondentSumType firstRespondent = respondentCollection.get(0).getValue();
         if (YES.equals(firstRespondent.getResponseReceived())) {
             firstRespondent.setResponseReceivedCount(
-                    firstRespondent.getResponseReceivedCount() != null
-                            ? firstRespondent.getResponseReceivedCount() + 1
-                            : 1
+                    StringUtils.isBlank(firstRespondent.getResponseReceivedCount())
+                            ? "1"
+                            : Integer.toString(Integer.parseInt(firstRespondent.getResponseReceivedCount()) + 1)
             );
         }
     }

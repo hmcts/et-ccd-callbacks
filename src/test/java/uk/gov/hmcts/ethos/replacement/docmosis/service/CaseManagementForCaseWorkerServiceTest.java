@@ -1047,7 +1047,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
 
-        assertEquals(1, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+        assertEquals("1", caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
     }
 
     @Test
@@ -1055,11 +1055,11 @@ class CaseManagementForCaseWorkerServiceTest {
         List<String> errors = new ArrayList<>();
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setResponseReceived(YES);
-        caseData.getRespondentCollection().get(0).getValue().setResponseReceivedCount(1);
+        caseData.getRespondentCollection().get(0).getValue().setResponseReceivedCount("1");
 
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
 
-        assertEquals(2, caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
+        assertEquals("2", caseData.getRespondentCollection().get(0).getValue().getResponseReceivedCount());
     }
 
     @Test

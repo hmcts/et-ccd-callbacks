@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
@@ -19,9 +20,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -43,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 public class Et1ReppedService {
     private final AcasService acasService;
     private final AuthTokenGenerator authTokenGenerator;
+    private final CcdCaseAssignment ccdCaseAssignment;
     private final DocumentManagementService documentManagementService;
     private final JurisdictionCodesMapperService jurisdictionCodesMapperService;
     private final OrganisationClient organisationClient;
@@ -93,10 +98,15 @@ public class Et1ReppedService {
      * @param caseDetails the case details
      * @param userToken the user token
      */
-    public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) throws PdfServiceException {
-        DocumentTypeItem et1 = createEt1(caseDetails, userToken);
-        List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(), userToken);
-        addDocsToClaim(caseDetails.getCaseData(), et1, acasCertificates);
+    public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
+        try {
+            DocumentTypeItem et1 = createEt1(caseDetails, userToken);
+            List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
+                    userToken);
+            addDocsToClaim(caseDetails.getCaseData(), et1, acasCertificates);
+        } catch (Exception e) {
+            log.error("Failed to create and upload ET1 documents", e);
+        }
     }
 
     private void addDocsToClaim(CaseData caseData, DocumentTypeItem et1,
@@ -191,8 +201,13 @@ public class Et1ReppedService {
         claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
         OrganisationsResponse organisationDetails = getOrganisationDetailsFromUserId(userToken, userDetails.getUid());
         if (!ObjectUtils.isEmpty(organisationDetails)) {
+            claimantRepresentative.setMyHmctsOrganisation(Organisation.builder()
+                    .organisationID(organisationDetails.getOrganisationIdentifier())
+                    .organisationName(organisationDetails.getName())
+                    .build());
             claimantRepresentative.setNameOfOrganisation(organisationDetails.getName());
             claimantRepresentative.setRepresentativeAddress(getOrganisationAddress(organisationDetails));
+            setClaimantRepOrgPolicy(caseData, organisationDetails);
         }
         caseData.setClaimantRepresentedQuestion(YES);
         caseData.setRepresentativeClaimantType(claimantRepresentative);
@@ -225,4 +240,40 @@ public class Et1ReppedService {
         }
         return null;
     }
+
+    public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
+        UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
+        OrganisationsResponse organisation = getOrganisationDetailsFromUserId(userToken, claimantRepUser.getUid());
+
+        log.info("Adding roles {} to case {}", claimantRepUser.getRoles(), caseDetails.getCaseId());
+
+        CaseAssignmentUserRolesRequest removeCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
+                Long.valueOf(caseDetails.getCaseId()),
+                claimantRepUser.getUid(),
+                organisation.getOrganisationIdentifier(),
+                "[CREATOR]");
+
+        ccdCaseAssignment.removeCaseUserRoles(removeCaseUserRole);
+
+        CaseAssignmentUserRolesRequest addCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
+                Long.valueOf(caseDetails.getCaseId()),
+                claimantRepUser.getUid(),
+                organisation.getOrganisationIdentifier(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        ccdCaseAssignment.addCaseUserRoles(addCaseUserRole);
+
+        log.info("Successfully added the claimant's solicitor roles to case Id {} ", caseDetails.getCaseId());
+    }
+
+    private void setClaimantRepOrgPolicy(CaseData caseData, OrganisationsResponse organisation) {
+        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                .organisation(Organisation.builder()
+                        .organisationID(organisation.getOrganisationIdentifier())
+                        .organisationName(organisation.getName())
+                        .build())
+                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+        caseData.setClaimantRepresentativeOrganisationPolicy(organisationPolicy);
+    }
+
 }

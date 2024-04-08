@@ -240,8 +240,8 @@ public class Et1ReppedHelper {
                 }
             });
         }
-        claimantRequestType.setLinkedCasesYesNo(caseData.getLinkedCasesYesNo());
-        claimantRequestType.setLinkedCases(caseData.getLinkedCasesDetails());
+        claimantRequestType.setLinkedCases(getFirstListItem(caseData.getLinkedCasesYesNo()));
+        claimantRequestType.setLinkedCasesDetail(caseData.getLinkedCasesDetails());
         caseData.setClaimantRequests(claimantRequestType);
     }
 

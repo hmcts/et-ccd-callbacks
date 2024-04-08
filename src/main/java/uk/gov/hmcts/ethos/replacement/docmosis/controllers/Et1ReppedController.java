@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.dwp.regex.InvalidPostcodeException;
-import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -24,24 +23,20 @@ import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService.INVALID_TOKEN;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/et1Repped")
 public class Et1ReppedController {
-    private final VerifyTokenService verifyTokenService;
     private final Et1ReppedService et1ReppedService;
     private final CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -67,10 +62,6 @@ public class Et1ReppedController {
                                                                 CCDRequest ccdRequest,
                                                                 @RequestHeader("Authorization") String userToken)
             throws InvalidPostcodeException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt1ReppedTriageYesNo(et1ReppedService.validatePostcode(caseData));
@@ -90,10 +81,6 @@ public class Et1ReppedController {
     public ResponseEntity<CCDCallbackResponse> officeError(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = List.of(ET1ReppedConstants.TRIAGE_ERROR_MESSAGE);
@@ -113,13 +100,10 @@ public class Et1ReppedController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.setCreateDraftData(caseData, ccdRequest.getCaseDetails().getCaseId());
+        et1ReppedService.assignCaseAccess(ccdRequest.getCaseDetails(), userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -135,10 +119,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantSex(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantSex());
@@ -157,10 +137,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantSupport(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantSupportQuestion());
@@ -179,10 +155,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateRepresentativeInformation(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getRepresentativeContactPreference());
@@ -201,10 +173,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitSection(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         Et1ReppedHelper.setEt1SectionStatuses(ccdRequest);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
@@ -222,10 +190,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantWorked(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getDidClaimantWorkForOrg());
@@ -244,10 +208,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantWorking(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantStillWorking());
@@ -266,10 +226,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantWrittenNoticePeriod(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantStillWorkingNoticePeriod());
@@ -288,10 +244,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantWorkingNoticePeriod(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantWorkingNoticePeriod());
@@ -310,10 +262,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantNoLongerWorking(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantNoLongerWorking());
@@ -332,10 +280,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantPay(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantPayType());
@@ -354,10 +298,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantPensionBenefits(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = new ArrayList<>();
@@ -378,10 +318,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantNewJob(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantNewJob());
@@ -400,10 +336,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateClaimantNewJobPay(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getClaimantNewJobPayPeriod());
@@ -422,10 +354,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> generateRespondentPreamble(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.generateRespondentPreamble(caseData);
@@ -444,10 +372,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> generateWorkAddressLabel(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.generateWorkAddressLabel(caseData);
@@ -466,10 +390,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> sectionCompleted(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return ResponseEntity.ok(CCDCallbackResponse.builder()
@@ -491,10 +411,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateWhistleblowing(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getWhistleblowingYesNo());
@@ -513,10 +429,6 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> validateLinkedCases(
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getLinkedCasesYesNo());
@@ -535,12 +447,8 @@ public class Et1ReppedController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> submitClaim(
-            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken)
-            throws PdfServiceException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
@@ -564,11 +472,9 @@ public class Et1ReppedController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> et1ReppedSubmitted(
-            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) throws IOException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) throws IOException {
+
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())

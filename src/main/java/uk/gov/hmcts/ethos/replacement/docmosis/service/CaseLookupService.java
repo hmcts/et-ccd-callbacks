@@ -48,9 +48,7 @@ public class CaseLookupService {
     }
 
     public CaseData getCaseData(String caseTypeId, String caseId, String auth) throws IOException {
-        log.error("Looking up " + caseTypeId + "case with caseId " + caseId + " with auth " + auth);
         SubmitEvent submitEvent = ccdClient.retrieveCase(auth, caseTypeId, EMPLOYMENT, caseId);
-        log.error("Got SubmitEvent for " + caseId);
         return submitEvent.getCaseData();
     }
 }

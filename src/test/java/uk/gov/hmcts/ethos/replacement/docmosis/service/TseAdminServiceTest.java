@@ -1,18 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
@@ -28,8 +35,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -41,12 +49,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
@@ -54,6 +69,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -71,8 +87,13 @@ class TseAdminServiceTest {
 
     @MockBean
     private TseService tseService;
+    @MockBean
+    private TornadoService tornadoService;
+    @MockBean
+    DocumentManagementService documentManagementService;
 
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
@@ -93,15 +114,21 @@ class TseAdminServiceTest {
     private static final String RESPONDENT_1 = "Respondent 1";
     private static final String RESPONDENT_2 = "Respondent 2";
     private static final String REP_EMAIL = "rep@test.com";
+    private static final String DOCUMENT_DESCRIPTION = "Test Description";
+    private static final String DOCUMENT_TYPE = "Referral/Judicial direction";
+    private static final String DOCUMENT_URL = "testUrl";
+    private static final String DOCUMENT_FILENAME = "Test Document Filename";
+    private static final String DOCUMENT_BINARY_URL = "Test Document Binary Url";
 
     @BeforeEach
     void setUp() {
-        emailService = spy(new EmailUtils());
-        tseAdminService = new TseAdminService(emailService, tseService);
+        emailService = spy(new TestEmailUtil());
+        tseAdminService = new TseAdminService(emailService, tornadoService, tseService, documentManagementService);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
 
         caseData = CaseDataBuilder.builder().build();
+        caseDetails = new CaseDetails();
     }
 
     @Test
@@ -138,6 +165,25 @@ class TseAdminServiceTest {
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
 
         assertThat(caseData.getTseAdminTableMarkUp()).isEqualTo(expected);
+    }
+
+    @Test
+    void initialTseAdminTableMarkUp_ReturnNothingWhenNoApplicationSelected() {
+        GenericTseApplicationType application = getGenericTseApplicationTypeItemBuild();
+
+        caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(application)
+                        .build())
+        );
+
+        caseData.setTseAdminSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("0", "Empty Value")));
+
+        tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
+
+        assertThat(caseData.getTseAdminTableMarkUp()).isNull();
     }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {
@@ -207,6 +253,59 @@ class TseAdminServiceTest {
         documentTypeItem.setId("1234");
         documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
         return documentTypeItem;
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void saveTseAdminDataFromCaseData_EmptyNullApplicationCollection(List<GenericTseApplicationTypeItem>
+                                                                             genericTseApplicationTypeItems) {
+        caseData.setGenericTseApplicationCollection(genericTseApplicationTypeItems);
+
+        caseData.setTseAdminSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
+
+        caseData.setTseAdminEnterNotificationTitle("Submit hearing agenda");
+        caseData.setTseAdminTypeOfDecision("Judgment");
+        caseData.setTseAdminAdditionalInformation("Additional information");
+        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        caseData.setTseAdminResponseRequiredNoDoc(documentList);
+        caseData.setTseAdminDecisionMadeBy("Legal officer");
+        caseData.setTseAdminDecisionMadeByFullName("Legal Officer Full Name");
+        caseData.setTseAdminSelectPartyNotify(BOTH_PARTIES);
+
+        tseAdminService.saveTseAdminDataFromCaseData(caseData);
+
+        assertThat(caseData.getGenericTseApplicationCollection()).isNullOrEmpty();
+        assertThat(caseData.getTseAdminDecision()).isNullOrEmpty();
+    }
+
+    @Test
+    void saveTseAdminDataFromCaseData_NullApplicationType() {
+        caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(TseApplicationBuilder.builder()
+                                .withNumber("2")
+                                .withType(TSE_APP_CHANGE_PERSONAL_DETAILS)
+                                .build())
+                        .build())
+        );
+
+        caseData.setTseAdminSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("0", "0 - Nothing")));
+
+        caseData.setTseAdminEnterNotificationTitle("Submit hearing agenda");
+        caseData.setTseAdminTypeOfDecision("Judgment");
+        caseData.setTseAdminAdditionalInformation("Additional information");
+        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        caseData.setTseAdminResponseRequiredNoDoc(documentList);
+        caseData.setTseAdminDecisionMadeBy("Legal officer");
+        caseData.setTseAdminDecisionMadeByFullName("Legal Officer Full Name");
+        caseData.setTseAdminSelectPartyNotify(BOTH_PARTIES);
+
+        tseAdminService.saveTseAdminDataFromCaseData(caseData);
+
+        assertThat(caseData.getTseAdminDecision()).isNullOrEmpty();
     }
 
     @Test
@@ -389,25 +488,113 @@ class TseAdminServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({BOTH_PARTIES, CLAIMANT_ONLY, RESPONDENT_ONLY})
-    void sendRecordADecisionEmails(String partyNotified) {
+    @CsvSource({BOTH_PARTIES + ", " + CLAIMANT_EMAIL + ", " + RESPONDENT_EMAIL,
+                BOTH_PARTIES + ", , " + RESPONDENT_EMAIL,
+                BOTH_PARTIES + ", " + CLAIMANT_EMAIL + ",",
+                CLAIMANT_ONLY + ", " + CLAIMANT_EMAIL + ", " + RESPONDENT_EMAIL,
+                RESPONDENT_ONLY + ", " + CLAIMANT_EMAIL + ", " + RESPONDENT_EMAIL})
+    void sendRecordADecisionEmails(String partyNotified, String claimantEmailAddress, String respondentEmailAddress) {
         caseData.setEthosCaseReference(CASE_NUMBER);
-        createClaimant(caseData);
-        createRespondent(caseData);
+        createClaimant(caseData, claimantEmailAddress);
+        createRespondent(caseData, respondentEmailAddress);
         caseData.setTseAdminSelectPartyNotify(partyNotified);
-
         Map<String, String> expectedPersonalisationClaimant =
             createPersonalisation(caseData, CLAIMANT_FIRSTNAME + " " + CLAIMANT_LASTNAME);
-
-        tseAdminService.sendEmailToClaimant(CASE_ID, caseData);
-        if (!RESPONDENT_ONLY.equals(partyNotified)) {
+        caseDetails.setCaseId(CASE_ID);
+        caseDetails.setCaseData(caseData);
+        tseAdminService.sendEmailToClaimant(caseDetails);
+        if (!RESPONDENT_ONLY.equals(partyNotified) && isNotBlank(claimantEmailAddress)) {
             verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
+        } else {
+            verify(emailService, never()).sendEmail(anyString(), anyString(), any());
         }
     }
 
-    private void createClaimant(CaseData caseData) {
+    @ParameterizedTest
+    @MethodSource("generateCaseDataForSendEmailToClaimant")
+    void sendRecordADecisionEmailToClaimantWithDocumentCollection(CaseData caseData) {
+
+        caseDetails.setCaseId(CASE_ID);
+        caseDetails.setCaseData(caseData);
+        tseAdminService.sendEmailToClaimant(caseDetails);
+
+        Map<String, String> expectedPersonalisationClaimant =
+                createPersonalisation(caseData, CLAIMANT_FIRSTNAME + " " + CLAIMANT_LASTNAME);
+
+        verify(emailService, times(1)).sendEmail(anyString(), anyString(),
+                eq(expectedPersonalisationClaimant));
+
+    }
+
+    private static Stream<Arguments> generateCaseDataForSendEmailToClaimant() {
+        CaseData caseDataWithoutValueDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithoutValueDocumentCollection.getDocumentCollection().add(null);
+
+        CaseData caseDataWithoutDocumentTypeItemDocumentCollection = generateCaseDataWithBasicInfo();
+        DocumentTypeItem documentTypeItemWithoutValue = new DocumentTypeItem();
+        caseDataWithoutDocumentTypeItemDocumentCollection.getDocumentCollection().add(documentTypeItemWithoutValue);
+
+        DocumentTypeItem documentTypeItemWithoutUploadedDocument = new DocumentTypeItem();
+        DocumentType documentTypeWithoutUploadedDocument = new DocumentType();
+        documentTypeItemWithoutUploadedDocument.setValue(documentTypeWithoutUploadedDocument);
+        CaseData caseDataWithoutUploadedDocumentTypeDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithoutUploadedDocumentTypeDocumentCollection.getDocumentCollection()
+                .add(documentTypeItemWithoutUploadedDocument);
+
+        DocumentTypeItem documentTypeItemWithoutBinaryDocumentUrl = new DocumentTypeItem();
+        DocumentType documentTypeWithoutBinaryDocumentUrl = new DocumentType();
+        UploadedDocumentType uploadedDocumentWithoutBinaryDocumentUrl = new UploadedDocumentType();
+        uploadedDocumentWithoutBinaryDocumentUrl.setDocumentBinaryUrl(null);
+        documentTypeWithoutBinaryDocumentUrl.setUploadedDocument(uploadedDocumentWithoutBinaryDocumentUrl);
+        documentTypeItemWithoutBinaryDocumentUrl.setValue(documentTypeWithoutBinaryDocumentUrl);
+        CaseData caseDataWithoutBinaryDocumentUrlDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithoutBinaryDocumentUrlDocumentCollection.getDocumentCollection()
+                .add(documentTypeItemWithoutBinaryDocumentUrl);
+
+        DocumentTypeItem documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument = new DocumentTypeItem();
+        DocumentType documentTypeUploadedDocumentWithBinaryUrl = new DocumentType();
+        UploadedDocumentType uploadedDocumentTypeWithBinaryUrl = new UploadedDocumentType();
+        uploadedDocumentTypeWithBinaryUrl.setDocumentUrl("testDocumentUrl/12343452342sseellekjsdnflkd");
+        documentTypeUploadedDocumentWithBinaryUrl.setUploadedDocument(uploadedDocumentTypeWithBinaryUrl);
+        documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument
+                .setValue(documentTypeUploadedDocumentWithBinaryUrl);
+        CaseData caseDataWithBinaryDocumentUrlDocumentCollection = generateCaseDataWithBasicInfo();
+        caseDataWithBinaryDocumentUrlDocumentCollection.getDocumentCollection()
+                .add(documentTypeItemWithValueAndUploadedDocumentWithBinaryDocument);
+
+        return Stream.of(
+                Arguments.of(caseDataWithoutValueDocumentCollection),
+                Arguments.of(caseDataWithoutDocumentTypeItemDocumentCollection),
+                Arguments.of(caseDataWithoutUploadedDocumentTypeDocumentCollection),
+                Arguments.of(caseDataWithoutBinaryDocumentUrlDocumentCollection),
+                Arguments.of(caseDataWithBinaryDocumentUrlDocumentCollection)
+        );
+    }
+
+    private static CaseData generateCaseDataWithBasicInfo() {
+        CaseData caseDataWithBasicInfo = new CaseData();
+        caseDataWithBasicInfo.setEthosCaseReference(CASE_NUMBER);
+        createClaimant(caseDataWithBasicInfo, CLAIMANT_EMAIL);
+        caseDataWithBasicInfo.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
+        caseDataWithBasicInfo.setDocumentCollection(new ArrayList<>());
+        return caseDataWithBasicInfo;
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void notSendEmailWhenRespondentEmailIsNullOrEmpty(String respondentEmailAddress) {
+        caseData.setEthosCaseReference(CASE_NUMBER);
+        createRespondent(caseData, respondentEmailAddress);
+        caseDetails.setCaseData(caseData);
+        tseAdminService.sendNotifyEmailsToRespondents(caseDetails);
+
+        verify(emailService, never()).sendEmail(anyString(), anyString(), any());
+
+    }
+
+    private static void createClaimant(CaseData caseData, String claimantEmailAddress) {
         ClaimantType claimantType = new ClaimantType();
-        claimantType.setClaimantEmailAddress(CLAIMANT_EMAIL);
+        claimantType.setClaimantEmailAddress(claimantEmailAddress);
 
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantFirstNames(CLAIMANT_FIRSTNAME);
@@ -417,10 +604,10 @@ class TseAdminServiceTest {
         caseData.setClaimantIndType(claimantIndType);
     }
 
-    private void createRespondent(CaseData caseData) {
+    private void createRespondent(CaseData caseData, String respondentEmailAddress) {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(RESPONDENT_TITLE);
-        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
+        respondentSumType.setRespondentEmail(respondentEmailAddress);
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
@@ -435,6 +622,18 @@ class TseAdminServiceTest {
         personalisation.put("name", expectedName);
         personalisation.put("linkToExUI", XUI_URL + CASE_ID);
         personalisation.put("linkToCitizenHub", CITIZEN_URL + CASE_ID);
+        String decisionDocumentURL = "";
+        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
+            DocumentTypeItem documentTypeItem =
+                    caseData.getDocumentCollection().get(caseData.getDocumentCollection().size() - 1);
+            if (isNotEmpty(documentTypeItem) && isNotEmpty(documentTypeItem.getValue())
+                    && isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
+                    && isNotBlank(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+                decisionDocumentURL = TseHelper.getDownloadableDocumentURL(
+                        documentTypeItem.getValue().getUploadedDocument().getDocumentUrl(), null);
+            }
+        }
+        personalisation.put("linkToDecisionFile", decisionDocumentURL);
         return personalisation;
     }
 
@@ -539,4 +738,101 @@ class TseAdminServiceTest {
         caseData.setRespondentCollection(List.of(respondentSumTypeItem, respondentSumTypeItem2));
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    @SneakyThrows
+    void notAddsTseAdminDecisionPdfToDocCollectionWhenCaseTypeIdIsEmpty(String caseTypeId) {
+        assertThrows(DocumentManagementException.class, () ->
+                tseAdminService.addTseAdminDecisionPdfToDocCollection(caseData, AUTH_TOKEN, caseTypeId));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @SneakyThrows
+    void addTseAdminDecisionPdfToDocCollectionWhenDocumentCollectionIsNullOrEmpty(
+            List<DocumentTypeItem> documentCollection) {
+        caseData.setDocumentCollection(documentCollection);
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setDescription(DOCUMENT_DESCRIPTION);
+        documentInfo.setType(DOCUMENT_TYPE);
+        documentInfo.setUrl(DOCUMENT_URL);
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentUrl(DOCUMENT_URL);
+        uploadedDocumentType.setDocumentFilename(DOCUMENT_FILENAME);
+        uploadedDocumentType.setDocumentBinaryUrl(DOCUMENT_BINARY_URL);
+        uploadedDocumentType.setCategoryId(DOCUMENT_TYPE);
+
+        when(tornadoService.generateEventDocument(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
+                TornadoService.TSE_ADMIN_DECISION_FILE_NAME)).thenReturn(documentInfo);
+        when(documentManagementService.addDocumentToDocumentField(documentInfo)).thenReturn(uploadedDocumentType);
+        tseAdminService.addTseAdminDecisionPdfToDocCollection(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(caseData.getDocumentCollection()).hasSize(1);
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument())
+                .isEqualTo(uploadedDocumentType);
+        assertThat(caseData.getDocumentCollection().get(0)
+                .getValue().getUploadedDocument().getCategoryId()).isEqualTo(DOCUMENT_TYPE);
+        assertThat(caseData.getDocumentCollection().get(0)
+                .getValue().getUploadedDocument().getDocumentFilename()).isEqualTo(DOCUMENT_FILENAME);
+        assertThat(caseData.getDocumentCollection().get(0)
+                .getValue().getUploadedDocument().getDocumentBinaryUrl()).isEqualTo(DOCUMENT_BINARY_URL);
+        assertThat(caseData.getDocumentCollection().get(0)
+                .getValue().getUploadedDocument().getDocumentUrl()).isEqualTo(DOCUMENT_URL);
+    }
+
+    @Test
+    @SneakyThrows
+    void addTseAdminDecisionPdfToDocCollectionWhenDocumentCollectionIsNotEmptyOrNull() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        DocumentType documentType = new DocumentType();
+        documentTypeItem.setValue(documentType);
+        documentCollection.add(documentTypeItem);
+        caseData.setDocumentCollection(documentCollection);
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setDescription(DOCUMENT_DESCRIPTION);
+        documentInfo.setType(DOCUMENT_TYPE);
+        documentInfo.setUrl(DOCUMENT_URL);
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentUrl(DOCUMENT_URL);
+        uploadedDocumentType.setDocumentFilename(DOCUMENT_FILENAME);
+        uploadedDocumentType.setDocumentBinaryUrl(DOCUMENT_BINARY_URL);
+        uploadedDocumentType.setCategoryId(DOCUMENT_TYPE);
+
+        when(tornadoService.generateEventDocument(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
+                TornadoService.TSE_ADMIN_DECISION_FILE_NAME)).thenReturn(documentInfo);
+        when(documentManagementService.addDocumentToDocumentField(documentInfo)).thenReturn(uploadedDocumentType);
+        tseAdminService.addTseAdminDecisionPdfToDocCollection(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(caseData.getDocumentCollection()).hasSize(2);
+        assertThat(caseData.getDocumentCollection().get(1).getValue().getUploadedDocument())
+                .isEqualTo(uploadedDocumentType);
+        assertThat(caseData.getDocumentCollection().get(1)
+                .getValue().getUploadedDocument().getCategoryId()).isEqualTo(DOCUMENT_TYPE);
+        assertThat(caseData.getDocumentCollection().get(1)
+                .getValue().getUploadedDocument().getDocumentFilename()).isEqualTo(DOCUMENT_FILENAME);
+        assertThat(caseData.getDocumentCollection().get(1)
+                .getValue().getUploadedDocument().getDocumentBinaryUrl()).isEqualTo(DOCUMENT_BINARY_URL);
+        assertThat(caseData.getDocumentCollection().get(1)
+                .getValue().getUploadedDocument().getDocumentUrl()).isEqualTo(DOCUMENT_URL);
+    }
+
+    @Test
+    @SneakyThrows
+    void addTseAdminDecisionPdfToDocCollectionThrowsException() {
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setDescription(DOCUMENT_DESCRIPTION);
+        documentInfo.setType(DOCUMENT_TYPE);
+        documentInfo.setUrl(DOCUMENT_URL);
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentUrl(DOCUMENT_URL);
+        uploadedDocumentType.setDocumentFilename(DOCUMENT_FILENAME);
+        uploadedDocumentType.setDocumentBinaryUrl(DOCUMENT_BINARY_URL);
+        uploadedDocumentType.setCategoryId(DOCUMENT_TYPE);
+
+        when(tornadoService.generateEventDocument(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
+                TornadoService.TSE_ADMIN_DECISION_FILE_NAME)).thenThrow(DocumentManagementException.class);
+        when(documentManagementService.addDocumentToDocumentField(documentInfo)).thenReturn(uploadedDocumentType);
+        assertThrows(DocumentManagementException.class, () ->
+            tseAdminService.addTseAdminDecisionPdfToDocCollection(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID)
+        );
+    }
 }

@@ -178,8 +178,7 @@ class TseAdminControllerTest extends BaseControllerTest {
         verify(tseAdminService).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            ccdRequest.getCaseDetails());
         verify(tseAdminService).clearTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
         verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
@@ -196,8 +195,7 @@ class TseAdminControllerTest extends BaseControllerTest {
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            ccdRequest.getCaseDetails());
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
     }
@@ -212,8 +210,7 @@ class TseAdminControllerTest extends BaseControllerTest {
         verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).sendEmailToClaimant(
-            ccdRequest.getCaseDetails().getCaseId(),
-            ccdRequest.getCaseDetails().getCaseData());
+            ccdRequest.getCaseDetails());
         verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
                 ccdRequest.getCaseDetails().getCaseData());
     }

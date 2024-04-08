@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -17,13 +18,17 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseDecisionData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseDecisionDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DateUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -32,6 +37,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
@@ -66,7 +72,10 @@ public final class TseHelper {
             + "afresh", "Reconsider a judgment", "Withdraw my claim");
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
-    private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
+    private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-04696.docx";
+    private static final String TSE_ADMIN_DECISION_RESPONSE_REQUIRED_MESSAGE = "Yes - view document for details";
+    private static final String TSE_ADMIN_DECISION_TEMPLATE_NAME = "EM-TRB-EGW-ENG-03914.docx";
+    private static final String TSE_ADMIN_DECISION_OUTPUT_FILE_NAME = "%s_%s_decision.pdf";
 
     private TseHelper() {
         // Access through static methods
@@ -201,11 +210,12 @@ public final class TseHelper {
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
      */
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
+                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -265,29 +275,103 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
+                                                      String ccdGatewayBaseUrl) {
 
         return TseReplyData.builder()
-            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-            .respondentParty(RESPONDENT_TITLE)
-            .type(defaultIfEmpty(application.getType(), null))
-            .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
-            .response(defaultIfEmpty(application.getDetails(), null))
-            .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-            .documentCollection(getUploadedDocList(caseData))
-            .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
-            .build();
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .respondentParty(RESPONDENT_TITLE)
+                .type(defaultIfEmpty(application.getType(), null))
+                .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .response(defaultIfEmpty(application.getDetails(), null))
+                .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()) ? YES : NO)
+                .documentCollection(getUploadedDocList(caseData, ccdGatewayBaseUrl))
+                .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
+                .build();
     }
 
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
-        if (caseData.getTseResponseSupportingMaterial() == null) {
-            return null;
+    private static TseDecisionData createDataForTseDecision(CaseData caseData, String ccdGatewayBaseUrl) {
+        return TseDecisionData.builder()
+        .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .notificationTitle(defaultIfEmpty(caseData.getTseAdminEnterNotificationTitle(), ""))
+            .decision(defaultIfEmpty(caseData.getTseAdminDecision(), ""))
+            .decisionDetails(defaultIfEmpty(caseData.getTseAdminDecisionDetails(), ""))
+            .typeOfDecision(defaultIfEmpty(caseData.getTseAdminTypeOfDecision(), ""))
+            .responseRequired(YES.equals(caseData.getTseAdminIsResponseRequired())
+                    ? TSE_ADMIN_DECISION_RESPONSE_REQUIRED_MESSAGE : NO)
+            .selectedRespondents(defaultIfEmpty(caseData.getTseAdminSelectPartyRespond(), ""))
+            .additionalInformation(defaultIfEmpty(caseData.getTseAdminAdditionalInformation(), ""))
+            .supportingMaterial(getSupportedDocumentsList(caseData, ccdGatewayBaseUrl))
+            .decisionMadeBy(defaultIfEmpty(caseData.getTseAdminDecisionMadeBy(), ""))
+            .decisionMakerFullName(defaultIfEmpty(caseData.getTseAdminDecisionMadeByFullName(), ""))
+            .notificationParties(defaultIfEmpty(caseData.getTseAdminSelectPartyNotify(), ""))
+        .build();
+    }
+
+    private static List<DocumentType> getSupportedDocumentsList(CaseData caseData, String ccdGatewayBaseUrl) {
+        List<GenericTypeItem<DocumentType>> documentList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(caseData.getTseAdminResponseRequiredYesDoc())) {
+            documentList.addAll(caseData.getTseAdminResponseRequiredYesDoc());
+        }
+        if (!CollectionUtils.isEmpty(caseData.getTseAdminResponseRequiredNoDoc())) {
+            documentList.addAll(caseData.getTseAdminResponseRequiredNoDoc());
+        }
+        List<DocumentType> documents = new ArrayList<>();
+        for (GenericTypeItem<DocumentType> document : documentList) {
+            document.getValue().setShortDescription(defaultIfEmpty(document.getValue().getShortDescription(),
+                    ""));
+            if (ObjectUtils.isNotEmpty(document.getValue().getUploadedDocument())) {
+                document.getValue().setTornadoEmbeddedPdfUrl(document.getValue().getUploadedDocument()
+                        .getDocumentFilename() + "|" + getDownloadableDocumentURL(document.getValue()
+                                .getUploadedDocument().getDocumentUrl(), ccdGatewayBaseUrl));
+            }
+            documents.add(document.getValue());
         }
 
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
+        return documents;
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+    public static String getDownloadableDocumentURL(String documentURL, String ccdGatewayBaseUrl) {
+        return ccdGatewayBaseUrl + "/documents/" + getDocumentUUIDByDocumentURL(documentURL) + "/binary";
+    }
+
+    private static String getDocumentUUIDByDocumentURL(String documentURL) {
+        return documentURL.substring(documentURL.lastIndexOf('/') + 1);
+    }
+
+    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData, String ccdGatewayBaseUrl) {
+        if (caseData.getTseResponseSupportingMaterial() == null) {
+            return new ArrayList<>();
+        }
+
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial(),
+                ccdGatewayBaseUrl);
+    }
+
+    private static boolean hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+        return supportDocList != null && !supportDocList.isEmpty();
+    }
+
+    /**
+     * Builds a document request for generating the pdf of the CYA page for decision to a claimant application.
+     *
+     * @param caseData  contains all the case data
+     * @param accessKey access key required for docmosis
+     * @return a string representing the api request to docmosis
+     */
+    public static String getDecisionDocument(CaseData caseData, String accessKey, String ccdGatewayBaseUrl)
+            throws JsonProcessingException {
+        GenericTseApplicationType selectedApplication = getAdminSelectedApplicationType(caseData);
+        assert selectedApplication != null;
+
+        TseDecisionData data = createDataForTseDecision(caseData, ccdGatewayBaseUrl);
+        TseDecisionDocument document = TseDecisionDocument.builder()
+                .accessKey(accessKey)
+                .outputName(String.format(TSE_ADMIN_DECISION_OUTPUT_FILE_NAME,
+                        DateUtil.getCurrentDateFormattedAsYearMonthDayHourMinute(),
+                        selectedApplication.getType()))
+                .templateName(TSE_ADMIN_DECISION_TEMPLATE_NAME)
+                .data(data).build();
+        return new ObjectMapper().writeValueAsString(document);
     }
 }

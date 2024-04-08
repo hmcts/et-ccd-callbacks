@@ -54,6 +54,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @RequiredArgsConstructor
 @Service("tornadoService")
 public class TornadoService {
+    public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
+    public static final String TSE_REPLY = "TSE Reply.pdf";
+    public static final String TSE_ADMIN_DECISION_FILE_NAME = "decision.pdf";
+    public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
 
@@ -61,13 +65,8 @@ public class TornadoService {
     private static final String ET3_PROCESSING_PDF = "ET3 Processing.pdf";
     private static final String ET3_RESPONSE_PDF = "ET3 Response.pdf";
     private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
-    public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
     public static final String REFERRAL_SUMMARY_PDF = "Referral Summary.pdf";
-    public static final String TSE_REPLY = "TSE Reply.pdf";
-    public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
-
     private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
-
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
     private final UserIdamService userIdamService;
@@ -374,6 +373,7 @@ public class TornadoService {
         if (isNullOrEmpty(documentName)) {
             throw new IllegalArgumentException("Document name cannot be null or empty");
         }
+
         String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
 
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
@@ -412,10 +412,14 @@ public class TornadoService {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_REPLY -> {
-                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey(), ccdGatewayBaseUrl);
             }
             case TSE_ADMIN_REPLY -> {
-                return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        ccdGatewayBaseUrl);
+            }
+            case TSE_ADMIN_DECISION_FILE_NAME -> {
+                return TseHelper.getDecisionDocument(caseData, tornadoConnection.getAccessKey(), ccdGatewayBaseUrl);
             }
             default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

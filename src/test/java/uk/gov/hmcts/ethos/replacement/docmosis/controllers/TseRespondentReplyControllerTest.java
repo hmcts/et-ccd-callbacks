@@ -92,8 +92,6 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
-        mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
 
     @Test

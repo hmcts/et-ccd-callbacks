@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
@@ -60,6 +61,7 @@ public class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
             .withCaseId("123")
+            .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
             .build();
     }
 

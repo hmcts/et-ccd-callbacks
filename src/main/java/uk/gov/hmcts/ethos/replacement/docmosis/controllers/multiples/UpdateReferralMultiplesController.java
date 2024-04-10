@@ -49,7 +49,7 @@ public class UpdateReferralMultiplesController {
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
     private final CaseLookupService caseLookupService;
-    private static final String LOG_MESSAGE = "received update referral request for case reference : ";
+    private static final String LOG_MESSAGE = "received update multiples referral request for case reference : ";
 
     /**
      * Called for the first page of the Update Referral event.

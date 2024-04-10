@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
@@ -76,8 +77,6 @@ public class UpdateReferralMultiplesController {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
         clearReferralDataFromCaseData(caseData);
-        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
-        caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(leadCase));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
         return multipleResponse(caseData, null);
     }

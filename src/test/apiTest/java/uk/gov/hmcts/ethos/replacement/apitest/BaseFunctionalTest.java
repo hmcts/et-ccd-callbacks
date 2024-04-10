@@ -33,7 +33,7 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public abstract class BaseFunctionalTest {
-    static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION = "Authorization";
 
     protected String userToken;
     protected CloseableHttpClient client;
@@ -45,6 +45,8 @@ public abstract class BaseFunctionalTest {
     private String idamApiUrl;
     @Value("${et-sya-api.url}")
     protected String syaApiUrl;
+    @Value("${ft.exui.url}")
+    protected String exuiUrl;
     protected RequestSpecification spec;
 
     @BeforeAll

@@ -76,20 +76,32 @@ public class IdamTestApiRequests {
      * Get Access Token when testing locally - uses standard login journey which requires xui app to be running.
      */
     public String getLocalAccessToken() throws IOException {
+        List<String> cookies = idamAuth();
+
+        String auth = cookies.stream().filter(o -> o.startsWith("__auth__")).findFirst().get();
+        return "Bearer " + auth.substring(9, auth.indexOf(";"));
+    }
+
+    /**
+     * Authorize with Idam and return
+     * @return
+     * @throws IOException
+     */
+    public List<String> idamAuth() throws IOException {
         HttpClient instance = HttpClientBuilder.create().disableRedirectHandling().build();
-        HttpResponse response = instance.execute(new HttpGet("http://localhost:3455/auth/login"));
+        HttpResponse response = instance.execute(new HttpGet("http://localhost:3000/auth/login"));
 
         List<String> cookies =
-            Arrays.stream(response.getHeaders("Set-Cookie")).map(o -> o.getValue().substring(0,
-                o.getValue().indexOf(";"))).collect(Collectors.toList());
+                Arrays.stream(response.getHeaders("Set-Cookie")).map(o -> o.getValue().substring(0,
+                        o.getValue().indexOf(";"))).collect(Collectors.toList());
 
         cookies.add("seen_cookie_message=yes");
         cookies.add("cookies_policy={ \"essential\": true, \"analytics\": false, \"apm\": false }");
         cookies.add("cookies_preferences_set=false");
 
         List<NameValuePair> formparams = new ArrayList<>();
-        formparams.add(new BasicNameValuePair("username", "et.dev@hmcts.net"));
-        formparams.add(new BasicNameValuePair("password", "Pa55word11"));
+        formparams.add(new BasicNameValuePair("username", "admin@hmcts.net"));
+        formparams.add(new BasicNameValuePair("password", "Password"));
         formparams.add(new BasicNameValuePair("save", "Sign in"));
         formparams.add(new BasicNameValuePair("selfRegistrationEnabled", "true"));
         formparams.add(new BasicNameValuePair("azureLoginEnabled", "true"));
@@ -98,10 +110,10 @@ public class IdamTestApiRequests {
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
 
         HttpResponse loginResponse = client.execute(post(response.getHeaders("Location")[0].getValue())
-            .setHeader("Content-type", APPLICATION_FORM_URLENCODED_VALUE)
-            .setHeader("Cookie", String.join("; ", cookies))
-            .setEntity(entity)
-            .build());
+                .setHeader("Content-type", APPLICATION_FORM_URLENCODED_VALUE)
+                .setHeader("Cookie", String.join("; ", cookies))
+                .setEntity(entity)
+                .build());
 
         Header[] locations = loginResponse.getHeaders("Location");
 
@@ -109,12 +121,11 @@ public class IdamTestApiRequests {
         String cookieStr = String.join("; ", cookies);
         HttpGet httpGet = new HttpGet(locations[0].getValue());
         httpGet.setHeader("Cookie", cookieStr);
-        HttpResponse callbackResponse = instance.execute(httpGet);
 
-        String auth = Arrays.stream(callbackResponse.getHeaders("Set-Cookie")).filter(o -> o.getValue().startsWith(
-            "__auth__")).findFirst().get().getValue();
+        HttpResponse execute = instance.execute(httpGet);
+        Arrays.stream(execute.getHeaders("Set-Cookie")).forEach(o -> cookies.add(o.getValue()));
 
-        return "Bearer " + auth.substring(9, auth.indexOf(";"));
+        return cookies;
     }
 
     public String getAccessToken(String email) throws IOException {

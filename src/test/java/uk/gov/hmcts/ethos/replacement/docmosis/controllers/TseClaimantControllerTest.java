@@ -11,10 +11,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -50,6 +55,17 @@ class TseClaimantControllerTest extends BaseControllerTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.setCaseId("4321");
+
+        caseDetails.getCaseData().setTseApplicationStoredCollection(List.of(
+            GenericTseApplicationTypeItem.builder()
+                .id("2468")
+                .value(new GenericTseApplicationType())
+                .build()
+        ));
+
+        ClaimantTse claimantTse = new ClaimantTse();
+        claimantTse.setStoredApplicationId("2468");
+        caseDetails.getCaseData().setClaimantTse(claimantTse);
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())

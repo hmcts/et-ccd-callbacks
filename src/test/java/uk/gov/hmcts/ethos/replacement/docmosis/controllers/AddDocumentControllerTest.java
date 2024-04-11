@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -86,5 +88,20 @@ class AddDocumentControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
         verify(documentManagementService, never()).addUploadedDocsToCaseDocCollection(any());
+    }
+
+    @Test
+    void testAboutToSubmitWithInvalidDocumentIndex() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doThrow(new RuntimeException("Invalid document index"))
+                .when(documentManagementService).addUploadedDocsToCaseDocCollection(any());
+
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()));
+        verify(documentManagementService, times(1)).addUploadedDocsToCaseDocCollection(any());
     }
 }

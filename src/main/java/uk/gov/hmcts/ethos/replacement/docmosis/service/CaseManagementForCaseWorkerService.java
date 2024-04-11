@@ -95,6 +95,8 @@ public class CaseManagementForCaseWorkerService {
     public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
     public static final String CASE_MANAGEMENT_CODE = "Employment";
 
+    public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
+
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,
@@ -288,7 +290,7 @@ public class CaseManagementForCaseWorkerService {
         if (YES.equals(firstRespondent.getResponseReceived())) {
             firstRespondent.setResponseReceivedCount(
                     StringUtils.isBlank(firstRespondent.getResponseReceivedCount())
-                            ? "1"
+                            ? ET3_RESPONSE_RECEIVED_INITIAL_VALUE
                             : Integer.toString(Integer.parseInt(firstRespondent.getResponseReceivedCount()) + 1)
             );
         }

@@ -97,7 +97,7 @@ class AddDocumentControllerTest {
                 .when(documentManagementService).addUploadedDocsToCaseDocCollection(any());
 
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())

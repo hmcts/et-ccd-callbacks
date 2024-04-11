@@ -293,7 +293,8 @@ public class DocumentManagementService {
                     DocumentTypeItem docTypeItem = createDocumentTypeItemFromTopLevel(
                             uploadedDocType.getUploadedDocument(), uploadedDocType.getTopLevelDocuments(),
                             uploadedDocType.getDocumentType(), shortDescription);
-                    docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
+                    docTypeItem.getValue().setDateOfCorrespondence(uploadedDocType.getDateOfCorrespondence());
+                    docTypeItem.getValue().setExcludeFromDcf(uploadedDocType.getExcludeFromDcf());
                     addDocumentToCollectionAtIndex(caseData.getDocumentCollection(), docTypeItem,
                             uploadedDocType.getDocumentIndex());
                 });

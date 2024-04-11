@@ -34,6 +34,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
 
@@ -1076,7 +1077,7 @@ public final class DocumentHelper {
      * Add document numbers to each of the docs in the case.
      * @param caseData CaseData
      */
-    public static void setDocumentNumbers(CaseData caseData) {
+    public static void setDocumentNumbers(BaseCaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             return;
         }

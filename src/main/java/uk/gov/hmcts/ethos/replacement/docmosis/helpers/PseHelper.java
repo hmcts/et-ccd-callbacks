@@ -12,33 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.addDocumentRows;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.asRow;
 
 @Slf4j
 public final class PseHelper {
 
-    private static final String CLAIMANT_REPLY_MARKUP = RESPONSE_TABLE_HEADER
-            + TABLE_STRING
-            + RESPONSE_FROM
-            + RESPONSE_DATE
-            + "|What's your response to the tribunal? | %s|\r\n"
-            + "%s"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-            + "%s" // Rule92 No Details
-            + "\r\n";
-
-    private static final String RULE92_DETAILS_MARKUP =
-            "|Details of why you do not want to inform the other party | %s|\r\n";
-
-    private static final String DOC_MARKUP = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>\r\n";
     private static final String ACCEPTANCE_OF_ECC_RESPONSE = "Acceptance of ECC response";
 
     private PseHelper() {
@@ -141,34 +124,16 @@ public final class PseHelper {
     }
 
     private static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
-        var supportingMaterial = pseResponseType.getSupportingMaterial();
-        String supportingMaterialString = "";
-        if (supportingMaterial != null) {
-            supportingMaterialString = supportingMaterial.stream()
-                .map(d -> String.format(
-                    DOC_MARKUP,
-                    Helper.getDocumentMatcher(d.getValue().getUploadedDocument().getDocumentBinaryUrl())
-                        .replaceFirst(""),
-                    d.getValue().getUploadedDocument().getDocumentFilename()
-                ))
-                .collect(Collectors.joining());
-            supportingMaterialString = String.format(SUPPORTING_MATERIAL_TABLE_HEADER, supportingMaterialString);
-        }
+        String rule92 = "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
+        String rule92Why = "Details of why you do not want to inform the other party";
 
-        return String.format(
-                CLAIMANT_REPLY_MARKUP,
-                respondCount,
-                pseResponseType.getFrom(),
-                pseResponseType.getDate(),
-                pseResponseType.getResponse(),
-                supportingMaterialString,
-                pseResponseType.getCopyToOtherParty(),
-                NO.equals(pseResponseType.getCopyToOtherParty())
-                        ? String.format(
-                        RULE92_DETAILS_MARKUP,
-                        pseResponseType.getCopyNoGiveDetails())
-                        : ""
-        );
+        return "\r\n" + MarkdownHelper.createTwoColumnTable(new String[] {"Response " + respondCount, " "}, Stream.of(
+            asRow("Response from", pseResponseType.getFrom()), 
+            asRow("Response date", pseResponseType.getDate()),
+            asRow("What's your response to the tribunal?", pseResponseType.getResponse()),
+            addDocumentRows(pseResponseType.getSupportingMaterial(), "Supporting material"),
+            asRow(rule92, pseResponseType.getCopyToOtherParty()),
+            asRow(rule92Why, pseResponseType.getCopyNoGiveDetails())
+        ));
     }
-
 }

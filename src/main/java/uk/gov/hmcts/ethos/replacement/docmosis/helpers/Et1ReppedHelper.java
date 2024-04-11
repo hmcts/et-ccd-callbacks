@@ -208,6 +208,9 @@ public class Et1ReppedHelper {
     }
 
     private static void addClaimDetails(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getEt1SectionThreeTypeOfClaim())) {
+            return;
+        }
         caseData.setTypesOfClaim(caseData.getEt1SectionThreeTypeOfClaim());
         ClaimantRequestType claimantRequestType = new ClaimantRequestType();
         claimantRequestType.setClaimDescription(caseData.getEt1SectionThreeClaimDetails());
@@ -328,13 +331,13 @@ public class Et1ReppedHelper {
         } else if (NO.equals(caseData.getDidClaimantWorkAtSameAddress())) {
             return caseData.getClaimantWorkAddress();
         }
-        return claimantWorkAddressType;
+        return null;
     }
 
     private static NewEmploymentType claimantNewEmployment(CaseData caseData) {
         NewEmploymentType newEmploymentType = new NewEmploymentType();
         if (CollectionUtils.isEmpty(caseData.getClaimantNewJob()) || caseData.getClaimantNewJob().get(0).equals(NO)) {
-            return newEmploymentType;
+            return null;
         }
         newEmploymentType.setNewJob(getFirstListItem(caseData.getClaimantNewJob()));
         newEmploymentType.setNewlyEmployedFrom(caseData.getClaimantNewJobStartDate());

@@ -11,6 +11,8 @@ import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
+import uk.gov.hmcts.ecm.common.model.helper.DocumentConstants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
@@ -39,12 +41,15 @@ import java.util.Optional;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class Et1ReppedService {
+    private static final String ET1_EN_PDF = "ET1_2222.pdf";
+
     private final AcasService acasService;
     private final AuthTokenGenerator authTokenGenerator;
     private final CcdCaseAssignment ccdCaseAssignment;
@@ -82,11 +87,11 @@ public class Et1ReppedService {
 
     /**
      * Adds some base data to the case.
-     * @param caseDetails the case details
+     * @param caseTypeId the case type ID
+     * @param caseData the case data
      */
-    public void addDefaultData(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        tribunalOfficesService.addManagingOffice(caseData, caseDetails.getCaseTypeId());
+    public void addDefaultData(String caseTypeId, CaseData caseData) {
+        tribunalOfficesService.addManagingOffice(caseData, caseTypeId);
         caseData.setJurCodesCollection(jurisdictionCodesMapperService.mapToJurCodes(caseData));
         caseData.setReceiptDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         caseData.setPositionType("ET1 Online submission");
@@ -100,10 +105,13 @@ public class Et1ReppedService {
      */
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
-            DocumentTypeItem et1 = createEt1(caseDetails, userToken);
+            DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, ET1_EN_PDF);
+            // TODO add logic to descide if we need a welsh version
+            // DocumentTypeItem welshEt1 = createEt1DocumentType(caseDetails, userToken, ET1_CY_PDF);
+
             List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
                     userToken);
-            addDocsToClaim(caseDetails.getCaseData(), et1, acasCertificates);
+            addDocsToClaim(caseDetails.getCaseData(), englishEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
         }
@@ -117,28 +125,50 @@ public class Et1ReppedService {
         }
         if (caseData.getEt1SectionThreeDocumentUpload() != null) {
             UploadedDocumentType et1Attachment = caseData.getEt1SectionThreeDocumentUpload();
-            et1Attachment.setCategoryId("C12");
-            documentList.add(createDocumentTypeItem(caseData.getEt1SectionThreeDocumentUpload(), "ET1 Attachment"));
+            et1Attachment.setCategoryId(DocumentCategory.ET1_ATTACHMENT.getCategory());
+            documentList.add(createDocumentTypeItem(caseData.getEt1SectionThreeDocumentUpload(), ET1_ATTACHMENT));
         }
         documentList.addAll(acasCertificates);
         caseData.setClaimantDocumentCollection(documentList);
         caseData.setDocumentCollection(documentList);
     }
 
-    private DocumentTypeItem createEt1(CaseDetails caseDetails, String userToken) throws PdfServiceException {
-        byte[] pdf = pdfService.convertCaseToPdf(caseDetails.getCaseData(), "ET1_2222.pdf");
+    /**
+     * Creates a draft ET1 PDF.
+     * @param caseDetails the case details
+     * @param userToken the user token
+     */
+    public void createDraftEt1(CaseDetails caseDetails, String userToken) {
+        try {
+            caseDetails.getCaseData().setManagingOffice(null);
+            DocumentInfo documentInfo = createEt1(caseDetails, userToken, ET1_EN_PDF);
+            documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
+                    "Draft ET1 - " + caseDetails.getCaseId()));
+            caseDetails.getCaseData().setDocMarkUp(documentInfo.getMarkUp());
+        } catch (Exception e) {
+            log.error("Failed to create and upload draft ET1 documents", e);
+        }
+    }
+
+    private DocumentTypeItem createEt1DocumentType(CaseDetails caseDetails, String userToken, String pdfSource)
+            throws PdfServiceException {
+        DocumentInfo documentInfo = createEt1(caseDetails, userToken, pdfSource);
+
+        UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(documentInfo);
+        uploadedDocumentType.setCategoryId(DocumentCategory.ET1.getCategory());
+        return createDocumentTypeItem(uploadedDocumentType, DocumentConstants.ET1);
+    }
+
+    private DocumentInfo createEt1(CaseDetails caseDetails, String userToken, String pdfSource)
+            throws PdfServiceException {
+        byte[] pdf = pdfService.convertCaseToPdf(caseDetails.getCaseData(), pdfSource);
         if (ObjectUtils.isEmpty(pdf)) {
             throw new PdfServiceException("Failed to create ET1 PDF", new NullPointerException());
         }
-        DocumentInfo documentInfo = tornadoService.createDocumentInfoFromBytes(
-                userToken,
+        return tornadoService.createDocumentInfoFromBytes(userToken,
                 pdf,
                 getEt1DocumentName(caseDetails.getCaseData()),
                 caseDetails.getCaseTypeId());
-
-        UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(documentInfo);
-        uploadedDocumentType.setCategoryId("C11");
-        return createDocumentTypeItem(uploadedDocumentType, "ET1");
     }
 
     private String getEt1DocumentName(CaseData caseData) {
@@ -171,8 +201,9 @@ public class Et1ReppedService {
         documentInfoList.stream()
                 .map(documentManagementService::addDocumentToDocumentField)
                 .forEach(uploadedDocumentType -> {
-                    uploadedDocumentType.setCategoryId("C13");
-                    documentTypeItems.add(createDocumentTypeItem(uploadedDocumentType, "ACAS Certificate"));
+                    uploadedDocumentType.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
+                    documentTypeItems.add(createDocumentTypeItem(uploadedDocumentType,
+                            DocumentConstants.ACAS_CERTIFICATE));
                 });
 
         return documentTypeItems;
@@ -201,6 +232,7 @@ public class Et1ReppedService {
         claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
         OrganisationsResponse organisationDetails = getOrganisationDetailsFromUserId(userToken, userDetails.getUid());
         if (!ObjectUtils.isEmpty(organisationDetails)) {
+            log.info("Adding ref data organisation details to case {}", caseData.getEthosCaseReference());
             claimantRepresentative.setMyHmctsOrganisation(Organisation.builder()
                     .organisationID(organisationDetails.getOrganisationIdentifier())
                     .organisationName(organisationDetails.getName())
@@ -216,6 +248,9 @@ public class Et1ReppedService {
     @NotNull
     private static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
         Address organisationAddress = new Address();
+        if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
+            return organisationAddress;
+        }
         organisationAddress.setAddressLine1(organisationDetails.getContactInformation().get(0).getAddressLine1());
         organisationAddress.setAddressLine2(organisationDetails.getContactInformation().get(0).getAddressLine2());
         organisationAddress.setAddressLine3(organisationDetails.getContactInformation().get(0).getAddressLine3());
@@ -226,7 +261,13 @@ public class Et1ReppedService {
         return organisationAddress;
     }
 
-    private OrganisationsResponse getOrganisationDetailsFromUserId(String userToken, String userId) {
+    /**
+     * Retrieves the organisation details from the user ID.
+     * @param userToken the user token
+     * @param userId the user ID
+     * @return the organisation details
+     */
+    public OrganisationsResponse getOrganisationDetailsFromUserId(String userToken, String userId) {
         try {
             ResponseEntity<OrganisationsResponse> response =
                     organisationClient.retrieveOrganisationDetailsByUserId(userToken,
@@ -241,11 +282,25 @@ public class Et1ReppedService {
         return null;
     }
 
+    /**
+     * Assigns the case access to the claimant representative.
+     * @param caseDetails the case details
+     * @param userToken the user token
+     */
     public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
         UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
         OrganisationsResponse organisation = getOrganisationDetailsFromUserId(userToken, claimantRepUser.getUid());
 
-        log.info("Adding roles {} to case {}", claimantRepUser.getRoles(), caseDetails.getCaseId());
+        log.info("Adding claimant solicitor role to case {}", caseDetails.getCaseId());
+
+        CaseAssignmentUserRolesRequest addCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
+                Long.valueOf(caseDetails.getCaseId()),
+                claimantRepUser.getUid(),
+                organisation.getOrganisationIdentifier(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        ccdCaseAssignment.addCaseUserRoles(addCaseUserRole);
+
+        log.info("Removing creator role from case {}", caseDetails.getCaseId());
 
         CaseAssignmentUserRolesRequest removeCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
                 Long.valueOf(caseDetails.getCaseId()),
@@ -255,14 +310,7 @@ public class Et1ReppedService {
 
         ccdCaseAssignment.removeCaseUserRoles(removeCaseUserRole);
 
-        CaseAssignmentUserRolesRequest addCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
-                Long.valueOf(caseDetails.getCaseId()),
-                claimantRepUser.getUid(),
-                organisation.getOrganisationIdentifier(),
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-        ccdCaseAssignment.addCaseUserRoles(addCaseUserRole);
-
-        log.info("Successfully added the claimant's solicitor roles to case Id {} ", caseDetails.getCaseId());
+        log.info("Successfully modified roles for case {} ", caseDetails.getCaseId());
     }
 
     private void setClaimantRepOrgPolicy(CaseData caseData, OrganisationsResponse organisation) {

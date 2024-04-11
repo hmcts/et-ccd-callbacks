@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,11 +11,15 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -28,9 +33,10 @@ class Et1ReppedHelperTest {
     private CaseData caseData;
     private CCDRequest ccdRequest;
     private CaseDetails caseDetails;
+    private CaseDetails caseDetails2;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         caseData = new CaseData();
 
         caseDetails = new CaseDetails();
@@ -40,6 +46,7 @@ class Et1ReppedHelperTest {
 
         ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
+        caseDetails2 = generateCaseDetails("et1ReppedDraft.json");
     }
 
     @Test
@@ -132,6 +139,22 @@ class Et1ReppedHelperTest {
         assertThrows(NullPointerException.class, () -> Et1ReppedHelper.generateWorkAddressLabel(caseData));
     }
 
+    @Test
+    void clearEt1ReppedFields() {
+        CaseData caseData1 = caseDetails2.getCaseData();
+        Et1ReppedHelper.clearEt1ReppedCreationFields(caseData1);
+        assertNull(caseData1.getEt1ReppedSectionOne());
+        assertNull(caseData1.getEt1ReppedSectionTwo());
+        assertNull(caseData1.getEt1ReppedSectionThree());
+        assertNull(caseData1.getEt1ClaimStatuses());
+    }
+
+    @Test
+    void setEt1SubmitData() {
+        CaseData caseData1 = caseDetails2.getCaseData();
+        Et1ReppedHelper.setEt1SubmitData(caseData1);
+    }
+
     private void generateRespondentTypeInfo(String type) {
         if (INDIVIDUAL.equals(type)) {
             caseData.setRespondentFirstName("First");
@@ -139,5 +162,12 @@ class Et1ReppedHelperTest {
         } else {
             caseData.setRespondentOrganisationName("Org");
         }
+    }
+
+    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource(jsonFileName)).toURI())));
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, CaseDetails.class);
     }
 }

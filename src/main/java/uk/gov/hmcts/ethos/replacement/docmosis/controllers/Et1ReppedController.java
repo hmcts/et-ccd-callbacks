@@ -37,6 +37,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequestMapping("/et1Repped")
 public class Et1ReppedController {
+    private static final String GENERATED_DOCUMENT_URL = "Please download the draft ET1 from : ";
     private final Et1ReppedService et1ReppedService;
     private final CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -103,6 +104,25 @@ public class Et1ReppedController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.setCreateDraftData(caseData, ccdRequest.getCaseDetails().getCaseId());
+        caseData.setSearchCriteria(null);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/createCase/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "create case submitted callback handler for ET1 repped journey")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> createCaseSubmitted(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         et1ReppedService.assignCaseAccess(ccdRequest.getCaseDetails(), userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -451,14 +471,15 @@ public class Et1ReppedController {
             @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
-        et1ReppedService.addDefaultData(caseDetails);
-        et1ReppedService.addClaimantRepresentativeDetails(caseDetails.getCaseData(), userToken);
+        CaseData caseData = caseDetails.getCaseData();
+        Et1ReppedHelper.setEt1SubmitData(caseData);
+        et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseData);
+        et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
         caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
         et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
         // TODO do we need to send an email?
-        Et1ReppedHelper.clearEt1ReppedCreationFields(caseDetails.getCaseData());
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+        Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
@@ -484,6 +505,50 @@ public class Et1ReppedController {
                                    
                                    The tribunal will send you updates as the claim progresses.
                                    """)
+                .build());
+    }
+
+    @PostMapping(value = "/createDraftEt1", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for validating LinkedCases question")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> createDraftEt1(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
+        et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
+        et1ReppedService.addClaimantRepresentativeDetails(caseDetails.getCaseData(), userToken);
+        et1ReppedService.createDraftEt1(ccdRequest.getCaseDetails(), userToken);
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    @PostMapping(value = "/createDraftEt1Submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Show Draft ET1 download link.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> createDraftEt1Submitted(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_body(GENERATED_DOCUMENT_URL + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp()
+                       + "\n\n"
+                       + Et1ReppedHelper.getSectionCompleted(ccdRequest.getCaseDetails().getCaseData(),
+                        ccdRequest.getCaseDetails().getCaseId()))
                 .build());
     }
 }

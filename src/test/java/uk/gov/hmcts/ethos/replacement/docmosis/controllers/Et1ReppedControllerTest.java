@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,17 +14,49 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -47,6 +80,7 @@ class Et1ReppedControllerTest {
     private static final String VALIDATE_POSTCODE = "/et1Repped/createCase/validatePostcode";
     private static final String OFFICE_ERROR = "/et1Repped/createCase/officeError";
     private static final String CREATE_CASE_ABOUT_TO_SUBMIT = "/et1Repped/createCase/aboutToSubmit";
+    private static final String CREATE_CASE_SUBMITTED = "/et1Repped/createCase/submitted";
     private static final String VALIDATE_CLAIMANT_SEX = "/et1Repped/sectionOne/validateClaimantSex";
     private static final String VALIDATE_CLAIMANT_SUPPORT = "/et1Repped/sectionOne/validateClaimantSupport";
     private static final String VALIDATE_REPRESENTATIVE_INFORMATION =
@@ -68,22 +102,84 @@ class Et1ReppedControllerTest {
     private static final String GENERATE_RESPONDENT_PREAMBLE = "/et1Repped/sectionTwo/generateRespondentPreamble";
     private static final String GENERATE_WORK_ADDRESS_LABEL = "/et1Repped/sectionTwo/generateWorkAddressLabel";
     private static final String SECTION_COMPLETED = "/et1Repped/sectionCompleted";
+    private static final String VALIDATE_WHISTLEBLOWING = "/et1Repped/sectionThree/validateWhistleblowing";
+    private static final String VALIDATE_LINKED_CASES = "/et1Repped/sectionThree/validateLinkedCases";
+    private static final String SUBMIT_CLAIM = "/et1Repped/submitClaim";
+    private static final String SUBMITTED = "/et1Repped/submitted";
+    private static final String CREATE_DRAFT_ET1 = "/et1Repped/createDraftEt1";
+    private static final String CREATE_DRAFT_ET1_SUBMITTED = "/et1Repped/createDraftEt1Submitted";
 
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
+    private CCDRequest ccdRequest2;
     private CaseData caseData;
 
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private Et1ReppedService et1ReppedService;
+    @MockBean
+    private UserIdamService userIdamService;
+    @MockBean
+    private OrganisationClient organisationClient;
+
+    @MockBean
+    private CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private JsonMapper jsonMapper;
 
+    // Below needed as reusing code in caseActionsForCaseWorkerController
+    @MockBean
+    private CaseCloseValidator caseCloseValidator;
+    @MockBean
+    private CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
+    @MockBean
+    private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
+    @MockBean
+    private CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
+    @MockBean
+    private DefaultValuesReaderService defaultValuesReaderService;
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    @MockBean
+    private SingleReferenceService singleReferenceService;
+    @MockBean
+    private EventValidationService eventValidationService;
+    @MockBean
+    private DepositOrderValidationService depositOrderValidationService;
+    @MockBean
+    private JudgmentValidationService judgmentValidationService;
+    @MockBean
+    private ConciliationTrackService conciliationTrackService;
+    @MockBean
+    private SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
+    @MockBean
+    private AddSingleCaseToMultipleService addSingleCaseToMultipleService;
+    @MockBean
+    private ClerkService clerkService;
+    @MockBean
+    private FileLocationSelectionService fileLocationSelectionService;
+    @MockBean
+    private ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
+    @MockBean
+    private FixCaseApiService fixCaseApiService;
+    @MockBean
+    private Et1VettingService et1VettingService;
+    @MockBean
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    @MockBean
+    private CaseFlagsService caseFlagsService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
+    @MockBean
+    private NocRespondentHelper nocRespondentHelper;
+    @MockBean
+    private CaseManagementLocationService caseManagementLocationService;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         caseData = new CaseData();
         caseData.setEt1ReppedSectionOne(NO);
         caseData.setEt1ReppedSectionTwo(NO);
@@ -97,6 +193,22 @@ class Et1ReppedControllerTest {
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .build();
+
+        CaseDetails caseDetails = generateCaseDetails("et1ReppedDraft.json");
+        ccdRequest2 = CCDRequestBuilder.builder()
+                .withCaseData(caseDetails.getCaseData())
+                .withState(caseDetails.getState())
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
+                .build();
+
+        when(userIdamService.getUserDetails(AUTH_TOKEN)).thenReturn(HelperTest.getUserDetails());
+        OrganisationsResponse organisationsResponse = OrganisationsResponse.builder()
+                .name("TestOrg")
+                .organisationIdentifier("AA11BB")
+                .build();
+        when(et1ReppedService.getOrganisationDetailsFromUserId(anyString(), anyString()))
+                .thenReturn(organisationsResponse);
     }
 
     @Test
@@ -602,4 +714,106 @@ class Et1ReppedControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void validateWhistleblowing() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(VALIDATE_WHISTLEBLOWING)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void validateLinkedCases() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(VALIDATE_LINKED_CASES)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void createCaseSubmitted() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(CREATE_CASE_SUBMITTED)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void createDraftEt1Submitted() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(CREATE_DRAFT_ET1_SUBMITTED)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void createDraftEt1() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(CREATE_DRAFT_ET1)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void submitted() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(SUBMITTED)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void submitClaim() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(SUBMIT_CLAIM)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource(jsonFileName)).toURI())));
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, CaseDetails.class);
+    }
 }

@@ -145,7 +145,7 @@ public final class PseHelper {
 
         String table = MarkdownHelper.createTwoColumnTable(new String[] {"Response " + respondCount, " "}, initialRows);
 
-        String rule92 = "Do you want to copy correspondence to the other party to satisfy the Rules of Procedure?";
+        String rule92 = "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
         String rule92Why = "Details of why you do not want to inform the other party";
 
         String rowsPostSupporting = MarkdownHelper.createTwoColumnRows(List.of(

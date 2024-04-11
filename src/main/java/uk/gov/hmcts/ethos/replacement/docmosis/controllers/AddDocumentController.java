@@ -20,8 +20,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
@@ -65,9 +68,15 @@ public class AddDocumentController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
-        caseData.getAddDocumentCollection().clear();
-        return getCallbackRespEntityNoErrors(caseData);
+
+        try {
+            documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
+            caseData.getAddDocumentCollection().clear();
+            return getCallbackRespEntityNoErrors(caseData);
+        } catch (Exception e) {
+            log.error("Error adding uploaded docs to case doc collection", e);
+            return getCallbackRespEntityErrors(List.of(e.getMessage()), caseData);
+        }
     }
 }
 

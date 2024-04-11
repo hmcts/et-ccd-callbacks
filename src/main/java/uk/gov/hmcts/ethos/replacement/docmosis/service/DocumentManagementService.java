@@ -47,6 +47,7 @@ import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument;
 import static uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.addDocumentToCollectionAtIndex;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
@@ -293,7 +294,8 @@ public class DocumentManagementService {
                             uploadedDocType.getUploadedDocument(), uploadedDocType.getTopLevelDocuments(),
                             uploadedDocType.getDocumentType(), shortDescription);
                     docTypeItem.getValue().setDateOfCorrespondence(uploadDoc.getValue().getDateOfCorrespondence());
-                    caseData.getDocumentCollection().add(docTypeItem);
+                    addDocumentToCollectionAtIndex(caseData.getDocumentCollection(), docTypeItem,
+                            uploadedDocType.getDocumentIndex());
                 });
         setDocumentNumbers(caseData);
     }

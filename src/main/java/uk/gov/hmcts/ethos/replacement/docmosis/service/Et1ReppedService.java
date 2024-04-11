@@ -43,12 +43,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class Et1ReppedService {
     private static final String ET1_EN_PDF = "ET1_2222.pdf";
+    private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
 
     private final AcasService acasService;
     private final AuthTokenGenerator authTokenGenerator;
@@ -226,9 +228,7 @@ public class Et1ReppedService {
         claimantRepresentative.setRepresentativeEmailAddress(userDetails.getEmail());
         claimantRepresentative.setRepresentativeReference(caseData.getRepresentativeReferenceNumber());
         claimantRepresentative.setRepresentativePreference(
-                CollectionUtils.isEmpty(caseData.getRepresentativeContactPreference())
-                        ? null
-                        : caseData.getRepresentativeContactPreference().get(0));
+                getFirstListItem(caseData.getRepresentativeContactPreference()));
         claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
         OrganisationsResponse organisationDetails = getOrganisationDetailsFromUserId(userToken, userDetails.getUid());
         if (!ObjectUtils.isEmpty(organisationDetails)) {

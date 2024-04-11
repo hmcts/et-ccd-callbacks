@@ -553,7 +553,7 @@ class RespondentTellSomethingElseServiceTest {
         DocumentType actualDocumentType = documentCollection.get(0).getValue();
 
         assertThat(documentCollection.size(), is(1));
-        System.out.println(actualDocumentType);
+
         assertEquals(selectedApplication, actualDocumentType.getShortDescription());
 
     }

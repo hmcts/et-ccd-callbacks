@@ -105,7 +105,7 @@ class Et1ReppedControllerTest {
     private static final String VALIDATE_WHISTLEBLOWING = "/et1Repped/sectionThree/validateWhistleblowing";
     private static final String VALIDATE_LINKED_CASES = "/et1Repped/sectionThree/validateLinkedCases";
     private static final String SUBMIT_CLAIM = "/et1Repped/submitClaim";
-    private static final String SUBMITTED = "/et1Repped/submitted";
+    private static final String CLAIM_SUBMITTED = "/et1Repped/submitted";
     private static final String CREATE_DRAFT_ET1 = "/et1Repped/createDraftEt1";
     private static final String CREATE_DRAFT_ET1_SUBMITTED = "/et1Repped/createDraftEt1Submitted";
 
@@ -784,7 +784,7 @@ class Et1ReppedControllerTest {
     @Test
     void submitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(SUBMITTED)
+        mockMvc.perform(post(CLAIM_SUBMITTED)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest2)))

@@ -353,7 +353,7 @@ public final class Helper {
      * @param list the list to get the first item from
      * @return the first item in the list or null if the list is empty
      */
-    static String getFirstListItem(List<String> list) {
+    public static String getFirstListItem(List<String> list) {
         return CollectionUtils.isEmpty(list) ? null : list.get(0);
     }
 }

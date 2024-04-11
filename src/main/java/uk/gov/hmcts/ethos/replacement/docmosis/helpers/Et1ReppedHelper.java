@@ -126,12 +126,12 @@ public class Et1ReppedHelper {
     }
 
     private static boolean allSectionsCompleted(CaseData caseData) {
-        return (!isNullOrEmpty(caseData.getEt1ReppedSectionOne())
-                && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionOne()))
-                && (!isNullOrEmpty(caseData.getEt1ReppedSectionTwo())
-                && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionTwo()))
-                && (!isNullOrEmpty(caseData.getEt1ReppedSectionThree())
-                && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionThree()));
+        return !isNullOrEmpty(caseData.getEt1ReppedSectionOne())
+               && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionOne())
+               && !isNullOrEmpty(caseData.getEt1ReppedSectionTwo())
+               && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionTwo())
+               && !isNullOrEmpty(caseData.getEt1ReppedSectionThree())
+               && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionThree());
     }
 
     /**
@@ -235,10 +235,10 @@ public class Et1ReppedHelper {
         if (CollectionUtils.isNotEmpty(caseData.getClaimSuccessful())) {
             claimantRequestType.setClaimOutcome(caseData.getClaimSuccessful());
             claimantRequestType.getClaimOutcome().forEach(claimOutcome -> {
-                if (claimOutcome.equals("compensation")) {
+                if ("compensation".equals(claimOutcome)) {
                     claimantRequestType.setClaimantCompensationText(caseData.getCompensationDetails());
                     claimantRequestType.setClaimantCompensationAmount(caseData.getCompensationAmount());
-                } else if (claimOutcome.equals(("tribunal"))) {
+                } else if ("tribunal".equals(claimOutcome)) {
                     claimantRequestType.setClaimantTribunalRecommendation(caseData.getTribunalRecommendationDetails());
                 }
             });
@@ -335,10 +335,10 @@ public class Et1ReppedHelper {
     }
 
     private static NewEmploymentType claimantNewEmployment(CaseData caseData) {
-        NewEmploymentType newEmploymentType = new NewEmploymentType();
         if (CollectionUtils.isEmpty(caseData.getClaimantNewJob()) || caseData.getClaimantNewJob().get(0).equals(NO)) {
             return null;
         }
+        NewEmploymentType newEmploymentType = new NewEmploymentType();
         newEmploymentType.setNewJob(getFirstListItem(caseData.getClaimantNewJob()));
         newEmploymentType.setNewlyEmployedFrom(caseData.getClaimantNewJobStartDate());
         newEmploymentType.setNewPayBeforeTax(caseData.getClaimantNewJobPayBeforeTax());

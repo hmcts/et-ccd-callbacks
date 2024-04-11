@@ -562,7 +562,8 @@ class CaseCompletedReportTest {
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
-        DateListedTypeItem[] dateListedTypeItem = new DateListedTypeItem[] {
+        DateListedTypeItem[] dateListedTypeItem;
+        dateListedTypeItem = new DateListedTypeItem[] {
                 createHearingDateListed("1970-01-01T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-02T00:00:00", HEARING_STATUS_WITHDRAWN, NO), // should be ignored
                 createHearingDateListed("1970-01-03T00:00:00", HEARING_STATUS_HEARD, NO),
@@ -606,7 +607,8 @@ class CaseCompletedReportTest {
         List<SubmitEvent> submitEvents = new ArrayList<>();
 
         // Case 1: 4 session days no conciliation
-        DateListedTypeItem[] dateListedTypeItem = new DateListedTypeItem[] {
+        DateListedTypeItem[] dateListedTypeItem;
+        dateListedTypeItem = new DateListedTypeItem[] {
                 createHearingDateListed("1970-01-01T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-02T00:00:00", HEARING_STATUS_HEARD, NO),
                 createHearingDateListed("1970-01-03T00:00:00", HEARING_STATUS_HEARD, NO),

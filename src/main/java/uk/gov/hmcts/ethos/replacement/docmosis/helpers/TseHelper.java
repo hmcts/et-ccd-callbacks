@@ -288,6 +288,6 @@ public final class TseHelper {
     }
 
     private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+        return supportDocList != null && !supportDocList.isEmpty() ? "Yes" : "No";
     }
 }

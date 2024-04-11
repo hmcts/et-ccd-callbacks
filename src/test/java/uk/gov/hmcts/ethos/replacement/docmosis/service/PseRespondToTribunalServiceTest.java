@@ -336,8 +336,7 @@ class PseRespondToTribunalServiceTest {
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
-            |Supporting material | <a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>\r
-            |\r
+            |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
             |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 

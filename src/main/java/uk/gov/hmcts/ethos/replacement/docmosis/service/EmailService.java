@@ -57,4 +57,8 @@ public class EmailService {
     public String getExuiCaseLink(String caseId) {
         return exuiUrl + caseId;
     }
+
+    public String getExuiAllDocumentsLink(String caseId) {
+        return exuiUrl + caseId + "#Documents";
+    }
 }

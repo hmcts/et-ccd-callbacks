@@ -194,7 +194,7 @@ class Et1ReppedControllerTest {
                 .withCaseData(caseData)
                 .build();
 
-        CaseDetails caseDetails = generateCaseDetails("et1ReppedDraft.json");
+        CaseDetails caseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
         ccdRequest2 = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
                 .withState(caseDetails.getState())

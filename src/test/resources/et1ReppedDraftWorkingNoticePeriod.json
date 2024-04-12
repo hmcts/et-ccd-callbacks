@@ -45,8 +45,13 @@
       "Yes"
     ],
     "claimantStillWorking": [
-      "Working"
+      "Notice"
     ],
+    "claimantWorkingNoticePeriodEndDate": "2024-04-10",
+    "claimantWorkingNoticePeriod": [
+      "Weeks"
+    ],
+    "claimantWorkingNoticePeriodWeeks": "10",
     "et1ReppedTriageYesNo": "Yes",
     "claimantAttendHearing": [
       "Video"

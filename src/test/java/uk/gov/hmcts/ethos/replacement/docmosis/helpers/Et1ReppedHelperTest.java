@@ -25,7 +25,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.INDIVIDUAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NOTICE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NO_LONGER_WORKING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.WORKING;
 import static uk.gov.hmcts.ethos.utils.CaseDataBuilder.createGenericAddress;
 
 class Et1ReppedHelperTest {
@@ -33,7 +36,6 @@ class Et1ReppedHelperTest {
     private CaseData caseData;
     private CCDRequest ccdRequest;
     private CaseDetails caseDetails;
-    private CaseDetails caseDetails2;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -46,7 +48,6 @@ class Et1ReppedHelperTest {
 
         ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
-        caseDetails2 = generateCaseDetails("et1ReppedDraft.json");
     }
 
     @Test
@@ -140,8 +141,8 @@ class Et1ReppedHelperTest {
     }
 
     @Test
-    void clearEt1ReppedFields() {
-        CaseData caseData1 = caseDetails2.getCaseData();
+    void clearEt1ReppedFields() throws Exception {
+        CaseData caseData1 = generateCaseDetails("et1ReppedDraftStillWorking.json").getCaseData();
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData1);
         assertNull(caseData1.getEt1ReppedSectionOne());
         assertNull(caseData1.getEt1ReppedSectionTwo());
@@ -150,9 +151,25 @@ class Et1ReppedHelperTest {
     }
 
     @Test
-    void setEt1SubmitData() {
-        CaseData caseData1 = caseDetails2.getCaseData();
-        Et1ReppedHelper.setEt1SubmitData(caseData1);
+    void setEt1SubmitDataStillWorking() throws Exception {
+        caseData = generateCaseDetails("et1ReppedDraftStillWorking.json").getCaseData();
+        Et1ReppedHelper.setEt1SubmitData(caseData);
+        assertEquals(WORKING, caseData.getClaimantOtherType().getStillWorking());
+    }
+
+    @Test
+    void setEt1SubmitDataNoticePeriod() throws Exception {
+        caseData = generateCaseDetails("et1ReppedDraftWorkingNoticePeriod.json").getCaseData();
+        Et1ReppedHelper.setEt1SubmitData(caseData);
+        assertEquals(NOTICE, caseData.getClaimantOtherType().getStillWorking());
+    }
+
+    @Test
+    void setEt1SubmitDataNoLongerWorking() throws Exception {
+        caseData = generateCaseDetails("et1ReppedDraftNoLongerWorking.json").getCaseData();
+        Et1ReppedHelper.setEt1SubmitData(caseData);
+        assertEquals(NO_LONGER_WORKING, caseData.getClaimantOtherType().getStillWorking());
+
     }
 
     private void generateRespondentTypeInfo(String type) {

@@ -382,7 +382,7 @@ public class Et1ReppedHelper {
     }
 
     private static void claimantNoLongerWorking(CaseData caseData, ClaimantOtherType claimantOtherType) {
-        if (CollectionUtils.isNotEmpty(caseData.getClaimantNoLongerWorkingQuestion())) {
+        if (CollectionUtils.isEmpty(caseData.getClaimantNoLongerWorkingQuestion())) {
             return;
         }
         claimantOtherType.setClaimantNoticePeriod(YES);

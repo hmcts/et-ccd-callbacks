@@ -88,7 +88,7 @@ class Et1ReppedServiceTest {
         caseDetails.setCaseId("1234567890123456");
         caseDetails.setCaseTypeId("ET_EnglandWales");
 
-        draftCaseDetails = generateCaseDetails("et1ReppedDraft.json");
+        draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
 
         postcodeToOfficeService = new PostcodeToOfficeService(new PostcodeToOfficeMappings());
         tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),

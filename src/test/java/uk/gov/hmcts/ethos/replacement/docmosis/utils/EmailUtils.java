@@ -19,4 +19,9 @@ public class EmailUtils extends EmailService {
     public String getExuiCaseLink(String caseId) {
         return "exuiUrl" + caseId;
     }
+
+    @Override
+    public String getExuiAllDocumentsLink(String caseId) {
+        return "exuiAllDocumentsUrl" + caseId + "#Documents";
+    }
 }

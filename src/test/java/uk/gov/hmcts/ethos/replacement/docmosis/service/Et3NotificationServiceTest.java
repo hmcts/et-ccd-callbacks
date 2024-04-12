@@ -61,14 +61,20 @@ class Et3NotificationServiceTest {
     void sendNotifications_shouldSendThreeNotifications() {
         et3NotificationService.sendNotifications(caseDetails);
 
-        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToCitizenHub", "citizenUrl1234");
+        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"),
+                personalisation.capture());
+        assertThat(personalisation.getValue())
+                .containsEntry("exuiAllDocumentsLink", "exuiAllDocumentsUrl1234#Documents");
 
-        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1234");
+        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"),
+                personalisation.capture());
+        assertThat(personalisation.getValue())
+                .containsEntry("linkToExUI", "exuiUrl1234");
 
-        verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1234");
+        verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"),
+                personalisation.capture());
+        assertThat(personalisation.getValue())
+                .containsEntry("linkToExUI", "exuiUrl1234");
     }
 
     @Test

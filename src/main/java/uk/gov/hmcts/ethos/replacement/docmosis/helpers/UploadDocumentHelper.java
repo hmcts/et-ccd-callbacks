@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -196,7 +195,6 @@ public final class UploadDocumentHelper {
     }
 
     public static void getMultipleDocumentCollection(BaseCaseData multipleData) {
-
 
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             return;

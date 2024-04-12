@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,12 +10,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -31,15 +35,19 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -56,6 +64,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.g
 @ExtendWith(SpringExtension.class)
 class TseHelperTest {
     private static final DynamicValueType SELECT_APPLICATION = DynamicValueType.create("1", "");
+
+    private static final String ACCESS_KEY = "Test Access Key";
 
     private CaseData caseData;
     private GenericTseApplicationTypeItem genericTseApplicationTypeItem;
@@ -236,13 +246,14 @@ class TseHelperTest {
 
         caseData.setTseResponseSupportingMaterial(List.of(item));
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
-        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
-        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
+        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "",
+                "testBinaryUrl");
+        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-04696.docx\","
             + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
             + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
             + "\"documentCollection\":[{\"id\":\"78910\","
             + "\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
             + "\",\"document_filename\":\"image.png\","
             + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
             + ":null},\"ownerDocument\":null,"
@@ -250,7 +261,8 @@ class TseHelperTest {
             + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
             + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
             + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null,\"docNumber\":null,\"excludeFromDcf\":null,\"documentIndex\":null}}],"
+            + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\""
+            + ":\"image.png|testBinaryUrl/documents/1234/binary\",\"excludeFromDcf\":null,\"documentIndex\":null}}],"
             + "\"copy\":\"Yes\","
             + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
 
@@ -365,6 +377,67 @@ class TseHelperTest {
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("3", ""));
 
             assertNull(getRespondentSelectedApplicationType(caseData));
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void getDecisionDocument() {
+
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
+                InvocationOnMock::callRealMethod)) {
+            tseHelperMockedStatic.when(() -> TseHelper.getAdminSelectedApplicationType(caseData))
+                    .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
+            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY, "TestUrl");
+
+            assertThat(value, containsString("EM-TRB-EGW-ENG-03914.docx"));
+            assertThat(value, containsString("decision.pdf"));
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void getDecisionDocumentWithSupportedDocumentList() {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setCategoryId("Uploaded Document Type Category Id1");
+        uploadedDocumentType.setDocumentFilename("Uploaded Document File Name1");
+        uploadedDocumentType.setDocumentUrl(
+                "dm-store-aat.service.core-compute-aat.internal/documents/0de3d0d5-4fd2-4080-89b0-8830d8ad1056");
+        uploadedDocumentType.setDocumentBinaryUrl("Uploaded Document Binary Url1");
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(uploadedDocumentType);
+        DocumentTypeItem uploadedDocumentTypeItem = new DocumentTypeItem();
+        uploadedDocumentTypeItem.setValue(documentType);
+        List<GenericTypeItem<DocumentType>> documentList1 = new ArrayList<>();
+        documentList1.add(uploadedDocumentTypeItem);
+        caseData.setTseAdminResponseRequiredYesDoc(documentList1);
+        caseData.setTseAdminResponseRequiredNoDoc(documentList1);
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
+                InvocationOnMock::callRealMethod)) {
+            tseHelperMockedStatic.when(() -> TseHelper.getAdminSelectedApplicationType(caseData))
+                    .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
+            String value = TseHelper.getDecisionDocument(caseData, ACCESS_KEY, "TestUrl");
+
+            assertThat(value, containsString("EM-TRB-EGW-ENG-03914.docx"));
+            assertThat(value, containsString("decision.pdf"));
+            assertThat(value, containsString("0de3d0d5-4fd2-4080-89b0-8830d8ad1056"));
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void getPersonalisationForAcknowledgement() {
+
+        try (MockedStatic<TseHelper> tseHelperMockedStatic = mockStatic(TseHelper.class,
+                InvocationOnMock::callRealMethod)) {
+            tseHelperMockedStatic.when(() -> getRespondentSelectedApplicationType(caseData))
+                    .thenReturn(caseData.getGenericTseApplicationCollection().get(0).getValue());
+            CaseDetails caseDetails = new CaseDetails();
+            caseDetails.setCaseData(caseData);
+            Map<String, Object> value = TseHelper.getPersonalisationForAcknowledgement(caseDetails,
+                    "TestEXUO URL");
+
+            assertThat(value, aMapWithSize(5));
         }
     }
 }

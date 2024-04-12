@@ -24,12 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 
 public final class TseAdmReplyHelper {
     private static final String TSE_ADMIN_REPLY_OUTPUT_NAME = "%s Reply.pdf";
-    private static final String TSE_ADMIN_REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-000991.docx";
+    private static final String TSE_ADMIN_REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-000992.docx";
 
     private TseAdmReplyHelper() {
         // Sonar Lint: Utility classes should not have public constructors
@@ -59,11 +61,12 @@ public final class TseAdmReplyHelper {
         }
     }
 
-    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey,
+                                                 String ccdGatewayBaseUrl) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getTseAdminSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication, ccdGatewayBaseUrl);
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(TSE_ADMIN_REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -81,7 +84,8 @@ public final class TseAdmReplyHelper {
                 .orElse(null);
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application,
+                                                      String ccdGatewayBaseUrl) {
         String selectedCmoRespondent = caseData.getTseAdmReplyCmoSelectPartyRespond();
         return TseAdminReplyData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -89,8 +93,8 @@ public final class TseAdmReplyHelper {
                 .type(defaultIfEmpty(application.getType(), null))
                 .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .response(defaultIfEmpty(application.getDetails(), null))
-                .supportingYesNo(hasSupportingDocs(caseData.getTseAdmReplyAddDocument()))
-                .documentCollection(getUploadedDocList(caseData.getTseAdmReplyAddDocument()))
+                .supportingYesNo(hasSupportingDocs(caseData.getTseAdmReplyAddDocument()) ? YES : NO)
+                .documentCollection(getUploadedDocList(caseData.getTseAdmReplyAddDocument(), ccdGatewayBaseUrl))
                 .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
                 .responseTitle(defaultIfEmpty(caseData.getTseAdmReplyEnterResponseTitle(), null))
                 .responseAdditionalInfo(defaultIfEmpty(caseData.getTseAdmReplyAdditionalInformation(), null))
@@ -110,15 +114,15 @@ public final class TseAdmReplyHelper {
     }
 
     private static List<GenericTypeItem<DocumentType>> getUploadedDocList(
-            List<GenericTypeItem<DocumentType>> docTypeList) {
+            List<GenericTypeItem<DocumentType>> docTypeList, String ccdGatewayBaseUrl) {
         if (docTypeList == null) {
             return new ArrayList<>();
         }
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
+        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList, ccdGatewayBaseUrl);
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
+    private static boolean hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+        return supportDocList != null && !supportDocList.isEmpty();
     }
 
 }

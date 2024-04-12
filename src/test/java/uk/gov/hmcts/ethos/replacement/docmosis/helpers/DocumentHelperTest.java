@@ -58,6 +58,7 @@ class DocumentHelperTest {
     private static final String GLASGOW_VENUE_ADDRESS =
             "Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT";
     private static final String ABERDEEN_VENUE_ADDRESS = "Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH";
+    private static final String END_BLOCK_NEW_LINE = "}\n";
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
     private CaseDetails caseDetails3;
@@ -193,8 +194,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails1.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails1.getCaseData().getCorrespondenceType(),
@@ -264,8 +265,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         caseDetails2.getCaseData().getRepCollection().get(0).getValue().setRespRepName("Antonio Vazquez");
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
@@ -344,8 +345,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         caseDetails2.getCaseData().getRespondentCollection().get(0).getValue().setResponseStruckOut(NO);
         caseDetails2.getCaseData().getRepCollection().get(0).getValue().setRespRepName("Antonio Vazquez");
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
@@ -424,8 +425,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails3.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails3.getCaseData().getCorrespondenceType(),
@@ -501,8 +502,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails4.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails4.getCaseData().getCorrespondenceType(),
@@ -581,8 +582,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails5.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails5.getCaseData().getCorrespondenceType(),
@@ -660,8 +661,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails6.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails6.getCaseData().getCorrespondenceType(),
@@ -740,8 +741,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails7.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails7.getCaseData().getCorrespondenceType(),
@@ -819,8 +820,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails8.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails8.getCaseData().getCorrespondenceType(),
@@ -897,8 +898,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails9.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails9.getCaseData().getCorrespondenceType(),
@@ -926,8 +927,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper
                 .buildDocumentContent(caseDetails10.getCaseData(), "", userDetails, ENGLANDWALES_CASE_TYPE_ID,
                         caseDetails10.getCaseData().getCorrespondenceType(),
@@ -976,8 +977,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails12.getCaseData(), "",
                 userDetails,
                 ENGLANDWALES_CASE_TYPE_ID,
@@ -1019,8 +1020,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails13.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails13.getCaseData().getCorrespondenceType(),
@@ -1179,8 +1180,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails14.getCaseData(), "",
                 userDetails,
                 ENGLANDWALES_CASE_TYPE_ID,
@@ -1406,8 +1407,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails15.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails15.getCaseData().getCorrespondenceType(),
@@ -1486,8 +1487,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
 
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails20.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
@@ -1557,8 +1558,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"\",\n"
                 + "\"submission_reference\":\"\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsEmpty.getCaseData(), "",
                 userDetails, "",
                 caseDetailsEmpty.getCaseData().getCorrespondenceType(),
@@ -1637,8 +1638,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot1.getCaseData(), "",
                 userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsScot1.getCaseData().getCorrespondenceType(),
@@ -1713,8 +1714,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(GLASGOW_VENUE_ADDRESS);
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot2.getCaseData(), "",
                 userDetails, DUMMY_CASE_TYPE_ID,
@@ -1789,8 +1790,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot3.getCaseData(), "",
                 userDetails, SCOTLAND_CASE_TYPE_ID,
@@ -1866,8 +1867,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         DefaultValues allocatedCourtAddress = DefaultValues.builder()
                 .tribunalCorrespondenceAddressLine1("Aberdeen Address Line1")
                 .tribunalCorrespondenceAddressLine2("Aberdeen Address Line2")
@@ -2059,8 +2060,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"\",\n"
                 + "\"submission_reference\":\"\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(result, DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
                 "", userDetails, "",
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
@@ -2129,8 +2130,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"\",\n"
                 + "\"submission_reference\":\"\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
     }
 
     @Test
@@ -2173,8 +2174,8 @@ class DocumentHelperTest {
                 + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
                 + "\"Case_No\":\"123456\",\n"
                 + "\"submission_reference\":\"12212121\",\n"
-                + "}\n"
-                + "}\n";
+                + END_BLOCK_NEW_LINE
+                + END_BLOCK_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 multipleData.getCorrespondenceType(), multipleData.getCorrespondenceScotType(),

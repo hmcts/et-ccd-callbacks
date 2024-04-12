@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TestEmailUtil;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ class SendNotificationServiceTest {
 
     @BeforeEach
     public void setUp() {
-        emailService = spy(new EmailUtils());
+        emailService = spy(new TestEmailUtil());
         sendNotificationService = new SendNotificationService(hearingSelectionService,
                 emailService, featureToggleService);
         ReflectionTestUtils.setField(sendNotificationService,

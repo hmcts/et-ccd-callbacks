@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -191,7 +192,14 @@ public class Et1ReppedService {
         }
 
         List<DocumentInfo> documentInfoList = acasNumbers.stream()
-                .map(acasNumber -> acasService.getAcasCertificates(caseData, acasNumber, userToken))
+                .map(acasNumber -> {
+                    try {
+                        return acasService.getAcasCertificates(caseData, acasNumber, userToken);
+                    } catch (JsonProcessingException e) {
+                        log.error("Failed to retrieve ACAS Certificate", e);
+                        return null;
+                    }
+                })
                 .filter(Objects::nonNull)
                 .toList();
 

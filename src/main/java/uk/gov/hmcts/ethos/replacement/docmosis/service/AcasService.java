@@ -59,7 +59,7 @@ public class AcasService {
             if (ObjectUtils.isEmpty(acasCertificateObject)) {
                 return List.of("Error reading ACAS Certificate");
             }
-        } catch (HttpClientErrorException errorException) {
+        } catch (Exception errorException) {
             log.error("Error retrieving ACAS Certificate with exception : " + errorException.getMessage());
             return List.of("Error retrieving ACAS Certificate");
         }
@@ -119,7 +119,8 @@ public class AcasService {
         );
     }
 
-    public DocumentInfo getAcasCertificates(CaseData caseData, String acasNumber, String authToken) {
+    public DocumentInfo getAcasCertificates(CaseData caseData, String acasNumber, String authToken)
+            throws JsonProcessingException {
         Object acasCertificateObject;
         try {
             acasCertificateObject = fetchAcasCertificates(acasNumber).getBody();
@@ -129,10 +130,11 @@ public class AcasService {
             return documentInfo;
         } catch (HttpClientErrorException errorException) {
             log.error("Error retrieving ACAS Certificate with exception : " + errorException.getMessage());
+            throw errorException;
         } catch (JsonProcessingException e) {
             log.error("Error converting ACAS Certificate with exception : " + e.getMessage());
+            throw e;
         }
-        return null;
     }
 
 }

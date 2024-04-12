@@ -12,6 +12,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRoleWithOrganisation;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -103,13 +104,13 @@ public class CcdCaseAssignment {
         String userToken = adminUserService.getAdminUserToken();
         HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
                 new HttpEntity<>(caseAssignmentUserRolesRequest, createHeaders(serviceAuthorizationToken, userToken));
-        ResponseEntity<?> response;
+        ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
                 ccdDataStoreApiUrl + "/case-users",
                 HttpMethod.DELETE,
                 requestEntity,
-                Object.class);
+                CaseAssignmentUserRolesResponse.class);
         } catch (RestClientResponseException exception) {
             log.info("Error from CCD - {}", exception.getMessage());
             throw exception;
@@ -124,13 +125,13 @@ public class CcdCaseAssignment {
         String userToken = adminUserService.getAdminUserToken();
         HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
                 new HttpEntity<>(caseAssignmentUserRolesRequest, createHeaders(serviceAuthorizationToken, userToken));
-        ResponseEntity<?> response;
+        ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
                 ccdDataStoreApiUrl + "/case-users",
                 HttpMethod.POST,
                 requestEntity,
-                Object.class);
+                    CaseAssignmentUserRolesResponse.class);
         } catch (RestClientResponseException exception) {
             log.info("Error from CCD - {}", exception.getMessage());
             throw exception;

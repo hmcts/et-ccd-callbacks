@@ -82,8 +82,6 @@ public class TribunalOfficesService {
         return isNullOrEmpty(epimmsId) ? "" : epimmsId;
     }
 
-    // TODO refactor the below into et-common as similar code exists in et-sya-api and could be put into a library to
-    //  reduce duplication.
     public void addManagingOffice(CaseData caseData, String caseTypeId) {
         String managingOffice = UNASSIGNED_OFFICE;
         if (claimantWorkPostcodeExists(caseData)) {

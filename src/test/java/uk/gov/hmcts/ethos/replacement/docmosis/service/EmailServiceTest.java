@@ -100,4 +100,10 @@ class EmailServiceTest {
         assertThat(emailService.getExuiCaseLink("123"))
             .isEqualTo("https://manage-case.test.platform.hmcts.net/cases/case-details/123");
     }
+
+    @Test
+    void getExuiAllDocumentsLink() {
+        assertThat(emailService.getExuiAllDocumentsLink("123"))
+                .isEqualTo("https://manage-case.test.platform.hmcts.net/cases/case-details/123#Documents");
+    }
 }

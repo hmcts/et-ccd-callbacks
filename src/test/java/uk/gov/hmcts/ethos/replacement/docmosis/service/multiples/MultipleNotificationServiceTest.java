@@ -9,10 +9,14 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleDynamicListFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDetailsGenerator;
@@ -49,6 +53,13 @@ class MultipleNotificationServiceTest {
     @MockBean
     CaseLookupService caseLookupService;
 
+    @MockBean
+    MultipleDynamicListFlagsService multipleDynamicListFlagsService;
+    @MockBean
+    FileLocationSelectionService fileLocationSelectionService;
+    @MockBean
+    ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
+
     private HearingSelectionService hearingSelectionService;
 
     private MultiplesSendNotificationService multiplesSendNotificationService;
@@ -65,7 +76,11 @@ class MultipleNotificationServiceTest {
                         userIdamService,
                         excelReadingService,
                         caseLookupService,
-                        hearingSelectionService);
+                        hearingSelectionService,
+                        multipleDynamicListFlagsService,
+                        fileLocationSelectionService,
+                        scotlandFileLocationSelectionService
+                );
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleDataForNotification());
@@ -124,6 +139,28 @@ class MultipleNotificationServiceTest {
 
         verify(createUpdatesBusSender, times(1))
                 .sendUpdatesToQueue(any(), any(), any(), eq("2"));
+
+    }
+
+    @Test
+    void verifyNotificationIsSentUsingBulk() {
+        SortedMap<String, Object> sortedMap = new TreeMap<>();
+        MultipleObject multipleObject1 = MultipleObject.builder().ethosCaseRef("6000001/2024").build();
+        sortedMap.put("A", multipleObject1);
+        var caseData = multipleDetails.getCaseData();
+        caseData.setSendNotificationNotify("Selected cases");
+        when(excelReadingService.readExcel(any(), any(), any(), any(), eq(FilterExcelType.FLAGS)))
+                .thenReturn(sortedMap);
+
+        multiplesSendNotificationService.sendNotificationToSingles(
+                multipleDetails.getCaseData(),
+                multipleDetails,
+                userToken,
+                errors
+        );
+
+        verify(createUpdatesBusSender, times(1))
+                .sendUpdatesToQueue(any(), any(), any(), eq("1"));
 
     }
 

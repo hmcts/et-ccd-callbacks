@@ -16,8 +16,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleDynamicListFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
@@ -25,19 +28,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_LEAD;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_SELECTED;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service("multiplesSendNotificationService")
 public class MultiplesSendNotificationService {
+    public static final String NO_CASES_FILTERED = "No cases filtered";
     private final CreateUpdatesBusSender createUpdatesBusSender;
     private final UserIdamService userIdamService;
     private final ExcelReadingService excelReadingService;
     private final CaseLookupService caseLookupService;
     private final HearingSelectionService hearingSelectionService;
+    private final MultipleDynamicListFlagsService multipleDynamicListFlagsService;
+    private final FileLocationSelectionService fileLocationSelectionService;
+    private final ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
     public void setHearingDetailsFromLeadCase(MultipleDetails multipleDetails, List<String> errors) {
         try {
@@ -55,6 +65,18 @@ public class MultiplesSendNotificationService {
         }
     }
 
+    public void setMultipleWithExcelFileData(MultipleDetails multipleDetails, String userToken, List<String> errors) {
+        multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
+        if (errors.isEmpty()) {
+            String caseTypeId = multipleDetails.getCaseTypeId();
+            if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+                fileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+            } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+                scotlandFileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+            }
+        }
+    }
+
     public void sendNotificationToSingles(MultipleData multipleData,
                                           MultipleDetails caseDetails,
                                           String userToken,
@@ -66,17 +88,35 @@ public class MultiplesSendNotificationService {
         } else if (SEND_NOTIFICATION_ALL.equals(multipleData.getSendNotificationNotify())) {
             SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(
                     userToken, MultiplesHelper.getExcelBinaryUrl(caseDetails.getCaseData()),
-                    errors, caseDetails.getCaseData(), FilterExcelType.ALL);
-
-            multipleObjects.forEach((key, value) -> {
-                MultipleObject excelRow = (MultipleObject) value;
-                ethosCaseRefCollection.add(excelRow.getEthosCaseRef());
-            });
+                    errors, caseDetails.getCaseData(), FilterExcelType.ALL
+            );
+            setCaseRefCollection(multipleObjects, ethosCaseRefCollection);
+        } else if (SEND_NOTIFICATION_SELECTED.equals(multipleData.getSendNotificationNotify())) {
+            SortedMap<String, Object> multipleObjects =
+                    excelReadingService.readExcel(
+                            userToken,
+                            MultiplesHelper.getExcelBinaryUrl(multipleData),
+                            errors,
+                            multipleData,
+                            FilterExcelType.FLAGS
+                    );
+            ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
         }
 
         if (ethosCaseRefCollection.isEmpty()) {
+            log.error(NO_CASES_FILTERED);
+            errors.add(NO_CASES_FILTERED);
             return;
         }
+        sendNotificationToQueue(multipleData, caseDetails, userToken, errors, ethosCaseRefCollection);
+    }
+
+    private void sendNotificationToQueue(MultipleData multipleData,
+                                         MultipleDetails caseDetails,
+                                         String userToken,
+                                         List<String> errors,
+                                         List<String> ethosCaseRefCollection) {
+
         CreateUpdatesDto sendNotificationsDto = getCreateUpdatesDto(
                 multipleData,
                 caseDetails,
@@ -91,6 +131,15 @@ public class MultiplesSendNotificationService {
                 dataModelParent,
                 errors,
                 String.valueOf(ethosCaseRefCollection.size()));
+    }
+
+    private static void setCaseRefCollection(SortedMap<String, Object> multipleObjects,
+                                             List<String> ethosCaseRefCollection) {
+
+        multipleObjects.forEach((key, value) -> {
+            MultipleObject excelRow = (MultipleObject) value;
+            ethosCaseRefCollection.add(excelRow.getEthosCaseRef());
+        });
     }
 
     private CreateUpdatesDto getCreateUpdatesDto(MultipleData multipleData,
@@ -120,6 +169,7 @@ public class MultiplesSendNotificationService {
         sendNotificationType.setSendNotificationNotify(multipleData.getSendNotificationNotify());
         sendNotificationType.setSendNotificationNotifyLeadCase(multipleData.getSendNotificationNotifyLeadCase());
         sendNotificationType.setSendNotificationNotifyAll(multipleData.getSendNotificationNotifyAll());
+        sendNotificationType.setSendNotificationNotifySelected(multipleData.getSendNotificationNotifySelected());
         sendNotificationType.setSendNotificationSelectHearing(multipleData.getSendNotificationSelectHearing());
         sendNotificationType.setSendNotificationCaseManagement(multipleData.getSendNotificationCaseManagement());
         sendNotificationType.setSendNotificationResponseTribunal(multipleData.getSendNotificationResponseTribunal());
@@ -160,5 +210,6 @@ public class MultiplesSendNotificationService {
         multipleData.setSendNotificationWhoCaseOrder(null);
         multipleData.setSendNotificationNotifyLeadCase(null);
         multipleData.setSendNotificationNotifyAll(null);
+        multipleData.setSendNotificationNotifySelected(null);
     }
 }

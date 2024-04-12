@@ -5,6 +5,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -189,6 +192,25 @@ public final class UploadDocumentHelper {
             documentTypeItem.getValue().setDocNumber(
                     String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
         });
+
+    }
+
+    public static void getMultipleDocumentCollection(BaseCaseData multipleData) {
+
+
+        if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
+            return;
+        }
+
+        List<DynamicValueType> docs = multipleData.getDocumentCollection().stream()
+                .map(documentTypeItem -> DynamicListHelper.getDynamicCodeLabel(documentTypeItem.getId(),
+                        documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()))
+                .toList();
+
+        multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
+
+        DynamicMultiSelectListType dynamicMultiSelectList = new DynamicMultiSelectListType();
+        dynamicMultiSelectList.setListItems(docs);
 
     }
 }

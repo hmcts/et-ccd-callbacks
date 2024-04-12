@@ -3,15 +3,18 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
@@ -31,26 +34,32 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = { Et1ReppedService.class, TribunalOfficesService.class, PostcodeToOfficeService.class})
 @EnableConfigurationProperties({ CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class,
     PostcodeToOfficeMappings.class })
 class Et1ReppedServiceTest {
 
     private Et1ReppedService et1ReppedService;
-
     private PostcodeToOfficeService postcodeToOfficeService;
+    @MockBean
     private PostcodeToOfficeMappings postcodeToOfficeMappings;
+    private TribunalOfficesService tribunalOfficesService;
+
     @MockBean
     private AcasService acasService;
     @MockBean
@@ -67,9 +76,10 @@ class Et1ReppedServiceTest {
     private PdfService pdfService;
     @MockBean
     private TornadoService tornadoService;
-    private TribunalOfficesService tribunalOfficesService;
     @MockBean
     private UserIdamService userIdamService;
+    @MockBean
+    private AdminUserService adminUserService;
     @Mock
     private RestTemplate restTemplate;
 
@@ -89,13 +99,13 @@ class Et1ReppedServiceTest {
         caseDetails.setCaseTypeId("ET_EnglandWales");
 
         draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
-
-        postcodeToOfficeService = new PostcodeToOfficeService(new PostcodeToOfficeMappings());
+        postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
         tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
         et1ReppedService = new Et1ReppedService(acasService, authTokenGenerator, ccdCaseAssignment,
                 documentManagementService, jurisdictionCodesMapperService, organisationClient, pdfService,
                 postcodeToOfficeService, tornadoService, tribunalOfficesService, userIdamService);
+        when(postcodeToOfficeMappings.getPostcodes()).thenReturn(getPostcodes());
     }
 
     @Test
@@ -127,11 +137,81 @@ class Et1ReppedServiceTest {
         assertNotNull(draftCaseDetails.getCaseData().getRepresentativeClaimantType());
     }
 
+    @Test
+    void shouldReturnNoIfNoPostcodeEntered() throws InvalidPostcodeException {
+        caseData = new CaseData();
+        caseData.setEt1ReppedTriageAddress(new Address());
+        assertEquals(NO, et1ReppedService.validatePostcode(caseData));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validatePostcodes")
+    void validatePostcode(String postcode, String expected) throws InvalidPostcodeException {
+        caseData = new CaseData();
+        Address address = new Address();
+        address.setPostCode(postcode);
+        caseData.setEt1ReppedTriageAddress(address);
+        assertEquals(expected, et1ReppedService.validatePostcode(caseData));
+    }
+
+    @Test
+    void assignCaseAccess() {
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        when(authTokenGenerator.generate()).thenReturn("serviceAuthToken");
+        when(adminUserService.getAdminUserToken()).thenReturn("userToken");
+        OrganisationsResponse organisationsResponse = OrganisationsResponse.builder()
+                .name("TestOrg")
+                .organisationIdentifier("AA11BB")
+                .build();
+        when(organisationClient.retrieveOrganisationDetailsByUserId("authToken", "serviceAuthToken", "id"))
+                .thenReturn(ResponseEntity.status(200).body(organisationsResponse));
+        et1ReppedService.assignCaseAccess(caseDetails, "authToken");
+        verify(ccdCaseAssignment, times(1)).removeCaseUserRoles(any());
+        verify(ccdCaseAssignment, times(1)).addCaseUserRoles(any());
+    }
+
+    @Test
+    void retrieveOrganisationException() {
+        when(organisationClient.retrieveOrganisationDetailsByUserId("authToken", "serviceAuthToken", "id"))
+                .thenReturn(ResponseEntity.status(404).build());
+        assertNull(et1ReppedService.getOrganisationDetailsFromUserId("authToken", "id"));
+    }
+
+    private static Stream<Arguments> validatePostcodes() {
+        return Stream.of(
+                Arguments.of("LS16 6NB", YES),
+                Arguments.of("G1 1AA", YES),
+                Arguments.of("B1 1AA", NO),
+                Arguments.of("EH1 1AA", NO),
+                Arguments.of("CH1 1AA", NO),
+                Arguments.of("BN1 1AA", NO),
+                Arguments.of("RM1 1AA", NO),
+                Arguments.of("EC1 1AA", NO),
+                Arguments.of("AL1 1AA", NO),
+                Arguments.of("BA1 1AA", YES)
+        );
+    }
+
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
                 .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
+    }
+
+    private Map<String, String> getPostcodes() {
+        return Map.of(
+                "LS", TribunalOffice.LEEDS.getOfficeName(),
+                "EH", TribunalOffice.EDINBURGH.getOfficeName(),
+                "G", TribunalOffice.GLASGOW.getOfficeName(),
+                "B", TribunalOffice.MIDLANDS_WEST.getOfficeName(),
+                "CH", TribunalOffice.MANCHESTER.getOfficeName(),
+                "BN", TribunalOffice.LONDON_SOUTH.getOfficeName(),
+                "RM", TribunalOffice.LONDON_EAST.getOfficeName(),
+                "EC", TribunalOffice.LONDON_CENTRAL.getOfficeName(),
+                "AL", TribunalOffice.WATFORD.getOfficeName(),
+                "BA", TribunalOffice.BRISTOL.getOfficeName()
+        );
     }
 
 }

@@ -84,7 +84,6 @@ public class Et1ReppedService {
         if (office.isEmpty() || !liveTribunalOffices.contains(office.get())) {
             return NO;
         }
-
         return YES;
     }
 

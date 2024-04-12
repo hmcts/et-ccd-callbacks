@@ -17,16 +17,21 @@ import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
+import uk.gov.hmcts.ecm.common.service.pdf.PdfMapperService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.nio.file.Files;
@@ -38,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -49,7 +55,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SpringBootTest(classes = { Et1ReppedService.class, TribunalOfficesService.class, PostcodeToOfficeService.class})
+@SpringBootTest(classes = { Et1ReppedService.class, TribunalOfficesService.class, PostcodeToOfficeService.class,
+    PdfService.class, PdfMapperService.class})
 @EnableConfigurationProperties({ CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class,
     PostcodeToOfficeMappings.class })
 class Et1ReppedServiceTest {
@@ -72,7 +79,6 @@ class Et1ReppedServiceTest {
     private JurisdictionCodesMapperService jurisdictionCodesMapperService;
     @MockBean
     private OrganisationClient organisationClient;
-    @MockBean
     private PdfService pdfService;
     @MockBean
     private TornadoService tornadoService;
@@ -99,6 +105,8 @@ class Et1ReppedServiceTest {
         caseDetails.setCaseTypeId("ET_EnglandWales");
 
         draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
+
+        pdfService = new PdfService(new PdfMapperService());
         postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
         tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
@@ -175,6 +183,45 @@ class Et1ReppedServiceTest {
         when(organisationClient.retrieveOrganisationDetailsByUserId("authToken", "serviceAuthToken", "id"))
                 .thenReturn(ResponseEntity.status(404).build());
         assertNull(et1ReppedService.getOrganisationDetailsFromUserId("authToken", "id"));
+    }
+
+    @Test
+    void createDraftEt1() throws Exception {
+        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
+        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
+        et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
+
+        DocumentInfo documentInfo = DocumentInfo.builder()
+                .description("Draft ET1 - R111111/11/11")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+                .thenReturn(documentInfo);
+        assertDoesNotThrow(() -> et1ReppedService.createDraftEt1(caseDetails, "authToken"));
+        assertNotNull(caseDetails.getCaseData().getDocMarkUp());
+    }
+
+    @Test
+    void createAndUploadEt1Docs() throws Exception {
+        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
+        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
+        et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
+
+        DocumentInfo documentInfo = DocumentInfo.builder()
+                .description("ET1 - John Doe")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+                .thenReturn(documentInfo);
+        UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
+                .withUrl("http://test.com/documents/random-uuid")
+                .withFilename("ET1 - John Doe.pdf")
+                .build();
+        when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
+        assertDoesNotThrow(() -> et1ReppedService.createAndUploadEt1Docs(caseDetails, "authToken"));
+        assertEquals(1, caseDetails.getCaseData().getDocumentCollection().size());
     }
 
     private static Stream<Arguments> validatePostcodes() {

@@ -170,7 +170,7 @@ public final class ReferralHelper {
     public static String populateHearingDetails(CaseData caseData) {
         List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
         if (CollectionUtils.isEmpty(hearingCollection)) {
-            log.error("No hearings on populateHearingDetails for " + caseData.getEthosCaseReference());
+            log.info("No hearings on populateHearingDetails for " + caseData.getEthosCaseReference());
             return "";
         }
 

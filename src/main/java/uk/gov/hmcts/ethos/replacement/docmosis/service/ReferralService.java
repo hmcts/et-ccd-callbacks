@@ -2,11 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
@@ -21,13 +19,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class ReferralService {
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
-    private final EmailService emailService;
-    private final UserIdamService userIdamService;
     private final TornadoService tornadoService;
     private final CaseLookupService caseLookupService;
-
-    @Value("${template.referral}")
-    private String referralTemplateId;
 
     /**
      * Uses {@link TornadoService} to generate a pdf to display a summary of data for the created referral.
@@ -46,11 +39,12 @@ public class ReferralService {
     }
 
     /**
-     * Uses {@link TornadoService} to generate a pdf to display a summary of data for the created referral.
-     * @param caseData in which the referral type is extracted from
-     * @param userJwt jwt used for authorization
-     * @param caseTypeId e.g. ET_EnglandWales
-     * @return {@link DocumentInfo} object populated with pdf data
+     * Generates referral summary pdf.
+     * @param caseData information about the cases for which a referral summary will be generated.
+     * @param leadCase the lead case that will serve as a reference for the document generation.
+     * @param userJwt The JWT token of the user who is requesting to generate the document.
+     * @param caseTypeId The ID of the type of case for which the referral summary should be generated.
+     * @return A DocumentInfo object representing the generated document.
      */
     public DocumentInfo generateDocument(MultipleData caseData, CaseData leadCase, String userJwt, String caseTypeId) {
         try {
@@ -78,18 +72,4 @@ public class ReferralService {
         return ReferralHelper.populateHearingDetails(caseData);
     }
 
-    public void sendEmail(CaseDetails caseDetails, String referralNumber, boolean isNew, String userToken) {
-        CaseData caseData = caseDetails.getCaseData();
-        emailService.sendEmail(
-            referralTemplateId,
-            caseData.getReferentEmail(),
-            ReferralHelper.buildPersonalisation(
-                caseData,
-                referralNumber,
-                isNew,
-                userIdamService.getUserDetails(userToken).getName(),
-                emailService.getExuiCaseLink(caseDetails.getCaseId())
-            )
-        );
-    }
 }

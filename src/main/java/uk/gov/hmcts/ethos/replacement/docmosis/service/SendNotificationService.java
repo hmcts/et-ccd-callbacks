@@ -33,8 +33,10 @@ import java.util.function.Function;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
@@ -51,6 +53,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @Slf4j
 public class SendNotificationService {
     private static final String EMPLOYER_CONTRACT_CLAIM = "Employer Contract Claim";
+    public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
+
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
@@ -117,7 +121,11 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
+        sendNotificationType.setNotificationSentFrom(caseData.getNotificationSentFrom());
+
         sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+
+        setStatusForCitizenHub(caseData, sendNotificationType);
 
         sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
         sendNotificationType.setSendNotificationSubjectString(
@@ -132,7 +140,16 @@ public class SendNotificationService {
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
         sendNotificationTypeItem.setValue(sendNotificationType);
         caseData.getSendNotificationCollection().add(sendNotificationTypeItem);
+    }
 
+    private static void setStatusForCitizenHub(CaseData caseData, SendNotificationType sendNotificationType) {
+        if (sendNotificationType.getSendNotificationSubject().contains(CASE_MANAGEMENT_ORDERS_REQUESTS)
+                && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
+                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
+            sendNotificationType.setNotificationState(NOT_STARTED_YET);
+        } else {
+            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+        }
     }
 
     private static int getNextNotificationNumber(CaseData caseData) {
@@ -161,6 +178,7 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
         caseData.setSendNotificationEccQuestion(null);
         caseData.setSendNotificationWhoCaseOrder(null);
+        caseData.setNotificationSentFrom(null);
     }
 
     /**

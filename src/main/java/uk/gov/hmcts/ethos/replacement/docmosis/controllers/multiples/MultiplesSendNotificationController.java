@@ -33,9 +33,10 @@ public class MultiplesSendNotificationController {
     private final MultiplesSendNotificationService multiplesSendNotificationService;
 
     /**
-     * Send Notification about to start.
+     * Send Notification about to start with hearing details from lead case.
      *
      * @param multipleRequest holds the request and case data
+     * @param userToken user token
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -49,11 +50,12 @@ public class MultiplesSendNotificationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<MultipleCallbackResponse> aboutToStart(@RequestBody MultipleRequest multipleRequest) {
-
+    public ResponseEntity<MultipleCallbackResponse> aboutToStart(@RequestBody MultipleRequest multipleRequest,
+                                                                 @RequestHeader("Authorization") String userToken) {
         List<String> errors = new ArrayList<>();
-        // TODO: Get hearing details from lead case as part of RET-4711
-
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
+        multiplesSendNotificationService.setHearingDetailsFromLeadCase(multipleRequest.getCaseDetails(), errors);
+        multiplesSendNotificationService.setMultipleWithExcelFileData(multipleDetails, userToken, errors);
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
     }
 

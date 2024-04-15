@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
@@ -39,7 +40,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_S
 @RequiredArgsConstructor
 @Service("multiplesSendNotificationService")
 public class MultiplesSendNotificationService {
-    public static final String NO_CASES_FILTERED = "No cases filtered";
+    private static final String NO_CASES_FILTERED = "No cases filtered";
+    private static final String INVALID_CASE_TYPE = "Invalid case type";
     private final CreateUpdatesBusSender createUpdatesBusSender;
     private final UserIdamService userIdamService;
     private final ExcelReadingService excelReadingService;
@@ -67,13 +69,17 @@ public class MultiplesSendNotificationService {
 
     public void setMultipleWithExcelFileData(MultipleDetails multipleDetails, String userToken, List<String> errors) {
         multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
-        if (errors.isEmpty()) {
-            String caseTypeId = multipleDetails.getCaseTypeId();
-            if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
-                fileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
-            } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
-                scotlandFileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
-            }
+        if (CollectionUtils.isNotEmpty(errors)) {
+            return;
+        }
+        String caseTypeId = multipleDetails.getCaseTypeId();
+        if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+            fileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+        } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+            scotlandFileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+        } else {
+            log.error(INVALID_CASE_TYPE);
+            errors.add(INVALID_CASE_TYPE);
         }
     }
 

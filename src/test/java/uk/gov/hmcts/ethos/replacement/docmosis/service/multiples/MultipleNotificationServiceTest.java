@@ -34,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 
@@ -193,6 +194,27 @@ class MultipleNotificationServiceTest {
         multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);
         multiplesSendNotificationService.setMultipleWithExcelFileData(multipleDetails, userToken, errors);
         verify(scotlandFileLocationSelectionService, times(1))
+                .initialiseFileLocation(multipleDetails.getCaseData());
+    }
+
+    @Test
+    void shouldErrorIfWrongCaseTypeProvided() {
+        multipleDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        multiplesSendNotificationService.setMultipleWithExcelFileData(multipleDetails, userToken, errors);
+        verify(scotlandFileLocationSelectionService, times(0))
+                .initialiseFileLocation(multipleDetails.getCaseData());
+        verify(fileLocationSelectionService, times(0))
+                .initialiseFileLocation(multipleDetails.getCaseData());
+        assertEquals("Invalid case type", errors.get(0));
+    }
+
+    @Test
+    void shouldNotCallFileLocationServiceIfErrors() {
+        errors.add("Worksheet name not found");
+        multiplesSendNotificationService.setMultipleWithExcelFileData(multipleDetails, userToken, errors);
+        verify(scotlandFileLocationSelectionService, times(0))
+                .initialiseFileLocation(multipleDetails.getCaseData());
+        verify(fileLocationSelectionService, times(0))
                 .initialiseFileLocation(multipleDetails.getCaseData());
     }
 

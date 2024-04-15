@@ -482,6 +482,29 @@ public class Et1ReppedController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    @PostMapping(value = "/submitClaim/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for ET1 Submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> submitClaimAboutToStart(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        if (!Et1ReppedHelper.allSectionsCompleted(caseData)) {
+            errors.add("Please complete all sections before submitting the claim");
+        }
+
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "callback handler for ET1 Submitted page")
     @ApiResponses(value = {

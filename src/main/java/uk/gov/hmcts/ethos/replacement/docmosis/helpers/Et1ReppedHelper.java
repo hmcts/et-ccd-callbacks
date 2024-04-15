@@ -125,7 +125,7 @@ public class Et1ReppedHelper {
                 : COMPLETED;
     }
 
-    private static boolean allSectionsCompleted(CaseData caseData) {
+    public static boolean allSectionsCompleted(CaseData caseData) {
         return !isNullOrEmpty(caseData.getEt1ReppedSectionOne())
                && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionOne())
                && !isNullOrEmpty(caseData.getEt1ReppedSectionTwo())

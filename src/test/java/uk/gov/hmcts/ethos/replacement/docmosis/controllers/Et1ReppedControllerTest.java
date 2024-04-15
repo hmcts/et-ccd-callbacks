@@ -105,6 +105,7 @@ class Et1ReppedControllerTest {
     private static final String VALIDATE_WHISTLEBLOWING = "/et1Repped/sectionThree/validateWhistleblowing";
     private static final String VALIDATE_LINKED_CASES = "/et1Repped/sectionThree/validateLinkedCases";
     private static final String SUBMIT_CLAIM = "/et1Repped/submitClaim";
+    private static final String SUBMIT_CLAIM_ABOUT_TO_START = "/et1Repped/submitClaim/aboutToStart";
     private static final String CLAIM_SUBMITTED = "/et1Repped/submitted";
     private static final String CREATE_DRAFT_ET1 = "/et1Repped/createDraftEt1";
     private static final String CREATE_DRAFT_ET1_SUBMITTED = "/et1Repped/createDraftEt1Submitted";
@@ -244,7 +245,6 @@ class Et1ReppedControllerTest {
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
@@ -760,7 +760,6 @@ class Et1ReppedControllerTest {
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
@@ -774,7 +773,6 @@ class Et1ReppedControllerTest {
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest2)))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
@@ -788,7 +786,6 @@ class Et1ReppedControllerTest {
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest2)))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
@@ -803,7 +800,6 @@ class Et1ReppedControllerTest {
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest2)))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
@@ -815,5 +811,36 @@ class Et1ReppedControllerTest {
                 .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
+    }
+
+    @Test
+    void submitClaimAboutToStart() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(SUBMIT_CLAIM_ABOUT_TO_START)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void submitClaimAboutToStartErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequest2.getCaseDetails().getCaseData().setEt1ReppedSectionTwo(NO);
+        mockMvc.perform(post(SUBMIT_CLAIM_ABOUT_TO_START)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Please complete all sections before submitting the claim")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

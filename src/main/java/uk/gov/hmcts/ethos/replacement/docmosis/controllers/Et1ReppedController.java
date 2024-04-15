@@ -574,4 +574,22 @@ public class Et1ReppedController {
                         ccdRequest.getCaseDetails().getCaseId()))
                 .build());
     }
+
+    @PostMapping(value = "/validateGrounds", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for validating grounds for a claim")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateGrounds(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
 }

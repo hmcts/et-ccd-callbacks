@@ -109,6 +109,7 @@ class Et1ReppedControllerTest {
     private static final String CLAIM_SUBMITTED = "/et1Repped/submitted";
     private static final String CREATE_DRAFT_ET1 = "/et1Repped/createDraftEt1";
     private static final String CREATE_DRAFT_ET1_SUBMITTED = "/et1Repped/createDraftEt1Submitted";
+    private static final String VALIDATE_GROUNDS = "/et1Repped/validateGrounds";
 
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
@@ -836,11 +837,40 @@ class Et1ReppedControllerTest {
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest2)))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath("$.errors[0]", is("Please complete all sections before submitting the claim")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void validateGrounds() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequest2.getCaseDetails().getCaseData().setEt1SectionThreeClaimDetails("Grounds");
+        mockMvc.perform(post(VALIDATE_GROUNDS)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void validateGroundsError() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequest2.getCaseDetails().getCaseData().setEt1SectionThreeClaimDetails(null);
+        ccdRequest2.getCaseDetails().getCaseData().setEt1SectionThreeDocumentUpload(null);
+        mockMvc.perform(post(VALIDATE_GROUNDS)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is("Please provide details of the claim")))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 
 import java.nio.file.Files;
@@ -186,5 +187,30 @@ class Et1ReppedHelperTest {
                 .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
+    }
+
+    @Test
+    void validateGroundsClaimDetails() {
+        caseData.setEt1SectionThreeClaimDetails("Grounds");
+        caseData.setEt1SectionThreeDocumentUpload(null);
+        assertEquals(0, Et1ReppedHelper.validateGrounds(caseData).size());
+    }
+
+    @Test
+    void validateGroundsDocument() {
+        caseData.setEt1SectionThreeClaimDetails(null);
+        UploadedDocumentType document = UploadedDocumentType.builder()
+                .documentFilename("Test")
+                .documentUrl("http://test.com")
+                .build();
+        caseData.setEt1SectionThreeDocumentUpload(document);
+        assertEquals(0, Et1ReppedHelper.validateGrounds(caseData).size());
+    }
+
+    @Test
+    void validateGroundsError() {
+        caseData.setEt1SectionThreeClaimDetails(null);
+        caseData.setEt1SectionThreeDocumentUpload(null);
+        assertEquals(1, Et1ReppedHelper.validateGrounds(caseData).size());
     }
 }

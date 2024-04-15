@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -569,4 +571,16 @@ public class Et1ReppedHelper {
         caseData.setLinkedCasesDetails(null);
     }
 
+    /**
+     * Validates the grounds for the ET1 Repped journey.
+     * @param caseData the case data
+     * @return a list of error messages
+     */
+    public static List<String> validateGrounds(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData.getEt1SectionThreeDocumentUpload())
+            && isNullOrEmpty(caseData.getEt1SectionThreeClaimDetails())) {
+            return Collections.singletonList("Please provide details of the claim");
+        }
+        return Collections.emptyList();
+    }
 }

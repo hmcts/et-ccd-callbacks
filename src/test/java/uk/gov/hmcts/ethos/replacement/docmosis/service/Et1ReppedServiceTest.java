@@ -31,6 +31,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfigurati
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -49,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -88,6 +90,8 @@ class Et1ReppedServiceTest {
     private AdminUserService adminUserService;
     @Mock
     private RestTemplate restTemplate;
+    @MockBean
+    private EmailService emailService;
 
     private CaseDetails caseDetails;
     private CaseData caseData;
@@ -106,13 +110,14 @@ class Et1ReppedServiceTest {
 
         draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
 
+        emailService = spy(new EmailUtils());
         pdfService = new PdfService(new PdfMapperService());
         postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
         tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
         et1ReppedService = new Et1ReppedService(acasService, authTokenGenerator, ccdCaseAssignment,
                 documentManagementService, jurisdictionCodesMapperService, organisationClient, pdfService,
-                postcodeToOfficeService, tornadoService, tribunalOfficesService, userIdamService);
+                postcodeToOfficeService, tornadoService, tribunalOfficesService, userIdamService, emailService);
         when(postcodeToOfficeMappings.getPostcodes()).thenReturn(getPostcodes());
     }
 

@@ -477,7 +477,7 @@ public class Et1ReppedController {
         et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
         caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
         et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
-        // TODO do we need to send an email?
+        et1ReppedService.sendEt1Confirmation(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

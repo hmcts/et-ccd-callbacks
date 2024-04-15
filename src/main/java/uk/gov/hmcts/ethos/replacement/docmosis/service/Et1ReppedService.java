@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +37,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,6 +45,9 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
@@ -50,8 +55,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstLis
 @Slf4j
 @RequiredArgsConstructor
 public class Et1ReppedService {
-    private static final String ET1_EN_PDF = "ET1_2222.pdf";
-    private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
 
     private final AcasService acasService;
     private final AuthTokenGenerator authTokenGenerator;
@@ -64,6 +67,12 @@ public class Et1ReppedService {
     private final TornadoService tornadoService;
     private final TribunalOfficesService tribunalOfficesService;
     private final UserIdamService userIdamService;
+    private final EmailService emailService;
+
+    @Value("${template.et1ProfessionalSubmission}")
+    private String et1ProfessionalSubmissionTemplateId;
+    private static final String ET1_EN_PDF = "ET1_2222.pdf";
+    private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.GLASGOW);
 
@@ -329,6 +338,18 @@ public class Et1ReppedService {
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
                 .build();
         caseData.setClaimantRepresentativeOrganisationPolicy(organisationPolicy);
+    }
+
+    public void sendEt1Confirmation(CaseDetails caseDetails, String userToken) {
+        log.info("Sending ET1 confirmation email for case {}", caseDetails.getCaseId());
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        emailService.sendEmail(et1ProfessionalSubmissionTemplateId,
+                userDetails.getEmail(),
+                Map.of(CASE_NUMBER, caseDetails.getCaseId(),
+                        "firstName", userDetails.getFirstName(),
+                        "lastName", userDetails.getLastName(),
+                        CLAIMANT, caseDetails.getCaseData().getClaimant(),
+                        LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())));
     }
 
 }

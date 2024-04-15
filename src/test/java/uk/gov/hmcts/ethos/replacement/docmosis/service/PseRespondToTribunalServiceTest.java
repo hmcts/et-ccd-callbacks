@@ -256,13 +256,12 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            |Response 1 | |\r
+            \r\n|Response 1| |\r
             |--|--|\r
-            |Response from | Claimant|\r
-            |Response date | 10 Aug 2022|\r
-            |What's your response to the tribunal? | Response text entered|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | Yes|\r
-            \r
+            |Response from|Claimant|\r
+            |Response date|10 Aug 2022|\r
+            |What's your response to the tribunal?|Response text entered|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 
         assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
@@ -332,19 +331,62 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            |Response 1 | |\r
+            \r\n|Response 1| |\r
             |--|--|\r
-            |Response from | Claimant|\r
-            |Response date | 10 Aug 2022|\r
-            |What's your response to the tribunal? | Response text entered|\r
-            |Supporting material | <a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>\r
-            |\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | Yes|\r
-            \r
+            |Response from|Claimant|\r
+            |Response date|10 Aug 2022|\r
+            |What's your response to the tribunal?|Response text entered|\r
+            |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 
         assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
             is(expected));
+    }
+
+    @Test
+    void initialOrdReqDetailsTableMarkUp_acceptanceOfECCResponse() {
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .date("5 Aug 2022")
+                                .sendNotificationTitle("Acceptance")
+                                .sendNotificationLetter(NO)
+                                .sendNotificationSubject(List.of("Employer Contract Claim"))
+                                .sendNotificationEccQuestion("Acceptance of ECC response")
+                                .sendNotificationResponseTribunal("Yes - view document for details")
+                                .sendNotificationSelectParties(BOTH_PARTIES)
+                                .sendNotificationWhoCaseOrder("Legal Officer")
+                                .sendNotificationFullName("Mr Lee Gal Officer")
+                                .sendNotificationAdditionalInfo("Additional Info")
+                                .sendNotificationNotify(BOTH_PARTIES)
+                                .build())
+                        .build()
+        ));
+
+        caseData.setPseRespondentSelectOrderOrRequest(
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
+
+        String expected = """
+            |View Application||\r
+            |--|--|\r
+            |Notification|Acceptance|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Is a response required?|Yes - view document for details|\r
+            |Party or parties to respond|Both parties|\r
+            |Additional information|Additional Info|\r
+            |Name|Mr Lee Gal Officer|\r
+            |What is the ECC notification?|Acceptance of ECC response|\r
+            |Sent to|Both parties|\r
+            """;
+
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+                is(expected));
     }
 
     private DocumentTypeItem createDocumentTypeItem(String fileName, String uuid) {

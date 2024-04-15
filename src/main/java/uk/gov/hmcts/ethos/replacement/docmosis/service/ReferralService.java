@@ -39,11 +39,12 @@ public class ReferralService {
     }
 
     /**
-     * Uses {@link TornadoService} to generate a pdf to display a summary of data for the created referral.
-     * @param caseData in which the referral type is extracted from
-     * @param userJwt jwt used for authorization
-     * @param caseTypeId e.g. ET_EnglandWales
-     * @return {@link DocumentInfo} object populated with pdf data
+     * Generates referral summary pdf.
+     * @param caseData information about the cases for which a referral summary will be generated.
+     * @param leadCase the lead case that will serve as a reference for the document generation.
+     * @param userJwt The JWT token of the user who is requesting to generate the document.
+     * @param caseTypeId The ID of the type of case for which the referral summary should be generated.
+     * @return A DocumentInfo object representing the generated document.
      */
     public DocumentInfo generateDocument(MultipleData caseData, CaseData leadCase, String userJwt, String caseTypeId) {
         try {

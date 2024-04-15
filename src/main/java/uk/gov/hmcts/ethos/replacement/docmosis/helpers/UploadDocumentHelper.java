@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
@@ -196,6 +197,8 @@ public final class UploadDocumentHelper {
 
     public static void getMultipleDocumentCollection(BaseCaseData multipleData) {
 
+        Logger logger = Logger.getLogger("MyLogger");
+
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             return;
         }
@@ -205,10 +208,13 @@ public final class UploadDocumentHelper {
                         documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()))
                 .toList();
 
+        logger.info("DOCS1: " + docs);
+
         multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
 
         DynamicMultiSelectListType dynamicMultiSelectList = new DynamicMultiSelectListType();
         dynamicMultiSelectList.setListItems(docs);
+        logger.info("DOCS2: " + docs);
 
     }
 }

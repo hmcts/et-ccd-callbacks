@@ -34,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 
 @ExtendWith(SpringExtension.class)
@@ -178,6 +179,21 @@ class MultipleNotificationServiceTest {
         verify(createUpdatesBusSender, times(0))
                 .sendUpdatesToQueue(any(), any(), any(), any());
 
+    }
+
+    @Test
+    void shouldSetMultipleWithEWFileLocation() {
+        multiplesSendNotificationService.setMultipleWithExcelFileData(multipleDetails, userToken, errors);
+        verify(fileLocationSelectionService, times(1))
+                .initialiseFileLocation(multipleDetails.getCaseData());
+    }
+
+    @Test
+    void shouldSetMultipleWithScotlandFileLocation() {
+        multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);
+        multiplesSendNotificationService.setMultipleWithExcelFileData(multipleDetails, userToken, errors);
+        verify(scotlandFileLocationSelectionService, times(1))
+                .initialiseFileLocation(multipleDetails.getCaseData());
     }
 
     @Test

@@ -350,6 +350,9 @@ public class Et1ReppedHelper {
 
     private static ClaimantOtherType claimantOtherType(CaseData caseData) {
         ClaimantOtherType claimantOtherType = new ClaimantOtherType();
+        if (CollectionUtils.isEmpty(caseData.getDidClaimantWorkForOrg())) {
+            return claimantOtherType;
+        }
         claimantOtherType.setPastEmployer(getFirstListItem(caseData.getDidClaimantWorkForOrg()));
         if (NO.equals(claimantOtherType.getPastEmployer())) {
             return claimantOtherType;
@@ -362,7 +365,9 @@ public class Et1ReppedHelper {
             case WORKING -> claimantStillWorkingNoticePeriod(caseData, claimantOtherType);
             case NOTICE -> claimantNoticePeriod(caseData, claimantOtherType);
             case NO_LONGER_WORKING -> claimantNoLongerWorking(caseData, claimantOtherType);
-            default -> throw new IllegalArgumentException(UNEXPECTED_VALUE + claimantOtherType.getStillWorking());
+            default -> {
+                // Do nothing for unmatched values
+            }
         }
         claimantOtherType.setClaimantAverageWeeklyHours(caseData.getClaimantAverageWeeklyWorkHours());
         claimantOtherType.setClaimantPayBeforeTax(caseData.getClaimantPayBeforeTax());

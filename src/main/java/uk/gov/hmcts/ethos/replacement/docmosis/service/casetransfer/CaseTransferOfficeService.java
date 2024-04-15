@@ -62,7 +62,6 @@ public final class CaseTransferOfficeService {
 
     private static DynamicFixedListType getOffices(String managingOffice) {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
-                .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
                 .toList();

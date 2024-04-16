@@ -21,7 +21,7 @@ public final class CaseTransferOfficeService {
             return;
         }
 
-        DynamicFixedListType offices = getOffices(managingOffice);
+        DynamicFixedListType offices = getOffices();
         caseData.setOfficeCT(offices);
         caseData.setAssignOffice(offices);
     }
@@ -32,7 +32,7 @@ public final class CaseTransferOfficeService {
             return;
         }
 
-        DynamicFixedListType offices = getOffices(managingOffice);
+        DynamicFixedListType offices = getOffices();
         multipleData.setOfficeMultipleCT(offices);
     }
 
@@ -60,7 +60,7 @@ public final class CaseTransferOfficeService {
         multipleData.setOfficeMultipleCT(officeCT);
     }
 
-    private static DynamicFixedListType getOffices(String managingOffice) {
+    private static DynamicFixedListType getOffices() {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))

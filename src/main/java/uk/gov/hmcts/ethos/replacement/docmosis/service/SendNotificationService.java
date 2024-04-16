@@ -300,14 +300,15 @@ public class SendNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
         Map<String, String> emailData = getEmailData(caseData, caseId);
+        emailData.put(EXUI_ALL_DOCUMENTS_LINK, emailService.getExuiAllDocumentsLink(caseId));
         emailService.sendEmail(bundlesSubmittedNotificationForClaimantTemplateId,
                 caseDetails.getCaseData()
                         .getClaimantType().getClaimantEmailAddress(),
                 emailData
         );
-        emailData.remove(LINK_TO_CITIZEN_HUB);
+        emailData.remove(LINK_TO_CITIZEN_HUB); // should this be removed?
+        emailData.remove(EXUI_ALL_DOCUMENTS_LINK);
         emailData.put(EXUI_HEARING_DOCUMENTS_LINK, emailService.getExuiHearingDocumentsLink(caseId));
-        emailData.put(EXUI_ALL_DOCUMENTS_LINK, emailService.getExuiAllDocumentsLink(caseId));
         emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData

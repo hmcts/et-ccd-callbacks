@@ -57,7 +57,7 @@ public class PseRespondentViewService {
 
     private boolean isNotifyRespondent(SendNotificationTypeItem sendNotificationTypeItem) {
         return RESPONDENT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
-            || BOTH_PARTIES.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify());
+            || BOTH_PARTIES.equalsIgnoreCase(sendNotificationTypeItem.getValue().getSendNotificationNotify());
     }
 
     public String generateViewNotificationsMarkdown(CaseData caseData) {

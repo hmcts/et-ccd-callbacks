@@ -11,6 +11,7 @@ import uk.gov.service.notify.NotificationClientException;
 import java.util.Map;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DOCUMENTS_PATH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DOCUMENTS_PATH;
 
 /**
@@ -62,5 +63,9 @@ public class EmailService {
 
     public String getExuiHearingDocumentsLink(String caseId) {
         return exuiUrl + caseId + HEARING_DOCUMENTS_PATH;
+    }
+
+    public String getExuiAllDocumentsLink(String caseId) {
+        return exuiUrl + caseId + DOCUMENTS_PATH;
     }
 }

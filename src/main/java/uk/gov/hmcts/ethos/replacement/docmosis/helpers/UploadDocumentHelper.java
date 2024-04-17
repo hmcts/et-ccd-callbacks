@@ -214,7 +214,7 @@ public final class UploadDocumentHelper {
 
         DynamicMultiSelectListType dynamicMultiSelectList = new DynamicMultiSelectListType();
         dynamicMultiSelectList.setListItems(docs);
-        logger.info("DOCS2: " + docs);
+        logger.info("DOCS2: " + dynamicMultiSelectList);
 
     }
 }

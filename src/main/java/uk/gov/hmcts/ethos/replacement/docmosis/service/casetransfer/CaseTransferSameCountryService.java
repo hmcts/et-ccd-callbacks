@@ -22,15 +22,9 @@ public class CaseTransferSameCountryService {
 
     public List<String> transferCase(CaseDetails caseDetails, String userToken) {
         List<CaseData> caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
-        CaseData caseData = caseDetails.getCaseData();
         if (caseDataList.isEmpty()) {
             throw new IllegalStateException("No cases found for Case Transfer for "
-                                            + caseData.getEthosCaseReference());
-        }
-
-        // If transferring to the same office, skip validation and transfer directly
-        if (caseData.getOfficeCT().getSelectedCode().equals(caseData.getManagingOffice())) {
-            return transferCases(caseDetails, caseDataList, userToken);
+                    + caseDetails.getCaseData().getEthosCaseReference());
         }
         List<String> errors = validate(caseDataList);
 

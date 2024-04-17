@@ -297,7 +297,7 @@ public class SendNotificationService {
     public void notify(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
-        Map<String, String> emailData = getEmailData(caseData, caseId);
+        Map<String, String> emailData = getEmailData(caseData);
 
         // include the link to all documents in the email to claimant
         emailData.put(EXUI_ALL_DOCUMENTS_LINK, emailService.getExuiAllDocumentsLink(caseId));
@@ -316,7 +316,7 @@ public class SendNotificationService {
     }
 
     @NotNull
-    private Map<String, String> getEmailData(CaseData caseData, String caseId) {
+    private Map<String, String> getEmailData(CaseData caseData) {
         Map<String, String> emailData = new ConcurrentHashMap<>();
         emailData.put(CLAIMANT, caseData.getClaimant());
         emailData.put(CASE_NUMBER, caseData.getEthosCaseReference());

@@ -178,7 +178,8 @@ class ReferralHelperTest {
                 + "withdrawalSettledDocuments=null, hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
                 + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null"
                 + ", docNumber=null, tornadoEmbeddedPdfUrl=null, excludeFromDcf=null, documentIndex=null)), "
-                + "GenericTypeItem(id=2, value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType("
+                + "GenericTypeItem(id=2, "
+                + "value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType("
                 + "documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl=null, "
                 + "categoryId=null, uploadTimestamp=null), "
                 + "ownerDocument=null, creationDate=null, shortDescription=null, topLevelDocuments=null, "
@@ -186,7 +187,8 @@ class ReferralHelperTest {
                 + "caseManagementDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, j"
                 + "udgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
                 + "documentType=null, dateOfCorrespondence=null, docNumber=null, tornadoEmbeddedPdfUrl=null, "
-                + "excludeFromDcf=null, documentIndex=null))], referralInstruction=Custom instructions for judge, "
+                + "excludeFromDcf=null, documentIndex=null))], "
+                + "referralInstruction=Custom instructions for judge, "
                 + "referredBy=Judge Judy, "
                 + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
                 + "closeReferralGeneralNotes=null, "
@@ -562,9 +564,8 @@ class ReferralHelperTest {
             + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
             + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
             + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
-            + "\"excludeFromDcf\":null,\"documentIndex\":null}},"
-            + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
+            + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,\"excludeFromDcf\":null,"
+            + "\"documentIndex\":null}},{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
             + ":null},\"ownerDocument\":null,"
@@ -573,8 +574,7 @@ class ReferralHelperTest {
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
-            + "\"excludeFromDcf\":null,"
-            + "\"documentIndex\":null}}],"
+            + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
             + "\"referralInstruction\":null,\"referralReplyCollection\":null,\"updateReferralCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
@@ -603,8 +603,7 @@ class ReferralHelperTest {
             + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
             + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
             + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,\"excludeFromDcf\":null,"
-            + "\"documentIndex\":null}},"
-            + "{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
+            + "\"documentIndex\":null}},{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
             + ":null},\"ownerDocument\":null,"
@@ -613,8 +612,7 @@ class ReferralHelperTest {
             + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
-            + "\"excludeFromDcf\":null,"
-            + "\"documentIndex\":null}}],"
+            + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
             + "\"referralInstruction\":null,\"referralReplyCollection\":null,\"updateReferralCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");

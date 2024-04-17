@@ -42,7 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_ALL_DOCUMENTS_LINK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CITIZEN_UI_ALL_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
@@ -300,7 +300,7 @@ public class SendNotificationService {
         Map<String, String> emailData = getEmailData(caseData);
 
         // include the link to all documents in the email to claimant
-        emailData.put(EXUI_ALL_DOCUMENTS_LINK, emailService.getExuiAllDocumentsLink(caseId));
+        emailData.put(CITIZEN_UI_ALL_DOCUMENTS_LINK, emailService.getCitizenUiAllDocumentsLink());
         emailService.sendEmail(bundlesSubmittedNotificationForClaimantTemplateId,
                 caseDetails.getCaseData()
                         .getClaimantType().getClaimantEmailAddress(),
@@ -308,7 +308,7 @@ public class SendNotificationService {
         );
 
         // remove the link to all documents from the email to tribunal
-        emailData.remove(EXUI_ALL_DOCUMENTS_LINK);
+        emailData.remove(CITIZEN_UI_ALL_DOCUMENTS_LINK);
         emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData

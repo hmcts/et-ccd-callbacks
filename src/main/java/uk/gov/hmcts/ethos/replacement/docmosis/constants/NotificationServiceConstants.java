@@ -8,8 +8,8 @@ public final class NotificationServiceConstants {
     public static final String CLAIMANT = "claimant";
     public static final String RESPONDENTS = "respondents";
     public static final String RESPONDENT_NAMES = "respondentNames";
-    public static final String EXUI_ALL_DOCUMENTS_LINK = "exuiAllDocumentsLink";
-    public static final String DOCUMENTS_PATH = "#Documents";
+    public static final String CITIZEN_UI_ALL_DOCUMENTS_LINK = "citizenUIAllDocumentsLink";
+    public static final String ALL_DOCUMENTS_PATH = "all-documents";
     public static final String HEARING_DATE = "hearingDate";
     public static final String APPLICATION = "application";
     public static final String CCD_ID = "ccdId";

@@ -42,8 +42,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_HEARING_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CITIZEN_UI_ALL_DOCUMENTS_LINK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_HEARING_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
@@ -297,7 +297,6 @@ public class SendNotificationService {
 
     public void notify(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        String caseId = caseDetails.getCaseId();
         Map<String, String> emailData = getEmailData(caseData);
 
         // include the link to all documents in the email to claimant
@@ -310,7 +309,8 @@ public class SendNotificationService {
 
         // remove the link to all documents from the email to tribunal
         emailData.remove(CITIZEN_UI_ALL_DOCUMENTS_LINK);
-        emailData.put(EXUI_HEARING_DOCUMENTS_LINK, emailService.getExuiCaseHearingDocumentsLink(caseId));
+        emailData.put(EXUI_HEARING_DOCUMENTS_LINK,
+                emailService.getExuiCaseHearingDocumentsLink(caseDetails.getCaseId()));
         emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData

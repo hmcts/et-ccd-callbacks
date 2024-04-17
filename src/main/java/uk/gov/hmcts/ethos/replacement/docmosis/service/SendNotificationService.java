@@ -43,9 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_ALL_DOCUMENTS_LINK;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_HEARING_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 
@@ -300,15 +298,17 @@ public class SendNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
         Map<String, String> emailData = getEmailData(caseData, caseId);
+
+        // include the link to all documents in the email to claimant
         emailData.put(EXUI_ALL_DOCUMENTS_LINK, emailService.getExuiAllDocumentsLink(caseId));
         emailService.sendEmail(bundlesSubmittedNotificationForClaimantTemplateId,
                 caseDetails.getCaseData()
                         .getClaimantType().getClaimantEmailAddress(),
                 emailData
         );
-        emailData.remove(LINK_TO_CITIZEN_HUB); // should this be removed?
+
+        // remove the link to all documents from the email to tribunal
         emailData.remove(EXUI_ALL_DOCUMENTS_LINK);
-        emailData.put(EXUI_HEARING_DOCUMENTS_LINK, emailService.getExuiHearingDocumentsLink(caseId));
         emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData
@@ -322,7 +322,6 @@ public class SendNotificationService {
         emailData.put(CASE_NUMBER, caseData.getEthosCaseReference());
         emailData.put(RESPONDENT_NAMES, caseData.getRespondent());
         emailData.put(HEARING_DATE, caseData.getTargetHearingDate());
-        emailData.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         return emailData;
     }
 

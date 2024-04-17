@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DOCUMENTS_PATH;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DOCUMENTS_PATH;
 
 /**
  * EmailService is a class that is used for sending email via the GOV.UK Notify service.
@@ -59,10 +58,6 @@ public class EmailService {
 
     public String getExuiCaseLink(String caseId) {
         return exuiUrl + caseId;
-    }
-
-    public String getExuiHearingDocumentsLink(String caseId) {
-        return exuiUrl + caseId + HEARING_DOCUMENTS_PATH;
     }
 
     public String getExuiAllDocumentsLink(String caseId) {

@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_HEARING_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CITIZEN_UI_ALL_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
@@ -309,6 +310,7 @@ public class SendNotificationService {
 
         // remove the link to all documents from the email to tribunal
         emailData.remove(CITIZEN_UI_ALL_DOCUMENTS_LINK);
+        emailData.put(EXUI_HEARING_DOCUMENTS_LINK, emailService.getExuiCaseHearingDocumentsLink(caseId));
         emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData

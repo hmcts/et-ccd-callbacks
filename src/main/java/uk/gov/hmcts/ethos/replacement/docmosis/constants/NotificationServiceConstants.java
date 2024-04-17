@@ -8,6 +8,7 @@ public final class NotificationServiceConstants {
     public static final String CLAIMANT = "claimant";
     public static final String RESPONDENTS = "respondents";
     public static final String RESPONDENT_NAMES = "respondentNames";
+    public static final String EXUI_HEARING_DOCUMENTS_LINK = "exuiHearingDocumentsLink";
     public static final String CITIZEN_UI_ALL_DOCUMENTS_LINK = "citizenUIAllDocumentsLink";
     public static final String ALL_DOCUMENTS_PATH = "all-documents";
     public static final String HEARING_DATE = "hearingDate";

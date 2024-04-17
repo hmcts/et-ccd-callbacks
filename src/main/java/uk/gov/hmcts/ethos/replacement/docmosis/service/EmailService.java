@@ -60,6 +60,10 @@ public class EmailService {
         return exuiUrl + caseId;
     }
 
+    public String getExuiCaseHearingDocumentsLink(String caseId) {
+        return exuiUrl + caseId + "#Hearing%20Documents";
+    }
+
     public String getCitizenUiAllDocumentsLink() {
         return citizenUrl + ALL_DOCUMENTS_PATH;
     }

@@ -204,7 +204,7 @@
     "summary": "",
     "description": ""
   },
-  "event_token": "",
+  "event_token": "%EVENT_TOKEN%",
   "ignore_warning": false,
   "draft_id": null
 }

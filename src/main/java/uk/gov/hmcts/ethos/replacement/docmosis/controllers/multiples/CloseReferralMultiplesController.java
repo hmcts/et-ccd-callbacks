@@ -90,8 +90,7 @@ public class CloseReferralMultiplesController {
             @RequestBody MultipleRequest multipleRequest) throws IOException {
         MultipleDetails details = multipleRequest.getCaseDetails();
         MultipleData multipleData = details.getCaseData();
-        String caseTypeId = details.getCaseTypeId().replace(MULTIPLE, "");
-        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(caseTypeId, multipleData.getLeadCaseId());
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(details);
         multipleData.setCloseReferralHearingDetails(
                 ReferralHelper.populateHearingReferralDetails(multipleData, leadCase)
         );

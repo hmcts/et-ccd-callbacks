@@ -33,3 +33,5 @@ feature:
 
 document_management:
   url: http://localhost:5005
+  ccdCaseDocument:
+    url: http://localhost:5005

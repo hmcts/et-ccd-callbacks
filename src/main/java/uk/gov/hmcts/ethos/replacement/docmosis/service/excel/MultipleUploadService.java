@@ -67,7 +67,7 @@ public class MultipleUploadService {
 
             } else {
 
-                log.info("Errors uploading excel: " + errors);
+                log.error("Errors uploading excel: " + errors);
 
             }
 

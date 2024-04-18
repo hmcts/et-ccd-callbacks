@@ -103,7 +103,7 @@ public class PseRespondToTribunalService {
 
     private boolean isNotifyRespondent(SendNotificationTypeItem sendNotificationTypeItem) {
         return RESPONDENT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
-            || BOTH_PARTIES.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify());
+            || BOTH_PARTIES.equalsIgnoreCase(sendNotificationTypeItem.getValue().getSendNotificationNotify());
     }
 
     private boolean isNoRespondentReply(List<PseResponseTypeItem> pseResponseTypeItems) {

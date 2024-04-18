@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -21,16 +19,15 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -43,7 +40,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -59,21 +55,18 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CreateReferralMultiplesController.class, JsonMapper.class})
-class CreateReferralMultiplesControllerTest {
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String START_CREATE_REFERRAL_URL = "/multiples/createReferral/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/multiples/createReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/multiples/createReferral/completeCreateReferral";
     private static final String VALIDATE_EMAIL_URL = "/multiples/createReferral/validateReferentEmail";
 
     @MockBean
-    private VerifyTokenService verifyTokenService;
-    @MockBean
     private UserIdamService userIdamService;
     @MockBean
-    private DocumentManagementService documentManagementService;
-    @MockBean
     private ReferralService referralService;
+    @MockBean
+    private DocumentManagementService documentManagementService;
     @MockBean
     private EmailService emailService;
     @Autowired
@@ -84,9 +77,9 @@ class CreateReferralMultiplesControllerTest {
     @MockBean
     private CaseLookupService caseLookupService;
     private CCDRequest ccdRequest;
-    private CreateReferralMultiplesController createReferralMultiplesController;
 
     @BeforeEach
+    @Override
     protected void setUp() throws Exception {
         when(emailService.getExuiCaseLink(any())).thenReturn("exui");
         CaseData caseData = CaseDataBuilder.builder()
@@ -100,11 +93,11 @@ class CreateReferralMultiplesControllerTest {
                         true)
                 .build();
         caseData.setEthosCaseReference("caseRef");
-        caseData.setClaimant("claimant");
-        caseData.setIsUrgent("Yes");
-        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
-        caseData.setReferentEmail("test@gmail.com");
         MultipleData multipleData = MultipleData.builder().build();
+        caseData.setClaimant("claimant");
+        multipleData.setIsUrgent("Yes");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        multipleData.setReferentEmail("test@gmail.com");
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("123")
@@ -118,14 +111,12 @@ class CreateReferralMultiplesControllerTest {
         UserDetails userDetails = new UserDetails();
         userDetails.setRoles(List.of("role1"));
         when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
-        when(caseLookupService.getCaseDataAsAdmin(any(), any())).thenReturn(caseData);
-        createReferralMultiplesController = new CreateReferralMultiplesController(verifyTokenService, referralService,
-                userIdamService, documentManagementService);
+        when(caseLookupService.getLeadCaseFromMultipleAsAdmin(any())).thenReturn(caseData);
+        super.setUp();
     }
 
     @Test
     void initReferralHearingDetails_Success() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -138,7 +129,6 @@ class CreateReferralMultiplesControllerTest {
 
     @Test
     void initReferralHearingDetails_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -154,10 +144,6 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isForbidden());
-
-        ResponseEntity<MultipleCallbackResponse> response =
-                createReferralMultiplesController.initReferralHearingDetails(request, AUTH_TOKEN);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -168,15 +154,10 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isForbidden());
-
-        ResponseEntity<MultipleCallbackResponse> response =
-                createReferralMultiplesController.aboutToSubmitReferralDetails(request, AUTH_TOKEN);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     void aboutToSubmit_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
@@ -196,7 +177,6 @@ class CreateReferralMultiplesControllerTest {
 
     @Test
     void aboutToSubmit_NoReferentEmail_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
@@ -217,7 +197,6 @@ class CreateReferralMultiplesControllerTest {
 
     @Test
     void aboutToSubmit_ReferentEmail_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
@@ -248,7 +227,6 @@ class CreateReferralMultiplesControllerTest {
 
     @Test
     void completeCreateReferral_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -265,15 +243,10 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(request)))
                 .andExpect(status().isForbidden());
-
-        ResponseEntity<MultipleCallbackResponse> response =
-                createReferralMultiplesController.completeCreateReferral(request, AUTH_TOKEN);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     void validateNoReferentEmail_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CCDRequest noReferentEmailCCDRequest = ccdRequest;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
@@ -286,7 +259,6 @@ class CreateReferralMultiplesControllerTest {
 
     @Test
     void validateReferentEmail_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -303,16 +275,10 @@ class CreateReferralMultiplesControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-
-        ResponseEntity<MultipleCallbackResponse> response =
-                createReferralMultiplesController.aboutToSubmitReferralDetails(request, AUTH_TOKEN);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     void validateReferentEmail_WithDocumentUploadErrors() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
         MultipleData caseData = new MultipleData();
         caseData.setReferentEmail("test@example.com");
         DocumentType documentTypeWithError = new DocumentType();

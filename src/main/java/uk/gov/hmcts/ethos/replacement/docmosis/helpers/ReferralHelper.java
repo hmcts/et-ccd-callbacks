@@ -170,7 +170,7 @@ public final class ReferralHelper {
     public static String populateHearingDetails(CaseData caseData) {
         List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
         if (CollectionUtils.isEmpty(hearingCollection)) {
-            log.error("No hearings on populateHearingDetails for " + caseData.getEthosCaseReference());
+            log.info("No hearings on populateHearingDetails for " + caseData.getEthosCaseReference());
             return "";
         }
 
@@ -321,8 +321,8 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName Full name of the logged-in user
      */
-    public static void createReferral(CaseData caseData, String userFullName,
-                                      UploadedDocumentType documentInfo) {
+    public static void createReferral(BaseCaseData caseData, String userFullName,
+                                      UploadedDocumentType documentInfo, String nextHearingDate) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             caseData.setReferralCollection(new ArrayList<>());
         }
@@ -343,7 +343,7 @@ public final class ReferralHelper {
 
         referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
 
-        referralType.setReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
+        referralType.setReferralHearingDate(nextHearingDate);
         referralType.setReferralSummaryPdf(documentInfo);
 
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
@@ -353,6 +353,17 @@ public final class ReferralHelper {
         List<ReferralTypeItem> referralCollection = caseData.getReferralCollection();
         referralCollection.add(referralTypeItem);
         caseData.setReferralCollection(referralCollection);
+    }
+
+    /**
+     * Creates a referral and adds it to the referral collection.
+     * @param caseData contains all the case data
+     * @param userFullName Full name of the logged-in user
+     */
+    public static void createReferral(CaseData caseData, String userFullName,
+                                      UploadedDocumentType documentInfo) {
+        String nextHearingDate = getNearestHearingToReferral(caseData, "None");
+        createReferral(caseData, userFullName, documentInfo, nextHearingDate);
     }
 
     public static boolean isValidReferralStatus(BaseCaseData caseData) {

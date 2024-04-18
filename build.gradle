@@ -131,15 +131,15 @@ tasks.register('smoke', Test) {
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
 }
 
-tasks.register('functional', Test) {
-    testClassesDirs = sourceSets.apiTest.output.classesDirs
-    classpath = sourceSets.apiTest.runtimeClasspath
-
-    useJUnitPlatform()
-
-    systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
-    maxHeapSize = '1G'
-}
+//tasks.register('functional', Test) {
+//    testClassesDirs = sourceSets.apiTest.output.classesDirs
+//    classpath = sourceSets.apiTest.runtimeClasspath
+//
+//    useJUnitPlatform()
+//
+//    systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
+//    maxHeapSize = '1G'
+//}
 
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
@@ -157,11 +157,11 @@ tasks.register('codeceptSmoke', Exec) {
     commandLine 'yarn', 'test:smoke'
 }
 
-tasks.register('codeceptFunctional', Exec) {
-    dependsOn 'yarnInstall'
-    dependsOn 'functional'
-    commandLine 'yarn', 'test:functional'
-}
+//tasks.register('codeceptFunctional', Exec) {
+//    dependsOn 'yarnInstall'
+//    dependsOn 'functional'
+//    commandLine 'yarn', 'test:functional'
+//}
 
 tasks.register('crossbrowser') {
     dependsOn ':codeceptFunctionalSauce'

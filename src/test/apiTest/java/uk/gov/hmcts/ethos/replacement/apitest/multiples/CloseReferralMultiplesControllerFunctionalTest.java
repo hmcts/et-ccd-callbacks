@@ -79,7 +79,6 @@ public class CloseReferralMultiplesControllerFunctionalTest extends BaseFunction
                 .log()
                 .all(true);
     }
-
     
     @Test
     void aboutToSubmitUrl() {
@@ -94,7 +93,6 @@ public class CloseReferralMultiplesControllerFunctionalTest extends BaseFunction
                 .log()
                 .all(true);
     }
-
     
     @Test
     void submittedUrl() {

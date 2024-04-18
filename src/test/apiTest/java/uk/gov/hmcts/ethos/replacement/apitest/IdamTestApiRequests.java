@@ -83,9 +83,7 @@ public class IdamTestApiRequests {
     }
 
     /**
-     * Authorize with Idam and return
-     * @return
-     * @throws IOException
+     * Authorize with Idam and return cookies.
      */
     public List<String> idamAuth() throws IOException {
         HttpClient instance = HttpClientBuilder.create().disableRedirectHandling().build();

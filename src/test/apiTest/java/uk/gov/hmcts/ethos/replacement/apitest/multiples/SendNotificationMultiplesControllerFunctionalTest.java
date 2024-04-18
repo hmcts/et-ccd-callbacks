@@ -39,7 +39,8 @@ public class SendNotificationMultiplesControllerFunctionalTest extends BaseFunct
 
         String singleEthosRef = singleCase.getJSONObject("data").getString("ethosCaseReference");
         JSONObject multipleCase = createMultiplesCase(singleEthosRef);
-        MultipleData data = new ObjectMapper().readValue(multipleCase.getJSONObject("data").toString(), MultipleData.class);
+        var jsonData = multipleCase.getJSONObject("data").toString();
+        MultipleData data = new ObjectMapper().readValue(jsonData, MultipleData.class);
         multipleDetails.setCaseData(data);
     }
 

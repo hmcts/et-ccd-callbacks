@@ -27,7 +27,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
@@ -101,7 +100,8 @@ public abstract class BaseFunctionalTest {
         return httpClientBuilder.build();
     }
 
-    private static HttpResponse retryRequest(HttpClient instance, HttpUriRequest request) throws IOException, InterruptedException {
+    private static HttpResponse retryRequest(HttpClient instance, HttpUriRequest request)
+            throws IOException, InterruptedException {
         int maxAttempts = 5;
         int attempt = 0;
         while (attempt++ < maxAttempts) {
@@ -141,7 +141,8 @@ public abstract class BaseFunctionalTest {
         throw new InterruptedException("Failed to login to Idam");
     }
 
-    protected JSONObject runEventOnCase(String name, String jsonPayload, String caseId) throws IOException, InterruptedException {
+    protected JSONObject runEventOnCase(String name, String jsonPayload, String caseId)
+            throws IOException, InterruptedException {
         List<String> cookies = retryLogin();
 
         HttpClient instance = HttpClientBuilder.create().disableRedirectHandling().build();
@@ -173,12 +174,13 @@ public abstract class BaseFunctionalTest {
         return createCase("createMultiple", transformed, "ET_Scotland_Multiple");
     }
 
-    protected JSONObject createCase(String name, String payload, String caseTypeId) throws IOException, InterruptedException {
+    protected JSONObject createCase(String name, String payload, String caseTypeId)
+            throws IOException, InterruptedException {
         List<String> cookies = retryLogin();
 
         HttpClient instance = HttpClientBuilder.create().disableRedirectHandling().build();
         String url = String.format("%s/data/internal/case-types/%s/event-triggers/%s", exuiUrl, caseTypeId, name);
-        HttpResponse triggerCreateResponse = retryRequest(instance, buildAuthorisedRequest(get(url), cookies,null));
+        HttpResponse triggerCreateResponse = retryRequest(instance, buildAuthorisedRequest(get(url), cookies, null));
 
         JSONObject jsonObject = new JSONObject(EntityUtils.toString(triggerCreateResponse.getEntity()));
         String eventToken = jsonObject.get("event_token").toString();
@@ -194,9 +196,11 @@ public abstract class BaseFunctionalTest {
     }
 
     private HttpUriRequest buildAuthorisedRequest(RequestBuilder request, List<String> cookies, HttpEntity entity) {
-        String xsrfToken = cookies.stream().filter(o -> o.startsWith("XSRF-TOKEN")).findFirst().get().replace("XSRF-TOKEN=", "");
+        String xsrfToken = cookies.stream().filter(o -> o.startsWith("XSRF-TOKEN"))
+                .findFirst().get().replace("XSRF-TOKEN=", "");
 
-        RequestBuilder requestBuilder = request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0) Gecko/20100101 Firefox/102.0")
+        String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0) Gecko/20100101 Firefox/102.0";
+        RequestBuilder requestBuilder = request.setHeader("User-Agent", userAgent)
                 .setHeader("Accept", "*/*")
                 .setHeader("Accept-Language", "en-GB,en;q=0.5")
                 .setHeader("Accept-Encoding", "gzip, deflate, br")
@@ -218,7 +222,8 @@ public abstract class BaseFunctionalTest {
 
     public String readJsonResource(String name) throws IOException {
         Resource resource = resourceLoader.getResource(String.format("classpath:/%s.json", name));
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+        InputStreamReader in = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
+        try (BufferedReader reader = new BufferedReader(in)) {
             return reader.lines().collect(Collectors.joining("\n"));
         }
     }

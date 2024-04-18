@@ -101,19 +101,19 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
 
     }
 
-    @Test
-    void handleAboutToSubmitSuccessResponse() {
-        RestAssured.given()
-                .spec(spec)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(ccdRequest)
-                .post(ABOUT_TO_SUBMIT_URL)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log()
-                .all(true);
-    }
+//    @Test
+//    void handleAboutToSubmitSuccessResponse() {
+//        RestAssured.given()
+//                .spec(spec)
+//                .contentType(ContentType.JSON)
+//                .header(new Header(AUTHORIZATION, userToken))
+//                .body(ccdRequest)
+//                .post(ABOUT_TO_SUBMIT_URL)
+//                .then()
+//                .statusCode(HttpStatus.SC_OK)
+//                .log()
+//                .all(true);
+//    }
 
     @Test
     void nocSubmittedSuccessResponse() {

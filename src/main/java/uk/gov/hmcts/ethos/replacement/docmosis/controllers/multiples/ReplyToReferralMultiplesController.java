@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.buildPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
@@ -122,8 +121,7 @@ public class ReplyToReferralMultiplesController {
 
         MultipleDetails details = request.getCaseDetails();
         MultipleData caseData = details.getCaseData();
-        String caseTypeId = details.getCaseTypeId().replace(MULTIPLE, "");
-        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(caseTypeId, caseData.getLeadCaseId());
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(request.getCaseDetails());
         caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData, leadCase));
         return multipleResponse(caseData, null);
     }
@@ -197,8 +195,7 @@ public class ReplyToReferralMultiplesController {
         ReferralHelper.createReferralReply(caseData, name, featureToggleService.isWorkAllocationEnabled());
 
         String caseTypeId = caseDetails.getCaseTypeId();
-        String singleCaseTypeId = caseTypeId.replace(MULTIPLE, "");
-        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(singleCaseTypeId, caseData.getLeadCaseId());
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(request.getCaseDetails());
         DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
 
         ReferralType referral = ReferralHelper.getSelectedReferral(caseData);

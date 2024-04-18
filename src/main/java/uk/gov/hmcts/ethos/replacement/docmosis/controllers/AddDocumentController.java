@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,26 +15,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
+/**
+ * REST controller for the Add Document event page.
+ */
 @Slf4j
-@RestController
-@RequestMapping("/tseClaimant")
+@RequestMapping("/addDocument")
 @RequiredArgsConstructor
-public class TseClaimantController {
-
-    private final VerifyTokenService verifyTokenService;
-    private final TseService tseService;
-
+@RestController
+public class AddDocumentController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    private final VerifyTokenService verifyTokenService;
+    private final DocumentManagementService documentManagementService;
 
+    /**
+     * Called at the end of 'Manage Doc Upload' event. It adds one or more uploaded doc detail entries
+     * to the case doc collection field so that the documents get listed in the documents tab
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Adds uploaded docs details to the case doc collection")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -43,22 +57,26 @@ public class TseClaimantController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondentTSE(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader("Authorization") String userToken) {
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
 
-        if (caseDetails.getCaseData().getClaimantTse() != null) {
-            tseService.createApplication(caseDetails.getCaseData(), true);
-            tseService.removeStoredApplication(caseDetails.getCaseData());
-            tseService.clearApplicationData(caseDetails.getCaseData());
+        try {
+            documentManagementService.addUploadedDocsToCaseDocCollection(caseData);
+            caseData.getAddDocumentCollection().clear();
+            return getCallbackRespEntityNoErrors(caseData);
+        } catch (Exception e) {
+            log.error("Error adding uploaded docs to case doc collection", e);
+            return getCallbackRespEntityErrors(List.of(e.getMessage()), caseData);
         }
-
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }
+

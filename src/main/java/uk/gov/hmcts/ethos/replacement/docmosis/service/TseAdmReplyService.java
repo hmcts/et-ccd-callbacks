@@ -273,7 +273,7 @@ public class TseAdmReplyService {
     private void collectClaimants(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
         // if claimant only or both parties: send Claimant Reply Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
-            || BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            || BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdmReplySelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
 
             if (claimantEmail != null) {
@@ -300,13 +300,13 @@ public class TseAdmReplyService {
 
     private static boolean isCmoAndResponseRequiredFromParty(CaseData caseData, String party) {
         return YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
-            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyCmoSelectPartyRespond())
+            && (BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdmReplyCmoSelectPartyRespond())
             || party.equals(caseData.getTseAdmReplyCmoSelectPartyRespond()));
     }
 
     private static boolean isRequestAndResponseRequiredFromParty(CaseData caseData, String party) {
         return YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired())
-            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyRequestSelectPartyRespond())
+            && (BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdmReplyRequestSelectPartyRespond())
             || party.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
     }
 

@@ -24,7 +24,6 @@ class CaseTransferOfficeServiceTest {
         CaseData caseData = new CaseData();
         caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        expectedTribunalOffices.remove(TribunalOffice.MANCHESTER);
 
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(caseData);
 
@@ -75,7 +74,6 @@ class CaseTransferOfficeServiceTest {
         MultipleData multipleData = new MultipleData();
         multipleData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        expectedTribunalOffices.remove(TribunalOffice.MANCHESTER);
 
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(multipleData);
 

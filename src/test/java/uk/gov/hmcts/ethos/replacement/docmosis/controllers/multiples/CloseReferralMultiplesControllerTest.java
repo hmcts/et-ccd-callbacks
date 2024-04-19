@@ -102,7 +102,7 @@ class CloseReferralMultiplesControllerTest extends BaseControllerTest {
 
         UserDetails userDetails = new UserDetails();
         userDetails.setRoles(List.of("role1"));
-        when(caseLookupService.getCaseDataAsAdmin(any(), any())).thenReturn(caseData);
+        when(caseLookupService.getLeadCaseFromMultipleAsAdmin(any())).thenReturn(caseData);
     }
 
     @Test

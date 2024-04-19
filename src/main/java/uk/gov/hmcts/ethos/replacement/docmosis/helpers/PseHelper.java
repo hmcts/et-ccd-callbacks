@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.addDocumentRows;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.asRow;
@@ -110,6 +111,7 @@ public final class PseHelper {
 
     /**
      * Markup for displaying Response(s).
+     *
      * @param sendNotificationType Send Notification Type with Response(s)
      * @return Response(s) Markup
      */
@@ -119,21 +121,33 @@ public final class PseHelper {
         }
         IntWrapper respondCount = new IntWrapper(0);
         return sendNotificationType.getRespondCollection().stream()
-            .map(r -> formatClaimantReply(r.getValue(), respondCount.incrementAndReturnValue()))
-            .collect(Collectors.joining(""));
+                .map(r -> formatClaimantReply(r.getValue(),
+                        respondCount,
+                        sendNotificationType.getSendNotificationSubject()))
+                .collect(Collectors.joining(""));
     }
 
-    private static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
+    private static String formatClaimantReply(PseResponseType pseResponseType,
+                                              IntWrapper respondCount,
+                                              List<String> sendNotificationSubject) {
+        if (isClaimantEccResponse(sendNotificationSubject, pseResponseType.getFrom())) {
+            return "";
+        }
+
         String rule92 = "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
         String rule92Why = "Details of why you do not want to inform the other party";
-
-        return "\r\n" + MarkdownHelper.createTwoColumnTable(new String[] {"Response " + respondCount, " "}, Stream.of(
-            asRow("Response from", pseResponseType.getFrom()), 
-            asRow("Response date", pseResponseType.getDate()),
-            asRow("What's your response to the tribunal?", pseResponseType.getResponse()),
-            addDocumentRows(pseResponseType.getSupportingMaterial(), "Supporting material"),
-            asRow(rule92, pseResponseType.getCopyToOtherParty()),
-            asRow(rule92Why, pseResponseType.getCopyNoGiveDetails())
+        return "\r\n" + MarkdownHelper.createTwoColumnTable(
+                new String[]{"Response " + respondCount.incrementAndReturnValue(), " "}, Stream.of(
+                        asRow("Response from", pseResponseType.getFrom()),
+                        asRow("Response date", pseResponseType.getDate()),
+                        asRow("What's your response to the tribunal?", pseResponseType.getResponse()),
+                        addDocumentRows(pseResponseType.getSupportingMaterial(), "Supporting material"),
+                        asRow(rule92, pseResponseType.getCopyToOtherParty()),
+                        asRow(rule92Why, pseResponseType.getCopyNoGiveDetails())
         ));
+    }
+
+    private static boolean isClaimantEccResponse(List<String> sendNotificationSubject, String from) {
+        return sendNotificationSubject.contains("Employer Contract Claim") && from.equals(CLAIMANT_TITLE);
     }
 }

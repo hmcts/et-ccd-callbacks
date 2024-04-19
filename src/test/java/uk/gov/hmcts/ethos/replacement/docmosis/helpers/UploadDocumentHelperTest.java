@@ -24,6 +24,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -138,6 +139,13 @@ public class UploadDocumentHelperTest {
 
         assertThat(actual, is(expected));
     }
+
+   @Test
+   void emptyDocCollectionReturnsEarly(){
+       UploadDocumentHelper.setMultipleDocumentCollection(caseData);
+
+       assertNull(caseData.getDocumentSelect());
+   }
 
     @ParameterizedTest
     @MethodSource

@@ -21,7 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
@@ -120,7 +119,7 @@ public final class UploadDocumentHelper {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentType documentType = documentTypeItem.getValue();
                 if (isNullOrEmpty(documentType.getTopLevelDocuments())
-                        && (!isNullOrEmpty(documentType.getTypeOfDocument()))) {
+                        && !isNullOrEmpty(documentType.getTypeOfDocument())) {
                     mapLegacyDocTypeToNewDocType(documentType);
                 }
             }
@@ -195,26 +194,22 @@ public final class UploadDocumentHelper {
 
     }
 
-    public static void getMultipleDocumentCollection(BaseCaseData multipleData) {
-
-        Logger logger = Logger.getLogger("MyLogger");
+    public static void setMultipleDocumentCollection(BaseCaseData multipleData) {
 
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
+            log.warn("Empty document collection");
             return;
         }
 
+        log.info("Getting docs");
         List<DynamicValueType> docs = multipleData.getDocumentCollection().stream()
                 .map(documentTypeItem -> DynamicListHelper.getDynamicCodeLabel(documentTypeItem.getId(),
                         documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()))
                 .toList();
 
-        logger.info("DOCS1: " + docs);
-
+        log.info("Retrieved docs: " + docs.size());
         multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
 
-        DynamicMultiSelectListType dynamicMultiSelectList = new DynamicMultiSelectListType();
-        dynamicMultiSelectList.setListItems(docs);
-        logger.info("DOCS2: " + dynamicMultiSelectList);
-
     }
+
 }

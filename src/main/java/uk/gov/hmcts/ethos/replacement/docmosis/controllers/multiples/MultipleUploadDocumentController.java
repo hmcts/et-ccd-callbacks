@@ -17,8 +17,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 
-import java.util.logging.Logger;
-
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 
@@ -51,13 +49,9 @@ public class MultipleUploadDocumentController {
     public ResponseEntity<MultipleCallbackResponse> aboutToStart(
             @RequestBody MultipleRequest ccdRequest) {
 
-        Logger logger = Logger.getLogger("MyLogger");
-
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
-        UploadDocumentHelper.getMultipleDocumentCollection(caseData);
-        logger.info("DOCS3: " + caseData);
+        UploadDocumentHelper.setMultipleDocumentCollection(caseData);
 
         return multipleResponse(caseData, null);
     }

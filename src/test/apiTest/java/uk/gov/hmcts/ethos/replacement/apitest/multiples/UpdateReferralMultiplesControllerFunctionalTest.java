@@ -49,8 +49,8 @@ public class UpdateReferralMultiplesControllerFunctionalTest extends BaseFunctio
         multipleData.setSelectReferral(selectReferralList);
         multipleData.setUpdateReferralDetails("modified details");
 
-        JSONObject singleCase = createSinglesCase();
-        multipleData.setLeadCase(singleCase.getString("id"));
+        JSONObject singleCase = createSinglesCaseDataStore();
+        multipleData.setLeadCase(String.valueOf(singleCase.getLong("id")));
     }
 
     @Test

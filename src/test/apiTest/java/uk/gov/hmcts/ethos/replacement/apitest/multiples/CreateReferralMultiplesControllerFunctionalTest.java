@@ -34,8 +34,8 @@ public class CreateReferralMultiplesControllerFunctionalTest extends BaseFunctio
         multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);
         request.setCaseDetails(multipleDetails);
 
-        JSONObject singleCase = createSinglesCase();
-        multipleData.setLeadCase(singleCase.getString("id"));
+        JSONObject singleCase = createSinglesCaseDataStore();
+        multipleData.setLeadCase(String.valueOf(singleCase.getLong("id")));
 
         multipleData.setIsUrgent("Yes");
         multipleData.setReferentEmail("test@gmail.com");

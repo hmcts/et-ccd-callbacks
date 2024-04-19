@@ -12,15 +12,15 @@ ft:
   et-sya-api:
     url: ${FT_SYA_URL:http://localhost:4550}
   idam:
-    url: ${IDAM_API_URL:http://localhost:5000}
+    url: ${IDAM_API_URL:http://localhost:5062}
 
 idam:
   api:
-    url: http://localhost:5000
-    jwkUrl: http://localhost:5000/o/jwks
+    url: http://localhost:5062
+    jwkUrl: http://localhost:5062/o/jwks
   s2s-auth:
-    url: http://localhost:4502
-    totp_secret: AAAAAAAAAAAAAAAA
+    url: ${SERVICE_AUTH_PROVIDER_URL:http://localhost:8489}
+    totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: et_cos
 
 et-sya-api:
@@ -135,7 +135,7 @@ apply_noc_access_api_assignments_path: /noc/apply-decision
 
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
-  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}
+  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3000/cases/case-details/}
 
 hmcts_service_id: BHA1
 

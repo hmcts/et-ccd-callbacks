@@ -21,7 +21,6 @@ import uk.gov.hmcts.ethos.replacement.apitest.model.Role;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +38,7 @@ public class IdamTestApiRequests {
     private final HttpClient client;
     private final String baseIdamApiUrl;
     private static final String USER_PASSWORD = "Apassword123";
+    private CreateUser user;
 
     public IdamTestApiRequests(HttpClient client, String baseIdamApiUrl) {
         this.client = client;
@@ -51,17 +51,18 @@ public class IdamTestApiRequests {
             "ATestForename",
             "ATestSurname",
             USER_PASSWORD,
-            Collections.singletonList(new Role("citizen"))
+            List.of(new Role("citizen"), new Role("caseworker-employment-api"))
         );
 
         String body = new ObjectMapper().writeValueAsString(createUser);
-        makePostRequest(baseIdamApiUrl + "/testing-support/accounts", body);
+        String resJson = makePostRequest(baseIdamApiUrl + "/testing-support/accounts", body);
+        createUser.setId(new JSONObject(resJson).getString("uuid"));
         log.info("BaseFunctionalTest user created.");
-
+        user = createUser;
         return createUser;
     }
 
-    private void makePostRequest(String uri, String body) throws IOException {
+    private String makePostRequest(String uri, String body) throws IOException {
         HttpResponse createUserResponse = client.execute(post(uri)
                                                              .setEntity(new StringEntity(body, APPLICATION_JSON))
                                                              .build());
@@ -70,6 +71,7 @@ public class IdamTestApiRequests {
 
         assertTrue(statusCode == CREATED.value() || statusCode == OK.value());
         log.info("BaseFunctionalTest user created.");
+        return EntityUtils.toString(createUserResponse.getEntity());
     }
 
     /**
@@ -98,8 +100,8 @@ public class IdamTestApiRequests {
         cookies.add("cookies_preferences_set=false");
 
         List<NameValuePair> formparams = new ArrayList<>();
-        formparams.add(new BasicNameValuePair("username", "admin@hmcts.net"));
-        formparams.add(new BasicNameValuePair("password", "Password"));
+        formparams.add(new BasicNameValuePair("username", user.getEmail()));
+        formparams.add(new BasicNameValuePair("password", user.getPassword()));
         formparams.add(new BasicNameValuePair("save", "Sign in"));
         formparams.add(new BasicNameValuePair("selfRegistrationEnabled", "true"));
         formparams.add(new BasicNameValuePair("azureLoginEnabled", "true"));

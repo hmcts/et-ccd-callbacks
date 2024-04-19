@@ -24,7 +24,7 @@ public class SendNotificationMultiplesControllerFunctionalTest extends BaseFunct
     private static final String ABOUT_TO_START_URL = "/multiples/sendNotification/aboutToStart";
     private static final String SUBMITTED_URL = "/multiples/sendNotification/submitted";
     private MultipleRequest request;
-    
+
     @BeforeAll
     public void setUpCaseData() throws IOException, InterruptedException {
         request = new MultipleRequest();
@@ -32,14 +32,11 @@ public class SendNotificationMultiplesControllerFunctionalTest extends BaseFunct
         multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);
         request.setCaseDetails(multipleDetails);
 
-        JSONObject singleCase = createSinglesCase();
-        String caseId = singleCase.getString("id");
-        runEventOnCase("et1Vetting", readJsonResource("eventET1Vetting"), caseId);
-        runEventOnCase("preAcceptanceCase", readJsonResource("eventPreAcceptanceCase"), caseId);
+        JSONObject singleCase = createSinglesCaseDataStore();
 
-        String singleEthosRef = singleCase.getJSONObject("data").getString("ethosCaseReference");
-        JSONObject multipleCase = createMultiplesCase(singleEthosRef);
-        var jsonData = multipleCase.getJSONObject("data").toString();
+        String singleEthosRef = singleCase.getJSONObject("case_data").getString("ethosCaseReference");
+        JSONObject multipleCase = createMultiplesCaseDataStore(singleEthosRef);
+        var jsonData = multipleCase.getJSONObject("case_data").toString();
         MultipleData data = new ObjectMapper().readValue(jsonData, MultipleData.class);
         multipleDetails.setCaseData(data);
     }

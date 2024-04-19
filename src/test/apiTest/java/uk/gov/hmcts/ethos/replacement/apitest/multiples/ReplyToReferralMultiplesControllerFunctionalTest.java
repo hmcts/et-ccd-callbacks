@@ -30,7 +30,7 @@ public class ReplyToReferralMultiplesControllerFunctionalTest extends BaseFuncti
     private static final String SUBMITTED_REFERRAL_URL = "/multiples/replyReferral/completeReplyToReferral";
     private static final String VALIDATE_EMAIL_URL = "/multiples/replyReferral/validateReplyToEmail";
     private MultipleRequest request;
-    
+
     @BeforeAll
     public void setUpCaseData() throws IOException, InterruptedException {
         MultipleData multipleData = MultipleData.builder().build();
@@ -51,8 +51,8 @@ public class ReplyToReferralMultiplesControllerFunctionalTest extends BaseFuncti
 
         multipleData.setReplyDetails("response details");
 
-        JSONObject singleCase = createSinglesCase();
-        multipleData.setLeadCase(singleCase.getString("id"));
+        JSONObject singleCase = createSinglesCaseDataStore();
+        multipleData.setLeadCase(String.valueOf(singleCase.getLong("id")));
     }
 
     @Test

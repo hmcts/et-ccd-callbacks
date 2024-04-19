@@ -31,7 +31,7 @@ public class CloseReferralMultiplesControllerFunctionalTest extends BaseFunction
     private MultipleRequest request;
 
     @BeforeAll
-    public void setUpCaseData() throws IOException, InterruptedException {
+    public void setUpCaseData() throws IOException {
         MultipleData multipleData = MultipleData.builder().build();
         request = new MultipleRequest();
         MultipleDetails multipleDetails = new MultipleDetails();
@@ -48,8 +48,8 @@ public class CloseReferralMultiplesControllerFunctionalTest extends BaseFunction
         selectReferralList.getValue().setLabel("idklol");
         multipleData.setSelectReferral(selectReferralList);
 
-        JSONObject singleCase = createSinglesCase();
-        multipleData.setLeadCase(singleCase.getString("id"));
+        JSONObject singleCase = createSinglesCaseDataStore();
+        multipleData.setLeadCase(String.valueOf(singleCase.getLong("id")));
     }
 
     @Test

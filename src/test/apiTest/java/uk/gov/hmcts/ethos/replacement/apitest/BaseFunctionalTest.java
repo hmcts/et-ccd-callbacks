@@ -3,10 +3,7 @@ package uk.gov.hmcts.ethos.replacement.apitest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -28,18 +25,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpRetryException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
@@ -55,6 +54,7 @@ public abstract class BaseFunctionalTest {
     public static final String AUTHORIZATION = "Authorization";
 
     protected String userToken;
+    protected String userId;
     protected CloseableHttpClient client;
     protected IdamTestApiRequests idamTestApiRequests;
 
@@ -66,21 +66,54 @@ public abstract class BaseFunctionalTest {
     private String idamApiUrl;
     @Value("${et-sya-api.url}")
     protected String syaApiUrl;
-    @Value("${ft.exui.url}")
-    protected String exuiUrl;
+    @Value("${ccd.data-store-api-url}")
+    private String ccdDataStoreUrl;
     protected RequestSpecification spec;
+    @Value("${etcos.system.username}")
+    private String systemUserName;
+
+    @Value("${etcos.system.password}")
+    private String systemUserPassword;
+    @Value("${idam.s2s-auth.url}")
+    private String s2sUrl;
+    @Value("${idam.s2s-auth.totp_secret}")
+    private String secret;
+    @Autowired
+    private AuthTokenGenerator serviceAuthTokenGenerator;
+    @Autowired
+    private AdminUserService adminUserService;
+    @Autowired
+    private UserIdamService userIdamService;
 
     @BeforeAll
     public void setup() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException {
         log.info("BaseFunctionalTest setup started.");
+        log.info("user " + systemUserName);
+        log.info("pass " + systemUserPassword);
+        log.info("s2sUrl " + s2sUrl);
+        log.info("secret " + secret);
         client = buildClient();
         idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
         CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
         userToken = baseUrl.contains("localhost") ? idamTestApiRequests.getLocalAccessToken()
                 : idamTestApiRequests.getAccessToken(user.getEmail());
+        userId = user.getId();
         useRelaxedHTTPSValidation();
         spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
         log.info("BaseFunctionalTest setup completed.");
+        userToken = adminUserService.getAdminUserToken();
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        userId = userDetails.getUid();
+    }
+
+    protected JSONObject createSinglesCaseDataStore() throws IOException {
+        return createCaseDataStore("initiateCase", readJsonResource("eventInitiateCase"), "ET_Scotland");
+    }
+
+    protected JSONObject createMultiplesCaseDataStore(String singleEthosRef) throws IOException {
+        String eventCreateMultiple = readJsonResource("eventCreateMultiple");
+        String transformed = eventCreateMultiple.replace("%LEAD_ETHOS_REF%", singleEthosRef);
+        return createCaseDataStore("createMultiple", transformed, "ET_Scotland_Multiple");
     }
 
     private String createRandomEmail() {
@@ -100,124 +133,31 @@ public abstract class BaseFunctionalTest {
         return httpClientBuilder.build();
     }
 
-    private static HttpResponse retryRequest(HttpClient instance, HttpUriRequest request)
-            throws IOException, InterruptedException {
-        int maxAttempts = 5;
-        int attempt = 0;
-        while (attempt++ < maxAttempts) {
-            HttpResponse response = instance.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
+    protected JSONObject createCaseDataStore(String name, String payload, String caseTypeId) throws IOException {
+        String serviceToken = serviceAuthTokenGenerator.generate();
+        String triggerFormat = "%s/caseworkers/%s/jurisdictions/EMPLOYMENT/case-types/%s/event-triggers/%s/token";
+        String triggerUrl = String.format(triggerFormat, ccdDataStoreUrl, userId, caseTypeId, name);
+        RequestBuilder requestBuilder = get(triggerUrl)
+                .setHeader("Authorization", userToken)
+                .setHeader("ServiceAuthorization", serviceToken)
+                .setHeader("Content-Type", "application/json");
 
-            if (statusCode == 500) {
-                log.error("something unexpected happened. status code was " + statusCode);
-                Thread.sleep(1000);
-                continue;
-            }
-
-            return response;
-        }
-
-        HttpResponse response = instance.execute(request);
-        int statusCode = response.getStatusLine().getStatusCode();
-
-        if (statusCode == 500) {
-            throw new HttpRetryException("Request to " + request.getURI() + " failed", 500);
-        }
-
-        return response;
-    }
-
-    private List<String> retryLogin() throws InterruptedException {
-        int maxAttempts = 5;
-        int attempt = 0;
-        while (attempt++ < maxAttempts) {
-            try {
-                return idamTestApiRequests.idamAuth();
-            } catch (Exception e) {
-                log.warn("Login to idam failed - retrying in 5 seconds...");
-                Thread.sleep(5000);
-            }
-        }
-        throw new InterruptedException("Failed to login to Idam");
-    }
-
-    protected JSONObject runEventOnCase(String name, String jsonPayload, String caseId)
-            throws IOException, InterruptedException {
-        List<String> cookies = retryLogin();
-
-        HttpClient instance = HttpClientBuilder.create().disableRedirectHandling().build();
-        String url = String.format("%s/data/internal/cases/%s/event-triggers/%s", exuiUrl, caseId, name);
-        HttpResponse triggerCreateResponse = retryRequest(instance, buildAuthorisedRequest(get(url), cookies, null));
-
-        JSONObject jsonObject = new JSONObject(EntityUtils.toString(triggerCreateResponse.getEntity()));
-        String eventToken = jsonObject.get("event_token").toString();
-
-        StringEntity caseEntity = new StringEntity(jsonPayload.replace("%EVENT_TOKEN%", eventToken));
-
-        String postUrl = String.format("%s/data/cases/%s/events", exuiUrl, caseId);
-        HttpUriRequest request = buildAuthorisedRequest(
-                post(postUrl).setHeader("Content-Type", "application/json"), cookies, caseEntity
-        );
-
-        HttpResponse createResponse = retryRequest(instance, request);
-
-        return new JSONObject(EntityUtils.toString(createResponse.getEntity()));
-    }
-
-    protected JSONObject createSinglesCase() throws IOException, InterruptedException {
-        return createCase("initiateCase", readJsonResource("eventInitiateCase"), "ET_Scotland");
-    }
-
-    protected JSONObject createMultiplesCase(String leadCaseId) throws IOException, InterruptedException {
-        String eventCreateMultiple = readJsonResource("eventCreateMultiple");
-        String transformed = eventCreateMultiple.replace("%LEAD_ETHOS_REF%", leadCaseId);
-        return createCase("createMultiple", transformed, "ET_Scotland_Multiple");
-    }
-
-    protected JSONObject createCase(String name, String payload, String caseTypeId)
-            throws IOException, InterruptedException {
-        List<String> cookies = retryLogin();
-
-        HttpClient instance = HttpClientBuilder.create().disableRedirectHandling().build();
-        String url = String.format("%s/data/internal/case-types/%s/event-triggers/%s", exuiUrl, caseTypeId, name);
-        HttpResponse triggerCreateResponse = retryRequest(instance, buildAuthorisedRequest(get(url), cookies, null));
-
-        JSONObject jsonObject = new JSONObject(EntityUtils.toString(triggerCreateResponse.getEntity()));
-        String eventToken = jsonObject.get("event_token").toString();
+        CloseableHttpResponse execute = client.execute(requestBuilder.build());
+        JSONObject jsonObject = new JSONObject(EntityUtils.toString(execute.getEntity()));
+        String eventToken = jsonObject.getString("token");
 
         StringEntity caseEntity = new StringEntity(payload.replace("%EVENT_TOKEN%", eventToken));
 
-        RequestBuilder postUrl = post(String.format("%s/data/case-types/%s/cases", exuiUrl, caseTypeId))
-                .setHeader("Content-Type", "application/json");
+        String postFormat = "%s/caseworkers/%s/jurisdictions/EMPLOYMENT/case-types/%s/cases";
+        RequestBuilder submitRequest = post(String.format(postFormat, ccdDataStoreUrl, userId, caseTypeId))
+                .setHeader("Authorization", userToken)
+                .setHeader("ServiceAuthorization", serviceToken)
+                .setHeader("Content-Type", "application/json")
+                .setEntity(caseEntity);
 
-        HttpResponse createResponse = retryRequest(instance, buildAuthorisedRequest(postUrl, cookies, caseEntity));
-
-        return new JSONObject(EntityUtils.toString(createResponse.getEntity()));
-    }
-
-    private HttpUriRequest buildAuthorisedRequest(RequestBuilder request, List<String> cookies, HttpEntity entity) {
-        String xsrfToken = cookies.stream().filter(o -> o.startsWith("XSRF-TOKEN"))
-                .findFirst().get().replace("XSRF-TOKEN=", "");
-
-        String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0) Gecko/20100101 Firefox/102.0";
-        RequestBuilder requestBuilder = request.setHeader("User-Agent", userAgent)
-                .setHeader("Accept", "*/*")
-                .setHeader("Accept-Language", "en-GB,en;q=0.5")
-                .setHeader("Accept-Encoding", "gzip, deflate, br")
-                .setHeader("Referer", exuiUrl)
-                .setHeader("Cookie", String.join("; ", cookies))
-                .setHeader("Connection", "keep-alive")
-                .setHeader("Upgrade-Insecure-Requests", "1")
-                .setHeader("Sec-Fetch-Dest", "empty")
-                .setHeader("Sec-Fetch-Mode", "cors")
-                .setHeader("Sec-Fetch-Site", "same-origin")
-                .setHeader("Pragma", "no-cache")
-                .setHeader("Cache-Control", "no-cache")
-                .setHeader("X-XSRF-TOKEN", xsrfToken)
-                .setHeader("experimental", "true");
-
-        requestBuilder.setEntity(entity);
-        return requestBuilder.build();
+        CloseableHttpResponse execute2 = client.execute(submitRequest.build());
+        String result = EntityUtils.toString(execute2.getEntity());
+        return new JSONObject(result);
     }
 
     public String readJsonResource(String name) throws IOException {

@@ -56,10 +56,18 @@ public class IdamTestApiRequests {
 
         String body = new ObjectMapper().writeValueAsString(createUser);
         String resJson = makePostRequest(baseIdamApiUrl + "/testing-support/accounts", body);
-        createUser.setId(new JSONObject(resJson).getString("uuid"));
+        createUser.setId(getIdFromIdamResponse(new JSONObject(resJson)));
         log.info("BaseFunctionalTest user created.");
         user = createUser;
         return createUser;
+    }
+
+    private String getIdFromIdamResponse(JSONObject idamResponse) {
+        try {
+            return idamResponse.getString("uuid");
+        } catch (Exception e) {
+            return idamResponse.getString("id");
+        }
     }
 
     private String makePostRequest(String uri, String body) throws IOException {

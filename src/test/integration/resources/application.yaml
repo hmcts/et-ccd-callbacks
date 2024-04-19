@@ -117,6 +117,7 @@ template:
   claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
 
   respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
+  et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
 
 etcos:
   system:

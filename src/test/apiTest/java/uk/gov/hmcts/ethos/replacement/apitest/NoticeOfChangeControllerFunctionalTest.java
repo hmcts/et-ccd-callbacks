@@ -25,7 +25,6 @@ import java.util.Collections;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 
 public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
-
     private static final String AUTHORIZATION = "Authorization";
 
     private static final String SUBMITTED_URL = "/noc-decision/submitted";

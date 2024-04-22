@@ -1,14 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@Slf4j
 public class OAuth2Configuration {
 
     private String clientId;
@@ -27,10 +25,5 @@ public class OAuth2Configuration {
         this.redirectUri = redirectUri;
         this.clientSecret = clientSecret;
         this.clientScope = clientScope;
-
-        log.error(this.clientId);
-        log.error(this.redirectUri);
-        log.error(this.clientScope);
-        log.error(this.clientSecret);
     }
 }

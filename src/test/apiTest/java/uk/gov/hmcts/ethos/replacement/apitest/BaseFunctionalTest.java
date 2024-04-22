@@ -69,15 +69,6 @@ public abstract class BaseFunctionalTest {
     @Value("${ccd.data-store-api-url}")
     private String ccdDataStoreUrl;
     protected RequestSpecification spec;
-    @Value("${etcos.system.username}")
-    private String systemUserName;
-
-    @Value("${etcos.system.password}")
-    private String systemUserPassword;
-    @Value("${idam.s2s-auth.url}")
-    private String s2sUrl;
-    @Value("${idam.s2s-auth.totp_secret}")
-    private String secret;
     @Autowired
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @Autowired
@@ -88,10 +79,6 @@ public abstract class BaseFunctionalTest {
     @BeforeAll
     public void setup() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException {
         log.info("BaseFunctionalTest setup started.");
-        log.info("user " + systemUserName);
-        log.info("pass " + systemUserPassword);
-        log.info("s2sUrl " + s2sUrl);
-        log.info("secret " + secret);
         client = buildClient();
         idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
         CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
@@ -155,8 +142,8 @@ public abstract class BaseFunctionalTest {
                 .setHeader("Content-Type", "application/json")
                 .setEntity(caseEntity);
 
-        CloseableHttpResponse execute2 = client.execute(submitRequest.build());
-        String result = EntityUtils.toString(execute2.getEntity());
+        CloseableHttpResponse postResponse = client.execute(submitRequest.build());
+        String result = EntityUtils.toString(postResponse.getEntity());
         return new JSONObject(result);
     }
 

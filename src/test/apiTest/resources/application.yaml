@@ -38,7 +38,7 @@ document_management:
 ccd:
   client:
     timeout: 60000
-  data-store-api-url: http://localhost:4452
+  data-store-api-url: ${CCD_DATA_STORE_API_URL:http://localhost:4452}
 
 tornado:
   accessKey: test

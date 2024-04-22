@@ -176,8 +176,8 @@ class ReferralHelperTest {
                 + "shortDescription=null, topLevelDocuments=null, startingClaimDocuments=null, "
                 + "responseClaimDocuments=null, initialConsiderationDocuments=null, caseManagementDocuments=null, "
                 + "withdrawalSettledDocuments=null, hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
-                + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null, "
-                + "docNumber=null, tornadoEmbeddedPdfUrl=null, excludeFromDcf=null, documentIndex=null)), "
+                + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null"
+                + ", docNumber=null, tornadoEmbeddedPdfUrl=null, excludeFromDcf=null, documentIndex=null)), "
                 + "GenericTypeItem(id=2, "
                 + "value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType("
                 + "documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl=null, "
@@ -357,7 +357,7 @@ class ReferralHelperTest {
         caseData.setUpdateIsUrgent("Yes");
         caseData.setUpdateReferralInstruction("Instruction");
         caseData.setUpdateReferralSubjectSpecify("Subject Specify");
-        ReferralHelper.updateReferral(caseData, "FullName");
+        ReferralHelper.updateReferral(caseData, "FullName", "None");
         ReferralType referral = caseData.getReferralCollection().get(0).getValue();
         UpdateReferralType updateReferralType = referral.getUpdateReferralCollection().get(0).getValue();
         assertEquals("Judge", updateReferralType.getUpdateReferCaseTo());
@@ -406,7 +406,7 @@ class ReferralHelperTest {
     @Test
     void createReferralReply() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        DynamicFixedListType selectReferralList = 
+        DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
@@ -785,7 +785,7 @@ class ReferralHelperTest {
         UploadedDocumentType doc = UploadedDocumentType.builder().documentFilename("fileName").documentUrl("url")
                 .documentBinaryUrl("binaryUrl").build();
         caseData.getReferralCollection().get(0).getValue().setReferralSummaryPdf(doc);
-        DynamicFixedListType selectReferralList = 
+        DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");

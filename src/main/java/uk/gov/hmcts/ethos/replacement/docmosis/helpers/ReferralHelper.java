@@ -150,7 +150,7 @@ public final class ReferralHelper {
                 + populateReplyDetails(caseData, leadCase);
     }
 
-    public static void populateUpdateReferralDetails(CaseData caseData) {
+    public static void populateUpdateReferralDetails(BaseCaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         caseData.setUpdateReferCaseTo(referral.getReferCaseTo());
         caseData.setUpdateReferralSubject(referral.getReferralSubject());
@@ -170,6 +170,7 @@ public final class ReferralHelper {
     public static String populateHearingDetails(CaseData caseData) {
         List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
         if (CollectionUtils.isEmpty(hearingCollection)) {
+            log.info("No hearings on populateHearingDetails for " + caseData.getEthosCaseReference());
             return "";
         }
 
@@ -320,8 +321,8 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName Full name of the logged-in user
      */
-    public static void createReferral(CaseData caseData, String userFullName,
-                                      UploadedDocumentType documentInfo) {
+    public static void createReferral(BaseCaseData caseData, String userFullName,
+                                      UploadedDocumentType documentInfo, String nextHearingDate) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             caseData.setReferralCollection(new ArrayList<>());
         }
@@ -342,7 +343,7 @@ public final class ReferralHelper {
 
         referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
 
-        referralType.setReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
+        referralType.setReferralHearingDate(nextHearingDate);
         referralType.setReferralSummaryPdf(documentInfo);
 
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
@@ -354,7 +355,18 @@ public final class ReferralHelper {
         caseData.setReferralCollection(referralCollection);
     }
 
-    public static boolean isValidReferralStatus(CaseData caseData) {
+    /**
+     * Creates a referral and adds it to the referral collection.
+     * @param caseData contains all the case data
+     * @param userFullName Full name of the logged-in user
+     */
+    public static void createReferral(CaseData caseData, String userFullName,
+                                      UploadedDocumentType documentInfo) {
+        String nextHearingDate = getNearestHearingToReferral(caseData, "None");
+        createReferral(caseData, userFullName, documentInfo, nextHearingDate);
+    }
+
+    public static boolean isValidReferralStatus(BaseCaseData caseData) {
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
         return ReferralStatus.AWAITING_INSTRUCTIONS.equals(referral.getReferralStatus());
@@ -365,7 +377,7 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName Full name of the logged-in user
      */
-    public static void updateReferral(CaseData caseData, String userFullName) {
+    public static void updateReferral(BaseCaseData caseData, String userFullName, String nextHearingDate) {
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
         if (CollectionUtils.isEmpty(referral.getUpdateReferralCollection())) {
@@ -384,7 +396,7 @@ public final class ReferralHelper {
         updateReferralType.setUpdateReferralDate(Helper.getCurrentDate());
         updateReferralType.setUpdateReferredBy(userFullName);
         updateReferralType.setUpdateReferentEmail(caseData.getUpdateReferentEmail());
-        updateReferralType.setUpdateReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
+        updateReferralType.setUpdateReferralHearingDate(nextHearingDate);
         ListTypeItem<UpdateReferralType> updateReferralCollection = referral.getUpdateReferralCollection();
         updateReferralCollection.add(GenericTypeItem.from(UUID.randomUUID().toString(), updateReferralType));
         referral.setUpdateReferralCollection(updateReferralCollection);
@@ -419,17 +431,19 @@ public final class ReferralHelper {
     public static TornadoDocument<ReferralTypeData> getDocumentRequest(MultipleData caseData, CaseData leadCase,
                                                                        String accessKey) {
         ReferralTypeData data;
-        if (caseData.getReferentEmail() != null || caseData.getSelectReferral() == null) {
+        if (caseData.getSelectReferral() == null) {
             data = newReferralRequest(caseData, leadCase);
         } else {
-            data = existingReferralRequest(caseData, leadCase);
+            ReferralType referral = getSelectedReferral(caseData);
+            data = rebuildReferral(leadCase.getHearingCollection(), caseData.getMultipleReference(), referral);
         }
 
         return TornadoDocument.<ReferralTypeData>builder()
             .accessKey(accessKey)
             .outputName(REF_OUTPUT_NAME)
             .templateName(REF_SUMMARY_TEMPLATE_NAME)
-            .data(data).build();
+            .data(data)
+            .build();
     }
 
     /**
@@ -502,16 +516,6 @@ public final class ReferralHelper {
                 .referralStatus(referral.getReferralStatus())
                 .updateReferralCollection(referral.getUpdateReferralCollection())
                 .build();
-    }
-
-    /**
-     * Creates a referral using the existing selected Referral.
-     * @param caseData contains selected referral
-     * @return a referral object which can then be mapped into the pdf doc
-     */
-    private static ReferralTypeData existingReferralRequest(MultipleData caseData, CaseData leadCase) {
-        ReferralType referral = getSelectedReferral(caseData);
-        return rebuildReferral(leadCase.getHearingCollection(), caseData.getMultipleReference(), referral);
     }
 
     /**

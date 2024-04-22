@@ -435,6 +435,13 @@ dependencies {
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 
+configurations.every {conf -> conf.resolutionStrategy.eachDependency {rs -> {
+    if(rs.getRequested().group == "ch.qos.logback" && (rs.getRequested().name == "logback-classic" || rs.getRequested().name == "logback-core")) {
+        useVersion('1.2.13')
+        because('CVE-2023-6378 & CVE-2023-6481')
+    }
+}}}
+
 bootJar {
     getArchiveFileName().set(provider {
         'et-cos.jar'

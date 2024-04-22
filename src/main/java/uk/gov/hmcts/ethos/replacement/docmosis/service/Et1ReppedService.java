@@ -68,6 +68,7 @@ public class Et1ReppedService {
     private final TribunalOfficesService tribunalOfficesService;
     private final UserIdamService userIdamService;
     private final EmailService emailService;
+    private final AdminUserService adminUserService;
 
     @Value("${template.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
@@ -305,7 +306,8 @@ public class Et1ReppedService {
      */
     public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
         UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
-        OrganisationsResponse organisation = getOrganisationDetailsFromUserId(userToken, claimantRepUser.getUid());
+        String adminToken = adminUserService.getAdminUserToken();
+        OrganisationsResponse organisation = getOrganisationDetailsFromUserId(adminToken, claimantRepUser.getUid());
 
         log.info("Adding claimant solicitor role to case {}", caseDetails.getCaseId());
 

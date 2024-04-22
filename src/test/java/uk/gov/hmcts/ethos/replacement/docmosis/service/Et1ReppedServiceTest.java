@@ -117,7 +117,8 @@ class Et1ReppedServiceTest {
                 postcodeToOfficeService);
         et1ReppedService = new Et1ReppedService(acasService, authTokenGenerator, ccdCaseAssignment,
                 documentManagementService, jurisdictionCodesMapperService, organisationClient, pdfService,
-                postcodeToOfficeService, tornadoService, tribunalOfficesService, userIdamService, emailService);
+                postcodeToOfficeService, tornadoService, tribunalOfficesService, userIdamService, emailService,
+                adminUserService);
         when(postcodeToOfficeMappings.getPostcodes()).thenReturn(getPostcodes());
     }
 
@@ -176,7 +177,7 @@ class Et1ReppedServiceTest {
                 .name("TestOrg")
                 .organisationIdentifier("AA11BB")
                 .build();
-        when(organisationClient.retrieveOrganisationDetailsByUserId("authToken", "serviceAuthToken", "id"))
+        when(organisationClient.retrieveOrganisationDetailsByUserId("userToken", "serviceAuthToken", "id"))
                 .thenReturn(ResponseEntity.status(200).body(organisationsResponse));
         et1ReppedService.assignCaseAccess(caseDetails, "authToken");
         verify(ccdCaseAssignment, times(1)).removeCaseUserRoles(any());

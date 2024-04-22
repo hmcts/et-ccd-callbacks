@@ -22,6 +22,10 @@ idam:
     url: ${SERVICE_AUTH_PROVIDER_URL:http://localhost:8489}
     totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: et_cos
+  client:
+    scope: openid profile roles manage-user
+    secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAA}
+    id: ${REFORM_SERVICE_NAME:et-cos}
 
 et-sya-api:
   url: http://et-sya-api-aat.service.core-compute-aat.internal
@@ -127,8 +131,8 @@ ccd_gateway_base_url: http://127.0.0.1:3453
 
 etcos:
   system:
-    username: ${ET_COS_SYSTEM_USER:123}
-    password: ${ET_COS_SYSTEM_USER_PASSWORD:123}
+    username: ${ET_COS_SYSTEM_USER:et.service@hmcts.net}
+    password: ${ET_COS_SYSTEM_USER_PASSWORD:Password}
 
 assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision

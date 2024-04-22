@@ -436,7 +436,9 @@ dependencies {
 }
 
 configurations.every {conf -> conf.resolutionStrategy.eachDependency {rs -> {
-    if(rs.getRequested().group == "ch.qos.logback" && (rs.getRequested().name == "logback-classic" || rs.getRequested().name == "logback-core")) {
+    if(rs.getRequested().group == "ch.qos.logback" && (rs.getRequested().name == "logback-classic"
+            || rs.getRequested().name == "logback-core"
+            || rs.getRequested().name == "logback-access")) {
         useVersion('1.2.13')
         because('CVE-2023-6378 & CVE-2023-6481')
     }

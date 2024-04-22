@@ -209,8 +209,7 @@ class Et1ReppedControllerTest {
                 .name("TestOrg")
                 .organisationIdentifier("AA11BB")
                 .build();
-        when(et1ReppedService.getOrganisationDetailsFromUserId(anyString(), anyString()))
-                .thenReturn(organisationsResponse);
+        when(et1ReppedService.getOrganisationDetailsFromUserId(anyString())).thenReturn(organisationsResponse);
     }
 
     @Test

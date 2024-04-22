@@ -188,7 +188,7 @@ class Et1ReppedServiceTest {
     void retrieveOrganisationException() {
         when(organisationClient.retrieveOrganisationDetailsByUserId("authToken", "serviceAuthToken", "id"))
                 .thenReturn(ResponseEntity.status(404).build());
-        assertNull(et1ReppedService.getOrganisationDetailsFromUserId("authToken", "id"));
+        assertNull(et1ReppedService.getOrganisationDetailsFromUserId("id"));
     }
 
     @Test

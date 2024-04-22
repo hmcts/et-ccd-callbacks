@@ -247,7 +247,7 @@ public class Et1ReppedService {
         claimantRepresentative.setRepresentativePreference(
                 getFirstListItem(caseData.getRepresentativeContactPreference()));
         claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
-        OrganisationsResponse organisationDetails = getOrganisationDetailsFromUserId(userToken, userDetails.getUid());
+        OrganisationsResponse organisationDetails = getOrganisationDetailsFromUserId(userDetails.getUid());
         if (!ObjectUtils.isEmpty(organisationDetails)) {
             log.info("Adding ref data organisation details to case {}", caseData.getEthosCaseReference());
             claimantRepresentative.setMyHmctsOrganisation(Organisation.builder()
@@ -280,12 +280,12 @@ public class Et1ReppedService {
 
     /**
      * Retrieves the organisation details from the user ID.
-     * @param userToken the user token
      * @param userId the user ID
      * @return the organisation details
      */
-    public OrganisationsResponse getOrganisationDetailsFromUserId(String userToken, String userId) {
+    public OrganisationsResponse getOrganisationDetailsFromUserId(String userId) {
         try {
+            String userToken = adminUserService.getAdminUserToken();
             ResponseEntity<OrganisationsResponse> response =
                     organisationClient.retrieveOrganisationDetailsByUserId(userToken,
                             authTokenGenerator.generate(),
@@ -306,8 +306,7 @@ public class Et1ReppedService {
      */
     public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
         UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
-        String adminToken = adminUserService.getAdminUserToken();
-        OrganisationsResponse organisation = getOrganisationDetailsFromUserId(adminToken, claimantRepUser.getUid());
+        OrganisationsResponse organisation = getOrganisationDetailsFromUserId(claimantRepUser.getUid());
 
         log.info("Adding claimant solicitor role to case {}", caseDetails.getCaseId());
 

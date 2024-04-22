@@ -100,6 +100,18 @@ public class TseService {
     }
 
     /**
+     * Remove item from TseApplicationStoredCollection.
+     *
+     * @param caseData contains all the case data.
+     */
+    public void removeStoredApplication(CaseData caseData) {
+        String applicationId = caseData.getClaimantTse().getStoredApplicationId();
+        if (applicationId != null) {
+            caseData.getTseApplicationStoredCollection().removeIf(item -> item.getId().equals(applicationId));
+        }
+    }
+
+    /**
      * Clears the existing TSE data from CaseData to ensure fields will be empty when user
      * starts a new application in the same case.
      *

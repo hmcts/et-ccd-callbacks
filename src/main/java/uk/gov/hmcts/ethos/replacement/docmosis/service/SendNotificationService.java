@@ -33,8 +33,10 @@ import java.util.function.Function;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
@@ -50,23 +52,16 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
-    public static final List<String>
-            SEND_NOTIFICATION_SUBJECTS = List.of("Claimant / Respondent details",
-            "Judgment", "Claim (ET1)",
-            "Response (ET3)",
-            "Employer Contract Claim",
-            "Case management orders / requests");
-    public static final List<String>
-            SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER = List.of("Other (General correspondence)",
-            "Hearing");
+    private static final String EMPLOYER_CONTRACT_CLAIM = "Employer Contract Claim";
+    public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
+
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
-    @Value("${template.sendNotification}")
-    private String sendNotificationTemplateId;
-    @Value("${template.claimantSendNotificationHearingOther}")
-    private String claimantSendNotificationHearingOtherTemplateId;
-    @Value("${template.respondentSendNotificationHearingOther}")
-    private String respondentSendNotificationHearingOtherTemplateId;
+    private final FeatureToggleService featureToggleService;
+    @Value("${template.claimantSendNotification}")
+    private String claimantSendNotificationTemplateId;
+    @Value("${template.respondentSendNotification}")
+    private String respondentSendNotificationTemplateId;
     @Value("${template.bundles.respondentSubmittedNotificationForClaimant}")
     private String bundlesSubmittedNotificationForClaimantTemplateId;
     @Value("${template.bundles.respondentSubmittedNotificationForTribunal}")
@@ -126,7 +121,11 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
         sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
+        sendNotificationType.setNotificationSentFrom(caseData.getNotificationSentFrom());
+
         sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+
+        setStatusForCitizenHub(caseData, sendNotificationType);
 
         sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
         sendNotificationType.setSendNotificationSubjectString(
@@ -141,7 +140,16 @@ public class SendNotificationService {
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
         sendNotificationTypeItem.setValue(sendNotificationType);
         caseData.getSendNotificationCollection().add(sendNotificationTypeItem);
+    }
 
+    private static void setStatusForCitizenHub(CaseData caseData, SendNotificationType sendNotificationType) {
+        if (sendNotificationType.getSendNotificationSubject().contains(CASE_MANAGEMENT_ORDERS_REQUESTS)
+                && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
+                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
+            sendNotificationType.setNotificationState(NOT_STARTED_YET);
+        } else {
+            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+        }
     }
 
     private static int getNextNotificationNumber(CaseData caseData) {
@@ -170,6 +178,7 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
         caseData.setSendNotificationEccQuestion(null);
         caseData.setSendNotificationWhoCaseOrder(null);
+        caseData.setNotificationSentFrom(null);
     }
 
     /**
@@ -202,37 +211,24 @@ public class SendNotificationService {
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
         String caseId = caseDetails.getCaseId();
 
+        boolean ecc = featureToggleService.isEccEnabled();
+
+        if (caseData.getSendNotificationSubject().contains(EMPLOYER_CONTRACT_CLAIM)
+                && !ecc) {
+            log.warn("No emails sent. ECC feature flag is not enabled");
+            return;
+        }
+
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
-
-            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
-                emailService.sendEmail(sendNotificationTemplateId,
-                        claimantEmailAddress,
-                        buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
-            }
-
-            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(),
-                    SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER)) {
-                emailService.sendEmail(claimantSendNotificationHearingOtherTemplateId, claimantEmailAddress,
-                        buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
-            }
+            emailService.sendEmail(claimantSendNotificationTemplateId, claimantEmailAddress,
+                    buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
         }
 
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
-
-            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(), SEND_NOTIFICATION_SUBJECTS)) {
-                Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                        emailService.getExuiCaseLink(caseId));
-                List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-                respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue()));
-            }
-
-            if (CollectionUtils.containsAny(caseData.getSendNotificationSubject(),
-                    SEND_NOTIFICATION_SUBJECTS_HEARING_OTHER)) {
-                Map<String, String> personalisation = buildPersonalisation(caseDetails,
-                        emailService.getExuiCaseLink(caseId));
-                List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-                respondents.forEach(obj -> sendRespondentEmailHearingOther(caseData, personalisation, obj.getValue()));
-            }
+            Map<String, String> personalisation = buildPersonalisation(caseDetails,
+                    emailService.getExuiCaseLink(caseId));
+            List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+            respondents.forEach(obj -> sendRespondentEmailHearingOther(caseData, personalisation, obj.getValue()));
         }
     }
 
@@ -284,21 +280,13 @@ public class SendNotificationService {
 
     }
 
-    private void sendRespondentEmail(CaseData caseData, Map<String, String> emailData, RespondentSumType respondent) {
-        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
-        if (isNullOrEmpty(respondentEmail)) {
-            return;
-        }
-        emailService.sendEmail(sendNotificationTemplateId, respondentEmail, emailData);
-    }
-
     private void sendRespondentEmailHearingOther(CaseData caseData, Map<String, String> emailData,
                                                  RespondentSumType respondent) {
         String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
         if (isNullOrEmpty(respondentEmail)) {
             return;
         }
-        emailService.sendEmail(respondentSendNotificationHearingOtherTemplateId, respondentEmail, emailData);
+        emailService.sendEmail(respondentSendNotificationTemplateId, respondentEmail, emailData);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {

@@ -66,6 +66,7 @@ public class MultipleHelperService {
                         newLeadCase));
                 if (featureToggleService.isMultiplesEnabled()) {
                     multipleData.setLeadCaseId(leadCaseId);
+                    multipleData.setLeadEthosCaseRef(newLeadCase);
                 }
 
             } else {
@@ -79,6 +80,7 @@ public class MultipleHelperService {
                     newLeadCase));
             if (featureToggleService.isMultiplesEnabled()) {
                 multipleData.setLeadCaseId(caseId);
+                multipleData.setLeadEthosCaseRef(newLeadCase);
             }
         }
     }

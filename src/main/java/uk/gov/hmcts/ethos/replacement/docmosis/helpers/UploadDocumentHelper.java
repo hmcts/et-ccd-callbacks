@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +112,7 @@ public final class UploadDocumentHelper {
      * Names where all the preexisting data will sit
      * @param caseData where the data is stored
      */
-    public static void convertLegacyDocsToNewDocNaming(CaseData caseData) {
+    public static void convertLegacyDocsToNewDocNaming(BaseCaseData caseData) {
         if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentType documentType = documentTypeItem.getValue();
@@ -171,7 +172,7 @@ public final class UploadDocumentHelper {
         }
     }
 
-    public static void setDocumentTypeForDocumentCollection(CaseData caseData) {
+    public static void setDocumentTypeForDocumentCollection(BaseCaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             return;
         }
@@ -190,5 +191,4 @@ public final class UploadDocumentHelper {
         });
 
     }
-
 }

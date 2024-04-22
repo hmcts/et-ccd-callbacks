@@ -209,7 +209,30 @@ public final class UploadDocumentHelper {
 
         log.info("Retrieved docs: " + docs.size());
         multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
-
     }
 
+    public static void setMultiplesDocumentsToCorrectTab (BaseCaseData multipleData) {
+        if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
+            log.warn("Empty document collection");
+            return;
+        }
+
+        List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
+
+        if (multipleData.getDocumentAccess() == "Citizens") {
+            //set to claimantDocumentCollection
+            multipleData.setClaimantDocumentCollection(docs);
+        } else if (multipleData.getDocumentAccess() == "Legal rep/respondents") {
+            //set to legalrepDocumentCollection
+            multipleData.setLegalrepDocumentCollection(docs);
+        } else if (multipleData.getDocumentAccess() == "Both Citizens and Legal rep/respondents") {
+            //set to claimantDocumentCollection
+            multipleData.setClaimantDocumentCollection(docs);
+            //set to legalrepDocumentCollection
+            multipleData.setLegalrepDocumentCollection(docs);
+        } else {
+            //set to documentCollection
+            multipleData.setDocumentCollection(docs);
+        }
+    }
 }

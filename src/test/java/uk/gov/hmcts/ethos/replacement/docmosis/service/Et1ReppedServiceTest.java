@@ -145,6 +145,7 @@ class Et1ReppedServiceTest {
         when(organisationClient.retrieveOrganisationDetailsByUserId(anyString(), anyString(), anyString()))
                 .thenReturn(ResponseEntity.ok(organisationsResponse));
         when(authTokenGenerator.generate()).thenReturn("serviceAuthToken");
+        when(adminUserService.getAdminUserToken()).thenReturn("userToken");
         et1ReppedService.addClaimantRepresentativeDetails(draftCaseDetails.getCaseData(), "authToken");
         verify(organisationClient, times(1)).retrieveOrganisationDetailsByUserId(anyString(), anyString(), anyString());
         assertEquals(YES, draftCaseDetails.getCaseData().getClaimantRepresentedQuestion());

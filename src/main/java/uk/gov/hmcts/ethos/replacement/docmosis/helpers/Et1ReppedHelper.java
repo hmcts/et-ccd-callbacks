@@ -87,11 +87,24 @@ public class Et1ReppedHelper {
                 caseId,
                 sectionCompleted(caseData.getEt1ReppedSectionThree()),
                 listingFormatLocalDate(caseData.getEt1SectionThreeDateCompleted()));
+        String downloadSection = anySectionCompleted(caseData)
+                ? ET1ReppedConstants.DOWNLOAD_DRAFT_LABEL.formatted(caseId,
+                listingFormatLocalDate(caseData.getDownloadDraftEt1Date()))
+                : "";
         String submitSection = allSectionsCompleted(caseData)
                 ? ET1ReppedConstants.ET1_SUBMIT_AVAILABLE.formatted(caseId)
                 : ET1ReppedConstants.ET1_SUBMIT_UNAVAILABLE;
-        return formatted + submitSection;
+        return formatted + downloadSection + submitSection;
 
+    }
+
+    private static boolean anySectionCompleted(CaseData caseData) {
+        return !isNullOrEmpty(caseData.getEt1ReppedSectionOne())
+               && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionOne())
+               || !isNullOrEmpty(caseData.getEt1ReppedSectionTwo())
+               && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionTwo())
+               || !isNullOrEmpty(caseData.getEt1ReppedSectionThree())
+               && YES.equalsIgnoreCase(caseData.getEt1ReppedSectionThree());
     }
 
     /**
@@ -195,7 +208,7 @@ public class Et1ReppedHelper {
         } else if (ORGANISATION.equals(respondentType)) {
             return organisationName;
         } else {
-            throw new IllegalArgumentException(UNEXPECTED_VALUE + respondentType);
+            return "";
         }
     }
 
@@ -261,8 +274,6 @@ public class Et1ReppedHelper {
             respondentSumType.setRespondentLastName(caseData.getRespondentLastName());
         } else if (ORGANISATION.equals(caseData.getRespondentType())) {
             respondentSumType.setRespondentOrganisation(caseData.getRespondentOrganisationName());
-        } else {
-            throw new IllegalArgumentException(UNEXPECTED_VALUE + caseData.getRespondentType());
         }
         respondentSumType.setRespondentAddress(caseData.getRespondentAddress());
         respondentSumType.setRespondentAcasQuestion(caseData.getRespondentAcasYesNo());
@@ -481,13 +492,16 @@ public class Et1ReppedHelper {
 
     private static List<String> hearingPreferenceMapping(List<String> claimantHearingPreferences) {
         List<String> hearingPreferencesMapped = new ArrayList<>();
-        for (String claimantHearingPreference : claimantHearingPreferences) {
+        if (CollectionUtils.isEmpty(claimantHearingPreferences)) {
+            return hearingPreferencesMapped;
+        }
+        claimantHearingPreferences.forEach(claimantHearingPreference -> {
             if (claimantHearingPreference.equals(VIDEO_PREFERENCE)) {
                 hearingPreferencesMapped.add(VIDEO_PREFERENCE);
             } else if (claimantHearingPreference.equals(PHONE_PREFERENCE)) {
                 hearingPreferencesMapped.add(PHONE_PREFERENCE);
             }
-        }
+        });
         return hearingPreferencesMapped;
     }
 

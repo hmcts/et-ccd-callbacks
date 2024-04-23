@@ -152,11 +152,13 @@ public class Et1ReppedService {
      */
     public void createDraftEt1(CaseDetails caseDetails, String userToken) {
         try {
-            caseDetails.getCaseData().setManagingOffice(null);
+            CaseData caseData = caseDetails.getCaseData();
+            caseData.setManagingOffice(null);
             DocumentInfo documentInfo = createEt1(caseDetails, userToken, ET1_EN_PDF);
             documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
                     "Draft ET1 - " + caseDetails.getCaseId()));
-            caseDetails.getCaseData().setDocMarkUp(documentInfo.getMarkUp());
+            caseData.setDocMarkUp(documentInfo.getMarkUp());
+            caseData.setDownloadDraftEt1Date(LocalDate.now().toString());
         } catch (Exception e) {
             log.error("Failed to create and upload draft ET1 documents", e);
         }

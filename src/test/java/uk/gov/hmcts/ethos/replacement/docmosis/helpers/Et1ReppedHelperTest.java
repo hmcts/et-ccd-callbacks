@@ -124,12 +124,6 @@ class Et1ReppedHelperTest {
     }
 
     @Test
-    void generateRespondentPreamble_invalidValue() {
-        caseData.setRespondentType("invalid");
-        assertThrows(IllegalArgumentException.class, () -> Et1ReppedHelper.generateRespondentPreamble(caseData));
-    }
-
-    @Test
     void generateWorkAddressLabel() {
         caseData.setRespondentAddress(createGenericAddress());
         Et1ReppedHelper.generateWorkAddressLabel(caseData);

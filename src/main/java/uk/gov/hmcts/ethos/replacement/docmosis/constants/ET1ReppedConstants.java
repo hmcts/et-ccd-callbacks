@@ -37,6 +37,11 @@ public class ET1ReppedConstants {
    [ET1 Section 3 - Details of the claim](/cases/case-details/%s/trigger/et1SectionThree/et1SectionThree1)|%s|%s
         """;
 
+    @SuppressWarnings("checkstyle:LineLength")
+    public static final String DOWNLOAD_DRAFT_LABEL = """
+     [Download Draft ET1](/cases/case-details/%s/trigger/createDraftEt1/createDraftEt11)|<strong class="govuk-tag govuk-tag--blue">Available</strong>|%s
+         """;
+
     public static final String ET1_SUBMIT_AVAILABLE =
             "[Submit claim](/cases/case-details/%s/trigger/submitEt1Draft/submitEt1Draft1) "
             + "|  <strong class=\"govuk-tag govuk-tag--blue\">Available</strong>\n";

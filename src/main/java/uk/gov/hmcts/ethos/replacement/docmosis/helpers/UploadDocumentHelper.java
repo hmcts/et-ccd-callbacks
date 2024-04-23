@@ -15,11 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -211,7 +207,7 @@ public final class UploadDocumentHelper {
         multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
     }
 
-    public static void setMultiplesDocumentsToCorrectTab (BaseCaseData multipleData) {
+    public static void setMultiplesDocumentsToCorrectTab(BaseCaseData multipleData) {
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             log.warn("Empty document collection");
             return;
@@ -219,13 +215,13 @@ public final class UploadDocumentHelper {
 
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
 
-        if (multipleData.getDocumentAccess() == "Citizens") {
+        if (Objects.equals(multipleData.getDocumentAccess(), "Citizens")) {
             //set to claimantDocumentCollection
             multipleData.setClaimantDocumentCollection(docs);
-        } else if (multipleData.getDocumentAccess() == "Legal rep/respondents") {
+        } else if (Objects.equals(multipleData.getDocumentAccess(), "Legal rep/respondents")) {
             //set to legalrepDocumentCollection
             multipleData.setLegalrepDocumentCollection(docs);
-        } else if (multipleData.getDocumentAccess() == "Both Citizens and Legal rep/respondents") {
+        } else if (Objects.equals(multipleData.getDocumentAccess(), "Both Citizens and Legal rep/respondents")) {
             //set to claimantDocumentCollection
             multipleData.setClaimantDocumentCollection(docs);
             //set to legalrepDocumentCollection

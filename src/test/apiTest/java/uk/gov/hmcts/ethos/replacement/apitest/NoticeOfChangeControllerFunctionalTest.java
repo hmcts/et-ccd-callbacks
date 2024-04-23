@@ -32,7 +32,6 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
 
     private static final String AUTHORIZATION = "Authorization";
 
-    private static final String ABOUT_TO_SUBMIT_URL = "/noc-decision/about-to-submit";
     private static final String SUBMITTED_URL = "/noc-decision/submitted";
 
     private static final String SOLICITORA = "[SOLICITORA]";
@@ -99,20 +98,6 @@ public class NoticeOfChangeControllerFunctionalTest extends BaseFunctionalTest {
                 .withCaseId(String.valueOf(caseId))
                 .build();
 
-    }
-
-    @Test
-    void handleAboutToSubmitSuccessResponse() {
-        RestAssured.given()
-                .spec(spec)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(ccdRequest)
-                .post(ABOUT_TO_SUBMIT_URL)
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log()
-                .all(true);
     }
 
     @Test

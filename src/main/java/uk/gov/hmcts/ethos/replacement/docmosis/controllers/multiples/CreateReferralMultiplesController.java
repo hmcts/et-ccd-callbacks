@@ -63,7 +63,6 @@ public class CreateReferralMultiplesController {
      * Called for the first page of the Create Multiples Referral event.
      * Populates the Referral hearing detail's section on the page.
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -78,14 +77,14 @@ public class CreateReferralMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> initReferralHearingDetails(
-            @RequestBody MultipleRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) throws IOException {
-        log.info("ABOUT TO START CREATE MULTIPLES REFERRAL ---> "
-                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+            @RequestBody MultipleRequest ccdRequest) throws IOException {
+        log.info("ABOUT TO START CREATE MULTIPLES REFERRAL ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
 
         MultipleData multipleData = ccdRequest.getCaseDetails().getCaseData();
-        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
+        clearReferralDataFromCaseData(multipleData);
 
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
         multipleData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(leadCase));
         return multipleResponse(multipleData, null);
     }
@@ -93,7 +92,6 @@ public class CreateReferralMultiplesController {
     /**
      * Called for the email validation of the Create Multiples Referral event.
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/validateReferentEmail", consumes = APPLICATION_JSON_VALUE)
@@ -185,7 +183,6 @@ public class CreateReferralMultiplesController {
      * Called after submitting a create multiples referral event.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
     @PostMapping(value = "/completeCreateReferral", consumes = APPLICATION_JSON_VALUE)
@@ -195,8 +192,7 @@ public class CreateReferralMultiplesController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<MultipleCallbackResponse> completeCreateReferral(
-            @RequestBody MultipleRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest ccdRequest) {
         log.info("COMPLETE CREATE MULTIPLES REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         String body = String.format(CREATE_REFERRAL_BODY,

@@ -24,7 +24,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import java.io.IOException;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 
@@ -90,8 +89,7 @@ public class CloseReferralMultiplesController {
             @RequestBody MultipleRequest multipleRequest) throws IOException {
         MultipleDetails details = multipleRequest.getCaseDetails();
         MultipleData multipleData = details.getCaseData();
-        String caseTypeId = details.getCaseTypeId().replace(MULTIPLE, "");
-        CaseData leadCase = caseLookupService.getCaseDataAsAdmin(caseTypeId, multipleData.getLeadCaseId());
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(details);
         multipleData.setCloseReferralHearingDetails(
                 ReferralHelper.populateHearingReferralDetails(multipleData, leadCase)
         );

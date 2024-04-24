@@ -342,7 +342,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.4'
-//    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.3'
 
     // Log4J core added to remove startup error message
@@ -385,8 +385,8 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.109.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.6.2'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.0'
-//    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
-//    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.3.0'
 

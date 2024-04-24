@@ -49,6 +49,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.getSectionCompleted;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
 @Service
@@ -159,6 +160,8 @@ public class Et1ReppedService {
                     "Draft ET1 - " + caseDetails.getCaseId()));
             caseData.setDocMarkUp(documentInfo.getMarkUp());
             caseData.setDownloadDraftEt1Date(LocalDate.now().toString());
+            getSectionCompleted(caseData, caseDetails.getCaseId());
+
         } catch (Exception e) {
             log.error("Failed to create and upload draft ET1 documents", e);
         }

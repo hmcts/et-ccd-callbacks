@@ -416,6 +416,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.7'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.9'

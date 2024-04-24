@@ -155,6 +155,7 @@ public class Et1ReppedService {
         try {
             CaseData caseData = caseDetails.getCaseData();
             caseData.setManagingOffice(null);
+            caseData.setReceiptDate(null);
             DocumentInfo documentInfo = createEt1(caseDetails, userToken, ET1_EN_PDF);
             documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
                     "Draft ET1 - " + caseDetails.getCaseId()));

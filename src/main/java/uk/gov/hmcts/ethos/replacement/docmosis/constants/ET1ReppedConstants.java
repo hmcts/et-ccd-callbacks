@@ -15,11 +15,13 @@ public class ET1ReppedConstants {
     public static final String INDIVIDUAL = "Individual";
     public static final String TAB_PRE_LABEL = """
        Complete the ET1 claim form in 3 sections.
-                       
+       
        You can sign out and return to the claim if you've completed at least one section.
-                   
+
        You can review and edit any completed section before you submit the claim to the tribunal.
-                                        
+
+       You can download a draft copy of the ET1 form once at least one of the sections is marked as 'completed'.
+       
        You can complete the sections in any order.
 
         """;

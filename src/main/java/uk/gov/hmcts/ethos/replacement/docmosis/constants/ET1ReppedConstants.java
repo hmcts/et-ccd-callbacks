@@ -39,7 +39,7 @@ public class ET1ReppedConstants {
 
     @SuppressWarnings("checkstyle:LineLength")
     public static final String DOWNLOAD_DRAFT_LABEL = """
-     [Download Draft ET1](/cases/case-details/%s/trigger/createDraftEt1/createDraftEt11)|<strong class="govuk-tag govuk-tag--blue">Available</strong>|%s
+     [Download draft ET1](/cases/case-details/%s/trigger/createDraftEt1/createDraftEt11)|<strong class="govuk-tag govuk-tag--blue">Available</strong>|%s
          """;
 
     public static final String ET1_SUBMIT_AVAILABLE =

@@ -218,7 +218,9 @@ public final class UploadDocumentHelper {
         }
 
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
+        log.info("Retrieved docs: " + docs);
         String documentAccess = multipleData.getDocumentAccess();
+        log.info("documentAccess :" + documentAccess);
 
         if (documentAccess != null) {
             switch (documentAccess) {

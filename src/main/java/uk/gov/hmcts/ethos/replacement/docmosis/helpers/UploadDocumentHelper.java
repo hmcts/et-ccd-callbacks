@@ -211,7 +211,7 @@ public final class UploadDocumentHelper {
         multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
     }
 
-    public static void setMultiplesDocumentsToCorrectTab(BaseCaseData multipleData) {
+    public static void setMultipleDocumentsToCorrectTab(BaseCaseData multipleData) {
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             log.warn("Empty document collection");
             return;
@@ -220,20 +220,24 @@ public final class UploadDocumentHelper {
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
         String documentAccess = multipleData.getDocumentAccess();
 
-        switch (documentAccess) {
-            case "Citizens":
-                multipleData.setClaimantDocumentCollection(docs);
-                break;
-            case "Legal rep/respondents":
-                multipleData.setLegalrepDocumentCollection(docs);
-                break;
-            case "Both Citizens and Legal rep/respondents":
-                multipleData.setClaimantDocumentCollection(docs);
-                multipleData.setLegalrepDocumentCollection(docs);
-                break;
-            default:
-                multipleData.setDocumentCollection(docs);
-                break;
+        if (documentAccess != null) {
+            switch (documentAccess) {
+                case "Citizens":
+                    multipleData.setClaimantDocumentCollection(docs);
+                    break;
+                case "Legal rep/respondents":
+                    multipleData.setLegalrepDocumentCollection(docs);
+                    break;
+                case "Both Citizens and Legal rep/respondents":
+                    multipleData.setClaimantDocumentCollection(docs);
+                    multipleData.setLegalrepDocumentCollection(docs);
+                    break;
+                default:
+                    multipleData.setDocumentCollection(docs);
+                    break;
+            }
+        } else {
+            log.warn("documentAccess is null. Cannot set documents to correct tab.");
         }
     }
 }

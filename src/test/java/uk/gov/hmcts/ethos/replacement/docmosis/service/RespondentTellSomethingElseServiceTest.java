@@ -106,22 +106,14 @@ class RespondentTellSomethingElseServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String I_DO_WANT_TO_COPY = "I do want to copy";
-    private static final String TEMPLATE_ID = "someTemplateId";
+    private static final String TEMPLATE_ID_NO = "NoTemplateId";
+    private static final String TEMPLATE_ID_A = "TypeATemplateId";
+    private static final String TEMPLATE_ID_B = "TypeBTemplateId";
+    private static final String TEMPLATE_ID_C = "TypeCTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
 
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
-    private static final String RULE_92_ANSWERED_NO_TEXT = "You have said that you do not want to copy this "
-        + "correspondence to "
-        + "the other party. \n \n"
-        + "The tribunal will consider all correspondence and let you know what happens next.";
-    private static final String RULE_92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections "
-        + "to your %s application should be sent to the tribunal as soon as possible, and in any event "
-        + "within 7 days.";
-    private static final String RULE_92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
-        + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
-        + "sent to the tribunal as soon as possible, and in any event within 7 days.";
-
     private static final String EXPECTED_EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
         + "Response due | Number of responses | Status "
@@ -139,9 +131,13 @@ class RespondentTellSomethingElseServiceTest {
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
-                "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
+                "tseRespondentAcknowledgeNoTemplateId", TEMPLATE_ID_NO);
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
-                "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
+            "tseRespondentAcknowledgeTypeATemplateId", TEMPLATE_ID_A);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+            "tseRespondentAcknowledgeTypeBTemplateId", TEMPLATE_ID_B);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+                "tseRespondentAcknowledgeTypeCTemplateId", TEMPLATE_ID_C);
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -289,51 +285,46 @@ class RespondentTellSomethingElseServiceTest {
 
     @ParameterizedTest
     @MethodSource("sendAcknowledgeEmailAndGeneratePdf")
-    void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection, String expectedAnswer,
-                                        Boolean emailSent) {
+    void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection,
+                                            String expectedTemplateId) {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
 
-        Map<String, String> expectedPersonalisation = createPersonalisation(caseData, expectedAnswer,
-            selectedApplication);
+        Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
 
-        if (emailSent) {
-            verify(emailService).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
-        } else {
-            verify(emailService, never()).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
-        }
+        verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
-            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, TEMPLATE_ID_NO),
 
-            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY,
-                    RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true)
+            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, TEMPLATE_ID_B)
         );
     }
 
@@ -353,7 +344,7 @@ class RespondentTellSomethingElseServiceTest {
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
 
-        verify(emailService).sendEmail("TypeCTemplateId", LEGAL_REP_EMAIL, expectedPersonalisation);
+        verify(emailService).sendEmail(TEMPLATE_ID_C, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
     @Test
@@ -750,7 +741,6 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     private Map<String, String> createPersonalisation(CaseData caseData,
-                                                      String expectedAnswer,
                                                       String selectedApplication) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
@@ -758,9 +748,6 @@ class RespondentTellSomethingElseServiceTest {
         personalisation.put("respondents", getRespondentNames(caseData));
         personalisation.put("shortText", selectedApplication);
         personalisation.put("linkToExUI", "exuiUrl669718251103419");
-        if (expectedAnswer != null) {
-            personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
-        }
         return personalisation;
     }
 

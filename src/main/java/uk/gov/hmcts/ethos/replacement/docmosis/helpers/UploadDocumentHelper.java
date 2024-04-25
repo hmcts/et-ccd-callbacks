@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -219,21 +218,22 @@ public final class UploadDocumentHelper {
         }
 
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
+        String documentAccess = multipleData.getDocumentAccess();
 
-        if (Objects.equals(multipleData.getDocumentAccess(), "Citizens")) {
-            //set to claimantDocumentCollection
-            multipleData.setClaimantDocumentCollection(docs);
-        } else if (Objects.equals(multipleData.getDocumentAccess(), "Legal rep/respondents")) {
-            //set to legalrepDocumentCollection
-            multipleData.setLegalrepDocumentCollection(docs);
-        } else if (Objects.equals(multipleData.getDocumentAccess(), "Both Citizens and Legal rep/respondents")) {
-            //set to claimantDocumentCollection
-            multipleData.setClaimantDocumentCollection(docs);
-            //set to legalrepDocumentCollection
-            multipleData.setLegalrepDocumentCollection(docs);
-        } else {
-            //set to documentCollection
-            multipleData.setDocumentCollection(docs);
+        switch (documentAccess) {
+            case "Citizens":
+                multipleData.setClaimantDocumentCollection(docs);
+                break;
+            case "Legal rep/respondents":
+                multipleData.setLegalrepDocumentCollection(docs);
+                break;
+            case "Both Citizens and Legal rep/respondents":
+                multipleData.setClaimantDocumentCollection(docs);
+                multipleData.setLegalrepDocumentCollection(docs);
+                break;
+            default:
+                multipleData.setDocumentCollection(docs);
+                break;
         }
     }
 }

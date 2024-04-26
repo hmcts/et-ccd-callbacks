@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -115,6 +116,7 @@ public class DigitalCaseFileService {
     private List<BundleDocumentDetails> getDocsForDcf(CaseData caseData) {
         return caseData.getDocumentCollection().stream()
                 .map(GenericTypeItem::getValue)
+                .sorted(Comparator.comparing(DocumentType::getDocNumber))
                 .filter(doc -> doc.getUploadedDocument() != null && isExcludedFromDcf(doc))
                 .map(doc -> BundleDocumentDetails.builder()
                         .name(getDocumentName(doc))

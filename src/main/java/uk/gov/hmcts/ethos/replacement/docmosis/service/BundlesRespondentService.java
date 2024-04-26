@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RemovedHearingBundleItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -151,5 +152,19 @@ public class BundlesRespondentService {
                 .build()
             )
         );
+    }
+
+    public void removeHearingBundles(CaseData caseData) {
+        try {
+            List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();
+            removedHearingBundlesCollection.forEach(removedHearingBundleItem -> {
+                caseData.getBundlesRespondentCollection()
+                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getId()));
+                caseData.getBundlesClaimantCollection()
+                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getId()));
+            });
+        } catch (Exception e) {
+            log.error("Error removing hearing bundles", e);
+        }
     }
 }

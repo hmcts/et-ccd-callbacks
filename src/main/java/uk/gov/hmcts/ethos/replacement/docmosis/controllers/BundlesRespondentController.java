@@ -228,6 +228,39 @@ public class BundlesRespondentController {
                 .build());
     }
 
+    // In BundlesRespondentController.java
+
+    @PostMapping(value = "/removeHearingBundle", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Remove a hearing bundle")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Removed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> removeHearingBundle(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        throwIfBundlesFlagDisabled();
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        try {
+            bundlesRespondentService.removeHearingBundles(caseData);
+            return getCallbackRespEntityNoErrors(caseData);
+        } catch (Exception e) {
+            log.error("Error removing hearing bundle", e);
+            return getCallbackRespEntityErrors(List.of(e.getMessage()), caseData);
+        }
+    }
+
     private void throwIfBundlesFlagDisabled() {
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
         log.info(BUNDLES_LOG, bundlesToggle);

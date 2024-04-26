@@ -98,6 +98,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isMultiplesEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenMultiplesDBIsEnabled(Boolean toggleStat) {
+        givenToggle("muldb", toggleStat);
+
+        assertThat(featureToggleService.isMultiplesDBEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

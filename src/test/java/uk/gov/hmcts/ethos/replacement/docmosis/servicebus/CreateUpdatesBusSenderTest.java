@@ -9,6 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationDataModel;
 import uk.gov.hmcts.ecm.common.servicebus.ServiceBusSender;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -27,6 +29,8 @@ class CreateUpdatesBusSenderTest {
     private CreateUpdatesBusSender createUpdatesBusSender;
     @Mock
     private ServiceBusSender serviceBusSender;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private CreateUpdatesDto createUpdatesDto;
 
@@ -36,7 +40,8 @@ class CreateUpdatesBusSenderTest {
 
     @BeforeEach
     public void setUp() {
-        createUpdatesBusSender = new CreateUpdatesBusSender(serviceBusSender);
+        createUpdatesBusSender = new CreateUpdatesBusSender(serviceBusSender, featureToggleService);
+        when(featureToggleService.isMultiplesDBEnabled()).thenReturn(false);
         ethosCaseRefCollection = Arrays.asList("4150001/2020", "4150002/2020",
                 "4150003/2020", "4150004/2020", "4150005/2020");
         createUpdatesDto = getCreateUpdatesDto(ethosCaseRefCollection);

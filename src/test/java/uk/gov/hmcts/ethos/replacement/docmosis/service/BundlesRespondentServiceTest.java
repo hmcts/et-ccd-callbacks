@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RemovedHearingBundleItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -198,14 +199,7 @@ class BundlesRespondentServiceTest {
         String butReason = "ButReason";
         String disagree = "Disagree";
         UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
-
-        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
-        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
-        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
-        englandCaseData.setBundlesRespondentUploadFile(file);
-        englandCaseData.setBundlesRespondentAgreedDocWith(YES);
-        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
-        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
+        setupEnglandCaseData(YES, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
 
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
         HearingBundleType actual = collection.get(0).getValue();
@@ -232,14 +226,7 @@ class BundlesRespondentServiceTest {
         String butReason = "ButReason";
         String disagree = "Disagree";
         UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
-
-        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
-        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
-        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
-        englandCaseData.setBundlesRespondentUploadFile(file);
-        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
-        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
-        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
+        setupEnglandCaseData(NO, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
 
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
         HearingBundleType actual = collection.get(0).getValue();
@@ -247,5 +234,32 @@ class BundlesRespondentServiceTest {
 
         assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));
         assertThat(actual.getAgreedDocWith(), is(expectedAgreedDocsWith));
+        assertThat(actual.getWhatDocuments(), is(witnessStatementsOnly));
+        assertThat(actual.getWhoseDocuments(), is(respondentsDocumentsOnly));
+        assertThat(actual.getUploadFile(), is(file));
+    }
+
+    @Test
+    void removeHearingBundles_removeFromBothCollections() {
+        List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
+        englandCaseData.setBundlesRespondentCollection(hearingBundleCollection);
+
+        List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundleCollection = new ArrayList<>();
+        englandCaseData.setRemovedHearingBundlesCollection(removedHearingBundleCollection);
+
+        bundlesRespondentService.removeHearingBundles(englandCaseData);
+    }
+
+    private void setupEnglandCaseData(String agreedDocWith, String butReason, String disagree,
+                                      String respondentsDocumentsOnly, String witnessStatementsOnly,
+                                      UploadedDocumentType file) {
+
+        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
+        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
+        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
+        englandCaseData.setBundlesRespondentUploadFile(file);
+        englandCaseData.setBundlesRespondentAgreedDocWith(agreedDocWith);
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
     }
 }

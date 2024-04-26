@@ -43,7 +43,7 @@ def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
                        '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
                        '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
                        '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
+                       '**/*.java'
 ]
 
 sonarqube {
@@ -335,7 +335,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'2.0.0'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.5.10'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version:'3.6.9'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'

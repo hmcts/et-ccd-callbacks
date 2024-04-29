@@ -157,9 +157,6 @@ public class BundlesRespondentService {
 
     /**
      * Removes a hearing bundle from the collection.
-     *
-     * @param caseData contains all the case data
-     * @throws NotFoundException if the bundle is not found in the collection
      */
     public void removeHearingBundles(CaseData caseData) {
         List<RemovedHearingBundleItem> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();

@@ -228,8 +228,6 @@ public class BundlesRespondentController {
                 .build());
     }
 
-    // In BundlesRespondentController.java
-
     @PostMapping(value = "/removeHearingBundle", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Remove a hearing bundle")
     @ApiResponses(value = {

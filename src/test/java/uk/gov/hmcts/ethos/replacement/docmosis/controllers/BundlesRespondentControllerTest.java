@@ -35,6 +35,7 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     private static final String MID_POPULATE_HEARINGS_URL = "/bundlesRespondent/midPopulateHearings";
     private static final String MID_VALIDATE_UPLOAD_URL = "/bundlesRespondent/midValidateUpload";
     private static final String SUBMITTED_URL = "/bundlesRespondent/submitted";
+    private static final String REMOVE_HEARING_BUNDLE_URL = "/bundlesRespondent/removeHearingBundle";
 
     @MockBean
     private BundlesRespondentService bundlesRespondentService;
@@ -225,5 +226,37 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void removeHearingBundle_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void removeHearingBundle_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void removeHearingBundle_badRequest() throws Exception {
+        mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

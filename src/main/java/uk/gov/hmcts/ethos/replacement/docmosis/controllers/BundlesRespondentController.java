@@ -237,7 +237,7 @@ public class BundlesRespondentController {
             content = {
                 @Content(mediaType = "application/json",
                     schema = @Schema(implementation = CCDCallbackResponse.class))
-        }),
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })

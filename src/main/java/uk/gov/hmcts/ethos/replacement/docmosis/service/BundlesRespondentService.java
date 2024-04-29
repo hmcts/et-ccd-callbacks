@@ -156,12 +156,13 @@ public class BundlesRespondentService {
 
     public void removeHearingBundles(CaseData caseData) {
         try {
-            List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();
+            List<RemovedHearingBundleItem> removedHearingBundlesCollection =
+                    caseData.getRemovedHearingBundlesCollection();
             removedHearingBundlesCollection.forEach(removedHearingBundleItem -> {
                 caseData.getBundlesRespondentCollection()
-                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getId()));
+                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
                 caseData.getBundlesClaimantCollection()
-                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getId()));
+                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
             });
         } catch (Exception e) {
             log.error("Error removing hearing bundles", e);

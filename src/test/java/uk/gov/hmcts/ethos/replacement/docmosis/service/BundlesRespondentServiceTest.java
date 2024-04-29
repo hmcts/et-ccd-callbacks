@@ -244,6 +244,7 @@ class BundlesRespondentServiceTest {
         // Setup bundle data
         List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
         englandCaseData.setBundlesRespondentCollection(hearingBundleCollection);
+        englandCaseData.setBundlesClaimantCollection(new ArrayList<>());
 
         String respondentsDocumentsOnly = "Respondent's documents only";
         String witnessStatementsOnly = "Witness statements only";

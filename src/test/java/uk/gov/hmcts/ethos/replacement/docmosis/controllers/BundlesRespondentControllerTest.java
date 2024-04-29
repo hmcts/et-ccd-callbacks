@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -19,6 +20,8 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -253,6 +256,9 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
 
     @Test
     void removeHearingBundle_badRequest() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doThrow(new NotFoundException("Bundle not found in the collection"))
+                .when(bundlesRespondentService).removeHearingBundles(any());
         mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

@@ -7,6 +7,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -154,18 +155,22 @@ public class BundlesRespondentService {
         );
     }
 
-    public void removeHearingBundles(CaseData caseData) {
-        try {
-            List<RemovedHearingBundleItem> removedHearingBundlesCollection =
-                    caseData.getRemovedHearingBundlesCollection();
-            removedHearingBundlesCollection.forEach(removedHearingBundleItem -> {
-                caseData.getBundlesRespondentCollection()
-                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
-                caseData.getBundlesClaimantCollection()
-                        .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
-            });
-        } catch (Exception e) {
-            log.error("Error removing hearing bundles", e);
+    public void removeHearingBundles(CaseData caseData) throws NotFoundException {
+        List<RemovedHearingBundleItem> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();
+
+        boolean itemRemoved = false;
+        for (RemovedHearingBundleItem removedHearingBundleItem : removedHearingBundlesCollection) {
+            boolean respondentBundleRemoved = caseData.getBundlesRespondentCollection()
+                    .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
+            boolean claimantBundleRemoved = caseData.getBundlesClaimantCollection()
+                    .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
+            if (respondentBundleRemoved || claimantBundleRemoved) {
+                itemRemoved = true;
+            }
+        }
+
+        if (!itemRemoved) {
+            throw new NotFoundException("Bundle not found in the collection");
         }
     }
 }

@@ -240,14 +240,38 @@ class BundlesRespondentServiceTest {
     }
 
     @Test
-    void removeHearingBundles_removeFromBothCollections() {
+    void removeHearingBundles_removeFromRespondentCollections() {
+        // Setup bundle data
         List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
         englandCaseData.setBundlesRespondentCollection(hearingBundleCollection);
 
-        List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundleCollection = new ArrayList<>();
+        String respondentsDocumentsOnly = "Respondent's documents only";
+        String witnessStatementsOnly = "Witness statements only";
+        String butReason = "ButReason";
+        String disagree = "Disagree";
+        UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
+        setupEnglandCaseData(NO, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
+
+        // Assert bundle added
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+        assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(1));
+
+        // Setup remove bundle collection
+        String bundleId = englandCaseData.getBundlesRespondentCollection().get(0).getId();
+        List<RemovedHearingBundleItem> removedHearingBundleCollection = new ArrayList<>();
+        RemovedHearingBundleItem removedHearingBundleItem = RemovedHearingBundleItem.builder()
+                .bundleId(bundleId)
+                .build();
+        removedHearingBundleCollection.add(removedHearingBundleItem);
         englandCaseData.setRemovedHearingBundlesCollection(removedHearingBundleCollection);
 
+        // Remove bundle
         bundlesRespondentService.removeHearingBundles(englandCaseData);
+
+        // Assert bundle removed
+        assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(0));
+        assertThat(englandCaseData.getRemovedHearingBundlesCollection().size(), is(1));
+        assertThat(englandCaseData.getRemovedHearingBundlesCollection().get(0).getBundleId(), is(bundleId));
     }
 
     private void setupEnglandCaseData(String agreedDocWith, String butReason, String disagree,

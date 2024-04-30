@@ -524,7 +524,7 @@ public class CaseActionsForCaseWorkerController {
     })
     public ResponseEntity<CCDCallbackResponse> amendRespondentRepresentative(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("AMEND RESPONDENT REPRESENTATIVE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -532,7 +532,8 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
 
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 

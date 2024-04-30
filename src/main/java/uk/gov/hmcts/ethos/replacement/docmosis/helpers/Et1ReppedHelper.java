@@ -252,7 +252,6 @@ public class Et1ReppedHelper {
             claimantRequestType.getClaimOutcome().forEach(claimOutcome -> {
                 if ("compensation".equals(claimOutcome)) {
                     claimantRequestType.setClaimantCompensationText(caseData.getCompensationDetails());
-                    claimantRequestType.setClaimantCompensationAmount(caseData.getCompensationAmount());
                 } else if ("tribunal".equals(claimOutcome)) {
                     claimantRequestType.setClaimantTribunalRecommendation(caseData.getTribunalRecommendationDetails());
                 }

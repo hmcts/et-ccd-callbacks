@@ -110,6 +110,7 @@ class Et1ReppedControllerTest {
     private static final String CREATE_DRAFT_ET1 = "/et1Repped/createDraftEt1";
     private static final String CREATE_DRAFT_ET1_SUBMITTED = "/et1Repped/createDraftEt1Submitted";
     private static final String VALIDATE_GROUNDS = "/et1Repped/validateGrounds";
+    private static final String VALIDATE_HEARING_PREFERENCES = "/et1Repped/sectionOne/validateHearingPreferences";
 
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
@@ -870,6 +871,21 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath("$.errors[0]", is("Please provide details of the claim")))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void validateHearingPreferences() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(VALIDATE_HEARING_PREFERENCES)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

@@ -478,6 +478,8 @@ public class Et1ReppedHelper {
         claimantHearingPreference.setReasonableAdjustments(
                 reasonableAdjustmentsMapping(caseData.getClaimantSupportQuestion()));
         claimantHearingPreference.setReasonableAdjustmentsDetail(caseData.getClaimantSupportQuestionReason());
+        claimantHearingPreference.setHearingLanguage(getFirstListItem(caseData.getHearingContactLanguage()));
+        claimantHearingPreference.setContactLanguage(getFirstListItem(caseData.getContactLanguageQuestion()));
         return claimantHearingPreference;
     }
 
@@ -583,10 +585,12 @@ public class Et1ReppedHelper {
         caseData.setOtherTypeOfClaimDetails(null);
         caseData.setClaimSuccessful(null);
         caseData.setCompensationDetails(null);
-        caseData.setCompensationAmount(null);
         caseData.setTribunalRecommendationDetails(null);
         caseData.setLinkedCasesYesNo(null);
         caseData.setLinkedCasesDetails(null);
+        caseData.setHearingContactLanguage(null);
+        caseData.setContactLanguageQuestion(null);
+        caseData.setAddAdditionalRespondent(null);
     }
 
     /**

@@ -145,6 +145,24 @@ public class Et1ReppedController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    @PostMapping(value = "/sectionOne/validateHearingPreferences", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for claimant sex")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateHearingPreferences(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getHearingContactLanguage());
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
     @PostMapping(value = "/sectionOne/validateClaimantSupport", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "callback handler for claimant support question")
     @ApiResponses(value = {
@@ -177,7 +195,9 @@ public class Et1ReppedController {
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getRepresentativeContactPreference());
+        List<String> errors = new ArrayList<>();
+        errors.addAll(Et1ReppedHelper.validateSingleOption(caseData.getRepresentativeContactPreference()));
+        errors.addAll(Et1ReppedHelper.validateSingleOption(caseData.getContactLanguageQuestion()));
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

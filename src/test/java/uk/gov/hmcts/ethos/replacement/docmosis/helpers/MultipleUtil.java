@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadES;
+import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadES;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantIndType;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
@@ -34,8 +37,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -54,7 +60,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BATCH_UPDATE_TYPE_1;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CREATE_ACTION;
@@ -244,6 +252,21 @@ public final class MultipleUtil {
         return schedulePayloadEvent;
     }
 
+    public static NotificationSchedulePayloadEvent getNotificationSchedulePayloadEventData(String ethosCaseReference) {
+        NotificationSchedulePayloadES schedulePayloadES = new NotificationSchedulePayloadES();
+        schedulePayloadES.setEthosCaseReference(ethosCaseReference);
+        schedulePayloadES.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder().id(UUID.randomUUID().toString()).value(
+                        SendNotificationType.builder().number("1").respondCollection(
+                                        List.of(PseResponseTypeItem.builder().value(
+                                                PseResponseType.builder().copyToOtherParty(NO).build()
+                                        ).build()))
+                                .build()).build()));
+        NotificationSchedulePayloadEvent schedulePayloadEvent = new NotificationSchedulePayloadEvent();
+        schedulePayloadEvent.setSchedulePayloadES(schedulePayloadES);
+        return schedulePayloadEvent;
+    }
+
     public static List<SubmitEvent> getSubmitEvents() {
         SubmitEvent submitEvent1 = new SubmitEvent();
         submitEvent1.setCaseData(getCaseData("245000/2020"));
@@ -268,6 +291,12 @@ public final class MultipleUtil {
         return new HashSet<>(Arrays.asList(
                 getSchedulePayloadEventData("245000/2020"),
                 getSchedulePayloadEventData("245003/2020")));
+    }
+
+    public static Set<NotificationSchedulePayloadEvent> getNotificationSchedulePayloadEvents() {
+        return new HashSet<>(Arrays.asList(
+                getNotificationSchedulePayloadEventData("245000/2020"),
+                getNotificationSchedulePayloadEventData("245003/2020")));
     }
 
     public static List<SubmitMultipleEvent> getSubmitMultipleEvents() {

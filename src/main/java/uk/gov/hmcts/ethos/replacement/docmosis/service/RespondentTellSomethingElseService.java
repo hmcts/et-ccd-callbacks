@@ -137,7 +137,7 @@ public class RespondentTellSomethingElseService {
             emailService.sendEmail(
                 tseRespondentAcknowledgeTypeCTemplateId,
                 email,
-                buildPersonalisation(caseDetails));
+                buildPersonalisationTypeC(caseDetails));
             return;
         }
 
@@ -155,6 +155,16 @@ public class RespondentTellSomethingElseService {
                 : tseRespondentAcknowledgeTypeATemplateId,
             email,
             buildPersonalisation(caseDetails));
+    }
+
+    private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        return Map.of(
+            CASE_NUMBER, caseData.getEthosCaseReference(),
+            CLAIMANT, caseData.getClaimant(),
+            RESPONDENTS, getRespondentNames(caseData),
+            LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
+        );
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails detail) {

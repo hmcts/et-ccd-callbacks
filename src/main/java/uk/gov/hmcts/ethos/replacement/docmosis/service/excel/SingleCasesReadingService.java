@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
@@ -104,4 +105,19 @@ public class SingleCasesReadingService {
 
     }
 
+    public Set<NotificationSchedulePayloadEvent> retrieveNotificationScheduleCases(String userToken,
+                                                                                   String multipleCaseTypeId,
+                                                                                   List<String> caseIds) {
+        HashSet<NotificationSchedulePayloadEvent> schedulePayloadEvents = new HashSet<>();
+        try {
+            schedulePayloadEvents = new HashSet<>(ccdClient.retrieveCasesElasticNotificationSearchSchedule(userToken,
+                    UtilHelper.getCaseTypeId(multipleCaseTypeId),
+                    caseIds));
+
+        } catch (Exception ex) {
+            log.error("Error retrieving notification schedule cases");
+            log.error(ex.getMessage(), ex);
+        }
+        return schedulePayloadEvents;
+    }
 }

@@ -32,14 +32,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepre
 public class CcdCaseAssignment {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
-    public static final String UPDATE_USER_ERROR = "Call to Supplementary Data API failed for %s";
+    public static final String ADD_USER_ERROR = "Call to add legal rep to Multiple Case failed for %s";
     private final RestTemplate restTemplate;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final String aacUrl;
     private final String applyNocAssignmentsApiPath;
     private final AdminUserService adminUserService;
     private final FeatureToggleService featureToggleService;
-    private final UserIdamService userIdamService;
     private final CcdClient ccdClient;
     private final NocCcdService nocCcdService;
 
@@ -47,7 +46,6 @@ public class CcdCaseAssignment {
                              AuthTokenGenerator serviceAuthTokenGenerator,
                              AdminUserService adminUserService,
                              FeatureToggleService featureToggleService,
-                             UserIdamService userIdamService,
                              CcdClient ccdClient,
                              NocCcdService nocCcdService,
                              @Value("${assign_case_access_api_url}") String aacUrl,
@@ -57,15 +55,13 @@ public class CcdCaseAssignment {
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
         this.adminUserService = adminUserService;
         this.featureToggleService = featureToggleService;
-        this.userIdamService = userIdamService;
         this.ccdClient = ccdClient;
         this.aacUrl = aacUrl;
         this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
         this.nocCcdService = nocCcdService;
     }
 
-    public CCDCallbackResponse applyNoc(
-        final CallbackRequest callback, String userToken) throws IOException {
+    public CCDCallbackResponse applyNoc(final CallbackRequest callback, String userToken) throws IOException {
         requireNonNull(callback, "callback must not be null");
 
         final String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
@@ -95,8 +91,7 @@ public class CcdCaseAssignment {
             response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
 
         if (featureToggleService.isMultiplesEnabled()) {
-//            if (featureToggleService.isMultiplesEnabled() && caseData.getMultipleFlag().equals(YES)) {
-            addRespondentsToMultiple(userToken, callback.getCaseDetails());
+            addRespondentRepresentativeToMultiple(callback.getCaseDetails());
         }
 
         return response.getBody();
@@ -115,45 +110,52 @@ public class CcdCaseAssignment {
         return headers;
     }
 
-    public void addUserToCase(
-            String userToken, String jurisdiction, String caseType, String caseId) throws IOException {
-
-        String uid = null;
+    private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails) throws IOException {
         String accessToken = adminUserService.getAdminUserToken();
-        Optional<AuditEvent> auditEvent =
-                nocCcdService.getLatestAuditEventByName(accessToken, caseId, NOC_REQUEST);
-//        String uid = userIdamService.getUserDetails(userToken).getUid();
-        if (auditEvent.isPresent()) {
-            uid = auditEvent.get().getUserId();}
+        String jurisdiction = caseDetails.getJurisdiction();
+        String caseType = caseDetails.getCaseTypeId();
+        String caseId = caseDetails.getCaseId();
+        String userToAddId = getEventTriggerUserId(accessToken, caseId);
 
+        // TODO: Add Multiple Shell LookUp for given CaseId
+        String multipleId = caseId;
+        if (!userToAddId.isEmpty() && YES.equals(caseDetails.getCaseData().getMultipleFlag())) {
+            addUserToCase(accessToken, jurisdiction, caseType, multipleId, userToAddId);
+        }
+    }
+
+    private void addUserToCase(String accessToken,
+                               String jurisdiction,
+                               String caseType,
+                               String multipleId,
+                               String userToAddId) throws IOException {
         Map<String, String> payload = Maps.newHashMap();
-        payload.put("id", uid);
-        String errorMessage = String.format(UPDATE_USER_ERROR, caseId);
+        payload.put("id", userToAddId);
+        String errorMessage = String.format(ADD_USER_ERROR, multipleId);
 
         try {
             ResponseEntity<Object> response =
                     ccdClient.addUserToMultiple(
                             accessToken,
-                            payload,
-                            caseType,
                             jurisdiction,
-                            caseId);
+                            caseType,
+                            multipleId,
+                            payload);
 
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
-            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+            log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
     }
 
-    public void addRespondentsToMultiple(String userToken, CaseDetails caseDetails) throws IOException {
-        String jurisdiction = caseDetails.getJurisdiction();
-        String caseId = caseDetails.getCaseId();
-        String caseType = caseDetails.getCaseTypeId();
-//      String multipleId = multipleDetails.getCaseId();
-        addUserToCase(userToken, jurisdiction, caseType, caseId);
-
+    private String getEventTriggerUserId(String accessToken, String caseId) throws IOException {
+        Optional<AuditEvent> auditEvent = nocCcdService.getLatestAuditEventByName(accessToken, caseId, NOC_REQUEST);
+        if (auditEvent.isPresent()) {
+            return auditEvent.get().getUserId();
+        }
+        return "";
     }
 }

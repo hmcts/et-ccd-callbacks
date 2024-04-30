@@ -41,9 +41,9 @@ public class NoticeOfChangeController {
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
     @PostMapping("/about-to-submit")
-    public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
-                                                      @RequestHeader("Authorization")
-                                                      String userToken) throws IOException {
+    public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
+            @RequestHeader("Authorization") String userToken,
+            @RequestBody CallbackRequest callbackRequest) throws IOException {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -55,7 +55,6 @@ public class NoticeOfChangeController {
         callbackRequest.getCaseDetails().setCaseData(caseData);
 
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
-
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
@@ -64,10 +63,9 @@ public class NoticeOfChangeController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public GenericCallbackResponse nocSubmitted(@RequestBody CallbackRequest callbackRequest,
-                                                @RequestHeader("Authorization")
-                                                String userToken) {
-
+    public GenericCallbackResponse nocSubmitted(
+            @RequestHeader("Authorization") String userToken,
+            @RequestBody CallbackRequest callbackRequest) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
         }

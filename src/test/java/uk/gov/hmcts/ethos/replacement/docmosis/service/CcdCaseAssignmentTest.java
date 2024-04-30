@@ -16,6 +16,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,7 +48,7 @@ class CcdCaseAssignmentTest {
     }
 
     @Test
-    void shouldCallCaseAssignmentNoc() {
+    void shouldCallCaseAssignmentNoc() throws IOException {
         CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
 
         when(restTemplate

@@ -74,7 +74,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEN
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -191,44 +197,22 @@ class RespondentTellSomethingElseServiceTest {
 
     private void setDocForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseDocument1(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseDocument2(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseDocument3(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseDocument4(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseDocument5(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseDocument6(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseDocument1(createDocumentType("documentUrl"));
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseDocument2(createDocumentType("documentUrl"));
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseDocument3(createDocumentType("documentUrl"));
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseDocument4(createDocumentType("documentUrl"));
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseDocument5(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseDocument6(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE ->
                 caseData.setResTseDocument7(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseDocument8(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseDocument9(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseDocument10(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseDocument8(createDocumentType("documentUrl"));
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseDocument9(createDocumentType("documentUrl"));
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseDocument10(createDocumentType("documentUrl"));
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM ->
                 caseData.setResTseDocument11(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseDocument12(createDocumentType("documentUrl"));
-                break;
-            default:
-                break;
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseDocument12(createDocumentType("documentUrl"));
+            default -> {
+            }
         }
     }
 
@@ -242,44 +226,20 @@ class RespondentTellSomethingElseServiceTest {
 
     private void setTextBoxForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseTextBox1("Not Blank");
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseTextBox2("Not Blank");
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseTextBox3("Not Blank");
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseTextBox4("Not Blank");
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseTextBox5("Not Blank");
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseTextBox6("Not Blank");
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                caseData.setResTseTextBox7("Not Blank");
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseTextBox8("Not Blank");
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseTextBox9("Not Blank");
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseTextBox10("Not Blank");
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                caseData.setResTseTextBox11("Not Blank");
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseTextBox12("Not Blank");
-                break;
-            default:
-                break;
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseTextBox1("Not Blank");
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseTextBox2("Not Blank");
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseTextBox3("Not Blank");
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseTextBox4("Not Blank");
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseTextBox5("Not Blank");
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseTextBox6("Not Blank");
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> caseData.setResTseTextBox7("Not Blank");
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseTextBox8("Not Blank");
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseTextBox9("Not Blank");
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseTextBox10("Not Blank");
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> caseData.setResTseTextBox11("Not Blank");
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseTextBox12("Not Blank");
+            default -> {
+            }
         }
     }
 
@@ -336,10 +296,10 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         Map<String, String> expectedPersonalisation = Map.of(
-            "caseNumber", caseData.getEthosCaseReference(),
-            "claimant", caseData.getClaimant(),
-            "respondents", getRespondentNames(caseData),
-            "linkToExUI", "exuiUrl669718251103419"
+            CASE_NUMBER, caseData.getEthosCaseReference(),
+            CLAIMANT, caseData.getClaimant(),
+            RESPONDENT_NAMES, getRespondentNames(caseData),
+            EXUI_CASE_DETAILS_LINK, "exuiUrl669718251103419"
         );
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
@@ -648,56 +608,56 @@ class RespondentTellSomethingElseServiceTest {
                                                      String textBoxData,
                                                      String documentUrl) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
+            case TSE_APP_AMEND_RESPONSE -> {
                 caseData.setResTseTextBox1(textBoxData);
                 caseData.setResTseDocument1(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
+            }
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> {
                 caseData.setResTseTextBox2(textBoxData);
                 caseData.setResTseDocument2(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
+            }
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> {
                 caseData.setResTseTextBox3(textBoxData);
                 caseData.setResTseDocument3(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
+            }
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> {
                 caseData.setResTseTextBox4(textBoxData);
                 caseData.setResTseDocument4(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
+            }
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> {
                 caseData.setResTseTextBox5(textBoxData);
                 caseData.setResTseDocument5(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
+            }
+            case TSE_APP_ORDER_OTHER_PARTY -> {
                 caseData.setResTseTextBox6(textBoxData);
                 caseData.setResTseDocument6(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            }
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> {
                 caseData.setResTseTextBox7(textBoxData);
                 caseData.setResTseDocument7(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
+            }
+            case TSE_APP_POSTPONE_A_HEARING -> {
                 caseData.setResTseTextBox8(textBoxData);
                 caseData.setResTseDocument8(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
+            }
+            case TSE_APP_RECONSIDER_JUDGEMENT -> {
                 caseData.setResTseTextBox9(textBoxData);
                 caseData.setResTseDocument9(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
+            }
+            case TSE_APP_RESTRICT_PUBLICITY -> {
                 caseData.setResTseTextBox10(textBoxData);
                 caseData.setResTseDocument10(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            }
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> {
                 caseData.setResTseTextBox11(textBoxData);
                 caseData.setResTseDocument11(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
+            }
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> {
                 caseData.setResTseTextBox12(textBoxData);
                 caseData.setResTseDocument12(createDocumentType(documentUrl));
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
     }
 
@@ -743,11 +703,12 @@ class RespondentTellSomethingElseServiceTest {
     private Map<String, String> createPersonalisation(CaseData caseData,
                                                       String selectedApplication) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("claimant", caseData.getClaimant());
-        personalisation.put("respondents", getRespondentNames(caseData));
-        personalisation.put("shortText", selectedApplication);
-        personalisation.put("linkToExUI", "exuiUrl669718251103419");
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        personalisation.put(CLAIMANT, caseData.getClaimant());
+        personalisation.put(RESPONDENT_NAMES, getRespondentNames(caseData));
+        personalisation.put(HEARING_DATE, null);
+        personalisation.put(SHORT_TEXT, selectedApplication);
+        personalisation.put(EXUI_CASE_DETAILS_LINK, "exuiUrl669718251103419");
         return personalisation;
     }
 

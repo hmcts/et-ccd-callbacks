@@ -220,20 +220,22 @@ public final class UploadDocumentHelper {
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
         String documentAccess = multipleData.getDocumentAccess();
 
-        switch (documentAccess) {
-            case "Citizens":
-                setDocumentCollection(multipleData, docs, "claimantDocumentCollection");
-                break;
-            case "Legal rep/respondents":
-                setDocumentCollection(multipleData, docs, "legalrepDocumentCollection");
-                break;
-            case "Both Citizens and Legal rep/respondents":
-                setDocumentCollection(multipleData, docs, "claimantDocumentCollection");
-                setDocumentCollection(multipleData, docs, "legalrepDocumentCollection");
-                break;
-            default:
-                multipleData.setDocumentCollection(docs);
-                break;
+        if (documentAccess != null) {
+            switch (documentAccess) {
+                case "Citizens":
+                    setDocumentCollection(multipleData, docs, "claimantDocumentCollection");
+                    break;
+                case "Legal rep/respondents":
+                    setDocumentCollection(multipleData, docs, "legalrepDocumentCollection");
+                    break;
+                case "Both Citizens and Legal rep/respondents":
+                    setDocumentCollection(multipleData, docs, "claimantDocumentCollection");
+                    setDocumentCollection(multipleData, docs, "legalrepDocumentCollection");
+                    break;
+                default:
+                    multipleData.setDocumentCollection(docs);
+                    break;
+            }
         }
     }
 

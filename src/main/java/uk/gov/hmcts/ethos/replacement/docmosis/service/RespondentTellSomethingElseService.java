@@ -44,9 +44,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
@@ -162,8 +164,8 @@ public class RespondentTellSomethingElseService {
         return Map.of(
             CASE_NUMBER, caseData.getEthosCaseReference(),
             CLAIMANT, caseData.getClaimant(),
-            RESPONDENTS, getRespondentNames(caseData),
-            LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
+            RESPONDENT_NAMES, getRespondentNames(caseData),
+            EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 
@@ -172,9 +174,10 @@ public class RespondentTellSomethingElseService {
         return Map.of(
             CASE_NUMBER, caseData.getEthosCaseReference(),
             CLAIMANT, caseData.getClaimant(),
-            RESPONDENTS, getRespondentNames(caseData),
+            RESPONDENT_NAMES, getRespondentNames(caseData),
+            HEARING_DATE, "",
             SHORT_TEXT, caseData.getResTseSelectApplication(),
-            LINK_TO_EXUI, emailService.getExuiCaseLink(detail.getCaseId())
+            EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(detail.getCaseId())
         );
     }
 

@@ -47,7 +47,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
@@ -119,22 +119,28 @@ public class Et1ReppedService {
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
             DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, ET1_EN_PDF);
-            // TODO add logic to descide if we need a welsh version
-            // DocumentTypeItem welshEt1 = createEt1DocumentType(caseDetails, userToken, ET1_CY_PDF);
+            DocumentTypeItem welshEt1 = null;
+            if (WELSH_LANGUAGE.equals(getFirstListItem(caseDetails.getCaseData().getHearingContactLanguage()))
+                || WELSH_LANGUAGE.equals(getFirstListItem(caseDetails.getCaseData().getContactLanguageQuestion()))) {
+                welshEt1 = createEt1DocumentType(caseDetails, userToken, ET1_CY_PDF);
+            }
 
             List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
                     userToken);
-            addDocsToClaim(caseDetails.getCaseData(), englishEt1, acasCertificates);
+            addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
         }
     }
 
-    private void addDocsToClaim(CaseData caseData, DocumentTypeItem et1,
+    private void addDocsToClaim(CaseData caseData, DocumentTypeItem englishEt1, DocumentTypeItem welshEt1,
                                 List<DocumentTypeItem> acasCertificates) {
         List<DocumentTypeItem> documentList = new ArrayList<>();
-        if (!ObjectUtils.isEmpty(et1)) {
-            documentList.add(et1);
+        if (!ObjectUtils.isEmpty(englishEt1)) {
+            documentList.add(englishEt1);
+        }
+        if (!ObjectUtils.isEmpty(welshEt1)) {
+            documentList.add(welshEt1);
         }
         if (caseData.getEt1SectionThreeDocumentUpload() != null) {
             UploadedDocumentType et1Attachment = caseData.getEt1SectionThreeDocumentUpload();
@@ -355,8 +361,7 @@ public class Et1ReppedService {
                 Map.of(CASE_NUMBER, caseDetails.getCaseId(),
                         "firstName", userDetails.getFirstName(),
                         "lastName", userDetails.getLastName(),
-                        CLAIMANT, caseDetails.getCaseData().getClaimant(),
-                        LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())));
+                        CLAIMANT, caseDetails.getCaseData().getClaimant()));
     }
 
 }

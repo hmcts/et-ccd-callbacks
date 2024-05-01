@@ -20,8 +20,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 class MultipleNotificationsHelperTest {
     public static final String MULTIPLE_REF = "60001";
-    public static final String ETHOS_CASE_REFERENCE_1 = "245000/2021";
-    public static final String ETHOS_CASE_REFERENCE_2 = "245001/2021";
+    public static final String ETHOS_CASE_REFERENCE_1 = "6047765/2023";
+    public static final String ETHOS_CASE_REFERENCE_2 = "6047766/2024";
     List<NotificationSchedulePayload> schedulePayloads;
 
     @BeforeEach
@@ -31,8 +31,11 @@ class MultipleNotificationsHelperTest {
                 .getNotificationSchedulePayloadList(ETHOS_CASE_REFERENCE_1, MULTIPLE_REF);
         List<NotificationSchedulePayload> list2 = MultipleUtil
                 .getNotificationSchedulePayloadList(ETHOS_CASE_REFERENCE_2, MULTIPLE_REF);
+        List<NotificationSchedulePayload> list3 = MultipleUtil
+                .getNotificationSchedulePayloadList(ETHOS_CASE_REFERENCE_2, "60002");
         schedulePayloads.addAll(list1);
         schedulePayloads.addAll(list2);
+        schedulePayloads.addAll(list3);
     }
 
     @Test

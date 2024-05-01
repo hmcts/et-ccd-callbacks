@@ -211,38 +211,6 @@ public final class UploadDocumentHelper {
         multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
     }
 
-//    public static void setMultipleDocumentsToCorrectTab(BaseCaseData multipleData) {
-//        if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
-//            log.warn("Empty document collection");
-//            return;
-//        }
-//
-//        List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
-//        log.info("got docs for TAB: " + docs);
-//        String documentAccess = multipleData.getDocumentAccess();
-//        log.info("documentAccess for TAB :" + documentAccess);
-//
-//        if (documentAccess != null) {
-//            switch (documentAccess) {
-//                case "Citizens":
-//                    multipleData.setClaimantDocumentCollection(docs);
-//                    break;
-//                case "Legal rep/respondents":
-//                    multipleData.setLegalrepDocumentCollection(docs);
-//                    break;
-//                case "Both Citizens and Legal rep/respondents":
-//                    multipleData.setClaimantDocumentCollection(docs);
-//                    multipleData.setLegalrepDocumentCollection(docs);
-//                    break;
-//                default:
-//                    multipleData.setDocumentCollection(docs);
-//                    break;
-//            }
-//        } else {
-//            log.warn("documentAccess is null. Cannot set documents to correct tab.");
-//        }
-//    }
-
     public static void setMultipleDocumentsToCorrectTab(BaseCaseData multipleData) {
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             log.warn("Empty document collection");

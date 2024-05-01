@@ -706,7 +706,7 @@ class RespondentTellSomethingElseServiceTest {
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put(RESPONDENT_NAMES, getRespondentNames(caseData));
-        personalisation.put(HEARING_DATE, null);
+        personalisation.put(HEARING_DATE, "");
         personalisation.put(SHORT_TEXT, selectedApplication);
         personalisation.put(EXUI_CASE_DETAILS_LINK, "exuiUrl669718251103419");
         return personalisation;

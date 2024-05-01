@@ -175,7 +175,7 @@ public class RespondentTellSomethingElseService {
             CASE_NUMBER, caseData.getEthosCaseReference(),
             CLAIMANT, caseData.getClaimant(),
             RESPONDENT_NAMES, getRespondentNames(caseData),
-            HEARING_DATE, caseData.getTargetHearingDate(),
+            HEARING_DATE, "",
             SHORT_TEXT, caseData.getResTseSelectApplication(),
             EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(detail.getCaseId())
         );

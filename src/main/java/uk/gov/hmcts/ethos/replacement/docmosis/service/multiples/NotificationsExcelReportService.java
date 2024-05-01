@@ -2,22 +2,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.client.utils.DateUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -26,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGrou
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesSchedulePrinter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
@@ -36,17 +31,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 
-import static java.util.stream.Collectors.groupingBy;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.HEADER_1;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.RESPONSE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
@@ -93,12 +83,13 @@ public class NotificationsExcelReportService {
 
             MultipleData multipleData = multipleDetails.getCaseData();
             // Transform data for the extract
-            List<NotificationGroup> notificationGroups = flattenNotificationsWithCaseRef(schedulePayloads,
-                    multipleData.getMultipleReference());
+            List<NotificationGroup> notificationGroups =
+                    MultipleNotificationsHelper
+                            .flattenNotificationsWithCaseRef(schedulePayloads, multipleData.getMultipleReference());
             Map<Pair<String, String>, List<NotificationGroup>> notificationsGroupedByTitle =
-                    groupNotificationsByTitleAndDate(notificationGroups);
+                    MultipleNotificationsHelper.groupNotificationsByTitleAndDate(notificationGroups);
             List<Map.Entry<Pair<String, String>, List<NotificationGroup>>> sortedList =
-                    groupedNotificationsSortedByDate(notificationsGroupedByTitle);
+                    MultipleNotificationsHelper.groupedNotificationsSortedByDate(notificationsGroupedByTitle);
 
             log.info("Generating extract");
             byte[] schedule = generateSchedule(multipleData, sortedList);
@@ -134,52 +125,7 @@ public class NotificationsExcelReportService {
         multipleData.getNotificationsExtract().setExtractDateTime(formatter.format(new Date()));
     }
 
-    private static @NotNull Map<Pair<String, String>, List<NotificationGroup>> groupNotificationsByTitleAndDate(
-            List<NotificationGroup> notificationGroups) {
-        return notificationGroups.stream()
-                .collect(groupingBy(notificationGroup ->
-                        new ImmutablePair<>(
-                                notificationGroup.getNotificationTitle(),
-                                notificationGroup.getDate()))
-                );
-    }
-
-    private static @NotNull List<NotificationGroup> flattenNotificationsWithCaseRef(
-            List<NotificationSchedulePayload> schedulePayloads, String multipleRef) {
-        List<NotificationGroup> notificationGroups = new ArrayList<>();
-        for (NotificationSchedulePayload schedulePayload : schedulePayloads) {
-            for (SendNotificationTypeItem sendNotificationTypeItem : schedulePayload.getSendNotificationCollection()) {
-                SendNotificationType notification = sendNotificationTypeItem.getValue();
-                // Filter notifications sent from the multiple
-                if (StringUtils.isNotEmpty(notification.getNotificationSentFrom())
-                        && notification.getNotificationSentFrom().equals(multipleRef)) {
-                    String responseReceived = isEmpty(notification.getRespondCollection()) ? NO : YES;
-                    notificationGroups.add(NotificationGroup.builder()
-                            .caseNumber(schedulePayload.getEthosCaseRef())
-                            .date(notification.getDate())
-                            .responseReceived(responseReceived)
-                            .notificationTitle(notification.getSendNotificationTitle())
-                            .notificationSubjectString(notification.getSendNotificationSubjectString())
-                            .build()
-                    );
-                }
-            }
-        }
-        return notificationGroups;
-    }
-
-    private static @NotNull List<Map.Entry<Pair<String, String>,
-            List<NotificationGroup>>> groupedNotificationsSortedByDate(Map<Pair<String, String>,
-            List<NotificationGroup>> notificationsGroupedByTitle) {
-        return
-                notificationsGroupedByTitle.entrySet().stream().sorted(
-                        Comparator.comparing(e ->
-                                DateUtils.parseDate(e.getKey().getRight(), new String[]{"dd MMM yyyy"})
-                        )
-                ).toList();
-    }
-
-    public byte[] generateSchedule(MultipleData multipleData,
+    private byte[] generateSchedule(MultipleData multipleData,
                                    List<Map.Entry<Pair<String, String>,
                                            List<NotificationGroup>>> notificationsGroupedByTitle) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {

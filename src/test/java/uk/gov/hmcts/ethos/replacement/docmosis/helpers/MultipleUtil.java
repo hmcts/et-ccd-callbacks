@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
@@ -52,6 +53,7 @@ import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleActionType;
 import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.SendNotificationUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,7 +91,7 @@ public final class MultipleUtil {
 
     public static TreeMap<String, Object> getMultipleObjectsAll() {
         TreeMap<String, Object> multipleObjectTreeMap = new TreeMap<>();
-        multipleObjectTreeMap.put("245000/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245000/2020", MultipleObject.builder()
                 .subMultiple("245000")
                 .ethosCaseRef("245000/2020")
                 .flag1("AA")
@@ -97,7 +99,7 @@ public final class MultipleUtil {
                 .flag3("")
                 .flag4("")
                 .build());
-        multipleObjectTreeMap.put("245003/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245003/2020", MultipleObject.builder()
                 .subMultiple("245003")
                 .ethosCaseRef("245003/2020")
                 .flag1("AA")
@@ -105,7 +107,7 @@ public final class MultipleUtil {
                 .flag3("")
                 .flag4("")
                 .build());
-        multipleObjectTreeMap.put("245004/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245004/2020", MultipleObject.builder()
                 .subMultiple("245002")
                 .ethosCaseRef("245004/2020")
                 .flag1("AA")
@@ -113,7 +115,7 @@ public final class MultipleUtil {
                 .flag3("")
                 .flag4("")
                 .build());
-        multipleObjectTreeMap.put("245005/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245005/2020", MultipleObject.builder()
                 .subMultiple("SubMultiple")
                 .ethosCaseRef("245005/2020")
                 .flag1("AA")
@@ -192,8 +194,8 @@ public final class MultipleUtil {
         caseData.setJudgementCollection(new ArrayList<>(Collections.singletonList(judgementTypeItem)));
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .respRepName("Respondent")
-            .nameOfRepresentative("Representative").build();
+                .respRepName("Respondent")
+                .nameOfRepresentative("Representative").build();
         representedTypeRItem.setValue(representedTypeR);
         representedTypeRItem.setId("1");
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));
@@ -265,6 +267,20 @@ public final class MultipleUtil {
         NotificationSchedulePayloadEvent schedulePayloadEvent = new NotificationSchedulePayloadEvent();
         schedulePayloadEvent.setSchedulePayloadES(schedulePayloadES);
         return schedulePayloadEvent;
+    }
+
+    public static List<NotificationSchedulePayload> getNotificationSchedulePayloadList(String ethosCaseReference,
+                                                                                       String multipleRef) {
+        List<SendNotificationTypeItem> sendNotificationTypeItems =
+                SendNotificationUtil.listOfSendNotificationTypeItemsOnMultiple(multipleRef);
+        List<NotificationSchedulePayload> notificationSchedulePayloadList = new ArrayList<>();
+        notificationSchedulePayloadList.add(
+                NotificationSchedulePayload.builder()
+                        .ethosCaseRef(ethosCaseReference)
+                        .sendNotificationCollection(sendNotificationTypeItems)
+                        .build()
+        );
+        return notificationSchedulePayloadList;
     }
 
     public static List<SubmitEvent> getSubmitEvents() {

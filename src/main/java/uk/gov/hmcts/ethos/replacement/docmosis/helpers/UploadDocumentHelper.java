@@ -237,7 +237,8 @@ public final class UploadDocumentHelper {
         }
     }
 
-    private static void setDocumentCollection(BaseCaseData multipleData, List<DocumentTypeItem> docs, String collectionType) {
+    private static void setDocumentCollection(BaseCaseData multipleData,
+                                              List<DocumentTypeItem> docs, String collectionType) {
         switch (collectionType) {
             case "claimantDocumentCollection":
                 multipleData.setClaimantDocumentCollection(docs);

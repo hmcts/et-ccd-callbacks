@@ -208,7 +208,8 @@ public final class UploadDocumentHelper {
                 .toList();
 
         log.info("Retrieved docs: " + docs.size());
-        multipleData.setDocumentSelect(DynamicMultiSelectListType.of(docs));
+        List<DynamicValueType> dynamicValueTypes = new ArrayList<>(docs);
+        multipleData.setDocumentSelect(DynamicMultiSelectListType.of(dynamicValueTypes));
     }
 
     public static void setMultipleDocumentsToCorrectTab(BaseCaseData multipleData) {

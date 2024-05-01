@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 public class NotificationScheduleCallable implements Callable<HashSet<NotificationSchedulePayload>> {
     private final SingleCasesReadingService singleCasesReadingService;
     private final String userToken;
@@ -33,8 +35,12 @@ public class NotificationScheduleCallable implements Callable<HashSet<Notificati
                 singleCasesReadingService.retrieveNotificationScheduleCases(userToken, caseTypeId, partitionCaseIds);
 
         for (NotificationSchedulePayloadEvent schedulePayloadEvent : schedulePayloadEvents) {
-            schedulePayloads.add(MultiplesScheduleHelper.getNotificationSchedulePayload(
-                    schedulePayloadEvent.getSchedulePayloadES()));
+            NotificationSchedulePayload payload = MultiplesScheduleHelper.getNotificationSchedulePayload(
+                    schedulePayloadEvent.getSchedulePayloadES());
+            if (isNotEmpty(payload.getSendNotificationCollection())) {
+                schedulePayloads.add(payload);
+            }
+
         }
 
         return schedulePayloads;

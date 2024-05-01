@@ -269,6 +269,15 @@ public final class MultipleUtil {
         return schedulePayloadEvent;
     }
 
+    public static NotificationSchedulePayloadEvent getNotificationSchedulePayloadEventNoNotifications(
+            String ethosCaseReference) {
+        NotificationSchedulePayloadES schedulePayloadES = new NotificationSchedulePayloadES();
+        schedulePayloadES.setEthosCaseReference(ethosCaseReference);
+        NotificationSchedulePayloadEvent schedulePayloadEvent = new NotificationSchedulePayloadEvent();
+        schedulePayloadEvent.setSchedulePayloadES(schedulePayloadES);
+        return schedulePayloadEvent;
+    }
+
     public static List<NotificationSchedulePayload> getNotificationSchedulePayloadList(String ethosCaseReference,
                                                                                        String multipleRef) {
         List<SendNotificationTypeItem> sendNotificationTypeItems =

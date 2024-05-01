@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SingleCasesReadingS
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,16 +41,16 @@ class NotificationScheduleServiceTest {
         userToken = "authString";
         errors = new ArrayList<>();
         caseIds = Arrays.asList(new String[]{"245000/2020", "245003/2020"});
+    }
+
+    @Test
+    void verifyServiceReturnsSuccessfully() {
         Set<NotificationSchedulePayloadEvent> schedulePayloadEvents =
                 MultipleUtil.getNotificationSchedulePayloadEvents();
 
         when(singleCasesReadingService
                 .retrieveNotificationScheduleCases(userToken, ENGLANDWALES_BULK_CASE_TYPE_ID, caseIds))
                 .thenReturn(schedulePayloadEvents);
-    }
-
-    @Test
-    void verifyServiceReturnsSuccessfully() {
         var result = notificationScheduleService.getSchedulePayloadCollection(
                 userToken,
                 ENGLANDWALES_BULK_CASE_TYPE_ID,
@@ -57,5 +58,20 @@ class NotificationScheduleServiceTest {
                 errors);
 
         Assertions.assertEquals(2, result.size());
+    }
+
+    @Test
+    void verifySizeIsZeroWhenNoSendNotificationCollection() {
+        Set<NotificationSchedulePayloadEvent> schedulePayloadEvents = new HashSet<>(List.of(
+                MultipleUtil.getNotificationSchedulePayloadEventNoNotifications("245000/2020")));
+        when(singleCasesReadingService
+                .retrieveNotificationScheduleCases(userToken, ENGLANDWALES_BULK_CASE_TYPE_ID, caseIds))
+                .thenReturn(schedulePayloadEvents);
+        var result = notificationScheduleService.getSchedulePayloadCollection(userToken,
+                ENGLANDWALES_BULK_CASE_TYPE_ID,
+                caseIds,
+                errors);
+
+        Assertions.assertEquals(0, result.size());
     }
 }

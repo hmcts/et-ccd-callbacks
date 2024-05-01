@@ -45,7 +45,7 @@ class SingleCasesReadingServiceTest {
     private MultipleDetails multipleDetails;
     private String userToken;
     private List<SubmitEvent> submitEventList;
-    private HashSet<SchedulePayloadEvent> schedulePayloadEvents;
+    private Set<SchedulePayloadEvent> schedulePayloadEvents;
     private List<LabelPayloadEvent> labelPayloadEvents;
 
     @BeforeEach

@@ -312,7 +312,7 @@ public final class MultipleUtil {
         return new ArrayList<>(Arrays.asList(labelPayloadEvent1, labelPayloadEvent2));
     }
 
-    public static HashSet<SchedulePayloadEvent> getSchedulePayloadEvents() {
+    public static Set<SchedulePayloadEvent> getSchedulePayloadEvents() {
         return new HashSet<>(Arrays.asList(
                 getSchedulePayloadEventData("245000/2020"),
                 getSchedulePayloadEventData("245003/2020")));

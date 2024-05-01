@@ -293,8 +293,7 @@ class CaseTransferSameCountryServiceTest {
     @Test
     void caseTransferShouldTransferSameOfficeWithBfActionAndHearingListed() {
         String officeCT = TribunalOffice.MANCHESTER.getOfficeName();
-        CaseDetails caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT,
-                HEARING_STATUS_LISTED);
+        CaseDetails caseDetails = createCaseDetails(officeCt, officeCT, HEARING_STATUS_LISTED);
         addBfAction(caseDetails.getCaseData(), null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));

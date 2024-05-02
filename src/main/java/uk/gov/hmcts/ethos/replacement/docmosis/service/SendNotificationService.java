@@ -311,7 +311,6 @@ public class SendNotificationService {
         emailData.remove(CITIZEN_UI_ALL_DOCUMENTS_LINK);
         emailData.put(EXUI_HEARING_DOCUMENTS_LINK,
                 emailService.getExuiCaseHearingDocumentsLink(caseDetails.getCaseId()));
-
         emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,
                 caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
                 emailData

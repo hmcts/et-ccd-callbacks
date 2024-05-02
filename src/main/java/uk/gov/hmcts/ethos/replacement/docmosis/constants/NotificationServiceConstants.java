@@ -11,6 +11,7 @@ public final class NotificationServiceConstants {
     public static final String EXUI_HEARING_DOCUMENTS_LINK = "exuiHearingDocumentsLink";
     public static final String CITIZEN_UI_ALL_DOCUMENTS_LINK = "citizenUiAllDocumentsLink";
     public static final String ALL_DOCUMENTS_PATH = "all-documents";
+    public static final String HEARING_DOCUMENTS_PATH = "#Hearing%20Documents";
     public static final String HEARING_DATE = "hearingDate";
     public static final String APPLICATION = "application";
     public static final String CCD_ID = "ccdId";

@@ -24,19 +24,20 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
 
 /**
  * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
@@ -46,13 +47,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @RequiredArgsConstructor
 @RestController
 public class CreateReferralMultiplesController {
-
-    private final VerifyTokenService verifyTokenService;
     private final ReferralService referralService;
     private final UserIdamService userIdamService;
     private final DocumentManagementService documentManagementService;
+    private final CaseLookupService caseLookupService;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
     private static final String CREATE_REFERRAL_BODY = "<hr>"
@@ -64,7 +63,6 @@ public class CreateReferralMultiplesController {
      * Called for the first page of the Create Multiples Referral event.
      * Populates the Referral hearing detail's section on the page.
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -79,25 +77,21 @@ public class CreateReferralMultiplesController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> initReferralHearingDetails(
-            @RequestBody MultipleRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-        log.info("ABOUT TO START CREATE MULTIPLES REFERRAL ---> "
-                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+            @RequestBody MultipleRequest ccdRequest) throws IOException {
+        log.info("ABOUT TO START CREATE MULTIPLES REFERRAL ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
 
         MultipleData multipleData = ccdRequest.getCaseDetails().getCaseData();
-        CaseData caseData = new ObjectMapper().convertValue(ccdRequest.getCaseDetails().getCaseData(), CaseData.class);
-        caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
+        clearReferralDataFromCaseData(multipleData);
+
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
+        multipleData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(leadCase));
         return multipleResponse(multipleData, null);
     }
 
     /**
      * Called for the email validation of the Create Multiples Referral event.
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/validateReferentEmail", consumes = APPLICATION_JSON_VALUE)
@@ -116,10 +110,7 @@ public class CreateReferralMultiplesController {
             @RequestHeader("Authorization") String userToken) {
         log.info("VALIDATE REFERENT EMAIL CREATE MULTIPLES REFERRAL ---> " + LOG_MESSAGE
                 + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+
         MultipleDetails caseDetails = ccdRequest.getCaseDetails();
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
@@ -155,29 +146,29 @@ public class CreateReferralMultiplesController {
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralDetails(
             @RequestBody MultipleRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("ABOUT TO SUBMIT CREATE MULTIPLES REFERRAL ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = new ObjectMapper().convertValue(ccdRequest.getCaseDetails().getCaseData(), CaseData.class);
+        MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
             caseData.setReferralSubject("Party not responded/complied");
         }
+
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
-        DocumentInfo documentInfo = referralService.generateCRDocument(caseData,
-                userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+
+        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+        DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
+        String nextHearingDate = getNearestHearingToReferral(leadCase, "None");
 
         ReferralHelper.createReferral(
                 caseData,
                 String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
-                this.documentManagementService.addDocumentToDocumentField(documentInfo));
+                this.documentManagementService.addDocumentToDocumentField(documentInfo),
+                nextHearingDate);
 
         clearReferralDataFromCaseData(caseData);
 
@@ -192,7 +183,6 @@ public class CreateReferralMultiplesController {
      * Called after submitting a create multiples referral event.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
     @PostMapping(value = "/completeCreateReferral", consumes = APPLICATION_JSON_VALUE)
@@ -202,13 +192,8 @@ public class CreateReferralMultiplesController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<MultipleCallbackResponse> completeCreateReferral(
-            @RequestBody MultipleRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestBody MultipleRequest ccdRequest) {
         log.info("COMPLETE CREATE MULTIPLES REFERRAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         String body = String.format(CREATE_REFERRAL_BODY,
                 ccdRequest.getCaseDetails().getCaseId());

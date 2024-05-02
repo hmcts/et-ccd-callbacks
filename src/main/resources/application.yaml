@@ -80,7 +80,6 @@ queue:
       connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
 
 springdoc:
-  pre-loading-enabled: 'true'
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
   pathsToMatch: /**
 

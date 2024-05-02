@@ -121,7 +121,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
         UserDetails userDetails = new UserDetails();
         userDetails.setRoles(List.of("role1"));
         when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
-        when(caseLookupService.getCaseDataAsAdmin(any(), any())).thenReturn(caseData);
+        when(caseLookupService.getLeadCaseFromMultipleAsAdmin(any())).thenReturn(caseData);
     }
 
     @Test

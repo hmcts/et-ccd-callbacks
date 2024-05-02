@@ -31,6 +31,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.updateReferral;
 
 /**
@@ -140,7 +141,9 @@ public class UpdateReferralController {
             caseData.setUpdateReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        updateReferral(caseData, String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        String nextHearingDate = getNearestHearingToReferral(caseData, "None");
+        String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
+        updateReferral(caseData, name, nextHearingDate);
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 

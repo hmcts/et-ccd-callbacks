@@ -17,9 +17,12 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.*;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesReadingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,6 +44,7 @@ public class CcdCaseAssignment {
     private final FeatureToggleService featureToggleService;
     private final CcdClient ccdClient;
     private final NocCcdService nocCcdService;
+    private final MultipleCasesReadingService multipleCasesReadingService;
 
     public CcdCaseAssignment(RestTemplate restTemplate,
                              AuthTokenGenerator serviceAuthTokenGenerator,
@@ -48,6 +52,7 @@ public class CcdCaseAssignment {
                              FeatureToggleService featureToggleService,
                              CcdClient ccdClient,
                              NocCcdService nocCcdService,
+                             MultipleCasesReadingService multipleCasesReadingService,
                              @Value("${assign_case_access_api_url}") String aacUrl,
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath
     ) {
@@ -59,6 +64,7 @@ public class CcdCaseAssignment {
         this.aacUrl = aacUrl;
         this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
         this.nocCcdService = nocCcdService;
+        this.multipleCasesReadingService = multipleCasesReadingService;
     }
 
     public CCDCallbackResponse applyNoc(final CallbackRequest callback, String userToken) throws IOException {
@@ -91,7 +97,7 @@ public class CcdCaseAssignment {
             response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
 
         if (featureToggleService.isMultiplesEnabled()) {
-            addRespondentRepresentativeToMultiple(callback.getCaseDetails());
+            addRespondentRepresentativeToMultiple(callback.getCaseDetails(), userToken);
         }
 
         return response.getBody();
@@ -110,15 +116,18 @@ public class CcdCaseAssignment {
         return headers;
     }
 
-    private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails) throws IOException {
+    private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails, String userToken) throws IOException {
         String accessToken = adminUserService.getAdminUserToken();
         String jurisdiction = caseDetails.getJurisdiction();
         String caseType = caseDetails.getCaseTypeId();
         String caseId = caseDetails.getCaseId();
         String userToAddId = getEventTriggerUserId(accessToken, caseId);
 
-        // TODO: Add Multiple Shell LookUp for given CaseId
-        String multipleId = caseId;
+        List<SubmitMultipleEvent> submitMultipleEvents = multipleCasesReadingService.retrieveMultipleCases(
+                userToken,
+                "ET_EnglandWales_Multiple",
+                caseDetails.getCaseData().getMultipleReference());
+        String multipleId = String.valueOf(submitMultipleEvents.get(0).getCaseId());
         if (!userToAddId.isEmpty() && YES.equals(caseDetails.getCaseData().getMultipleFlag())) {
             addUserToCase(accessToken, jurisdiction, caseType, multipleId, userToAddId);
         }

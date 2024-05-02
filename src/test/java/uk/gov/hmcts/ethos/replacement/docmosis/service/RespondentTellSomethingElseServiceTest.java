@@ -74,13 +74,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEN
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -296,10 +290,10 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         Map<String, String> expectedPersonalisation = Map.of(
-            CASE_NUMBER, caseData.getEthosCaseReference(),
-            CLAIMANT, caseData.getClaimant(),
-            RESPONDENT_NAMES, getRespondentNames(caseData),
-            EXUI_CASE_DETAILS_LINK, "exuiUrl669718251103419"
+            "caseNumber", caseData.getEthosCaseReference(),
+            "claimant", caseData.getClaimant(),
+            "respondentNames", getRespondentNames(caseData),
+            "exuiCaseDetailsLink", "exuiUrl669718251103419"
         );
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
@@ -703,12 +697,12 @@ class RespondentTellSomethingElseServiceTest {
     private Map<String, String> createPersonalisation(CaseData caseData,
                                                       String selectedApplication) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
-        personalisation.put(CLAIMANT, caseData.getClaimant());
-        personalisation.put(RESPONDENT_NAMES, getRespondentNames(caseData));
-        personalisation.put(HEARING_DATE, "");
-        personalisation.put(SHORT_TEXT, selectedApplication);
-        personalisation.put(EXUI_CASE_DETAILS_LINK, "exuiUrl669718251103419");
+        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put("respondentNames", getRespondentNames(caseData));
+        personalisation.put("hearingDate", "Not set");
+        personalisation.put("shortText", selectedApplication);
+        personalisation.put("exuiCaseDetailsLink", "exuiUrl669718251103419");
         return personalisation;
     }
 

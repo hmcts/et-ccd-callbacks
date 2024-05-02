@@ -10,6 +10,7 @@ public final class NotificationServiceConstants {
     public static final String RESPONDENT_NAMES = "respondentNames";
     public static final String EXUI_CASE_DETAILS_LINK = "exuiCaseDetailsLink";
     public static final String HEARING_DATE = "hearingDate";
+    public static final String NOT_SET = "Not set";
     public static final String APPLICATION = "application";
     public static final String CCD_ID = "ccdId";
     public static final String DATE = "date";

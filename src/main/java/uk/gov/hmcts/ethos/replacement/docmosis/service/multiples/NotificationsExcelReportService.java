@@ -8,7 +8,6 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
@@ -46,6 +45,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleSche
 @RequiredArgsConstructor
 @Service("notificationsExcelReportService")
 public class NotificationsExcelReportService {
+    public static final String DATE_FORMAT = "dd-MMM-yyyy HH:mm:ss";
     private static final String FILE_NAME = "notifications_extract.xlsx";
     private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, RESPONSE));
     private final ExcelReadingService excelReadingService;
@@ -110,18 +110,14 @@ public class NotificationsExcelReportService {
                 .documentFilename(FILE_NAME)
                 .documentUrl(String.valueOf(documentSelfPath))
                 .documentBinaryUrl(String.valueOf(documentSelfPath))
-                .uploadTimestamp(new DateTime().toString())
-                .categoryId("C4")
                 .build();
-
-        log.warn("Generated doc binary + {}", uploadedDocumentType.getDocumentBinaryUrl());
 
         if (multipleData.getNotificationsExtract() == null) {
             multipleData.setNotificationsExtract(new NotificationsExtract());
         }
         multipleData.getNotificationsExtract().setNotificationsExtractFile(uploadedDocumentType);
 
-        DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss", Locale.ENGLISH);
+        DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
         multipleData.getNotificationsExtract().setExtractDateTime(formatter.format(new Date()));
     }
 
@@ -137,9 +133,9 @@ public class NotificationsExcelReportService {
             createCell(rowHead1, 0, "List of notifications for ", header1CellStyle);
             createCell(rowHead1, 1, multipleTitle, header1CellStyle);
 
-            log.warn("Init data");
+            log.info("Init data");
             initData(workbook, sheet, notificationsGroupedByTitle);
-            log.warn("Completed init data");
+            log.info("Completed init data");
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
 

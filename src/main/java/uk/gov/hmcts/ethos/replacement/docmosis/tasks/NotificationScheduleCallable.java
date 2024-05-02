@@ -40,9 +40,7 @@ public class NotificationScheduleCallable implements Callable<HashSet<Notificati
             if (isNotEmpty(payload.getSendNotificationCollection())) {
                 schedulePayloads.add(payload);
             }
-
         }
-
         return schedulePayloads;
     }
 }

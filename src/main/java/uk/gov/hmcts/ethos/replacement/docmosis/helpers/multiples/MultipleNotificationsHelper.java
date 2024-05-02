@@ -24,6 +24,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 public final class MultipleNotificationsHelper {
 
+    public static final String DATE_FORMAT = "dd MMM yyyy";
+
     private MultipleNotificationsHelper() {
 
     }
@@ -68,7 +70,7 @@ public final class MultipleNotificationsHelper {
         return
                 notificationsGroupedByTitle.entrySet().stream().sorted(
                         Comparator.comparing(e ->
-                                DateUtils.parseDate(e.getKey().getRight(), new String[]{"dd MMM yyyy"})
+                                DateUtils.parseDate(e.getKey().getRight(), new String[]{DATE_FORMAT})
                         )
                 ).toList();
     }

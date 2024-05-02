@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadES;
@@ -71,11 +72,10 @@ public final class MultiplesScheduleHelper {
     }
 
     private static List<SendNotificationTypeItem> notificationNullCheck(NotificationSchedulePayloadES submitEventES) {
-        if (submitEventES.getSendNotificationCollection() != null) {
-            return submitEventES.getSendNotificationCollection();
+        if (CollectionUtils.isEmpty(submitEventES.getSendNotificationCollection())) {
+            return new ArrayList<>();
         }
-        log.warn("No send notification collection found");
-        return new ArrayList<>();
+        return submitEventES.getSendNotificationCollection();
     }
 
     private static String getRespondentData(List<RespondentSumTypeItem> respondentCollection, String field) {

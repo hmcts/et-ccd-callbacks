@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -1085,5 +1086,24 @@ public final class DocumentHelper {
             documentType.setDocNumber(String.valueOf(caseData.getDocumentCollection()
                                                              .indexOf(documentTypeItem) + 1));
         });
+    }
+
+    /**
+     * Add document to the document collection based on the provided index.
+     * @param docTypeItem document type item
+     * @param indexToAddString index of the document to be added
+     */
+    public static void addDocumentToCollectionAtIndex(List<DocumentTypeItem> documentCollection,
+                                                      DocumentTypeItem docTypeItem, String indexToAddString) {
+        if (StringUtils.isNotEmpty(indexToAddString)) {
+            int indexToAdd = Integer.parseInt(indexToAddString);
+            if (indexToAdd > 0 && indexToAdd <= documentCollection.size() + 1) {
+                documentCollection.add(indexToAdd - 1, docTypeItem);
+            } else {
+                throw new IllegalArgumentException("The document number is invalid");
+            }
+        } else {
+            documentCollection.add(docTypeItem);   
+        }
     }
 }

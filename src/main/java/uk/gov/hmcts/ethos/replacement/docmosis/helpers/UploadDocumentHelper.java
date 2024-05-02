@@ -195,7 +195,6 @@ public final class UploadDocumentHelper {
     }
 
     public static void setMultipleDocumentCollection(BaseCaseData multipleData) {
-
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             log.warn("Empty document collection");
             return;
@@ -208,8 +207,11 @@ public final class UploadDocumentHelper {
                 .toList();
 
         log.info("Retrieved docs: " + docs.size());
-        List<DynamicValueType> dynamicValueTypes = new ArrayList<>(docs);
-        multipleData.setDocumentSelect(DynamicMultiSelectListType.of(dynamicValueTypes));
+
+        DynamicMultiSelectListType dynamicMultiSelectList = new DynamicMultiSelectListType();
+        dynamicMultiSelectList.setListItems(docs);
+
+        multipleData.setDocumentSelect(dynamicMultiSelectList);
     }
 
     public static void setMultipleDocumentsToCorrectTab(BaseCaseData multipleData) {

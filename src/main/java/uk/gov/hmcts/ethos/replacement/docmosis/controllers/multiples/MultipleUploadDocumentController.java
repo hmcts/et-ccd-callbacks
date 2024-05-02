@@ -51,8 +51,8 @@ public class MultipleUploadDocumentController {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
-        UploadDocumentHelper.setMultipleDocumentCollection(caseData);
         UploadDocumentHelper.setMultipleDocumentsToCorrectTab(caseData);
+        UploadDocumentHelper.setMultipleDocumentCollection(caseData);
 
         return multipleResponse(caseData, null);
     }

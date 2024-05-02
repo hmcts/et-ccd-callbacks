@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
@@ -194,7 +196,7 @@ public final class UploadDocumentHelper {
 
     }
 
-    public static void setMultipleDocumentCollection(BaseCaseData multipleData) {
+    public static void setMultipleDocumentCollection(MultipleData multipleData) {
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             log.warn("Empty document collection");
             return;
@@ -214,7 +216,7 @@ public final class UploadDocumentHelper {
         multipleData.setDocumentSelect(dynamicMultiSelectList);
     }
 
-    public static void setMultipleDocumentsToCorrectTab(BaseCaseData multipleData) {
+    public static void setMultipleDocumentsToCorrectTab(MultipleData multipleData) {
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
             log.warn("Empty document collection");
             return;
@@ -223,37 +225,26 @@ public final class UploadDocumentHelper {
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
         String documentAccess = multipleData.getDocumentAccess();
 
+        List<DocumentTypeItem> filtered = docs.stream()
+               .filter(doc -> multipleData.getDocumentSelect().getValue().stream().anyMatch(x -> x.getCode().equals(doc.getId())))
+               .toList();
+
         if (documentAccess != null) {
             switch (documentAccess) {
                 case "Citizens":
-                    setDocumentCollection(multipleData, docs, "claimantDocumentCollection");
+                    multipleData.setClaimantDocumentCollection(filtered);
                     break;
                 case "Legal rep/respondents":
-                    setDocumentCollection(multipleData, docs, "legalrepDocumentCollection");
+                multipleData.setLegalrepDocumentCollection(filtered);
                     break;
                 case "Both Citizens and Legal rep/respondents":
-                    setDocumentCollection(multipleData, docs, "claimantDocumentCollection");
-                    setDocumentCollection(multipleData, docs, "legalrepDocumentCollection");
+                    multipleData.setClaimantDocumentCollection(filtered);
+                    multipleData.setLegalrepDocumentCollection(filtered);
                     break;
                 default:
-                    multipleData.setDocumentCollection(docs);
+                    multipleData.setDocumentCollection(filtered);
                     break;
             }
-        }
-    }
-
-    private static void setDocumentCollection(BaseCaseData multipleData,
-                                              List<DocumentTypeItem> docs, String collectionType) {
-        switch (collectionType) {
-            case "claimantDocumentCollection":
-                multipleData.setClaimantDocumentCollection(docs);
-                break;
-            case "legalrepDocumentCollection":
-                multipleData.setLegalrepDocumentCollection(docs);
-                break;
-            default:
-                multipleData.setDocumentCollection(docs);
-                break;
         }
     }
 }

@@ -97,7 +97,7 @@ public class CcdCaseAssignment {
             response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
 
         if (featureToggleService.isMultiplesEnabled()) {
-            addRespondentRepresentativeToMultiple(callback.getCaseDetails(), userToken);
+            addRespondentRepresentativeToMultiple(callback.getCaseDetails());
         }
 
         return response.getBody();
@@ -116,20 +116,23 @@ public class CcdCaseAssignment {
         return headers;
     }
 
-    private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails, String userToken) throws IOException {
+    private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails) throws IOException {
         String accessToken = adminUserService.getAdminUserToken();
         String jurisdiction = caseDetails.getJurisdiction();
         String caseType = caseDetails.getCaseTypeId();
         String caseId = caseDetails.getCaseId();
         String userToAddId = getEventTriggerUserId(accessToken, caseId);
 
-        List<SubmitMultipleEvent> submitMultipleEvents = multipleCasesReadingService.retrieveMultipleCases(
-                userToken,
-                "ET_EnglandWales_Multiple",
-                caseDetails.getCaseData().getMultipleReference());
-        String multipleId = String.valueOf(submitMultipleEvents.get(0).getCaseId());
         if (!userToAddId.isEmpty() && YES.equals(caseDetails.getCaseData().getMultipleFlag())) {
-            addUserToCase(accessToken, jurisdiction, caseType, multipleId, userToAddId);
+            List<SubmitMultipleEvent> submitMultipleEvents = multipleCasesReadingService.retrieveMultipleCases(
+                    accessToken,
+                    caseType,
+                    caseDetails.getCaseData().getMultipleReference());
+               if (!submitMultipleEvents.isEmpty()) {
+                   String multipleId = String.valueOf(submitMultipleEvents.get(0).getCaseId());
+                   addUserToCase(accessToken, jurisdiction, caseType, multipleId, userToAddId);
+            }
+
         }
     }
 

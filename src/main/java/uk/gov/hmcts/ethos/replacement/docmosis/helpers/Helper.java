@@ -54,6 +54,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class Helper {
@@ -284,7 +285,7 @@ public final class Helper {
      * @return current date in "dd MMM yyy" format
      */
     public static String getCurrentDate() {
-        return new SimpleDateFormat("dd MMM yyyy").format(new Date());
+        return new SimpleDateFormat(MONTH_STRING_DATE_FORMAT).format(new Date());
     }
 
     /**

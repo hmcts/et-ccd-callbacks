@@ -26,6 +26,7 @@ import java.util.Optional;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class InitialConsiderationHelper {
@@ -60,7 +61,7 @@ public final class InitialConsiderationHelper {
     }
 
     private static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {
-        String formattedNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+        String formattedNow = LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT));
 
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -177,7 +178,7 @@ public final class InitialConsiderationHelper {
     }
 
     private static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
-        String formattedNow = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+        String formattedNow = LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT));
 
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))

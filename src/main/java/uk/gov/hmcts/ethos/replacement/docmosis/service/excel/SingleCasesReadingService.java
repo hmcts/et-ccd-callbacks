@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
@@ -93,15 +94,33 @@ public class SingleCasesReadingService {
                     caseIds));
 
         } catch (Exception ex) {
-
-            log.error("Error retrieving schedule cases");
-
-            log.error(ex.getMessage(), ex);
-
+            log.error("Error retrieving schedule cases: {}", ex.getMessage(), ex);
         }
 
         return schedulePayloadEvents;
 
     }
 
+    /**
+     * Gets notification schedules with ES Query.
+     *
+     * @param userToken          user token
+     * @param multipleCaseTypeId multiple case type (EW or Scotland)
+     * @param caseIds            all single cases on the multiple
+     * @return schedulePayloadEvents
+     */
+    public Set<NotificationSchedulePayloadEvent> retrieveNotificationScheduleCases(String userToken,
+                                                                                   String multipleCaseTypeId,
+                                                                                   List<String> caseIds) {
+        HashSet<NotificationSchedulePayloadEvent> schedulePayloadEvents = new HashSet<>();
+        try {
+            schedulePayloadEvents = new HashSet<>(ccdClient.retrieveCasesElasticNotificationSearchSchedule(userToken,
+                    UtilHelper.getCaseTypeId(multipleCaseTypeId),
+                    caseIds));
+
+        } catch (Exception ex) {
+            log.error("Error retrieving notification schedule cases: {}", ex.getMessage(), ex);
+        }
+        return schedulePayloadEvents;
+    }
 }

@@ -93,17 +93,16 @@ public class ScheduleCreationService {
     private void initializeData(XSSFWorkbook workbook, XSSFSheet sheet,
                                 List<SchedulePayload> schedulePayloads, String scheduleTemplate) {
 
-        CellStyle cellStyle = MultiplesSchedulePrinter.getRowCellStyle(workbook);
-        int startingRow = 4;
-        XSSFRow tableTitleRow = sheet.createRow(3);
-
         if (schedulePayloads.isEmpty()) {
             return;
         }
+        CellStyle cellStyle = MultiplesSchedulePrinter.getRowCellStyle(workbook);
 
         SortedMap<String, SortedMap<String, Object>> orderedScheduleCollection =
             MultiplesHelper.createCollectionOrderedByCaseRef(schedulePayloads);
 
+        int startingRow = 4;
+        XSSFRow tableTitleRow = sheet.createRow(3);
         if (scheduleTemplate.equals(MULTIPLE_SCHEDULE_CONFIG)) {
             log.info("Multiple schedule");
             for (int j = 0; j < multipleHeaders.size(); j++) {

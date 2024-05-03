@@ -143,8 +143,7 @@ public class SendNotificationService {
     }
 
     private static void setStatusForCitizenHub(CaseData caseData, SendNotificationType sendNotificationType) {
-        if (sendNotificationType.getSendNotificationSubject().contains(CASE_MANAGEMENT_ORDERS_REQUESTS)
-                && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
+        if (caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
                 && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
             sendNotificationType.setNotificationState(NOT_STARTED_YET);
         } else {

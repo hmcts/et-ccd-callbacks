@@ -221,12 +221,13 @@ public class Et1ReppedService {
         }
         return tornadoService.createDocumentInfoFromBytes(userToken,
                 pdf,
-                getEt1DocumentName(caseDetails.getCaseData()),
+                getEt1DocumentName(caseDetails.getCaseData(), pdfSource),
                 caseDetails.getCaseTypeId());
     }
 
-    private String getEt1DocumentName(CaseData caseData) {
-        return "ET1 - " + caseData.getClaimant() + ".pdf";
+    private String getEt1DocumentName(CaseData caseData, String pdfSource) {
+        return ET1_CY_PDF.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
+                : "ET1 - " + caseData.getClaimant() + ".pdf";
     }
 
     private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {

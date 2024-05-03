@@ -20,6 +20,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.UK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class NocNotificationHelper {
@@ -96,7 +97,8 @@ public final class NocNotificationHelper {
         if (nextHearingDate != null) {
             try {
                 Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", UK).parse(nextHearingDate);
-                personalisation.put("date", new SimpleDateFormat("dd MMM yyyy", UK).format(hearingStartDate));
+                personalisation.put("date",
+                        new SimpleDateFormat(MONTH_STRING_DATE_FORMAT, UK).format(hearingStartDate));
             } catch (ParseException ignored) {
                 log.warn("Failed to parse nextHearingDate");
             }

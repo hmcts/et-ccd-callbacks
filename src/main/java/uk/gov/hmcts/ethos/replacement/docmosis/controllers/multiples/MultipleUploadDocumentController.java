@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -47,11 +48,10 @@ public class MultipleUploadDocumentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToStart(
-            @RequestBody MultipleRequest ccdRequest) {
+            @RequestBody MultipleRequest ccdRequest) throws JsonProcessingException {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
-        UploadDocumentHelper.setMultipleDocumentCollection(caseData);
 
         return multipleResponse(caseData, null);
     }
@@ -71,14 +71,13 @@ public class MultipleUploadDocumentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralReply(
+    public ResponseEntity<MultipleCallbackResponse> aboutToSubmit(
             @RequestBody MultipleRequest ccdRequest) {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
         caseManagementForCaseWorkerService.addClaimantDocuments(caseData);
-        UploadDocumentHelper.setMultipleDocumentsToCorrectTab(caseData);
 
         return multipleResponse(caseData, null);
     }

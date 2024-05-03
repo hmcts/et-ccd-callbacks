@@ -5,8 +5,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -14,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
@@ -194,57 +190,5 @@ public final class UploadDocumentHelper {
                     String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
         });
 
-    }
-
-    public static void setMultipleDocumentCollection(MultipleData multipleData) {
-        if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
-            log.warn("Empty document collection");
-            return;
-        }
-
-        log.info("Getting docs");
-        List<DynamicValueType> docs = multipleData.getDocumentCollection().stream()
-                .map(documentTypeItem -> DynamicListHelper.getDynamicCodeLabel(documentTypeItem.getId(),
-                        documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()))
-                .toList();
-
-        log.info("Retrieved docs: " + docs.size());
-
-        DynamicMultiSelectListType dynamicMultiSelectList = new DynamicMultiSelectListType();
-        dynamicMultiSelectList.setListItems(docs);
-
-        multipleData.setDocumentSelect(dynamicMultiSelectList);
-    }
-
-    public static void setMultipleDocumentsToCorrectTab(MultipleData multipleData) {
-        if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
-            log.warn("Empty document collection");
-            return;
-        }
-
-        List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
-        String documentAccess = multipleData.getDocumentAccess();
-
-        List<DocumentTypeItem> filtered = docs.stream()
-               .filter(doc -> multipleData.getDocumentSelect().getValue().stream().anyMatch(x -> x.getCode().equals(doc.getId())))
-               .toList();
-
-        if (documentAccess != null) {
-            switch (documentAccess) {
-                case "Citizens":
-                    multipleData.setClaimantDocumentCollection(filtered);
-                    break;
-                case "Legal rep/respondents":
-                multipleData.setLegalrepDocumentCollection(filtered);
-                    break;
-                case "Both Citizens and Legal rep/respondents":
-                    multipleData.setClaimantDocumentCollection(filtered);
-                    multipleData.setLegalrepDocumentCollection(filtered);
-                    break;
-                default:
-                    multipleData.setDocumentCollection(filtered);
-                    break;
-            }
-        }
     }
 }

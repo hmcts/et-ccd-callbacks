@@ -478,8 +478,7 @@ public class Et1ReppedHelper {
         claimantHearingPreference.setReasonableAdjustments(
                 reasonableAdjustmentsMapping(caseData.getClaimantSupportQuestion()));
         claimantHearingPreference.setReasonableAdjustmentsDetail(caseData.getClaimantSupportQuestionReason());
-        claimantHearingPreference.setHearingLanguage(getFirstListItem(caseData.getHearingContactLanguage()));
-        claimantHearingPreference.setContactLanguage(getFirstListItem(caseData.getContactLanguageQuestion()));
+        claimantHearingPreference.setHearingLanguage(getFirstListItem(caseData.getClaimantHearingContactLanguage()));
         return claimantHearingPreference;
     }
 

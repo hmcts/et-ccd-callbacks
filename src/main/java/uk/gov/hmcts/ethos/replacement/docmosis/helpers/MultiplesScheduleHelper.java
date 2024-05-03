@@ -63,6 +63,12 @@ public final class MultiplesScheduleHelper {
                 .build();
     }
 
+    /**
+     * Using response from NotificationSchedulePayloadEvent return NotificationSchedulePayload.
+     *
+     * @param submitEventES elastic search event
+     * @return NotificationSchedulePayload
+     */
     public static NotificationSchedulePayload getNotificationSchedulePayload(
             NotificationSchedulePayloadES submitEventES) {
         return NotificationSchedulePayload.builder()

@@ -94,17 +94,21 @@ public class SingleCasesReadingService {
                     caseIds));
 
         } catch (Exception ex) {
-
-            log.error("Error retrieving schedule cases");
-
-            log.error(ex.getMessage(), ex);
-
+            log.error("Error retrieving schedule cases: {}", ex.getMessage(), ex);
         }
 
         return schedulePayloadEvents;
 
     }
 
+    /**
+     * Gets notification schedules with ES Query.
+     *
+     * @param userToken          user token
+     * @param multipleCaseTypeId multiple case type (EW or Scotland)
+     * @param caseIds            all single cases on the multiple
+     * @return schedulePayloadEvents
+     */
     public Set<NotificationSchedulePayloadEvent> retrieveNotificationScheduleCases(String userToken,
                                                                                    String multipleCaseTypeId,
                                                                                    List<String> caseIds) {
@@ -115,8 +119,7 @@ public class SingleCasesReadingService {
                     caseIds));
 
         } catch (Exception ex) {
-            log.error("Error retrieving notification schedule cases");
-            log.error(ex.getMessage(), ex);
+            log.error("Error retrieving notification schedule cases: {}", ex.getMessage(), ex);
         }
         return schedulePayloadEvents;
     }

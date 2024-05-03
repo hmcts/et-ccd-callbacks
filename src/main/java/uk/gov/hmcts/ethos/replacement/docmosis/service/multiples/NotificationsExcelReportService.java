@@ -52,6 +52,14 @@ public class NotificationsExcelReportService {
     private final NotificationScheduleService notificationScheduleService;
     private final DocumentManagementService documentManagementService;
 
+    /**
+     * Populates excel report with data and saves to case data.
+     *
+     * @param multipleDetails multiple case details
+     * @param userToken       user token
+     * @param errors          errors
+     * @throws IOException execution error
+     */
     public void generateReport(MultipleDetails multipleDetails,
                                String userToken,
                                List<String> errors) throws IOException {

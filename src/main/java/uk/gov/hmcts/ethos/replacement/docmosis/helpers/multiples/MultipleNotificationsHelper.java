@@ -20,16 +20,22 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class MultipleNotificationsHelper {
-
-    public static final String DATE_FORMAT = "dd MMM yyyy";
 
     private MultipleNotificationsHelper() {
 
     }
 
+    /**
+     * Flattened notifications joined with ethos case reference.
+     *
+     * @param schedulePayloads response
+     * @param multipleRef      multiple case Id
+     * @return list of notification group type with all data needed for report
+     */
     public static @NotNull List<NotificationGroup> flattenNotificationsWithCaseRef(
             List<NotificationSchedulePayload> schedulePayloads, String multipleRef) {
         List<NotificationGroup> notificationGroups = new ArrayList<>();
@@ -54,6 +60,12 @@ public final class MultipleNotificationsHelper {
         return notificationGroups;
     }
 
+    /**
+     * Identify related notifications by grouping them by title and date.
+     *
+     * @param notificationGroups flat list of all notifications
+     * @return grouped notifications
+     */
     public static @NotNull Map<Pair<String, String>, List<NotificationGroup>> groupNotificationsByTitleAndDate(
             List<NotificationGroup> notificationGroups) {
         return notificationGroups.stream()
@@ -64,13 +76,19 @@ public final class MultipleNotificationsHelper {
                 );
     }
 
+    /**
+     * Sort notifications so they come out in the same order each time.
+     *
+     * @param notificationsGroupedByTitle notifications for report
+     * @return grouped notifications in ascending date order
+     */
     public static @NotNull List<Map.Entry<Pair<String, String>,
             List<NotificationGroup>>> groupedNotificationsSortedByDate(Map<Pair<String, String>,
             List<NotificationGroup>> notificationsGroupedByTitle) {
         return
                 notificationsGroupedByTitle.entrySet().stream().sorted(
                         Comparator.comparing(e ->
-                                DateUtils.parseDate(e.getKey().getRight(), new String[]{DATE_FORMAT})
+                                DateUtils.parseDate(e.getKey().getRight(), new String[]{MONTH_STRING_DATE_FORMAT})
                         )
                 ).toList();
     }

@@ -33,13 +33,13 @@ public class ExtractNotificationsController {
     private final NotificationsExcelReportService notificationsExcelReportService;
 
     /**
-     * Creates the Excel report.
+     * Creates the Excel report of notifications sent from the multiple.
      *
      * @param multipleRequest holds the request and case data
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "submitted")
+    @Operation(summary = "aboutToSubmit")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -56,7 +56,7 @@ public class ExtractNotificationsController {
         List<String> errors = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
-        log.info("Generating report");
+        log.info("Generating report for multiple ref - {}", multipleDetails.getCaseId());
         notificationsExcelReportService.generateReport(multipleDetails, userToken, errors);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);

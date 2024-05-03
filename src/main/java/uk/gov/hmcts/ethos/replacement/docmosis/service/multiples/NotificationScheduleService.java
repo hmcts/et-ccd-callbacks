@@ -25,6 +25,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleSche
 public class NotificationScheduleService {
     private final SingleCasesReadingService singleCasesReadingService;
 
+    /**
+     * Threaded execution of ES queries to retrieve all notifications sent from multiple.
+     *
+     * @param userToken        user Token
+     * @param caseTypeId       multiple case type (EW or Scotland)
+     * @param caseIdCollection all single cases on the multiple
+     * @param errors           errors
+     * @return list of notifications from single cases
+     */
     public List<NotificationSchedulePayload> getSchedulePayloadCollection(String userToken,
                                                                           String caseTypeId,
                                                                           List<String> caseIdCollection,

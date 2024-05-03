@@ -1,12 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
+import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadES;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadES;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantIndType;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
@@ -59,9 +63,30 @@ public final class MultiplesScheduleHelper {
                 .build();
     }
 
+    /**
+     * Using response from NotificationSchedulePayloadEvent return NotificationSchedulePayload.
+     *
+     * @param submitEventES elastic search event
+     * @return NotificationSchedulePayload
+     */
+    public static NotificationSchedulePayload getNotificationSchedulePayload(
+            NotificationSchedulePayloadES submitEventES) {
+        return NotificationSchedulePayload.builder()
+                .ethosCaseRef(nullCheck(submitEventES.getEthosCaseReference()))
+                .sendNotificationCollection(notificationNullCheck(submitEventES))
+                .build();
+    }
+
+    private static List<SendNotificationTypeItem> notificationNullCheck(NotificationSchedulePayloadES submitEventES) {
+        if (CollectionUtils.isEmpty(submitEventES.getSendNotificationCollection())) {
+            return new ArrayList<>();
+        }
+        return submitEventES.getSendNotificationCollection();
+    }
+
     private static String getRespondentData(List<RespondentSumTypeItem> respondentCollection, String field) {
         if (respondentCollection != null && !respondentCollection.isEmpty()) {
-            if (field.equals(RESPONDENT_NAME)) {
+            if (RESPONDENT_NAME.equals(field)) {
                 String respondentName = respondentCollection.get(0).getValue().getRespondentName();
 
                 return respondentCollection.size() > 1

@@ -165,7 +165,8 @@ class Et1ReppedServiceTest {
 
     @ParameterizedTest
     @MethodSource("validatePostcodes")
-    void validatePostcode(String postcode, String caseTypeId, int expected, String condition) throws InvalidPostcodeException {
+    void validatePostcode(String postcode, String caseTypeId, int expected, String condition)
+            throws InvalidPostcodeException {
         caseData = new CaseData();
         Address address = new Address();
         address.setPostCode(postcode);

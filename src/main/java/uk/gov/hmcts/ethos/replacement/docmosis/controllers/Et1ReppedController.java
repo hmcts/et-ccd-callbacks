@@ -147,7 +147,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/sectionOne/validateHearingPreferences", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for claimant sex")
+    @Operation(summary = "callback handler for hearing preferences")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -160,7 +160,9 @@ public class Et1ReppedController {
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors  = Et1ReppedHelper.validateSingleOption(caseData.getHearingContactLanguage());
+        List<String> errors = new ArrayList<>();
+        errors.addAll(Et1ReppedHelper.validateSingleOption(caseData.getHearingContactLanguage()));
+        errors.addAll(Et1ReppedHelper.validateSingleOption(caseData.getClaimantHearingContactLanguage()));
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

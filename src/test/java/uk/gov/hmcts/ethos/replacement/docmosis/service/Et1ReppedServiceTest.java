@@ -54,7 +54,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @SpringBootTest(classes = { Et1ReppedService.class, TribunalOfficesService.class, PostcodeToOfficeService.class,
@@ -156,17 +158,34 @@ class Et1ReppedServiceTest {
     void shouldReturnNoIfNoPostcodeEntered() throws InvalidPostcodeException {
         caseData = new CaseData();
         caseData.setEt1ReppedTriageAddress(new Address());
-        assertEquals(NO, et1ReppedService.validatePostcode(caseData));
+        List<String> errors =  et1ReppedService.validatePostcode(caseData, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(1, errors.size());
+        assertEquals("Please enter a valid postcode", errors.get(0));
     }
 
     @ParameterizedTest
     @MethodSource("validatePostcodes")
-    void validatePostcode(String postcode, String expected) throws InvalidPostcodeException {
+    void validatePostcode(String postcode, String caseTypeId, int expected, String condition) throws InvalidPostcodeException {
         caseData = new CaseData();
         Address address = new Address();
         address.setPostCode(postcode);
         caseData.setEt1ReppedTriageAddress(address);
-        assertEquals(expected, et1ReppedService.validatePostcode(caseData));
+        List<String> errors =  et1ReppedService.validatePostcode(caseData, caseTypeId);
+        assertEquals(expected, errors.size());
+        assertEquals(condition, caseData.getEt1ReppedTriageYesNo());
+    }
+
+    private static Stream<Arguments> validatePostcodes() {
+        return Stream.of(
+                Arguments.of("LS16 6NB", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
+                Arguments.of("B1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, NO),
+                Arguments.of("EH1 1AA", ENGLANDWALES_CASE_TYPE_ID, 1, NO),
+                Arguments.of("RM1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
+                Arguments.of("EC1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
+                Arguments.of("AL1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
+                Arguments.of("BA1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
+                Arguments.of("G1 1AA", SCOTLAND_CASE_TYPE_ID, 0, YES)
+        );
     }
 
     @Test
@@ -229,21 +248,6 @@ class Et1ReppedServiceTest {
         when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
         assertDoesNotThrow(() -> et1ReppedService.createAndUploadEt1Docs(caseDetails, "authToken"));
         assertEquals(1, caseDetails.getCaseData().getDocumentCollection().size());
-    }
-
-    private static Stream<Arguments> validatePostcodes() {
-        return Stream.of(
-                Arguments.of("LS16 6NB", YES),
-                Arguments.of("G1 1AA", YES),
-                Arguments.of("B1 1AA", NO),
-                Arguments.of("EH1 1AA", NO),
-                Arguments.of("CH1 1AA", NO),
-                Arguments.of("BN1 1AA", NO),
-                Arguments.of("RM1 1AA", NO),
-                Arguments.of("EC1 1AA", NO),
-                Arguments.of("AL1 1AA", NO),
-                Arguments.of("BA1 1AA", YES)
-        );
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {

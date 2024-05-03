@@ -49,6 +49,7 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,8 +67,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MULTIPLE_OPTION_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.TRIAGE_ERROR_MESSAGE;
@@ -194,6 +195,7 @@ class Et1ReppedControllerTest {
         caseData.setRespondentAddress(createGenericAddress());
 
         ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .withCaseData(caseData)
                 .build();
 
@@ -216,16 +218,16 @@ class Et1ReppedControllerTest {
     @Test
     void validatePostcode() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(et1ReppedService.validatePostcode(any())).thenReturn(YES);
+        when(et1ReppedService.validatePostcode(any(), anyString())).thenReturn(Collections.emptyList());
         mockMvc.perform(post(VALIDATE_POSTCODE)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(et1ReppedService, times(1)).validatePostcode(any());
+        verify(et1ReppedService, times(1)).validatePostcode(any(), anyString());
     }
 
     @Test
@@ -236,7 +238,7 @@ class Et1ReppedControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(et1ReppedService, never()).validatePostcode(any());
+        verify(et1ReppedService, never()).validatePostcode(any(), anyString());
     }
 
     @Test

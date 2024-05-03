@@ -36,13 +36,16 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -76,26 +79,53 @@ public class Et1ReppedService {
     private static final String ET1_EN_PDF = "ET1_2222.pdf";
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
-            TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.GLASGOW);
+            TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL);
 
     /**
-     * Validates the postcode.
+     * Validates the postcode and region.
      * @param caseData the case data
-     * @return YES if the postcode is valid, NO otherwise
+     * @param caseTypeId the case type ID
+     * @return a list of validation messages
      * @throws InvalidPostcodeException if the postcode is invalid
      */
-    public String validatePostcode(CaseData caseData) throws InvalidPostcodeException {
+    public List<String> validatePostcode(CaseData caseData, String caseTypeId)
+            throws InvalidPostcodeException {
         if (ObjectUtils.isEmpty(caseData.getEt1ReppedTriageAddress())
-                || isNullOrEmpty(caseData.getEt1ReppedTriageAddress().getPostCode())) {
-            return NO;
+            || isNullOrEmpty(caseData.getEt1ReppedTriageAddress().getPostCode())) {
+            return Collections.singletonList("Please enter a valid postcode");
         }
 
         Optional<TribunalOffice> office = postcodeToOfficeService.getTribunalOfficeFromPostcode(
                 caseData.getEt1ReppedTriageAddress().getPostCode());
-        if (office.isEmpty() || !liveTribunalOffices.contains(office.get())) {
-            return NO;
+        if (office.isEmpty()) {
+            return Collections.singletonList("Could not match postcode to a tribunal office. "
+                                             + "Please check the postcode.");
         }
-        return YES;
+
+        caseData.setEt1ReppedTriageYesNo(NO);
+        switch (caseTypeId) {
+            case ENGLANDWALES_CASE_TYPE_ID -> {
+                if (TribunalOffice.isScotlandOffice(office.get().getOfficeName())) {
+                    return Collections.singletonList(
+                            "Please use the link below to submit your claim to the correct office");
+                }
+                if (!liveTribunalOffices.contains(office.get())) {
+                    return Collections.emptyList();
+                }
+            }
+            case SCOTLAND_CASE_TYPE_ID -> {
+                if (TribunalOffice.isEnglandWalesOffice(office.get().getOfficeName())) {
+                    return Collections.singletonList(
+                            "Please use the link below to submit your claim to the correct office");
+                }
+            }
+            default -> {
+                // Do nothing for unmatched casetypes
+            }
+        }
+
+        caseData.setEt1ReppedTriageYesNo(YES);
+        return Collections.emptyList();
     }
 
     /**

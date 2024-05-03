@@ -65,8 +65,9 @@ public class Et1ReppedController {
             throws InvalidPostcodeException {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setEt1ReppedTriageYesNo(et1ReppedService.validatePostcode(caseData));
-        return getCallbackRespEntityNoErrors(caseData);
+        List<String> errors = et1ReppedService.validatePostcode(caseData,
+                ccdRequest.getCaseDetails().getCaseTypeId());
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/createCase/officeError", consumes = APPLICATION_JSON_VALUE)

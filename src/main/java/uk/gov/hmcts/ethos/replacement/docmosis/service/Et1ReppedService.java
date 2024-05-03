@@ -292,6 +292,7 @@ public class Et1ReppedService {
         claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
         claimantRepresentative.setHearingContactLanguage(caseData.getHearingContactLanguage());
         claimantRepresentative.setContactLanguageQuestion(caseData.getContactLanguageQuestion());
+        claimantRepresentative.setRepresentativeAttendHearing(caseData.getRepresentativeAttendHearing());
         OrganisationsResponse organisationDetails = getOrganisationDetailsFromUserId(userDetails.getUid());
         if (!ObjectUtils.isEmpty(organisationDetails)) {
             log.info("Adding ref data organisation details to case {}", caseData.getEthosCaseReference());

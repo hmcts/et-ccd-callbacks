@@ -13,10 +13,10 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.ccd.*;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesReadingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -36,15 +36,17 @@ public class CcdCaseAssignment {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     public static final String ADD_USER_ERROR = "Call to add legal rep to Multiple Case failed for %s";
+
     private final RestTemplate restTemplate;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
-    private final String aacUrl;
-    private final String applyNocAssignmentsApiPath;
     private final AdminUserService adminUserService;
     private final FeatureToggleService featureToggleService;
     private final CcdClient ccdClient;
     private final NocCcdService nocCcdService;
     private final MultipleCasesReadingService multipleCasesReadingService;
+
+    private final String aacUrl;
+    private final String applyNocAssignmentsApiPath;
 
     public CcdCaseAssignment(RestTemplate restTemplate,
                              AuthTokenGenerator serviceAuthTokenGenerator,
@@ -61,10 +63,10 @@ public class CcdCaseAssignment {
         this.adminUserService = adminUserService;
         this.featureToggleService = featureToggleService;
         this.ccdClient = ccdClient;
-        this.aacUrl = aacUrl;
-        this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
         this.nocCcdService = nocCcdService;
         this.multipleCasesReadingService = multipleCasesReadingService;
+        this.aacUrl = aacUrl;
+        this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
     }
 
     public CCDCallbackResponse applyNoc(final CallbackRequest callback, String userToken) throws IOException {
@@ -118,28 +120,33 @@ public class CcdCaseAssignment {
 
     private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails) throws IOException {
         String accessToken = adminUserService.getAdminUserToken();
-        String jurisdiction = caseDetails.getJurisdiction();
-        String caseType = caseDetails.getCaseTypeId();
         String caseId = caseDetails.getCaseId();
         String userToAddId = getEventTriggerUserId(accessToken, caseId);
 
-        if (!userToAddId.isEmpty() && YES.equals(caseDetails.getCaseData().getMultipleFlag())) {
-            List<SubmitMultipleEvent> submitMultipleEvents = multipleCasesReadingService.retrieveMultipleCases(
-                    accessToken,
-                    caseType,
-                    caseDetails.getCaseData().getMultipleReference());
-               if (!submitMultipleEvents.isEmpty()) {
-                   String multipleId = String.valueOf(submitMultipleEvents.get(0).getCaseId());
-                   addUserToCase(accessToken, jurisdiction, caseType, multipleId, userToAddId);
-            }
-
+        if (userToAddId.isEmpty() || !YES.equals(caseDetails.getCaseData().getMultipleFlag())) {
+            return;
         }
+
+        String caseType = caseDetails.getCaseTypeId();
+        List<SubmitMultipleEvent> submitMultipleEvents = multipleCasesReadingService.retrieveMultipleCases(
+                accessToken,
+                caseType,
+                caseDetails.getCaseData().getMultipleReference());
+
+        if (submitMultipleEvents.isEmpty()) {
+            return;
+        }
+
+        String jurisdiction = caseDetails.getJurisdiction();
+        String multipleId = String.valueOf(submitMultipleEvents.get(0).getCaseId());
+        addUserToCase(accessToken, jurisdiction, caseType, multipleId, caseId, userToAddId);
     }
 
     private void addUserToCase(String accessToken,
                                String jurisdiction,
                                String caseType,
                                String multipleId,
+                               String caseId,
                                String userToAddId) throws IOException {
         Map<String, String> payload = Maps.newHashMap();
         payload.put("id", userToAddId);
@@ -157,6 +164,9 @@ public class CcdCaseAssignment {
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
+
+            // TODO: Update MultipleCaseData to include caseId & userToAddId
+
             log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));

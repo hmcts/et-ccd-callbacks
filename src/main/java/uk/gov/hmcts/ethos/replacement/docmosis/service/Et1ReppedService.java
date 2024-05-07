@@ -138,7 +138,7 @@ public class Et1ReppedService {
         caseData.setJurCodesCollection(jurisdictionCodesMapperService.mapToJurCodes(caseData));
         caseData.setReceiptDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         caseData.setPositionType("ET1 Online submission");
-        caseData.setCaseSource("ET1 Online");
+        caseData.setCaseSource("MyHMCTS");
     }
 
     /**

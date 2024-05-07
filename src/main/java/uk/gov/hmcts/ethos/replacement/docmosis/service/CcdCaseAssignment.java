@@ -142,6 +142,7 @@ public class CcdCaseAssignment {
         addUserToCase(accessToken, jurisdiction, caseType, multipleId, caseId, userToAddId);
     }
 
+    @SuppressWarnings({"PMD.UnusedFormalParameter"})
     private void addUserToCase(String accessToken,
                                String jurisdiction,
                                String caseType,

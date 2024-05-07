@@ -66,7 +66,8 @@ public final class MultiplesDocumentAccessService {
         }
     }
 
-    private void addSelectedDocsToCollection(List<DocumentTypeItem> selectedDocs, List<DocumentTypeItem> documentCollection) {
+    private void addSelectedDocsToCollection(List<DocumentTypeItem> selectedDocs,
+                                             List<DocumentTypeItem> documentCollection) {
         for (DocumentTypeItem selectedDoc : selectedDocs) {
             if (!documentCollection.stream().anyMatch(doc -> doc.getId().equals(selectedDoc.getId()))) {
                 documentCollection.add(selectedDoc);

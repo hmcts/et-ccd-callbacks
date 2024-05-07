@@ -55,6 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 
 @Slf4j
@@ -532,7 +533,7 @@ public final class ReferralHelper {
 
         try {
             Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(earliestFutureHearingDate);
-            return new SimpleDateFormat("dd MMM yyyy").format(hearingStartDate);
+            return new SimpleDateFormat(MONTH_STRING_DATE_FORMAT).format(hearingStartDate);
         } catch (ParseException e) {
             log.info("Failed to parse hearing date when creating new referral");
             return defaultValue;

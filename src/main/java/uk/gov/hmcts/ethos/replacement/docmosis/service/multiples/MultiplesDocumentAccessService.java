@@ -40,7 +40,6 @@ public final class MultiplesDocumentAccessService {
 
     public void setMultipleDocumentsToCorrectTab(MultipleData multipleData) {
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
-        String documentAccess = multipleData.getDocumentAccess();
 
         List<DocumentTypeItem> selectedDocs = docs.stream()
                 .filter(doc -> multipleData.getDocumentSelect().getValue().stream()
@@ -58,6 +57,8 @@ public final class MultiplesDocumentAccessService {
         if (multipleData.getDocumentCollection() == null) {
             multipleData.setDocumentCollection(new ArrayList<>());
         }
+
+        String documentAccess = multipleData.getDocumentAccess();
 
         if (documentAccess != null) {
             switch (documentAccess) {

@@ -67,7 +67,8 @@ public final class MultiplesDocumentAccessService {
         }
     }
 
-    private void handleDocumentCollection(List<DocumentTypeItem> selectedDocs, List<DocumentTypeItem> documentCollection) {
+    private void handleDocumentCollection(List<DocumentTypeItem> selectedDocs,
+                                          List<DocumentTypeItem> documentCollection) {
         if (CollectionUtils.isEmpty(documentCollection)) {
             documentCollection.addAll(selectedDocs);
         } else {

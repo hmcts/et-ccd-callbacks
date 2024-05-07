@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -46,6 +47,18 @@ public final class MultiplesDocumentAccessService {
                         .anyMatch(code -> code.getCode().equals(doc.getId())))
                 .toList();
 
+        if (multipleData.getClaimantDocumentCollection() == null){
+            multipleData.setClaimantDocumentCollection(new ArrayList<>());
+        }
+
+        if (multipleData.getLegalrepDocumentCollection() == null){
+            multipleData.setLegalrepDocumentCollection(new ArrayList<>());
+        }
+
+        if (multipleData.getDocumentCollection() == null){
+            multipleData.setDocumentCollection(new ArrayList<>());
+        }
+
         if (documentAccess != null) {
             switch (documentAccess) {
                 case "Citizens":
@@ -60,6 +73,8 @@ public final class MultiplesDocumentAccessService {
                     break;
                 default:
                     addSelectedDocsToCollection(selectedDocs, multipleData.getDocumentCollection());
+                    multipleData.getClaimantDocumentCollection().removeAll(selectedDocs);
+                    multipleData.getLegalrepDocumentCollection().removeAll(selectedDocs);
                     break;
             }
         }

@@ -29,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.SendNotificationUtil;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -49,12 +50,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -110,67 +109,25 @@ class PseRespondToTribunalServiceTest {
 
     @Test
     void populateSelectDropdown_checkSendNotificationNotify_returnList() {
-        caseData.setSendNotificationCollection(List.of(
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("1")
-                    .sendNotificationTitle("View notice of hearing")
-                    .sendNotificationNotify(BOTH_PARTIES)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("2")
-                    .sendNotificationTitle("Submit hearing agenda")
-                    .sendNotificationNotify(CLAIMANT_ONLY)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("3")
-                    .sendNotificationTitle("Send Notification Title")
-                    .sendNotificationNotify(RESPONDENT_ONLY)
-                    .build())
-                .build()
+        caseData.setSendNotificationCollection(List.of(SendNotificationUtil.sendNotificationNotifyBothParties(),
+                SendNotificationUtil.sendNotificationNotifyClaimant(),
+                SendNotificationUtil.sendNotificationNotifyRespondent()
         ));
 
         DynamicFixedListType expected = DynamicFixedListType.from(List.of(
                 DynamicValueType.create("1", "1 View notice of hearing"),
                 DynamicValueType.create("3", "3 Send Notification Title")
-            ));
+        ));
 
         assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
-            is(expected));
+                is(expected));
     }
 
     @Test
     void populateSelectDropdown_checkRespondCollection_returnList() {
         caseData.setSendNotificationCollection(List.of(
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("1")
-                    .sendNotificationTitle("View notice of hearing")
-                    .sendNotificationNotify(BOTH_PARTIES)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("2")
-                    .sendNotificationTitle("Submit hearing agenda")
-                    .sendNotificationNotify(BOTH_PARTIES)
-                    .respondCollection(List.of(PseResponseTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(PseResponseType.builder()
-                            .from(CLAIMANT_TITLE)
-                            .build())
-                        .build()))
-                    .build())
-                .build(),
+            SendNotificationUtil.sendNotificationNotifyBothParties(),
+            SendNotificationUtil.sendNotificationNotifyBothPartiesWithResponse(),
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(SendNotificationType.builder()

@@ -143,9 +143,8 @@ public class SendNotificationService {
     }
 
     private static void setStatusForCitizenHub(CaseData caseData, SendNotificationType sendNotificationType) {
-        if (sendNotificationType.getSendNotificationSubject().contains(CASE_MANAGEMENT_ORDERS_REQUESTS)
-                && caseData.getSendNotificationResponseTribunal().equals(SEND_NOTIFICATION_RESPONSE_REQUIRED)
-                && !caseData.getSendNotificationSelectParties().equals(RESPONDENT_ONLY)) {
+        if (SEND_NOTIFICATION_RESPONSE_REQUIRED.equals(caseData.getSendNotificationResponseTribunal())
+                && !RESPONDENT_ONLY.equals(caseData.getSendNotificationSelectParties())) {
             sendNotificationType.setNotificationState(NOT_STARTED_YET);
         } else {
             sendNotificationType.setNotificationState(NOT_VIEWED_YET);
@@ -208,8 +207,6 @@ public class SendNotificationService {
      */
     public void sendNotifyEmails(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
-        String caseId = caseDetails.getCaseId();
 
         boolean ecc = featureToggleService.isEccEnabled();
 
@@ -219,6 +216,8 @@ public class SendNotificationService {
             return;
         }
 
+        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        String caseId = caseDetails.getCaseId();
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
             emailService.sendEmail(claimantSendNotificationTemplateId, claimantEmailAddress,
                     buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));

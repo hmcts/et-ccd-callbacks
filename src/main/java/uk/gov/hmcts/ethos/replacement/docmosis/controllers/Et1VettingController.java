@@ -33,6 +33,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 @RestController
@@ -173,7 +174,7 @@ public class Et1VettingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
-        caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+        caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

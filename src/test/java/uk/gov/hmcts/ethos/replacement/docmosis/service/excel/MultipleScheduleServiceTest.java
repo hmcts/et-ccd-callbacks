@@ -14,8 +14,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +44,7 @@ class MultipleScheduleServiceTest {
     private TreeMap<String, Object> multipleObjectsFlags;
     private TreeMap<String, Object> multipleObjectsSubMultiple;
     private MultipleDetails multipleDetails;
-    private HashSet<SchedulePayloadEvent> schedulePayloadEvents;
+    private Set<SchedulePayloadEvent> schedulePayloadEvents;
     private String userToken;
 
     @BeforeEach

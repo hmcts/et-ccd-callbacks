@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 /**
  * ET1 Vetting Helper provides methods to assist with the ET1 vetting event.
@@ -149,7 +150,7 @@ public final class Et1VettingHelper {
                         defaultIfEmpty(caseData.getEt1VettingAdditionalInformationTextArea(), null))
                 .et1DateCompleted(
                         defaultIfEmpty(caseData.getEt1DateCompleted(),
-                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
+                                LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT))))
 
                 .et1VettingCompletedBy(defaultIfEmpty(caseData.getEt1VettingCompletedBy(), null))
                 .build();

@@ -37,6 +37,7 @@ public final class MultiplesDocumentAccessService {
         multipleData.setDocumentSelect(dynamicMultiSelectList);
     }
 
+
     public void setMultipleDocumentsToCorrectTab(MultipleData multipleData) {
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
         String documentAccess = multipleData.getDocumentAccess();
@@ -49,33 +50,26 @@ public final class MultiplesDocumentAccessService {
         if (documentAccess != null) {
             switch (documentAccess) {
                 case "Citizens":
-                    handleDocumentCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
+                    addSelectedDocsToCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
                     break;
                 case "Legal rep/respondents":
-                    handleDocumentCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
+                    addSelectedDocsToCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
                     break;
                 case "Both Citizens and Legal rep/respondents":
-                    handleDocumentCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
-                    handleDocumentCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
+                    addSelectedDocsToCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
+                    addSelectedDocsToCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
                     break;
                 default:
-                    handleDocumentCollection(selectedDocs, multipleData.getDocumentCollection());
-                    multipleData.getClaimantDocumentCollection().removeAll(selectedDocs);
-                    multipleData.getLegalrepDocumentCollection().removeAll(selectedDocs);
+                    addSelectedDocsToCollection(selectedDocs, multipleData.getDocumentCollection());
                     break;
             }
         }
     }
 
-    private void handleDocumentCollection(List<DocumentTypeItem> selectedDocs,
-                                          List<DocumentTypeItem> documentCollection) {
-        if (CollectionUtils.isEmpty(documentCollection)) {
-            documentCollection.addAll(selectedDocs);
-        } else {
-            for (DocumentTypeItem selectedDoc : selectedDocs) {
-                if (documentCollection.stream().noneMatch(doc -> doc.getId().equals(selectedDoc.getId()))) {
-                    documentCollection.add(selectedDoc);
-                }
+    private void addSelectedDocsToCollection(List<DocumentTypeItem> selectedDocs, List<DocumentTypeItem> documentCollection) {
+        for (DocumentTypeItem selectedDoc : selectedDocs) {
+            if (!documentCollection.stream().anyMatch(doc -> doc.getId().equals(selectedDoc.getId()))) {
+                documentCollection.add(selectedDoc);
             }
         }
     }

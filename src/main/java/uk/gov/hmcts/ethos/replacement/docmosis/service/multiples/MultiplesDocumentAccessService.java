@@ -38,11 +38,6 @@ public final class MultiplesDocumentAccessService {
     }
 
     public void setMultipleDocumentsToCorrectTab(MultipleData multipleData) {
-        if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
-            log.warn("Empty document collection");
-            return;
-        }
-
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
         String documentAccess = multipleData.getDocumentAccess();
 
@@ -54,18 +49,32 @@ public final class MultiplesDocumentAccessService {
         if (documentAccess != null) {
             switch (documentAccess) {
                 case "Citizens":
-                    multipleData.setClaimantDocumentCollection(selectedDocs);
+                    handleDocumentCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
                     break;
                 case "Legal rep/respondents":
-                    multipleData.setLegalrepDocumentCollection(selectedDocs);
+                    handleDocumentCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
                     break;
                 case "Both Citizens and Legal rep/respondents":
-                    multipleData.setClaimantDocumentCollection(selectedDocs);
-                    multipleData.setLegalrepDocumentCollection(selectedDocs);
+                    handleDocumentCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
+                    handleDocumentCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
                     break;
                 default:
-                    multipleData.setDocumentCollection(selectedDocs);
+                    handleDocumentCollection(selectedDocs, multipleData.getDocumentCollection());
+                    multipleData.getClaimantDocumentCollection().removeAll(selectedDocs);
+                    multipleData.getLegalrepDocumentCollection().removeAll(selectedDocs);
                     break;
+            }
+        }
+    }
+
+    private void handleDocumentCollection(List<DocumentTypeItem> selectedDocs, List<DocumentTypeItem> documentCollection) {
+        if (CollectionUtils.isEmpty(documentCollection)) {
+            documentCollection.addAll(selectedDocs);
+        } else {
+            for (DocumentTypeItem selectedDoc : selectedDocs) {
+                if (documentCollection.stream().noneMatch(doc -> doc.getId().equals(selectedDoc.getId()))) {
+                    documentCollection.add(selectedDoc);
+                }
             }
         }
     }

@@ -37,7 +37,6 @@ public final class MultiplesDocumentAccessService {
         multipleData.setDocumentSelect(dynamicMultiSelectList);
     }
 
-
     public void setMultipleDocumentsToCorrectTab(MultipleData multipleData) {
         List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
         String documentAccess = multipleData.getDocumentAccess();

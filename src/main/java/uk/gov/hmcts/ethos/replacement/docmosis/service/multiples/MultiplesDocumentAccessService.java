@@ -47,15 +47,15 @@ public final class MultiplesDocumentAccessService {
                         .anyMatch(code -> code.getCode().equals(doc.getId())))
                 .toList();
 
-        if (multipleData.getClaimantDocumentCollection() == null){
+        if (multipleData.getClaimantDocumentCollection() == null) {
             multipleData.setClaimantDocumentCollection(new ArrayList<>());
         }
 
-        if (multipleData.getLegalrepDocumentCollection() == null){
+        if (multipleData.getLegalrepDocumentCollection() == null) {
             multipleData.setLegalrepDocumentCollection(new ArrayList<>());
         }
 
-        if (multipleData.getDocumentCollection() == null){
+        if (multipleData.getDocumentCollection() == null) {
             multipleData.setDocumentCollection(new ArrayList<>());
         }
 

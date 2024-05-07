@@ -68,7 +68,10 @@ public final class MultiplesDocumentAccessService {
     private void addSelectedDocsToCollection(List<DocumentTypeItem> selectedDocs,
                                              List<DocumentTypeItem> documentCollection) {
         for (DocumentTypeItem selectedDoc : selectedDocs) {
-            if (!documentCollection.stream().anyMatch(doc -> doc.getId().equals(selectedDoc.getId()))) {
+            boolean docAlreadyExists = documentCollection.stream()
+                    .anyMatch(doc -> doc.getId().equals(selectedDoc.getId()));
+
+            if (!docAlreadyExists) {
                 documentCollection.add(selectedDoc);
             }
         }

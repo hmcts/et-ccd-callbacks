@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleSche
 
 @ExtendWith(SpringExtension.class)
 class NotificationsExcelReportServiceTest {
-    public static final String BINARY = "http://dm-store/documents/64668823-d355-4663-8d38-1ce3c61108df/binary";
+    public static final String DOC_URL = "http://dm-store/documents/64668823-d355-4663-8d38-1ce3c61108df";
     @MockBean
     private ExcelReadingService excelReadingService;
     @MockBean
@@ -76,7 +76,7 @@ class NotificationsExcelReportServiceTest {
                         eq("notifications_extract.xlsx"),
                         eq(APPLICATION_EXCEL_VALUE),
                         eq(ENGLANDWALES_BULK_CASE_TYPE_ID)))
-                .thenReturn(URI.create(BINARY));
+                .thenReturn(URI.create(DOC_URL));
 
     }
 
@@ -90,7 +90,7 @@ class NotificationsExcelReportServiceTest {
         when(excelReadingService
                 .readExcel(
                         userToken,
-                        BINARY,
+                        DOC_URL,
                         errors,
                         multipleDetails.getCaseData(),
                         FilterExcelType.ALL))
@@ -99,7 +99,8 @@ class NotificationsExcelReportServiceTest {
         notificationsExcelReportService.generateReport(multipleDetails, userToken, errors);
 
         NotificationsExtract notificationsExtract = multipleDetails.getCaseData().getNotificationsExtract();
-        assertEquals(BINARY, notificationsExtract.getNotificationsExtractFile().getDocumentBinaryUrl());
+        assertEquals(DOC_URL, notificationsExtract.getNotificationsExtractFile().getDocumentUrl());
+        assertEquals(DOC_URL + "/binary", notificationsExtract.getNotificationsExtractFile().getDocumentBinaryUrl());
         assertNotNull(notificationsExtract.getExtractDateTime());
     }
 

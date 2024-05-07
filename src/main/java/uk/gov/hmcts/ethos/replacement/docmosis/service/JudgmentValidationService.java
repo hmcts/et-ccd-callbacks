@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
 @Service("judgmentValidationService")
@@ -29,7 +30,7 @@ public class JudgmentValidationService {
                 && !NO_HEARINGS.equals(judgementType.getDynamicJudgementHearing().getValue().getLabel())) {
             String hearingDate = judgementType.getDynamicJudgementHearing().getValue().getLabel();
             hearingDate = hearingDate.substring(hearingDate.length() - 11);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(MONTH_STRING_DATE_FORMAT);
             Date date = simpleDateFormat.parse(hearingDate);
             simpleDateFormat.applyPattern("yyyy-MM-dd");
             judgementType.setJudgmentHearingDate(simpleDateFormat.format(date));

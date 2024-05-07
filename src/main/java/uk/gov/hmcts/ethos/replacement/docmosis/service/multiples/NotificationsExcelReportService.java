@@ -47,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleSche
 public class NotificationsExcelReportService {
     public static final String DATE_FORMAT = "dd-MMM-yyyy HH:mm:ss";
     private static final String FILE_NAME = "notifications_extract.xlsx";
+    private static final String BINARY = "/binary";
     private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, RESPONSE));
     private final ExcelReadingService excelReadingService;
     private final NotificationScheduleService notificationScheduleService;
@@ -117,7 +118,7 @@ public class NotificationsExcelReportService {
         UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder()
                 .documentFilename(FILE_NAME)
                 .documentUrl(String.valueOf(documentSelfPath))
-                .documentBinaryUrl(String.valueOf(documentSelfPath))
+                .documentBinaryUrl(documentSelfPath + BINARY)
                 .build();
 
         if (multipleData.getNotificationsExtract() == null) {

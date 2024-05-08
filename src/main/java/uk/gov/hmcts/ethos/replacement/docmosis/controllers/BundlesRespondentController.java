@@ -8,14 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -252,6 +250,7 @@ public class BundlesRespondentController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         try {
             bundlesRespondentService.removeHearingBundles(caseData);
+            bundlesRespondentService.clearInputData(caseData);
             return getCallbackRespEntityNoErrors(caseData);
         } catch (Exception e) {
             log.error("Error removing hearing bundle", e);
@@ -259,11 +258,43 @@ public class BundlesRespondentController {
         }
     }
 
+    /**
+     * Populates the hearing list on page 3 and validates the length of text input.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/midPopulateRemoveHearingBundles", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the hearing list on page 3.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midPopulateRemoveHearingBundles(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+//        throwIfBundlesFlagDisabled();
+//        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+//            log.error(INVALID_TOKEN, userToken);
+//            return ResponseEntity.status(FORBIDDEN.value()).build();
+//        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        bundlesRespondentService.populateSelectRemoveHearingBundle(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
     private void throwIfBundlesFlagDisabled() {
         boolean bundlesToggle = featureToggleService.isBundlesEnabled();
-        log.info(BUNDLES_LOG, bundlesToggle);
-        if (!bundlesToggle) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
-        }
+//        log.info(BUNDLES_LOG, bundlesToggle);
+//        if (!bundlesToggle) {
+//            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
+//        }
     }
 }

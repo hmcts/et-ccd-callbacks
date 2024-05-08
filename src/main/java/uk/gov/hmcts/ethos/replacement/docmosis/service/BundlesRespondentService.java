@@ -52,6 +52,9 @@ public class BundlesRespondentService {
         caseData.setBundlesRespondentUploadFile(null);
         caseData.setBundlesRespondentWhatDocuments(null);
         caseData.setBundlesRespondentWhoseDocuments(null);
+        caseData.setHearingBundleRemoveReason(null);
+        caseData.setRemoveHearingBundleSelect(null);
+        caseData.setRemoveBundleDropDownSelectedParty(null);
     }
 
     /**
@@ -159,21 +162,74 @@ public class BundlesRespondentService {
      * Removes a hearing bundle from the collection.
      */
     public void removeHearingBundles(CaseData caseData) {
+        String selectedParty = caseData.getRemoveBundleDropDownSelectedParty();
+
+        if ("selectClaimantHearingBundles".equals(selectedParty)) {
+            removeHearingBundles(caseData, caseData.getBundlesClaimantCollection());
+        } else if ("selectRespondentHearingBundles".equals(selectedParty)) {
+            removeHearingBundles(caseData, caseData.getBundlesRespondentCollection());
+        }
+    }
+
+    private void removeHearingBundles(CaseData caseData,
+                                      List<GenericTypeItem<HearingBundleType>> bundlesCollection) {
+
         List<RemovedHearingBundleItem> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();
-
-        boolean itemRemoved = false;
-        for (RemovedHearingBundleItem removedHearingBundleItem : removedHearingBundlesCollection) {
-            boolean respondentBundleRemoved = caseData.getBundlesRespondentCollection()
-                    .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
-            boolean claimantBundleRemoved = caseData.getBundlesClaimantCollection()
-                    .removeIf(bundle -> bundle.getId().equals(removedHearingBundleItem.getBundleId()));
-            if (respondentBundleRemoved || claimantBundleRemoved) {
-                itemRemoved = true;
-            }
+        if (removedHearingBundlesCollection == null) {
+            removedHearingBundlesCollection = new ArrayList<>();
+            caseData.setRemovedHearingBundlesCollection(removedHearingBundlesCollection);
         }
 
-        if (!itemRemoved) {
-            throw new NotFoundException("Bundle not found in the collection");
+        if (CollectionUtils.isEmpty(bundlesCollection)) {
+            return;
         }
+
+        String selectedBundle = caseData.getRemoveHearingBundleSelect().getSelectedCode();
+
+        GenericTypeItem<HearingBundleType> bundleToRemove = caseData.getBundlesRespondentCollection().stream()
+                .filter(bundle -> bundle.getId().equals(selectedBundle))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Bundle not found in the collection"));
+
+        caseData.getBundlesRespondentCollection().removeIf(bundle -> bundle.getId().equals(selectedBundle));
+
+        removedHearingBundlesCollection.add(
+            RemovedHearingBundleItem.builder()
+                .bundleId(bundleToRemove.getId())
+                .bundleName(bundleToRemove.getValue().getFormattedSelectedHearing())
+                .removedDateTime(DateTime.now().toString())
+                .removedBy("Respondent")
+                .removedReason(caseData.getHearingBundleRemoveReason())
+                .build()
+        );
+    }
+
+    public void populateSelectRemoveHearingBundle(CaseData caseData) {
+        String selectedParty = caseData.getRemoveBundleDropDownSelectedParty();
+        if ("selectClaimantHearingBundles".equals(selectedParty)) {
+            populateSelectRemoveHearingBundle(caseData.getBundlesClaimantCollection(), caseData);
+        } else if ("selectRespondentHearingBundles".equals(selectedParty)) {
+            populateSelectRemoveHearingBundle(caseData.getBundlesRespondentCollection(), caseData);
+        }
+    }
+
+    private void populateSelectRemoveHearingBundle(List<GenericTypeItem<HearingBundleType>> bundlesCollection,
+                                                   CaseData caseData) {
+        if (CollectionUtils.isEmpty(bundlesCollection)) {
+            return;
+        }
+        DynamicFixedListType listType = DynamicFixedListType.from(bundlesCollection.stream()
+                .map(this::createHearingBundlesValueType)
+                .toList()
+        );
+        caseData.setRemoveHearingBundleSelect(listType);
+    }
+
+    private DynamicValueType createHearingBundlesValueType(GenericTypeItem<HearingBundleType> hearingBundleType) {
+        String label = String.format("%s - %s",
+                hearingBundleType.getValue().getFormattedSelectedHearing(),
+                hearingBundleType.getValue().getUploadFile().getDocumentFilename()
+        );
+        return DynamicValueType.create(hearingBundleType.getId(), label);
     }
 }

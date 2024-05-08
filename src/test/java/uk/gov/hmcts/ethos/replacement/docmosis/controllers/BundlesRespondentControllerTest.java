@@ -260,9 +260,10 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
         doThrow(new NotFoundException("Bundle not found in the collection"))
                 .when(bundlesRespondentService).removeHearingBundles(any());
         mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
-                        .content("garbage content")
+                        .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.errors", notNullValue()));
     }
 }

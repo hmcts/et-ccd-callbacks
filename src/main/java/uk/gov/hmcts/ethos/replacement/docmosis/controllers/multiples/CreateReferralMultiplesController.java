@@ -36,6 +36,7 @@ import java.util.List;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getLast;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
 
@@ -150,17 +151,18 @@ public class CreateReferralMultiplesController {
         log.info("ABOUT TO SUBMIT CREATE MULTIPLES REFERRAL ---> "
                 + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
-        MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
+        MultipleDetails details = ccdRequest.getCaseDetails();
+        MultipleData caseData = details.getCaseData();
         if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
             caseData.setReferralSubject("Party not responded/complied");
         }
 
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
+        CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(details);
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
 
-        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+        String caseTypeId = details.getCaseTypeId();
         DocumentInfo documentInfo = referralService.generateDocument(caseData, leadCase, userToken, caseTypeId);
         String nextHearingDate = getNearestHearingToReferral(leadCase, "None");
 
@@ -173,10 +175,13 @@ public class CreateReferralMultiplesController {
         clearReferralDataFromCaseData(caseData);
 
         MultipleData multipleData = new ObjectMapper().convertValue(
-                ccdRequest.getCaseDetails().getCaseData(), MultipleData.class);
+            details.getCaseData(), MultipleData.class);
         multipleData.setReferralCollection(caseData.getReferralCollection());
-        return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
 
+        String referralNumber = getLast(caseData.getReferralCollection()).getValue().getReferralNumber();
+        referralService.sendEmail(details, leadCase, referralNumber, true, userDetails.getName());
+
+        return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
     }
 
     /**

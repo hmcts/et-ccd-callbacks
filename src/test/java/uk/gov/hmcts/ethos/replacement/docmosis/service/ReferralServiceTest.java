@@ -10,9 +10,13 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -20,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,12 +39,14 @@ class ReferralServiceTest {
     private TornadoService tornadoService;
     @MockBean
     private CaseLookupService caseLookupService;
+    @MockBean
+    private EmailService emailService;
 
     private DocumentInfo documentInfo;
 
     @BeforeEach
     void setUp() {
-        referralService = new ReferralService(tornadoService, caseLookupService);
+        referralService = new ReferralService(tornadoService, caseLookupService, emailService);
 
         documentInfo = DocumentInfo.builder()
             .description("Referral Summary.pdf")
@@ -110,5 +117,47 @@ class ReferralServiceTest {
 
         verify(tornadoService).generateDocument(any(), doc.capture(), any(), any());
         assertEquals("Referral Summary.pdf", doc.getValue().getOutputName());
+    }
+
+    @Test
+    void sendEmail_NoEmail() {
+        MultipleDetails multipleDetails = new MultipleDetails();
+        MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
+        multipleDetails.setCaseData(multipleData);
+
+        referralService.sendEmail(multipleDetails, new CaseData(), "", true, ENGLANDWALES_BULK_CASE_TYPE_ID);
+    }
+
+    @Test
+    void sendEmail_withEmail() {
+        MultipleDetails multipleDetails = new MultipleDetails();
+        MultipleData multipleData = MultipleData.builder().leadCaseId(null).build();
+        multipleDetails.setCaseData(multipleData);
+        multipleData.setReferentEmail("test@email.com");
+        multipleData.setReferralSubject("ET1");
+        multipleData.setMultipleReference("123");
+
+        CaseData leadCase = CaseDataBuilder.builder().withRespondent("respondent", "", "", false).build();
+        leadCase.setClaimant("claimant");
+
+        when(emailService.getExuiCaseLink(any())).thenReturn("exui");
+
+        referralService.sendEmail(multipleDetails, leadCase, "1", true, "Test Person");
+
+        Map<String, String> expected = new ConcurrentHashMap<>();
+
+        expected.put("date", "Not set");
+        expected.put("respondents", "respondent");
+        expected.put("linkToExUI", "exui");
+        expected.put("emailFlag", "");
+        expected.put("refNumber", "1");
+        expected.put("caseNumber", "123");
+        expected.put("subject", "ET1");
+        expected.put("body", "You have a new referral on this case.");
+        expected.put("claimant", "claimant");
+        expected.put("replyReferral", "Referred by");
+        expected.put("username", "Test Person");
+
+        verify(emailService).sendEmail(any(), eq(multipleData.getReferentEmail()), eq(expected));
     }
 }

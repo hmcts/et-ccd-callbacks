@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

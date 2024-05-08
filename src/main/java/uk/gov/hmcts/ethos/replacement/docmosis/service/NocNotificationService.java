@@ -47,7 +47,8 @@ public class NocNotificationService {
     @Value("${template.nocNotification.tribunal}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew,
+    public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
+                                               CaseDetails caseDetailsNew,
                                                ChangeOrganisationRequest changeRequest) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
@@ -114,14 +115,16 @@ public class NocNotificationService {
             return;
         }
 
-        String oldOrgAdminEmail = resBody.getSuperUser().getEmail();
-        if (isNullOrEmpty(oldOrgAdminEmail)) {
+        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
             log.warn("Previous Org {} is missing org admin email", orgId);
             return;
         }
 
         Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
-        emailService.sendEmail(previousRespondentSolicitorTemplateId, oldOrgAdminEmail, personalisation);
+        emailService.sendEmail(
+                previousRespondentSolicitorTemplateId,
+                resBody.getSuperUser().getEmail(),
+                personalisation);
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {

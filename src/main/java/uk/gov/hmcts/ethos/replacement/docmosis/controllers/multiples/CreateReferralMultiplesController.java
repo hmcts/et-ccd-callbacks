@@ -172,16 +172,11 @@ public class CreateReferralMultiplesController {
                 this.documentManagementService.addDocumentToDocumentField(documentInfo),
                 nextHearingDate);
 
-        clearReferralDataFromCaseData(caseData);
-
-        MultipleData multipleData = new ObjectMapper().convertValue(
-            details.getCaseData(), MultipleData.class);
-        multipleData.setReferralCollection(caseData.getReferralCollection());
-
         String referralNumber = getLast(caseData.getReferralCollection()).getValue().getReferralNumber();
         referralService.sendEmail(details, leadCase, referralNumber, true, userDetails.getName());
+        clearReferralDataFromCaseData(caseData);
 
-        return ResponseEntity.ok(MultipleCallbackResponse.builder().data(multipleData).build());
+        return multipleResponse(caseData, null);
     }
 
     /**

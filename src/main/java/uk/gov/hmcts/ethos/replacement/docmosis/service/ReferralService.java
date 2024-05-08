@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -81,17 +82,13 @@ public class ReferralService {
 
     public void sendEmail(MultipleDetails details, CaseData leadCase, String refNumber, boolean isNew, String name) {
         MultipleData caseData = details.getCaseData();
-        if (StringUtils.isEmpty(caseData.getReferentEmail())) {
-            log.error("No email given");
+        String email = Optional.ofNullable(caseData.getReferentEmail()).orElse(caseData.getReplyToEmailAddress());
+        if (StringUtils.isEmpty(email)) {
             return;
         }
 
         String caseLink = emailService.getExuiCaseLink(details.getCaseId());
-        log.error("Sending email to " + caseData.getReferentEmail());
-        emailService.sendEmail(
-                referralTemplateId,
-                caseData.getReferentEmail(),
-                ReferralHelper.buildPersonalisation(caseData, leadCase, refNumber, isNew, name, caseLink)
-        );
+        var personalisation = ReferralHelper.buildPersonalisation(caseData, leadCase, refNumber, isNew, name, caseLink);
+        emailService.sendEmail(referralTemplateId, email, personalisation);
     }
 }

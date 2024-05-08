@@ -134,14 +134,17 @@ class CaseRetrievalForCaseWorkerServiceTest {
         Assert.assertEquals(0, result.size());
     }
 
-    @org.junit.Test(expected = Exception.class)
-    public void testTransferSourceCaseRetrievalESRequestThrowsException() throws IOException {
+    @Test
+    void testTransferSourceCaseRetrievalESRequestThrowsException() throws IOException {
         String currentCaseId = "123456";
         String authToken = "authToken";
         List<SubmitEvent> submitEvents = getSubmitEvent();
         when(ccdClient.retrieveTransferredCaseElasticSearch(any(), any(), any())).thenReturn(submitEvents);
-        List<SubmitEvent> result = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId,
-                authToken, null);
+
+        assertThrows(Exception.class, () ->
+                caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId,
+                        authToken, null)
+        );
     }
 
     private List<SubmitEvent> getSubmitEvent() {

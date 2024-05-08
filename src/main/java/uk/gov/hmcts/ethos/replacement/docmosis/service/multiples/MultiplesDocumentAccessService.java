@@ -73,7 +73,6 @@ public final class MultiplesDocumentAccessService {
                     addSelectedDocsToCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
                     break;
                 default:
-                    addSelectedDocsToCollection(selectedDocs, multipleData.getDocumentCollection());
                     multipleData.getClaimantDocumentCollection().removeAll(selectedDocs);
                     multipleData.getLegalrepDocumentCollection().removeAll(selectedDocs);
                     break;

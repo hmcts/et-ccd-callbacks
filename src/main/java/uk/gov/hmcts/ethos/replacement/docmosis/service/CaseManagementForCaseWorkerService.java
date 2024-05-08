@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.collect.Maps;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,8 +95,15 @@ public class CaseManagementForCaseWorkerService {
 
     public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
     public static final String CASE_MANAGEMENT_CODE = "Employment";
-
     public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
+
+    private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
+            "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
+            "Newcastle", "Scotland", "Wales", "Watford");
+
+    @Value("${ccd_gateway_base_url}")
+    @Getter
+    private String ccdGatewayBaseUrl;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -329,6 +337,34 @@ public class CaseManagementForCaseWorkerService {
             }
         }
         return dates;
+    }
+
+    public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails) {
+        // get a target case data using the source case data and
+        // elastic search query
+        List<SubmitEvent> submitEvent = transferSourceCaseRetrievalESRequest(caseDetails.getCaseId(), authToken);
+        if (submitEvent == null || submitEvent.isEmpty()) {
+            return;
+        }
+
+        String sourceCaseId = String.valueOf(submitEvent.get(0).getCaseId());
+        SubmitEvent fullSourceCase = caseRetrievalRequest(authToken, caseDetails.getCaseTypeId(),
+                "EMPLOYMENT", sourceCaseId);
+        if (fullSourceCase.getCaseData().getEthosCaseReference() != null) {
+            caseDetails.getCaseData().setTransferredCaseLink("<a target=\"_blank\" href=\""
+                    + String.format("%s/cases/case-details/%s", ccdGatewayBaseUrl, sourceCaseId) + "\">"
+                    + fullSourceCase.getCaseData().getEthosCaseReference() + "</a>");
+        }
+    }
+
+    private List<SubmitEvent> transferSourceCaseRetrievalESRequest(String currentCaseId, String authToken) {
+        return caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId, authToken,
+                caseTypeIdsToCheck);
+    }
+
+    private SubmitEvent caseRetrievalRequest(String authToken, String caseTypeId, String employment,
+                                             String sourceCaseId) {
+        return caseRetrievalForCaseWorkerService.caseRetrievalRequest(authToken, caseTypeId, employment, sourceCaseId);
     }
 
     public CaseData struckOutRespondents(CCDRequest ccdRequest) {

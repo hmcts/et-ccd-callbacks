@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.exceptions.CaseRetrievalException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -50,4 +52,20 @@ public class CaseRetrievalForCaseWorkerService {
         }
     }
 
+    public List<SubmitEvent> transferSourceCaseRetrievalESRequest(String currentCaseId, String authToken,
+                                                                  List<String> caseTypeIdsToCheck) {
+        try {
+            for (String targetOffice : caseTypeIdsToCheck) {
+                List<SubmitEvent> submitEvents = ccdClient.retrieveTransferredCaseElasticSearch(authToken,
+                        targetOffice, currentCaseId);
+                if (!submitEvents.isEmpty()) {
+                    return submitEvents;
+                }
+            }
+
+            return new ArrayList<>();
+        } catch (Exception ex) {
+            throw new CaseRetrievalException(MESSAGE + currentCaseId + ex.getMessage());
+        }
+    }
 }

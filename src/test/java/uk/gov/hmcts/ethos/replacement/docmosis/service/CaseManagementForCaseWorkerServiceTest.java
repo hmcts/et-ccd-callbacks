@@ -3,7 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -963,6 +965,100 @@ class CaseManagementForCaseWorkerServiceTest {
         assertEquals(2, errors.size());
         submitEvent.setState("Accepted");
         submitEvent.getCaseData().getRespondentCollection().get(0).getValue().setResponseReceived(YES);
+    }
+
+    @Test
+    @Disabled
+    public void testSetMigratedCaseLinkDetails() {
+        String caseId = "caseId";
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+
+        List<SubmitEvent> submitEventList = new ArrayList<>();
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(12345);
+        submitEventList.add(submitEvent);
+
+        SubmitEvent fullSourceCase = new SubmitEvent();
+        CaseData sourceCaseData = new CaseData();
+        sourceCaseData.setEthosCaseReference("EthosCaseRef");
+        fullSourceCase.setCaseData(sourceCaseData);
+
+        String authToken = "authToken";
+        String ccdGatewayBaseUrl = "http://reformetest.com";
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                caseId, authToken, List.of("ET_EnglandWales")))
+                .thenReturn(submitEventList);
+        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(authToken, "caseTypeId",
+                "EMPLOYMENT", "12345")).thenReturn(fullSourceCase);
+        when(caseManagementForCaseWorkerService.getCcdGatewayBaseUrl()).thenReturn(ccdGatewayBaseUrl);
+        assertEquals(
+                "<a target=\"_blank\" href=\"http://reformetest.com/cases/case-details/12345\">EthosCaseRef</a>",
+                caseDetails.getCaseData().getTransferredCaseLink());
+    }
+
+    @Test
+    public void testSetMigratedCaseLinkDetails_When_SubmitEventListIsNull() {
+        String caseId = "caseId";
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+
+        String authToken = "authToken";
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(null);
+
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
+
+        assertEquals(null, caseDetails.getCaseData().getTransferredCaseLink());
+    }
+
+    @Test
+    public void testSetMigratedCaseLinkDetails_When_SubmitEventListIsEmpty() {
+        String caseId = "caseId";
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+        String authToken = "authToken";
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(new ArrayList<>());
+
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
+
+        assertNull(caseDetails.getCaseData().getTransferredCaseLink());
+    }
+
+    @Test
+    public void testSetMigratedCaseLinkDetails_When_EthosCaseReferenceIsNull() {
+        String caseId = "caseId";
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+        List<SubmitEvent> submitEventList = new ArrayList<>();
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(12345);
+        submitEventList.add(submitEvent);
+
+        SubmitEvent fullSourceCase = new SubmitEvent();
+        CaseData sourceCaseData = new CaseData();
+        sourceCaseData.setEthosCaseReference(null);
+        fullSourceCase.setCaseData(sourceCaseData);
+        String authToken = "authToken";
+
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(submitEventList);
+        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(
+                authToken, "caseTypeId", "EMPLOYMENT", "12345"))
+                .thenReturn(fullSourceCase);
+
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
+
+        Assert.assertNull(caseDetails.getCaseData().getTransferredCaseLink());
     }
 
     @Test

@@ -156,15 +156,12 @@ class NocNotificationServiceTest {
     }
 
     @Test
-    void sendNotificationsShouldSendFiveNotifications_NoSuperUser() {
+    void sendNotificationsShouldSendFiveNotifications_NoSuperUserEmail() {
         RetrieveOrgByIdResponse retrieveOrgByIdResponse1 = RetrieveOrgByIdResponse.builder().build();
         when(organisationClient.getOrganisationById(anyString(), anyString(), eq(OLD_ORG_ID)))
                 .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse1));
 
-        RetrieveOrgByIdResponse.SuperUser newSuperUser = RetrieveOrgByIdResponse.SuperUser.builder()
-                .email(NEW_ORG_ADMIN_EMAIL).build();
-        RetrieveOrgByIdResponse retrieveOrgByIdResponse2 = RetrieveOrgByIdResponse.builder()
-                .superUser(newSuperUser).build();
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse2 = RetrieveOrgByIdResponse.builder().build();
         when(organisationClient.getOrganisationById(anyString(), anyString(), eq(NEW_ORG_ID)))
                 .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse2));
 
@@ -180,7 +177,7 @@ class NocNotificationServiceTest {
         // Claimant
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
-        verify(emailService, times(1)).sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
+        verify(emailService, never()).sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
         //Old Representative
         verify(emailService, never()).sendEmail(any(), eq(OLD_ORG_ADMIN_EMAIL), any());
         // Tribunal

@@ -141,15 +141,14 @@ public class NocNotificationService {
             return;
         }
 
-        String newOrgAdminEmail = resBody.getSuperUser().getEmail();
-        if (isNullOrEmpty(newOrgAdminEmail)) {
+        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
             log.warn("New Org {} is missing org admin email", orgId);
             return;
         }
 
         String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
         Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
-        emailService.sendEmail(newRespondentSolicitorTemplateId, newOrgAdminEmail, personalisation);
+        emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);
     }
 
     private ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(String orgId) {

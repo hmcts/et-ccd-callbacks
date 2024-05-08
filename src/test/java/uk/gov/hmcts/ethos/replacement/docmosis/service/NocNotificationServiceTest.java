@@ -157,8 +157,6 @@ class NocNotificationServiceTest {
 
     @Test
     void sendNotificationsShouldSendFiveNotifications_NoSuperUser() {
-        RetrieveOrgByIdResponse.SuperUser oldSuperUser = RetrieveOrgByIdResponse.SuperUser.builder()
-                .email(OLD_ORG_ADMIN_EMAIL).build();
         RetrieveOrgByIdResponse retrieveOrgByIdResponse1 = RetrieveOrgByIdResponse.builder().build();
         when(organisationClient.getOrganisationById(anyString(), anyString(), eq(OLD_ORG_ID)))
                 .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse1));

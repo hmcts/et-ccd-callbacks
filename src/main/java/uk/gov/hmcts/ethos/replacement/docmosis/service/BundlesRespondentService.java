@@ -174,7 +174,7 @@ public class BundlesRespondentService {
     private void removeHearingBundles(CaseData caseData,
                                       List<GenericTypeItem<HearingBundleType>> bundlesCollection) {
 
-        List<RemovedHearingBundleItem> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();
+        List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();
         if (removedHearingBundlesCollection == null) {
             removedHearingBundlesCollection = new ArrayList<>();
             caseData.setRemovedHearingBundlesCollection(removedHearingBundlesCollection);
@@ -186,21 +186,20 @@ public class BundlesRespondentService {
 
         String selectedBundle = caseData.getRemoveHearingBundleSelect().getSelectedCode();
 
-        GenericTypeItem<HearingBundleType> bundleToRemove = caseData.getBundlesRespondentCollection().stream()
+        GenericTypeItem<HearingBundleType> bundleToRemove = bundlesCollection.stream()
                 .filter(bundle -> bundle.getId().equals(selectedBundle))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Bundle not found in the collection"));
 
-        caseData.getBundlesRespondentCollection().removeIf(bundle -> bundle.getId().equals(selectedBundle));
+        bundlesCollection.removeIf(bundle -> bundle.getId().equals(selectedBundle));
 
         removedHearingBundlesCollection.add(
-            RemovedHearingBundleItem.builder()
-                .bundleId(bundleToRemove.getId())
-                .bundleName(bundleToRemove.getValue().getFormattedSelectedHearing())
+            GenericTypeItem.from(RemovedHearingBundleItem.builder()
+                .bundleName(bundleToRemove.getValue().getUploadFile().getDocumentFilename())
                 .removedDateTime(DateTime.now().toString())
-                .removedBy("Respondent")
                 .removedReason(caseData.getHearingBundleRemoveReason())
                 .build()
+            )
         );
     }
 

@@ -10,7 +10,6 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RemovedHearingBundleItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -240,6 +239,34 @@ class BundlesRespondentServiceTest {
     }
 
     @Test
+    void populateSelectRemoveHearingBundle_respondentCollection() {
+        // Setup bundle data
+        List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
+        englandCaseData.setBundlesRespondentCollection(hearingBundleCollection);
+        englandCaseData.setBundlesClaimantCollection(new ArrayList<>());
+
+        String respondentsDocumentsOnly = "Respondent's documents only";
+        String witnessStatementsOnly = "Witness statements only";
+        String butReason = "ButReason";
+        String disagree = "Disagree";
+        UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
+        setupEnglandCaseData(NO, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
+
+        // Assert bundle added
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+        assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(1));
+
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectRespondentHearingBundles");
+        // Populate remove select removal bundle collection
+        bundlesRespondentService.populateSelectRemoveHearingBundle(englandCaseData);
+
+        // Assert remove bundle collection populated
+        assertThat(englandCaseData.getRemoveHearingBundleSelect().getListItems().size(), is(1));
+        assertThat(englandCaseData.getRemoveHearingBundleSelect().getListItems().get(0).getLabel(),
+                is("1 Hearing - Bodmin - 16 May 2069 - file.txt"));
+    }
+
+    @Test
     void removeHearingBundles_removeFromRespondentCollections() {
         // Setup bundle data
         List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
@@ -259,20 +286,26 @@ class BundlesRespondentServiceTest {
 
         // Setup remove bundle collection
         String bundleId = englandCaseData.getBundlesRespondentCollection().get(0).getId();
-        List<RemovedHearingBundleItem> removedHearingBundleCollection = new ArrayList<>();
-        RemovedHearingBundleItem removedHearingBundleItem = RemovedHearingBundleItem.builder()
-                .bundleId(bundleId)
-                .build();
-        removedHearingBundleCollection.add(removedHearingBundleItem);
-        englandCaseData.setRemovedHearingBundlesCollection(removedHearingBundleCollection);
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectRespondentHearingBundles");
+        DynamicValueType bundleItem = DynamicValueType.create(bundleId, "Bundle");
+        DynamicFixedListType bundleItemList =
+                DynamicFixedListType.from(List.of(bundleItem));
+        bundleItemList.setValue(bundleItem);
+        englandCaseData.setRemoveHearingBundleSelect(bundleItemList);
+        englandCaseData.setHearingBundleRemoveReason("Remove reason");
 
         // Remove bundle
+        int bundleSizeBefore = englandCaseData.getBundlesRespondentCollection().size();
+        int removedBundleSizeBefore = 0;
         bundlesRespondentService.removeHearingBundles(englandCaseData);
+        int bundleSizeAfter = englandCaseData.getBundlesRespondentCollection().size();
+        int removedBundleSizeAfter = englandCaseData.getRemovedHearingBundlesCollection().size();
 
         // Assert bundle removed
-        assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(0));
-        assertThat(englandCaseData.getRemovedHearingBundlesCollection().size(), is(1));
-        assertThat(englandCaseData.getRemovedHearingBundlesCollection().get(0).getBundleId(), is(bundleId));
+        assertThat(bundleSizeAfter, is(bundleSizeBefore - 1));
+        assertThat(removedBundleSizeAfter, is(removedBundleSizeBefore + 1));
+        assertThat(englandCaseData.getRemovedHearingBundlesCollection().get(0).getValue().getRemovedReason(),
+                is("Remove reason"));
     }
 
     private void setupEnglandCaseData(String agreedDocWith, String butReason, String disagree,

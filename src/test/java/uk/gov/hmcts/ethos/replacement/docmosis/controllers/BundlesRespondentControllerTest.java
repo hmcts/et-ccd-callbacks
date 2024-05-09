@@ -39,6 +39,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     private static final String MID_VALIDATE_UPLOAD_URL = "/bundlesRespondent/midValidateUpload";
     private static final String SUBMITTED_URL = "/bundlesRespondent/submitted";
     private static final String REMOVE_HEARING_BUNDLE_URL = "/bundlesRespondent/removeHearingBundle";
+    private static final String MID_POPULATE_REMOVE_HEARING_BUNDLES_URL =
+            "/bundlesRespondent/midPopulateRemoveHearingBundles";
 
     @MockBean
     private BundlesRespondentService bundlesRespondentService;
@@ -263,7 +265,39 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.errors", notNullValue()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors", notNullValue()));
+    }
+
+    @Test
+    void midPopulateRemoveHearingBundles_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_POPULATE_REMOVE_HEARING_BUNDLES_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void midPopulateRemoveHearingBundles_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_POPULATE_REMOVE_HEARING_BUNDLES_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void midPopulateRemoveHearingBundles_badRequest() throws Exception {
+        mockMvc.perform(post(MID_POPULATE_REMOVE_HEARING_BUNDLES_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

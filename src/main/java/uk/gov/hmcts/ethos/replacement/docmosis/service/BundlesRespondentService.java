@@ -174,7 +174,8 @@ public class BundlesRespondentService {
     private void removeHearingBundles(CaseData caseData,
                                       List<GenericTypeItem<HearingBundleType>> bundlesCollection) {
 
-        List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection = caseData.getRemovedHearingBundlesCollection();
+        List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection =
+                caseData.getRemovedHearingBundlesCollection();
         if (removedHearingBundlesCollection == null) {
             removedHearingBundlesCollection = new ArrayList<>();
             caseData.setRemovedHearingBundlesCollection(removedHearingBundlesCollection);

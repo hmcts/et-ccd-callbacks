@@ -267,6 +267,16 @@ class BundlesRespondentServiceTest {
     }
 
     @Test
+    void populateSelectRemoveHearingBundle_claimantCollectionEmpty() {
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectClaimantHearingBundles");
+        // Populate remove select removal bundle collection
+        bundlesRespondentService.populateSelectRemoveHearingBundle(englandCaseData);
+
+        // Assert remove bundle collection populated
+        assertNull(englandCaseData.getRemoveHearingBundleSelect());
+    }
+
+    @Test
     void removeHearingBundles_removeFromRespondentCollections() {
         // Setup bundle data
         List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
@@ -306,6 +316,18 @@ class BundlesRespondentServiceTest {
         assertThat(removedBundleSizeAfter, is(removedBundleSizeBefore + 1));
         assertThat(englandCaseData.getRemovedHearingBundlesCollection().get(0).getValue().getRemovedReason(),
                 is("Remove reason"));
+    }
+
+    @Test
+    void removeHearingBundles_removeFromClaimantBundlesWhenEmpty() {
+        // Setup remove bundle collection
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectClaimantHearingBundles");
+
+        // Remove bundle
+        bundlesRespondentService.removeHearingBundles(englandCaseData);
+
+        // Assert
+        assertTrue(englandCaseData.getRemovedHearingBundlesCollection().isEmpty());
     }
 
     private void setupEnglandCaseData(String agreedDocWith, String butReason, String disagree,

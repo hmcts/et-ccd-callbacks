@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.springframework.http.HttpEntity;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,10 +14,11 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
-import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.*;
+import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesReadingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -47,6 +49,7 @@ public class CcdCaseAssignment {
 
     private final String aacUrl;
     private final String applyNocAssignmentsApiPath;
+    private final UserIdamService userIdamService;
 
     public CcdCaseAssignment(RestTemplate restTemplate,
                              AuthTokenGenerator serviceAuthTokenGenerator,
@@ -55,6 +58,7 @@ public class CcdCaseAssignment {
                              CcdClient ccdClient,
                              NocCcdService nocCcdService,
                              MultipleCasesReadingService multipleCasesReadingService,
+                             UserIdamService userIdamService,
                              @Value("${assign_case_access_api_url}") String aacUrl,
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath
     ) {
@@ -65,6 +69,7 @@ public class CcdCaseAssignment {
         this.ccdClient = ccdClient;
         this.nocCcdService = nocCcdService;
         this.multipleCasesReadingService = multipleCasesReadingService;
+        this.userIdamService = userIdamService;
         this.aacUrl = aacUrl;
         this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
     }
@@ -128,17 +133,14 @@ public class CcdCaseAssignment {
         }
 
         String caseType = caseDetails.getCaseTypeId();
-        List<SubmitMultipleEvent> submitMultipleEvents = multipleCasesReadingService.retrieveMultipleCases(
-                accessToken,
-                caseType,
-                caseDetails.getCaseData().getMultipleReference());
+        String multipleId = getMultipleIdByReference(accessToken, caseDetails.getCaseData().getMultipleReference());
 
-        if (submitMultipleEvents.isEmpty()) {
+        if (multipleId.isEmpty()) {
             return;
         }
 
         String jurisdiction = caseDetails.getJurisdiction();
-        String multipleId = String.valueOf(submitMultipleEvents.get(0).getCaseId());
+
         addUserToCase(accessToken, jurisdiction, caseType, multipleId, caseId, userToAddId);
     }
 
@@ -165,13 +167,40 @@ public class CcdCaseAssignment {
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
-
             // TODO: Update MultipleCaseData to include caseId & userToAddId
 
             log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
+    }
+
+    public String getMultipleIdByReference(String userToken, String multipleReference) {
+        String getUrl = "http://172.28.78.80:4452/searchCases?ctid=ET_EnglandWales_Multiple";
+        String requestBody = "{"
+                + "\"size\":10000,"
+                + "\"query\":{"
+                + "\"terms\":{"
+                + "\"data.multipleReference.keyword\":[\""+ multipleReference +"\"],"
+                + "\"boost\":1}}}";
+
+        HttpEntity<String> request =
+                new HttpEntity<>(
+                        requestBody,
+                        createHeaders(serviceAuthTokenGenerator.generate(), userToken)
+                );
+
+        ResponseEntity<MultipleCaseSearchResult> response;
+
+        response = restTemplate
+                .exchange(
+                        getUrl,
+                        HttpMethod.POST,
+                        request,
+                        MultipleCaseSearchResult.class
+                );
+        MultipleCaseSearchResult responseBody = response.getBody();
+        return String.valueOf(responseBody.getCases().get(0).getCaseId());
     }
 
     private String getEventTriggerUserId(String accessToken, String caseId) throws IOException {

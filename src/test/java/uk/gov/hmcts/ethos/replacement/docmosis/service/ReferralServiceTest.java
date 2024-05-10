@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -126,6 +127,7 @@ class ReferralServiceTest {
         multipleDetails.setCaseData(multipleData);
 
         referralService.sendEmail(multipleDetails, new CaseData(), "", true, ENGLANDWALES_BULK_CASE_TYPE_ID);
+        verifyNoInteractions(emailService);
     }
 
     @Test

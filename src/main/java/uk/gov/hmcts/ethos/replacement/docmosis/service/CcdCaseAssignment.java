@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService.NOC_REQUEST;
@@ -40,7 +39,8 @@ public class CcdCaseAssignment {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     public static final String ADD_USER_ERROR = "Call to add legal rep to Multiple Case failed for %s";
-    private static final String SEARCH_CASES_FORMAT = "%s/searchCases?%s";
+    private static final String SEARCH_CASES_FORMAT = "%s/searchCases?ctid=%s";
+    private static final String MULTIPLE_CASE_REFERENCE_KEYWORD = "data.multipleReference.keyword";
 
     private final RestTemplate restTemplate;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
@@ -161,7 +161,7 @@ public class CcdCaseAssignment {
     }
 
     public String getMultipleIdByReference(String adminUserToken, String caseType, String multipleReference) {
-        String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);
+        String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType + "_Multiple");
         String requestBody = buildQueryForGetMultipleIdByReference(multipleReference);
 
         HttpEntity<String> request =
@@ -195,12 +195,11 @@ public class CcdCaseAssignment {
     }
 
     private String buildQueryForGetMultipleIdByReference(String multipleReference) {
-        BoolQueryBuilder boolQueryBuilder = boolQuery()
-                .filter(new TermsQueryBuilder("data.multipleReference.keyword", multipleReference));
+        TermsQueryBuilder termsQueryBuilder = termsQuery(MULTIPLE_CASE_REFERENCE_KEYWORD, multipleReference);
 
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
-                .query(boolQueryBuilder)
+                .query(termsQueryBuilder)
                 .toString();
     }
 

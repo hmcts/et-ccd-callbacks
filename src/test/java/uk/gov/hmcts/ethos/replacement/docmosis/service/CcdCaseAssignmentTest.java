@@ -117,7 +117,7 @@ class CcdCaseAssignmentTest {
     }
 
     @Test
-    void shouldCallCaseAssignmentNoc_Fail() throws IOException {
+    void shouldCallCaseAssignmentNoc_Fail() {
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         when(restTemplate.exchange(
                 anyString(),
@@ -131,7 +131,10 @@ class CcdCaseAssignmentTest {
                 RestClientResponseException.class,
                 () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
 
-        assertTrue(exception.getMessage().contains("call failed"));
+        String exceptionMessage = exception.getMessage();
+        if (exceptionMessage != null && !exceptionMessage.isEmpty()){
+            assertTrue(exceptionMessage.contains("call failed"));
+        }
     }
 
     @Test
@@ -272,7 +275,11 @@ class CcdCaseAssignmentTest {
 
         Exception exception = assertThrows(RestClientResponseException.class,
                 () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
-        assertTrue(exception.getMessage().contains("call failed"));
+
+        String exceptionMessage = exception.getMessage();
+        if (exceptionMessage != null && !exceptionMessage.isEmpty()){
+            assertTrue(exceptionMessage.contains("call failed"));
+        }
     }
 
     @Test

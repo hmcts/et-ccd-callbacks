@@ -132,7 +132,7 @@ class CcdCaseAssignmentTest {
                 () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
 
         String exceptionMessage = exception.getMessage();
-        if (exceptionMessage != null && !exceptionMessage.isEmpty()){
+        if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
             assertTrue(exceptionMessage.contains("call failed"));
         }
     }
@@ -277,7 +277,7 @@ class CcdCaseAssignmentTest {
                 () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
 
         String exceptionMessage = exception.getMessage();
-        if (exceptionMessage != null && !exceptionMessage.isEmpty()){
+        if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
             assertTrue(exceptionMessage.contains("call failed"));
         }
     }

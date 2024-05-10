@@ -12,9 +12,8 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class MultiplesDocumentAccessServiceTest {
 
@@ -47,7 +46,7 @@ class MultiplesDocumentAccessServiceTest {
         multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
 
         // Verify that the documentSelect is not set when document collection is empty
-        Mockito.verify(multipleData, Mockito.never()).setDocumentSelect(Mockito.any());
+        verify(multipleData, Mockito.never()).setDocumentSelect(Mockito.any());
 
         // Assert that the documentSelect is not set when document collection is empty
         assertNull(multipleData.getDocumentSelect());
@@ -60,13 +59,13 @@ class MultiplesDocumentAccessServiceTest {
         DocumentTypeItem document1 = new DocumentTypeItem();
         document1.setId("1");
 
-        // Add document1 to the legalrepDocumentCollection
+        // Add document1 to the claimantDocumentCollection
         multipleData.getClaimantDocumentCollection().add(document1);
 
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
 
-        // Verify legalrepDocumentCollection contains selected document
         assertEquals(1, multipleData.getClaimantDocumentCollection().size());
+        assertTrue(multipleData.getClaimantDocumentCollection().contains(document1));
     }
 
     @Test
@@ -81,8 +80,8 @@ class MultiplesDocumentAccessServiceTest {
 
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
 
-        // Verify legalrepDocumentCollection contains selected document
         assertEquals(1, multipleData.getLegalrepDocumentCollection().size());
+        assertTrue(multipleData.getLegalrepDocumentCollection().contains(document1));
     }
 
     @Test
@@ -98,11 +97,11 @@ class MultiplesDocumentAccessServiceTest {
 
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
 
-        // Verify legalrepDocumentCollection contains selected document
         assertEquals(1, multipleData.getLegalrepDocumentCollection().size());
-
-        // Verify citizenDocumentCollection also contains the selected document
         assertEquals(1, multipleData.getClaimantDocumentCollection().size());
+
+        assertTrue(multipleData.getLegalrepDocumentCollection().contains(document1));
+        assertTrue(multipleData.getClaimantDocumentCollection().contains(document1));
     }
 
     @Test

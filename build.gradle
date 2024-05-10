@@ -341,7 +341,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.4'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.3'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -411,7 +411,7 @@ dependencies {
     }
     testImplementation(platform('org.junit:junit-bom:5.10.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.7'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.8'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
 

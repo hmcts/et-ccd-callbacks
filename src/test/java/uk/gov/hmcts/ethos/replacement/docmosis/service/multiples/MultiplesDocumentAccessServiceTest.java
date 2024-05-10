@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -11,7 +12,8 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 class MultiplesDocumentAccessServiceTest {
 
@@ -32,6 +34,22 @@ class MultiplesDocumentAccessServiceTest {
         multipleData.setClaimantDocumentCollection(new ArrayList<>());
         multipleData.setLegalrepDocumentCollection(new ArrayList<>());
 
+    }
+
+    @Test
+    void testSetMultipleDocumentCollectionWhenDocumentCollectionIsEmpty() {
+        // Create a mock MultipleData object with an empty document collection
+        MultipleData multipleData = Mockito.mock(MultipleData.class);
+        when(multipleData.getDocumentCollection()).thenReturn(new ArrayList<>());
+
+        // Call the method to set multiple document collection
+        multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
+
+        // Verify that the documentSelect is not set when document collection is empty
+        Mockito.verify(multipleData, Mockito.never()).setDocumentSelect(Mockito.any());
+
+        // Assert that the documentSelect is not set when document collection is empty
+        assertNull(multipleData.getDocumentSelect());
     }
 
     @Test

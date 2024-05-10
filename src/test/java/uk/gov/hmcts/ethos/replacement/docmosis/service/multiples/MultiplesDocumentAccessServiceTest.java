@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 class MultiplesDocumentAccessServiceTest {
 
     private MultiplesDocumentAccessService multiplesDocumentAccessService;

@@ -348,4 +348,14 @@ public final class Helper {
         }
         return true;
     }
+
+    /**
+     * Gets the last item in a list.
+     * @param <T> the type of the elements in the list
+     * @param list the list to get the last item from
+     * @return the last element in the list
+     */
+    public static <T> T getLast(List<T> list) {
+        return CollectionUtils.isEmpty(list) ? null : list.get(list.size() - 1);
+    }
 }

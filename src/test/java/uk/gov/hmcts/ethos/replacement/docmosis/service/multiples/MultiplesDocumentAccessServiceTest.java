@@ -86,7 +86,6 @@ class MultiplesDocumentAccessServiceTest {
         assertEquals(1, multipleData.getClaimantDocumentCollection().size());
     }
 
-
     @Test
     void testSetMultipleDocumentsToCorrectTab_Default() {
         multipleData.setDocumentAccess("None (clear access)");

@@ -20,17 +20,13 @@ public final class MultiplesDocumentAccessService {
 
     public void setMultipleDocumentCollection(MultipleData multipleData) {
         if (CollectionUtils.isEmpty(multipleData.getDocumentCollection())) {
-            log.warn("Empty document collection");
             return;
         }
 
-        log.info("Getting docs");
         List<DynamicValueType> docs = multipleData.getDocumentCollection().stream()
                 .map(documentTypeItem -> DynamicListHelper.getDynamicCodeLabel(documentTypeItem.getId(),
                         documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()))
                 .toList();
-
-        log.info("Retrieved docs: " + docs.size());
 
         DynamicMultiSelectListType dynamicMultiSelectList = new DynamicMultiSelectListType();
         dynamicMultiSelectList.setListItems(docs);
@@ -80,7 +76,7 @@ public final class MultiplesDocumentAccessService {
         }
     }
 
-    private void addSelectedDocsToCollection(List<DocumentTypeItem> selectedDocs,
+    public void addSelectedDocsToCollection(List<DocumentTypeItem> selectedDocs,
                                              List<DocumentTypeItem> documentCollection) {
         for (DocumentTypeItem selectedDoc : selectedDocs) {
             boolean docAlreadyExists = documentCollection.stream()

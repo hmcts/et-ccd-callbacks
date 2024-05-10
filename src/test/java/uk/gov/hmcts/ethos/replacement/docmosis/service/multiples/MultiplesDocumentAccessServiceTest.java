@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -85,6 +86,7 @@ class MultiplesDocumentAccessServiceTest {
         assertEquals(1, multipleData.getClaimantDocumentCollection().size());
     }
 
+
     @Test
     void testSetMultipleDocumentsToCorrectTab_Default() {
         multipleData.setDocumentAccess("None (clear access)");
@@ -102,5 +104,27 @@ class MultiplesDocumentAccessServiceTest {
         // Verify claimantDocumentCollection and legalrepDocumentCollection do not contain selected documents
         assertEquals(0, multipleData.getClaimantDocumentCollection().size());
         assertEquals(0, multipleData.getLegalrepDocumentCollection().size());
+    }
+
+    @Test
+    void testAddSelectedDocsToCollection() {
+        // Create a list of selected documents
+        List<DocumentTypeItem> selectedDocs = new ArrayList<>();
+        DocumentTypeItem selectedDoc1 = new DocumentTypeItem();
+        selectedDoc1.setId("1");
+        selectedDocs.add(selectedDoc1);
+
+        // Create a document collection with an existing document
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem existingDoc = new DocumentTypeItem();
+        existingDoc.setId("2");
+        documentCollection.add(existingDoc);
+
+        // Call the method to add selected documents to the collection
+        multiplesDocumentAccessService.addSelectedDocsToCollection(selectedDocs, documentCollection);
+
+        // Verify that the selected document is added to the collection
+        assertEquals(2, documentCollection.size()); // Expecting 2 documents in the collection
+        assertEquals(selectedDoc1, documentCollection.get(1)); // Verify the selected document is added
     }
 }

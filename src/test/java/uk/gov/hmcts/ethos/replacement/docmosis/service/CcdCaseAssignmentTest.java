@@ -23,12 +23,14 @@ import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -36,6 +38,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -75,7 +78,27 @@ class CcdCaseAssignmentTest {
     }
 
     @Test
-    void shouldCallCaseAssignmentNoc() throws IOException {
+    void applyNocAsAdmin() throws IOException {
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))).thenReturn(ResponseEntity.ok(expected));
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(false);
+
+        CCDCallbackResponse actual = ccdCaseAssignment.applyNocAsAdmin(callbackRequest);
+
+        assertThat(expected).isEqualTo(actual);
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNoc_Success() throws IOException {
         CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
 
         when(restTemplate
@@ -91,6 +114,24 @@ class CcdCaseAssignmentTest {
 
         assertThat(expected).isEqualTo(actual);
         verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNoc_Fail() throws IOException {
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(restTemplate.exchange(
+                anyString(),
+                eq(HttpMethod.POST),
+                any(HttpEntity.class),
+                eq(CCDCallbackResponse.class)))
+                .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
+        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(false);
+
+        Exception exception = assertThrows(
+                RestClientResponseException.class,
+                () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
+
+        assertTrue(exception.getMessage().contains("call failed"));
     }
 
     @Test
@@ -128,7 +169,114 @@ class CcdCaseAssignmentTest {
     }
 
     @Test
-    void shouldCallCaseAssignmentNocMultiple_Empty() throws IOException {
+    void shouldCallCaseAssignmentNocMultiple_CaseNotMultiple() throws IOException {
+        callbackRequest.getCaseDetails().getCaseData().setMultipleFlag(NO);
+
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(expected));
+
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+
+        CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
+
+        assertThat(expected).isEqualTo(actual);
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_UserNotFound() throws IOException {
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(expected));
+
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.empty());
+
+        CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
+
+        assertThat(expected).isEqualTo(actual);
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_MultipleId_NotFound() throws IOException {
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(expected));
+
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
+
+        MultipleCaseSearchResult expectedMultipleCaseSearchResult =
+                new MultipleCaseSearchResult(1L, new ArrayList<>());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
+
+        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+
+        CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
+
+        assertThat(expected).isEqualTo(actual);
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_MultipleId_Empty() throws IOException {
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(expected));
+
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
+
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
+
+        Exception exception = assertThrows(RestClientResponseException.class,
+                () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
+        assertTrue(exception.getMessage().contains("call failed"));
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_ccdClientReturn_Empty() throws IOException {
         CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
         when(restTemplate
                 .exchange(
@@ -161,7 +309,7 @@ class CcdCaseAssignmentTest {
     }
 
     @Test
-    void shouldCallCaseAssignmentNocMultiple_Fail() throws IOException {
+    void shouldCallCaseAssignmentNocMultiple_ccdClientReturn_Fail() throws IOException {
         CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
         when(restTemplate
                 .exchange(

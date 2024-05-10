@@ -227,7 +227,7 @@ public class CcdCaseAssignment {
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
-            // TODO: Update MultipleCaseData to include caseId & userToAddId
+            // TO DO: Update MultipleCaseData to include caseId & userToAddId
 
             log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {

@@ -37,7 +37,6 @@ class MultiplesDocumentAccessServiceTest {
     void testSetMultipleDocumentsToCorrectTab_Citizens() {
         multipleData.setDocumentAccess("Citizen");
 
-
         DocumentTypeItem document1 = new DocumentTypeItem();
         document1.setId("1");
 
@@ -53,7 +52,6 @@ class MultiplesDocumentAccessServiceTest {
     @Test
     void testSetMultipleDocumentsToCorrectTab_LegalRep() {
         multipleData.setDocumentAccess("Legal rep/respondents");
-
 
         DocumentTypeItem document1 = new DocumentTypeItem();
         document1.setId("1");
@@ -98,7 +96,6 @@ class MultiplesDocumentAccessServiceTest {
         document2.setId("2");
         multipleData.getDocumentCollection().add(document1);
         multipleData.getDocumentCollection().add(document2);
-
 
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
 

@@ -39,6 +39,8 @@ public class CreateReferralMultiplesControllerFunctionalTest extends BaseFunctio
 
         multipleData.setIsUrgent("Yes");
         multipleData.setReferentEmail("test@gmail.com");
+        multipleData.setReferralSubject("ET1");
+        multipleData.setMultipleReference("123");
     }
 
     @Test

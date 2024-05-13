@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +27,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
@@ -39,7 +37,6 @@ import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.buildPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
 
 /**
@@ -53,7 +50,6 @@ public class ReplyToReferralMultiplesController {
     private final UserIdamService userIdamService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
-    private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
     private final CaseLookupService caseLookupService;
 
@@ -201,21 +197,7 @@ public class ReplyToReferralMultiplesController {
         ReferralType referral = ReferralHelper.getSelectedReferral(caseData);
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
-        String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
-
-        if (StringUtils.isNotEmpty(caseData.getReplyToEmailAddress())) {
-            emailService.sendEmail(
-                    referralTemplateId,
-                    caseData.getReplyToEmailAddress(),
-                    buildPersonalisation(caseData, leadCase, referralCode, false, userDetails.getName(), caseLink)
-            );
-
-            log.info("Event: Referral Reply Email sent. "
-                    + ". EventId: " + request.getEventId()
-                    + ". Referral code: " + referralCode
-                    + ". Emailed at: " + DateTime.now());
-
-        }
+        referralService.sendEmail(caseDetails, leadCase, referralCode, false, name);
 
         clearReferralReplyDataFromCaseData(caseData);
 

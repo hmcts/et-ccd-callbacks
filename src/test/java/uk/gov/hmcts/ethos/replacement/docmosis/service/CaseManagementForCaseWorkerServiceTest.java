@@ -966,16 +966,17 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void testSetMigratedCaseLinkDetails_Success() {
+        String caseDetailsId = "123";
         String caseId = "caseId";
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId("123_45");
+        caseDetails.setCaseId(caseDetailsId);
         CaseData caseData = new CaseData();
         caseData.setCcdID(caseId);
         caseDetails.setCaseData(caseData);
 
         List<SubmitEvent> submitEventList22 = new ArrayList<>();
         SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(123_45);
+        submitEvent.setCaseId(123);
         submitEvent.setCaseData(caseData);
         submitEventList22.add(submitEvent);
 
@@ -993,10 +994,8 @@ class CaseManagementForCaseWorkerServiceTest {
                 .thenReturn(submitEventSourceCase);
 
         caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(AUTH_TOKEN, caseDetails, CCD_GATEWAY_BASE_URL);
-        assertEquals(
-                "<a target=\"_blank\" href=\"http://reformetest.com/cases/case-details/12345\">"
-                        + "EthosCaseRef</a>",
-                caseDetails.getCaseData().getTransferredCaseLink());
+        assertEquals("<a target=\"_blank\" href=\"http://reformetest.com/cases/case-details/"
+                + caseDetailsId + "\">EthosCaseRef</a>", caseDetails.getCaseData().getTransferredCaseLink());
     }
 
     @Test
@@ -1035,15 +1034,16 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void testSetMigratedCaseLinkDetails_When_EthosCaseReferenceIsNull() {
         String caseId = "caseId";
+        String caseDetailsId = "123_45";
         CaseDetails caseDetails = new CaseDetails();
         CaseData caseData = new CaseData();
         caseData.setCcdID(caseId);
         caseDetails.setCaseData(caseData);
+
         List<SubmitEvent> submitEventList = new ArrayList<>();
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseId(123_45);
         submitEventList.add(submitEvent);
-
         SubmitEvent fullSourceCase = new SubmitEvent();
         CaseData sourceCaseData = new CaseData();
         sourceCaseData.setEthosCaseReference(null);
@@ -1052,9 +1052,8 @@ class CaseManagementForCaseWorkerServiceTest {
 
         when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(submitEventList);
-        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(
-                authToken, "caseTypeId", "EMPLOYMENT", "123_45"))
-                .thenReturn(fullSourceCase);
+        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(anyString(), anyString(),
+                anyString(), anyString())).thenReturn(fullSourceCase);
 
         caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails, CCD_GATEWAY_BASE_URL);
 

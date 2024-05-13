@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -336,18 +337,16 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails, String ccdGatewayBaseUrl) {
-        // get a target case data using the source case data and
-        // elastic search query
-        var localCaseDetails = caseDetails;
+        // get a target case data using the source case data and elastic search query
         List<SubmitEvent> submitEvent = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
-                localCaseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
+                caseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
         if (CollectionUtils.isEmpty(submitEvent)) {
             return;
         }
 
         String sourceCaseId = String.valueOf(submitEvent.get(0).getCaseId());
         SubmitEvent fullSourceCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(authToken,
-                 caseDetails.getCaseTypeId(), "EMPLOYMENT", sourceCaseId);
+                caseDetails.getCaseTypeId(), "EMPLOYMENT", sourceCaseId);
         if (fullSourceCase.getCaseData().getEthosCaseReference() != null) {
             caseDetails.getCaseData().setTransferredCaseLink("<a target=\"_blank\" href=\""
                     + String.format("%s/cases/case-details/%s", ccdGatewayBaseUrl, sourceCaseId) + "\">"

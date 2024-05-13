@@ -111,7 +111,7 @@ class CaseRetrievalForCaseWorkerServiceTest {
 
     @Test
     void testTransferSourceCaseRetrievalESRequest() throws IOException {
-        String currentCaseId = "123456";
+        String currentCaseId = "123_456";
         String authToken = "authToken";
 
         List<SubmitEvent> submitEvents = getSubmitEvent();
@@ -124,7 +124,7 @@ class CaseRetrievalForCaseWorkerServiceTest {
 
     @Test
     void testTransferSourceCaseRetrievalESRequest_When_CaseTypeIdsToCheck_Null() throws IOException {
-        String currentCaseId = "123456";
+        String currentCaseId = "123_456";
         String authToken = "authToken";
         List<SubmitEvent> submitEvents = getSubmitEvent();
         when(ccdClient.retrieveTransferredCaseElasticSearch(any(), any(), any())).thenReturn(submitEvents);
@@ -136,7 +136,7 @@ class CaseRetrievalForCaseWorkerServiceTest {
 
     @Test
     void testTransferSourceCaseRetrievalESRequestThrowsException() throws IOException {
-        String currentCaseId = "123456";
+        String currentCaseId = "123_456";
         String authToken = "authToken";
         List<SubmitEvent> submitEvents = getSubmitEvent();
         when(ccdClient.retrieveTransferredCaseElasticSearch(any(), any(), any())).thenReturn(submitEvents);
@@ -151,7 +151,7 @@ class CaseRetrievalForCaseWorkerServiceTest {
         CaseData linkedCaseData = new CaseData();
         linkedCaseData.setEthosCaseReference("R5000656");
         SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(123456);
+        submitEvent.setCaseId(123_456);
         submitEvent.setCaseData(linkedCaseData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
         submitEvents.add(submitEvent);

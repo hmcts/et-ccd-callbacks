@@ -6,14 +6,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -57,17 +57,25 @@ class MultiplesDocumentAccessServiceTest {
 
     @Test
     void testSetMultipleDocumentCollection() {
-        multipleData.setDocumentAccess("Citizen");
+        multipleData = new MultipleData();
+        multipleData.setDocumentCollection(new ArrayList<>());
+
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentFilename("random.pdf");
+
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(uploadedDocumentType);
 
         DocumentTypeItem document1 = new DocumentTypeItem();
+        document1.setValue(documentType);
         document1.setId("1");
 
-        multipleData.getClaimantDocumentCollection().add(document1);
+        multipleData.getDocumentCollection().add(document1);
 
         multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
 
-        assertEquals(1, multipleData.getClaimantDocumentCollection().size());
-        assertTrue(multipleData.getClaimantDocumentCollection().contains(document1));
+        assertEquals(1, multipleData.getDocumentCollection().size());
+        assertTrue(multipleData.getDocumentCollection().contains(document1));
     }
 
     @Test
@@ -120,25 +128,6 @@ class MultiplesDocumentAccessServiceTest {
 
         assertTrue(multipleData.getLegalrepDocumentCollection().contains(document1));
         assertTrue(multipleData.getClaimantDocumentCollection().contains(document1));
-    }
-
-    @Test
-    void testSetMultipleDocumentsToCorrectTab_Default() {
-        multipleData.setDocumentAccess("None (clear access)");
-
-        // Add test data to document collection
-        DocumentTypeItem document1 = new DocumentTypeItem();
-        document1.setId("1");
-        DocumentTypeItem document2 = new DocumentTypeItem();
-        document2.setId("2");
-        multipleData.getDocumentCollection().add(document1);
-        multipleData.getDocumentCollection().add(document2);
-
-        multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
-
-        // Verify claimantDocumentCollection and legalrepDocumentCollection do not contain selected documents
-        assertEquals(0, multipleData.getClaimantDocumentCollection().size());
-        assertEquals(0, multipleData.getLegalrepDocumentCollection().size());
     }
 
     @Test

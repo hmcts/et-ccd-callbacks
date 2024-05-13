@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelperTest {
@@ -143,5 +145,23 @@ public class HelperTest {
         caseData.setHubLinksStatuses(new HubLinksStatuses());
         boolean actual3 = Helper.isClaimantNonSystemUser(caseData);
         assertFalse(actual3);
+    }
+
+    @Test
+    void getLastNullCollection() {
+        assertNull(Helper.getLast(null));
+    }
+
+    @Test
+    void getLastEmptyCollection() {
+        assertNull(Helper.getLast(new ArrayList<>()));
+    }
+
+    @Test
+    void getLastNonEmptyCollection() {
+        List<String> list = new ArrayList<>();
+        list.add("test");
+        list.add("test2");
+        assertEquals("test2", Helper.getLast(list));
     }
 }

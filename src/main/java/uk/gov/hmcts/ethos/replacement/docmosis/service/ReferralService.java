@@ -2,14 +2,18 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -18,9 +22,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Slf4j
 public class ReferralService {
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
-
+    
     private final TornadoService tornadoService;
     private final CaseLookupService caseLookupService;
+    private final EmailService emailService;
+
+    @Value("${template.referral}")
+    private String referralTemplateId;
 
     /**
      * Uses {@link TornadoService} to generate a pdf to display a summary of data for the created referral.
@@ -72,4 +80,15 @@ public class ReferralService {
         return ReferralHelper.populateHearingDetails(caseData);
     }
 
+    public void sendEmail(MultipleDetails details, CaseData leadCase, String refNumber, boolean isNew, String name) {
+        MultipleData caseData = details.getCaseData();
+        String email = Optional.ofNullable(caseData.getReferentEmail()).orElse(caseData.getReplyToEmailAddress());
+        if (StringUtils.isEmpty(email)) {
+            return;
+        }
+
+        String caseLink = emailService.getExuiCaseLink(details.getCaseId());
+        var personalisation = ReferralHelper.buildPersonalisation(caseData, leadCase, refNumber, isNew, name, caseLink);
+        emailService.sendEmail(referralTemplateId, email, personalisation);
+    }
 }

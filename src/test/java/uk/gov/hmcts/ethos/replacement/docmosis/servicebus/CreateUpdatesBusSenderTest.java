@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings({"PMD.CloseResource"})
 class CreateUpdatesBusSenderTest {
 
     @InjectMocks
@@ -107,7 +108,7 @@ class CreateUpdatesBusSenderTest {
         when(datasource.getConnection()).thenReturn(mockConn);
         CallableStatement mockAddWork = Mockito.mock(CallableStatement.class);
         
-        Mockito.when(mockConn.prepareCall(anyString())).thenReturn(mockAddWork);
+        when(mockConn.prepareCall(anyString())).thenReturn(mockAddWork);
 
         CreateUpdatesDto createUpdatesDto = CreateUpdatesDto.builder()
                 .caseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID)

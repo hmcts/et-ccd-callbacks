@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.helpers.CreateUpdatesHelper;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
@@ -13,9 +12,9 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.ecm.common.servicebus.ServiceBusSender;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
+import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,22 +25,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 public class CreateUpdatesBusSender {
-    @Value("${spring.datasource.url}")
-    private String url;
-    @Value("${spring.datasource.username}")
-    private String user;
-    @Value("${spring.datasource.password}")
-    private String password;
-
     private static final String ERROR_MESSAGE = "Failed to send the message to the queue";
     private final ServiceBusSender serviceBusSender;
     private final FeatureToggleService featureToggleService;
+    private final DataSource dataSource;
 
     public CreateUpdatesBusSender(
             @Qualifier("create-updates-send-helper") ServiceBusSender serviceBusSender,
-            FeatureToggleService featureToggleService) {
+            FeatureToggleService featureToggleService, DataSource dataSource) {
         this.serviceBusSender = serviceBusSender;
         this.featureToggleService = featureToggleService;
+        this.dataSource = dataSource;
     }
 
     public void sendMessageToServiceBus(CreateUpdatesDto createUpdatesDto, DataModelParent dataModelParent,
@@ -84,7 +78,7 @@ public class CreateUpdatesBusSender {
                 500,
                 updateSize);
 
-        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+        try (Connection conn = dataSource.getConnection()) {
             createUpdatesMsgList.forEach(msg -> sendMessage(conn, msg));
         } catch (SQLException ex) {
             log.error(ex.getMessage());

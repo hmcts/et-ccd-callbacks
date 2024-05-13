@@ -341,7 +341,7 @@ public class CaseManagementForCaseWorkerService {
         var localCaseDetails = caseDetails;
         List<SubmitEvent> submitEvent = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 localCaseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
-        if (submitEvent == null || submitEvent.isEmpty()) {
+        if (CollectionUtils.isEmpty(submitEvent)) {
             return;
         }
 

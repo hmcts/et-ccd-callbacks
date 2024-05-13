@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -95,7 +96,10 @@ class CaseManagementForCaseWorkerServiceTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
     private static final String HMCTS_SERVICE_ID = "BHA1";
-    private static final String CCD_GATEWAY_BASE_URL = "http://reformetest.com";
+
+    @Value("${ccd_gateway_base_url}")
+    private String ccdGatewayBaseUrl;
+
     @InjectMocks
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private CCDRequest scotlandCcdRequest1;
@@ -225,7 +229,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
-                adminUserService, caseManagementLocationService);
+                adminUserService, caseManagementLocationService, ccdGatewayBaseUrl);
     }
 
     private static Address getAddress() {
@@ -993,8 +997,8 @@ class CaseManagementForCaseWorkerServiceTest {
         when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(any(), any(), any(), any()))
                 .thenReturn(submitEventSourceCase);
 
-        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(AUTH_TOKEN, caseDetails, CCD_GATEWAY_BASE_URL);
-        assertEquals("<a target=\"_blank\" href=\"http://reformetest.com/cases/case-details/"
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(AUTH_TOKEN, caseDetails);
+        assertEquals("<a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/"
                 + caseDetailsId + "\">EthosCaseRef</a>", caseDetails.getCaseData().getTransferredCaseLink());
     }
 
@@ -1010,7 +1014,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(null);
 
-        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails, CCD_GATEWAY_BASE_URL);
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
 
         assertEquals(null, caseDetails.getCaseData().getTransferredCaseLink());
     }
@@ -1026,7 +1030,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(new ArrayList<>());
 
-        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails, CCD_GATEWAY_BASE_URL);
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
 
         assertNull(caseDetails.getCaseData().getTransferredCaseLink());
     }
@@ -1055,7 +1059,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(anyString(), anyString(),
                 anyString(), anyString())).thenReturn(fullSourceCase);
 
-        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails, CCD_GATEWAY_BASE_URL);
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
 
         Assert.assertNull(caseDetails.getCaseData().getTransferredCaseLink());
     }

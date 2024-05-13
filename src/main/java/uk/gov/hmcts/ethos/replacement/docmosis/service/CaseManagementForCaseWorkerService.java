@@ -97,7 +97,7 @@ public class CaseManagementForCaseWorkerService {
     public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
     public static final String CASE_MANAGEMENT_CODE = "Employment";
     public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
-
+    private final String ccdGatewayBaseUrl;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
             "Newcastle", "Scotland", "Wales", "Watford");
@@ -109,7 +109,8 @@ public class CaseManagementForCaseWorkerService {
                                               FeatureToggleService featureToggleService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
-                                              CaseManagementLocationService caseManagementLocationService) {
+                                              CaseManagementLocationService caseManagementLocationService,
+                                              @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
@@ -117,6 +118,7 @@ public class CaseManagementForCaseWorkerService {
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
         this.caseManagementLocationService = caseManagementLocationService;
+        this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -336,7 +338,7 @@ public class CaseManagementForCaseWorkerService {
         return dates;
     }
 
-    public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails, String ccdGatewayBaseUrl) {
+    public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails) {
         // get a target case data using the source case data and elastic search query
         List<SubmitEvent> submitEvent = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 caseDetails.getCaseId(), authToken, caseTypeIdsToCheck);

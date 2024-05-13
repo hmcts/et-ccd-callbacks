@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.exceptions.CaseRetrievalException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -29,7 +28,9 @@ public class CaseRetrievalForCaseWorkerService {
         try {
             return ccdClient.retrieveCase(authToken, caseTypeId, jurisdiction, caseId);
         } catch (Exception ex) {
-            throw new CaseCreationException(MESSAGE + caseId + ex.getMessage());
+            throw (CaseRetrievalException)new CaseRetrievalException(
+                    MESSAGE + caseId + ex.getMessage()).initCause(ex);
+
         }
     }
 
@@ -39,7 +40,8 @@ public class CaseRetrievalForCaseWorkerService {
         try {
             return ccdClient.retrieveCases(authToken, caseDetails.getCaseTypeId(), caseDetails.getJurisdiction());
         } catch (Exception ex) {
-            throw new CaseCreationException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
+            throw (CaseRetrievalException)new CaseRetrievalException(
+                    MESSAGE + caseDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
     }
 
@@ -48,7 +50,8 @@ public class CaseRetrievalForCaseWorkerService {
         try {
             return ccdClient.retrieveCasesElasticSearch(authToken, caseTypeId, caseIds);
         } catch (Exception ex) {
-            throw new CaseCreationException(MESSAGE + currentCaseId + ex.getMessage());
+            throw (CaseRetrievalException)new CaseRetrievalException(
+                    MESSAGE + currentCaseId + ex.getMessage()).initCause(ex);
         }
     }
 
@@ -65,7 +68,8 @@ public class CaseRetrievalForCaseWorkerService {
 
             return new ArrayList<>();
         } catch (Exception ex) {
-            throw new CaseRetrievalException(MESSAGE + currentCaseId + ex.getMessage());
+            throw (CaseRetrievalException)new CaseRetrievalException(
+                    MESSAGE + currentCaseId + ex.getMessage()).initCause(ex);
         }
     }
 }

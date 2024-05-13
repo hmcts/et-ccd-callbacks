@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.collect.Maps;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,13 +65,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @Slf4j
-@Service("caseManagementForCaseWorkerService")
+@Service
 public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
@@ -100,10 +100,6 @@ public class CaseManagementForCaseWorkerService {
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
             "Newcastle", "Scotland", "Wales", "Watford");
-
-    @Value("${ccd_gateway_base_url}")
-    @Getter
-    private String ccdGatewayBaseUrl;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -314,7 +310,7 @@ public class CaseManagementForCaseWorkerService {
             }
             for (String date : dates) {
                 LocalDateTime parsedDate = LocalDateTime.parse(date);
-                if (nextListedDate.equals("") && parsedDate.isAfter(LocalDateTime.now())
+                if (EMPTY_STRING.equals(nextListedDate) && parsedDate.isAfter(LocalDateTime.now())
                         || parsedDate.isAfter(LocalDateTime.now())
                         && parsedDate.isBefore(LocalDateTime.parse(nextListedDate))) {
                     nextListedDate = date;
@@ -339,32 +335,24 @@ public class CaseManagementForCaseWorkerService {
         return dates;
     }
 
-    public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails) {
+    public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails, String ccdGatewayBaseUrl) {
         // get a target case data using the source case data and
         // elastic search query
-        List<SubmitEvent> submitEvent = transferSourceCaseRetrievalESRequest(caseDetails.getCaseId(), authToken);
+        var localCaseDetails = caseDetails;
+        List<SubmitEvent> submitEvent = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                localCaseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
         if (submitEvent == null || submitEvent.isEmpty()) {
             return;
         }
 
         String sourceCaseId = String.valueOf(submitEvent.get(0).getCaseId());
-        SubmitEvent fullSourceCase = caseRetrievalRequest(authToken, caseDetails.getCaseTypeId(),
-                "EMPLOYMENT", sourceCaseId);
+        SubmitEvent fullSourceCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(authToken,
+                 caseDetails.getCaseTypeId(), "EMPLOYMENT", sourceCaseId);
         if (fullSourceCase.getCaseData().getEthosCaseReference() != null) {
             caseDetails.getCaseData().setTransferredCaseLink("<a target=\"_blank\" href=\""
                     + String.format("%s/cases/case-details/%s", ccdGatewayBaseUrl, sourceCaseId) + "\">"
                     + fullSourceCase.getCaseData().getEthosCaseReference() + "</a>");
         }
-    }
-
-    private List<SubmitEvent> transferSourceCaseRetrievalESRequest(String currentCaseId, String authToken) {
-        return caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId, authToken,
-                caseTypeIdsToCheck);
-    }
-
-    private SubmitEvent caseRetrievalRequest(String authToken, String caseTypeId, String employment,
-                                             String sourceCaseId) {
-        return caseRetrievalForCaseWorkerService.caseRetrievalRequest(authToken, caseTypeId, employment, sourceCaseId);
     }
 
     public CaseData struckOutRespondents(CCDRequest ccdRequest) {
@@ -597,7 +585,8 @@ public class CaseManagementForCaseWorkerService {
             ccdClient.submitEventForCase(authToken, originalCaseData, currentCaseDetails.getCaseTypeId(),
                     currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
         } catch (Exception e) {
-            throw new CaseCreationException(MESSAGE + caseIdToLink + e.getMessage());
+            throw (CaseCreationException)new CaseCreationException(
+                    MESSAGE + caseIdToLink + e.getMessage()).initCause(e);
         }
     }
 
@@ -688,7 +677,7 @@ public class CaseManagementForCaseWorkerService {
         }
         RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
         if (respondentSumType != null && respondentSumType.getRespondentType() != null) {
-            if (respondentSumType.getRespondentType().equals(ORGANISATION)) {
+            if (ORGANISATION.equals(respondentSumType.getRespondentType())) {
                 respondentSumType.setRespondentFirstName("");
                 respondentSumType.setRespondentLastName("");
             } else {

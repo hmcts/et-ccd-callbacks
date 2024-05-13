@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -15,8 +14,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class MultiplesDocumentAccessServiceTest {
 
@@ -29,7 +28,6 @@ class MultiplesDocumentAccessServiceTest {
     @BeforeEach
     void setUp() {
         multiplesDocumentAccessService = new MultiplesDocumentAccessService();
-        MockitoAnnotations.initMocks(this);
 
         multipleData = new MultipleData();
         multipleData.setDocumentCollection(new ArrayList<>());
@@ -42,17 +40,32 @@ class MultiplesDocumentAccessServiceTest {
     @Test
     void testSetMultipleDocumentCollectionWhenDocumentCollectionIsEmpty() {
         // Create a mock MultipleData object with an empty document collection
-        MultipleData multipleData = Mockito.mock(MultipleData.class);
+        MultipleData multipleData = mock(MultipleData.class);
         when(multipleData.getDocumentCollection()).thenReturn(new ArrayList<>());
 
         // Call the method to set multiple document collection
         multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
 
         // Verify that the documentSelect is not set when document collection is empty
-        verify(multipleData, Mockito.never()).setDocumentSelect(Mockito.any());
+        verify(multipleData, Mockito.never()).setDocumentSelect(any());
 
         // Assert that the documentSelect is not set when document collection is empty
         assertNull(multipleData.getDocumentSelect());
+    }
+
+    @Test
+    void testSetMultipleDocumentCollection() {
+        multipleData.setDocumentAccess("Citizen");
+
+        DocumentTypeItem document1 = new DocumentTypeItem();
+        document1.setId("1");
+
+        multipleData.getClaimantDocumentCollection().add(document1);
+
+        multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
+
+        assertEquals(1, multipleData.getClaimantDocumentCollection().size());
+        assertTrue(multipleData.getClaimantDocumentCollection().contains(document1));
     }
 
     @Test

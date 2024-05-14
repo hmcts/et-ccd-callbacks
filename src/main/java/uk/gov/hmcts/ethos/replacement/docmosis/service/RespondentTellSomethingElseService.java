@@ -48,6 +48,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET_CY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
@@ -204,14 +205,6 @@ public class RespondentTellSomethingElseService {
         }
     }
 
-    private String translateDateToWelsh(String date) {
-        return CY_MONTHS_MAP.entrySet().stream()
-                .filter(entry -> date.contains(entry.getKey()))
-                .findFirst()
-                .map(entry -> date.replace(entry.getKey(), entry.getValue()))
-                .orElse(date);
-    }
-
     private String getEmailTemplate(boolean isWelsh, String applicationType) {
         if (GROUP_B_TYPES.contains(applicationType)) {
             return isWelsh
@@ -252,12 +245,30 @@ public class RespondentTellSomethingElseService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENT_NAMES, getRespondentNames(caseData),
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                HEARING_DATE, getNearestHearingToReferral(caseData, NOT_SET),
+                HEARING_DATE, getNearestHearingToReferralForClaimant(caseData, isWelsh),
                 SHORT_TEXT, shortText,
                 DATE_PLUS_7, datePlus7,
                 LINK_TO_DOCUMENT, documentJson,
                 CITIZEN_PORTAL_LINK, citizenPortalLink
         );
+    }
+
+    private String getNearestHearingToReferralForClaimant(CaseData caseData, boolean isWelsh) {
+        String hearingDate = getNearestHearingToReferral(caseData.getHearingCollection(), NOT_SET);
+        if (isWelsh) {
+            return NOT_SET.equals(hearingDate)
+                ? NOT_SET_CY
+                : translateDateToWelsh(hearingDate);
+        }
+        return hearingDate;
+    }
+
+    private String translateDateToWelsh(String date) {
+        return CY_MONTHS_MAP.entrySet().stream()
+            .filter(entry -> date.contains(entry.getKey()))
+            .findFirst()
+            .map(entry -> date.replace(entry.getKey(), entry.getValue()))
+            .orElse(date);
     }
 
     public String generateTableMarkdown(CaseData caseData) {

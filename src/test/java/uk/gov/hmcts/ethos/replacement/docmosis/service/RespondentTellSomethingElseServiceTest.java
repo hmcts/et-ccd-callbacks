@@ -351,7 +351,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("hearingDate"), is("Not set"));
         assertThat(personalisation.get("shortText"), is(TSE_APP_AMEND_RESPONSE));
         assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
-        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
+            + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
     }
 
     @ParameterizedTest
@@ -418,7 +419,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("hearingDate"), is("Not set"));
         assertThat(personalisation.get("shortText"), is(TSE_APP_CHANGE_PERSONAL_DETAILS));
         assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
-        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
+            + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
     }
 
     @ParameterizedTest

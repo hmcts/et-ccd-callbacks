@@ -13,6 +13,7 @@ public final class NotificationServiceConstants {
     public static final String HEARING_DOCUMENTS_PATH = "#Hearing%20Documents";
     public static final String HEARING_DATE = "hearingDate";
     public static final String NOT_SET = "Not set";
+    public static final String NOT_SET_CY = "Heb ei anfon";
     public static final String APPLICATION = "application";
     public static final String CCD_ID = "ccdId";
     public static final String DATE = "date";

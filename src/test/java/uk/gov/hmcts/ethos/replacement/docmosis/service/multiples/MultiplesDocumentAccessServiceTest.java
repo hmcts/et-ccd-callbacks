@@ -2,9 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -14,8 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -24,37 +23,17 @@ import static org.mockito.Mockito.when;
 class MultiplesDocumentAccessServiceTest {
 
     private MultiplesDocumentAccessService multiplesDocumentAccessService;
-    private MultipleData multipleData;
 
-    @Mock
-    private DynamicMultiSelectListType dynamicMultiSelectList;
+    private MultipleData multipleData;
 
     @BeforeEach
     void setUp() {
         multiplesDocumentAccessService = new MultiplesDocumentAccessService();
-
         multipleData = new MultipleData();
         multipleData.setDocumentCollection(new ArrayList<>());
-        multipleData.setDocumentSelect(dynamicMultiSelectList);
         multipleData.setClaimantDocumentCollection(new ArrayList<>());
         multipleData.setLegalrepDocumentCollection(new ArrayList<>());
 
-    }
-
-    @Test
-    void testSetMultipleDocumentCollectionWhenDocumentCollectionIsEmpty() {
-        // Create a mock MultipleData object with an empty document collection
-        MultipleData multipleData = mock(MultipleData.class);
-        when(multipleData.getDocumentCollection()).thenReturn(new ArrayList<>());
-
-        // Call the method to set multiple document collection
-        multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
-
-        // Verify that the documentSelect is not set when document collection is empty
-        verify(multipleData, Mockito.never()).setDocumentSelect(any());
-
-        // Assert that the documentSelect is not set when document collection is empty
-        assertNull(multipleData.getDocumentSelect());
     }
 
     @Test
@@ -78,6 +57,23 @@ class MultiplesDocumentAccessServiceTest {
 
         assertEquals(1, multipleData.getDocumentCollection().size());
         assertTrue(multipleData.getDocumentCollection().contains(document1));
+    }
+
+
+    @Test
+    void testSetMultipleDocumentCollectionWhenDocumentCollectionIsEmpty() {
+        // Create a mock MultipleData object with an empty document collection
+        MultipleData multipleData = mock(MultipleData.class);
+        when(multipleData.getDocumentCollection()).thenReturn(new ArrayList<>());
+
+        // Call the method to set multiple document collection
+        multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
+
+        // Verify that the documentSelect is not set when document collection is empty
+        verify(multipleData, Mockito.never()).setDocumentSelect(any());
+
+        // Assert that the documentSelect is not set when document collection is empty
+        assertNull(multipleData.getDocumentSelect());
     }
 
     @Test
@@ -119,6 +115,9 @@ class MultiplesDocumentAccessServiceTest {
         DocumentTypeItem document1 = new DocumentTypeItem();
         document1.setId("1");
 
+        DocumentTypeItem document2 = new DocumentTypeItem();
+        document2.setId("2");
+
         // Add document1 to the legalrepDocumentCollection
         multipleData.getLegalrepDocumentCollection().add(document1);
         multipleData.getClaimantDocumentCollection().add(document1);
@@ -130,6 +129,34 @@ class MultiplesDocumentAccessServiceTest {
 
         assertTrue(multipleData.getLegalrepDocumentCollection().contains(document1));
         assertTrue(multipleData.getClaimantDocumentCollection().contains(document1));
+    }
+
+    @Test
+    public void testClaimantDocumentCollectionNullCheck() {
+
+        // Set claimantDocumentCollection to null
+        multipleData.setClaimantDocumentCollection(null);
+
+        // Call the method that initializes claimantDocumentCollection if it is null
+        multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
+
+        // Assert that claimantDocumentCollection is not null and is an empty ArrayList
+        assertNotNull(multipleData.getClaimantDocumentCollection());
+        assertTrue(multipleData.getClaimantDocumentCollection().isEmpty());
+    }
+
+    @Test
+    public void testLegalRepDocumentCollectionNullCheck() {
+
+        // Set claimantDocumentCollection to null
+        multipleData.setClaimantDocumentCollection(null);
+
+        // Call the method that initializes claimantDocumentCollection if it is null
+        multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
+
+        // Assert that claimantDocumentCollection is not null and is an empty ArrayList
+        assertNotNull(multipleData.getLegalrepDocumentCollection());
+        assertTrue(multipleData.getLegalrepDocumentCollection().isEmpty());
     }
 
     @Test

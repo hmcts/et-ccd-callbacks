@@ -61,20 +61,20 @@ public final class MultiplesDocumentAccessService {
         }
 
         switch (documentAccess) {
-                case "Citizens":
-                    addSelectedDocsToCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
-                    break;
-                case "Legal rep/respondents":
-                    addSelectedDocsToCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
-                    break;
-                case "Both Citizens and Legal rep/respondents":
-                    addSelectedDocsToCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
-                    addSelectedDocsToCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
-                    break;
-                default:
-                    multipleData.getClaimantDocumentCollection().removeAll(selectedDocs);
-                    multipleData.getLegalrepDocumentCollection().removeAll(selectedDocs);
-                    break;
+            case "Citizens":
+                addSelectedDocsToCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
+                break;
+            case "Legal rep/respondents":
+                addSelectedDocsToCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
+                break;
+            case "Both Citizens and Legal rep/respondents":
+                addSelectedDocsToCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
+                addSelectedDocsToCollection(selectedDocs, multipleData.getLegalrepDocumentCollection());
+                break;
+            default:
+                multipleData.getClaimantDocumentCollection().removeAll(selectedDocs);
+                multipleData.getLegalrepDocumentCollection().removeAll(selectedDocs);
+                break;
         }
     }
 

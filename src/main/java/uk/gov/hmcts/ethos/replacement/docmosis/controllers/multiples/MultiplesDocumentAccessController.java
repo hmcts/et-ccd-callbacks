@@ -49,7 +49,7 @@ public class MultiplesDocumentAccessController {
     }
 
     /**
-     * Called at the end of Upload Document event.
+     * Called at the end of DocumentAccess event.
      * @param ccdRequest holds the request and case data
      * @return Callback response entity with case data and errors attached.
      */

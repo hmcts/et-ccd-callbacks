@@ -56,8 +56,11 @@ public final class MultiplesDocumentAccessService {
 
         String documentAccess = multipleData.getDocumentAccess();
 
-        if (documentAccess != null) {
-            switch (documentAccess) {
+        if (documentAccess == null) {
+            return;
+        }
+
+        switch (documentAccess) {
                 case "Citizens":
                     addSelectedDocsToCollection(selectedDocs, multipleData.getClaimantDocumentCollection());
                     break;
@@ -72,7 +75,6 @@ public final class MultiplesDocumentAccessService {
                     multipleData.getClaimantDocumentCollection().removeAll(selectedDocs);
                     multipleData.getLegalrepDocumentCollection().removeAll(selectedDocs);
                     break;
-            }
         }
     }
 

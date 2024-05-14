@@ -61,17 +61,14 @@ class MultiplesDocumentAccessServiceTest {
 
     @Test
     void testSetMultipleDocumentCollectionWhenDocumentCollectionIsEmpty() {
-        // Create a mock MultipleData object with an empty document collection
+
         MultipleData multipleData = mock(MultipleData.class);
         when(multipleData.getDocumentCollection()).thenReturn(new ArrayList<>());
 
-        // Call the method to set multiple document collection
         multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
 
-        // Verify that the documentSelect is not set when document collection is empty
         verify(multipleData, Mockito.never()).setDocumentSelect(any());
 
-        // Assert that the documentSelect is not set when document collection is empty
         assertNull(multipleData.getDocumentSelect());
     }
 
@@ -82,7 +79,6 @@ class MultiplesDocumentAccessServiceTest {
         DocumentTypeItem document1 = new DocumentTypeItem();
         document1.setId("1");
 
-        // Add document1 to the claimantDocumentCollection
         multipleData.getClaimantDocumentCollection().add(document1);
 
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
@@ -98,7 +94,6 @@ class MultiplesDocumentAccessServiceTest {
         DocumentTypeItem document1 = new DocumentTypeItem();
         document1.setId("1");
 
-        // Add document1 to the legalrepDocumentCollection
         multipleData.getLegalrepDocumentCollection().add(document1);
 
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
@@ -117,7 +112,6 @@ class MultiplesDocumentAccessServiceTest {
         DocumentTypeItem document2 = new DocumentTypeItem();
         document2.setId("2");
 
-        // Add document1 to the legalrepDocumentCollection
         multipleData.getLegalrepDocumentCollection().add(document1);
         multipleData.getClaimantDocumentCollection().add(document1);
 
@@ -133,13 +127,10 @@ class MultiplesDocumentAccessServiceTest {
     @Test
      void testClaimantDocumentCollectionNullCheck() {
 
-        // Set claimantDocumentCollection to null
         multipleData.setClaimantDocumentCollection(null);
 
-        // Call the method that initializes claimantDocumentCollection if it is null
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
 
-        // Assert that claimantDocumentCollection is not null and is an empty ArrayList
         assertNotNull(multipleData.getClaimantDocumentCollection());
         assertTrue(multipleData.getClaimantDocumentCollection().isEmpty());
     }
@@ -147,36 +138,30 @@ class MultiplesDocumentAccessServiceTest {
     @Test
     void testLegalRepDocumentCollectionNullCheck() {
 
-        // Set claimantDocumentCollection to null
         multipleData.setClaimantDocumentCollection(null);
 
-        // Call the method that initializes claimantDocumentCollection if it is null
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
 
-        // Assert that claimantDocumentCollection is not null and is an empty ArrayList
         assertNotNull(multipleData.getLegalrepDocumentCollection());
         assertTrue(multipleData.getLegalrepDocumentCollection().isEmpty());
     }
 
     @Test
     void testAddSelectedDocsToCollection() {
-        // Create a list of selected documents
+
         List<DocumentTypeItem> selectedDocs = new ArrayList<>();
         DocumentTypeItem selectedDoc1 = new DocumentTypeItem();
         selectedDoc1.setId("1");
         selectedDocs.add(selectedDoc1);
 
-        // Create a document collection with an existing document
         List<DocumentTypeItem> documentCollection = new ArrayList<>();
         DocumentTypeItem existingDoc = new DocumentTypeItem();
         existingDoc.setId("2");
         documentCollection.add(existingDoc);
 
-        // Call the method to add selected documents to the collection
         multiplesDocumentAccessService.addSelectedDocsToCollection(selectedDocs, documentCollection);
 
-        // Verify that the selected document is added to the collection
-        assertEquals(2, documentCollection.size()); // Expecting 2 documents in the collection
-        assertEquals(selectedDoc1, documentCollection.get(1)); // Verify the selected document is added
+        assertEquals(2, documentCollection.size());
+        assertEquals(selectedDoc1, documentCollection.get(1));
     }
 }

@@ -24,7 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -331,14 +330,22 @@ class RespondentTellSomethingElseServiceTest {
         verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
-    @Test
-    void sendClaimantEmail_groupA_sendsEmail() throws IOException {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY);
+    @ParameterizedTest
+    @ValueSource(strings = {
+        TSE_APP_AMEND_RESPONSE,
+        TSE_APP_CLAIMANT_NOT_COMPLIED,
+        TSE_APP_CONTACT_THE_TRIBUNAL,
+        TSE_APP_ORDER_OTHER_PARTY,
+        TSE_APP_POSTPONE_A_HEARING,
+        TSE_APP_RESTRICT_PUBLICITY,
+        TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM,
+        TSE_APP_VARY_OR_REVOKE_AN_ORDER
+    })
+    void sendClaimantEmail_groupA_sendsEmail(String applicationType) throws IOException {
+        CaseData caseData = createCaseDataWithHearing(applicationType);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
-        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
-        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
@@ -348,8 +355,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("claimant"), is("claimant"));
         assertThat(personalisation.get("respondentNames"), is("Father Ted"));
         assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
-        assertThat(personalisation.get("hearingDate"), is("Not set"));
-        assertThat(personalisation.get("shortText"), is(TSE_APP_AMEND_RESPONSE));
+        assertThat(personalisation.get("hearingDate"), is("16 May 2069"));
+        assertThat(personalisation.get("shortText"), is(applicationType));
         assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
             + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
@@ -367,14 +374,13 @@ class RespondentTellSomethingElseServiceTest {
         TSE_APP_VARY_OR_REVOKE_AN_ORDER
     })
     void sendClaimantEmail_groupA_sendsEmail_Welsh(String applicationType) throws IOException {
-        CaseData caseData = createCaseData(applicationType, I_DO_WANT_TO_COPY);
+        CaseData caseData = createCaseDataWithHearing(applicationType);
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
-        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
-        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
-        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
         verify(emailService).sendEmail(eq(TEMPLATE_ID_A_CY), any(), personalisationCaptor.capture());
@@ -391,7 +397,7 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("claimant"), is("claimant"));
         assertThat(personalisation.get("respondentNames"), is("Father Ted"));
         assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
-        assertThat(personalisation.get("hearingDate"), is("Not set"));
+        assertThat(personalisation.get("hearingDate"), is("16 Mai 2069"));
         assertThat(personalisation.get("shortText"), is(CY_RESPONDENT_APP_TYPE_MAP.get(applicationType)));
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
@@ -399,14 +405,18 @@ class RespondentTellSomethingElseServiceTest {
         assertTrue(((String) personalisation.get("citizenPortalLink")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 
-    @Test
-    void sendClaimantEmail_groupB_sendsEmail() throws IOException {
-        CaseData caseData = createCaseData(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY);
+    @ParameterizedTest
+    @ValueSource(strings = {
+        TSE_APP_CHANGE_PERSONAL_DETAILS,
+        TSE_APP_CONSIDER_A_DECISION_AFRESH,
+        TSE_APP_RECONSIDER_JUDGEMENT
+    })
+    void sendClaimantEmail_groupB_sendsEmail(String applicationType) throws IOException {
+        CaseData caseData = createCaseDataWithHearing(applicationType);
+        caseData.setHearingCollection(null);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
-        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
-        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
@@ -417,7 +427,7 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("respondentNames"), is("Father Ted"));
         assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
         assertThat(personalisation.get("hearingDate"), is("Not set"));
-        assertThat(personalisation.get("shortText"), is(TSE_APP_CHANGE_PERSONAL_DETAILS));
+        assertThat(personalisation.get("shortText"), is(applicationType));
         assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
             + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
@@ -430,14 +440,14 @@ class RespondentTellSomethingElseServiceTest {
         TSE_APP_RECONSIDER_JUDGEMENT
     })
     void sendClaimantEmail_groupB_sendsEmail_Welsh(String applicationType) throws IOException {
-        CaseData caseData = createCaseData(applicationType, I_DO_WANT_TO_COPY);
+        CaseData caseData = createCaseDataWithHearing(applicationType);
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        caseData.setHearingCollection(null);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
-        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
-        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
-        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
         verify(emailService).sendEmail(eq(TEMPLATE_ID_B_CY), any(), personalisationCaptor.capture());
@@ -454,12 +464,27 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("claimant"), is("claimant"));
         assertThat(personalisation.get("respondentNames"), is("Father Ted"));
         assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
-        assertThat(personalisation.get("hearingDate"), is("Not set"));
+        assertThat(personalisation.get("hearingDate"), is("Heb ei anfon"));
         assertThat(personalisation.get("shortText"), is(CY_RESPONDENT_APP_TYPE_MAP.get(applicationType)));
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
             + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
         assertTrue(((String) personalisation.get("citizenPortalLink")).endsWith(WELSH_LANGUAGE_PARAM));
+    }
+
+    private CaseData createCaseDataWithHearing(String selectedApplication) {
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("test")
+            .withClaimant("claimant")
+            .withClaimantType("person@email.com")
+            .withClaimantHearingPreference(ENGLISH_LANGUAGE)
+            .withRespondent("Father Ted", NO, null, false)
+            .withHearing("1", "Hearing", "Judge", "Bodmin", List.of("In person"), "60", "Days", "Sit Alone")
+            .withHearingSession(0, "1", "2069-05-16T01:00:00.000", "Listed", false)
+            .build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        caseData.setResTseCopyToOtherPartyYesOrNo(YES);
+        return caseData;
     }
 
     @ParameterizedTest

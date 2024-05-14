@@ -68,8 +68,10 @@ template:
     respondent:
       application:
         claimant: ${TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID:5d014e5a-9528-4d02-bd31-8eca98cfba19}
-        respondent: ${TSE_RESPONDENT_TO_RESPONDENT_TEMPLATE_ID:c0b393f6-daf0-46fc-8995-d5e98149326f}
-        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:e60bc338-db48-4270-95b0-5e8f29e6ae0f}
+        respondent-no: ${TSE_RESPONDENT_TO_RESPONDENT_NO_TEMPLATE_ID:e8e02ca0-6443-41c4-9064-705f7ab8b39b}
+        respondent-type-a: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:368b44ed-54ff-4ba6-9f90-cdbe6fab81b9}
+        respondent-type-b: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:eb056a09-72ca-4bf2-b774-016aae1d185c}
+        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:5e75a23b-4a84-415d-8eba-4f10b023ba8b}
         tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
       respond:
         claimant: ${TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:dec79c11-2c02-481d-aed8-6f013667cdf5}

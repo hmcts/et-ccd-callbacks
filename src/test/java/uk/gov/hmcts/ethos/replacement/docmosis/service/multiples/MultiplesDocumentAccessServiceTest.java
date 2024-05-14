@@ -59,7 +59,6 @@ class MultiplesDocumentAccessServiceTest {
         assertTrue(multipleData.getDocumentCollection().contains(document1));
     }
 
-
     @Test
     void testSetMultipleDocumentCollectionWhenDocumentCollectionIsEmpty() {
         // Create a mock MultipleData object with an empty document collection

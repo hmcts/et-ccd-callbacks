@@ -42,6 +42,8 @@ public class BundlesRespondentService {
     private static final String BUT = "But";
     private static final String EXCEEDED_CHAR_LIMIT = "This field must be 2500 characters or less";
     private static final int MAX_CHAR_TEXT_AREA = 2500;
+    private static final String SELECT_CLAIMANT_HEARING_BUNDLES = "selectClaimantHearingBundles";
+    private static final String SELECT_RESPONDENT_HEARING_BUNDLES = "selectRespondentHearingBundles";
 
     public void clearInputData(CaseData caseData) {
         caseData.setBundlesRespondentPrepareDocNotesShow(null);
@@ -164,9 +166,9 @@ public class BundlesRespondentService {
     public void removeHearingBundles(CaseData caseData) {
         String selectedParty = caseData.getRemoveBundleDropDownSelectedParty();
 
-        if ("selectClaimantHearingBundles".equals(selectedParty)) {
+        if (SELECT_CLAIMANT_HEARING_BUNDLES.equals(selectedParty)) {
             removeHearingBundles(caseData, caseData.getBundlesClaimantCollection());
-        } else if ("selectRespondentHearingBundles".equals(selectedParty)) {
+        } else if (SELECT_RESPONDENT_HEARING_BUNDLES.equals(selectedParty)) {
             removeHearingBundles(caseData, caseData.getBundlesRespondentCollection());
         }
     }
@@ -207,9 +209,9 @@ public class BundlesRespondentService {
 
     public void populateSelectRemoveHearingBundle(CaseData caseData) {
         String selectedParty = caseData.getRemoveBundleDropDownSelectedParty();
-        if ("selectClaimantHearingBundles".equals(selectedParty)) {
+        if (SELECT_CLAIMANT_HEARING_BUNDLES.equals(selectedParty)) {
             populateSelectRemoveHearingBundle(caseData.getBundlesClaimantCollection(), caseData);
-        } else if ("selectRespondentHearingBundles".equals(selectedParty)) {
+        } else if (SELECT_RESPONDENT_HEARING_BUNDLES.equals(selectedParty)) {
             populateSelectRemoveHearingBundle(caseData.getBundlesRespondentCollection(), caseData);
         }
     }

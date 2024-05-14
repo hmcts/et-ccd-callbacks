@@ -41,6 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
@@ -260,7 +261,7 @@ public final class TseHelper {
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
-                "shortText", selectedApplication.getType(),
+                SHORT_TEXT, selectedApplication.getType(),
                 LINK_TO_EXUI, exuiUrl
         );
     }

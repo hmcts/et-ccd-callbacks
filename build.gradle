@@ -3,7 +3,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'jacoco'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'io.spring.dependency-management' version '1.1.5'
     id 'org.springframework.boot' version '2.7.18'
     id 'org.owasp.dependencycheck' version '9.1.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
@@ -304,14 +304,14 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '9.0.88'
+    tomcatEmbedVersion = '9.0.89'
 }
 
 ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'com.google.guava', version: '33.1.0-jre') {
+        dependencySet(group: 'com.google.guava', version: '33.2.0-jre') {
             entry 'guava'
         }
         dependencySet(group: 'io.netty', version: '4.1.109.Final') {
@@ -335,13 +335,13 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.5.10'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'5ac79141ae'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.6.3'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'3.8.1'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.4'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.37.3'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -386,7 +386,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.3.0'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.4.0'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.0'
 
@@ -411,7 +411,7 @@ dependencies {
     }
     testImplementation(platform('org.junit:junit-bom:5.10.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.7'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.8'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
 
@@ -491,7 +491,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 323
-pmdTest.maxFailures = 227
+pmdMain.maxFailures = 320
+pmdTest.maxFailures = 221
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

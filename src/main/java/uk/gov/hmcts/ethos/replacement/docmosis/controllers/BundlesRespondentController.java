@@ -212,8 +212,8 @@ public class BundlesRespondentController {
         <html>
             <body>
                 <tag><h2>What happens next</h2></tag>
-                <h2>The tribunal will let you know</h2>
-                <h2> if they have any questions about the hearing documents you have submitted.</h2>
+                <h2>The tribunal will let you know
+                if they have any questions about the hearing documents you have submitted.</h2>
             </body>
         </html>""";
 

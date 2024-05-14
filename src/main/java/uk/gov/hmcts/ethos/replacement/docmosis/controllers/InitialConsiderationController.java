@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 
 /**
@@ -95,7 +96,7 @@ public class InitialConsiderationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
-        caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+        caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

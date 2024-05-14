@@ -20,6 +20,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
 public final class DynamicListHelper {
@@ -143,6 +144,6 @@ public final class DynamicListHelper {
     private static String getListedDate(DateListedType dateListedType) {
         String listedDate = dateListedType.getListedDate().substring(0, 10);
         LocalDate date = LocalDate.parse(listedDate);
-        return date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+        return date.format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT));
     }
 }

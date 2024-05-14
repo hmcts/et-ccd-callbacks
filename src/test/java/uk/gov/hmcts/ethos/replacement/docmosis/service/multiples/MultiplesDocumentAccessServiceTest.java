@@ -131,7 +131,7 @@ class MultiplesDocumentAccessServiceTest {
     }
 
     @Test
-    public void testClaimantDocumentCollectionNullCheck() {
+     void testClaimantDocumentCollectionNullCheck() {
 
         // Set claimantDocumentCollection to null
         multipleData.setClaimantDocumentCollection(null);
@@ -145,7 +145,7 @@ class MultiplesDocumentAccessServiceTest {
     }
 
     @Test
-    public void testLegalRepDocumentCollectionNullCheck() {
+    void testLegalRepDocumentCollectionNullCheck() {
 
         // Set claimantDocumentCollection to null
         multipleData.setClaimantDocumentCollection(null);

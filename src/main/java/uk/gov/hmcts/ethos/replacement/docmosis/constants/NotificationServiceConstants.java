@@ -19,6 +19,9 @@ public final class NotificationServiceConstants {
     public static final String EMAIL_FLAG = "emailFlag";
     public static final String LINK_TO_CITIZEN_HUB = "linkToCitizenHub";
     public static final String LINK_TO_EXUI = "linkToExUI";
+    public static final String LINK_TO_DOCUMENT = "linkToDocument";
+    public static final String CITIZEN_PORTAL_LINK = "citizenPortalLink";
+    public static final String DATE_PLUS_7 = "datePlus7";
     public static final String SHORT_TEXT = "shortText";
     public static final String WELSH_LANGUAGE = "Welsh";
     public static final String WELSH_LANGUAGE_PARAM = "?lng=cy";

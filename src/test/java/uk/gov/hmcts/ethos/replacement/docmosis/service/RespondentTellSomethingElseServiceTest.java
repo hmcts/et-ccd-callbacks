@@ -31,7 +31,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -78,8 +77,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService.CY_CLAIMANT_EMAIL_GROUP_A;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService.CY_CLAIMANT_EMAIL_GROUP_B;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class RespondentTellSomethingElseServiceTest {
@@ -108,7 +105,9 @@ class RespondentTellSomethingElseServiceTest {
     private static final String I_DO_WANT_TO_COPY = "I do want to copy";
     private static final String TEMPLATE_ID_NO = "NoTemplateId";
     private static final String TEMPLATE_ID_A = "TypeATemplateId";
+    private static final String TEMPLATE_ID_A_CY = "TypeACYTemplateId";
     private static final String TEMPLATE_ID_B = "TypeBTemplateId";
+    private static final String TEMPLATE_ID_B_CY = "TypeBCYTemplateId";
     private static final String TEMPLATE_ID_C = "TypeCTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
@@ -138,6 +137,15 @@ class RespondentTellSomethingElseServiceTest {
             "tseRespondentAcknowledgeTypeBTemplateId", TEMPLATE_ID_B);
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTypeCTemplateId", TEMPLATE_ID_C);
+
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+            "tseRespondentToClaimantTypeATemplateId", TEMPLATE_ID_A);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+            "tseRespondentToClaimantTypeBTemplateId", TEMPLATE_ID_B);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+            "cyTseRespondentToClaimantTypeATemplateId", TEMPLATE_ID_A_CY);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+            "cyTseRespondentToClaimantTypeBTemplateId", TEMPLATE_ID_B_CY);
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -302,50 +310,6 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     @Test
-    void claimantPersonalisation_buildsCorrectData_English_Language() throws NotificationClientException {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY);
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
-        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
-
-        Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
-            new byte[]{});
-
-        assertThat(actual.get("caseNumber"), is(caseData.getEthosCaseReference()));
-        assertThat(actual.get("applicationType"), is(TSE_APP_AMEND_RESPONSE));
-        assertThat(actual.get("instructions"), is("test"));
-        assertThat(actual.get("claimant"), is("claimant"));
-        assertThat(actual.get("respondents"), is("Father Ted"));
-        assertThat(actual.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download"
-            + "\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
-    }
-
-    @Test
-    void claimantPersonalisation_buildsCorrectData_Welsh_Language() throws NotificationClientException {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY);
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(CASE_ID);
-        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
-        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
-        when(featureToggleService.isWelshEnabled()).thenReturn(true);
-
-        Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
-                new byte[]{});
-
-        assertThat(actual.get("caseNumber"), is(caseData.getEthosCaseReference()));
-        assertThat(actual.get("applicationType"), is(CY_RESPONDENT_APP_TYPE_MAP.get(TSE_APP_AMEND_RESPONSE)));
-        assertThat(actual.get("instructions"), is("test"));
-        assertThat(actual.get("claimant"), is("claimant"));
-        assertThat(actual.get("respondents"), is("Father Ted"));
-        assertThat(actual.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download"
-                + "\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
-        assertTrue(((String) actual.get("linkToCitizenHub")).endsWith(WELSH_LANGUAGE_PARAM));
-    }
-
-    @Test
     void sendClaimantEmail_rule92No_doesNothing() {
         CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
         CaseDetails caseDetails = new CaseDetails();
@@ -378,11 +342,16 @@ class RespondentTellSomethingElseServiceTest {
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
-        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        verify(emailService).sendEmail(eq(TEMPLATE_ID_A), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
-        String expectedInstructions = String.format("You should respond as soon as possible, and in any event by %s.",
-            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
-        assertThat(personalisation.get("instructions"), is(expectedInstructions));
+
+        assertThat(personalisation.get("claimant"), is("claimant"));
+        assertThat(personalisation.get("respondentNames"), is("Father Ted"));
+        assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
+        assertThat(personalisation.get("hearingDate"), is("Not set"));
+        assertThat(personalisation.get("shortText"), is(TSE_APP_AMEND_RESPONSE));
+        assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
     }
 
     @ParameterizedTest
@@ -407,19 +376,26 @@ class RespondentTellSomethingElseServiceTest {
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
-        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        verify(emailService).sendEmail(eq(TEMPLATE_ID_A_CY), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
-        String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
 
+        String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
         for (Map.Entry<String, String> monthEntry : CY_MONTHS_MAP.entrySet()) {
             if (expectedDueDate.contains(monthEntry.getKey())) {
                 expectedDueDate = expectedDueDate.replace(monthEntry.getKey(), monthEntry.getValue());
                 break;
             }
         }
-        String expectedInstructions = String.format(CY_CLAIMANT_EMAIL_GROUP_A, expectedDueDate);
 
-        assertThat(personalisation.get("instructions"), is(expectedInstructions));
+        assertThat(personalisation.get("claimant"), is("claimant"));
+        assertThat(personalisation.get("respondentNames"), is("Father Ted"));
+        assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
+        assertThat(personalisation.get("hearingDate"), is("Not set"));
+        assertThat(personalisation.get("shortText"), is(CY_RESPONDENT_APP_TYPE_MAP.get(applicationType)));
+        assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
+            + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+        assertTrue(((String) personalisation.get("citizenPortalLink")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 
     @Test
@@ -433,12 +409,16 @@ class RespondentTellSomethingElseServiceTest {
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
-        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        verify(emailService).sendEmail(eq(TEMPLATE_ID_B), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
-        String expected = String.format("You are not expected to respond to this application"
-            + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.",
-            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
-        assertThat(personalisation.get("instructions"), is(expected));
+
+        assertThat(personalisation.get("claimant"), is("claimant"));
+        assertThat(personalisation.get("respondentNames"), is("Father Ted"));
+        assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
+        assertThat(personalisation.get("hearingDate"), is("Not set"));
+        assertThat(personalisation.get("shortText"), is(TSE_APP_CHANGE_PERSONAL_DETAILS));
+        assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
     }
 
     @ParameterizedTest
@@ -458,19 +438,26 @@ class RespondentTellSomethingElseServiceTest {
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
-        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        verify(emailService).sendEmail(eq(TEMPLATE_ID_B_CY), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
         String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
-
         for (Map.Entry<String, String> monthEntry : CY_MONTHS_MAP.entrySet()) {
             if (expectedDueDate.contains(monthEntry.getKey())) {
                 expectedDueDate = expectedDueDate.replace(monthEntry.getKey(), monthEntry.getValue());
                 break;
             }
         }
-        String expectedInstructions = String.format(CY_CLAIMANT_EMAIL_GROUP_B, expectedDueDate);
-        assertThat(personalisation.get("instructions"), is(expectedInstructions));
+
+        assertThat(personalisation.get("claimant"), is("claimant"));
+        assertThat(personalisation.get("respondentNames"), is("Father Ted"));
+        assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
+        assertThat(personalisation.get("hearingDate"), is("Not set"));
+        assertThat(personalisation.get("shortText"), is(CY_RESPONDENT_APP_TYPE_MAP.get(applicationType)));
+        assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
+            + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+        assertTrue(((String) personalisation.get("citizenPortalLink")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 
     @ParameterizedTest

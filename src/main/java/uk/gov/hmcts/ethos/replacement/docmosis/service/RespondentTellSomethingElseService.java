@@ -38,14 +38,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WIT
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CITIZEN_PORTAL_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE_PLUS_7;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
@@ -76,29 +77,20 @@ public class RespondentTellSomethingElseService {
     private String tseRespondentAcknowledgeTypeBTemplateId;
     @Value("${template.tse.respondent.application.respondent-type-c}")
     private String tseRespondentAcknowledgeTypeCTemplateId;
-    @Value("${template.tse.respondent.application.claimant}")
-    private String tseRespondentToClaimantTemplateId;
-    @Value("${template.tse.respondent.application.cyClaimant}")
-    private String cyTseRespondentToClaimantTemplateId;
+    @Value("${template.tse.respondent.application.claimant-a}")
+    private String tseRespondentToClaimantTypeATemplateId;
+    @Value("${template.tse.respondent.application.claimant-b}")
+    private String tseRespondentToClaimantTypeBTemplateId;
+    @Value("${template.tse.respondent.application.cyClaimant-a}")
+    private String cyTseRespondentToClaimantTypeATemplateId;
+    @Value("${template.tse.respondent.application.cyClaimant-b}")
+    private String cyTseRespondentToClaimantTypeBTemplateId;
     @Value("${template.tse.respondent.application.tribunal}")
     private String tseNewApplicationAdminTemplateId;
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
     private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,
             TSE_APP_CONSIDER_A_DECISION_AFRESH, TSE_APP_RECONSIDER_JUDGEMENT);
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
-    private static final String CLAIMANT_EMAIL_GROUP_B = "You are not expected to respond to this application"
-            + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
-
-    public static final String CY_CLAIMANT_EMAIL_GROUP_B = """
-    Nid oes disgwyl i chi ymateb i'r cais hwn.
-
-    Os byddwch yn ymateb dylech wneud hynny cyn gynted â phosibl ac erbyn %s fan bellaf.
-        """;
-    private static final String CLAIMANT_EMAIL_GROUP_A = "You should respond as soon as possible, and in any "
-            + "event by %s.";
-
-    public static final String CY_CLAIMANT_EMAIL_GROUP_A = "Dylech ymateb cyn gynted â phosibl, ac erbyn %s "
-            + "fan bellaf.";
 
     private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String TABLE_COLUMNS_MARKDOWN =
@@ -200,17 +192,13 @@ public class RespondentTellSomethingElseService {
         boolean isWelsh = featureToggleService.isWelshEnabled()
                 && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
 
-        String dueDate = isWelsh
-                ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
-                : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
-
-        String emailTemplate = getEmailTemplateId(isWelsh);
-        String instructions = getInstructions(dueDate, isWelsh, caseData.getResTseSelectApplication());
-
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", TSE_FILE_NAME);
-            Map<String, Object> personalisation = claimantPersonalisation(caseDetails, instructions, bytes);
-            emailService.sendEmail(emailTemplate, claimantEmail, personalisation);
+            emailService.sendEmail(
+                getEmailTemplate(isWelsh, caseData.getResTseSelectApplication()),
+                claimantEmail,
+                claimantPersonalisation(caseDetails, bytes)
+            );
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
@@ -224,34 +212,27 @@ public class RespondentTellSomethingElseService {
                 .orElse(date);
     }
 
-    private String getEmailTemplateId(boolean isWelsh) {
-        return isWelsh ? cyTseRespondentToClaimantTemplateId : tseRespondentToClaimantTemplateId;
-    }
-
-    private String getInstructions(String dueDate, boolean isWelsh, String applicationType) {
-        String instructionFormat;
-        if (isWelsh) {
-            instructionFormat = GROUP_B_TYPES.contains(applicationType)
-                    ? CY_CLAIMANT_EMAIL_GROUP_B
-                    : CY_CLAIMANT_EMAIL_GROUP_A;
+    private String getEmailTemplate(boolean isWelsh, String applicationType) {
+        if (GROUP_B_TYPES.contains(applicationType)) {
+            return isWelsh
+                ? cyTseRespondentToClaimantTypeBTemplateId
+                : tseRespondentToClaimantTypeBTemplateId;
         } else {
-            instructionFormat = GROUP_B_TYPES.contains(applicationType)
-                    ? CLAIMANT_EMAIL_GROUP_B
-                    : CLAIMANT_EMAIL_GROUP_A;
+            return isWelsh
+                ? cyTseRespondentToClaimantTypeATemplateId
+                : tseRespondentToClaimantTypeATemplateId;
         }
-        return String.format(instructionFormat, dueDate);
     }
 
     /**
      * Builds personalisation for sending an email to the claimant.
      *
      * @param caseDetails  Details about the case
-     * @param instructions Instructions to be included
      * @param document     document to link off to
      * @return KeyValue mappings needed to populate the email
      * @throws NotificationClientException When the document cannot be uploaded
      */
-    public Map<String, Object> claimantPersonalisation(CaseDetails caseDetails, String instructions, byte[] document)
+    private Map<String, Object> claimantPersonalisation(CaseDetails caseDetails, byte[] document)
             throws NotificationClientException {
 
         CaseData caseData = caseDetails.getCaseData();
@@ -261,17 +242,21 @@ public class RespondentTellSomethingElseService {
         String shortText = isWelsh
                 ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
                 : caseData.getResTseSelectApplication();
-        String linkToCitizenHub = emailService.getCitizenCaseLink(
+        String datePlus7 = isWelsh
+                ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
+                : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
+        String citizenPortalLink = emailService.getCitizenCaseLink(
                 caseDetails.getCaseId()) + (isWelsh ? WELSH_LANGUAGE_PARAM : "");
 
         return Map.of(
-                LINK_TO_CITIZEN_HUB, linkToCitizenHub,
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, shortText,
-                "instructions", instructions,
                 CLAIMANT, caseData.getClaimant(),
-                RESPONDENTS, getRespondentNames(caseData),
-                "linkToDocument", documentJson
+                RESPONDENT_NAMES, getRespondentNames(caseData),
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                HEARING_DATE, getNearestHearingToReferral(caseData, NOT_SET),
+                SHORT_TEXT, shortText,
+                DATE_PLUS_7, datePlus7,
+                LINK_TO_DOCUMENT, documentJson,
+                CITIZEN_PORTAL_LINK, citizenPortalLink
         );
     }
 

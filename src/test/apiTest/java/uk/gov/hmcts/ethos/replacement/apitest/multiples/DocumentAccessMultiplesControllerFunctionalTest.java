@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.apitest.BaseFunctionalTest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
@@ -34,6 +35,7 @@ public class DocumentAccessMultiplesControllerFunctionalTest extends BaseFunctio
         multipleDetails.setCaseData(multipleData);
         multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);
         request.setCaseDetails(multipleDetails);
+        multipleData.setDocumentCollection(new ArrayList<>());
 
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentFilename("random.pdf");

@@ -20,12 +20,17 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
@@ -52,6 +57,7 @@ public class CcdCaseAssignment {
     private final String aacUrl;
     private final String applyNocAssignmentsApiPath;
     private final String ccdDataStoreUrl;
+    private final MultipleCasesSendingService multipleCasesSendingService;
 
     public CcdCaseAssignment(RestTemplate restTemplate,
                              AuthTokenGenerator serviceAuthTokenGenerator,
@@ -61,7 +67,8 @@ public class CcdCaseAssignment {
                              NocCcdService nocCcdService,
                              @Value("${assign_case_access_api_url}") String aacUrl,
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath,
-                             @Value("${ccd.data-store-api-url}") String ccdDataStoreUrl
+                             @Value("${ccd.data-store-api-url}") String ccdDataStoreUrl,
+                             MultipleCasesSendingService multipleCasesSendingService
     ) {
         this.restTemplate = restTemplate;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
@@ -72,6 +79,7 @@ public class CcdCaseAssignment {
         this.aacUrl = aacUrl;
         this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
         this.ccdDataStoreUrl = ccdDataStoreUrl;
+        this.multipleCasesSendingService = multipleCasesSendingService;
     }
 
     public CCDCallbackResponse applyNoc(final CallbackRequest callback, String userToken) throws IOException {
@@ -80,20 +88,20 @@ public class CcdCaseAssignment {
         final String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
 
         HttpEntity<CallbackRequest> requestEntity =
-            new HttpEntity<>(
-                callback,
-                createHeaders(serviceAuthorizationToken, userToken)
-            );
+                new HttpEntity<>(
+                        callback,
+                        createHeaders(serviceAuthorizationToken, userToken)
+                );
 
         ResponseEntity<CCDCallbackResponse> response;
         try {
             response = restTemplate
-                .exchange(
-                    aacUrl + applyNocAssignmentsApiPath,
-                    HttpMethod.POST,
-                    requestEntity,
-                    CCDCallbackResponse.class
-                );
+                    .exchange(
+                            aacUrl + applyNocAssignmentsApiPath,
+                            HttpMethod.POST,
+                            requestEntity,
+                            CCDCallbackResponse.class
+                    );
 
         } catch (RestClientResponseException exception) {
             log.info("Error form ccd - {}", exception.getMessage());
@@ -101,12 +109,11 @@ public class CcdCaseAssignment {
         }
 
         log.info("Apply NoC. Http status received from AAC API; {} for case {}",
-            response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
+                response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
 
         if (featureToggleService.isMultiplesEnabled()) {
             addRespondentRepresentativeToMultiple(callback.getCaseDetails());
         }
-
         return response.getBody();
     }
 
@@ -137,18 +144,64 @@ public class CcdCaseAssignment {
             return;
         }
 
-        String caseType = caseDetails.getCaseTypeId();
+        String caseType = caseDetails.getCaseTypeId() + "_Multiple";
         String multipleRef = caseDetails.getCaseData().getMultipleReference();
-        String multipleId = getMultipleIdByReference(adminUserToken, caseType, multipleRef);
+        SubmitMultipleEvent multiShell = getMultipleIdByReference(adminUserToken, caseType, multipleRef);
 
-        if (multipleId.isEmpty()) {
+        if (String.valueOf(multiShell.getCaseId()).isEmpty()) {
+
             log.info("Add Respondent Representative to Multiple failed. "
                     + "Multiple Id not found for case {}, with MultipleReference {}", caseId, multipleRef);
             return;
         }
 
+        String multipleId = String.valueOf(multiShell.getCaseId());
         String jurisdiction = caseDetails.getJurisdiction();
+
         addUserToCase(adminUserToken, jurisdiction, caseType, multipleId, caseId, userToAddId);
+
+        MultipleData multipleShell = multiShell.getCaseData();
+
+        updateMultipleLegalRepCollection(adminUserToken, caseType, jurisdiction, multipleShell, caseId, userToAddId, multipleId);
+    }
+
+    private void updateMultipleLegalRepCollection(
+            String userToken,
+            String caseTypeId,
+            String jurisdiction,
+            MultipleData multiDataToUpdate,
+            String caseId,
+            String legalRepId,
+            String multipleId) {
+
+        List<SubCaseLegalRepDetails> legalRepCollection = multiDataToUpdate.getLegalRepCollection();
+        if (legalRepCollection == null) {
+            legalRepCollection = new ArrayList<>();
+            multiDataToUpdate.setLegalRepCollection(legalRepCollection);
+        }
+
+        boolean caseExists = false;
+        for (SubCaseLegalRepDetails details : legalRepCollection) {
+            if (details.getCaseReference().equals(caseId)) {
+                caseExists = true;
+                if (!details.getLegalRepIds().contains(legalRepId)) {
+                    details.getLegalRepIds().add(legalRepId);
+                }
+                break;
+            }
+        }
+
+        if (!caseExists) {
+            List<String> newLegalRepList = new ArrayList<>();
+            newLegalRepList.add(legalRepId);
+            SubCaseLegalRepDetails newDetails = new SubCaseLegalRepDetails(caseId, newLegalRepList);
+            legalRepCollection.add(newDetails);
+            log.warn("legalRepCollection: " + legalRepCollection);
+        }
+
+        multiDataToUpdate.setLegalRepCollection(legalRepCollection);
+        multipleCasesSendingService.sendUpdateToMultiple(userToken, caseTypeId, jurisdiction,
+                multiDataToUpdate, multipleId);
     }
 
     private String getEventTriggerUserId(String adminUserToken, String caseId) throws IOException {
@@ -160,8 +213,8 @@ public class CcdCaseAssignment {
         return "";
     }
 
-    public String getMultipleIdByReference(String adminUserToken, String caseType, String multipleReference) {
-        String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType + "_Multiple");
+    public SubmitMultipleEvent getMultipleIdByReference(String adminUserToken, String caseType, String multipleReference) {
+        String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);
         String requestBody = buildQueryForGetMultipleIdByReference(multipleReference);
 
         HttpEntity<String> request =
@@ -185,13 +238,13 @@ public class CcdCaseAssignment {
             throw exception;
         }
 
-        MultipleCaseSearchResult responseBody = response.getBody();
+        MultipleCaseSearchResult resultBody = response.getBody();
 
-        if (responseBody != null && CollectionUtils.isNotEmpty(responseBody.getCases())) {
-            return String.valueOf(responseBody.getCases().get(0).getCaseId());
+        if (resultBody != null && CollectionUtils.isNotEmpty(resultBody.getCases())) {
+            return resultBody.getCases().get(0);
         }
 
-        return "";
+        return new SubmitMultipleEvent();
     }
 
     private String buildQueryForGetMultipleIdByReference(String multipleReference) {
@@ -227,7 +280,6 @@ public class CcdCaseAssignment {
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
-            // TO DO: Update MultipleCaseData to include caseId & userToAddId
 
             log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {

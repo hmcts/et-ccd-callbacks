@@ -8,7 +8,6 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.apitest.BaseFunctionalTest;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 

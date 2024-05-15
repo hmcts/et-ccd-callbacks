@@ -56,17 +56,17 @@ public class UploadDocumentHelperTest {
     @BeforeEach
     public void setUp() {
         caseData = CaseDataBuilder.builder()
-            .withClaimantIndType("First", "Last")
-            .withEthosCaseReference("1234")
-            .build();
+                .withClaimantIndType("First", "Last")
+                .withEthosCaseReference("1234")
+                .build();
 
         caseData.setClaimant("First Last");
 
         ccdRequest = CCDRequestBuilder.builder()
-            .withState(ACCEPTED_STATE)
-            .withCaseId("1234")
-            .withCaseData(caseData)
-            .build();
+                .withState(ACCEPTED_STATE)
+                .withCaseId("1234")
+                .withCaseData(caseData)
+                .build();
 
         caseDetails = ccdRequest.getCaseDetails();
     }
@@ -108,8 +108,8 @@ public class UploadDocumentHelperTest {
     void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
         Map<String, String> expected = buildPersonalisation("F");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(
-            caseDetails.getCaseData(),
-            "link"
+                caseDetails.getCaseData(),
+                "link"
         );
 
         assertThat(actual, is(expected));
@@ -120,8 +120,8 @@ public class UploadDocumentHelperTest {
         caseData.getClaimantIndType().setClaimantTitle("Mr");
         Map<String, String> expected = buildPersonalisation("Mr");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(
-            caseDetails.getCaseData(),
-            "link"
+                caseDetails.getCaseData(),
+                "link"
         );
 
         assertThat(actual, is(expected));
@@ -132,8 +132,8 @@ public class UploadDocumentHelperTest {
         caseData.getClaimantIndType().setClaimantPreferredTitle("Professor");
         Map<String, String> expected = buildPersonalisation("Professor");
         Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(
-            caseDetails.getCaseData(),
-            "link"
+                caseDetails.getCaseData(),
+                "link"
         );
 
         assertThat(actual, is(expected));
@@ -208,10 +208,10 @@ public class UploadDocumentHelperTest {
         DocumentTypeItem docItem = new DocumentTypeItem();
         DocumentType doc = new DocumentType();
         doc.setUploadedDocument(UploadedDocumentType.builder()
-            .documentUrl("http://localhost:8080/documents/1234")
-            .documentBinaryUrl("http://localhost:8080/documents/1234/binary")
-            .documentFilename("test.pdf")
-            .build());
+                .documentUrl("http://localhost:8080/documents/1234")
+                .documentBinaryUrl("http://localhost:8080/documents/1234/binary")
+                .documentFilename("test.pdf")
+                .build());
         doc.setTypeOfDocument(typeOfDocument);
         docItem.setValue(doc);
         caseData.setDocumentCollection(List.of(docItem));

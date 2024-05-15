@@ -15,6 +15,21 @@ docker pull docker.elastic.co/elasticsearch/elasticsearch:7.11.1
 # Download logstash
 docker pull docker.elastic.co/logstash/logstash:7.16.1
 # Download XUI Manage Cases
-docker pull hmctspublic.azurecr.io/xui/webapp:latest
+docker pull hmctspublic.azurecr.io/xui/webapp:prod-e0b76e1-20240423132447
 # Download XUI Manage Organisations
 docker pull hmctspublic.azurecr.io/xui/mo-webapp:latest
+
+#*************************WORK ALLOCATION*****************************
+# Download camunda
+# docker pull hmctsprivate.azurecr.io/camunda/bpm:latest
+# Download CCD Message Publisher
+# docker pull hmctspublic.azurecr.io/ccd/message-publisher:latest
+# Download WA Workflow API
+# docker pull hmctspublic.azurecr.io/wa/workflow-api:latest
+# Download WA Task Management API
+# docker pull hmctspublic.azurecr.io/wa/task-management-api:latest
+# Download Case Event Handler
+# docker pull hmctspublic.azurecr.io/wa/case-event-handler:latest
+# Download Task Monitor
+# docker pull hmctspublic.azurecr.io/wa/task-monitor:latest
+# Download

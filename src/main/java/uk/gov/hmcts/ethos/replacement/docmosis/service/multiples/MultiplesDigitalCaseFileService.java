@@ -50,17 +50,6 @@ public class MultiplesDigitalCaseFileService {
     }
 
     /**
-     * Sets the default bundle config is none is present.
-     *
-     * @param caseData data
-     */
-    public void setBundleConfig(MultipleData caseData) {
-        if (isNullOrEmpty(caseData.getBundleConfiguration())) {
-            caseData.setBundleConfiguration(defaultBundle);
-        }
-    }
-
-    /**
      * Creates a case file.
      * @param caseDetails data
      * @param userToken token
@@ -97,6 +86,12 @@ public class MultiplesDigitalCaseFileService {
                 .value(createBundleDetails(caseData))
                 .build();
         return List.of(bundle);
+    }
+
+    private void setBundleConfig(MultipleData caseData) {
+        if (isNullOrEmpty(caseData.getBundleConfiguration())) {
+            caseData.setBundleConfiguration(defaultBundle);
+        }
     }
 
     private BundleDetails createBundleDetails(MultipleData caseData) {

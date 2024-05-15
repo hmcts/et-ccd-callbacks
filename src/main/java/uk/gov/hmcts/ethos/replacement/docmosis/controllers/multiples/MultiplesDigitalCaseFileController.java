@@ -46,7 +46,7 @@ public class MultiplesDigitalCaseFileController {
                                                               @RequestHeader(HttpHeaders.AUTHORIZATION)
                                                               String userToken) {
 
-        log.info("About to start DCF for " + multipleRequest.getCaseDetails().getCaseId());
+        log.info("About to start DCF for {}", multipleRequest.getCaseDetails().getCaseId());
 
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         // Convert doc type from legacy to new before dcf
@@ -71,11 +71,12 @@ public class MultiplesDigitalCaseFileController {
                                                                   @RequestHeader(HttpHeaders.AUTHORIZATION)
                                                                   String userToken) {
 
+        log.info("About to submit DCF for {}", multipleRequest.getCaseDetails().getCaseId());
+
         MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         multipleData.setCaseBundles(multiplesDigitalCaseFileService.stitchCaseFile(
                 multipleRequest.getCaseDetails(),
                 userToken));
-        log.info(" case bundles{}", multipleData.getCaseBundles().toString());
         DigitalCaseFileHelper.addDcfToDocumentCollection(multipleData);
         multipleData.setCaseBundles(null);
         return multipleResponse(multipleData, null);

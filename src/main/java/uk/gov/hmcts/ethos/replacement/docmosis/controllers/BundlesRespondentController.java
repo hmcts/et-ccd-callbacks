@@ -244,10 +244,6 @@ public class BundlesRespondentController {
             @RequestHeader("Authorization") String userToken) {
 
         throwIfBundlesFlagDisabled();
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         try {

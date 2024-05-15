@@ -79,7 +79,8 @@ public class Et1ReppedService {
     private static final String ET1_EN_PDF = "ET1_2222.pdf";
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
-            TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL);
+            TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
+            TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST);
 
     /**
      * Validates the postcode and region.

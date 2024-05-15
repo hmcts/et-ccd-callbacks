@@ -21,8 +21,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
-import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
@@ -30,7 +30,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendin
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
@@ -148,8 +149,7 @@ public class CcdCaseAssignment {
         String multipleRef = caseDetails.getCaseData().getMultipleReference();
         SubmitMultipleEvent multiShell = getMultipleIdByReference(adminUserToken, caseType, multipleRef);
 
-        if (String.valueOf(multiShell.getCaseId()).isEmpty()) {
-
+        if (String.valueOf(multiShell.getCaseId()).isBlank()) {
             log.info("Add Respondent Representative to Multiple failed. "
                     + "Multiple Id not found for case {}, with MultipleReference {}", caseId, multipleRef);
             return;
@@ -161,7 +161,7 @@ public class CcdCaseAssignment {
         addUserToCase(adminUserToken, jurisdiction, caseType, multipleId, caseId, userToAddId);
 
         MultipleData multipleShell = multiShell.getCaseData();
-
+        multipleShell.setMultipleName(multipleShell.getMultipleName() + " Hello World");
         updateMultipleLegalRepCollection(adminUserToken, caseType, jurisdiction, multipleShell, caseId, userToAddId, multipleId);
     }
 
@@ -174,29 +174,29 @@ public class CcdCaseAssignment {
             String legalRepId,
             String multipleId) {
 
-        List<SubCaseLegalRepDetails> legalRepCollection = multiDataToUpdate.getLegalRepCollection();
+        ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = multiDataToUpdate.getLegalRepCollection();
         if (legalRepCollection == null) {
-            legalRepCollection = new ArrayList<>();
+            legalRepCollection = new ListTypeItem<>();
             multiDataToUpdate.setLegalRepCollection(legalRepCollection);
         }
 
         boolean caseExists = false;
-        for (SubCaseLegalRepDetails details : legalRepCollection) {
-            if (details.getCaseReference().equals(caseId)) {
+        for (GenericTypeItem<SubCaseLegalRepDetails> details : legalRepCollection) {
+            if (details.getValue().getCaseReference().equals(caseId)) {
                 caseExists = true;
-                if (!details.getLegalRepIds().contains(legalRepId)) {
-                    details.getLegalRepIds().add(legalRepId);
+                if (!details.getValue().getLegalRepIds().contains(legalRepId)) {
+                    GenericTypeItem<String> legalRepList = GenericTypeItem.from(legalRepId);
+                    details.getValue().getLegalRepIds().add(legalRepList);
                 }
                 break;
             }
         }
 
         if (!caseExists) {
-            List<String> newLegalRepList = new ArrayList<>();
-            newLegalRepList.add(legalRepId);
-            SubCaseLegalRepDetails newDetails = new SubCaseLegalRepDetails(caseId, newLegalRepList);
+            ListTypeItem<String> newLegalRepList = ListTypeItem.from(legalRepId);
+            GenericTypeItem<SubCaseLegalRepDetails> newDetails = GenericTypeItem.from(new SubCaseLegalRepDetails(caseId, newLegalRepList));
             legalRepCollection.add(newDetails);
-            log.warn("legalRepCollection: " + legalRepCollection);
+            log.warn("legalRepCollection: {}", legalRepCollection);
         }
 
         multiDataToUpdate.setLegalRepCollection(legalRepCollection);

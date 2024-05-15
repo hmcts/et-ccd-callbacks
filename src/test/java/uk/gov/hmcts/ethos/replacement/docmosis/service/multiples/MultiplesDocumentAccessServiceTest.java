@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -15,10 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class MultiplesDocumentAccessServiceTest {
 
@@ -62,12 +57,10 @@ class MultiplesDocumentAccessServiceTest {
     @Test
     void testSetMultipleDocumentCollectionWhenDocumentCollectionIsEmpty() {
 
-        MultipleData multipleData = mock(MultipleData.class);
-        when(multipleData.getDocumentCollection()).thenReturn(new ArrayList<>());
+        multipleData = new MultipleData();
+        multipleData.setDocumentCollection(new ArrayList<>());
 
         multiplesDocumentAccessService.setMultipleDocumentCollection(multipleData);
-
-        verify(multipleData, Mockito.never()).setDocumentSelect(any());
 
         assertNull(multipleData.getDocumentSelect());
     }

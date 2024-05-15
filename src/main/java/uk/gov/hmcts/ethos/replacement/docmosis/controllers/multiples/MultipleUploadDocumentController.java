@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,7 +47,7 @@ public class MultipleUploadDocumentController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToStart(
-            @RequestBody MultipleRequest ccdRequest) throws JsonProcessingException {
+            @RequestBody MultipleRequest ccdRequest) {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);

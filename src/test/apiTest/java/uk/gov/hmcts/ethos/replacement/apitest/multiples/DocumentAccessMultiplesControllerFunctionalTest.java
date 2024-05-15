@@ -8,6 +8,8 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicMultiSelectListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -46,7 +48,11 @@ public class DocumentAccessMultiplesControllerFunctionalTest extends BaseFunctio
         DocumentTypeItem document1 = new DocumentTypeItem();
         document1.setValue(documentType);
         document1.setId("1");
+        
+        DynamicMultiSelectListType multiSelectList = new DynamicMultiSelectListType();
+        multiSelectList.setValue(new ArrayList<DynamicValueType>());
 
+        multipleData.setDocumentSelect(multiSelectList);
         multipleData.getDocumentCollection().add(document1);
 
         JSONObject singleCase = createSinglesCaseDataStore();

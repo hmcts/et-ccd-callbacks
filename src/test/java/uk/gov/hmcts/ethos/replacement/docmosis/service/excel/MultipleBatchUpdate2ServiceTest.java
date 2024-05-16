@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling"})
 @ExtendWith(SpringExtension.class)
 class MultipleBatchUpdate2ServiceTest {
 
@@ -215,7 +216,8 @@ class MultipleBatchUpdate2ServiceTest {
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
                 .thenReturn("245003/2020");
 
-        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
 
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
@@ -238,7 +240,8 @@ class MultipleBatchUpdate2ServiceTest {
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
                 .thenReturn("245003/2020");
 
-        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
 
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
@@ -294,6 +297,7 @@ class MultipleBatchUpdate2ServiceTest {
         assertEquals(4, multipleDetails.getCaseData().getLegalRepCollection().size());
     }
 
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     private ListTypeItem<SubCaseLegalRepDetails> addCaseLegalRepDetails(TreeMap<String, Object> multipleObjects) {
         ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = new ListTypeItem<>();
 
@@ -302,15 +306,8 @@ class MultipleBatchUpdate2ServiceTest {
             GenericTypeItem<String> legalRep1 = GenericTypeItem.from(lrId + "1");
             GenericTypeItem<String> legalRep2 = GenericTypeItem.from(lrId + "2");
 
-            ListTypeItem<String> caseRepCollection = new ListTypeItem<>();
-            caseRepCollection.add(legalRep1);
-            caseRepCollection.add(legalRep2);
-
-            SubCaseLegalRepDetails caseReps = new SubCaseLegalRepDetails();
-            caseReps.setCaseReference(entry.getKey());
-            caseReps.setLegalRepIds(caseRepCollection);
-
-            legalRepCollection.add(GenericTypeItem.from(caseReps));
+            legalRepCollection.add(GenericTypeItem.from(
+                    new SubCaseLegalRepDetails(entry.getKey(), ListTypeItem.from(legalRep1, legalRep2))));
         }
 
         return legalRepCollection;

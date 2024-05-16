@@ -60,16 +60,17 @@ public class CcdCaseAssignment {
     private final String ccdDataStoreUrl;
     private final MultipleCasesSendingService multipleCasesSendingService;
 
+    @SuppressWarnings({"PMD.ExcessiveParameterList"})
     public CcdCaseAssignment(RestTemplate restTemplate,
                              AuthTokenGenerator serviceAuthTokenGenerator,
                              AdminUserService adminUserService,
                              FeatureToggleService featureToggleService,
                              CcdClient ccdClient,
                              NocCcdService nocCcdService,
+                             MultipleCasesSendingService multipleCasesSendingService,
                              @Value("${assign_case_access_api_url}") String aacUrl,
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath,
-                             @Value("${ccd.data-store-api-url}") String ccdDataStoreUrl,
-                             MultipleCasesSendingService multipleCasesSendingService
+                             @Value("${ccd.data-store-api-url}") String ccdDataStoreUrl
     ) {
         this.restTemplate = restTemplate;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
@@ -77,10 +78,10 @@ public class CcdCaseAssignment {
         this.featureToggleService = featureToggleService;
         this.ccdClient = ccdClient;
         this.nocCcdService = nocCcdService;
+        this.multipleCasesSendingService = multipleCasesSendingService;
         this.aacUrl = aacUrl;
         this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
         this.ccdDataStoreUrl = ccdDataStoreUrl;
-        this.multipleCasesSendingService = multipleCasesSendingService;
     }
 
     public CCDCallbackResponse applyNoc(final CallbackRequest callback, String userToken) throws IOException {
@@ -215,7 +216,9 @@ public class CcdCaseAssignment {
         return "";
     }
 
-    public SubmitMultipleEvent getMultipleIdByReference(String adminUserToken, String caseType, String multipleReference) {
+    public SubmitMultipleEvent getMultipleIdByReference(String adminUserToken,
+                                                        String caseType,
+                                                        String multipleReference) {
         String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);
         String requestBody = buildQueryForGetMultipleIdByReference(multipleReference);
 
@@ -258,7 +261,6 @@ public class CcdCaseAssignment {
                 .toString();
     }
 
-    @SuppressWarnings({"PMD.UnusedFormalParameter"})
     private void addUserToCase(String adminUserToken,
                                String jurisdiction,
                                String caseType,
@@ -284,7 +286,8 @@ public class CcdCaseAssignment {
 
             log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
         } catch (RestClientResponseException e) {
-            throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
+            throw (CaseCreationException)
+                    new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
         }
     }
 }

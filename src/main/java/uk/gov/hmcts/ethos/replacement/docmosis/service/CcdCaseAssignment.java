@@ -158,11 +158,12 @@ public class CcdCaseAssignment {
         String multipleId = String.valueOf(multiShell.getCaseId());
         String jurisdiction = caseDetails.getJurisdiction();
 
-        addUserToCase(adminUserToken, jurisdiction, caseType, multipleId, caseId, userToAddId);
+        addUserToCase(adminUserToken, jurisdiction, caseType, multipleId, userToAddId);
 
+        String caseRef = caseDetails.getCaseData().getEthosCaseReference();
         MultipleData multipleShell = multiShell.getCaseData();
-        multipleShell.setMultipleName(multipleShell.getMultipleName() + " Hello World");
-        updateMultipleLegalRepCollection(adminUserToken, caseType, jurisdiction, multipleShell, caseId, userToAddId, multipleId);
+        updateMultipleLegalRepCollection(
+                adminUserToken, caseType, jurisdiction, multipleShell, multipleId, caseRef, userToAddId);
     }
 
     private void updateMultipleLegalRepCollection(
@@ -170,9 +171,9 @@ public class CcdCaseAssignment {
             String caseTypeId,
             String jurisdiction,
             MultipleData multiDataToUpdate,
-            String caseId,
-            String legalRepId,
-            String multipleId) {
+            String multipleId,
+            String caseRef,
+            String legalRepId) {
 
         ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = multiDataToUpdate.getLegalRepCollection();
         if (legalRepCollection == null) {
@@ -182,7 +183,7 @@ public class CcdCaseAssignment {
 
         boolean caseExists = false;
         for (GenericTypeItem<SubCaseLegalRepDetails> details : legalRepCollection) {
-            if (details.getValue().getCaseReference().equals(caseId)) {
+            if (details.getValue().getCaseReference().equals(caseRef)) {
                 caseExists = true;
                 if (!details.getValue().getLegalRepIds().contains(legalRepId)) {
                     GenericTypeItem<String> legalRepList = GenericTypeItem.from(legalRepId);
@@ -194,7 +195,8 @@ public class CcdCaseAssignment {
 
         if (!caseExists) {
             ListTypeItem<String> newLegalRepList = ListTypeItem.from(legalRepId);
-            GenericTypeItem<SubCaseLegalRepDetails> newDetails = GenericTypeItem.from(new SubCaseLegalRepDetails(caseId, newLegalRepList));
+            GenericTypeItem<SubCaseLegalRepDetails> newDetails =
+                    GenericTypeItem.from(new SubCaseLegalRepDetails(caseRef, newLegalRepList));
             legalRepCollection.add(newDetails);
             log.warn("legalRepCollection: {}", legalRepCollection);
         }
@@ -261,7 +263,6 @@ public class CcdCaseAssignment {
                                String jurisdiction,
                                String caseType,
                                String multipleId,
-                               String caseId,
                                String userToAddId) throws IOException {
         Map<String, String> payload = Maps.newHashMap();
         payload.put("id", userToAddId);

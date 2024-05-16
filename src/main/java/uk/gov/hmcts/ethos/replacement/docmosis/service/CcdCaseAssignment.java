@@ -163,6 +163,10 @@ public class CcdCaseAssignment {
 
         String caseRef = caseDetails.getCaseData().getEthosCaseReference();
         MultipleData multipleShell = multiShell.getCaseData();
+        if (multipleShell == null) {
+            log.info("MultipleData is null for case {}", caseId);
+            return;
+        }
         updateMultipleLegalRepCollection(
                 adminUserToken, caseType, jurisdiction, multipleShell, multipleId, caseRef, userToAddId);
     }

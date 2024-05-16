@@ -18,8 +18,15 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -61,6 +68,9 @@ class CcdCaseAssignmentTest {
     private CcdCaseAssignment ccdCaseAssignment;
 
     private CallbackRequest callbackRequest;
+    @Mock
+    private MultipleCasesSendingService multipleCasesSendingService;
+    private MultipleDetails multipleDetails;
 
     @BeforeEach
     void setUp() {
@@ -75,6 +85,9 @@ class CcdCaseAssignmentTest {
 
         callbackRequest = new CallbackRequest();
         callbackRequest.setCaseDetails(caseDetails);
+        multipleDetails = new MultipleDetails();
+        multipleDetails.setCaseData(MultipleUtil.getMultipleData());
+        multipleCasesSendingService = new MultipleCasesSendingService(ccdClient);
     }
 
     @Test
@@ -163,6 +176,26 @@ class CcdCaseAssignmentTest {
                         eq(MultipleCaseSearchResult.class))
         ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
 
+        ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = new ListTypeItem<>();
+        GenericTypeItem<String> legalRepIdItem = GenericTypeItem.from("someId", "someLegalRepId");
+        SubCaseLegalRepDetails subCaseLegalRepDetails = SubCaseLegalRepDetails.builder()
+                .caseReference("someCaseReference")
+                .legalRepIds(ListTypeItem.from(legalRepIdItem))
+                .build();
+        GenericTypeItem<SubCaseLegalRepDetails> listItem = GenericTypeItem.from("subCaseId", subCaseLegalRepDetails);
+        legalRepCollection.add(listItem);
+        MultipleData multiDataToUpdate = multipleDetails.getCaseData();
+        multiDataToUpdate.setLegalRepCollection(legalRepCollection);
+        expectedMultipleCaseSearchResult.getCases().get(0).setCaseData(multiDataToUpdate);
+
+        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+
+        multipleCasesSendingService.sendUpdateToMultiple(
+                "token",
+                "EnglandWales_Multiple",
+                "EMPLOYMENT",
+                multiDataToUpdate,
+                "123");
         when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
 
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
@@ -217,15 +250,13 @@ class CcdCaseAssignmentTest {
 
     @Test
     void shouldCallCaseAssignmentNocMultiple_MultipleId_NotFound() throws IOException {
-        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
         when(restTemplate
                 .exchange(
                         anyString(),
                         eq(HttpMethod.POST),
                         any(HttpEntity.class),
                         eq(CCDCallbackResponse.class))
-        ).thenReturn(ResponseEntity.ok(expected));
-
+        ).thenReturn(ResponseEntity.ok(new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData())));
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
@@ -241,12 +272,12 @@ class CcdCaseAssignmentTest {
                         eq(MultipleCaseSearchResult.class))
         ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
 
-        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+        CaseCreationException thrown = assertThrows(CaseCreationException.class, () -> {
+            ccdCaseAssignment.applyNoc(callbackRequest, "token");
+        });
 
-        CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
-
-        assertThat(expected).isEqualTo(actual);
-        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+        assertThat(thrown.getMessage()).contains("Call to add legal rep to Multiple Case failed for");
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), eq(null), any());
     }
 
     @Test

@@ -190,7 +190,8 @@ public class CcdCaseAssignment {
         for (GenericTypeItem<SubCaseLegalRepDetails> details : legalRepCollection) {
             if (details.getValue().getCaseReference().equals(caseRef)) {
                 caseExists = true;
-                if (!details.getValue().getLegalRepIds().contains(legalRepId)) {
+                if (details.getValue().getLegalRepIds().stream().noneMatch(
+                        item -> legalRepId.equals(item.getValue()))) {
                     GenericTypeItem<String> legalRepList = GenericTypeItem.from(legalRepId);
                     details.getValue().getLegalRepIds().add(legalRepList);
                 }

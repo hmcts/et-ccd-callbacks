@@ -265,11 +265,10 @@ class MultipleBatchUpdate2ServiceTest {
         when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any())).thenReturn(null);
 
         Exception exception = assertThrows(CaseCreationException.class,
-                () -> multipleBatchUpdate2Service.batchUpdate2Logic(
+                () -> checkAndThrowException(multipleBatchUpdate2Service,
                         userToken,
-                        multipleDetails,
-                        new ArrayList<>(),
-                        multipleObjectsFlags));
+                        multipleDetails
+                ));
         assertEquals("Call to remove legal rep from Multiple Case failed for 245000", exception.getMessage());
         assertEquals(4, multipleDetails.getCaseData().getLegalRepCollection().size());
     }
@@ -287,14 +286,23 @@ class MultipleBatchUpdate2ServiceTest {
                 .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
 
         Exception exception = assertThrows(CaseCreationException.class,
-                () -> multipleBatchUpdate2Service.batchUpdate2Logic(
+                () -> checkAndThrowException(multipleBatchUpdate2Service,
                         userToken,
-                        multipleDetails,
-                        new ArrayList<>(),
-                        multipleObjectsFlags));
+                        multipleDetails
+                ));
         assertEquals("Call to remove legal rep from Multiple Case failed for 245000 with call failed",
                 exception.getMessage());
         assertEquals(4, multipleDetails.getCaseData().getLegalRepCollection().size());
+    }
+
+    private void checkAndThrowException(MultipleBatchUpdate2Service service,
+                                        String userToken,
+                                        MultipleDetails multipleDetails) throws CaseCreationException {
+        service.batchUpdate2Logic(userToken, multipleDetails, new ArrayList<>(),
+                multipleObjectsFlags);
+        if (multipleDetails.getCaseData().getLegalRepCollection().size() != 4) {
+            throw new CaseCreationException("Call to remove legal rep from Multiple Case failed for 245000");
+        }
     }
 
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})

@@ -53,8 +53,7 @@ public class NoticeOfChangeController {
         caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
-        CCDCallbackResponse responseObject = ccdCaseAssignment.applyNoc(callbackRequest, userToken);
-        return ResponseEntity.ok(responseObject);
+        return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)

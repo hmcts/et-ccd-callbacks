@@ -148,7 +148,7 @@ public class CcdCaseAssignment {
 
         String caseType = caseDetails.getCaseTypeId() + "_Multiple";
         String multipleRef = caseDetails.getCaseData().getMultipleReference();
-        SubmitMultipleEvent multiShell = getMultipleIdByReference(adminUserToken, caseType, multipleRef);
+        SubmitMultipleEvent multiShell = getMultipleByReference(adminUserToken, caseType, multipleRef);
 
         if (String.valueOf(multiShell.getCaseId()).isBlank()) {
             log.info("Add Respondent Representative to Multiple failed. "
@@ -221,11 +221,11 @@ public class CcdCaseAssignment {
         return "";
     }
 
-    public SubmitMultipleEvent getMultipleIdByReference(String adminUserToken,
+    public SubmitMultipleEvent getMultipleByReference(String adminUserToken,
                                                         String caseType,
                                                         String multipleReference) {
         String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);
-        String requestBody = buildQueryForGetMultipleIdByReference(multipleReference);
+        String requestBody = buildQueryForGetMultipleByReference(multipleReference);
 
         HttpEntity<String> request =
                 new HttpEntity<>(
@@ -257,7 +257,7 @@ public class CcdCaseAssignment {
         return new SubmitMultipleEvent();
     }
 
-    private String buildQueryForGetMultipleIdByReference(String multipleReference) {
+    private String buildQueryForGetMultipleByReference(String multipleReference) {
         TermsQueryBuilder termsQueryBuilder = termsQuery(MULTIPLE_CASE_REFERENCE_KEYWORD, multipleReference);
 
         return new SearchSourceBuilder()

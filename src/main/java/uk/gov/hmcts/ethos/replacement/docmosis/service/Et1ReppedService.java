@@ -76,7 +76,7 @@ public class Et1ReppedService {
 
     @Value("${template.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
-    private static final String ET1_EN_PDF = "ET1_2222.pdf";
+    private static final String ET1_EN_PDF = "ET1_0224.pdf";
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,

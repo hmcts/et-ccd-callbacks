@@ -61,15 +61,15 @@ public class BulkCreationService {
                 // 2) Create multiple ref number
                 bulkDetails.getCaseData().setMultipleReference(bulkSearchService.generateMultipleRef(bulkDetails));
                 // 3) Add list of cases to the multiple bulk case collection
-                if (!submitEvents.isEmpty()) {
+                if (submitEvents.isEmpty()) {
+                    bulkRequestPayload.setBulkDetails(BulkHelper.setMultipleCollection(bulkDetails,
+                            bulkDetails.getCaseData().getMultipleCollection()));
+                } else {
                     List<MultipleTypeItem> multipleTypeItemList =
                             BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents,
                             bulkDetails.getCaseData().getMultipleReference());
                     bulkRequestPayload.setBulkDetails(
                             BulkHelper.setMultipleCollection(bulkDetails, multipleTypeItemList));
-                } else {
-                    bulkRequestPayload.setBulkDetails(BulkHelper.setMultipleCollection(bulkDetails,
-                            bulkDetails.getCaseData().getMultipleCollection()));
                 }
             } else if (action.equals(UPDATE_SINGLES_STEP)) {
                 // 4) Create an event to update multiple reference field to all cases
@@ -80,7 +80,9 @@ public class BulkCreationService {
 
                 List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
                 log.info("ETHOS CASE REF COLLECTION: " + ethosCaseRefCollection);
-                if (!ethosCaseRefCollection.isEmpty()) {
+                if (ethosCaseRefCollection.isEmpty()) {
+                    log.info("EMPTY CASE REF COLLECTION");
+                } else {
 
                     String username = userIdamService.getUserDetails(userToken).getEmail();
                     PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
@@ -95,8 +97,6 @@ public class BulkCreationService {
                             String.valueOf(ethosCaseRefCollection.size()),
                             bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp());
 
-                } else {
-                    log.info("EMPTY CASE REF COLLECTION");
                 }
                 bulkRequestPayload.setBulkDetails(bulkDetails);
 
@@ -149,13 +149,13 @@ public class BulkCreationService {
                     bulkDetails.getCaseData().getMultipleReference(), false, bulkDetails);
             if (bulkCasesPayload.getErrors().isEmpty()) {
                 List<SubmitEvent> allSubmitEventsToUpdate = bulkCasesPayload.getSubmitEvents();
-                if (!allSubmitEventsToUpdate.isEmpty()) {
+                if (allSubmitEventsToUpdate.isEmpty()) {
+                    bulkCasesPayload.setMultipleTypeItems(bulkDetails.getCaseData().getMultipleCollection());
+                } else {
                     List<SubmitEvent> submitEventsWithLead =
                             BulkHelper.calculateLeadCase(allSubmitEventsToUpdate, caseIds);
                     bulkCasesPayload.setMultipleTypeItems(addRemoveNewCases(submitEventsWithLead,
                             caseIds, multipleCaseIds, bulkDetails, authToken, isPersistentQ));
-                } else {
-                    bulkCasesPayload.setMultipleTypeItems(bulkDetails.getCaseData().getMultipleCollection());
                 }
             } else {
                 errors.addAll(bulkCasesPayload.getErrors());
@@ -182,7 +182,16 @@ public class BulkCreationService {
                 submitEvent.getCaseData().setLeadClaimant(NO);
             }
 
-            if (!isPersistentQ) {
+            if (isPersistentQ) {
+
+                if (!caseIds.contains(ethosCaseRef) && multipleCaseIds.contains(ethosCaseRef)) {
+                    detachCasesList.add(ethosCaseRef);
+                } else {
+                    multipleTypeItemList.add(BulkHelper.getMultipleTypeItemFromSubmitEvent(submitEvent,
+                            bulkDetails.getCaseData().getMultipleReference()));
+                    attachCasesList.add(ethosCaseRef);
+                }
+            } else {
                 ExecutorService executor = Executors.newFixedThreadPool(NUMBER_THREADS);
                 if (!caseIds.contains(ethosCaseRef) && multipleCaseIds.contains(ethosCaseRef)) {
                     executor.execute(new BulkCreationTask(bulkDetails, submitEvent, authToken, " ",
@@ -195,15 +204,6 @@ public class BulkCreationService {
                 }
                 executor.shutdown();
 
-            } else {
-
-                if (!caseIds.contains(ethosCaseRef) && multipleCaseIds.contains(ethosCaseRef)) {
-                    detachCasesList.add(ethosCaseRef);
-                } else {
-                    multipleTypeItemList.add(BulkHelper.getMultipleTypeItemFromSubmitEvent(submitEvent,
-                            bulkDetails.getCaseData().getMultipleReference()));
-                    attachCasesList.add(ethosCaseRef);
-                }
             }
         }
 

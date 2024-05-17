@@ -80,7 +80,6 @@ queue:
       connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
 
 springdoc:
-  pre-loading-enabled: 'true'
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
   pathsToMatch: /**
 
@@ -112,8 +111,10 @@ template:
       application:
         claimant: ${TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID:5d014e5a-9528-4d02-bd31-8eca98cfba19}
         cyClaimant: ${CY_TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID:198c5afc-9984-4a04-96db-37e1f6e96843}
-        respondent: ${TSE_RESPONDENT_TO_RESPONDENT_TEMPLATE_ID:c0b393f6-daf0-46fc-8995-d5e98149326f}
-        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:e60bc338-db48-4270-95b0-5e8f29e6ae0f}
+        respondent-no: ${TSE_RESPONDENT_TO_RESPONDENT_NO_TEMPLATE_ID:e8e02ca0-6443-41c4-9064-705f7ab8b39b}
+        respondent-type-a: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:368b44ed-54ff-4ba6-9f90-cdbe6fab81b9}
+        respondent-type-b: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:eb056a09-72ca-4bf2-b774-016aae1d185c}
+        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:5e75a23b-4a84-415d-8eba-4f10b023ba8b}
         tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
       respond:
         claimant: ${TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:dec79c11-2c02-481d-aed8-6f013667cdf5}
@@ -154,19 +155,20 @@ template:
 
   sendNotification: ${SEND_NOTIFICATION_TEMPLATE_ID:1b8299d7-5051-4b78-a870-726b6384d8a8}
 
-  claimantSendNotificationHearingOther: ${CLAIMANT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
+  claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
 
-  respondentSendNotificationHearingOther: ${RESPONDENT_SEND_NOTIFICATION_HEARING_OTHER_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
+  respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
 
   respondNotification:
     noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
 
   bundles:
-    claimantSubmittedNotificationForClaimant:
+    respondentSubmittedNotificationForClaimant:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
-    claimantSubmittedNotificationForRespondent:
-      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+    respondentSubmittedNotificationForTribunal:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
 
+  et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
 
 etcos:
   system:
@@ -184,11 +186,18 @@ feature-flags:
   # noinspection SpringBootApplicationYaml
   hearings-api: ${HEARINGS_API_FLAG:true} # will be used in future releases, remove noinspection once in use
 
+em-ccd-orchestrator:
+  api:
+    url: ${EM_CCD_ORCHESTRATOR_URL:http://localhost:8082}
+  config:
+    default: et-dcf-2.yaml
+
 acas:
   api:
     url: ${ACAS_BASE_URL:https://api-dev-acas-01.azure-api.net/ECCLUAT}
     key: ${ACAS_KEY:AAAAAAAAAAAAAAAAA}
     # This environment variable can be set in your local environment. Do not change this value.
+
 hmcts_service_id: BHA1
 
 launchdarkly:
@@ -196,4 +205,7 @@ launchdarkly:
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
 
-
+cron:
+  caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
+  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:200}

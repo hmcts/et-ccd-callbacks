@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
@@ -99,7 +100,7 @@ public class InitialConsiderationService {
             return HEARING_MISSING;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT);
 
         return hearingCollection.stream()
             .filter(hearingTypeItem -> hearingTypeItem != null && hearingTypeItem.getValue() != null)
@@ -171,8 +172,7 @@ public class InitialConsiderationService {
         validJurisdictionCodes
             .forEach(codeName -> sb.append("<strong>")
                 .append(codeName)
-                .append("</strong>")
-                .append(" - ")
+                .append("</strong> - ")
                 .append(JurisdictionCode.valueOf(codeName).getDescription())
                 .append("<br><br>"));
 

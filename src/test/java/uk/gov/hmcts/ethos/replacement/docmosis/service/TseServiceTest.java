@@ -17,8 +17,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -281,6 +283,33 @@ class TseServiceTest {
         assertTrue(deepEquals(actual.toArray(), expected.toArray()));
     }
 
+    @Test
+    void removeStoredApplication_removeSuccessful() {
+        List<GenericTseApplicationTypeItem> storedCollection = new ArrayList<>(List.of(
+            GenericTseApplicationTypeItem.builder()
+                .id("13579")
+                .value(new GenericTseApplicationType())
+                .build(),
+            GenericTseApplicationTypeItem.builder()
+                .id("24680")
+                .value(new GenericTseApplicationType())
+                .build()
+        ));
+        CaseData caseData = new CaseData();
+        caseData.setTseApplicationStoredCollection(storedCollection);
+
+        ClaimantTse claimantTse = new ClaimantTse();
+        claimantTse.setStoredApplicationId("13579");
+        caseData.setClaimantTse(claimantTse);
+
+        tseService.removeStoredApplication(caseData);
+
+        assertThat(caseData.getTseApplicationStoredCollection())
+            .hasSize(1);
+        assertThat(caseData.getTseApplicationStoredCollection().get(0).getId())
+            .isEqualTo("24680");
+    }
+
     @Nested
     class FormatViewApplication {
         @Test
@@ -538,6 +567,7 @@ class TseServiceTest {
         return TseRespondType.builder()
             .enterResponseTitle("Title")
             .date("2000-01-01")
+            .dateTime("2000-01-01T10:20:30.555")
             .isCmoOrRequest("Request")
             .isResponseRequired("No")
             .selectPartyRespond(BOTH_PARTIES)
@@ -557,6 +587,7 @@ class TseServiceTest {
     private TseRespondType setupNonAdminTseRespondType() {
         return TseRespondType.builder()
             .date("2000-01-01")
+            .dateTime("2000-01-01T10:20:30.555")
             .from(CLAIMANT_TITLE)
             .response("I disagree")
             .copyToOtherParty(NO)

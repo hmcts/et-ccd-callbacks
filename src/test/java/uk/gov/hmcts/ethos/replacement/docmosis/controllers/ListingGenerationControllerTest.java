@@ -36,7 +36,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.GenerateReportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -72,7 +71,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ListingGenerationController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class ListingGenerationControllerTest {
+class ListingGenerationControllerTest extends BaseControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String LISTING_CASE_CREATION_URL = "/listingCaseCreation";
@@ -100,9 +99,6 @@ class ListingGenerationControllerTest {
 
     @MockBean
     private DefaultValuesReaderService defaultValuesReaderService;
-
-    @MockBean
-    private VerifyTokenService verifyTokenService;
 
     @MockBean
     private PrintHearingListService printHearingListService;
@@ -214,7 +210,9 @@ class ListingGenerationControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         listingDetails = new ListingDetails();
@@ -783,7 +781,6 @@ class ListingGenerationControllerTest {
     @Test
     void initGenerateReportForbidden() throws Exception {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
-                        .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestContent.toString()))
                 .andExpect(status().isForbidden());

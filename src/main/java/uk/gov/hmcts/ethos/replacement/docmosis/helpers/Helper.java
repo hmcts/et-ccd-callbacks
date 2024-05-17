@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,7 +52,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_STRIKING_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class Helper {
@@ -220,10 +223,8 @@ public final class Helper {
     }
 
     public static void updatePositionTypeToClosed(CaseData caseData) {
-
         caseData.setPositionType(CASE_CLOSED_POSITION);
         caseData.setCurrentPosition(CASE_CLOSED_POSITION);
-
     }
 
     public static void updatePostponedDate(CaseData caseData) {
@@ -284,7 +285,15 @@ public final class Helper {
      * @return current date in "dd MMM yyy" format
      */
     public static String getCurrentDate() {
-        return new SimpleDateFormat("dd MMM yyyy").format(new Date());
+        return new SimpleDateFormat(MONTH_STRING_DATE_FORMAT).format(new Date());
+    }
+
+    /**
+     * Gives current datetime in string format.
+     * @return current datetime in "yyyy-MM-dd'T'HH:mm:ss.SSS" format
+     */
+    public static String getCurrentDateTime() {
+        return LocalDateTime.now().format(OLD_DATE_TIME_PATTERN);
     }
 
     public static String getRespondentNames(CaseData caseData) {
@@ -338,5 +347,24 @@ public final class Helper {
             return caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null;
         }
         return true;
+    }
+
+    /**
+     * Gets the last item in a list.
+     * @param <T> the type of the elements in the list
+     * @param list the list to get the last item from
+     * @return the last element in the list
+     */
+    public static <T> T getLast(List<T> list) {
+        return CollectionUtils.isEmpty(list) ? null : list.get(list.size() - 1);
+    }
+
+    /**
+     * Return the first item in a list or null if the list is empty.
+     * @param list the list to get the first item from
+     * @return the first item in the list or null if the list is empty
+     */
+    public static String getFirstListItem(List<String> list) {
+        return CollectionUtils.isEmpty(list) ? null : list.get(0);
     }
 }

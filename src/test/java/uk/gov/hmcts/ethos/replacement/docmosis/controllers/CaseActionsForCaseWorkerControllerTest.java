@@ -27,7 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationCodeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -44,7 +44,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentati
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -82,9 +81,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CaseActionsForCaseWorkerController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-class CaseActionsForCaseWorkerControllerTest {
+class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String CREATION_CASE_URL = "/createCase";
     private static final String RETRIEVE_CASE_URL = "/retrieveCase";
     private static final String RETRIEVE_CASES_URL = "/retrieveCases";
@@ -151,9 +149,6 @@ class CaseActionsForCaseWorkerControllerTest {
     private SingleReferenceService singleReferenceService;
 
     @MockBean
-    private VerifyTokenService verifyTokenService;
-
-    @MockBean
     private EventValidationService eventValidationService;
 
     @MockBean
@@ -197,7 +192,7 @@ class CaseActionsForCaseWorkerControllerTest {
     @MockBean
     private NocRespondentHelper nocRespondentHelper;
     @MockBean
-    private CaseManagementLocationCodeService caseManagementLocationCodeService;
+    private CaseManagementLocationService caseManagementLocationService;
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent2;
@@ -224,7 +219,9 @@ class CaseActionsForCaseWorkerControllerTest {
     }
 
     @BeforeEach
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
@@ -374,6 +371,23 @@ class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    void amendCaseDetails_noErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(eventValidationService.validateReceiptDate(isA(CaseDetails.class))).thenReturn(new ArrayList<>());
+        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
+        when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
+        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+        mvc.perform(post(AMEND_CASE_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
     void amendCaseDetailsWithErrors() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -407,16 +421,39 @@ class CaseActionsForCaseWorkerControllerTest {
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
-            .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void amendRespondentDetails_UpdateCounter() throws Exception {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
+                .thenReturn(submitEvent.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
+
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(caseManagementForCaseWorkerService, times(1)).updateWorkAllocationField(any(), any());
     }
 
     @Test
@@ -1716,7 +1753,7 @@ class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(caseManagementLocationCodeService, times(1))
+        verify(caseManagementLocationService, times(1))
                 .setCaseManagementLocationCode(any());
     }
 }

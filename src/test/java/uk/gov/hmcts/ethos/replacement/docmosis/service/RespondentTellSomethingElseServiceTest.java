@@ -70,6 +70,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -104,22 +106,14 @@ class RespondentTellSomethingElseServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String I_DO_WANT_TO_COPY = "I do want to copy";
-    private static final String TEMPLATE_ID = "someTemplateId";
+    private static final String TEMPLATE_ID_NO = "NoTemplateId";
+    private static final String TEMPLATE_ID_A = "TypeATemplateId";
+    private static final String TEMPLATE_ID_B = "TypeBTemplateId";
+    private static final String TEMPLATE_ID_C = "TypeCTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
 
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
-    private static final String RULE_92_ANSWERED_NO_TEXT = "You have said that you do not want to copy this "
-        + "correspondence to "
-        + "the other party. \n \n"
-        + "The tribunal will consider all correspondence and let you know what happens next.";
-    private static final String RULE_92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections "
-        + "to your %s application should be sent to the tribunal as soon as possible, and in any event "
-        + "within 7 days.";
-    private static final String RULE_92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
-        + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
-        + "sent to the tribunal as soon as possible, and in any event within 7 days.";
-
     private static final String EXPECTED_EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
         + "Response due | Number of responses | Status "
@@ -137,9 +131,13 @@ class RespondentTellSomethingElseServiceTest {
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
-                "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
+                "tseRespondentAcknowledgeNoTemplateId", TEMPLATE_ID_NO);
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
-                "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
+            "tseRespondentAcknowledgeTypeATemplateId", TEMPLATE_ID_A);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+            "tseRespondentAcknowledgeTypeBTemplateId", TEMPLATE_ID_B);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+                "tseRespondentAcknowledgeTypeCTemplateId", TEMPLATE_ID_C);
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -193,44 +191,22 @@ class RespondentTellSomethingElseServiceTest {
 
     private void setDocForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseDocument1(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseDocument2(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseDocument3(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseDocument4(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseDocument5(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseDocument6(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseDocument1(createDocumentType("documentUrl"));
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseDocument2(createDocumentType("documentUrl"));
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseDocument3(createDocumentType("documentUrl"));
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseDocument4(createDocumentType("documentUrl"));
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseDocument5(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseDocument6(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE ->
                 caseData.setResTseDocument7(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseDocument8(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseDocument9(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseDocument10(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseDocument8(createDocumentType("documentUrl"));
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseDocument9(createDocumentType("documentUrl"));
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseDocument10(createDocumentType("documentUrl"));
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM ->
                 caseData.setResTseDocument11(createDocumentType("documentUrl"));
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseDocument12(createDocumentType("documentUrl"));
-                break;
-            default:
-                break;
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseDocument12(createDocumentType("documentUrl"));
+            default -> {
+            }
         }
     }
 
@@ -244,94 +220,65 @@ class RespondentTellSomethingElseServiceTest {
 
     private void setTextBoxForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                caseData.setResTseTextBox1("Not Blank");
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseTextBox2("Not Blank");
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseTextBox3("Not Blank");
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseTextBox4("Not Blank");
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseTextBox5("Not Blank");
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseTextBox6("Not Blank");
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                caseData.setResTseTextBox7("Not Blank");
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
-                caseData.setResTseTextBox8("Not Blank");
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseTextBox9("Not Blank");
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseTextBox10("Not Blank");
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                caseData.setResTseTextBox11("Not Blank");
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseTextBox12("Not Blank");
-                break;
-            default:
-                break;
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseTextBox1("Not Blank");
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseTextBox2("Not Blank");
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseTextBox3("Not Blank");
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseTextBox4("Not Blank");
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseTextBox5("Not Blank");
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseTextBox6("Not Blank");
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> caseData.setResTseTextBox7("Not Blank");
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseTextBox8("Not Blank");
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseTextBox9("Not Blank");
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseTextBox10("Not Blank");
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> caseData.setResTseTextBox11("Not Blank");
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseTextBox12("Not Blank");
+            default -> {
+            }
         }
     }
 
     @ParameterizedTest
     @MethodSource("sendAcknowledgeEmailAndGeneratePdf")
-    void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection, String expectedAnswer,
-                                        Boolean emailSent) {
+    void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection,
+                                            String expectedTemplateId) {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
 
-        Map<String, String> expectedPersonalisation = createPersonalisation(caseData, expectedAnswer,
-            selectedApplication);
+        Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
 
-        if (emailSent) {
-            verify(emailService).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
-        } else {
-            verify(emailService, never()).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
-        }
+        verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
-            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, RULE_92_ANSWERED_NO_TEXT, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, TEMPLATE_ID_NO),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, TEMPLATE_ID_NO),
 
-            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY,
-                    RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true)
+            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, TEMPLATE_ID_B)
         );
     }
 
@@ -345,13 +292,13 @@ class RespondentTellSomethingElseServiceTest {
         Map<String, String> expectedPersonalisation = Map.of(
             "caseNumber", caseData.getEthosCaseReference(),
             "claimant", caseData.getClaimant(),
-            "respondents", getRespondentNames(caseData),
-            "linkToExUI", "exuiUrl669718251103419"
+            "respondentNames", getRespondentNames(caseData),
+            "exuiCaseDetailsLink", "exuiUrl669718251103419"
         );
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
 
-        verify(emailService).sendEmail("TypeCTemplateId", LEGAL_REP_EMAIL, expectedPersonalisation);
+        verify(emailService).sendEmail(TEMPLATE_ID_C, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
     @Test
@@ -551,36 +498,9 @@ class RespondentTellSomethingElseServiceTest {
         DocumentType actualDocumentType = documentCollection.get(0).getValue();
 
         assertThat(documentCollection.size(), is(1));
-        assertEquals(selectedApplication, actualDocumentType.getShortDescription());
-        assertEquals("Respondent correspondence", actualDocumentType.getTypeOfDocument());
 
-        assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
-        assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));
-        assertThat(caseData.getResTseCopyToOtherPartyTextArea(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox1(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox2(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox3(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox4(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox5(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox6(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox7(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox8(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox9(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox10(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox11(), is(nullValue()));
-        assertThat(caseData.getResTseTextBox12(), is(nullValue()));
-        assertThat(caseData.getResTseDocument1(), is(nullValue()));
-        assertThat(caseData.getResTseDocument2(), is(nullValue()));
-        assertThat(caseData.getResTseDocument3(), is(nullValue()));
-        assertThat(caseData.getResTseDocument4(), is(nullValue()));
-        assertThat(caseData.getResTseDocument5(), is(nullValue()));
-        assertThat(caseData.getResTseDocument6(), is(nullValue()));
-        assertThat(caseData.getResTseDocument7(), is(nullValue()));
-        assertThat(caseData.getResTseDocument8(), is(nullValue()));
-        assertThat(caseData.getResTseDocument9(), is(nullValue()));
-        assertThat(caseData.getResTseDocument10(), is(nullValue()));
-        assertThat(caseData.getResTseDocument11(), is(nullValue()));
-        assertThat(caseData.getResTseDocument12(), is(nullValue()));
+        assertEquals(selectedApplication, actualDocumentType.getShortDescription());
+
     }
 
     @Test
@@ -682,56 +602,56 @@ class RespondentTellSomethingElseServiceTest {
                                                      String textBoxData,
                                                      String documentUrl) {
         switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
+            case TSE_APP_AMEND_RESPONSE -> {
                 caseData.setResTseTextBox1(textBoxData);
                 caseData.setResTseDocument1(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
+            }
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> {
                 caseData.setResTseTextBox2(textBoxData);
                 caseData.setResTseDocument2(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
+            }
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> {
                 caseData.setResTseTextBox3(textBoxData);
                 caseData.setResTseDocument3(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
+            }
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> {
                 caseData.setResTseTextBox4(textBoxData);
                 caseData.setResTseDocument4(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
+            }
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> {
                 caseData.setResTseTextBox5(textBoxData);
                 caseData.setResTseDocument5(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_ORDER_OTHER_PARTY:
+            }
+            case TSE_APP_ORDER_OTHER_PARTY -> {
                 caseData.setResTseTextBox6(textBoxData);
                 caseData.setResTseDocument6(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            }
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> {
                 caseData.setResTseTextBox7(textBoxData);
                 caseData.setResTseDocument7(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_POSTPONE_A_HEARING:
+            }
+            case TSE_APP_POSTPONE_A_HEARING -> {
                 caseData.setResTseTextBox8(textBoxData);
                 caseData.setResTseDocument8(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_RECONSIDER_JUDGEMENT:
+            }
+            case TSE_APP_RECONSIDER_JUDGEMENT -> {
                 caseData.setResTseTextBox9(textBoxData);
                 caseData.setResTseDocument9(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_RESTRICT_PUBLICITY:
+            }
+            case TSE_APP_RESTRICT_PUBLICITY -> {
                 caseData.setResTseTextBox10(textBoxData);
                 caseData.setResTseDocument10(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            }
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> {
                 caseData.setResTseTextBox11(textBoxData);
                 caseData.setResTseDocument11(createDocumentType(documentUrl));
-                break;
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
+            }
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> {
                 caseData.setResTseTextBox12(textBoxData);
                 caseData.setResTseDocument12(createDocumentType(documentUrl));
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
     }
 
@@ -775,17 +695,14 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     private Map<String, String> createPersonalisation(CaseData caseData,
-                                                      String expectedAnswer,
                                                       String selectedApplication) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("claimant", caseData.getClaimant());
-        personalisation.put("respondents", getRespondentNames(caseData));
+        personalisation.put("respondentNames", getRespondentNames(caseData));
+        personalisation.put("hearingDate", "Not set");
         personalisation.put("shortText", selectedApplication);
-        personalisation.put("linkToExUI", "exuiUrl669718251103419");
-        if (expectedAnswer != null) {
-            personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
-        }
+        personalisation.put("exuiCaseDetailsLink", "exuiUrl669718251103419");
         return personalisation;
     }
 
@@ -798,10 +715,45 @@ class RespondentTellSomethingElseServiceTest {
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
         DocumentType actual = documentCollection.get(0).getValue();
 
-        DocumentType expected = DocumentType.builder().typeOfDocument("Respondent correspondence")
-            .shortDescription("Amend response").build();
+        DocumentType expected = DocumentType.builder()
+                .shortDescription("Amend response")
+                .dateOfCorrespondence(LocalDate.now().toString())
+                .topLevelDocuments(CASE_MANAGEMENT)
+                .caseManagementDocuments(APP_TO_AMEND_RESPONSE)
+                .documentType(APP_TO_AMEND_RESPONSE)
+                .build();
 
         Assertions.assertThat(documentCollection).hasSize(1);
         Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void clearApplicationData() {
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
+        tseService.clearApplicationData(caseData);
+        assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
+        assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));
+        assertThat(caseData.getResTseCopyToOtherPartyTextArea(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox1(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox2(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox3(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox4(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox5(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox6(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox7(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox8(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox9(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox10(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox11(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox12(), is(nullValue()));
+        assertThat(caseData.getResTseDocument1(), is(nullValue()));
+        assertThat(caseData.getResTseDocument2(), is(nullValue()));
+        assertThat(caseData.getResTseDocument3(), is(nullValue()));
+        assertThat(caseData.getResTseDocument4(), is(nullValue()));
+        assertThat(caseData.getResTseDocument5(), is(nullValue()));
+        assertThat(caseData.getResTseDocument6(), is(nullValue()));
+        assertThat(caseData.getResTseDocument7(), is(nullValue()));
+        assertThat(caseData.getResTseDocument11(), is(nullValue()));
+        assertThat(caseData.getResTseDocument12(), is(nullValue()));
     }
 }

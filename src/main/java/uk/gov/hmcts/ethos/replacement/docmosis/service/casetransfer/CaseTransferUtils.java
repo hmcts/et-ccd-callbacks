@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
-import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -66,7 +65,7 @@ public class CaseTransferUtils {
 
     private CaseData getClaimantCase(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
-        if (Strings.isNullOrEmpty(caseData.getCounterClaim())) {
+        if (isNullOrEmpty(caseData.getCounterClaim())) {
             return caseData;
         }
 

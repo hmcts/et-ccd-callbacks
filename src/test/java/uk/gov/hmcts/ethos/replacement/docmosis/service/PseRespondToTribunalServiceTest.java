@@ -29,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.SendNotificationUtil;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
@@ -49,12 +50,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -110,67 +109,25 @@ class PseRespondToTribunalServiceTest {
 
     @Test
     void populateSelectDropdown_checkSendNotificationNotify_returnList() {
-        caseData.setSendNotificationCollection(List.of(
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("1")
-                    .sendNotificationTitle("View notice of hearing")
-                    .sendNotificationNotify(BOTH_PARTIES)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("2")
-                    .sendNotificationTitle("Submit hearing agenda")
-                    .sendNotificationNotify(CLAIMANT_ONLY)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("3")
-                    .sendNotificationTitle("Send Notification Title")
-                    .sendNotificationNotify(RESPONDENT_ONLY)
-                    .build())
-                .build()
+        caseData.setSendNotificationCollection(List.of(SendNotificationUtil.sendNotificationNotifyBothParties(),
+                SendNotificationUtil.sendNotificationNotifyClaimant(),
+                SendNotificationUtil.sendNotificationNotifyRespondent()
         ));
 
         DynamicFixedListType expected = DynamicFixedListType.from(List.of(
                 DynamicValueType.create("1", "1 View notice of hearing"),
                 DynamicValueType.create("3", "3 Send Notification Title")
-            ));
+        ));
 
         assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
-            is(expected));
+                is(expected));
     }
 
     @Test
     void populateSelectDropdown_checkRespondCollection_returnList() {
         caseData.setSendNotificationCollection(List.of(
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("1")
-                    .sendNotificationTitle("View notice of hearing")
-                    .sendNotificationNotify(BOTH_PARTIES)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("2")
-                    .sendNotificationTitle("Submit hearing agenda")
-                    .sendNotificationNotify(BOTH_PARTIES)
-                    .respondCollection(List.of(PseResponseTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(PseResponseType.builder()
-                            .from(CLAIMANT_TITLE)
-                            .build())
-                        .build()))
-                    .build())
-                .build(),
+            SendNotificationUtil.sendNotificationNotifyBothParties(),
+            SendNotificationUtil.sendNotificationNotifyBothPartiesWithResponse(),
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(SendNotificationType.builder()
@@ -256,13 +213,12 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            |Response 1 | |\r
+            \r\n|Response 1| |\r
             |--|--|\r
-            |Response from | Claimant|\r
-            |Response date | 10 Aug 2022|\r
-            |What's your response to the tribunal? | Response text entered|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | Yes|\r
-            \r
+            |Response from|Claimant|\r
+            |Response date|10 Aug 2022|\r
+            |What's your response to the tribunal?|Response text entered|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 
         assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
@@ -332,19 +288,62 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            |Response 1 | |\r
+            \r\n|Response 1| |\r
             |--|--|\r
-            |Response from | Claimant|\r
-            |Response date | 10 Aug 2022|\r
-            |What's your response to the tribunal? | Response text entered|\r
-            |Supporting material | <a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>\r
-            |\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | Yes|\r
-            \r
+            |Response from|Claimant|\r
+            |Response date|10 Aug 2022|\r
+            |What's your response to the tribunal?|Response text entered|\r
+            |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 
         assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
             is(expected));
+    }
+
+    @Test
+    void initialOrdReqDetailsTableMarkUp_acceptanceOfECCResponse() {
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .date("5 Aug 2022")
+                                .sendNotificationTitle("Acceptance")
+                                .sendNotificationLetter(NO)
+                                .sendNotificationSubject(List.of("Employer Contract Claim"))
+                                .sendNotificationEccQuestion("Acceptance of ECC response")
+                                .sendNotificationResponseTribunal("Yes - view document for details")
+                                .sendNotificationSelectParties(BOTH_PARTIES)
+                                .sendNotificationWhoCaseOrder("Legal Officer")
+                                .sendNotificationFullName("Mr Lee Gal Officer")
+                                .sendNotificationAdditionalInfo("Additional Info")
+                                .sendNotificationNotify(BOTH_PARTIES)
+                                .build())
+                        .build()
+        ));
+
+        caseData.setPseRespondentSelectOrderOrRequest(
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
+
+        String expected = """
+            |View Application||\r
+            |--|--|\r
+            |Notification|Acceptance|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Is a response required?|Yes - view document for details|\r
+            |Party or parties to respond|Both parties|\r
+            |Additional information|Additional Info|\r
+            |Name|Mr Lee Gal Officer|\r
+            |What is the ECC notification?|Acceptance of ECC response|\r
+            |Sent to|Both parties|\r
+            """;
+
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+                is(expected));
     }
 
     private DocumentTypeItem createDocumentTypeItem(String fileName, String uuid) {
@@ -394,7 +393,6 @@ class PseRespondToTribunalServiceTest {
             |View Application||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
-            |Hearing||\r
             |Date sent|5 Aug 2022|\r
             |Sent by|Tribunal|\r
             |Case management order or request?|Request|\r

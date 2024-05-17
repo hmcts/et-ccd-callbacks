@@ -7,9 +7,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadES;
+import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadES;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantIndType;
@@ -26,6 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
@@ -34,8 +38,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -46,6 +53,7 @@ import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleActionType;
 import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.SendNotificationUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,7 +62,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BATCH_UPDATE_TYPE_1;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CREATE_ACTION;
@@ -81,7 +91,7 @@ public final class MultipleUtil {
 
     public static TreeMap<String, Object> getMultipleObjectsAll() {
         TreeMap<String, Object> multipleObjectTreeMap = new TreeMap<>();
-        multipleObjectTreeMap.put("245000/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245000/2020", MultipleObject.builder()
                 .subMultiple("245000")
                 .ethosCaseRef("245000/2020")
                 .flag1("AA")
@@ -89,7 +99,7 @@ public final class MultipleUtil {
                 .flag3("")
                 .flag4("")
                 .build());
-        multipleObjectTreeMap.put("245003/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245003/2020", MultipleObject.builder()
                 .subMultiple("245003")
                 .ethosCaseRef("245003/2020")
                 .flag1("AA")
@@ -97,7 +107,7 @@ public final class MultipleUtil {
                 .flag3("")
                 .flag4("")
                 .build());
-        multipleObjectTreeMap.put("245004/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245004/2020", MultipleObject.builder()
                 .subMultiple("245002")
                 .ethosCaseRef("245004/2020")
                 .flag1("AA")
@@ -105,7 +115,7 @@ public final class MultipleUtil {
                 .flag3("")
                 .flag4("")
                 .build());
-        multipleObjectTreeMap.put("245005/2020",  MultipleObject.builder()
+        multipleObjectTreeMap.put("245005/2020", MultipleObject.builder()
                 .subMultiple("SubMultiple")
                 .ethosCaseRef("245005/2020")
                 .flag1("AA")
@@ -184,8 +194,8 @@ public final class MultipleUtil {
         caseData.setJudgementCollection(new ArrayList<>(Collections.singletonList(judgementTypeItem)));
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
-            .respRepName("Respondent")
-            .nameOfRepresentative("Representative").build();
+                .respRepName("Respondent")
+                .nameOfRepresentative("Representative").build();
         representedTypeRItem.setValue(representedTypeR);
         representedTypeRItem.setId("1");
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));
@@ -244,6 +254,44 @@ public final class MultipleUtil {
         return schedulePayloadEvent;
     }
 
+    public static NotificationSchedulePayloadEvent getNotificationSchedulePayloadEventData(String ethosCaseReference) {
+        NotificationSchedulePayloadES schedulePayloadES = new NotificationSchedulePayloadES();
+        schedulePayloadES.setEthosCaseReference(ethosCaseReference);
+        schedulePayloadES.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder().id(UUID.randomUUID().toString()).value(
+                        SendNotificationType.builder().number("1").respondCollection(
+                                        List.of(PseResponseTypeItem.builder().value(
+                                                PseResponseType.builder().copyToOtherParty(NO).build()
+                                        ).build()))
+                                .build()).build()));
+        NotificationSchedulePayloadEvent schedulePayloadEvent = new NotificationSchedulePayloadEvent();
+        schedulePayloadEvent.setSchedulePayloadES(schedulePayloadES);
+        return schedulePayloadEvent;
+    }
+
+    public static NotificationSchedulePayloadEvent getNotificationSchedulePayloadEventNoNotifications(
+            String ethosCaseReference) {
+        NotificationSchedulePayloadES schedulePayloadES = new NotificationSchedulePayloadES();
+        schedulePayloadES.setEthosCaseReference(ethosCaseReference);
+        NotificationSchedulePayloadEvent schedulePayloadEvent = new NotificationSchedulePayloadEvent();
+        schedulePayloadEvent.setSchedulePayloadES(schedulePayloadES);
+        return schedulePayloadEvent;
+    }
+
+    public static List<NotificationSchedulePayload> getNotificationSchedulePayloadList(String ethosCaseReference,
+                                                                                       String multipleRef) {
+        List<SendNotificationTypeItem> sendNotificationTypeItems =
+                SendNotificationUtil.listOfSendNotificationTypeItemsOnMultiple(multipleRef);
+        List<NotificationSchedulePayload> notificationSchedulePayloadList = new ArrayList<>();
+        notificationSchedulePayloadList.add(
+                NotificationSchedulePayload.builder()
+                        .ethosCaseRef(ethosCaseReference)
+                        .sendNotificationCollection(sendNotificationTypeItems)
+                        .build()
+        );
+        return notificationSchedulePayloadList;
+    }
+
     public static List<SubmitEvent> getSubmitEvents() {
         SubmitEvent submitEvent1 = new SubmitEvent();
         submitEvent1.setCaseData(getCaseData("245000/2020"));
@@ -264,10 +312,16 @@ public final class MultipleUtil {
         return new ArrayList<>(Arrays.asList(labelPayloadEvent1, labelPayloadEvent2));
     }
 
-    public static HashSet<SchedulePayloadEvent> getSchedulePayloadEvents() {
+    public static Set<SchedulePayloadEvent> getSchedulePayloadEvents() {
         return new HashSet<>(Arrays.asList(
                 getSchedulePayloadEventData("245000/2020"),
                 getSchedulePayloadEventData("245003/2020")));
+    }
+
+    public static Set<NotificationSchedulePayloadEvent> getNotificationSchedulePayloadEvents() {
+        return new HashSet<>(Arrays.asList(
+                getNotificationSchedulePayloadEventData("245000/2020"),
+                getNotificationSchedulePayloadEventData("245003/2020")));
     }
 
     public static List<SubmitMultipleEvent> getSubmitMultipleEvents() {
@@ -379,6 +433,30 @@ public final class MultipleUtil {
         multipleData.setPositionTypeCT("PositionTypeCT");
         multipleData.setReasonForCT("ReasonForCT");
 
+        return multipleData;
+    }
+
+    public static MultipleData getMultipleDataForNotification() {
+        MultipleData multipleData = getMultipleData();
+        multipleData.setLeadEthosCaseRef("21006/2020");
+        multipleData.setLeadCaseId("11111111");
+        multipleData.setSendNotificationTitle("title");
+        multipleData.setSendNotificationLetter("no");
+        multipleData.setSendNotificationUploadDocument(new ArrayList<>());
+        multipleData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
+        multipleData.setSendNotificationAdditionalInfo("info");
+        multipleData.setSendNotificationNotify("Lead case");
+        multipleData.setSendNotificationNotifyLeadCase("Both parties");
+        multipleData.setSendNotificationSelectHearing(null);
+        multipleData.setSendNotificationCaseManagement("");
+        multipleData.setSendNotificationResponseTribunal("no");
+        multipleData.setSendNotificationWhoCaseOrder("Judge");
+        multipleData.setSendNotificationSelectParties("Both parties");
+        multipleData.setSendNotificationFullName("John Doe");
+        multipleData.setSendNotificationFullName2("John Doe");
+        multipleData.setSendNotificationDecision("Other");
+        multipleData.setSendNotificationDetails("details");
+        multipleData.setSendNotificationRequestMadeBy("Judge");
         return multipleData;
     }
 

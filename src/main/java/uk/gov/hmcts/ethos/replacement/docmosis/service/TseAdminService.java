@@ -128,7 +128,7 @@ public class TseAdminService {
 
         // if claimant only or both parties: send Claimant Decision Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
-                || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
+                || BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdminSelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             String claimantName = caseData.getClaimantIndType().claimantFullNames();
 

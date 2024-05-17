@@ -10,26 +10,26 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 public class Et3ResponseService {
 
     public static final String ET3_ATTACHMENT = "ET3 Attachment";
+    public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response";
     public static final String ET3_CATEGORY_ID = "C18";
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
@@ -73,7 +74,7 @@ public class Et3ResponseService {
     public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
         uploadedDocument.setCategoryId(ET3_CATEGORY_ID);
-        addDocumentToDocCollection(caseData, createDocumentTypeItem(uploadedDocument, "ET3"));
+        addDocumentToDocCollection(caseData, createDocumentTypeItem(uploadedDocument, ET3));
         saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }
 
@@ -97,13 +98,17 @@ public class Et3ResponseService {
                 }
             }
         }
-
     }
 
     private static void addDocumentToDocCollection(CaseData caseData, DocumentTypeItem documentTypeItem) {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             caseData.setDocumentCollection(new ArrayList<>());
         }
+
+        documentTypeItem.getValue().setShortDescription(
+                String.format("%s : %s", SHORT_DESCRIPTION, "ET3 Form Submission."));
+        documentTypeItem.getValue().setDateOfCorrespondence(LocalDate.now().toString());
+        documentTypeItem.getValue().setTopLevelDocuments(RESPONSE_TO_A_CLAIM);
         caseData.getDocumentCollection().add(documentTypeItem);
     }
 
@@ -113,30 +118,46 @@ public class Et3ResponseService {
         }
 
         List<DocumentTypeItem> documents = caseData.getDocumentCollection();
-
-        Set<String> documentSet = documents.stream()
-                .map(GenericTypeItem::getId)
-                .collect(Collectors.toCollection(HashSet::new));
-
-        List<DocumentTypeItem> documentList = Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
-                .orElse(List.of())
-                .stream()
-                .filter(o -> !documentSet.contains(o.getId()))
-                .toList();
-        for (DocumentTypeItem documentTypeItem : documentList) {
-            documentTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
+        //Respondent Contest Claim - support doc
+        if (caseData.getEt3ResponseRespondentContestClaim() != null) {
+            for (DocumentTypeItem docTypeItem : Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
+                    .orElseGet(List::of)) {
+                if (!isExistingDoc(documents, docTypeItem.getValue().getUploadedDocument())) {
+                    documents.add(getDocumentTypeItemDetails(docTypeItem.getValue().getUploadedDocument(),
+                            "Respondent Contest Claim."));
+                }
+            }
         }
 
-        documents.addAll(documentList);
-
-        if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
-            documents.add(createDocumentTypeItem(caseData.getEt3ResponseEmployerClaimDocument(), ET3_ATTACHMENT));
+        //ECC support doc
+        if (caseData.getEt3ResponseEmployerClaimDocument() != null
+                && !isExistingDoc(documents, caseData.getEt3ResponseEmployerClaimDocument())) {
+            documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseEmployerClaimDocument(),
+                    "Employer Claim."));
         }
 
-        if (caseData.getEt3ResponseRespondentSupportDocument() != null) {
-            documents.add(createDocumentTypeItem(caseData.getEt3ResponseRespondentSupportDocument(), ET3_ATTACHMENT));
+        //Support needed - support doc
+        if (caseData.getEt3ResponseRespondentSupportDocument() != null
+                && !isExistingDoc(documents, caseData.getEt3ResponseRespondentSupportDocument())) {
+            documents.add(getDocumentTypeItemDetails(caseData.getEt3ResponseRespondentSupportDocument(),
+                    "Respondent Support."));
         }
+    }
 
+    private boolean isExistingDoc(List<DocumentTypeItem> documents, UploadedDocumentType uploadedDocType) {
+        return documents.stream()
+                .anyMatch(doc -> {
+                    UploadedDocumentType uploadedDocument = doc.getValue().getUploadedDocument();
+                    return uploadedDocument.getDocumentBinaryUrl().equals(uploadedDocType.getDocumentBinaryUrl())
+                            && uploadedDocument.getDocumentFilename().equals(uploadedDocType.getDocumentFilename())
+                            && uploadedDocument.getDocumentUrl().equals(uploadedDocType.getDocumentUrl());
+                });
+    }
+
+    private static DocumentTypeItem getDocumentTypeItemDetails(UploadedDocumentType uploadedDocType,
+                                                               String docSubGroup) {
+        return createDocumentTypeItemFromTopLevel(uploadedDocType, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT,
+                String.format("%s : %s", SHORT_DESCRIPTION, docSubGroup));
     }
 
     /**

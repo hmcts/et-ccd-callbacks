@@ -23,6 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class PseRespondentViewServiceTest {
@@ -146,19 +147,106 @@ class PseRespondentViewServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            |Response 1 | |\r
+            \r\n|Response 1| |\r
             |--|--|\r
-            |Response from | Claimant|\r
-            |Response date | 10 Aug 2022|\r
-            |What's your response to the tribunal? | Response text entered|\r
-            |Supporting material | <a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>\r
-            |\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | Yes|\r
-            \r
+            |Response from|Claimant|\r
+            |Response date|10 Aug 2022|\r
+            |What's your response to the tribunal?|Response text entered|\r
+            |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 
         assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
             is(expected));
+    }
+
+    @Test
+    void initialOrdReqDetailsTableMarkUpECC() {
+
+        PseResponseTypeItem claimantResponse = PseResponseTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(PseResponseType.builder()
+                        .from(CLAIMANT_TITLE)
+                        .date("10 Aug 2022")
+                        .response("Response text entered")
+                        .hasSupportingMaterial(YES)
+                        .supportingMaterial(List.of(createDocumentTypeItem("My claimant hearing agenda.pdf",
+                                "ca35bccd-f507-4243-9133-f6081fb0fe5e", null)))
+                        .build())
+                .build();
+
+        PseResponseTypeItem respondentResponse = PseResponseTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(PseResponseType.builder()
+                        .from(RESPONDENT_TITLE)
+                        .date("10 Aug 2022")
+                        .response("Response text entered")
+                        .hasSupportingMaterial(YES)
+                        .supportingMaterial(List.of(createDocumentTypeItem("My respondent hearing agenda.pdf",
+                                "ca35bccd-f507-4243-9133-f6081fb0fe5e", null)))
+                        .copyToOtherParty(YES)
+                        .build())
+                .build();
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .date("5 Aug 2022")
+                                .sendNotificationTitle("View notice of hearing")
+                                .sendNotificationLetter(YES)
+                                .sendNotificationUploadDocument(List.of(
+                                        createDocumentTypeItem("Letter 4.8 - Hearing notice - hearing agenda.pdf",
+                                                "5fac5af5-b8ac-458c-a329-31cce78da5c2",
+                                                "Notice of Hearing and Submit Hearing Agenda document")))
+                                .sendNotificationSubject(List.of("Employer Contract Claim",
+                                        "Case management orders / requests"))
+                                .sendNotificationSelectHearing(DynamicFixedListType.of(
+                                        DynamicValueType.create("3", "3: Hearing - Leeds - 14 Aug 2022")))
+                                .sendNotificationCaseManagement("Case management order")
+                                .sendNotificationResponseTribunal("Yes - view document for details")
+                                .sendNotificationSelectParties(BOTH_PARTIES)
+                                .sendNotificationWhoCaseOrder("Legal Officer")
+                                .sendNotificationFullName("Mr Lee Gal Officer")
+                                .sendNotificationAdditionalInfo("Additional Info")
+                                .sendNotificationNotify(BOTH_PARTIES)
+                                .respondCollection(List.of(claimantResponse, respondentResponse))
+                                .build())
+                        .build()
+        ));
+
+        caseData.setPseRespondentSelectJudgmentOrderNotification(
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
+
+        String expected = """
+            |View Application||\r
+            |--|--|\r
+            |Notification|View notice of hearing|\r
+            |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Case management order or request?|Case management order|\r
+            |Is a response required?|Yes - view document for details|\r
+            |Party or parties to respond|Both parties|\r
+            |Additional information|Additional Info|\r
+            |Document|<a href="/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary" target="_blank">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r
+            |Description|Notice of Hearing and Submit Hearing Agenda document|\r
+            |Request made by|Legal Officer|\r
+            |Name|Mr Lee Gal Officer|\r
+            |Sent to|Both parties|\r
+            \r\n|Response 1| |\r
+            |--|--|\r
+            |Response from|Respondent|\r
+            |Response date|10 Aug 2022|\r
+            |What's your response to the tribunal?|Response text entered|\r
+            |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My respondent hearing agenda.pdf</a>|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            """;
+
+        assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
+                is(expected));
     }
 
     private DocumentTypeItem createDocumentTypeItem(String fileName, String uuid, String shortDescription) {
@@ -199,7 +287,6 @@ class PseRespondentViewServiceTest {
             |View Application||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
-            |Hearing||\r
             |Date sent|5 Aug 2022|\r
             |Sent by|Tribunal|\r
             |Case management order or request?|Request|\r

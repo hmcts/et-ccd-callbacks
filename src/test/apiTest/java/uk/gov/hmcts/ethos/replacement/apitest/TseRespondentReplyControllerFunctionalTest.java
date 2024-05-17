@@ -45,9 +45,16 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
 
         caseData.setTseResponseCopyToOtherParty(YES_COPY);
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
-            .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
+        GenericTseApplicationType build = TseApplicationBuilder.builder()
+                .withApplicant(CLAIMANT_TITLE)
+                .withDate("13 December 2022")
+                .withDue("20 December 2022")
+                .withType("Withdraw all/part of claim")
+                .withDetails("Text")
+                .withNumber("1")
+                .withResponsesCount("0")
+                .withStatus(OPEN_STATE)
+                .build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -65,6 +72,7 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
                         TseRespondType.builder()
                             .from(CLAIMANT_TITLE)
                             .date("16-May-1996")
+                            .dateTime("1996-05-16T10:20:30.555")
                             .response("response")
                             .hasSupportingMaterial(NO)
                             .copyToOtherParty(YES)

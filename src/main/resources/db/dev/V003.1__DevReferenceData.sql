@@ -261,6 +261,7 @@ INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Hull','Hull');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Hull Combined Court Centre','Hull Combined Court Centre');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','IAC','IAC');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Leeds','Leeds');
+INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Leeds Westgate','Leeds Westgate');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Scarborough','Scarborough');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Sheffield Combi','Sheffield Combined Court');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Teesside ET','Teesside ET');
@@ -299,6 +300,7 @@ INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','Bury St
 INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','Cambridge','Cambridge');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','Hereford Court','Hereford Court');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','Leicester','Leicester');
+INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','North Staffordshire Justice Centre','North Staffordshire Justice Centre');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','Stoke','Stoke');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','STOKE (Hanley)','Stoke (Hanley)');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('MIDLANDS_WEST','Telford','Telford');

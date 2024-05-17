@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.UpdateReferralType;
 
 import java.util.List;
 
@@ -40,4 +42,6 @@ public class ReferralTypeData {
     private String referralInstruction;
     @JsonProperty("referralReplyCollection")
     private List<ReferralReplyTypeItem> referralReplyCollection;
+    @JsonProperty("updateReferralCollection")
+    private ListTypeItem<UpdateReferralType> updateReferralCollection;
 }

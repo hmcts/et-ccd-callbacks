@@ -1,6 +1,10 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  devcpuRequests: 250m
+  devmemoryRequests: 2Gi
+  devcpuLimits: 1024m
+  devmemoryLimits: 3Gi
   environment:
     ET_COS_DB_HOST: "{{ .Release.Name }}-postgresql"
     ET_COS_DB_NAME: "{{ .Values.postgresql.auth.database}}"
@@ -33,5 +37,7 @@ java:
           alias: GOV_NOTIFY_API_KEY
         - name: launch-darkly-sdk-key
           alias: LAUNCH_DARKLY_SDK_KEY
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
   postgresql:
     enabled: true

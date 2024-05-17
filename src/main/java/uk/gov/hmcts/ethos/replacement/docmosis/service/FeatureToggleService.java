@@ -36,7 +36,19 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bundles");
     }
 
+    public boolean isWorkAllocationEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("work-allocation");
+    }
+
     public boolean isWelshEnabled() {
         return this.featureToggleApi.isFeatureEnabled("welsh-language");
+    }
+
+    public boolean isEccEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("ecc");
+    }
+
+    public boolean isMultiplesEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("multiples");
     }
 }

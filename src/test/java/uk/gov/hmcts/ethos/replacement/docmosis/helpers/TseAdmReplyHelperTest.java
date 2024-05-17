@@ -85,7 +85,8 @@ class TseAdmReplyHelperTest {
         expectedDocumentInfo.setDescription(documentType);
         String correspondenceType = "correspondenceType";
 
-        when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(expectedDocumentInfo);
+        when(tornadoService.generateEventDocument(any(CaseData.class), any(), any(), any()))
+            .thenReturn(expectedDocumentInfo);
         DocumentTypeItem actual  = TseAdmReplyHelper.getDocumentTypeItem(documentManagementService, tornadoService,
                 caseDetails, "testToken", documentType, correspondenceType);
 
@@ -97,8 +98,7 @@ class TseAdmReplyHelperTest {
     @Test
     void getReplyDocumentRequest_Returns_doc_as_String() throws JsonProcessingException {
         caseData.setTseAdminSelectApplication(getTseAdminSelectApp());
-        String actual  = TseAdmReplyHelper.getReplyDocumentRequest(caseData, "testAccessKey",
-                "testBinaryUrl");
+        String actual  = TseAdmReplyHelper.getReplyDocumentRequest(caseData, "testAccessKey");
 
         assertNotNull(actual);
         assertThat(actual.contains("EM-TRB-EGW-ENG-000991.docx"), is(Boolean.TRUE));

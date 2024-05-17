@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
@@ -37,10 +39,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
@@ -583,6 +587,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withDocumentCollection(String docType) {
+        if (caseData.getDocumentCollection() == null) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentFilename("test.pdf");
+        uploadedDocumentType.setDocumentBinaryUrl("http://dummy.link/documents/11111111-1111-1111-1111-111111111111/binary");
+        uploadedDocumentType.setDocumentUrl("http://dummy.link/documents/11111111-1111-1111-1111-111111111111");
+        DocumentType documentType = new DocumentType();
+        documentType.setTypeOfDocument(docType);
+        documentType.setUploadedDocument(uploadedDocumentType);
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(documentType);
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        caseData.getDocumentCollection().add(documentTypeItem);
+        return this;
+    }
+
     public CaseDataBuilder withGenericTseApplicationTypeItem(String tseApplicant, String tseDate) {
         GenericTseApplicationTypeItem item = new GenericTseApplicationTypeItem();
         GenericTseApplicationType genericTseApplicationType = new GenericTseApplicationType();
@@ -596,5 +618,16 @@ public class CaseDataBuilder {
     public CaseDataBuilder withCaseSource(String caseSource) {
         caseData.setCaseSource(caseSource);
         return this;
+    }
+
+    public static Address createGenericAddress() {
+        Address address = new Address();
+        address.setAddressLine1("Line 1");
+        address.setAddressLine2("Line 2");
+        address.setAddressLine3("Line 3");
+        address.setPostTown("Town");
+        address.setPostCode("Postcode");
+        address.setCountry("Country");
+        return address;
     }
 }

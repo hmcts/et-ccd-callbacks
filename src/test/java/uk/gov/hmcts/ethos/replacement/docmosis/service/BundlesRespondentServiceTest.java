@@ -20,6 +20,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -29,6 +30,8 @@ class BundlesRespondentServiceTest {
     private BundlesRespondentService bundlesRespondentService;
     private CaseData scotlandCaseData;
     private CaseData englandCaseData;
+    private static final String VALID_TEXT = "valid text";
+    private static final String EXCEED_CHAR_LIMIT_TEXT = "a".repeat(2501);
 
     @BeforeEach
     void setUp() {
@@ -78,6 +81,18 @@ class BundlesRespondentServiceTest {
     }
 
     @Test
+    void populateSelectHearings_filtersOutPastDates() {
+        englandCaseData.getHearingCollection().get(0).getValue().getHearingDateCollection().get(0).getValue()
+                .setListedDate("2022-05-16T01:00:00.000");
+
+        bundlesRespondentService.populateSelectHearings(englandCaseData);
+        var actual = englandCaseData.getBundlesRespondentSelectHearing().getListItems();
+
+        assertThat(actual.size(), is(1));
+        assertThat(actual.get(0).getLabel(), is("2 Costs Hearing - ROIT - 16 May 2069"));
+    }
+
+    @Test
     void populateSelectHearings_scotland_twoOptionsWithCorrectDates() {
         bundlesRespondentService.populateSelectHearings(scotlandCaseData);
         var actual = scotlandCaseData.getBundlesRespondentSelectHearing().getListItems();
@@ -121,10 +136,44 @@ class BundlesRespondentServiceTest {
     }
 
     @Test
+    void validateTextAreaLength_noTooLong_returnsError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith("No");
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(EXCEED_CHAR_LIMIT_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
+    }
+
+    @Test
+    void validateTextAreaLength_butTooLong_returnsError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith("But");
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(EXCEED_CHAR_LIMIT_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is("This field must be 2500 characters or less"));
+    }
+
+    @Test
+    void validateTextAreaLength_validTextForNo_returnsNoError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(VALID_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
+    void validateTextAreaLength_validTextForBut_returnsNoError() {
+        englandCaseData.setBundlesRespondentAgreedDocWith("But");
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(VALID_TEXT);
+        List<String> errors = bundlesRespondentService.validateTextAreaLength(englandCaseData);
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
     void addToBundlesCollection_whenEmptyCollection_createsNewCollection() {
         englandCaseData.setBundlesRespondentCollection(null);
         englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
-
+        englandCaseData.setBundlesRespondentAgreedDocWith("Yes");
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
 
         assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(1));
@@ -169,5 +218,34 @@ class BundlesRespondentServiceTest {
         assertThat(actual.getUploadFile(), is(file));
         assertThat(actual.getWhatDocuments(), is(witnessStatementsOnly));
         assertThat(actual.getWhoseDocuments(), is(respondentsDocumentsOnly));
+        assertThat(actual.getFormattedSelectedHearing(),
+                is(englandCaseData.getBundlesRespondentSelectHearing().getSelectedLabel()));
+    }
+
+    @Test
+    void addToBundlesCollection_addsCorrectReason() {
+        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        englandCaseData.setBundlesRespondentCollection(collection);
+
+        String respondentsDocumentsOnly = "Respondent's documents only";
+        String witnessStatementsOnly = "Witness statements only";
+        String butReason = "ButReason";
+        String disagree = "Disagree";
+        UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
+
+        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
+        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
+        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
+        englandCaseData.setBundlesRespondentUploadFile(file);
+        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
+
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+        HearingBundleType actual = collection.get(0).getValue();
+        String expectedAgreedDocsWith = "No, we have not agreed and I want to provide my own documents";
+
+        assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));
+        assertThat(actual.getAgreedDocWith(), is(expectedAgreedDocsWith));
     }
 }

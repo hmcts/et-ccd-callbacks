@@ -210,7 +210,7 @@ public class ExcelReadingService {
         }
     }
 
-    private String getCellValue(Cell currentCell) {
+    public String getCellValue(Cell currentCell) {
 
         if (currentCell.getCellType() == CellType.STRING) {
 

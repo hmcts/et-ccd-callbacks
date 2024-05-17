@@ -21,13 +21,13 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -50,7 +50,6 @@ class UpdateReferralControllerTest {
     private static final String START_UPDATE_REFERRAL_URL = "/updateReferral/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/updateReferral/aboutToSubmit";
     private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = "/updateReferral/initHearingAndReferralDetails";
-    private static final String SUBMITTED_REFERRAL_URL = "/updateReferral/completeUpdateReferral";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -58,8 +57,6 @@ class UpdateReferralControllerTest {
     private UserIdamService userIdamService;
     @MockBean
     private DocumentManagementService documentManagementService;
-    @MockBean
-    private EmailService emailService;
     @MockBean
     private ReferralService referralService;
     @Autowired
@@ -85,7 +82,8 @@ class UpdateReferralControllerTest {
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
         caseData.setReferralSubject("ET1");
-        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
+        DynamicFixedListType selectReferralList = 
+            ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -147,7 +145,33 @@ class UpdateReferralControllerTest {
         caseData.setUpdateReferentEmail("example@example.com");
         caseData.setUpdateReferralSubject("subject");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
-        when(emailService.getExuiCaseLink(any())).thenReturn("dummyLink");
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void aboutToSubmitNoUpdateReferentEmailAddress_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId(UUID.randomUUID().toString());
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("respondent Name");
+        respondentSumTypeItem.setValue(respondentSumType);
+        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(
+                List.of(respondentSumTypeItem));
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setUpdateIsUrgent("Yes");
+        caseData.setUpdateReferentEmail("");
+        caseData.setUpdateReferralSubject("subject");
+        when(userIdamService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -198,26 +222,6 @@ class UpdateReferralControllerTest {
     void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void completeUpdateReferral_tokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
-                .contentType(APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isOk());
-    }
-
-    @Test
-    void completeUpdateReferral_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))

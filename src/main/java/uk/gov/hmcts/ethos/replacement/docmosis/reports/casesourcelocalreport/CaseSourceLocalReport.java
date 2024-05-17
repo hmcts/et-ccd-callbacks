@@ -73,17 +73,13 @@ public class CaseSourceLocalReport {
         }
         int totalCases = manuallyCreatedCases + et1OnlineCases + eccCases + migrationCases;
 
-        float manuallyCreatedPercent = (totalCases != 0)
-                ? ((float)manuallyCreatedCases / totalCases) * 100 : 0;
+        float manuallyCreatedPercent = (totalCases == 0) ? 0 : ((float) manuallyCreatedCases / totalCases) * 100;
 
-        float et1OnlinePercent = (totalCases != 0)
-                ? ((float)et1OnlineCases / totalCases) * 100 : 0;
+        float et1OnlinePercent = (totalCases == 0) ? 0 : ((float) et1OnlineCases / totalCases) * 100;
 
-        float eccPercent = (totalCases != 0)
-                ? ((float)eccCases / totalCases) * 100 : 0;
+        float eccPercent = (totalCases == 0) ? 0 : ((float) eccCases / totalCases) * 100;
 
-        float migrationCasesPercent = (totalCases != 0)
-                ? ((float)migrationCases / totalCases) * 100 : 0;
+        float migrationCasesPercent = (totalCases == 0) ? 0 : ((float) migrationCases / totalCases) * 100;
 
         adhocReportType.setManuallyCreatedTotalCases(String.valueOf(manuallyCreatedCases));
         adhocReportType.setEt1OnlineTotalCases(String.valueOf(et1OnlineCases));

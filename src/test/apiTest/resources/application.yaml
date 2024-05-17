@@ -12,16 +12,20 @@ ft:
   et-sya-api:
     url: ${FT_SYA_URL:http://localhost:4550}
   idam:
-    url: ${IDAM_API_URL:http://localhost:5000}
+    url: ${IDAM_API_URL:http://localhost:5062}
 
 idam:
   api:
-    url: http://localhost:5000
-    jwkUrl: http://localhost:5000/o/jwks
+    url: http://localhost:5062
+    jwkUrl: http://localhost:5062/o/jwks
   s2s-auth:
-    url: http://localhost:4502
-    totp_secret: AAAAAAAAAAAAAAAA
+    url: ${SERVICE_AUTH_PROVIDER_URL:http://localhost:8489}
+    totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: et_cos
+  client:
+    scope: openid profile roles manage-user
+    secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAA}
+    id: ${REFORM_SERVICE_NAME:et-cos}
 
 et-sya-api:
   url: http://et-sya-api-aat.service.core-compute-aat.internal
@@ -34,7 +38,7 @@ document_management:
 ccd:
   client:
     timeout: 60000
-  data-store-api-url: http://localhost:4452
+  data-store-api-url: ${CCD_DATA_STORE_API_URL:http://localhost:4452}
 
 tornado:
   accessKey: test
@@ -64,8 +68,10 @@ template:
     respondent:
       application:
         claimant: ${TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID:5d014e5a-9528-4d02-bd31-8eca98cfba19}
-        respondent: ${TSE_RESPONDENT_TO_RESPONDENT_TEMPLATE_ID:c0b393f6-daf0-46fc-8995-d5e98149326f}
-        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:e60bc338-db48-4270-95b0-5e8f29e6ae0f}
+        respondent-no: ${TSE_RESPONDENT_TO_RESPONDENT_NO_TEMPLATE_ID:e8e02ca0-6443-41c4-9064-705f7ab8b39b}
+        respondent-type-a: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:368b44ed-54ff-4ba6-9f90-cdbe6fab81b9}
+        respondent-type-b: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:eb056a09-72ca-4bf2-b774-016aae1d185c}
+        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:5e75a23b-4a84-415d-8eba-4f10b023ba8b}
         tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
       respond:
         claimant: ${TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:dec79c11-2c02-481d-aed8-6f013667cdf5}
@@ -109,10 +115,10 @@ template:
 
 
   bundles:
-    claimantSubmittedNotificationForClaimant:
+    respondentSubmittedNotificationForClaimant:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
-    claimantSubmittedNotificationForRespondent:
-      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_RESPONDENT_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+    respondentSubmittedNotificationForTribunal:
+      ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
 
 
 
@@ -127,15 +133,15 @@ ccd_gateway_base_url: http://127.0.0.1:3453
 
 etcos:
   system:
-    username: ${ET_COS_SYSTEM_USER}
-    password: ${ET_COS_SYSTEM_USER_PASSWORD}
+    username: ${ET_COS_SYSTEM_USER:et.service@hmcts.net}
+    password: ${ET_COS_SYSTEM_USER_PASSWORD:Password}
 
 assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
 
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
-  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}
+  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3000/cases/case-details/}
 
 hmcts_service_id: BHA1
 
@@ -144,5 +150,8 @@ launchdarkly:
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
 
-
+cron:
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
+  caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
 

@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
 
@@ -87,11 +89,11 @@ public final class DocumentHelper {
                                                      MultipleData multipleData,
                                                      DefaultValues allocatedCourtAddress,
                                                      VenueAddressReaderService venueAddressReaderService) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(260);
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
         // Start building the instruction
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
                 .append(OUTPUT_FILE_NAME).append(NEW_LINE);
 
@@ -136,13 +138,13 @@ public final class DocumentHelper {
                 .append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28)).append(NEW_LINE)
                 .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
                 .append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference()))
-                .append(NEW_LINE).append("}\n").append("}\n");
+                .append(NEW_LINE).append("}\n}\n");
 
         return sb;
     }
 
     private static StringBuilder getClaimantAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(150);
         sb.append("\"claimant_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"claimant_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
                 .append("\"claimant_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
@@ -153,7 +155,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("\"claimant_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"claimant_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
                 .append(NEW_LINE).append("\"claimant_or_rep_addressLine3\":\"")
@@ -229,7 +231,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(170);
         sb.append("\"respondent_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"respondent_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
                 .append("\"respondent_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
@@ -240,7 +242,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentOrRepAddressUK(Address address) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(210);
         sb.append("\"respondent_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
                 .append("\"respondent_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
                 .append(NEW_LINE).append("\"respondent_or_rep_addressLine3\":\"")
@@ -339,7 +341,7 @@ public final class DocumentHelper {
                                 new RespondentSumType())
                             ? getRespondentAddressUK(getRespondentAddressET3(finalRespondentToBeShown)) : "");
 
-            if (Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
+            if (isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
                     || YES.equals(finalRespondentToBeShown.getResponseContinue())) {
                 sb.append("\"Respondent\":\"").append(caseData.getRespondentCollection().size() > 1 ? "1. " : "")
                         .append(nullCheck(finalRespondentToBeShown.getRespondentName()))
@@ -357,7 +359,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(20);
         AtomicInteger atomicInteger = new AtomicInteger(2);
         List<String> respOthers = caseData.getRespondentCollection()
                 .stream()
@@ -374,7 +376,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespAddress(CaseData caseData) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(25);
         AtomicInteger atomicInteger = new AtomicInteger(1);
         int size = caseData.getRespondentCollection().size();
         List<String> respAddressList = caseData.getRespondentCollection()
@@ -660,7 +662,7 @@ public final class DocumentHelper {
         sectionName = sectionName.replace(".", "_");
         sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!sectionName.equals("")) {
+        if (!sectionName.isEmpty()) {
             sb.append('"').append('t').append(sectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
@@ -669,9 +671,11 @@ public final class DocumentHelper {
 
     private static StringBuilder getCorrespondenceScotData(CorrespondenceScotType correspondenceScotType) {
         String scotSectionName = getScotSectionName(correspondenceScotType);
+        scotSectionName = scotSectionName.replace(".", "_");
+        scotSectionName = scotSectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
-        if (!scotSectionName.equals("")) {
-            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
+        if (!scotSectionName.isEmpty()) {
+            sb.append('"').append("t_Scot_").append(scotSectionName)
                     .append(COLON).append("true").append(NEW_LINE);
         }
         return sb;
@@ -751,7 +755,7 @@ public final class DocumentHelper {
         List<AddressLabelTypeItem> copiedAddressLabelCollection =
                 getCopiedAddressLabels(selectedAddressLabelCollection, numberOfCopies);
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(40);
         sb.append("\"address_labels_page\":[\n");
 
         boolean startingLabelAboveOne = true;
@@ -798,7 +802,7 @@ public final class DocumentHelper {
 
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
                                                  String labelNumber, String showTelFax) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(70);
         sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE).append('"').append(LABEL)
                 .append(labelNumber).append("_Entity_Name_02\":\"")
@@ -957,6 +961,11 @@ public final class DocumentHelper {
         DocumentType documentType = documentTypeItem.getValue();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setShortDescription(shortDescription);
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(
+                uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(typeOfDocument));
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, typeOfDocument);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
         return documentTypeItem;
     }
 
@@ -971,6 +980,39 @@ public final class DocumentHelper {
         return createDocumentTypeItem(uploadedDocumentType, typeOfDocument, null);
     }
 
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
+    }
+
+    /**
+     * Create a new DocumentTypeItem, copy from uploadedDocumentType and update TypeOfDocument.
+     * @param uploadedDocumentType UploadedDocumentType to be added
+     * @param topLevel top level document
+     * @param secondLevel second level document
+     * @return DocumentTypeItem
+     */
+    public static DocumentTypeItem createDocumentTypeItemFromTopLevel(UploadedDocumentType uploadedDocumentType,
+                                                          String topLevel,
+                                                          String secondLevel,
+                                                          String shortDescription) {
+        DocumentTypeItem documentTypeItem = fromUploadedDocument(uploadedDocumentType);
+        DocumentType documentType = documentTypeItem.getValue();
+        documentType.setShortDescription(shortDescription);
+        documentType.setDateOfCorrespondence(LocalDate.now().toString());
+        documentType.setTopLevelDocuments(topLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
+        uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
+        return documentTypeItem;
+    }
+
     /**
      *  Filter documents that only the legal rep should be able to see.
      */
@@ -979,21 +1021,24 @@ public final class DocumentHelper {
             return;
         }
 
-        List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
+        List<String> docTypes = List.of("ET1 Vetting", "ET3 Processing", "Initial Consideration",
+                "App for a Witness Order - C", "Referral/Judicial Direction", "COT3", "Other", "Rejection of Claim",
+                "Claim rejected", "Contact the tribunal about something else - C", "Tribunal case file",
+                "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-            .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
-            .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
+                .filter(d -> ObjectUtils.isNotEmpty(d.getValue().getUploadedDocument()))
+                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
+                .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
                 d.getValue().getUploadedDocument().getDocumentBinaryUrl())
-            )
-            .toList());
+            ).toList());
     }
 
     private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
-        String typeOfDocument = documentType.getTypeOfDocument();
-        if (typeOfDocument == null) {
+        String typeOfDocument = ObjectUtils.isNotEmpty(documentType.getDocumentType())
+                ? documentType.getDocumentType() : documentType.getTypeOfDocument();
+        if (ObjectUtils.isEmpty(typeOfDocument)) {
             return false;
         }
-
         return types.contains(typeOfDocument);
     }
 
@@ -1026,5 +1071,39 @@ public final class DocumentHelper {
             .filter(Optional::isPresent)
             .map(optional -> optional.get().getDocumentBinaryUrl())
             .toList();
+    }
+
+    /**
+     * Add document numbers to each of the docs in the case.
+     * @param caseData CaseData
+     */
+    public static void setDocumentNumbers(BaseCaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            return;
+        }
+        caseData.getDocumentCollection().forEach(documentTypeItem -> {
+            DocumentType documentType = documentTypeItem.getValue();
+            documentType.setDocNumber(String.valueOf(caseData.getDocumentCollection()
+                                                             .indexOf(documentTypeItem) + 1));
+        });
+    }
+
+    /**
+     * Add document to the document collection based on the provided index.
+     * @param docTypeItem document type item
+     * @param indexToAddString index of the document to be added
+     */
+    public static void addDocumentToCollectionAtIndex(List<DocumentTypeItem> documentCollection,
+                                                      DocumentTypeItem docTypeItem, String indexToAddString) {
+        if (StringUtils.isNotEmpty(indexToAddString)) {
+            int indexToAdd = Integer.parseInt(indexToAddString);
+            if (indexToAdd > 0 && indexToAdd <= documentCollection.size() + 1) {
+                documentCollection.add(indexToAdd - 1, docTypeItem);
+            } else {
+                throw new IllegalArgumentException("The document number is invalid");
+            }
+        } else {
+            documentCollection.add(docTypeItem);   
+        }
     }
 }

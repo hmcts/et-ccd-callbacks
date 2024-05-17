@@ -68,11 +68,10 @@ class RoomSelectionServiceTest {
     }
 
     private CaseData mockCaseData() {
-        CaseData caseData = mock(CaseData.class);
+        CaseData caseData = new CaseData();
         DynamicFixedListType venue = new DynamicFixedListType();
         venue.setValue(DynamicValueType.create("venue1", "Venue 1"));
-        when(caseData.getAllocateHearingVenue()).thenReturn(venue);
-
+        caseData.setAllocateHearingVenue(venue);
         return caseData;
     }
 

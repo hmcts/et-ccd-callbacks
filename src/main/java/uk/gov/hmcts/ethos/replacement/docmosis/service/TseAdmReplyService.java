@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
@@ -63,6 +63,7 @@ public class TseAdmReplyService {
     private final EmailService emailService;
     private final TornadoService tornadoService;
     private final TseService tseService;
+    private final FeatureToggleService featureToggleService;
     
     @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
@@ -115,7 +116,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void updateApplicationState(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -136,7 +137,7 @@ public class TseAdmReplyService {
      * @param caseData in which the case details are extracted from
      */
     public void saveTseAdmReplyDataFromCaseData(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
@@ -145,34 +146,40 @@ public class TseAdmReplyService {
             return;
         }
 
-        if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
+        if (isEmpty(applicationType.getRespondCollection())) {
             applicationType.setRespondCollection(new ArrayList<>());
         }
 
         String tseAdmReplyRequestSelectPartyRespond = caseData.getTseAdmReplyRequestSelectPartyRespond();
         String tseAdmReplyCmoSelectPartyRespond = caseData.getTseAdmReplyCmoSelectPartyRespond();
 
-        applicationType.getRespondCollection().add(
-            TseRespondTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(TseRespondType.builder()
-                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                    .from(ADMIN)
-                    .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
-                    .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
-                    .addDocument(caseData.getTseAdmReplyAddDocument())
-                    .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
-                    .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
-                    .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
-                    .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
+        TseRespondType response = TseRespondType.builder()
+                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .from(ADMIN)
+                .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
+                .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
+                .addDocument(caseData.getTseAdmReplyAddDocument())
+                .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
+                .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
+                .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
+                .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
                         caseData.getTseAdmReplyRequestEnterFullName()))
-                    .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
+                .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
                         caseData.getTseAdmReplyRequestIsResponseRequired()))
-                    .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
+                .selectPartyRespond(defaultIfEmpty(tseAdmReplyCmoSelectPartyRespond,
                         tseAdmReplyRequestSelectPartyRespond))
-                    .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                    .build()
-            ).build());
+                .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                .build();
+
+        applicationType.getRespondCollection().add(TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(response)
+                .build());
+
+        if (featureToggleService.isWorkAllocationEnabled()) {
+            response.setDateTime(Helper.getCurrentDateTime()); // for Work Allocation DMNs
+            response.setApplicationType(applicationType.getType()); // for Work Allocation DMNs
+        }
 
         applicationType.setResponsesCount(String.valueOf(applicationType.getRespondCollection().size()));
 
@@ -266,7 +273,7 @@ public class TseAdmReplyService {
     private void collectClaimants(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
         // if claimant only or both parties: send Claimant Reply Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
-            || BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            || BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdmReplySelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
 
             if (claimantEmail != null) {
@@ -293,13 +300,13 @@ public class TseAdmReplyService {
 
     private static boolean isCmoAndResponseRequiredFromParty(CaseData caseData, String party) {
         return YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
-            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyCmoSelectPartyRespond())
+            && (BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdmReplyCmoSelectPartyRespond())
             || party.equals(caseData.getTseAdmReplyCmoSelectPartyRespond()));
     }
 
     private static boolean isRequestAndResponseRequiredFromParty(CaseData caseData, String party) {
         return YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired())
-            && (BOTH_PARTIES.equals(caseData.getTseAdmReplyRequestSelectPartyRespond())
+            && (BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdmReplyRequestSelectPartyRespond())
             || party.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
     }
 

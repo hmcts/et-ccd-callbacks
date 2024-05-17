@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.venues.VenueImportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -30,10 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({VenueImportController.class, JsonMapper.class})
-class VenueImportControllerTest {
-    @MockBean
-    private VerifyTokenService verifyTokenService;
-
+class VenueImportControllerTest extends BaseControllerTest {
     @MockBean
     private VenueImportService venueImportService;
 
@@ -87,11 +84,10 @@ class VenueImportControllerTest {
     void testInitImportBadRequest() throws Exception {
         mockMvc.perform(post("/admin/venue/initImport")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "user-token")
+                        .header("Authorization", AUTH_TOKEN)
                         .content("bad-request"))
                 .andExpect(status().isBadRequest());
 
-        verify(verifyTokenService, never()).verifyTokenSignature(anyString());
         verify(venueImportService, never()).initImport(any(AdminData.class));
     }
 
@@ -140,11 +136,10 @@ class VenueImportControllerTest {
     void testImportBadRequest() throws Exception {
         mockMvc.perform(post("/admin/venue/import")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "user-token")
+                        .header("Authorization", AUTH_TOKEN)
                         .content("bad-request"))
                 .andExpect(status().isBadRequest());
 
-        verify(verifyTokenService, never()).verifyTokenSignature(anyString());
         verify(venueImportService, never()).importVenues(any(AdminData.class), anyString());
     }
 }

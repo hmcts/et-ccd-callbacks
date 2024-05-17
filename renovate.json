@@ -6,6 +6,8 @@
   ],
   "ignoreDeps": [
     "com.github.hmcts:et-common",
-    "com.github.hmcts:et-data-model"
+    "com.github.hmcts:et-data-model",
+    "com.github.hmcts.rse-cft-lib"
   ],
+  "automergeSchedule": ["before 12pm every weekday"]
 }

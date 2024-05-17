@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
@@ -61,6 +63,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE
 
 @ExtendWith(SpringExtension.class)
 class TornadoServiceTest {
+    @MockBean
+    private TseService tseService;
     private TornadoService tornadoService;
     private TornadoConnection tornadoConnection;
     private DocumentManagementService documentManagementService;
@@ -68,9 +72,14 @@ class TornadoServiceTest {
     private DefaultValuesReaderService defaultValuesReaderService;
     private VenueAddressReaderService venueAddressReaderService;
     private MockHttpURLConnection mockConnection;
+    private OAuth2Configuration oauth2Configuration;
+
     private static final String AUTH_TOKEN = "a-test-auth-token";
     private static final String DOCUMENT_INFO_MARKUP = "<a>some test markup</a>";
-    private OAuth2Configuration oauth2Configuration;
+    private static final String ET1_VETTING_PDF = "ET1 Vetting.pdf";
+    private static final String TSE_ADMIN_REPLY_PDF = "TSE Admin Reply.pdf";
+    private static final String ET3_PROCESSING_PDF = "ET3 Processing.pdf";
+    private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -81,7 +90,7 @@ class TornadoServiceTest {
         mockVenueAddressReaderService();
 
         tornadoService = new TornadoService(tornadoConnection, documentManagementService,
-                userIdamService, defaultValuesReaderService, venueAddressReaderService);
+                userIdamService, defaultValuesReaderService, venueAddressReaderService, tseService);
     }
 
     @Test
@@ -213,7 +222,7 @@ class TornadoServiceTest {
     void generateEt1VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET1_VETTING_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -221,15 +230,17 @@ class TornadoServiceTest {
     void generateTseAdminReplyDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "TSE Admin Reply.pdf");
+                getCaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, TSE_ADMIN_REPLY_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
     @Test
     void generateEt3VettingDocument() throws IOException {
         mockConnectionSuccess();
+        CaseData caseData = new CaseData();
+        caseData.setEt3ChooseRespondent(DynamicFixedListType.from("Test Code", "Test Label", true));
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
+                caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, ET3_PROCESSING_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -237,7 +248,7 @@ class TornadoServiceTest {
     void generateInConEWDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -245,7 +256,7 @@ class TornadoServiceTest {
     void generateInConSCDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, "Initial Consideration.pdf");
+                new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, INITIAL_CONSIDERATION_PDF);
         verifyDocumentInfo(documentInfo);
     }
 
@@ -271,9 +282,22 @@ class TornadoServiceTest {
     @Test
     void generateDocumentAsBytes() throws IOException {
         mockConnectionSuccess();
-        byte[] bytes = tornadoService.generateEventDocumentBytes(new CaseData(), ENGLANDWALES_CASE_TYPE_ID, "Initial "
-            + "Consideration.pdf");
+        byte[] bytes = tornadoService.generateEventDocumentBytes(
+                new CaseData(),
+                ENGLANDWALES_CASE_TYPE_ID,
+                INITIAL_CONSIDERATION_PDF);
         assertThat(bytes.length, is(0));
+    }
+
+    @Test
+    void generateDocument_success() throws IOException {
+        mockConnectionSuccess();
+        var document = TornadoDocument.builder().templateName("template.docx").data(DOCUMENT_INFO_MARKUP).build();
+        DocumentInfo documentInfo = tornadoService.generateDocument(
+            AUTH_TOKEN, document, INITIAL_CONSIDERATION_PDF, ENGLANDWALES_CASE_TYPE_ID);
+
+        verifyDocumentInfo(documentInfo);
+        assertEquals(INITIAL_CONSIDERATION_PDF, documentInfo.getDescription());
     }
 
     private void createUserService() {

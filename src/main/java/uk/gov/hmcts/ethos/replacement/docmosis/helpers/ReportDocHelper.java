@@ -72,8 +72,8 @@ public final class ReportDocHelper {
                                                            String templateName, UserDetails userDetails) {
         log.info("Building {} report document data", listingData.getReportType());
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\n").append("\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
+        StringBuilder sb = new StringBuilder(120);
+        sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
                 .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
 
@@ -159,7 +159,7 @@ public final class ReportDocHelper {
 
         String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
         sb.append("\"Report_Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE).append("\"Today_date\":\"")
-                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n").append("}\n").append("}\n");
+                .append(UtilHelper.formatCurrentDate(LocalDate.now())).append("\"\n}\n}\n");
         return sb;
     }
 
@@ -250,7 +250,7 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getClaimsAcceptedByCaseType(ListingData listingData) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(80);
         Map<Boolean, List<AdhocReportTypeItem>> unsortedMap = listingData.getLocalReportsDetail().stream()
                 .collect(Collectors.partitioningBy(localReportDetail ->
                         localReportDetail.getValue().getMultipleRef() != null));
@@ -279,7 +279,7 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getAdhocReportCommonTypeRow(AdhocReportType adhocReportType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(140);
         sb.append(CASE_REFERENCE).append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE)
                 .append("\"Date_Of_Acceptance\":\"").append(nullCheck(adhocReportType.getDateOfAcceptance()))
                 .append(NEW_LINE).append("\"Multiple_Ref\":\"").append(nullCheck(adhocReportType.getMultipleRef()))
@@ -430,7 +430,7 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getAdhocReportCompletedTypeRow(AdhocReportType adhocReportType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(170);
         sb.append(CASE_REFERENCE).append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE)
                 .append("\"Position\":\"").append(nullCheck(adhocReportType.getPosition())).append(NEW_LINE)
                 .append("\"Conciliation_Track\":\"").append(nullCheck(adhocReportType.getConciliationTrack()))
@@ -445,7 +445,7 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getTimeToFirstHearingAdhocReportTypeRow(AdhocReportType adhocReportType) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(120);
         sb.append("{\"Office\":\"").append(nullCheck(adhocReportType.getReportOffice())).append(NEW_LINE)
                 .append("\"Case_Reference\":\"").append(nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE)
                 .append("\"Conciliation_Track\":\"").append(nullCheck(adhocReportType.getConciliationTrack()))
@@ -457,7 +457,7 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getLiveCaseLoadReportSummaryHdr(ListingData listingData) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(60);
         String singlesTotal = "0";
         String multiplesTotal = "0";
         String total = "0";
@@ -532,7 +532,7 @@ public final class ReportDocHelper {
                         .append(claimServedTypeItemsListSize).append(NEW_LINE);
             }
             reportContent.append("\"Date_Of_Receipt\":\"").append(claimServedTypeItemsListSize).append(NEW_LINE)
-                    .append("\"Date_Of_Service\":\"").append(claimServedTypeItemsListSize).append("\"}").append(",\n");
+                    .append("\"Date_Of_Service\":\"").append(claimServedTypeItemsListSize).append("\"},\n");
         } else {
             for (int i = 0; i < claimServedTypeItemsCount; i++) {
                 reportContent.append(getServedClaimsReportRow(claimServedTypeItems.get(i).getValue(), dayNumber));
@@ -549,7 +549,7 @@ public final class ReportDocHelper {
     }
 
     private static StringBuilder getServedClaimsReportRow(ClaimServedType claimServedTypeItem, int dayNumber) {
-        StringBuilder reportRowContent = new StringBuilder();
+        StringBuilder reportRowContent = new StringBuilder(55);
         int claimsServedDayListUpperBoundary = 5;
 
         reportRowContent.append(CASE_REFERENCE)
@@ -602,7 +602,7 @@ public final class ReportDocHelper {
         }
         RespondentsReportData reportData = (RespondentsReportData) listingData;
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(30);
         sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE)
                 .append("\"MoreThan1Resp\":\"")
                 .append(nullCheck(reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent()))
@@ -618,7 +618,7 @@ public final class ReportDocHelper {
         }
         SessionDaysReportData reportData = (SessionDaysReportData) listingData;
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(120);
         sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE)
                 .append("\"ftcSessionDays\":\"")
                 .append(nullCheck(reportData.getReportSummary().getFtSessionDaysTotal())).append(NEW_LINE)
@@ -655,7 +655,7 @@ public final class ReportDocHelper {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "HearingsByHearingTypeReportData");
         }
         HearingsByHearingTypeReportData reportData = (HearingsByHearingTypeReportData) listingData;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(175);
         sb.append(REPORT_OFFICE).append(reportData.getReportSummaryHdr().getOffice()).append(NEW_LINE)
                 .append("\"cm_SummaryHdr\":\"")
                 .append(nullCheck(reportData.getReportSummaryHdr().getFields().getCmCount())).append(NEW_LINE)

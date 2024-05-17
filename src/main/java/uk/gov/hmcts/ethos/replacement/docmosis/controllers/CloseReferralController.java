@@ -22,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 
 @Slf4j
 @RequestMapping("/closeReferral")
@@ -63,7 +64,8 @@ public class CloseReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
+        clearReferralDataFromCaseData(caseData);
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -116,7 +118,7 @@ public class CloseReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralReply(
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitCloseReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
@@ -126,6 +128,7 @@ public class CloseReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        ReferralHelper.addReferralDocumentToDocumentCollection(caseData);
         ReferralHelper.setReferralStatusToClosed(caseData);
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -144,7 +147,7 @@ public class CloseReferralController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(
+    public ResponseEntity<CCDCallbackResponse> completeCloseReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 

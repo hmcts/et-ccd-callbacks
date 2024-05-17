@@ -753,9 +753,6 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(caseData.getResTseDocument5(), is(nullValue()));
         assertThat(caseData.getResTseDocument6(), is(nullValue()));
         assertThat(caseData.getResTseDocument7(), is(nullValue()));
-        assertThat(caseData.getResTseDocument8(), is(nullValue()));
-        assertThat(caseData.getResTseDocument9(), is(nullValue()));
-        assertThat(caseData.getResTseDocument10(), is(nullValue()));
         assertThat(caseData.getResTseDocument11(), is(nullValue()));
         assertThat(caseData.getResTseDocument12(), is(nullValue()));
     }

@@ -478,7 +478,6 @@ public class Et1ReppedController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
-    // TODO More for the configs but event needs to be published for Work Allocation to show ET1 Vetting task.
     @PostMapping(value = "/submitClaim", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "callback handler for ET1 Submission")
     @ApiResponses(value = {

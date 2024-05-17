@@ -39,7 +39,7 @@ class Et1ReppedHelperTest {
     private CaseDetails caseDetails;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         caseData = new CaseData();
 
         caseDetails = new CaseDetails();
@@ -61,7 +61,7 @@ class Et1ReppedHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("setEt1SectionStatuses")
     void setEt1SectionStatuses(String eventId, String sectionOne, String sectionTwo, String sectionThree) {
         caseData.setClaimantFirstName("First");
         caseData.setClaimantLastName("Last");
@@ -91,7 +91,7 @@ class Et1ReppedHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("validateSingleOption")
     void validateSingleOption(List<String> options, int expected) {
         assertEquals(expected, Et1ReppedHelper.validateSingleOption(options).size());
     }
@@ -106,7 +106,7 @@ class Et1ReppedHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("generateRespondentPreamble")
     void generateRespondentPreamble(String type, String respondentName) {
         caseData.setRespondentType(type);
         generateRespondentTypeInfo(type);

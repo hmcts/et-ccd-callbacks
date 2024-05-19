@@ -7,14 +7,47 @@ public class ET3FormTestConstants {
     }
 
     // GENERIC CONSTANTS
-    public static final String ET3_FORM_SAMPLE_CASE_DATA_FILE = "et3FormCaseData.json";
+    public static final String TEST_ET3_FORM_CASE_DATA_FILE = "et3FormCaseData.json";
+    public static final String TEST_FIELD_NAME = "testField";
+    public static final String TEST_EXPECTED_VALUE = "expectedValue";
+    public static final String TEST_ACTUAL_VALUE = "actualValue";
+    public static final String TEST_EQUAL_VALUE = "equalValue";
+    public static final String TEST_CHECK_VALUE = "checkValue";
+    public static final String TEST_ADDRESS_LINE_1 = "addressLine1";
+    public static final String TEST_ADDRESS_LINE_2 = "addressLine2";
+    public static final String TEST_ADDRESS_LINE_3 = "addressLine3";
+    public static final String TEST_ADDRESS_POST_TOWN = "postTown";
+    public static final String TEST_ADDRESS_COUNTY = "county";
+    public static final String TEST_ADDRESS_COUNTRY = "country";
 
     // ET3FormHeaderMapperTest CONSTANTS
     public static final String TEST_PDF_HEADER_VALUE_CASE_NUMBER = "6009729/2024";
     public static final String TEST_PDF_HEADER_VALUE_DATE_RECEIVED = "13-05-2024";
 
     // ET3FormClaimantMapperTest CONSTANTS
-    public static final String TEST_PDF_CLAIMANT_VALUE_ET3_CLAIMANT_NAME = "Mehmet Tahir Dede";
     public static final String TEST_PDF_CLAIMANT_VALUE_ET1_CLAIMANT_NAME = "et citizen1";
+    public static final String TEST_PDF_CLAIMANT_VALUE_ET3_CLAIMANT_NAME = "Mehmet Tahir Dede";
+
+    //ET3FormRespondentMapperTest CONSTANTS
+    public static final String CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_OTHER = "Other Title";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_ADDRESS = """
+            50 Tithe Barn Drive
+            Maidenhead
+            United Kingdom""";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_CONTACT_NAME = "Will Respondent";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_CONTACT_TYPE_EMAIL = "email";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_DX = "Test DX Address";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_EMAIL = "respondent@testmail.com";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_EMPLOYEE_NUMBER_CLAIMANT_WORK_PLACE = "10";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_EMPLOYEE_NUMBER_GREAT_BRITAIN = "15";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_HEARING_TYPE_PHONE = "Yes";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_HEARING_TYPE_VIDEO = "Yes";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_MOBILE_NUMBER = "07444518907";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_MORE_THAN_ONE_SITE_GREAT_BRITAIN_YES = "yes";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_NAME = "Test Company";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_NUMBER = "123456";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_PHONE_NUMBER = "07444518906";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_POSTCODE = "SL6 2DE";
+    public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_TYPE = "Limited company";
 
 }

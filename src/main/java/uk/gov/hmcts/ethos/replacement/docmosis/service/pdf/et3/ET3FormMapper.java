@@ -12,6 +12,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormClaimantMapper.mapClaimant;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormHeaderMapper.mapHeader;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormRespondentMapper.mapRespondent;
+
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
  */
@@ -34,8 +38,10 @@ public class ET3FormMapper {
         RespondentSumType respondentSumType = caseData.getRespondentCollection().stream()
                 .filter(r -> submitRespondent.equals(r.getValue().getRespondentName()))
                 .toList().get(0).getValue();
-        ET3FormHeaderMapper.mapHeader(caseData, respondentSumType, pdfFields);
-        ET3FormClaimantMapper.mapClaimant(caseData, respondentSumType, pdfFields);
+        mapHeader(caseData, respondentSumType, pdfFields);
+        mapClaimant(caseData, respondentSumType, pdfFields);
+        mapRespondent(respondentSumType, pdfFields);
+
         return pdfFields;
     }
 

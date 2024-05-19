@@ -39,6 +39,8 @@
         "et3ResponseMultipleSites": "Yes",
         "respondent_ACAS_question": "Yes",
         "responseRespondentPhone1": "07444518906",
+        "responseRespondentPhone2": "07444518907",
+        "respondent_email": "respondent@testmail.com",
         "responseRespondentAddress": {
           "Country": "United Kingdom",
           "PostCode": "SL6 2DE",
@@ -60,7 +62,7 @@
         "et3ResponseClaimantWeeklyHours": "No",
         "et3ResponseContestClaimDetails": "I don't agree with the claimant.",
         "et3ResponseEmploymentStartDate": "2020-02-01",
-        "et3ResponseSiteEmploymentCount": "15",
+        "et3ResponseSiteEmploymentCount": "10",
         "et3ResponseClaimantCorrectHours": "36",
         "et3ResponseContestClaimDocument": [
           {

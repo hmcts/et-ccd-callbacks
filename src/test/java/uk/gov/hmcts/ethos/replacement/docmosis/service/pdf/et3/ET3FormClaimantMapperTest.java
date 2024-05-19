@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormClaimantMapper.mapClaimant;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_CLAIMANT_FIELD_CLAIMANT_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.ET3_FORM_SAMPLE_CASE_DATA_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_CLAIMANT_FIELD_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_CLAIMANT_VALUE_ET1_CLAIMANT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_CLAIMANT_VALUE_ET3_CLAIMANT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
@@ -37,16 +37,16 @@ class ET3FormClaimantMapperTest {
     void testMapClaimant(CaseData caseData, RespondentSumType respondentSumType) {
         mapClaimant(caseData, respondentSumType, pdfFields);
         if (StringUtils.isBlank(respondentSumType.getEt3ResponseClaimantNameCorrection())) {
-            assertThat(pdfFields.get(TXT_PDF_CLAIMANT_FIELD_CLAIMANT_NAME))
+            assertThat(pdfFields.get(TXT_PDF_CLAIMANT_FIELD_NAME))
                     .contains(TEST_PDF_CLAIMANT_VALUE_ET1_CLAIMANT_NAME);
         } else {
-            assertThat(pdfFields.get(TXT_PDF_CLAIMANT_FIELD_CLAIMANT_NAME))
+            assertThat(pdfFields.get(TXT_PDF_CLAIMANT_FIELD_NAME))
                     .contains(TEST_PDF_CLAIMANT_VALUE_ET3_CLAIMANT_NAME);
         }
     }
 
     private static Stream<Arguments> provideMapClaimantTestData() {
-        CaseData caseData = ResourceLoader.fromString(ET3_FORM_SAMPLE_CASE_DATA_FILE, CaseData.class);
+        CaseData caseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         RespondentSumType respondentSumTypeWithResponseClaimantNameCorrection =
                 caseData.getRespondentCollection().stream().filter(r -> caseData.getSubmitEt3Respondent()
                         .getSelectedLabel().equals(r.getValue().getRespondentName()))

@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_CLAIMANT_FIELD_CLAIMANT_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.addPdfField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_CLAIMANT_FIELD_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
 public class ET3FormClaimantMapper {
 
@@ -25,7 +25,7 @@ public class ET3FormClaimantMapper {
     public static void mapClaimant(CaseData caseData,
                                    RespondentSumType respondentSumType,
                                    ConcurrentMap<String, Optional<String>> pdfFields) {
-        addPdfField(pdfFields, TXT_PDF_CLAIMANT_FIELD_CLAIMANT_NAME,
+        putPdfTextField(pdfFields, TXT_PDF_CLAIMANT_FIELD_NAME,
                 isEmpty(respondentSumType.getEt3ResponseClaimantNameCorrection())
                         ? caseData.getClaimant() : respondentSumType.getEt3ResponseClaimantNameCorrection());
     }

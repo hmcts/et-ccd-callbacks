@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -146,7 +147,7 @@ public class CcdCaseAssignment {
             return;
         }
 
-        String caseType = caseDetails.getCaseTypeId() + "_Multiple";
+        String caseType = MultiplesHelper.appendMultipleSuffix(caseDetails.getCaseTypeId());
         String multipleRef = caseDetails.getCaseData().getMultipleReference();
         SubmitMultipleEvent multiShell = getMultipleByReference(adminUserToken, caseType, multipleRef);
 
@@ -244,7 +245,7 @@ public class CcdCaseAssignment {
                             MultipleCaseSearchResult.class
                     );
         } catch (RestClientResponseException exception) {
-            log.info("Error from ccd - {}", exception.getMessage());
+            log.error("Error from ccd - {}", exception.getMessage());
             throw exception;
         }
 

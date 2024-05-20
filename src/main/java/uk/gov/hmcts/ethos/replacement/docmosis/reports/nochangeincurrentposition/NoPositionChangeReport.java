@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.time.LocalDate;
@@ -73,8 +74,8 @@ public class NoPositionChangeReport {
                 UtilHelper.getListingCaseTypeId(caseTypeId), reportDate, managingOffice);
     }
 
-    private List<SubmitMultipleEvent> getMultipleCases(String casTypeId, List<String> multipleCaseIds) {
-        String multipleCaseTypeId = UtilHelper.getListingCaseTypeId(casTypeId) + "_Multiple";
+    private List<SubmitMultipleEvent> getMultipleCases(String caseTypeId, List<String> multipleCaseIds) {
+        String multipleCaseTypeId = MultiplesHelper.getListingMultipleCaseTypeId(caseTypeId);
         return noPositionChangeDataSource.getMultiplesData(multipleCaseTypeId, multipleCaseIds);
     }
 

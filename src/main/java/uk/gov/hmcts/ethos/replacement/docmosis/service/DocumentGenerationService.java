@@ -188,7 +188,7 @@ public class DocumentGenerationService {
 
     public boolean areBfActionsForEnglandOrWalesToBeUpdated(CaseData caseData, String sectionName) {
         if (caseData.getCorrespondenceType() != null) {
-            String[] values = {"2.6", "2.6 Reform", "2.7", "2.8"};
+            String[] values = {"2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform"};
             return Arrays.asList(values).contains(sectionName);
         }
         return false;
@@ -196,7 +196,7 @@ public class DocumentGenerationService {
 
     public boolean areBfActionsForScotlandToBeUpdated(CaseData caseData, String sectionName) {
         if (caseData.getCorrespondenceScotType() != null) {
-            String[] values = {"7", "72", "75", "76", "77.2", "77.2 Reform"};
+            String[] values = {"7", "72", "75", "76", "77.2", "77.2 Reform", "7 Reform", "72 Reform", "76 Reform"};
             return Arrays.asList(values).contains(sectionName);
         }
         return false;

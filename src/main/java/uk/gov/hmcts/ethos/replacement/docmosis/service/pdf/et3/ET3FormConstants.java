@@ -29,18 +29,21 @@ public final class ET3FormConstants {
     public static final String POST_CAPITALISED = "Post";
     public static final String DATE_FORMAT_YYYY_MM_DD_DASH = "yyyy-MM-dd";
     public static final String DATE_FORMAT_DD_MM_YYYY_DASH = "dd-MM-yyyy";
+    public static final String DATE_FORMAT_DD = "dd";
+    public static final String DATE_FORMAT_MM = "MM";
+    public static final String DATE_FORMAT_YYYY = "YYYY";
 
-    // HEADER FIELDS
+    // HEADER CONSTANTS
     public static final String TXT_PDF_HEADER_FIELD_CASE_NUMBER = "case number";
     public static final String TXT_PDF_HEADER_FIELD_DATE_RECEIVED = "date_received";
     public static final String TXT_PDF_HEADER_FIELD_RFT = "RTF";
     public static final String TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS = "Additional document exists";
     public static final String TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS = "No additional document";
 
-    // SECTION 1 CLAIMANT NAME
+    // SECTION 1 CLAIMANT CONSTANTS
     public static final String TXT_PDF_CLAIMANT_FIELD_NAME = "1.1 Claimant's name";
 
-    // SECTION 2 RESPONDENT DETAILS
+    // SECTION 2 RESPONDENT CONSTANTS
     public static final String CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS = "Miss";
     public static final String CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR = "Mr";
     public static final String CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MRS = "Mrs";
@@ -73,9 +76,33 @@ public final class ET3FormConstants {
     public static final String TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER = "2.1 other specify";
     public static final String TXT_PDF_RESPONDENT_FIELD_TYPE = "2.4";
 
-    // SECTION 3 ACAS DETAILS
+    // SECTION 3 ACAS CONSTANTS
     public static final String CHECKBOX_PDF_ACAS_FIELD_AGREEMENT_YES = "3.1 early conciliation details - yes";
     public static final String CHECKBOX_PDF_ACAS_FIELD_AGREEMENT_NO = "3.1 early conciliation details - no";
     public static final String TXT_PDF_ACAS_FIELD_AGREEMENT_NO_REASON = "3.1 If no, please explain why";
 
+    // SECTION 4 EMPLOYMENT CONSTANTS
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_YES = "4.1 dates correct - yes";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_NO = "4.1 dates correct - no";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_NOT_APPLICABLE =
+            "4.1 dates correct - not applicable";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_START_DATE_DAY = "4.1 date day";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_START_DATE_MONTH = "4.1 date month";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_START_DATE_YEAR = "4.1 date year";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_END_DATE_DAY = "4.1b date day";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_END_DATE_MONTH = "4.1b date month";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_END_DATE_YEAR = "4.1b date year";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_DATES_FURTHER_INFO =
+            "4.1 reasons you disagree with the claimant's dates";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_YES = "4.2 employment continuing - yes";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NO = "4.2 employment continuing - no";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NOT_APPLICABLE =
+            "4.2 employment continuing - not applicable";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_YES =
+            "4.3 job description correct - yes";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NO =
+            "4.3 job description correct - no";
+    public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NOT_APPLICABLE =
+            "4.3 job description correct - not applicable";
+    public static final String TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS = "4.3 correct details";
 }

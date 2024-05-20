@@ -9,6 +9,7 @@ public class ET3FormTestConstants {
     // GENERIC CONSTANTS
     public static final String TEST_ET3_FORM_CASE_DATA_FILE = "et3FormCaseData.json";
     public static final String TEST_FIELD_NAME = "testField";
+    public static final String TEST_DUMMY_VALUE = "dummy value";
     public static final String TEST_EXPECTED_VALUE = "expectedValue";
     public static final String TEST_ACTUAL_VALUE = "actualValue";
     public static final String TEST_EQUAL_VALUE = "equalValue";
@@ -52,4 +53,14 @@ public class ET3FormTestConstants {
 
     //ET3FormAcasMapperTest CONSTANTS
     public static final String TEST_PDF_ACAS_EXPECTED_NOT_AGREE_REASON = "Test acas not agreed reason";
+
+    //ET3FormEmploymentMapperTest CONSTANTS
+    public static final String TEST_PDF_EMPLOYMENT_START_DAY = "24";
+    public static final String TEST_PDF_EMPLOYMENT_START_MONTH = "02";
+    public static final String TEST_PDF_EMPLOYMENT_START_YEAR = "2020";
+    public static final String TEST_PDF_EMPLOYMENT_END_DAY = "28";
+    public static final String TEST_PDF_EMPLOYMENT_END_MONTH = "12";
+    public static final String TEST_PDF_EMPLOYMENT_END_YEAR = "2021";
+    public static final String TEST_PDF_EMPLOYMENT_DATE_INFORMATION = "Claimant gave wrong dates";
+    public static final String TEST_PDF_EMPLOYMENT_CORRECT_JOB_TITLE = "IT Guy";
 }

@@ -16,8 +16,6 @@ import static java.util.Optional.of;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_DD_MM_YYYY_DASH;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_YYYY_MM_DD_DASH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_COMMA_WITH_SPACE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_LINE_FEED;
@@ -34,26 +32,27 @@ public class PdfMapperUtil {
      * @param dateToFormat String value of date to be formatted
      * @return Formatted date
      */
-    public static String formatDate(String dateToFormat) {
+    public static String formatDate(String dateToFormat, String existingDateFormat, String conversionFormat) {
         if (isBlank(dateToFormat)) {
             return STRING_EMPTY;
         }
         String formattedDateStringValue;
         try {
-            formattedDateStringValue =  formatDateToString(formatStringToDate(dateToFormat));
+            formattedDateStringValue =  formatDateToString(formatStringToDate(dateToFormat, existingDateFormat),
+                    conversionFormat);
         } catch (ParseException e) {
             return dateToFormat;
         }
         return formattedDateStringValue;
     }
 
-    private static Date formatStringToDate(String stringValue)
+    private static Date formatStringToDate(String stringValue, String format)
             throws ParseException {
-        return new SimpleDateFormat(DATE_FORMAT_YYYY_MM_DD_DASH, Locale.UK).parse(stringValue);
+        return new SimpleDateFormat(format, Locale.UK).parse(stringValue);
     }
 
-    private static String formatDateToString(Date dateValue) {
-        return new SimpleDateFormat(DATE_FORMAT_DD_MM_YYYY_DASH, Locale.UK).format(dateValue);
+    private static String formatDateToString(Date dateValue, String format) {
+        return new SimpleDateFormat(format, Locale.UK).format(dateValue);
     }
 
     /**
@@ -130,6 +129,41 @@ public class PdfMapperUtil {
     }
 
     /**
+     * Puts checkbox field value to the pdf fields map. Checks field name, actual value, expected value List, and
+     * check value if they are empty or not. If passes empty checks, checks if actual value not exists in
+     * expected value list. If check passes it fills the checkbox with the check value to check it.
+     * If both expected value list and actual value are blank then fills the checkbox with the check value.
+     * @param pdfFields map for mapping pdf fields with case data
+     * @param fieldName name of the field in the pdf file
+     * @param expectedValueList value list that will be checked with the actual value to check the checkbox
+     * @param checkValue value that is required to set checkbox checked
+     * @param actualValue value that will be checked with the expected value to check the checkbox
+     */
+    public static void putPdfCheckboxFieldWhenOther(
+            ConcurrentMap<String, Optional<String>> pdfFields,
+            String fieldName,
+            String checkValue,
+            List<String> expectedValueList,
+            String actualValue) {
+        if (isBlank(fieldName)) {
+            return;
+        }
+        if (isBlank(checkValue)) {
+            pdfFields.put(fieldName, of(STRING_EMPTY));
+            return;
+        }
+        if (isEmpty(expectedValueList) || isBlank(actualValue)) {
+            pdfFields.put(fieldName, of(checkValue));
+            return;
+        }
+        if (expectedValueList.contains(actualValue)) {
+            pdfFields.put(fieldName, of(STRING_EMPTY));
+            return;
+        }
+        pdfFields.put(fieldName, of(checkValue));
+    }
+
+    /**
      * Puts checkbox field value to the pdf fields map. Checks field name, actual value, expected value, and
      * check value if they are empty or not. If not empty checks if actual value contains expected value.
      * If all checks pass it fills the checkbox with the check value to check it.
@@ -139,7 +173,7 @@ public class PdfMapperUtil {
      * @param checkValue value that is required to set checkbox checked
      * @param actualValue value that will be checked with the expected value to check the checkbox
      */
-    public static void putPdfCheckboxFieldWhenExpectedValueContainsActualValue(
+    public static void putPdfCheckboxFieldWhenActualValueContainsExpectedValue(
             ConcurrentMap<String, Optional<String>> pdfFields,
             String fieldName,
             String checkValue,

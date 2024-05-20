@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_DD_MM_YYYY_DASH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_YYYY_MM_DD_DASH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_DATE_RECEIVED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_RFT;
@@ -33,7 +35,8 @@ public class ET3FormHeaderMapper {
                                  ConcurrentMap<String, Optional<String>> pdfFields) {
 
         putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_CASE_NUMBER, caseData.getEthosCaseReference());
-        putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_DATE_RECEIVED, formatDate(caseData.getReceiptDate()));
+        putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_DATE_RECEIVED, formatDate(caseData.getReceiptDate(),
+                DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_DD_MM_YYYY_DASH));
         putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_RFT,
                 isEmpty(respondentSumType.getEt3ResponseContestClaimDocument())
                 && isEmpty(respondentSumType.getEt3ResponseEmployerClaimDocument())

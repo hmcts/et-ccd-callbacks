@@ -21,11 +21,15 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.platform.commons.util.StringUtils.isBlank;
 import static org.junit.platform.commons.util.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_COMMA_WITH_SPACE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_LINE_FEED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_SPACE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_ADDRESS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ACTUAL_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ADDRESS_COUNTRY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ADDRESS_COUNTY;
@@ -42,8 +46,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapper
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.formatDate;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfTextField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfAddressField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueContainsActualValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenOther;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
 class PdfMapperUtilTest {
@@ -60,9 +65,12 @@ class PdfMapperUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"2024/05/13:2024/05/13", "2024-05-13:13-05-2024", "null:null", "\"\":\"\""}, delimiter = ':')
-    void testFormatDate(String dateToFormat, String formattedDate) {
-        String actualValue = formatDate(dateToFormat);
+    @CsvSource(value = {"2024/05/13:2024/05/13:yyyy-MM-dd:dd-MM-yyyy", "2024-05-13:13-05-2024:yyyy-MM-dd:dd-MM-yyyy",
+                        "null:null:yyyy-MM-dd:dd-MM-yyyy", "\"\":\"\":yyyy-MM-dd:dd-MM-yyyy",
+                        "2024-05-20:20:yyyy-MM-dd:dd", "2024-05-20:05:yyyy-MM-dd:MM",
+                        "2024-05-20:2024:yyyy-MM-dd:yyyy"}, delimiter = ':')
+    void testFormatDate(String dateToFormat, String formattedDate, String existingDateFormat, String conversionFormat) {
+        String actualValue = formatDate(dateToFormat, existingDateFormat, conversionFormat);
         assertThat(actualValue).isEqualTo(formattedDate);
     }
 
@@ -112,11 +120,23 @@ class PdfMapperUtilTest {
                                                                    String checkValue,
                                                                    String expectedValue,
                                                                    List<String> actualValue) {
-        putPdfCheckboxFieldWhenExpectedValueContainsActualValue(
+        putPdfCheckboxFieldWhenActualValueContainsExpectedValue(
                 pdfFields, fieldName, checkValue, expectedValue, actualValue);
         assumeTrue(isNotBlank(fieldName));
         assertThat(pdfFields.get(fieldName)).contains(isBlank(checkValue) || isBlank(expectedValue)
                 || isEmpty(actualValue) || !actualValue.contains(expectedValue) ? STRING_EMPTY : checkValue);
+    }
+
+    @ParameterizedTest
+    @MethodSource("providePutPdfCheckboxFieldWhenOtherData")
+    void testPutPdfCheckboxFieldWhenOther(String fieldName,
+                                          String checkValue,
+                                          List<String> expectedValueList,
+                                          String actualValue) {
+        putPdfCheckboxFieldWhenOther(pdfFields, fieldName, checkValue, expectedValueList, actualValue);
+        assumeTrue(isNotBlank(fieldName));
+        assertThat(pdfFields.get(fieldName)).contains(isBlank(checkValue) || isEmpty(expectedValueList)
+                || isBlank(actualValue) || expectedValueList.contains(actualValue) ? STRING_EMPTY : checkValue);
     }
 
     @ParameterizedTest
@@ -198,5 +218,18 @@ class PdfMapperUtilTest {
         address.setCounty(county);
         address.setCountry(country);
         return address;
+    }
+
+    private static Stream<Arguments> providePutPdfCheckboxFieldWhenOtherData() {
+        return Stream.of(Arguments.of(null, null, null, null),
+                            Arguments.of(STRING_EMPTY, STRING_EMPTY, List.of(), STRING_EMPTY),
+                            Arguments.of(STRING_EMPTY, STRING_EMPTY, List.of(STRING_EMPTY), STRING_EMPTY),
+                            Arguments.of(STRING_EMPTY, STRING_EMPTY, List.of(STRING_EMPTY), STRING_EMPTY),
+                            Arguments.of(TEST_FIELD_NAME, STRING_EMPTY, null, STRING_EMPTY),
+                            Arguments.of(TEST_FIELD_NAME, YES_LOWERCASE,
+                                    List.of(YES_CAPITALISED, NO_CAPITALISED), YES_CAPITALISED),
+                            Arguments.of(TEST_FIELD_NAME, NO_LOWERCASE,
+                                    List.of(YES_CAPITALISED, NO_CAPITALISED), NO_CAPITALISED)
+        );
     }
 }

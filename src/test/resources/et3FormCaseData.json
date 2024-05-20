@@ -53,7 +53,7 @@
         "et3ResponseEmploymentCount": "15",
         "et3ResponseIsNoticeCorrect": "No",
         "et3ResponseIsPensionCorrect": "No",
-        "et3ResponseEmploymentEndDate": "2021-12-01",
+        "et3ResponseEmploymentEndDate": "2021-12-28",
         "et3ResponseHearingRespondent": [
           "Phone hearings",
           "Video hearings"
@@ -61,7 +61,7 @@
         "et3ResponseIsJobTitleCorrect": "No",
         "et3ResponseClaimantWeeklyHours": "No",
         "et3ResponseContestClaimDetails": "I don't agree with the claimant.",
-        "et3ResponseEmploymentStartDate": "2020-02-01",
+        "et3ResponseEmploymentStartDate": "2020-02-24",
         "et3ResponseSiteEmploymentCount": "10",
         "et3ResponseClaimantCorrectHours": "36",
         "et3ResponseContestClaimDocument": [

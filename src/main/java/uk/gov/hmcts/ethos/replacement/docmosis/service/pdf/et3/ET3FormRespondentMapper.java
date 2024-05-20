@@ -46,7 +46,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfAddressField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueContainsActualValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
@@ -114,12 +114,12 @@ public class ET3FormRespondentMapper {
                 POST_CAPITALISED,
                 respondentSumType.getResponseRespondentContactPreference());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_EMAIL, respondentSumType.getRespondentEmail());
-        putPdfCheckboxFieldWhenExpectedValueContainsActualValue(pdfFields,
+        putPdfCheckboxFieldWhenActualValueContainsExpectedValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_VIDEO,
                 YES_CAPITALISED,
                 VIDEO_HEARINGS,
                 respondentSumType.getEt3ResponseHearingRespondent());
-        putPdfCheckboxFieldWhenExpectedValueContainsActualValue(pdfFields,
+        putPdfCheckboxFieldWhenActualValueContainsExpectedValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_PHONE,
                 YES_CAPITALISED,
                 PHONE_HEARINGS,

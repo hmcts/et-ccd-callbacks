@@ -1,8 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
@@ -15,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -22,25 +31,31 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @Service("multipleBatchUpdate2Service")
 public class MultipleBatchUpdate2Service {
+    public static final String REMOVE_USER_ERROR = "Call to remove legal rep from Multiple Case failed for %s";
 
     private final ExcelDocManagementService excelDocManagementService;
     private final MultipleCasesReadingService multipleCasesReadingService;
     private final ExcelReadingService excelReadingService;
     private final MultipleHelperService multipleHelperService;
+    private final CcdClient ccdClient;
 
     @Autowired
     public MultipleBatchUpdate2Service(ExcelDocManagementService excelDocManagementService,
                                        MultipleCasesReadingService multipleCasesReadingService,
                                        ExcelReadingService excelReadingService,
-                                       MultipleHelperService multipleHelperService) {
+                                       MultipleHelperService multipleHelperService,
+                                       CcdClient ccdClient) {
         this.excelDocManagementService = excelDocManagementService;
         this.multipleCasesReadingService = multipleCasesReadingService;
         this.excelReadingService = excelReadingService;
         this.multipleHelperService = multipleHelperService;
+        this.ccdClient = ccdClient;
     }
 
-    public void batchUpdate2Logic(String userToken, MultipleDetails multipleDetails,
-                                  List<String> errors, SortedMap<String, Object> multipleObjects) {
+    public void batchUpdate2Logic(String userToken,
+                                  MultipleDetails multipleDetails,
+                                  List<String> errors,
+                                  SortedMap<String, Object> multipleObjects) {
 
         MultipleData multipleData = multipleDetails.getCaseData();
 
@@ -48,7 +63,7 @@ public class MultipleBatchUpdate2Service {
 
         String convertToSingle = multipleData.getMoveCases().getConvertToSingle();
 
-        log.info("Convert to singles " + convertToSingle);
+        log.info("Convert to singles {}", convertToSingle);
 
         List<String> multipleObjectsFiltered = new ArrayList<>(multipleObjects.keySet());
 
@@ -62,8 +77,8 @@ public class MultipleBatchUpdate2Service {
 
             log.info("Sending detach updates to singles");
 
-            multipleHelperService.sendDetachUpdatesToSinglesWithoutConfirmation(userToken, multipleDetails,
-                    errors, multipleObjects);
+            multipleHelperService.sendDetachUpdatesToSinglesWithoutConfirmation(
+                    userToken, multipleDetails, errors, multipleObjects);
 
         } else {
 
@@ -116,8 +131,9 @@ public class MultipleBatchUpdate2Service {
 
             if (multipleObjectsFiltered.contains(oldLeadCase)) {
 
-                log.info("Changing the lead case to: " + newLeadCase + " as old lead case: "
-                        + oldLeadCase + " has been taken out");
+                log.info("Changing the lead case to: {} as old lead case: {} has been taken out",
+                        newLeadCase,
+                        oldLeadCase);
 
                 multipleHelperService.addLeadMarkUp(userToken, multipleDetails.getCaseTypeId(),
                         multipleDetails.getCaseData(), newLeadCase, "");
@@ -136,18 +152,16 @@ public class MultipleBatchUpdate2Service {
 
     }
 
-    private void removeCasesFromCurrentMultiple(String userToken, MultipleDetails multipleDetails, List<String> errors,
+    private void removeCasesFromCurrentMultiple(String userToken,
+                                                MultipleDetails multipleDetails,
+                                                List<String> errors,
                                                 List<String> multipleObjectsFiltered) {
 
         log.info("Read current excel and remove cases in multiple");
-
-        readCurrentExcelAndRemoveCasesInMultiple(userToken, multipleDetails, errors,
-                multipleObjectsFiltered);
+        readCurrentExcelAndRemoveCasesInMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
 
         log.info("Perform actions with the new lead if exists");
-
         String oldLeadCase = MultiplesHelper.getCurrentLead(multipleDetails.getCaseData().getLeadCase());
-
         performActionsWithNewLeadCase(userToken, multipleDetails, errors, oldLeadCase, multipleObjectsFiltered);
 
     }
@@ -205,8 +219,10 @@ public class MultipleBatchUpdate2Service {
 
     }
 
-    private void readExcelAndAddSubMultipleRef(String userToken, MultipleDetails multipleDetails,
-                                               List<String> errors, List<String> multipleObjectsFiltered,
+    private void readExcelAndAddSubMultipleRef(String userToken,
+                                               MultipleDetails multipleDetails,
+                                               List<String> errors,
+                                               List<String> multipleObjectsFiltered,
                                                String updatedSubMultipleRef) {
 
         SortedMap<String, Object> multipleObjects =
@@ -241,8 +257,8 @@ public class MultipleBatchUpdate2Service {
                             multipleObject.getEthosCaseRef(),
                             updatedSubMultipleRef);
                 } catch (IOException e) {
-                    log.error(String.format("Error in setting subMultiple for case %s:",
-                            multipleObject.getEthosCaseRef()) + e.toString());
+                    log.error(String.format("Error in setting subMultiple for case %s: %s",
+                            multipleObject.getEthosCaseRef(), e));
                 }
             }
             newMultipleObjectsUpdated.add(multipleObject);
@@ -252,27 +268,80 @@ public class MultipleBatchUpdate2Service {
 
     }
 
-    private void readCurrentExcelAndRemoveCasesInMultiple(String userToken, MultipleDetails multipleDetails,
-                                                          List<String> errors, List<String> multipleObjectsFiltered) {
+    private void readCurrentExcelAndRemoveCasesInMultiple(String userToken,
+                                                          MultipleDetails multipleDetails,
+                                                          List<String> errors,
+                                                          List<String> multipleObjectsFiltered) {
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         SortedMap<String, Object> multipleObjects =
                 excelReadingService.readExcel(
                         userToken,
-                        MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                        MultiplesHelper.getExcelBinaryUrl(multipleData),
                         errors,
                         multipleDetails.getCaseData(),
                         FilterExcelType.ALL);
 
-        List<MultipleObject> newMultipleObjectsUpdated = removeCasesInMultiple(multipleObjectsFiltered,
-                multipleObjects);
+        List<MultipleObject> newMultipleObjectsUpdated =
+                removeCasesInMultiple(multipleObjectsFiltered, multipleObjects);
 
         excelDocManagementService.generateAndUploadExcel(newMultipleObjectsUpdated, userToken, multipleDetails);
 
+        if (multipleData.getLegalRepCollection() != null && !multipleData.getLegalRepCollection().isEmpty()) {
+            log.info("Remove LR access for removed singles of: {}", multipleData.getMultipleReference());
+            removeOldLegalRepsFromMultiple(userToken, multipleDetails, multipleObjectsFiltered);
+        }
+    }
+
+    private void removeOldLegalRepsFromMultiple(
+            String userToken,
+            MultipleDetails multipleDetails,
+            List<String> casesBeingRemoved) {
+
+        String multipleReference = multipleDetails.getCaseData().getMultipleReference();
+        ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = multipleDetails.getCaseData().getLegalRepCollection();
+
+        List<String> legalRepsToRemove = getLegalRepsToRemove(casesBeingRemoved, legalRepCollection);
+
+        if (legalRepsToRemove.isEmpty()) {
+            log.info("No LegalReps to be removed from : {}", multipleReference);
+            return;
+        }
+
+        String jurisdiction = multipleDetails.getJurisdiction();
+        String caseType = multipleDetails.getCaseTypeId();
+        String multipleId = multipleDetails.getCaseId();
+        for (String legalRepId : legalRepsToRemove) {
+            removeUserFromCase(userToken, jurisdiction, caseType, multipleId, legalRepId);
+        }
+
+        log.info("Update legalRepCollection for: {}", multipleReference);
+        ListTypeItem<SubCaseLegalRepDetails> newLegalRepCollection = new ListTypeItem<>();
+        for (GenericTypeItem<SubCaseLegalRepDetails> caseDetails : legalRepCollection) {
+            SubCaseLegalRepDetails currentCaseDetails = caseDetails.getValue();
+            if (!casesBeingRemoved.contains(currentCaseDetails.getCaseReference())) {
+                newLegalRepCollection.add(GenericTypeItem.from(currentCaseDetails));
+            }
+        }
+        multipleDetails.getCaseData().setLegalRepCollection(newLegalRepCollection);
+    }
+
+    private static @NotNull List<String> getLegalRepsToRemove(List<String> casesBeingRemoved,
+                                                              ListTypeItem<SubCaseLegalRepDetails> legalRepCollection) {
+        List<String> legalRepsToRemove = new ArrayList<>();
+        for (GenericTypeItem<SubCaseLegalRepDetails> caseDetails : legalRepCollection) {
+            SubCaseLegalRepDetails currentCaseDetails = caseDetails.getValue();
+            if (casesBeingRemoved.contains(currentCaseDetails.getCaseReference())) {
+                for (GenericTypeItem<String> legalRepId : currentCaseDetails.getLegalRepIds()) {
+                    legalRepsToRemove.add(legalRepId.getValue());
+                }
+            }
+        }
+        return legalRepsToRemove;
     }
 
     private List<MultipleObject> removeCasesInMultiple(List<String> multipleObjectsFiltered,
                                                        SortedMap<String, Object> multipleObjects) {
-
         List<MultipleObject> newMultipleObjectsUpdated = new ArrayList<>();
 
         multipleObjects.forEach((key, value) -> {
@@ -283,16 +352,40 @@ public class MultipleBatchUpdate2Service {
         });
 
         return newMultipleObjectsUpdated;
-
     }
 
     private SubmitMultipleEvent getUpdatedMultiple(String userToken, String caseTypeId, String updatedMultipleRef) {
-
         return multipleCasesReadingService.retrieveMultipleCasesWithRetries(
                 userToken,
                 caseTypeId,
                 updatedMultipleRef).get(0);
+    }
 
+    private void removeUserFromCase(String userToken,
+                               String jurisdiction,
+                               String caseType,
+                               String multipleId,
+                               String userToRemoveId) {
+        String errorMessage = String.format(REMOVE_USER_ERROR, multipleId);
+
+        try {
+            ResponseEntity<Object> response =
+                    ccdClient.removeUserFromMultiple(
+                            userToken,
+                            jurisdiction,
+                            caseType,
+                            multipleId,
+                            userToRemoveId);
+
+            if (response == null) {
+                throw new CaseCreationException(errorMessage);
+            }
+
+            log.info("Http status received from CCD removeUserFromMultiple API; {}", response.getStatusCodeValue());
+        } catch (IOException | RestClientResponseException e) {
+            throw (CaseCreationException)
+                    new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
+        }
     }
 
 }

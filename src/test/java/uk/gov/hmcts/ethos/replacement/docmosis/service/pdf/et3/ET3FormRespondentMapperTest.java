@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.platform.commons.util.StringUtils.isNotBlank;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MRS;
@@ -44,6 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_POSTCODE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormRespondentMapper.mapRespondent;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
@@ -81,18 +81,18 @@ class ET3FormRespondentMapperTest {
         String selectedTitle = respondentSumType.getEt3ResponseRespondentPreferredTitle();
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MR)).contains(
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR.equals(selectedTitle)
-                        ? CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED : STRING_EMPTY);
+                        ? YES_CAPITALISED : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MS)).contains(
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MS.equals(selectedTitle)
-                        ? CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED : STRING_EMPTY);
+                        ? YES_CAPITALISED : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MRS)).contains(
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MRS.equals(selectedTitle)
-                        ? CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED : STRING_EMPTY);
+                        ? YES_CAPITALISED : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MISS)).contains(
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS.equals(selectedTitle)
-                        ? CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED : STRING_EMPTY);
+                        ? YES_CAPITALISED : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(isOtherTitle(selectedTitle)
-                ? CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED : STRING_EMPTY);
+                ? YES_CAPITALISED : STRING_EMPTY);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(isOtherTitle(selectedTitle)
                 ? selectedTitle : STRING_EMPTY);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_NAME)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_NAME);
@@ -158,7 +158,7 @@ class ET3FormRespondentMapperTest {
         respondentSumTypeTitleOther
                 .setEt3ResponseRespondentPreferredTitle(CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_OTHER);
         return Stream.of(respondentSumType, respondentSumTypeTitleMr, respondentSumTypeTitleMrs,
-                respondentSumTypeTitleMs, respondentSumTypeTitleMiss,respondentSumTypeTitleOther);
+                respondentSumTypeTitleMs, respondentSumTypeTitleMiss, respondentSumTypeTitleOther);
     }
 
 }

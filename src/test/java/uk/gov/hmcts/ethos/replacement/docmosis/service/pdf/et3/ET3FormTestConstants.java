@@ -50,4 +50,6 @@ public class ET3FormTestConstants {
     public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_POSTCODE = "SL6 2DE";
     public static final String TEST_PDF_RESPONDENT_EXPECTED_VALUE_TYPE = "Limited company";
 
+    //ET3FormAcasMapperTest CONSTANTS
+    public static final String TEST_PDF_ACAS_EXPECTED_NOT_AGREE_REASON = "Test acas not agreed reason";
 }

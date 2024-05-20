@@ -1,22 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3;
 
-
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_CHECK_VALUE_EMAIL_LOWERCASE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_CHECK_VALUE_NO_CAPITALISED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_CHECK_VALUE_NO_LOWERCASE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_CHECK_VALUE_POST_LOWERCASE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_CHECK_VALUE_YES_LOWERCASE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EXPECTED_VALUE_CONTACT_TYPE_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EXPECTED_VALUE_CONTACT_TYPE_POST;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EXPECTED_VALUE_PHONE_HEARINGS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EXPECTED_VALUE_VIDEO_HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MRS;
@@ -32,6 +21,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MRS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.EMAIL_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.EMAIL_LOWERCASE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_LOWERCASE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.PHONE_HEARINGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.POST_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.POST_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_CONTACT_NAME;
@@ -46,11 +42,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_POSTCODE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_RESPONDENT_FIELD_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.VIDEO_HEARINGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfAddressField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueContainsActualValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
-
 
 public class ET3FormRespondentMapper {
 
@@ -64,27 +62,27 @@ public class ET3FormRespondentMapper {
      * @param pdfFields print fields that is created in ET3FormMapper
      */
     public static void mapRespondent(RespondentSumType respondentSumType,
-                                   ConcurrentMap<String, Optional<String>> pdfFields) {
+                                     ConcurrentMap<String, Optional<String>> pdfFields) {
         // Setting Respondent Title
         String selectedTitle = respondentSumType.getEt3ResponseRespondentPreferredTitle();
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MR,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
+                YES_CAPITALISED,
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR,
                 selectedTitle);
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MRS,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
+                YES_CAPITALISED,
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MRS,
                 selectedTitle);
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MISS,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
+                YES_CAPITALISED,
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS,
                 selectedTitle);
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MS,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
+                YES_CAPITALISED,
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MS,
                 selectedTitle);
         putOtherTitle(selectedTitle, pdfFields);
@@ -107,37 +105,37 @@ public class ET3FormRespondentMapper {
                 respondentSumType.getResponseRespondentPhone2());
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_EMAIL,
-                CHECKBOX_PDF_CHECK_VALUE_EMAIL_LOWERCASE,
-                CHECKBOX_PDF_EXPECTED_VALUE_CONTACT_TYPE_EMAIL,
+                EMAIL_LOWERCASE,
+                EMAIL_CAPITALISED,
                 respondentSumType.getResponseRespondentContactPreference());
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_POST,
-                CHECKBOX_PDF_CHECK_VALUE_POST_LOWERCASE,
-                CHECKBOX_PDF_EXPECTED_VALUE_CONTACT_TYPE_POST,
+                POST_LOWERCASE,
+                POST_CAPITALISED,
                 respondentSumType.getResponseRespondentContactPreference());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_EMAIL, respondentSumType.getRespondentEmail());
         putPdfCheckboxFieldWhenExpectedValueContainsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_VIDEO,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
-                CHECKBOX_PDF_EXPECTED_VALUE_VIDEO_HEARINGS,
+                YES_CAPITALISED,
+                VIDEO_HEARINGS,
                 respondentSumType.getEt3ResponseHearingRespondent());
         putPdfCheckboxFieldWhenExpectedValueContainsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_PHONE,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
-                CHECKBOX_PDF_EXPECTED_VALUE_PHONE_HEARINGS,
+                YES_CAPITALISED,
+                PHONE_HEARINGS,
                 respondentSumType.getEt3ResponseHearingRespondent());
         putPdfTextField(pdfFields,
                 TXT_PDF_RESPONDENT_FIELD_EMPLOYEE_NUMBER_GREAT_BRITAIN,
                 respondentSumType.getEt3ResponseEmploymentCount());
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_MORE_THAN_ONE_SITE_GREAT_BRITAIN_YES,
-                CHECKBOX_PDF_CHECK_VALUE_YES_LOWERCASE,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
+                YES_LOWERCASE,
+                YES_CAPITALISED,
                 respondentSumType.getEt3ResponseMultipleSites());
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_MORE_THAN_ONE_SITE_GREAT_BRITAIN_NO,
-                CHECKBOX_PDF_CHECK_VALUE_NO_LOWERCASE,
-                CHECKBOX_PDF_CHECK_VALUE_NO_CAPITALISED,
+                NO_LOWERCASE,
+                NO_CAPITALISED,
                 respondentSumType.getEt3ResponseMultipleSites());
         putPdfTextField(pdfFields,
                 TXT_PDF_RESPONDENT_FIELD_EMPLOYEE_NUMBER_CLAIMANT_WORK_PLACE,
@@ -158,7 +156,7 @@ public class ET3FormRespondentMapper {
         }
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER,
-                CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED,
+                YES_CAPITALISED,
                 selectedTitle,
                 selectedTitle);
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER, selectedTitle);

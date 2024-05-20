@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_FIELD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.formatDate;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfTextField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfAddressField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueContainsActualValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
@@ -67,7 +68,7 @@ class PdfMapperUtilTest {
 
     @ParameterizedTest
     @CsvSource(value = {"null:null", "'':null", "'':''", "test_field:''", "test_field:null",
-            "test_field:test_value", "'':test_value"}, delimiter = ':', nullValues = {"null"})
+                        "test_field:test_value", "'':test_value"}, delimiter = ':', nullValues = {"null"})
     void testPutPdfTextField(String fieldName, String value) {
         putPdfTextField(pdfFields, fieldName, value);
         assumeTrue(isNotBlank(fieldName));
@@ -75,9 +76,24 @@ class PdfMapperUtilTest {
     }
 
     @ParameterizedTest
+    @CsvSource(value = {"null:null:null:null", "'':null:null:null", "'':'':'':''", "test_field:'':'':''",
+                        "test_field:null:null:null", "test_field:expected_value:actual_value:put_value",
+                        "test_field:equal_value:equal_value:put_value", "test_field:expected_value:'':put_value",
+                        "'':test_value:equal_value:equal_value:put_value"},
+            delimiter = ':', nullValues = {"null"})
+    void testPutConditionalPdfTextField(String fieldName, String expectedValue, String actualValue, String valueToPut) {
+        putConditionalPdfTextField(pdfFields, fieldName, expectedValue, actualValue, valueToPut);
+        assumeTrue(isNotBlank(fieldName));
+        assertThat(pdfFields.get(fieldName)).contains(isBlank(valueToPut) || isBlank(fieldName)
+                || isBlank(expectedValue) || isBlank(actualValue)
+                || !expectedValue.equalsIgnoreCase(actualValue) ? STRING_EMPTY : valueToPut);
+    }
+
+    @ParameterizedTest
     @CsvSource(value = {"null:null:null:null", "'':'':'':'':''", "testField:'':'':''", "testField:checkValue:'':''",
-            "testField:null:null:null", "testField:checkValue:null:null", "testField:checkValue:expectedValue:null",
-            "testField:checkValue:expectedValue:actualValue", "testField:checkValue:equalValue:equalValue"},
+                        "testField:null:null:null", "testField:checkValue:null:null",
+                        "testField:checkValue:expectedValue:null", "testField:checkValue:expectedValue:actualValue",
+                        "testField:checkValue:equalValue:equalValue"},
             delimiter = ':', nullValues = {"null"})
     void testPutPdfCheckboxFieldWhenExpectedValueEqualsActualValue(String fieldName,
                                                                    String checkValue,
@@ -161,7 +177,7 @@ class PdfMapperUtilTest {
                 Arguments.of(addressWithoutLine1, TEST_ADDRESS_LINE_2 + STRING_SPACE + TEST_ADDRESS_LINE_3
                         + STRING_LINE_FEED + TEST_ADDRESS_POST_TOWN + STRING_COMMA_WITH_SPACE + TEST_ADDRESS_COUNTY
                         + STRING_LINE_FEED + TEST_ADDRESS_COUNTRY),
-                Arguments.of(addressWithoutLine1Line2,TEST_ADDRESS_LINE_3 + STRING_LINE_FEED
+                Arguments.of(addressWithoutLine1Line2, TEST_ADDRESS_LINE_3 + STRING_LINE_FEED
                         + TEST_ADDRESS_POST_TOWN + STRING_COMMA_WITH_SPACE + TEST_ADDRESS_COUNTY
                         + STRING_LINE_FEED + TEST_ADDRESS_COUNTRY),
                 Arguments.of(addressWithoutLine1Line2Line3, TEST_ADDRESS_POST_TOWN + STRING_COMMA_WITH_SPACE

@@ -17,16 +17,18 @@ public final class ET3FormConstants {
     public static final String STRING_SPACE = StringUtils.SPACE;
     public static final String STRING_COMMA_WITH_SPACE = ", ";
     public static final String STRING_LINE_FEED = StringUtils.LF;
-    public static final String CHECKBOX_PDF_CHECK_VALUE_YES_LOWERCASE = "yes";
-    public static final String CHECKBOX_PDF_CHECK_VALUE_YES_CAPITALISED = "Yes";
-    public static final String CHECKBOX_PDF_CHECK_VALUE_NO_LOWERCASE = "no";
-    public static final String CHECKBOX_PDF_CHECK_VALUE_NO_CAPITALISED = "No";
-    public static final String CHECKBOX_PDF_CHECK_VALUE_EMAIL_LOWERCASE = "email";
-    public static final String CHECKBOX_PDF_CHECK_VALUE_POST_LOWERCASE = "post";
-    public static final String CHECKBOX_PDF_EXPECTED_VALUE_VIDEO_HEARINGS = "Video hearings";
-    public static final String CHECKBOX_PDF_EXPECTED_VALUE_PHONE_HEARINGS = "Phone hearings";
-    public static final String CHECKBOX_PDF_EXPECTED_VALUE_CONTACT_TYPE_EMAIL = "Email";
-    public static final String CHECKBOX_PDF_EXPECTED_VALUE_CONTACT_TYPE_POST = "Post";
+    public static final String YES_LOWERCASE = "yes";
+    public static final String YES_CAPITALISED = "Yes";
+    public static final String NO_LOWERCASE = "no";
+    public static final String NO_CAPITALISED = "No";
+    public static final String EMAIL_LOWERCASE = "email";
+    public static final String POST_LOWERCASE = "post";
+    public static final String VIDEO_HEARINGS = "Video hearings";
+    public static final String PHONE_HEARINGS = "Phone hearings";
+    public static final String EMAIL_CAPITALISED = "Email";
+    public static final String POST_CAPITALISED = "Post";
+    public static final String DATE_FORMAT_YYYY_MM_DD_DASH = "yyyy-MM-dd";
+    public static final String DATE_FORMAT_DD_MM_YYYY_DASH = "dd-MM-yyyy";
 
     // HEADER FIELDS
     public static final String TXT_PDF_HEADER_FIELD_CASE_NUMBER = "case number";
@@ -70,5 +72,10 @@ public final class ET3FormConstants {
     public static final String TXT_PDF_RESPONDENT_FIELD_POSTCODE = "2.3 Respondent's address: postcode";
     public static final String TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER = "2.1 other specify";
     public static final String TXT_PDF_RESPONDENT_FIELD_TYPE = "2.4";
+
+    // SECTION 3 ACAS DETAILS
+    public static final String CHECKBOX_PDF_ACAS_FIELD_AGREEMENT_YES = "3.1 early conciliation details - yes";
+    public static final String CHECKBOX_PDF_ACAS_FIELD_AGREEMENT_NO = "3.1 early conciliation details - no";
+    public static final String TXT_PDF_ACAS_FIELD_AGREEMENT_NO_REASON = "3.1 If no, please explain why";
 
 }

@@ -13,8 +13,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_RFT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.formatDate;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
 public class ET3FormHeaderMapper {
 
@@ -34,7 +34,8 @@ public class ET3FormHeaderMapper {
 
         putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_CASE_NUMBER, caseData.getEthosCaseReference());
         putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_DATE_RECEIVED, formatDate(caseData.getReceiptDate()));
-        putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_RFT, isEmpty(respondentSumType.getEt3ResponseContestClaimDocument())
+        putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_RFT,
+                isEmpty(respondentSumType.getEt3ResponseContestClaimDocument())
                 && isEmpty(respondentSumType.getEt3ResponseEmployerClaimDocument())
                 && isEmpty(respondentSumType.getEt3ResponseRespondentSupportDocument())
                 ? TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS

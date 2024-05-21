@@ -189,6 +189,7 @@ public class Et1ReppedHelper {
             throw new NullPointerException("Claimant name is null or empty");
         }
         caseData.setClaimant(caseData.getClaimantFirstName() + " " + caseData.getClaimantLastName());
+        claimantInformation(caseData);
     }
 
     private static void setInitialSectionTwoData(CaseData caseData) {

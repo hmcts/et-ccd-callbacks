@@ -14,11 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRoleWithOrganisation;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -33,9 +33,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
-import java.util.List;
-
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -65,9 +64,6 @@ public class CcdCaseAssignment {
     private final String applyNocAssignmentsApiPath;
     private final String ccdDataStoreUrl;
     private final MultipleCasesSendingService multipleCasesSendingService;
-
-    private final AdminUserService adminUserService;
-    private final String ccdDataStoreApiUrl;
 
     @SuppressWarnings({"PMD.ExcessiveParameterList"})
     public CcdCaseAssignment(RestTemplate restTemplate,
@@ -303,8 +299,6 @@ public class CcdCaseAssignment {
                     new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
         }
     }
-}
-
 
     public void removeCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) {
         String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
@@ -314,7 +308,7 @@ public class CcdCaseAssignment {
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
-                ccdDataStoreApiUrl + "/case-users",
+                ccdDataStoreUrl + "/case-users",
                 HttpMethod.DELETE,
                 requestEntity,
                 CaseAssignmentUserRolesResponse.class);
@@ -335,7 +329,7 @@ public class CcdCaseAssignment {
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
-                ccdDataStoreApiUrl + "/case-users",
+                ccdDataStoreUrl + "/case-users",
                 HttpMethod.POST,
                 requestEntity,
                     CaseAssignmentUserRolesResponse.class);

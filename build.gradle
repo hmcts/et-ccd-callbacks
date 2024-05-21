@@ -336,7 +336,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '5fc5128cbf'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: 'c96caae573'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.12.0'
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
 
@@ -495,7 +495,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 316
-pmdTest.maxFailures = 209
+pmdMain.maxFailures = 315
+pmdTest.maxFailures = 208
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

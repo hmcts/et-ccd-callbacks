@@ -11,10 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -31,16 +31,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
-import java.util.UUID;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -63,8 +61,6 @@ class CcdCaseAssignmentTest {
 
     @Mock
     private AuthTokenGenerator serviceAuthTokenGenerator;
-    @Mock
-    private AdminUserService adminUserService;
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
@@ -254,11 +250,6 @@ class CcdCaseAssignmentTest {
         when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.empty());
-            .exchange(
-                anyString(),
-                eq(HttpMethod.POST),
-                any(HttpEntity.class),
-                eq(CCDCallbackResponse.class))).thenReturn(ResponseEntity.ok(expected));
 
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 

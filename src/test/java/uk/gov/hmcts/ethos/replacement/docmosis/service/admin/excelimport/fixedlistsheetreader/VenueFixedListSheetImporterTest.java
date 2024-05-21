@@ -61,7 +61,7 @@ class VenueFixedListSheetImporterTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testImportSheet")
     void testImportSheet(TribunalOffice tribunalOffice, String sheetName, int expectedVenues, int expectedRooms) {
         XSSFSheet sheet = workbook.getSheet(sheetName);
 
@@ -75,7 +75,7 @@ class VenueFixedListSheetImporterTest {
         assertEquals(expectedRooms, roomsArgumentCaptor.getValue().size());
     }
 
-    private static Stream<Arguments> testImportSheet() { //NOPMD - parameterized tests
+    private static Stream<Arguments> testImportSheet() {
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "Scotland Scrubbed", 9, 11),
                 Arguments.of(TribunalOffice.BRISTOL, "Bristol Scrubbed", 41, 141),

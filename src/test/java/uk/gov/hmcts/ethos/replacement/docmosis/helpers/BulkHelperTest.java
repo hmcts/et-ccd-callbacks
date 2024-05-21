@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -155,7 +154,7 @@ class BulkHelperTest {
     }
 
     private MultipleType getMultipleType() {
-        MultipleType multipleType = new MultipleType();
+        multipleType = new MultipleType();
         multipleType.setClaimantSurnameM("Mike");
         multipleType.setFileLocM("Manchester");
         multipleType.setFeeGroupReferenceM("11111");
@@ -434,7 +433,7 @@ class BulkHelperTest {
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[2, 1, 3, 4]", submitEventListResult.stream()
                 .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
-                .collect(Collectors.toList()).toString());
+                .toList().toString());
     }
 
     @Test
@@ -447,7 +446,7 @@ class BulkHelperTest {
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[5, 1, 2, 3]", submitEventListResult.stream()
                 .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
-                .collect(Collectors.toList()).toString());
+                .toList().toString());
     }
 
 }

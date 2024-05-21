@@ -151,7 +151,7 @@ class Et3ResponseServiceTest {
             .withEthosCaseReference("1234567/1234")
             .withRespondent("Respondent", NO, null, false)
             .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge", "Venue", null, null, null, null)
-            .withHearingSession(0, "1", "2099-11-25T12:11:00.000", Constants.HEARING_STATUS_LISTED, false)
+            .withHearingSession(0, "2099-11-25T12:11:00.000", Constants.HEARING_STATUS_LISTED, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId("1683646754393041");
         caseDetails.getCaseData().setClaimant("Claimant LastName");

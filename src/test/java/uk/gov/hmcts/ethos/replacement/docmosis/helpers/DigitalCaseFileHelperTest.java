@@ -2,15 +2,22 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
 import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -40,6 +47,66 @@ class DigitalCaseFileHelperTest {
         caseData.setCaseBundles(null);
         DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
         assertNull(caseData.getDigitalCaseFile());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getDocumentTypes")
+    void shouldGetDocumentName(DocumentType documentType, String docType, String docFileName, String docDate) {
+        assertEquals(DigitalCaseFileHelper.getDocumentName(documentType),
+                documentType.getDocNumber() + docType + docFileName + docDate);
+    }
+
+    private static Stream<Arguments> getDocumentTypes() {
+        return Stream.of(
+                Arguments.of(documentTypes().get(0),
+                        "", "", ""),
+                Arguments.of(documentTypes().get(1),
+                        "", "", ""),
+                Arguments.of(documentTypes().get(2),
+                        " - pdf", " - test", " - 01-05-2011")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getDocumentTypesForExcluded")
+    void isExcludedFromDCF(DocumentType documentType, boolean excluded) {
+        assertEquals(DigitalCaseFileHelper.isExcludedFromDcf(documentType), excluded);
+    }
+
+    private static Stream<Arguments> getDocumentTypesForExcluded() {
+        return Stream.of(
+                Arguments.of(documentTypes().get(0), true),
+                Arguments.of(documentTypes().get(1), true),
+                Arguments.of(documentTypes().get(2), true),
+                Arguments.of(documentTypes().get(3), false),
+                Arguments.of(documentTypes().get(4), true)
+        );
+    }
+
+    private static List<DocumentType> documentTypes() {
+        return List.of(DocumentType.builder()
+                        .uploadedDocument(UploadedDocumentType.builder().build())
+                        .build(),
+                DocumentType.builder()
+                        .documentType("")
+                        .dateOfCorrespondence("")
+                        .uploadedDocument(UploadedDocumentType.builder().documentFilename("").build())
+                        .build(),
+                DocumentType.builder().documentType("pdf")
+                        .docNumber("1")
+                        .dateOfCorrespondence("2011-05-01")
+                        .uploadedDocument(UploadedDocumentType.builder()
+                                .documentFilename("test")
+                                .build()).build(),
+                DocumentType.builder()
+                        .excludeFromDcf(List.of("Yes"))
+                        .uploadedDocument(UploadedDocumentType.builder().build())
+                        .build(),
+                DocumentType.builder()
+                        .excludeFromDcf(List.of("No"))
+                        .uploadedDocument(UploadedDocumentType.builder().build())
+                        .build()
+        );
     }
 
     private BundleDetails createBundleDetails() {

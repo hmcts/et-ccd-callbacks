@@ -145,7 +145,7 @@ public class MultipleBatchUpdate3Service {
     }
 
     private boolean checkAnyChange(MultipleData multipleData) {
-        return (
+        return
             multipleData.getBatchUpdateClaimantRep() != null
                 && !multipleData.getBatchUpdateClaimantRep().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateJurisdiction() != null
@@ -155,7 +155,7 @@ public class MultipleBatchUpdate3Service {
                 || multipleData.getBatchUpdateJudgment() != null
                 && !multipleData.getBatchUpdateJudgment().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateRespondentRep() != null
-                && !multipleData.getBatchUpdateRespondentRep().getValue().getCode().equals(SELECT_NONE_VALUE));
+                && !multipleData.getBatchUpdateRespondentRep().getValue().getCode().equals(SELECT_NONE_VALUE);
     }
 
 }

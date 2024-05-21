@@ -50,7 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapper
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
-public class ET3FormRespondentMapper {
+public final class ET3FormRespondentMapper {
 
     private ET3FormRespondentMapper() {
         // Add a private constructor to hide the implicit public one.

@@ -21,10 +21,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_LINE_FEED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_SPACE;
 
-public class PdfMapperUtil {
+public final class PdfMapperUtil {
 
     private PdfMapperUtil() {
-        // Add a private constructor to hide the implicit public one.
+        // Utility classes should not have a public or default constructor.
     }
 
     /**

@@ -13,7 +13,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfTextField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
 
-public class ET3FormAcasMapper {
+public final class ET3FormAcasMapper {
 
     private ET3FormAcasMapper() {
         // Add a private constructor to hide the implicit public one.

@@ -37,7 +37,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapper
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenOther;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
-public class ET3FormEmploymentMapper {
+public final class ET3FormEmploymentMapper {
 
     private ET3FormEmploymentMapper() {
         // Add a private constructor to hide the implicit public one.

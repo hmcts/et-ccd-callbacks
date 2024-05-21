@@ -20,7 +20,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormRes
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
  */
 @Slf4j
-public class ET3FormMapper {
+public final class ET3FormMapper {
 
     private ET3FormMapper() {
         // Add a private constructor to hide the implicit public one.

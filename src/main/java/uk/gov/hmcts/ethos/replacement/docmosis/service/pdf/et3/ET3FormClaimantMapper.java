@@ -10,7 +10,7 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_CLAIMANT_FIELD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
-public class ET3FormClaimantMapper {
+public final class ET3FormClaimantMapper {
 
     private ET3FormClaimantMapper() {
         // Add a private constructor to hide the implicit public one.

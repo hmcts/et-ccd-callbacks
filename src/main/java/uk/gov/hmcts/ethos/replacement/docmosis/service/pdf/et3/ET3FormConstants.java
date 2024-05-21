@@ -7,10 +7,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class ET3FormConstants {
 
-    private ET3FormConstants() {
-        // Add a private constructor to hide the implicit public one.
-    }
-
     // GENERIC CONSTANTS
     public static final String ET3_FORM_PDF_TEMPLATE = "ET3_0224.pdf";
     public static final String STRING_EMPTY = StringUtils.EMPTY;
@@ -105,4 +101,8 @@ public final class ET3FormConstants {
     public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NOT_APPLICABLE =
             "4.3 job description correct - not applicable";
     public static final String TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS = "4.3 correct details";
+
+    private ET3FormConstants() {
+        // Add a private constructor to hide the implicit public one.
+    }
 }

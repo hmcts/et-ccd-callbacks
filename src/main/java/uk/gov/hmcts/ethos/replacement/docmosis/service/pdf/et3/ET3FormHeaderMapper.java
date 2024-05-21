@@ -18,7 +18,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.formatDate;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
 
-public class ET3FormHeaderMapper {
+public final class ET3FormHeaderMapper {
 
     private ET3FormHeaderMapper() {
         // Add a private constructor to hide the implicit public one.

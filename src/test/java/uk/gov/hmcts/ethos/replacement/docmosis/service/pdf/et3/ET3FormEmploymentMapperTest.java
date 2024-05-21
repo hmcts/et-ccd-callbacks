@@ -7,7 +7,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.ResourceLoader;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -49,6 +48,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_DAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_MONTH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_YEAR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.isNotApplicable;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.isValueEnteredEqualsExpectedValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
 
 class ET3FormEmploymentMapperTest {
@@ -57,7 +58,6 @@ class ET3FormEmploymentMapperTest {
 
     @BeforeEach
     void beforeEach() {
-
         pdfFields = new ConcurrentHashMap<>();
     }
 
@@ -66,17 +66,13 @@ class ET3FormEmploymentMapperTest {
     void testMapClaimant(RespondentSumType respondentSumType) {
         mapEmployment(respondentSumType, pdfFields);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_YES))
-                .contains(isBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        || !YES_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        ? STRING_EMPTY : YES_LOWERCASE);
+                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
+                        YES_CAPITALISED) ? YES_LOWERCASE : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_NO))
-                .contains(isBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        || !NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        ? STRING_EMPTY : NO_LOWERCASE);
+                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
+                        NO_CAPITALISED) ? NO_LOWERCASE : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_NOT_APPLICABLE))
-                .contains(isBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        || !List.of(NO_CAPITALISED, YES_CAPITALISED)
-                        .contains(respondentSumType.getEt3ResponseAreDatesCorrect())
+                .contains(isNotApplicable(respondentSumType.getEt3ResponseAreDatesCorrect())
                         ? NO_LOWERCASE : STRING_EMPTY);
 
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_START_DATE_DAY))
@@ -116,36 +112,27 @@ class ET3FormEmploymentMapperTest {
                         : TEST_PDF_EMPLOYMENT_DATE_INFORMATION);
 
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_YES))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseContinuingEmployment())
-                        && YES_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseContinuingEmployment())
-                        ? YES_LOWERCASE : STRING_EMPTY);
+                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseContinuingEmployment(),
+                        YES_CAPITALISED) ? YES_LOWERCASE : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NO))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseContinuingEmployment())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseContinuingEmployment())
-                        ? NO_LOWERCASE : STRING_EMPTY);
+                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseContinuingEmployment(),
+                        NO_CAPITALISED) ? NO_LOWERCASE : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NOT_APPLICABLE))
-                .contains(isBlank(respondentSumType.getEt3ResponseContinuingEmployment())
-                        || !List.of(NO_CAPITALISED, YES_CAPITALISED)
-                        .contains(respondentSumType.getEt3ResponseContinuingEmployment())
+                .contains(isNotApplicable(respondentSumType.getEt3ResponseContinuingEmployment())
                         ? NO_LOWERCASE : STRING_EMPTY);
 
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_YES))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        && YES_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        ? YES_LOWERCASE : STRING_EMPTY);
+                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
+                        YES_CAPITALISED) ? YES_LOWERCASE : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NO))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        ? NO_LOWERCASE : STRING_EMPTY);
+                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
+                        NO_CAPITALISED) ? NO_LOWERCASE : STRING_EMPTY);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NOT_APPLICABLE))
-                .contains(isBlank(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        || !List.of(NO_CAPITALISED, YES_CAPITALISED)
-                        .contains(respondentSumType.getEt3ResponseIsJobTitleCorrect())
+                .contains(isNotApplicable(respondentSumType.getEt3ResponseIsJobTitleCorrect())
                         ? NO_LOWERCASE : STRING_EMPTY);
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        ? TEST_PDF_EMPLOYMENT_CORRECT_JOB_TITLE : STRING_EMPTY);
+                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
+                        NO_CAPITALISED) ? TEST_PDF_EMPLOYMENT_CORRECT_JOB_TITLE : STRING_EMPTY);
     }
 
     private static Stream<RespondentSumType> provideMapEmploymentTestData() {

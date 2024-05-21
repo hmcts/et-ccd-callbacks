@@ -3,7 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
+import uk.gov.hmcts.et.common.model.bundle.BundleDocumentDetails;
 import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -11,6 +13,7 @@ import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -68,5 +71,20 @@ public final class DigitalCaseFileHelper {
 
     public static boolean isExcludedFromDcf(DocumentType doc) {
         return CollectionUtils.isEmpty(doc.getExcludeFromDcf()) || !YES.equals(doc.getExcludeFromDcf().get(0));
+    }
+
+    public static List<BundleDocumentDetails> getDocsForDcf(BaseCaseData caseData) {
+        return caseData.getDocumentCollection().stream()
+                .map(GenericTypeItem::getValue)
+                .filter(doc -> doc.getUploadedDocument() != null && DigitalCaseFileHelper.isExcludedFromDcf(doc))
+                .map(doc -> BundleDocumentDetails.builder()
+                        .name(DigitalCaseFileHelper.getDocumentName(doc))
+                        .sourceDocument(DocumentLink.builder()
+                                .documentUrl(doc.getUploadedDocument().getDocumentUrl())
+                                .documentBinaryUrl(doc.getUploadedDocument().getDocumentBinaryUrl())
+                                .documentFilename(doc.getUploadedDocument().getDocumentFilename())
+                                .build())
+                        .build())
+                .toList();
     }
 }

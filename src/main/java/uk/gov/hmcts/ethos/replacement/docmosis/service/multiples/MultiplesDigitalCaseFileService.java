@@ -10,10 +10,7 @@ import uk.gov.hmcts.et.common.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
 import uk.gov.hmcts.et.common.model.bundle.BundleDocument;
 import uk.gov.hmcts.et.common.model.bundle.BundleDocumentDetails;
-import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
 import uk.gov.hmcts.et.common.model.bundle.MultipleBundleCreateRequest;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
@@ -95,7 +92,7 @@ public class MultiplesDigitalCaseFileService {
     }
 
     private BundleDetails createBundleDetails(MultipleData caseData) {
-        List<BundleDocumentDetails> caseDocs = getDocsForDcf(caseData);
+        List<BundleDocumentDetails> caseDocs = DigitalCaseFileHelper.getDocsForDcf(caseData);
         List<BundleDocument> bundleDocuments = caseDocs.stream()
                 .map(bundleDocumentDetails -> BundleDocument.builder()
                         .value(bundleDocumentDetails)
@@ -111,20 +108,5 @@ public class MultiplesDigitalCaseFileService {
                 .pageNumberFormat("numberOfPages")
                 .documents(bundleDocuments)
                 .build();
-    }
-
-    private List<BundleDocumentDetails> getDocsForDcf(BaseCaseData caseData) {
-        return caseData.getDocumentCollection().stream()
-                .map(GenericTypeItem::getValue)
-                .filter(doc -> doc.getUploadedDocument() != null && DigitalCaseFileHelper.isExcludedFromDcf(doc))
-                .map(doc -> BundleDocumentDetails.builder()
-                        .name(DigitalCaseFileHelper.getDocumentName(doc))
-                        .sourceDocument(DocumentLink.builder()
-                                .documentUrl(doc.getUploadedDocument().getDocumentUrl())
-                                .documentBinaryUrl(doc.getUploadedDocument().getDocumentBinaryUrl())
-                                .documentFilename(doc.getUploadedDocument().getDocumentFilename())
-                                .build())
-                        .build())
-                .toList();
     }
 }

@@ -102,7 +102,7 @@ class CcdCaseAssignmentTest {
                         eq(CCDCallbackResponse.class))).thenReturn(ResponseEntity.ok(expected));
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(false);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(false);
 
         CCDCallbackResponse actual = ccdCaseAssignment.applyNocAsAdmin(callbackRequest);
 
@@ -121,7 +121,7 @@ class CcdCaseAssignmentTest {
                         any(HttpEntity.class),
                         eq(CCDCallbackResponse.class))).thenReturn(ResponseEntity.ok(expected));
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(false);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(false);
 
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 
@@ -138,7 +138,7 @@ class CcdCaseAssignmentTest {
                 any(HttpEntity.class),
                 eq(CCDCallbackResponse.class)))
                 .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(false);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(false);
 
         Exception exception = assertThrows(
                 RestClientResponseException.class,
@@ -162,7 +162,7 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
 
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
 
@@ -218,7 +218,7 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
 
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
 
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 
@@ -238,7 +238,7 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
 
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.empty());
 
@@ -258,7 +258,7 @@ class CcdCaseAssignmentTest {
                         eq(CCDCallbackResponse.class))
         ).thenReturn(ResponseEntity.ok(new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData())));
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
 
@@ -292,7 +292,7 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
 
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
 
@@ -325,7 +325,7 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
 
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
 
@@ -358,7 +358,7 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
 
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(this.featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
 

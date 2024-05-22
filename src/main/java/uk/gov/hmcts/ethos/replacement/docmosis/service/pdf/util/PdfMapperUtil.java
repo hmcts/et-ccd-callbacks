@@ -83,11 +83,11 @@ public final class PdfMapperUtil {
      * @param actualValue value to check with expected value of the condition
      * @param valueToPut value to add pdf fields
      */
-    public static void putConditionalPdfTextField(ConcurrentMap<String, Optional<String>> pdfFields,
-                                                  String fieldName,
-                                                  String expectedValue,
-                                                  String actualValue,
-                                                  String valueToPut) {
+    public static void putConditionalPdfField(ConcurrentMap<String, Optional<String>> pdfFields,
+                                              String fieldName,
+                                              String expectedValue,
+                                              String actualValue,
+                                              String valueToPut) {
         if (isBlank(fieldName)) {
             return;
         }

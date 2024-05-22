@@ -7,13 +7,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.ResourceLoader;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NOT_APPLICABLE;
@@ -48,8 +47,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_DAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_MONTH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_YEAR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.isNotApplicable;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.isValueEnteredEqualsExpectedValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCheckBoxNotApplicableValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCheckboxValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCorrectedDetailValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
 
 class ET3FormEmploymentMapperTest {
@@ -66,73 +66,58 @@ class ET3FormEmploymentMapperTest {
     void testMapClaimant(RespondentSumType respondentSumType) {
         mapEmployment(respondentSumType, pdfFields);
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_YES))
-                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
-                        YES_CAPITALISED) ? YES_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckboxValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
+                        YES_CAPITALISED, YES_LOWERCASE));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_NO))
-                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
-                        NO_CAPITALISED) ? NO_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckboxValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
+                        NO_CAPITALISED, NO_LOWERCASE));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_DATES_CORRECT_NOT_APPLICABLE))
-                .contains(isNotApplicable(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        ? NO_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckBoxNotApplicableValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
+                        List.of(YES_CAPITALISED, NO_CAPITALISED), NO_LOWERCASE));
 
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_START_DATE_DAY))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                          && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                          && isNotBlank(respondentSumType.getEt3ResponseEmploymentStartDate())
-                ? TEST_PDF_EMPLOYMENT_START_DAY : STRING_EMPTY);
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseAreDatesCorrect(), NO_CAPITALISED,
+                        respondentSumType.getEt3ResponseEmploymentStartDate(), TEST_PDF_EMPLOYMENT_START_DAY));
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_START_DATE_MONTH))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && isNotBlank(respondentSumType.getEt3ResponseEmploymentStartDate())
-                        ? TEST_PDF_EMPLOYMENT_START_MONTH : STRING_EMPTY);
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseAreDatesCorrect(), NO_CAPITALISED,
+                        respondentSumType.getEt3ResponseEmploymentStartDate(), TEST_PDF_EMPLOYMENT_START_MONTH));
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_START_DATE_YEAR))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && isNotBlank(respondentSumType.getEt3ResponseEmploymentStartDate())
-                        ? TEST_PDF_EMPLOYMENT_START_YEAR : STRING_EMPTY);
-
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseAreDatesCorrect(), NO_CAPITALISED,
+                        respondentSumType.getEt3ResponseEmploymentStartDate(), TEST_PDF_EMPLOYMENT_START_YEAR));
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_END_DATE_DAY))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && isNotBlank(respondentSumType.getEt3ResponseEmploymentEndDate())
-                        ? TEST_PDF_EMPLOYMENT_END_DAY : STRING_EMPTY);
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseAreDatesCorrect(), NO_CAPITALISED,
+                        respondentSumType.getEt3ResponseEmploymentEndDate(), TEST_PDF_EMPLOYMENT_END_DAY));
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_END_DATE_MONTH))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && isNotBlank(respondentSumType.getEt3ResponseEmploymentEndDate())
-                        ? TEST_PDF_EMPLOYMENT_END_MONTH : STRING_EMPTY);
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseAreDatesCorrect(), NO_CAPITALISED,
+                        respondentSumType.getEt3ResponseEmploymentEndDate(), TEST_PDF_EMPLOYMENT_END_MONTH));
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_END_DATE_YEAR))
-                .contains(isNotBlank(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && NO_CAPITALISED.equalsIgnoreCase(respondentSumType.getEt3ResponseAreDatesCorrect())
-                        && isNotBlank(respondentSumType.getEt3ResponseEmploymentEndDate())
-                        ? TEST_PDF_EMPLOYMENT_END_YEAR : STRING_EMPTY);
-
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseAreDatesCorrect(), NO_CAPITALISED,
+                        respondentSumType.getEt3ResponseEmploymentEndDate(), TEST_PDF_EMPLOYMENT_END_YEAR));
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_DATES_FURTHER_INFO))
-                .contains(isBlank(respondentSumType.getEt3ResponseEmploymentInformation()) ? STRING_EMPTY
-                        : TEST_PDF_EMPLOYMENT_DATE_INFORMATION);
-
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseAreDatesCorrect(),
+                        NO_CAPITALISED, respondentSumType.getEt3ResponseEmploymentInformation(),
+                        TEST_PDF_EMPLOYMENT_DATE_INFORMATION));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_YES))
-                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseContinuingEmployment(),
-                        YES_CAPITALISED) ? YES_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckboxValue(respondentSumType.getEt3ResponseContinuingEmployment(),
+                        YES_CAPITALISED, YES_LOWERCASE));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NO))
-                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseContinuingEmployment(),
-                        NO_CAPITALISED) ? NO_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckboxValue(respondentSumType.getEt3ResponseContinuingEmployment(),
+                        NO_CAPITALISED, NO_LOWERCASE));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_CONTINUES_NOT_APPLICABLE))
-                .contains(isNotApplicable(respondentSumType.getEt3ResponseContinuingEmployment())
-                        ? NO_LOWERCASE : STRING_EMPTY);
-
+                .contains(getCheckBoxNotApplicableValue(respondentSumType.getEt3ResponseContinuingEmployment(),
+                        List.of(YES_CAPITALISED, NO_CAPITALISED), NO_LOWERCASE));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_YES))
-                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
-                        YES_CAPITALISED) ? YES_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckboxValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
+                        YES_CAPITALISED, YES_LOWERCASE));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NO))
-                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
-                        NO_CAPITALISED) ? NO_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckboxValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
+                        NO_CAPITALISED, NO_LOWERCASE));
         assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NOT_APPLICABLE))
-                .contains(isNotApplicable(respondentSumType.getEt3ResponseIsJobTitleCorrect())
-                        ? NO_LOWERCASE : STRING_EMPTY);
+                .contains(getCheckBoxNotApplicableValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
+                        List.of(YES_CAPITALISED, NO_CAPITALISED), NO_LOWERCASE));
         assertThat(pdfFields.get(TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS))
-                .contains(isValueEnteredEqualsExpectedValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
-                        NO_CAPITALISED) ? TEST_PDF_EMPLOYMENT_CORRECT_JOB_TITLE : STRING_EMPTY);
+                .contains(getCorrectedDetailValue(respondentSumType.getEt3ResponseIsJobTitleCorrect(), NO_CAPITALISED,
+                        respondentSumType.getEt3ResponseCorrectJobTitle(), TEST_PDF_EMPLOYMENT_CORRECT_JOB_TITLE));
     }
 
     private static Stream<RespondentSumType> provideMapEmploymentTestData() {

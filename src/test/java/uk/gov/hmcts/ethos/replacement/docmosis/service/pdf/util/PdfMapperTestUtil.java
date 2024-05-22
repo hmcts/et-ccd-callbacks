@@ -4,8 +4,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_CAPITALISED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
 public final class PdfMapperTestUtil {
 
@@ -13,11 +12,36 @@ public final class PdfMapperTestUtil {
         // Utility classes should not have a public or default constructor.
     }
 
-    public static boolean isNotApplicable(String checkValue) {
-        return isBlank(checkValue) || !List.of(NO_CAPITALISED, YES_CAPITALISED).contains(checkValue);
+    public static String getCheckBoxNotApplicableValue(String actualValue,
+                                                       List<String> expectedValues,
+                                                       String valueToEnableCheckbox) {
+        return isBlank(actualValue) || !expectedValues.contains(actualValue)
+                ? valueToEnableCheckbox : STRING_EMPTY;
     }
 
-    public static boolean isValueEnteredEqualsExpectedValue(String valueEntered, String expectedValue) {
-        return isNotBlank(valueEntered) && isNotBlank(expectedValue) && expectedValue.equalsIgnoreCase(valueEntered);
+    public static String getCheckboxValue(String actualValue, String expectedValue, String valueToEnableCheckbox) {
+        return isNotBlank(actualValue) && isNotBlank(expectedValue) && expectedValue.equalsIgnoreCase(actualValue)
+                ? valueToEnableCheckbox : STRING_EMPTY;
+    }
+
+    public static String getCorrectedDetailValue(String checkboxActualValue,
+                                                 String expectedCheckBoxValue,
+                                                 String correctedDetailValue,
+                                                 String expectedCorrectedDetailValue) {
+        return isNotBlank(checkboxActualValue)
+                && expectedCheckBoxValue.equalsIgnoreCase(checkboxActualValue)
+                && isNotBlank(correctedDetailValue) ? expectedCorrectedDetailValue : STRING_EMPTY;
+    }
+
+    public static String getCorrectedCheckboxValue(String checkboxActualValue,
+                                                   String expectedCheckBoxValue,
+                                                   String correctedDetailCheckboxValue,
+                                                   String expectedDetailCheckboxValue,
+                                                   String expectedCorrectedDetailValue) {
+        return isNotBlank(checkboxActualValue)
+                && expectedCheckBoxValue.equalsIgnoreCase(checkboxActualValue)
+                && isNotBlank(correctedDetailCheckboxValue)
+                && expectedDetailCheckboxValue.equalsIgnoreCase(correctedDetailCheckboxValue)
+                ? expectedCorrectedDetailValue : STRING_EMPTY;
     }
 }

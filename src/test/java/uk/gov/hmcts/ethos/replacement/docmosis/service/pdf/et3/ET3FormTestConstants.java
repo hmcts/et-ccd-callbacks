@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3;
 
-public class ET3FormTestConstants {
+public final class ET3FormTestConstants {
 
     // GENERIC CONSTANTS
     public static final String TEST_ET3_FORM_CASE_DATA_FILE = "et3FormCaseData.json";
@@ -59,6 +59,15 @@ public class ET3FormTestConstants {
     public static final String TEST_PDF_EMPLOYMENT_END_YEAR = "2021";
     public static final String TEST_PDF_EMPLOYMENT_DATE_INFORMATION = "Claimant gave wrong dates";
     public static final String TEST_PDF_EMPLOYMENT_CORRECT_JOB_TITLE = "IT Guy";
+
+    //ET3FormEarningsBenefitsMapperTest CONSTANTS
+    public static final String TEST_PDF_EARNINGS_BENEFITS_CORRECT_HOURS = "36";
+    public static final String TEST_PDF_EARNINGS_BENEFITS_PAY_BEFORE_TAX = "35000";
+    public static final String TEST_PDF_EARNINGS_BENEFITS_PAY_TAKE_HOME = "30000";
+    public static final String TEST_PDF_EARNINGS_BENEFITS_CORRECT_NOTICE_PERIOD =
+            "His notice period was only for 3 weeks";
+    public static final String TEST_PDF_EARNINGS_BENEFITS_CORRECT_PENSION_AND_OTHER_BENEFITS =
+            "His pension was 300 and he didn't have a car.";
 
     private ET3FormTestConstants() {
         // Add a private constructor to hide the implicit public one.

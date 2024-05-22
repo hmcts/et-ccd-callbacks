@@ -18,8 +18,7 @@ public class PdfService {
     ET3FormMapper et3FormMapperService;
 
     public DocumentInfo generateDocumentByCaseData(CaseData caseData, String pdfSource) {
-        DocumentInfo documentInfo = new DocumentInfo();
-        return documentInfo;
+        return new DocumentInfo();
     }
 
     public byte[] createET3FormByteArray(CaseData caseData, String pdfSource) {

@@ -28,6 +28,13 @@ public final class ET3FormConstants {
     public static final String DATE_FORMAT_DD = "dd";
     public static final String DATE_FORMAT_MM = "MM";
     public static final String DATE_FORMAT_YYYY = "YYYY";
+    public static final String WEEKLY_LOWERCASE = "weekly";
+    public static final String WEEKLY_CAPITALISED = "Weekly";
+    public static final String MONTHLY_LOWERCASE = "monthly";
+    public static final String MONTHLY_CAPITALISED = "Monthly";
+    // Implemented wrong in the PDF file that is why ANNUALLY_LOWERCASE value is monthly
+    public static final String ANNUALLY_LOWERCASE = "monthly";
+    public static final String ANNUALLY_CAPITALISED = "Annually";
 
     // HEADER CONSTANTS
     public static final String TXT_PDF_HEADER_FIELD_CASE_NUMBER = "case number";
@@ -101,6 +108,51 @@ public final class ET3FormConstants {
     public static final String CHECKBOX_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_NOT_APPLICABLE =
             "4.3 job description correct - not applicable";
     public static final String TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS = "4.3 correct details";
+
+    // SECTION 5 EARNINGS AND BENEFITS
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_HOURS_OF_WORK_CORRECT_YES =
+            "5.1 claimant's hours of work are correct - yes";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_HOURS_OF_WORK_CORRECT_NO =
+            "5.1 claimant's hours of work are correct - no";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_HOURS_OF_WORK_CORRECT_NOT_APPLICABLE =
+            "5.1 claimant's hours of work are correct - not applicable";
+    public static final String TXT_PDF_EARNINGS_BENEFITS_FIELD_WORK_HOURS_DETAILS = "Work hours details";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_EARNING_DETAILS_CORRECT_YES =
+            "5.2 earning details correct - yes";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_EARNING_DETAILS_CORRECT_NO =
+            "5.2 earning details correct - no";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_EARNING_DETAILS_CORRECT_NOT_APPLICABLE =
+            "5.2 earning details correct - not applicable";
+    public static final String TXT_PDF_EARNINGS_BENEFITS_FIELD_PAY_BEFORE_TAX = "5.2 pay before tax";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_PAY_BEFORE_TAX_WEEKLY =
+            "5.2 pay before tax - weekly";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_PAY_BEFORE_TAX_MONTHLY =
+            "5.2 pay before tax - monthly";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_PAY_BEFORE_TAX_ANNUALLY =
+            "5.2 pay before tax - annually";
+    public static final String TXT_PDF_EARNINGS_BENEFITS_FIELD_NORMAL_TAKE_HOME_PAY = "5.2 normal take-home pay";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_NORMAL_TAKE_HOME_PAY_WEEKLY =
+            "5.2 take-home pay - weekly";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_NORMAL_TAKE_HOME_PAY_MONTHLY =
+            "5.2 take-home pay - monthly";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_NORMAL_TAKE_HOME_PAY_ANNUALLY =
+            "5.2 take-home pay - annually";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_NOTICE_PERIOD_CORRECT_YES =
+            "5.3 period of notice information - correct";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_NOTICE_PERIOD_CORRECT_NO =
+            "5.3 period of notice information - not correct";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_NOTICE_PERIOD_CORRECT_NOT_APPLICABLE =
+            "5.3 period of notice information - not applicable";
+    public static final String TXT_PDF_EARNINGS_BENEFITS_FIELD_NOTICE_PERIOD_NOT_CORRECT_INFORMATION =
+            "5.3 if information is not correct";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_PENSION_AND_OTHER_BENEFITS_CORRECT_YES =
+            "5.4 pension details - correct";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_PENSION_AND_OTHER_BENEFITS_CORRECT_NO =
+            "5.4 pension details - not correct";
+    public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_PENSION_AND_OTHER_BENEFITS_CORRECT_NOT_APPLICABLE =
+            "5.4 pension details - not applicable";
+    public static final String TXT_PDF_EARNINGS_BENEFITS_FIELD_PENSION_AND_OTHER_BENEFITS_NOT_CORRECT_INFORMATION =
+            "5.4 if not correct, details";
 
     private ET3FormConstants() {
         // Add a private constructor to hide the implicit public one.

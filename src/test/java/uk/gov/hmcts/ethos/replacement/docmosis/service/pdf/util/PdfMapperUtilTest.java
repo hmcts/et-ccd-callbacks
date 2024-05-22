@@ -44,7 +44,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_FIELD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.formatDate;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfTextField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfAddressField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
@@ -90,7 +90,7 @@ class PdfMapperUtilTest {
                         "'':test_value:equal_value:equal_value:put_value"},
             delimiter = ':', nullValues = {"null"})
     void testPutConditionalPdfTextField(String fieldName, String expectedValue, String actualValue, String valueToPut) {
-        putConditionalPdfTextField(pdfFields, fieldName, expectedValue, actualValue, valueToPut);
+        putConditionalPdfField(pdfFields, fieldName, expectedValue, actualValue, valueToPut);
         assumeTrue(isNotBlank(fieldName));
         assertThat(pdfFields.get(fieldName)).contains(isBlank(valueToPut) || isBlank(fieldName)
                 || isBlank(expectedValue) || isBlank(actualValue)

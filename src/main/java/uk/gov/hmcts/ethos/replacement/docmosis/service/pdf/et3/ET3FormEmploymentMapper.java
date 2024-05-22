@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.formatDate;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfTextField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenOther;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
@@ -66,27 +66,27 @@ public final class ET3FormEmploymentMapper {
                 NO_LOWERCASE,
                 List.of(YES_CAPITALISED, NO_CAPITALISED),
                 respondentSumType.getEt3ResponseAreDatesCorrect());
-        putConditionalPdfTextField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_START_DATE_DAY, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_START_DATE_DAY, NO_CAPITALISED,
                 respondentSumType.getEt3ResponseAreDatesCorrect(),
                 formatDate(respondentSumType.getEt3ResponseEmploymentStartDate(),
                         DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_DD));
-        putConditionalPdfTextField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_START_DATE_MONTH, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_START_DATE_MONTH, NO_CAPITALISED,
                 respondentSumType.getEt3ResponseAreDatesCorrect(),
                 formatDate(respondentSumType.getEt3ResponseEmploymentStartDate(),
                         DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_MM));
-        putConditionalPdfTextField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_START_DATE_YEAR, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_START_DATE_YEAR, NO_CAPITALISED,
                 respondentSumType.getEt3ResponseAreDatesCorrect(),
                 formatDate(respondentSumType.getEt3ResponseEmploymentStartDate(),
                         DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_YYYY));
-        putConditionalPdfTextField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_END_DATE_DAY, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_END_DATE_DAY, NO_CAPITALISED,
                 respondentSumType.getEt3ResponseAreDatesCorrect(),
                 formatDate(respondentSumType.getEt3ResponseEmploymentEndDate(),
                         DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_DD));
-        putConditionalPdfTextField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_END_DATE_MONTH, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_END_DATE_MONTH, NO_CAPITALISED,
                 respondentSumType.getEt3ResponseAreDatesCorrect(),
                 formatDate(respondentSumType.getEt3ResponseEmploymentEndDate(),
                         DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_MM));
-        putConditionalPdfTextField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_END_DATE_YEAR, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_END_DATE_YEAR, NO_CAPITALISED,
                 respondentSumType.getEt3ResponseAreDatesCorrect(),
                 formatDate(respondentSumType.getEt3ResponseEmploymentEndDate(),
                         DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_YYYY));
@@ -126,7 +126,7 @@ public final class ET3FormEmploymentMapper {
                 NO_LOWERCASE,
                 List.of(YES_CAPITALISED, NO_CAPITALISED),
                 respondentSumType.getEt3ResponseIsJobTitleCorrect());
-        putConditionalPdfTextField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS, NO_CAPITALISED,
                 respondentSumType.getEt3ResponseIsJobTitleCorrect(),
                 respondentSumType.getEt3ResponseCorrectJobTitle());
     }

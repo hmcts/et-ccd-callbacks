@@ -114,7 +114,7 @@ public class CcdCaseAssignment {
         log.info("Apply NoC. Http status received from AAC API; {} for case {}",
                 response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
 
-        if (featureToggleService.isMultiplesEnabled()) {
+        if (featureToggleService.isMul2Enabled()) {
             addRespondentRepresentativeToMultiple(callback.getCaseDetails());
         }
         return response.getBody();

@@ -32,7 +32,7 @@ class SessionDaysTest {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
-                .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(0, "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
         ListingData listingData = createListingData("2021-07-02");
 
@@ -46,8 +46,8 @@ class SessionDaysTest {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
-                .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
-                .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(0, "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
+                .withHearingSession(0, "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
         ListingData listingData = createListingData("2021-07-02");
 
@@ -62,9 +62,9 @@ class SessionDaysTest {
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda", null, null, null, null)
-                .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
-                .withHearingSession(1, "1", "2021-07-03T09:00:00", HEARING_STATUS_HEARD, false)
-                .withHearingSession(1, "2", "2021-07-04T10:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(0, "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
+                .withHearingSession(1, "2021-07-03T09:00:00", HEARING_STATUS_HEARD, false)
+                .withHearingSession(1, "2021-07-04T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
         ListingData listingData = createListingData("2021-07-04");
 
@@ -79,10 +79,10 @@ class SessionDaysTest {
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
                 .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda", null, null, null, null)
-                .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
-                .withHearingSession(0, "2", "2021-07-02T09:00:00", HEARING_STATUS_HEARD, true)
-                .withHearingSession(1, "1", "2021-07-03T10:00:00", HEARING_STATUS_HEARD, true)
-                .withHearingSession(1, "2", "2021-07-04T10:00:00", HEARING_STATUS_WITHDRAWN, false)
+                .withHearingSession(0, "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
+                .withHearingSession(0, "2021-07-02T09:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(1, "2021-07-03T10:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(1, "2021-07-04T10:00:00", HEARING_STATUS_WITHDRAWN, false)
                 .build();
         ListingData listingData = createListingData("2021-07-03");
 
@@ -97,9 +97,9 @@ class SessionDaysTest {
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
                 .withHearing("2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Judge Brenda", null, null, null, null)
-                .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
-                .withHearingSession(0, "2", "2021-07-02T09:00:00", HEARING_STATUS_HEARD, true)
-                .withHearingSession(1, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(0, "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
+                .withHearingSession(0, "2021-07-02T09:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(1, "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
         ListingData listingData = createListingData("2021-07-02");
 
@@ -114,8 +114,8 @@ class SessionDaysTest {
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
             CaseData caseData = caseDataBuilder
                     .withHearing("1", hearingType, "Judge Dave", null, null, null, null)
-                    .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
-                    .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
+                    .withHearingSession(0, "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
+                    .withHearingSession(0, "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
             ListingData listingData = createListingData("2021-07-02");
 
@@ -152,7 +152,7 @@ class SessionDaysTest {
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
             CaseData caseData = caseDataBuilder
                     .withHearing("1", invalidHearingType, "Judge Doris", null, null, null, null)
-                    .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
+                    .withHearingSession(0, "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
 
             ListingData listingData = new ListingData();
@@ -168,7 +168,7 @@ class SessionDaysTest {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
-                .withHearingSession(0, "1", "2021-07-01T10:00:00", HEARING_STATUS_HEARD, true)
+                .withHearingSession(0, "2021-07-01T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
 
         ListingData listingData = new ListingData();
@@ -183,7 +183,7 @@ class SessionDaysTest {
         CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
-                .withHearingSession(0, "1", "2021-07-01T10:00:00", HEARING_STATUS_HEARD, false)
+                .withHearingSession(0, "2021-07-01T10:00:00", HEARING_STATUS_HEARD, false)
                 .build();
 
         ListingData listingData = new ListingData();

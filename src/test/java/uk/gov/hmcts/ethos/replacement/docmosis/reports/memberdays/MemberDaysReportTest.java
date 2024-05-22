@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -279,7 +278,7 @@ class MemberDaysReportTest {
         MemberDaysReportData resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         long actualFullPanelHearingsCount  = resultListingData.getReportDetails()
             .stream().map(MemberDaysReportDetail::getParentHearingId)
-            .collect(Collectors.toList()).stream().distinct().count();
+            .toList().stream().distinct().count();
         String actualReportDateType = resultListingData.getHearingDateType();
         assertEquals(expectedFullPanelHearingsCount, actualFullPanelHearingsCount);
         assertEquals(expectedReportDateType, actualReportDateType);
@@ -293,7 +292,7 @@ class MemberDaysReportTest {
         MemberDaysReportData resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         long actualFullPanelHearingsCount  = resultListingData.getReportDetails()
             .stream().map(MemberDaysReportDetail::getParentHearingId)
-            .collect(Collectors.toList()).stream().distinct().count();
+            .toList().stream().distinct().count();
         String actualReportDateType = resultListingData.getHearingDateType();
         assertEquals(0, actualFullPanelHearingsCount);
         assertEquals(expectedReportDateType, actualReportDateType);
@@ -451,7 +450,7 @@ class MemberDaysReportTest {
                     .stream().filter(h -> isValidDate(h.getValue().getListedDate(),
                         listingDetails.getCaseData().getListingDateFrom(),
                         listingDetails.getCaseData().getListingDateTo()))
-                    .collect(Collectors.toList());
+                    .toList();
                 dateListedTypeItems.addAll(validDates);
             }
         }

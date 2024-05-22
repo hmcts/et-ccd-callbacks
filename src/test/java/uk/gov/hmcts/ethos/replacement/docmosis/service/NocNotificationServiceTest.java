@@ -78,9 +78,7 @@ class NocNotificationServiceTest {
             .withRespondent("Respondent", YES, "2022-03-01", "res@rep.com", false)
             .withChangeOrganisationRequestField(
                 organisationToAdd,
-                organisationToRemove,
-                null,
-                null,
+                organisationToRemove, null,
                 null)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -102,9 +100,7 @@ class NocNotificationServiceTest {
                 "res@rep.com", false)
             .withChangeOrganisationRequestField(
                 organisationToAdd,
-                organisationToRemove,
-                null,
-                null,
+                organisationToRemove, null,
                 null)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

@@ -22,7 +22,7 @@ class ListingVenueHelperTest {
     private static final String VENUE_NAME = "Test Venue";
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testGetListingVenue")
     void testGetListingVenue(ListingData listingData, String expected) {
         assertEquals(expected, ListingVenueHelper.getListingVenue(listingData));
     }
@@ -44,7 +44,7 @@ class ListingVenueHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testGetListingVenueLabels")
     void testGetListingVenueLabels(ListingData listingData, String expected) {
         assertEquals(expected, ListingVenueHelper.getListingVenueLabel(listingData));
     }
@@ -66,7 +66,7 @@ class ListingVenueHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testGetListingVenueToSearch")
     void testGetListingVenueToSearch(ListingData listingData, Map<String, String> expected) {
         assertEquals(expected, ListingVenueHelper.getListingVenueToSearch(listingData));
     }
@@ -87,7 +87,7 @@ class ListingVenueHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testIsAllScottishVenues")
     void testIsAllScottishVenues(ListingData listingData, boolean expected) {
         assertEquals(expected, ListingVenueHelper.isAllScottishVenues(listingData));
     }

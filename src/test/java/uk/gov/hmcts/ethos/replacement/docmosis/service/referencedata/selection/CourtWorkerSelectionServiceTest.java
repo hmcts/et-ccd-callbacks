@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class CourtWorkerSelectionServiceTest {
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testCreateCourtWorkerSelection")
     void testCreateCourtWorkerSelection(TribunalOffice tribunalOffice, TribunalOffice expectedTribunalOffice) {
         String expectedCode = "TestCode";
         String expectedLabel = "TestLabel";
@@ -40,7 +40,7 @@ class CourtWorkerSelectionServiceTest {
             expectedTribunalOffice, CourtWorkerType.CLERK);
     }
 
-    private static Stream<Arguments> testCreateCourtWorkerSelection() { //NOPMD - parameterized tests source method
+    private static Stream<Arguments> testCreateCourtWorkerSelection() {
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, TribunalOffice.SCOTLAND),
                 Arguments.of(TribunalOffice.BRISTOL, TribunalOffice.BRISTOL),

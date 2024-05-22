@@ -78,9 +78,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
             .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
                 TribunalOffice.ABERDEEN, "venue")
             .withHearingSession(
-                0,
-                "hearingNumber",
-                "2019-11-25T12:11:00.000",
+                0, "2019-11-25T12:11:00.000",
                 HEARING_STATUS_HEARD,
                 true)
             .build();

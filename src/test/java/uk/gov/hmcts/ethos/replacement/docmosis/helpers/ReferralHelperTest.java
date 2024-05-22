@@ -131,7 +131,7 @@ class ReferralHelperTest {
         caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
                 "length num", "type", "Yes")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000",
+            .withHearingSession(0, "2021-12-25T00:00:00.000",
                 HEARING_STATUS_POSTPONED, false)
             .build();
 
@@ -143,11 +143,11 @@ class ReferralHelperTest {
         caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
                 "length num", "type", "Yes")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000",
+            .withHearingSession(0, "2021-12-25T00:00:00.000",
                 HEARING_STATUS_POSTPONED, false)
             .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
                 "length num", "type", "Yes")
-            .withHearingSession(1, "1", "2021-12-26T00:00:00.000",
+            .withHearingSession(1, "2021-12-26T00:00:00.000",
                 HEARING_STATUS_HEARD, false)
             .build();
 
@@ -669,7 +669,7 @@ class ReferralHelperTest {
         documentType.setShortDescription("shortDescription");
         documentTypeItem.setId(UUID.randomUUID().toString());
         documentTypeItem.setValue(documentType);
-        CaseData caseData = new CaseData();
+        caseData = new CaseData();
         caseData.setReferralDocument(List.of(documentTypeItem));
         List<String> errors = new ArrayList<>();
         ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);

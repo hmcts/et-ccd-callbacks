@@ -1038,7 +1038,6 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void testSetMigratedCaseLinkDetails_When_EthosCaseReferenceIsNull() {
         String caseId = "caseId";
-        String caseDetailsId = "123_45";
         CaseDetails caseDetails = new CaseDetails();
         CaseData caseData = new CaseData();
         caseData.setCcdID(caseId);

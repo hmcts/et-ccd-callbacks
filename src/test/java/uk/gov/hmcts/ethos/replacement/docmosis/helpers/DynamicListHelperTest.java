@@ -66,7 +66,7 @@ class DynamicListHelperTest {
     void createDynamicListForRespondentRepresentative() {
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseDetails1.getCaseData());
         assertNotNull(caseDetails1.getCaseData().getRepCollection());
-        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
         assertEquals(dynamicValueType, caseDetails1.getCaseData().getRepCollection().get(0)
@@ -77,7 +77,7 @@ class DynamicListHelperTest {
     void populateDynamicRespondentRepList() {
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseDetails6.getCaseData());
         assertNotNull(caseDetails6.getCaseData().getRepCollection().get(0).getValue().getDynamicRespRepName());
-        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
         assertEquals(dynamicValueType, caseDetails6.getCaseData().getRepCollection().get(0)
@@ -272,9 +272,7 @@ class DynamicListHelperTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", venue, null, null, null, null)
                 .withHearingSession(
-                        0,
-                        hearingNumber,
-                        "2019-11-25T12:11:00.000",
+                        0, "2019-11-25T12:11:00.000",
                         Constants.HEARING_STATUS_HEARD,
                         true)
                 .build();
@@ -289,16 +287,14 @@ class DynamicListHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testCreateDynamicHearingListWithScotlandVenue")
     void testCreateDynamicHearingListWithScotlandVenue(TribunalOffice tribunalOffice) {
         String hearingNumber = "123";
         String venue = "Some venue";
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearingScotland(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", tribunalOffice, venue)
                 .withHearingSession(
-                        0,
-                        hearingNumber,
-                        "2019-11-25T12:11:00.000",
+                        0, "2019-11-25T12:11:00.000",
                         Constants.HEARING_STATUS_HEARD,
                         true)
                 .build();
@@ -327,9 +323,7 @@ class DynamicListHelperTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue, null, null, null, null)
                 .withHearingSession(
-                        0,
-                        hearingNumber,
-                        "2019-11-25T12:11:00.000",
+                        0, "2019-11-25T12:11:00.000",
                         Constants.HEARING_STATUS_HEARD,
                         true)
                 .build();
@@ -344,9 +338,7 @@ class DynamicListHelperTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", null, null, null, null)
                 .withHearingSession(
-                        0,
-                        hearingNumber,
-                        "2019-11-25T12:11:00.000",
+                        0, "2019-11-25T12:11:00.000",
                         Constants.HEARING_STATUS_HEARD,
                         true)
                 .build();

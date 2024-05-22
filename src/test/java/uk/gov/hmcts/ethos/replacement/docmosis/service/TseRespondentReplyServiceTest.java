@@ -153,7 +153,7 @@ class TseRespondentReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("changeApplicationState")
     void changeApplicationState(String applicant, String respondentResponseRequired, String result) {
         genericTseApplicationType.setApplicant(applicant);
         genericTseApplicationType.setRespondentResponseRequired(respondentResponseRequired);
@@ -236,7 +236,7 @@ class TseRespondentReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("sendRespondingToApplicationEmails")
     void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant,
                                            String ackEmailTemplate) {
         caseData.setTseResponseCopyToOtherParty(rule92);
@@ -289,7 +289,7 @@ class TseRespondentReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("sendRespondingToTribunalEmails")
     void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant,
                                         String ackEmailTemplate) {
         caseData.setTseResponseCopyToOtherParty(rule92);
@@ -375,7 +375,7 @@ class TseRespondentReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("validateInput")
     void validateInput(String responseText, String respondingToTribunalText,
                        String supportingMaterial, int expectedErrorCount) {
         caseData.setTseResponseText(responseText);
@@ -399,7 +399,7 @@ class TseRespondentReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("isRespondingToTribunal")
     void isRespondingToTribunal(boolean respondentResponseRequired, boolean isRespondingToTribunal) {
         caseData.setTseRespondSelectApplication(
                 DynamicFixedListType.of(DynamicValueType.create("1", "test")));

@@ -69,6 +69,9 @@ public final class ET3FormTestConstants {
     public static final String TEST_PDF_EARNINGS_BENEFITS_CORRECT_PENSION_AND_OTHER_BENEFITS =
             "His pension was 300 and he didn't have a car.";
 
+    //ET3FormResponseMapperTest CONSTANTS
+    public static final String TEST_PDF_RESPONSE_CONTEST_CLAIM_CORRECT_FACTS = "I don't agree with the claimant.";
+
     private ET3FormTestConstants() {
         // Add a private constructor to hide the implicit public one.
     }

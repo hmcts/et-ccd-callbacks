@@ -109,7 +109,7 @@ public final class ET3FormConstants {
             "4.3 job description correct - not applicable";
     public static final String TXT_PDF_EMPLOYMENT_FIELD_JOB_TITLE_CORRECT_DETAILS = "4.3 correct details";
 
-    // SECTION 5 EARNINGS AND BENEFITS
+    // SECTION 5 EARNINGS AND BENEFITS CONSTANTS
     public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_HOURS_OF_WORK_CORRECT_YES =
             "5.1 claimant's hours of work are correct - yes";
     public static final String CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_HOURS_OF_WORK_CORRECT_NO =
@@ -153,6 +153,11 @@ public final class ET3FormConstants {
             "5.4 pension details - not applicable";
     public static final String TXT_PDF_EARNINGS_BENEFITS_FIELD_PENSION_AND_OTHER_BENEFITS_NOT_CORRECT_INFORMATION =
             "5.4 if not correct, details";
+
+    // SECTION 6 RESPONSE CONSTANTS
+    public static final String CHECKBOX_PDF_RESPONSE_FIELD_CONTEST_CLAIM_YES = "6.1 defend the claim - yes";
+    public static final String CHECKBOX_PDF_RESPONSE_FIELD_CONTEST_CLAIM_NO = "6.1 defend the claim - no";
+    public static final String TXT_PDF_RESPONSE_FIELD_CONTEST_CLAIM_CORRECT_FACTS = "6.1 if yes, facts in defence";
 
     private ET3FormConstants() {
         // Add a private constructor to hide the implicit public one.

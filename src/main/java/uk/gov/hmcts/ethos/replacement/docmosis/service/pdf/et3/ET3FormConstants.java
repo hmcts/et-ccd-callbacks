@@ -159,6 +159,10 @@ public final class ET3FormConstants {
     public static final String CHECKBOX_PDF_RESPONSE_FIELD_CONTEST_CLAIM_NO = "6.1 defend the claim - no";
     public static final String TXT_PDF_RESPONSE_FIELD_CONTEST_CLAIM_CORRECT_FACTS = "6.1 if yes, facts in defence";
 
+    // SECTION 7 EMPLOYER CONTRACT CLAIM CONSTANTS
+    public static final String CHECKBOX_PDF_EMPLOYER_CONTRACT_CLAIM_YES = "7.2 Employer's Contract Claim - yes";
+    public static final String TXT_PDF_EMPLOYER_CONTRACT_CLAIM_DETAILS = "7.3 details of Employer's Contract Claim";
+
     private ET3FormConstants() {
         // Add a private constructor to hide the implicit public one.
     }

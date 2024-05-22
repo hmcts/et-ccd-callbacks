@@ -72,6 +72,10 @@ public final class ET3FormTestConstants {
     //ET3FormResponseMapperTest CONSTANTS
     public static final String TEST_PDF_RESPONSE_CONTEST_CLAIM_CORRECT_FACTS = "I don't agree with the claimant.";
 
+    //ET3FormEmployerContractClaimMapperTest CONSTANTS
+    public static final String TEST_PDF_RESPONSE_EMPLOYER_CONTRACT_CLAIM_CORRECT_DETAILS =
+            "I want to make employer's contract claim.";
+
     private ET3FormTestConstants() {
         // Add a private constructor to hide the implicit public one.
     }

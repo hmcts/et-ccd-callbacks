@@ -160,8 +160,25 @@ public final class ET3FormConstants {
     public static final String TXT_PDF_RESPONSE_FIELD_CONTEST_CLAIM_CORRECT_FACTS = "6.1 if yes, facts in defence";
 
     // SECTION 7 EMPLOYER CONTRACT CLAIM CONSTANTS
-    public static final String CHECKBOX_PDF_EMPLOYER_CONTRACT_CLAIM_YES = "7.2 Employer's Contract Claim - yes";
-    public static final String TXT_PDF_EMPLOYER_CONTRACT_CLAIM_DETAILS = "7.3 details of Employer's Contract Claim";
+    public static final String CHECKBOX_PDF_EMPLOYER_CONTRACT_CLAIM_FIELD_YES = "7.2 Employer's Contract Claim - yes";
+    public static final String TXT_PDF_EMPLOYER_CONTRACT_CLAIM_FIELD_DETAILS =
+            "7.3 details of Employer's Contract Claim";
+
+    // SECTION 8 REPRESENTATIVE CONSTANTS
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_NAME = "8.1 name of your representative";
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_ORGANISATION_NAME =
+            "8.2 Name of representative's organisation";
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_ADDRESS = "8.3 representative's number or name";
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_POSTCODE = "8.3 representative's postcode";
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_PHONE_NUMBER = "8.5 phone number";
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_MOBILE_PHONE_NUMBER = "8.6 mobile phone number";
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_REFERENCE_FOR_CORRESPONDENCE =
+            "8.7 representative's reference for correspondence";
+    public static final String CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_EMAIL = "8.8 email";
+    public static final String CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_POST = "8.8 post";
+    public static final String TXT_PDF_REPRESENTATIVE_FIELD_EMAIL_ADDRESS = "8.9 email address";
+    public static final String CHECKBOX_PDF_REPRESENTATIVE_FIELD_VIDEO_HEARINGS = "8.10 video";
+    public static final String CHECKBOX_PDF_REPRESENTATIVE_FIELD_PHONE_HEARINGS = "8.10 phone";
 
     private ET3FormConstants() {
         // Add a private constructor to hide the implicit public one.

@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EMPLOYER_CONTRACT_CLAIM_YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_EMPLOYER_CONTRACT_CLAIM_FIELD_YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_EMPLOYER_CONTRACT_CLAIM_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_EMPLOYER_CONTRACT_CLAIM_FIELD_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormEmployerContractClaimMapper.mapEmployerContractClaim;
@@ -38,11 +38,12 @@ class ET3FormEmployerContractClaimMapperTest {
 
     @ParameterizedTest
     @MethodSource("provideMapEmployerContractClaimTestData")
-    void testMapResponse(RespondentSumType respondentSumType) {
+    void testMapEmployerContractClaim(RespondentSumType respondentSumType) {
         mapEmployerContractClaim(respondentSumType, pdfFields);
-        assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYER_CONTRACT_CLAIM_YES)).contains(
+
+        assertThat(pdfFields.get(CHECKBOX_PDF_EMPLOYER_CONTRACT_CLAIM_FIELD_YES)).contains(
                 getCheckboxValue(respondentSumType.getEt3ResponseEmployerClaim(), YES_CAPITALISED, YES_LOWERCASE));
-        assertThat(pdfFields.get(TXT_PDF_EMPLOYER_CONTRACT_CLAIM_DETAILS)).contains(
+        assertThat(pdfFields.get(TXT_PDF_EMPLOYER_CONTRACT_CLAIM_FIELD_DETAILS)).contains(
                 getCorrectedDetailValue(respondentSumType.getEt3ResponseEmployerClaim(), YES_CAPITALISED,
                         respondentSumType.getEt3ResponseEmployerClaimDetails(),
                         TEST_PDF_RESPONSE_EMPLOYER_CONTRACT_CLAIM_CORRECT_DETAILS));

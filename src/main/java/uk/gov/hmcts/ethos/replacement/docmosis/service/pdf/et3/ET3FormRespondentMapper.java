@@ -5,6 +5,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR;
@@ -97,7 +98,8 @@ public final class ET3FormRespondentMapper {
         putPdfAddressField(pdfFields,
                 TXT_PDF_RESPONDENT_FIELD_ADDRESS, respondentSumType.getResponseRespondentAddress());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_POSTCODE,
-                respondentSumType.getResponseRespondentAddress().getPostCode());
+                isEmpty(respondentSumType.getResponseRespondentAddress())
+                        ? STRING_EMPTY : respondentSumType.getResponseRespondentAddress().getPostCode());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_DX, respondentSumType.getEt3ResponseDXAddress());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_PHONE_NUMBER,
                 respondentSumType.getResponseRespondentPhone1());

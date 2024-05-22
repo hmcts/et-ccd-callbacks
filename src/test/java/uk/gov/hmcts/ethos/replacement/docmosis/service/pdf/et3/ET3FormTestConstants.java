@@ -76,6 +76,19 @@ public final class ET3FormTestConstants {
     public static final String TEST_PDF_RESPONSE_EMPLOYER_CONTRACT_CLAIM_CORRECT_DETAILS =
             "I want to make employer's contract claim.";
 
+    //ET3FormRepresentativeMapperTest CONSTANTS
+    public static final String TEST_PDF_REPRESENTATIVE_NAME = "EeT TesterOne";
+    public static final String TEST_PDF_REPRESENTATIVE_ORGANISATION_NAME = "ET Test Factory Solicitor";
+    public static final String TEST_PDF_REPRESENTATIVE_ADDRESS = """
+        10, GROVELANDS AVENUE
+        SWINDON""";
+    public static final String TEST_PDF_REPRESENTATIVE_POSTCODE = "SN1 4ET";
+    public static final String TEST_PDF_REPRESENTATIVE_PHONE_NUMBER = "07444518910";
+    public static final String TEST_PDF_REPRESENTATIVE_MOBILE_PHONE_NUMBER = "07444518911";
+
+    public static final String TEST_PDF_REPRESENTATIVE_REFERENCE_FOR_CORRESPONDENCE = "Reference for Correspondence";
+    public static final String TEST_PDF_REPRESENTATIVE_EMAIL_ADDRESS = "et.legalrep.1@gmail.com";
+
     private ET3FormTestConstants() {
         // Add a private constructor to hide the implicit public one.
     }

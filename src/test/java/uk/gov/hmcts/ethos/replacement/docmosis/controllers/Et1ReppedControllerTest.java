@@ -112,6 +112,7 @@ class Et1ReppedControllerTest {
     private static final String CREATE_DRAFT_ET1_SUBMITTED = "/et1Repped/createDraftEt1Submitted";
     private static final String VALIDATE_GROUNDS = "/et1Repped/validateGrounds";
     private static final String VALIDATE_HEARING_PREFERENCES = "/et1Repped/sectionOne/validateHearingPreferences";
+    private static final String GENERATE_DOCUMENTS = "/et1Repped/generateDocuments";
 
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
@@ -809,6 +810,20 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Test
+    void submitClaim_toggleOn() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
+        mockMvc.perform(post(SUBMIT_CLAIM)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
                 .getContextClassLoader().getResource(jsonFileName)).toURI())));
@@ -881,6 +896,36 @@ class Et1ReppedControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(VALIDATE_HEARING_PREFERENCES)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void generateDocuments_toggleFalse() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(GENERATE_DOCUMENTS)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest2)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void generateDocuments_toggleOn() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
+        mockMvc.perform(post(GENERATE_DOCUMENTS)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest2)))

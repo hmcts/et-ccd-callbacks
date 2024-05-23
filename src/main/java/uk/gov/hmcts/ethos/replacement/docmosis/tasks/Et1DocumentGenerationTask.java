@@ -40,7 +40,7 @@ public class Et1DocumentGenerationTask {
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
 
-    @Scheduled(cron = "${cron.acasCertTask}")
+    @Scheduled(cron = "${cron.et1DocGen}")
     public void generateEt1SubmissionDocuments() {
         if (!featureToggleService.isEt1DocGenEnabled()) {
             return;
@@ -48,7 +48,6 @@ public class Et1DocumentGenerationTask {
 
         String query = buildQuery();
         String adminUserToken = adminUserService.getAdminUserToken();
-
         String[] caseTypeIds = caseTypeIdsString.split(",");
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
@@ -60,7 +59,6 @@ public class Et1DocumentGenerationTask {
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                     log.info("{} - ET1 Submission document task - Retrieved {} cases", caseTypeId, cases.size());
                 }
-
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

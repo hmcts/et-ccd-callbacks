@@ -98,6 +98,14 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isMultiplesEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEt1DocGenIsEnabled(Boolean toggleStat) {
+        givenToggle("multiples", toggleStat);
+
+        assertThat(featureToggleService.isEt1DocGenEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

@@ -51,4 +51,8 @@ public class FeatureToggleService {
     public boolean isMultiplesEnabled() {
         return this.featureToggleApi.isFeatureEnabled("multiples");
     }
+
+    public boolean isMul2Enabled() {
+        return this.featureToggleApi.isFeatureEnabled("MUL2");
+    }
 }

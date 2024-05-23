@@ -588,8 +588,6 @@ public class Et1ReppedHelper {
         caseData.setTribunalRecommendationDetails(null);
         caseData.setLinkedCasesYesNo(null);
         caseData.setLinkedCasesDetails(null);
-        caseData.setHearingContactLanguage(null);
-        caseData.setContactLanguageQuestion(null);
         caseData.setAddAdditionalRespondent(null);
     }
 

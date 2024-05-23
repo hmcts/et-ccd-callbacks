@@ -23,12 +23,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -38,9 +40,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/et1Repped")
 public class Et1ReppedController {
     private static final String GENERATED_DOCUMENT_URL = "Please download the draft ET1 from : ";
-    private final Et1ReppedService et1ReppedService;
     private final CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    private final Et1ReppedService et1ReppedService;
+    private final FeatureToggleService featureToggleService;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -498,7 +501,11 @@ public class Et1ReppedController {
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseData);
         et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
         caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
-        et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
+        if (featureToggleService.isEt1CronJobEnabled()) {
+            caseData.setRequiresSubmissionDocuments(YES);
+        } else {
+            et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
+        }
         et1ReppedService.sendEt1Confirmation(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -554,7 +561,7 @@ public class Et1ReppedController {
     }
 
     @PostMapping(value = "/createDraftEt1", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "callback handler for validating LinkedCases question")
+    @Operation(summary = "callback handler for creating the draft ET1")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -613,5 +620,27 @@ public class Et1ReppedController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/generateDocuments", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "callback handler for generating docs on ET1 submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> generateDocuments(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        if (featureToggleService.isEt1CronJobEnabled()) {
+            et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
+            caseDetails.getCaseData().setRequiresSubmissionDocuments(null);
+        }
+
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

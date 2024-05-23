@@ -231,7 +231,7 @@ public class Et1ReppedService {
                 : "ET1 - " + caseData.getClaimant() + ".pdf";
     }
 
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {
+    public List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }

@@ -51,4 +51,8 @@ public class FeatureToggleService {
     public boolean isMultiplesEnabled() {
         return this.featureToggleApi.isFeatureEnabled("multiples");
     }
+
+    public boolean isEt1CronJobEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("et1-repped-cron-job");
+    }
 }

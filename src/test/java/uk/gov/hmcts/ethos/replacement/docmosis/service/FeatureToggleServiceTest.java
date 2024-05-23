@@ -100,6 +100,14 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenMultiples2IsEnabled(Boolean toggleStat) {
+        givenToggle("MUL2", toggleStat);
+
+        assertThat(featureToggleService.isMul2Enabled()).isEqualTo(toggleStat);
+    }
+  
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiplesDBIsEnabled(Boolean toggleStat) {
         givenToggle("muldb", toggleStat);
 

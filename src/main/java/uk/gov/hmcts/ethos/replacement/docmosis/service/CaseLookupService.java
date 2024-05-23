@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -37,7 +38,7 @@ public class CaseLookupService {
         }
 
         String caseId = matcher.group(1);
-        String caseTypeId = caseDetails.getCaseTypeId().replace("_Multiple", "");
+        String caseTypeId = MultiplesHelper.removeMultipleSuffix(caseDetails.getCaseTypeId());
 
         return getCaseData(caseTypeId, caseId, auth);
     }

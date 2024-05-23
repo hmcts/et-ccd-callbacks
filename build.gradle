@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.springframework.boot' version '2.7.18'
-    id 'org.owasp.dependencycheck' version '9.1.0'
+    id 'org.owasp.dependencycheck' version '9.2.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
     id 'io.freefair.lombok' version '8.6'
@@ -38,12 +38,13 @@ checkstyle {
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
-def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/model/**',
-                       '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
+def sonarExclusions =
+        ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/model/**',
+         '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
+         '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java',
 ]
 
 sonarqube {
@@ -314,7 +315,7 @@ dependencyManagement {
         dependencySet(group: 'com.google.guava', version: '33.2.0-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.1.109.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.110.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -335,8 +336,8 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.6.3'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'3.9.0'
+    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.7.0'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'3.11.0'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.4'
@@ -359,7 +360,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.4'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.3.0'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
@@ -371,7 +372,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.9'
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.5'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.6'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.2'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.1-RELEASE'
@@ -379,8 +380,8 @@ dependencies {
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.3'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
-    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.109.Final'
-    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.109.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.110.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.110.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.6.2'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.0'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
@@ -491,7 +492,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 320
-pmdTest.maxFailures = 221
+pmdMain.maxFailures = 317
+pmdTest.maxFailures = 206
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

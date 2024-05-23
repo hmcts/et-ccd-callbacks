@@ -49,7 +49,7 @@ class CaseManagementLocationServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testSetCaseManagementLocationCode")
     void testSetCaseManagementLocationCode(String epimmsCode, String expected) {
         CaseData caseData = new CaseData();
         caseData.setManagingOffice("Manchester");

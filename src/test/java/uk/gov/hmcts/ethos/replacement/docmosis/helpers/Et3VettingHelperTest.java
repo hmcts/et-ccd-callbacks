@@ -453,7 +453,7 @@ class Et3VettingHelperTest {
     void givenHearingIsListed_SetCaseAsListed() {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
+            .withHearingSession(0, "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
             .withConciliationTrack("Test track")
             .build();
         Et3VettingHelper.setHearingListedForExUi(caseData);
@@ -476,7 +476,7 @@ class Et3VettingHelperTest {
     void givenHearingIsNotListed_SetCaseAsNotListed() {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_POSTPONED, false)
+            .withHearingSession(0, "2021-12-25T00:00:00.000", HEARING_STATUS_POSTPONED, false)
             .withConciliationTrack("Test track")
             .build();
         Et3VettingHelper.setHearingListedForExUi(caseData);
@@ -489,7 +489,7 @@ class Et3VettingHelperTest {
     void givenHearingIsListedButNoTrack_SetCaseAsListedNoTrackFound() {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
+            .withHearingSession(0, "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
             .build();
         Et3VettingHelper.setHearingListedForExUi(caseData);
 

@@ -140,9 +140,9 @@ public class UploadDocumentHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("convertLegacyDocsToNewDocNaming")
     void convertLegacyDocsToNewDocNaming(String docType, String topLevel) {
-        CaseData caseData = new CaseDataBuilder()
+        caseData = new CaseDataBuilder()
                 .withDocumentCollection(docType)
                 .build();
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
@@ -167,9 +167,9 @@ public class UploadDocumentHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("setDocumentTypeForDocumentCollection")
     void setDocumentTypeForDocumentCollection(String typeOfDocument, String documentType) {
-        CaseData caseData = new CaseDataBuilder()
+        caseData = new CaseDataBuilder()
                 .withDocumentCollection(typeOfDocument)
                 .build();
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);

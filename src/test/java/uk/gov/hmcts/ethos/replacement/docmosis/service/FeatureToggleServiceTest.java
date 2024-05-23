@@ -101,7 +101,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEt1DocGenIsEnabled(Boolean toggleStat) {
-        givenToggle("multiples", toggleStat);
+        givenToggle("et1-doc-gen", toggleStat);
 
         assertThat(featureToggleService.isEt1DocGenEnabled()).isEqualTo(toggleStat);
     }

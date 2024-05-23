@@ -52,7 +52,7 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("multiples");
     }
 
-    public boolean isEt1CronJobEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("et1-repped-cron-job");
+    public boolean isEt1DocGenEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("et1-doc-gen");
     }
 }

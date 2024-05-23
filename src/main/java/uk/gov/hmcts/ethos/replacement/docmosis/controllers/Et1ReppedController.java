@@ -501,7 +501,7 @@ public class Et1ReppedController {
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseData);
         et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
         caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
-        if (featureToggleService.isEt1CronJobEnabled()) {
+        if (featureToggleService.isEt1DocGenEnabled()) {
             caseData.setRequiresSubmissionDocuments(YES);
         } else {
             et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
@@ -636,7 +636,7 @@ public class Et1ReppedController {
             @RequestBody CCDRequest ccdRequest, @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        if (featureToggleService.isEt1CronJobEnabled()) {
+        if (featureToggleService.isEt1DocGenEnabled()) {
             et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
             caseDetails.getCaseData().setRequiresSubmissionDocuments(null);
         }

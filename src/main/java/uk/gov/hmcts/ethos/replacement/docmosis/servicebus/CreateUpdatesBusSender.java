@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.helpers.CreateUpdatesHelper;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
@@ -29,6 +30,9 @@ public class CreateUpdatesBusSender {
     private final ServiceBusSender serviceBusSender;
     private final FeatureToggleService featureToggleService;
     private final DataSource dataSource;
+
+    @Value("${queue.chunkSize:500}")
+    private int chunkSize;
 
     public CreateUpdatesBusSender(
             @Qualifier("create-updates-send-helper") ServiceBusSender serviceBusSender,
@@ -75,7 +79,7 @@ public class CreateUpdatesBusSender {
         List<CreateUpdatesMsg> createUpdatesMsgList = CreateUpdatesHelper.getCreateUpdatesMessagesCollection(
                 createUpdatesDto,
                 dataModelParent,
-                500,
+                chunkSize,
                 updateSize);
 
         try (Connection conn = dataSource.getConnection()) {

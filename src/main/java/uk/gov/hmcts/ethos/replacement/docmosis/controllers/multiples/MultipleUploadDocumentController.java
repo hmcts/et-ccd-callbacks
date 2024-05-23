@@ -50,7 +50,6 @@ public class MultipleUploadDocumentController {
             @RequestBody MultipleRequest ccdRequest) {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
 
         return multipleResponse(caseData, null);
@@ -71,7 +70,7 @@ public class MultipleUploadDocumentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralReply(
+    public ResponseEntity<MultipleCallbackResponse> aboutToSubmit(
             @RequestBody MultipleRequest ccdRequest) {
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();

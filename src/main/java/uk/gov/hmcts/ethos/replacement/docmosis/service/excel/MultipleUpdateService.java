@@ -58,8 +58,10 @@ public class MultipleUpdateService {
 
     }
 
-    private void batchUpdateLogic(String userToken, MultipleDetails multipleDetails,
-                                  List<String> errors, SortedMap<String, Object> multipleObjects) {
+    private void batchUpdateLogic(String userToken,
+                                  MultipleDetails multipleDetails,
+                                  List<String> errors,
+                                  SortedMap<String, Object> multipleObjects) {
 
         String batchUpdateType = multipleDetails.getCaseData().getBatchUpdateType();
 

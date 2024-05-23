@@ -117,7 +117,7 @@ public final class UploadDocumentHelper {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentType documentType = documentTypeItem.getValue();
                 if (isNullOrEmpty(documentType.getTopLevelDocuments())
-                        && (!isNullOrEmpty(documentType.getTypeOfDocument()))) {
+                        && !isNullOrEmpty(documentType.getTypeOfDocument())) {
                     mapLegacyDocTypeToNewDocType(documentType);
                 }
             }

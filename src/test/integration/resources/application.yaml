@@ -148,6 +148,7 @@ cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
+  et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
 
 em-ccd-orchestrator:
   api:

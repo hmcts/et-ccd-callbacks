@@ -16,6 +16,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
  * Helper class for formatting strings into markdown.
  */
 public final class MarkdownHelper {
+
+    public static final int TWO = 2;
+
     private MarkdownHelper() {
         // Access through static methods
     }
@@ -27,7 +30,7 @@ public final class MarkdownHelper {
      * @return formatted string representing data in a two column Markdown table
      */
     public static String createTwoColumnTable(String[] header, List<String[]> rows) {
-        if (header.length != 2) {
+        if (header.length != TWO) {
             throw new IllegalArgumentException("header array should contain only two items");
         }
 

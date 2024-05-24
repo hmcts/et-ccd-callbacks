@@ -179,17 +179,18 @@ public final class FlagsImageHelper {
             HearingType hearingType = hearingTypeItem.getValue();
             if (hearingNotNullOrEmpty(hearingType)) {
                 for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
-                    if (dateNotNull(dateListedTypeItem)) {
-                        String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
-                        if (YES.equals(hearingReservedJudgement)) {
-                            return true;
-                        }
+                    if (dateNotNull(dateListedTypeItem) && hasReservedJudgement(dateListedTypeItem)) {
+                        return true;
                     }
                 }
             }
         }
 
         return false;
+    }
+
+    private static boolean hasReservedJudgement(DateListedTypeItem dateListedTypeItem) {
+        return YES.equals(dateListedTypeItem.getValue().getHearingReservedJudgement());
     }
 
     private static boolean dateNotNull(DateListedTypeItem dateListedTypeItem) {

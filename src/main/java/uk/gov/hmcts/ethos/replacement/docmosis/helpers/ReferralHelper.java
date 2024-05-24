@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -126,7 +127,7 @@ public final class ReferralHelper {
     /**
      * Checks to see if the user is a judge.
      */
-    public static String isJudge(List<String> roles) {
+    public static String stringIsJudge(List<String> roles) {
         if (roles.contains(JUDGE_ROLE_ENG) || roles.contains(JUDGE_ROLE_SCOT)) {
             return TRUE;
         }
@@ -532,8 +533,9 @@ public final class ReferralHelper {
         }
 
         try {
-            Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(earliestFutureHearingDate);
-            return new SimpleDateFormat(MONTH_STRING_DATE_FORMAT).format(hearingStartDate);
+            Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.UK)
+                    .parse(earliestFutureHearingDate);
+            return new SimpleDateFormat(MONTH_STRING_DATE_FORMAT, Locale.UK).format(hearingStartDate);
         } catch (ParseException e) {
             log.info("Failed to parse hearing date when creating new referral");
             return defaultValue;

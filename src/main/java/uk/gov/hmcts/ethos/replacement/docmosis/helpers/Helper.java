@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,10 +65,10 @@ public final class Helper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Helper() {
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public static String nullCheck(String value) {
@@ -96,16 +97,22 @@ public final class Helper {
     private static List<DynamicValueType> createDynamicRespondentAddressFixedList(
             List<RespondentSumTypeItem> respondentCollection) {
         List<DynamicValueType> listItems = new ArrayList<>();
+
+        DynamicValueType dynamicValueType = new DynamicValueType();
         if (respondentCollection != null) {
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-                DynamicValueType dynamicValueType = new DynamicValueType();
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
-                dynamicValueType.setCode(respondentSumType.getRespondentName());
-                dynamicValueType.setLabel(respondentSumType.getRespondentName() + " - "
-                        + respondentSumType.getRespondentAddress().toString());
+                String respondentName = respondentSumType.getRespondentName();
+
+                dynamicValueType.setCode(respondentName);
+
+                String label = respondentName + " - " + respondentSumType.getRespondentAddress().toString();
+                dynamicValueType.setLabel(label);
+
                 listItems.add(dynamicValueType);
             }
         }
+
         return listItems;
     }
 
@@ -174,11 +181,11 @@ public final class Helper {
             List<RespondentSumTypeItem> respondentCollection) {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (respondentCollection != null) {
+            DynamicValueType dynamicValueType = new DynamicValueType();
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 if (respondentSumType.getResponseStruckOut() == null
                         || respondentSumType.getResponseStruckOut().equals(NO)) {
-                    DynamicValueType dynamicValueType = new DynamicValueType();
                     dynamicValueType.setCode(respondentSumType.getRespondentName());
                     dynamicValueType.setLabel(respondentSumType.getRespondentName());
                     listItems.add(dynamicValueType);
@@ -277,7 +284,7 @@ public final class Helper {
      * @return A new object that has a subset of data from the source object dependent on the class passed
      */
     public static Object intersectProperties(Object sourceObject, Class<?> targetClassType) {
-        return objectMapper.convertValue(sourceObject, targetClassType);
+        return OBJECT_MAPPER.convertValue(sourceObject, targetClassType);
     }
 
     /**
@@ -285,7 +292,7 @@ public final class Helper {
      * @return current date in "dd MMM yyy" format
      */
     public static String getCurrentDate() {
-        return new SimpleDateFormat(MONTH_STRING_DATE_FORMAT).format(new Date());
+        return new SimpleDateFormat(MONTH_STRING_DATE_FORMAT, Locale.UK).format(new Date());
     }
 
     /**

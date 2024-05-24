@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -33,35 +34,46 @@ public final class NocNotificationHelper {
 
     public static String getRespondentNameForNewSolicitor(ChangeOrganisationRequest changeRequest,
                                                           CaseData caseDataNew) {
-        String respondentName = null;
         try {
-            String selectedRole = changeRequest.getCaseRoleId()
-                            .getSelectedCode();
+            String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
+            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElse(null);
 
-            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
-
-            respondentName =
-                    solicitorRole.getRepresentationItem(caseDataNew).map(respondentSumTypeItem ->
-                            respondentSumTypeItem.getValue().getRespondentName()).orElseThrow();
-        } catch (NullPointerException e) {
-            log.warn("Failed to get RespondentNameForNewSolicitor");
+            if (solicitorRole != null) {
+                Optional<RespondentSumTypeItem> representationItem = solicitorRole.getRepresentationItem(caseDataNew);
+                return representationItem.map(respondentSumTypeItem ->
+                                respondentSumTypeItem.getValue().getRespondentName())
+                        .orElse(UNKNOWN);
+            } else {
+                log.warn("Invalid solicitor role: {}", selectedRole);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get RespondentNameForNewSolicitor", e);
         }
-        return isNullOrEmpty(respondentName) ? UNKNOWN : respondentName;
+        return UNKNOWN;
     }
 
-    public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
+    public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest,
+                                                  CaseData caseData,
                                                   NocRespondentHelper nocRespondentHelper) {
-
         try {
+            String selectedRoleCode = changeRequest.getCaseRoleId().getSelectedCode();
+            SolicitorRole solicitorRole = SolicitorRole.from(selectedRoleCode).orElse(null);
 
-            String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
-            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
-            RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
-            return nocRespondentHelper.getRespondent(respondentSumTypeItem.getValue().getRespondentName(), caseData);
-        } catch (NullPointerException e) {
-            return null;
+            if (solicitorRole != null) {
+                Optional<RespondentSumTypeItem> respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData);
+                if (respondentSumTypeItem.isPresent()) {
+                    String respondentName = respondentSumTypeItem.get().getValue().getRespondentName();
+                    return nocRespondentHelper.getRespondent(respondentName, caseData);
+                } else {
+                    log.warn("No representation item found for solicitor role: {}", selectedRoleCode);
+                }
+            } else {
+                log.warn("Invalid solicitor role: {}", selectedRoleCode);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get Respondent for New Solicitor", e);
         }
-
+        return null;
     }
 
     public static Map<String, String> buildPersonalisationWithPartyName(CaseDetails caseDetails, String partyName,

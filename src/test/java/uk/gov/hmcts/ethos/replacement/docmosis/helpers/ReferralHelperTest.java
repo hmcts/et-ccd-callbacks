@@ -239,9 +239,9 @@ class ReferralHelperTest {
 
     @Test
     void isJudge() {
-        assertEquals(TRUE, ReferralHelper.isJudge(List.of(JUDGE_ROLE_ENG)));
-        assertEquals(TRUE, ReferralHelper.isJudge(List.of(JUDGE_ROLE_SCOT)));
-        assertEquals(FALSE, ReferralHelper.isJudge(List.of()));
+        assertEquals(TRUE, ReferralHelper.stringIsJudge(List.of(JUDGE_ROLE_ENG)));
+        assertEquals(TRUE, ReferralHelper.stringIsJudge(List.of(JUDGE_ROLE_SCOT)));
+        assertEquals(FALSE, ReferralHelper.stringIsJudge(List.of()));
     }
 
     @Test

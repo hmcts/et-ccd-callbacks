@@ -66,9 +66,9 @@ public class BulkCreationService {
                             BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents,
                             bulkDetails.getCaseData().getMultipleReference());
                     bulkRequestPayload.setBulkDetails(
-                            BulkHelper.setMultipleCollection(bulkDetails, multipleTypeItemList));
+                            BulkHelper.getMultipleCollection(bulkDetails, multipleTypeItemList));
                 } else {
-                    bulkRequestPayload.setBulkDetails(BulkHelper.setMultipleCollection(bulkDetails,
+                    bulkRequestPayload.setBulkDetails(BulkHelper.getMultipleCollection(bulkDetails,
                             bulkDetails.getCaseData().getMultipleCollection()));
                 }
             } else if (action.equals(UPDATE_SINGLES_STEP)) {
@@ -124,7 +124,7 @@ public class BulkCreationService {
         BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
         BulkCasesPayload bulkCasesPayload = updateBulkRequest(bulkRequest, authToken, isPersistentQ);
         if (bulkCasesPayload.getErrors().isEmpty()) {
-            bulkRequest.setCaseDetails(BulkHelper.setMultipleCollection(bulkRequest.getCaseDetails(),
+            bulkRequest.setCaseDetails(BulkHelper.getMultipleCollection(bulkRequest.getCaseDetails(),
                     bulkCasesPayload.getMultipleTypeItems()));
             bulkRequest.setCaseDetails(BulkHelper.clearSearchCollection(bulkRequest.getCaseDetails()));
         }

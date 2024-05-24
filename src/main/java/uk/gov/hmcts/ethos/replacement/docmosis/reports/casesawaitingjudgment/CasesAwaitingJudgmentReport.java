@@ -95,12 +95,11 @@ public final class CasesAwaitingJudgmentReport {
 
     private void populateData(CasesAwaitingJudgmentReportData reportData,
                               List<CasesAwaitingJudgmentSubmitEvent> submitEvents) {
+        ReportDetail reportDetail = new ReportDetail();
         for (CasesAwaitingJudgmentSubmitEvent submitEvent : submitEvents) {
             if (!isValidCase(submitEvent)) {
                 continue;
             }
-
-            ReportDetail reportDetail = new ReportDetail();
             CaseData caseData = submitEvent.getCaseData();
             log.info("Adding case {} to Cases Awaiting Judgment report", caseData.getEthosCaseReference());
 

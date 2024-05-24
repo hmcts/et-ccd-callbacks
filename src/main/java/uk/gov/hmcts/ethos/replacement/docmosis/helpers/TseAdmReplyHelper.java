@@ -89,7 +89,7 @@ public final class TseAdmReplyHelper {
                 .type(defaultIfEmpty(application.getType(), null))
                 .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .response(defaultIfEmpty(application.getDetails(), null))
-                .supportingYesNo(hasSupportingDocs(caseData.getTseAdmReplyAddDocument()))
+                .supportingYesNo(yesNoSupportingDocs(caseData.getTseAdmReplyAddDocument()))
                 .documentCollection(getUploadedDocList(caseData.getTseAdmReplyAddDocument()))
                 .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
                 .responseTitle(defaultIfEmpty(caseData.getTseAdmReplyEnterResponseTitle(), null))
@@ -117,7 +117,7 @@ public final class TseAdmReplyHelper {
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+    private static String yesNoSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
         return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 

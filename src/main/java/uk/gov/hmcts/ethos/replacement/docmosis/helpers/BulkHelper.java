@@ -63,7 +63,7 @@ public final class BulkHelper {
     private BulkHelper() {
     }
 
-    public static BulkDetails setMultipleCollection(BulkDetails bulkDetails,
+    public static BulkDetails getMultipleCollection(BulkDetails bulkDetails,
                                                     List<MultipleTypeItem> multipleTypeItemList) {
         if (multipleTypeItemList != null && !multipleTypeItemList.isEmpty()) {
             bulkDetails.getCaseData().setMultipleCollectionCount(String.valueOf(multipleTypeItemList.size()));
@@ -121,49 +121,15 @@ public final class BulkHelper {
     private static MultipleType getMultipleTypeFromCaseData(CaseData caseData) {
         MultipleType multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM(Optional.ofNullable(caseData.getEthosCaseReference()).orElse(" "));
-        if (caseData.getClerkResponsible() != null && caseData.getClerkResponsible().getValue() != null) {
-            multipleType.setClerkRespM(caseData.getClerkResponsible().getSelectedLabel());
-        } else {
-            multipleType.setClerkRespM(" ");
-        }
+        setClerkResponsible(caseData, multipleType);
         setClaimantSurnameM(caseData, multipleType);
         setClaimantAddressLine1M(caseData, multipleType);
         setClaimantPostCodeM(caseData, multipleType);
         setRespondentSurnameM(caseData, multipleType);
-        if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()
-                && caseData.getRespondentCollection().get(0).getValue().getRespondentAddress() != null
-                && caseData.getRespondentCollection().get(0).getValue()
-                .getRespondentAddress().getAddressLine1() != null) {
-            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-            multipleType.setRespondentAddressLine1M(respondentSumType.getRespondentAddress().getAddressLine1());
-        } else {
-            multipleType.setRespondentAddressLine1M(" ");
-        }
-        if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()
-                && caseData.getRespondentCollection().get(0).getValue().getRespondentAddress() != null
-                && caseData.getRespondentCollection().get(0).getValue().getRespondentAddress().getPostCode() != null) {
-            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-            multipleType.setRespondentPostCodeM(respondentSumType.getRespondentAddress().getPostCode());
-        } else {
-            multipleType.setRespondentPostCodeM(" ");
-        }
-        if (caseData.getRepresentativeClaimantType() != null
-                && caseData.getRepresentativeClaimantType().getNameOfRepresentative() != null) {
-            multipleType.setClaimantRepM(caseData.getRepresentativeClaimantType().getNameOfRepresentative());
-            multipleType.setClaimantRepOrgM(caseData.getRepresentativeClaimantType().getNameOfOrganisation());
-        } else {
-            multipleType.setClaimantRepM(" ");
-            multipleType.setClaimantRepOrgM(" ");
-        }
-        if (caseData.getRepCollection() != null
-                && !caseData.getRepCollection().isEmpty()
-                && caseData.getRepCollection().get(0).getValue() != null) {
-            multipleType.setRespondentRepM(caseData.getRepCollection().get(0).getValue().getNameOfRepresentative());
-            multipleType.setRespondentRepOrgM(caseData.getRepCollection().get(0).getValue().getNameOfOrganisation());
-        } else {
-            multipleType.setRespondentRepM(" ");
-            multipleType.setRespondentRepOrgM(" ");
-        }
+        setRespondentAddressLine1M(caseData, multipleType);
+        setRespondentPostCodeM(caseData, multipleType);
+        setClaimantRep(caseData, multipleType);
+        setRespondentRep(caseData, multipleType);
 
         multipleType.setFileLocM(DynamicFixedListType.getSelectedLabel(caseData.getFileLocation()).orElse(" "));
         multipleType.setReceiptDateM(Optional.ofNullable(caseData.getReceiptDate()).orElse(" "));
@@ -180,22 +146,76 @@ public final class BulkHelper {
         return multipleType;
     }
 
+    private static void setRespondentRep(CaseData caseData, MultipleType multipleType) {
+        if (caseData.getRepCollection() != null
+                && !caseData.getRepCollection().isEmpty()
+                && caseData.getRepCollection().get(0).getValue() != null) {
+            multipleType.setRespondentRepM(caseData.getRepCollection().get(0).getValue().getNameOfRepresentative());
+            multipleType.setRespondentRepOrgM(caseData.getRepCollection().get(0).getValue().getNameOfOrganisation());
+        } else {
+            multipleType.setRespondentRepM(" ");
+            multipleType.setRespondentRepOrgM(" ");
+        }
+    }
+
+    private static void setClaimantRep(CaseData caseData, MultipleType multipleType) {
+        if (caseData.getRepresentativeClaimantType() != null
+                && caseData.getRepresentativeClaimantType().getNameOfRepresentative() != null) {
+            multipleType.setClaimantRepM(caseData.getRepresentativeClaimantType().getNameOfRepresentative());
+            multipleType.setClaimantRepOrgM(caseData.getRepresentativeClaimantType().getNameOfOrganisation());
+        } else {
+            multipleType.setClaimantRepM(" ");
+            multipleType.setClaimantRepOrgM(" ");
+        }
+    }
+
+    private static void setRespondentPostCodeM(CaseData caseData, MultipleType multipleType) {
+        if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()
+                && caseData.getRespondentCollection().get(0).getValue().getRespondentAddress() != null
+                && caseData.getRespondentCollection().get(0).getValue().getRespondentAddress().getPostCode() != null) {
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            multipleType.setRespondentPostCodeM(respondentSumType.getRespondentAddress().getPostCode());
+        } else {
+            multipleType.setRespondentPostCodeM(" ");
+        }
+    }
+
+    private static void setRespondentAddressLine1M(CaseData caseData, MultipleType multipleType) {
+        if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()
+                && caseData.getRespondentCollection().get(0).getValue().getRespondentAddress() != null
+                && caseData.getRespondentCollection().get(0).getValue()
+                .getRespondentAddress().getAddressLine1() != null) {
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            multipleType.setRespondentAddressLine1M(respondentSumType.getRespondentAddress().getAddressLine1());
+        } else {
+            multipleType.setRespondentAddressLine1M(" ");
+        }
+    }
+
+    private static void setClerkResponsible(CaseData caseData, MultipleType multipleType) {
+        if (caseData.getClerkResponsible() != null && caseData.getClerkResponsible().getValue() != null) {
+            multipleType.setClerkRespM(caseData.getClerkResponsible().getSelectedLabel());
+        } else {
+            multipleType.setClerkRespM(" ");
+        }
+    }
+
     public static List<MultipleTypeItem> getMultipleTypeListBySubmitEventList(List<SubmitEvent> submitEvents,
                                                                               String multipleReference) {
-        List<MultipleTypeItem> multipleTypeItemList = new ArrayList<>();
-        for (SubmitEvent submitEvent : submitEvents) {
-            CaseData caseData = submitEvent.getCaseData();
-            MultipleType multipleType = getMultipleTypeFromCaseData(caseData);
-            multipleType.setCaseIDM(String.valueOf(submitEvent.getCaseId()));
-            multipleType.setMultipleReferenceM(Optional.ofNullable(multipleReference).orElse(" "));
-            multipleType.setStateM(getSubmitEventState(submitEvent));
+        return submitEvents.stream()
+                .map(submitEvent -> {
+                    CaseData caseData = submitEvent.getCaseData();
+                    MultipleType multipleType = getMultipleTypeFromCaseData(caseData);
+                    multipleType.setCaseIDM(String.valueOf(submitEvent.getCaseId()));
+                    multipleType.setMultipleReferenceM(StringUtils.defaultIfBlank(multipleReference, " "));
+                    multipleType.setStateM(getSubmitEventState(submitEvent));
 
-            MultipleTypeItem multipleTypeItem = new MultipleTypeItem();
-            multipleTypeItem.setId(String.valueOf(submitEvent.getCaseId()));
-            multipleTypeItem.setValue(multipleType);
-            multipleTypeItemList.add(multipleTypeItem);
-        }
-        return multipleTypeItemList;
+                    MultipleTypeItem multipleTypeItem = new MultipleTypeItem();
+                    multipleTypeItem.setId(String.valueOf(submitEvent.getCaseId()));
+                    multipleTypeItem.setValue(multipleType);
+                    return multipleTypeItem;
+                })
+                .toList();
     }
 
     private static String getSubmitEventState(SubmitEvent submitEvent) {

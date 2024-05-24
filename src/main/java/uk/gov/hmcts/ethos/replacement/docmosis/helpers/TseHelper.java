@@ -274,7 +274,7 @@ public final class TseHelper {
             .type(defaultIfEmpty(application.getType(), null))
             .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
             .response(defaultIfEmpty(application.getDetails(), null))
-            .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
+            .supportingYesNo(yesNoSupportingDocs(caseData.getTseResponseSupportingMaterial()))
             .documentCollection(getUploadedDocList(caseData))
             .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
             .build();
@@ -288,7 +288,7 @@ public final class TseHelper {
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return (supportDocList != null && !supportDocList.isEmpty())  ? "Yes" : "No";
+    private static String yesNoSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+        return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 }

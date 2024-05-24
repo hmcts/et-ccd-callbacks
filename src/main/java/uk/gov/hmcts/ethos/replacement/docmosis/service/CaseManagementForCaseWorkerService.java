@@ -158,7 +158,10 @@ public class CaseManagementForCaseWorkerService {
 
     public void claimantDefaults(CaseData caseData) {
         String claimantTypeOfClaimant = caseData.getClaimantTypeOfClaimant();
-        if (!isNullOrEmpty(claimantTypeOfClaimant)) {
+
+        if (isNullOrEmpty(claimantTypeOfClaimant)) {
+            caseData.setClaimant(MISSING_CLAIMANT);
+        } else {
             if (claimantTypeOfClaimant.equals(INDIVIDUAL_TYPE_CLAIMANT)) {
                 String claimantFirstNames = nullCheck(caseData.getClaimantIndType().getClaimantFirstNames());
                 String claimantLastName = nullCheck(caseData.getClaimantIndType().getClaimantLastName());
@@ -166,9 +169,8 @@ public class CaseManagementForCaseWorkerService {
             } else {
                 caseData.setClaimant(nullCheck(caseData.getClaimantCompany()));
             }
-        } else {
-            caseData.setClaimant(MISSING_CLAIMANT);
         }
+
         if (featureToggleService.isHmcEnabled()) {
             caseData.setClaimantId(UUID.randomUUID().toString());
         }
@@ -340,7 +342,11 @@ public class CaseManagementForCaseWorkerService {
 
         String adminToken = adminUserService.getAdminUserToken();
         String multipleCaseTypeId = details.getCaseTypeId() + "_Multiple";
-        SubmitMultipleEvent multiple = ccdCaseAssignment.getMultipleByReference(adminToken, multipleCaseTypeId, caseData.getMultipleReference());
+        SubmitMultipleEvent multiple = ccdCaseAssignment.getMultipleByReference(
+            adminToken,
+            multipleCaseTypeId,
+            caseData.getMultipleReference()
+        );
 
         var multipleData = multiple.getCaseData();
 

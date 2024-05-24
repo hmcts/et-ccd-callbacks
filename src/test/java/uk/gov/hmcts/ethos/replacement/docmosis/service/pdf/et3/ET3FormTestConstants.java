@@ -85,9 +85,11 @@ public final class ET3FormTestConstants {
     public static final String TEST_PDF_REPRESENTATIVE_POSTCODE = "SN1 4ET";
     public static final String TEST_PDF_REPRESENTATIVE_PHONE_NUMBER = "07444518910";
     public static final String TEST_PDF_REPRESENTATIVE_MOBILE_PHONE_NUMBER = "07444518911";
-
     public static final String TEST_PDF_REPRESENTATIVE_REFERENCE_FOR_CORRESPONDENCE = "Reference for Correspondence";
     public static final String TEST_PDF_REPRESENTATIVE_EMAIL_ADDRESS = "et.legalrep.1@gmail.com";
+
+    // ET3FormDisabilityMapperTest
+    public static final String TEST_PDF_DISABILITY_DETAIL = "";
 
     private ET3FormTestConstants() {
         // Add a private constructor to hide the implicit public one.

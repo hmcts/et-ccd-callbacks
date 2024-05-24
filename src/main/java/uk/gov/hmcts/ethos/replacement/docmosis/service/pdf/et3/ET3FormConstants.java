@@ -180,6 +180,12 @@ public final class ET3FormConstants {
     public static final String CHECKBOX_PDF_REPRESENTATIVE_FIELD_VIDEO_HEARINGS = "8.10 video";
     public static final String CHECKBOX_PDF_REPRESENTATIVE_FIELD_PHONE_HEARINGS = "8.10 phone";
 
+    // SECTION 9 DISABILITY CONSTANTS
+    public static final String CHECKBOX_PDF_DISABILITY_YES = "9.1 disability - yes";
+    public static final String CHECKBOX_PDF_DISABILITY_NO = "9.1 disability - no";
+    public static final String CHECKBOX_PDF_DISABILITY_NOT_SURE = "9.1 disability - I'm not sure yet";
+    public static final String TXT_PDF_DISABILITY_DETAILS = "He needs some food. Because he is always hungry.";
+
     private ET3FormConstants() {
         // Add a private constructor to hide the implicit public one.
     }

@@ -46,6 +46,7 @@ public final class ET3FormRepresentativeMapper {
     /**
      * Maps ET3 Form Representative with PDF input fields.
      * @param caseData case data selected by representative of respondent
+     * @param respondentSumType respondent data selected by representative of respondent
      * @param pdfFields print fields that is created in ET3FormMapper
      */
     public static void mapRepresentative(CaseData caseData,

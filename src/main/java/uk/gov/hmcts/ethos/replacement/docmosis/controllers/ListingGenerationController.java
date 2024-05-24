@@ -178,7 +178,7 @@ public class ListingGenerationController {
         List<String> errors = new ArrayList<>();
         ListingData listingData = ccdRequest.getCaseDetails().getCaseData().getPrintHearingCollection();
         if (listingData.getListingCollection() != null && !listingData.getListingCollection().isEmpty()) {
-            listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(
+            listingData = listingService.getManagingOfficeAndCourtAddressFromCaseData(
                     ccdRequest.getCaseDetails().getCaseData());
             DocumentInfo documentInfo = listingService.processHearingDocument(
                     listingData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);

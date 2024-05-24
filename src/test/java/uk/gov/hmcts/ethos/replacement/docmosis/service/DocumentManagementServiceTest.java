@@ -247,7 +247,7 @@ class DocumentManagementServiceTest {
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
-        documentGenerationService.setBfActions(caseData);
+        documentGenerationService.getCaseDataSetBfActions(caseData);
 
         LocalDate servingDate = LocalDate.parse(caseData.getClaimServedDate());
         LocalDate et3DueDate = LocalDate.parse(caseData.getEt3DueDate());

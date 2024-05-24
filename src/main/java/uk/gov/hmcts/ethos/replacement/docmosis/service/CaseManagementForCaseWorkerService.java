@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -149,7 +148,9 @@ public class CaseManagementForCaseWorkerService {
 
     public void claimantDefaults(CaseData caseData) {
         String claimantTypeOfClaimant = caseData.getClaimantTypeOfClaimant();
-        if (!isNullOrEmpty(claimantTypeOfClaimant)) {
+        if (isNullOrEmpty(claimantTypeOfClaimant)) {
+            caseData.setClaimant(MISSING_CLAIMANT);
+        } else {
             if (claimantTypeOfClaimant.equals(INDIVIDUAL_TYPE_CLAIMANT)) {
                 String claimantFirstNames = nullCheck(caseData.getClaimantIndType().getClaimantFirstNames());
                 String claimantLastName = nullCheck(caseData.getClaimantIndType().getClaimantLastName());
@@ -157,8 +158,6 @@ public class CaseManagementForCaseWorkerService {
             } else {
                 caseData.setClaimant(nullCheck(caseData.getClaimantCompany()));
             }
-        } else {
-            caseData.setClaimant(MISSING_CLAIMANT);
         }
         if (featureToggleService.isHmcEnabled()) {
             caseData.setClaimantId(UUID.randomUUID().toString());
@@ -342,7 +341,7 @@ public class CaseManagementForCaseWorkerService {
         // get a target case data using the source case data and elastic search query
         List<SubmitEvent> submitEvent = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 caseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
-        if (CollectionUtils.isEmpty(submitEvent)) {
+        if (isEmpty(submitEvent)) {
             return;
         }
 
@@ -410,22 +409,27 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (!isEmpty(caseData.getHearingCollection())) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
+        if (!isEmpty(hearingCollection)) {
+            for (HearingTypeItem hearingTypeItem : hearingCollection) {
                 HearingType hearingType = hearingTypeItem.getValue();
-                if (!isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
+                List<DateListedTypeItem> hearingDateCollection = hearingType.getHearingDateCollection();
+                if (!isEmpty(hearingDateCollection)) {
+                    for (DateListedTypeItem dateListedTypeItem : hearingDateCollection) {
                         DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (dateListedType.getHearingStatus() == null) {
-                            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-                            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
-                            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
-                        }
+                        setDateListedType(dateListedType);
                         populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                     }
                 }
             }
+        }
+    }
+
+    private static void setDateListedType(DateListedType dateListedType) {
+        if (dateListedType.getHearingStatus() == null) {
+            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
+            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
         }
     }
 

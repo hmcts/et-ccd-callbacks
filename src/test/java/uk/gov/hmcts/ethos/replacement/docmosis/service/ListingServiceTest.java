@@ -1277,7 +1277,7 @@ class ListingServiceTest {
                 + "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, "
                 + "localReportsSummary2=null, localReportsDetailHdr=null, "
                 + "localReportsDetail=null, managingOffice=Leeds)";
-        ListingData listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(
+        ListingData listingData = listingService.getManagingOfficeAndCourtAddressFromCaseData(
                 caseDetails.getCaseData());
         assertEquals(result, listingData.toString());
     }

@@ -136,7 +136,7 @@ public class BulkUpdateService {
             leadId = multipleTypeItems.get(0).getValue().getCaseIDM();
             log.info("Updating lead case for multipleCollection: " + leadId);
             try {
-                SubmitEvent submitEvent = hasLeadCaseBeenUpdated(submitBulkEventSubmitEventType, leadId);
+                SubmitEvent submitEvent = leadCaseUpdated(submitBulkEventSubmitEventType, leadId);
                 if (submitEvent == null) {
                     submitEvent = ccdClient.retrieveCase(authToken, UtilHelper.getCaseTypeId(
                             bulkDetails.getCaseTypeId()),
@@ -160,7 +160,7 @@ public class BulkUpdateService {
         return multipleTypeItems;
     }
 
-    private SubmitEvent hasLeadCaseBeenUpdated(SubmitBulkEventSubmitEventType
+    private SubmitEvent leadCaseUpdated(SubmitBulkEventSubmitEventType
                                                        submitBulkEventSubmitEventType, String leadId) {
         if (submitBulkEventSubmitEventType.getSubmitEventList() != null) {
             Optional<SubmitEvent> submitEventOptional = submitBulkEventSubmitEventType.getSubmitEventList().stream()
@@ -259,11 +259,11 @@ public class BulkUpdateService {
             if (!isNullOrEmpty(multipleReference)) {
                 List<SubmitBulkEvent> submitBulkEvents = ccdClient.retrieveBulkCasesElasticSearch(authToken,
                         bulkDetails.getCaseTypeId(), multipleReference);
-                if (!submitBulkEvents.isEmpty()) {
+                if (submitBulkEvents.isEmpty()) {
+                    multRefComplexType.setExist(false);
+                } else {
                     multRefComplexType.setExist(true);
                     multRefComplexType.setSubmitBulkEvent(submitBulkEvents.get(0));
-                } else {
-                    multRefComplexType.setExist(false);
                 }
             }
             return multRefComplexType;
@@ -523,8 +523,9 @@ public class BulkUpdateService {
                                                  String userToken, boolean isPersistentQ) {
         List<String> errors = new ArrayList<>();
         BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
-        if (!submitEventList.isEmpty()) {
-
+        if (submitEventList.isEmpty()) {
+            errors.add("No cases on the multiple case: " + bulkDetails.getCaseId());
+        } else {
             // 1) Update list of cases to the multiple bulk case collection
             List<MultipleTypeItem> multipleTypeItemList = new ArrayList<>();
             for (MultipleTypeItem multipleTypeItem : bulkDetails.getCaseData().getMultipleCollection()) {
@@ -538,9 +539,7 @@ public class BulkUpdateService {
             bulkDetails.getCaseData().setMultipleCollection(multipleTypeItemList);
 
             // 2) Create an event to update state of the cases
-            if (!isPersistentQ) {
-                sendPreAcceptUpdates(bulkDetails, submitEventList, userToken);
-            } else {
+            if (isPersistentQ) {
                 List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
                 PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
                         userIdamService.getUserDetails(userToken).getEmail(),
@@ -553,11 +552,11 @@ public class BulkUpdateService {
                         MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
                                 bulkDetails.getCaseId(),
                                 bulkDetails.getCaseData().getMultipleReference()));
+            } else {
+                sendPreAcceptUpdates(bulkDetails, submitEventList, userToken);
             }
 
             bulkRequestPayload.setBulkDetails(bulkDetails);
-        } else {
-            errors.add("No cases on the multiple case: " + bulkDetails.getCaseId());
         }
         if (bulkRequestPayload.getBulkDetails() == null) {
             bulkRequestPayload.setBulkDetails(bulkDetails);

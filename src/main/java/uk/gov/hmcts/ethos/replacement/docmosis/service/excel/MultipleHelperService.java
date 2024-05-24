@@ -94,21 +94,21 @@ public class MultipleHelperService {
                         caseTypeId,
                         multipleRef);
 
-        if (!multipleEvents.isEmpty()) {
+        if (multipleEvents.isEmpty()) {
+            errors.add("Multiple " + multipleRef + " does not exist");
+        } else {
 
             SubmitMultipleEvent multipleEvent = multipleEvents.get(0);
 
-            if (!multipleEvent.getState().equals(TRANSFERRED_STATE)) {
+            if (multipleEvent.getState().equals(TRANSFERRED_STATE)) {
+                errors.add("Multiple " + multipleRef
+                        + " has been transferred. The case cannot be moved to this multiple");
+            } else {
                 validateSubMultiple(subMultipleName,
                         multipleEvent.getCaseData().getSubMultipleCollection(),
                         errors,
                         multipleRef);
-            } else {
-                errors.add("Multiple " + multipleRef
-                        + " has been transferred. The case cannot be moved to this multiple");
             }
-        } else {
-            errors.add("Multiple " + multipleRef + " does not exist");
         }
     }
 

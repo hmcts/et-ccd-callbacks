@@ -84,8 +84,8 @@ public final class ListingHelper {
     private static final String LISTING_NEWLINE = "\"listing\":[\n";
     private static final String ARRAY_ELEMENT_CLOSING_NEWLINE = "}],\n";
     static final List<String> REPORTS = Arrays.asList(BROUGHT_FORWARD_REPORT, CLAIMS_ACCEPTED_REPORT,
-        LIVE_CASELOAD_REPORT, CASES_COMPLETED_REPORT, CASES_AWAITING_JUDGMENT_REPORT, TIME_TO_FIRST_HEARING_REPORT,
-        SERVING_CLAIMS_REPORT, CASE_SOURCE_LOCAL_REPORT, HEARINGS_TO_JUDGEMENTS_REPORT,
+            LIVE_CASELOAD_REPORT, CASES_COMPLETED_REPORT, CASES_AWAITING_JUDGMENT_REPORT, TIME_TO_FIRST_HEARING_REPORT,
+            SERVING_CLAIMS_REPORT, CASE_SOURCE_LOCAL_REPORT, HEARINGS_TO_JUDGEMENTS_REPORT,
             HEARINGS_BY_HEARING_TYPE_REPORT, NO_CHANGE_IN_CURRENT_POSITION_REPORT,
             MEMBER_DAYS_REPORT, RESPONDENTS_REPORT, SESSION_DAYS_REPORT, ECC_REPORT, CLAIMS_BY_HEARING_VENUE_REPORT);
     private static final List<String> SCOTLAND_HEARING_LIST = List.of("Reading Day", "Deliberation Day",
@@ -139,8 +139,8 @@ public final class ListingHelper {
                     : " ");
             listingType.setJudicialMediation(
                     isNullOrEmpty(hearingType.getJudicialMediation()) || NO.equals(hearingType.getJudicialMediation())
-                    ? " "
-                    : hearingType.getJudicialMediation());
+                            ? " "
+                            : hearingType.getJudicialMediation());
 
             log.info("getVenueFromDateListedType");
             listingType.setCauseListVenue(getVenueFromDateListedType(dateListedType));
@@ -330,17 +330,17 @@ public final class ListingHelper {
         return true;
     }
 
-    private static Map<String, List<ListingTypeItem>> getListHearingsByDate(ListingData listingData) {
+    private static TreeMap<String, List<ListingTypeItem>> getListHearingsByDate(ListingData listingData) {
         return listingData.getListingCollection()
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingDate(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListDate(),
-                    () -> new TreeMap<>(getDateComparator()), toList()));
+                        () -> new TreeMap<>(getDateComparator()), toList()));
     }
 
     private static Iterator<Map.Entry<String, List<ListingTypeItem>>> getEntriesByDate(StringBuilder sb,
                                                                                        ListingData listingData) {
-        Map<String, List<ListingTypeItem>> sortedMap = getListHearingsByDate(listingData);
+        TreeMap<String, List<ListingTypeItem>> sortedMap = getListHearingsByDate(listingData);
         sb.append("\"listing_date\":[\n");
         return new TreeMap<>(sortedMap).entrySet().iterator();
     }
@@ -353,7 +353,7 @@ public final class ListingHelper {
             sb.append("{\"date\":\"").append(listingEntry.getKey()).append(NEW_LINE);
             sb.append("\"case_total\":\"").append(listingEntry.getValue().size()).append(NEW_LINE);
             sb.append(LISTING_NEWLINE);
-            setListingEntry(listingData, caseType, sb, entries, listingEntry);
+            getListingEntry(listingData, caseType, sb, entries, listingEntry);
         }
         return sb;
     }
@@ -395,13 +395,13 @@ public final class ListingHelper {
         return true;
     }
 
-    private static Map<String, List<ListingTypeItem>> getListHearingsByRoomWithNotAllocated(
+    private static TreeMap<String, List<ListingTypeItem>> getListHearingsByRoomWithNotAllocated(
             List<ListingTypeItem> listingSubCollection) {
         TreeMap<String, List<ListingTypeItem>> sortedMap = listingSubCollection
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingRoom(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getHearingRoom(),
-                    () -> new TreeMap<>(getVenueComparator()), toList()));
+                        () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingSubCollection
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingRoom(listingTypeItem.getValue()))
@@ -420,13 +420,13 @@ public final class ListingHelper {
         return true;
     }
 
-    private static Map<String, List<ListingTypeItem>> getListHearingsByVenueWithNotAllocated(
+    private static TreeMap<String, List<ListingTypeItem>> getListHearingsByVenueWithNotAllocated(
             ListingData listingData) {
         TreeMap<String, List<ListingTypeItem>> sortedMap = listingData.getListingCollection()
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingVenue(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListVenue(),
-                    () -> new TreeMap<>(getVenueComparator()), toList()));
+                        () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingData.getListingCollection()
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingVenue(listingTypeItem.getValue()))
@@ -441,7 +441,7 @@ public final class ListingHelper {
     private static StringBuilder getListByRoomOrVenue(List<ListingTypeItem> collection, ListingData listingData,
                                                       String caseType, boolean byRoom) {
         StringBuilder sb = new StringBuilder(30);
-        Map<String, List<ListingTypeItem>> sortedMap = byRoom
+        TreeMap<String, List<ListingTypeItem>> sortedMap = byRoom
                 ? getListHearingsByRoomWithNotAllocated(collection)
                 : getListHearingsByVenueWithNotAllocated(listingData);
         sb.append("\"location\":[\n");
@@ -451,12 +451,12 @@ public final class ListingHelper {
             String hearingRoomOrVenue = byRoom ? "Hearing_room" : "Hearing_venue";
             sb.append("{\"").append(hearingRoomOrVenue).append("\":\"").append(listingEntry.getKey()).append(NEW_LINE)
                     .append(LISTING_NEWLINE);
-            setListingEntry(listingData, caseType, sb, entries, listingEntry);
+            getListingEntry(listingData, caseType, sb, entries, listingEntry);
         }
         return sb;
     }
 
-    private static void setListingEntry(ListingData listingData, String caseType, StringBuilder sb,
+    private static void getListingEntry(ListingData listingData, String caseType, StringBuilder sb,
                                         Iterator<Map.Entry<String, List<ListingTypeItem>>> entries,
                                         Map.Entry<String, List<ListingTypeItem>> listingEntry) {
         for (int i = 0; i < listingEntry.getValue().size(); i++) {
@@ -507,8 +507,8 @@ public final class ListingHelper {
                 .append(nullCheck(listingType.getClaimantTown())).append(NEW_LINE)
                 .append("\"claimant_representative\":\"").append(nullCheck(listingType.getClaimantRepresentative()))
                 .append(NEW_LINE).append("\"Respondent\":\"").append(nullCheck(listingType.getRespondent()))
-                .append(NEW_LINE)
-                .append("\"resp_others\":\"").append(nullCheck(getRespondentOthersWithLineBreaks(listingType)))
+                .append(NEW_LINE);
+        sb.append("\"resp_others\":\"").append(nullCheck(getRespondentOthersWithLineBreaks(listingType)))
                 .append(NEW_LINE).append("\"respondent_town\":\"").append(nullCheck(listingType.getRespondentTown()))
                 .append(NEW_LINE).append("\"Hearing_location\":\"").append(nullCheck(listingType.getCauseListVenue()))
                 .append(NEW_LINE).append("\"Hearing_room\":\"").append(nullCheck(listingType.getHearingRoom()))
@@ -825,4 +825,3 @@ public final class ListingHelper {
         return NO_DOCUMENT_FOUND;
     }
 }
-

@@ -8,10 +8,10 @@
     },
     "dependencies": {
         "@hmcts/nodejs-logging": "4.0.4",
-        "@wdio/cli": "8.36.1",
-        "@wdio/sauce-service": "8.36.1",
+        "@wdio/cli": "8.37.0",
+        "@wdio/sauce-service": "8.37.0",
         "@wdio/selenium-standalone-service": "8.15.0",
-        "@wdio/types": "8.36.1",
+        "@wdio/types": "8.37.0",
         "axios": "1.7.2",
         "codeceptjs-saucehelper": "1.4.0",
         "cross-env": "7.0.3",
@@ -102,7 +102,7 @@
         "unirest": "0.6.0",
         "uuid": "9.0.1",
         "watch": "1.0.2",
-        "webdriverio": "8.36.1",
+        "webdriverio": "8.37.0",
         "when": "3.7.8"
     },
     "resolutions": {

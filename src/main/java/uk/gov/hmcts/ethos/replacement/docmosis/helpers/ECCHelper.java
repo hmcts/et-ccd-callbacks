@@ -159,11 +159,11 @@ public final class ECCHelper {
 
     private static void populateRepresentativeClaimantDetails(CaseData caseData, CaseData originalCaseData) {
         if (originalCaseData.getRepCollection() != null && !originalCaseData.getRepCollection().isEmpty()) {
-            RepresentedTypeC representedTypeC = new RepresentedTypeC();
             for (RepresentedTypeRItem representedTypeRItem : originalCaseData.getRepCollection()) {
                 RepresentedTypeR representedTypeR = representedTypeRItem.getValue();
                 if (representedTypeR.getRespRepName() != null
                         && representedTypeR.getRespRepName().equals(caseData.getClaimantCompany())) {
+                    RepresentedTypeC representedTypeC = new RepresentedTypeC();
                     representedTypeC.setNameOfRepresentative(nullCheck(representedTypeR.getNameOfRepresentative()));
                     representedTypeC.setNameOfOrganisation(nullCheck(representedTypeR.getNameOfOrganisation()));
                     representedTypeC.setRepresentativeReference(

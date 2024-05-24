@@ -34,8 +34,8 @@ public final class DynamicListHelper {
     public static List<DynamicValueType> createDynamicRespondentName(List<RespondentSumTypeItem> respondentCollection) {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (respondentCollection != null) {
-            DynamicValueType dynamicValueType = new DynamicValueType();
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
+                DynamicValueType dynamicValueType = new DynamicValueType();
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 dynamicValueType.setCode("R: " + respondentSumType.getRespondentName());
                 dynamicValueType.setLabel(respondentSumType.getRespondentName());

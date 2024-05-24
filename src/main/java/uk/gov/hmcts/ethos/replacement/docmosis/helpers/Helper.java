@@ -98,9 +98,9 @@ public final class Helper {
             List<RespondentSumTypeItem> respondentCollection) {
         List<DynamicValueType> listItems = new ArrayList<>();
 
-        DynamicValueType dynamicValueType = new DynamicValueType();
         if (respondentCollection != null) {
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
+                DynamicValueType dynamicValueType = new DynamicValueType();
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 String respondentName = respondentSumType.getRespondentName();
 
@@ -181,11 +181,11 @@ public final class Helper {
             List<RespondentSumTypeItem> respondentCollection) {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (respondentCollection != null) {
-            DynamicValueType dynamicValueType = new DynamicValueType();
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
                 RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 if (respondentSumType.getResponseStruckOut() == null
                         || respondentSumType.getResponseStruckOut().equals(NO)) {
+                    DynamicValueType dynamicValueType = new DynamicValueType();
                     dynamicValueType.setCode(respondentSumType.getRespondentName());
                     dynamicValueType.setLabel(respondentSumType.getRespondentName());
                     listItems.add(dynamicValueType);

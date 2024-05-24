@@ -50,7 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCheckBoxNotApplicableValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCheckboxValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCorrectedDetailValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.cloneObject;
 
 class ET3FormEmploymentMapperTest {
 

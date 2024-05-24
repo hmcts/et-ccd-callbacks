@@ -89,7 +89,18 @@ public final class ET3FormTestConstants {
     public static final String TEST_PDF_REPRESENTATIVE_EMAIL_ADDRESS = "et.legalrep.1@gmail.com";
 
     // ET3FormDisabilityMapperTest
-    public static final String TEST_PDF_DISABILITY_DETAIL = "";
+    public static final String TEST_PDF_DISABILITY_DETAIL = "He needs some food. Because he is always hungry.";
+    public static final String TEST_PDF_CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE = "Case Data is null or empty";
+    public static final String TEST_PDF_RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE =
+            "Respondent Collection is empty";
+    public static final String TEST_PDF_RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE =
+            "ET3 Form submitting respondent not found in case data";
+    public static final String TEST_PDF_RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE =
+            "ET3 Form submitting respondent name is empty or blank";
+    public static final String TEST_PDF_RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE =
+            "ET3 Respondent not found, most probably label in the "
+                    + "case data(caseData.getSubmitEt3Respondent().getSelectedLabel()) "
+                    + "does not match with any name in the respondent collection";
 
     private ET3FormTestConstants() {
         // Add a private constructor to hide the implicit public one.

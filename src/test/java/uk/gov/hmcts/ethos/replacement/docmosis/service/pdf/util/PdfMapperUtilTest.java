@@ -42,14 +42,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_EXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_FIELD_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.formatDate;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfAddressField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenOther;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.cloneObject;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.formatDate;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putConditionalPdfField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfAddressField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenOther;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfTextField;
 
 class PdfMapperUtilTest {
 

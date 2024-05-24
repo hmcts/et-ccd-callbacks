@@ -184,7 +184,27 @@ public final class ET3FormConstants {
     public static final String CHECKBOX_PDF_DISABILITY_YES = "9.1 disability - yes";
     public static final String CHECKBOX_PDF_DISABILITY_NO = "9.1 disability - no";
     public static final String CHECKBOX_PDF_DISABILITY_NOT_SURE = "9.1 disability - I'm not sure yet";
-    public static final String TXT_PDF_DISABILITY_DETAILS = "He needs some food. Because he is always hungry.";
+    public static final String TXT_PDF_DISABILITY_DETAILS = "9.1 details of disability";
+
+    // ET3 FORM MAPPER CONSTANTS
+    public static final String RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD =
+            "There were no respondent found for the entered respondent name";
+    public static final String CASE_DATA_NOT_FOUND_EXCEPTION_FIRST_WORD = "Case data is empty";
+    public static final String RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_FIRST_WORD =
+            "There is no respondent defined in the case";
+    public static final String ET3_FORM_MAPPER_CLASS_NAME = "ET3FormMapper";
+    public static final String ET3_FORM_MAPPER_METHOD_NAME = "mapEt3Form";
+    public static final String ET3_FORM_CASE_DATA_CHECK_METHOD_NAME = "mapEt3Form";
+    public static final String CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE = "Case Data is null or empty";
+    public static final String RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE = "Respondent Collection is empty";
+    public static final String RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE =
+            "ET3 Respondent not found, most probably label in the "
+                    + "case data(caseData.getSubmitEt3Respondent().getSelectedLabel()) "
+                    + "does not match with any name in the respondent collection";
+    public static final String  RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE =
+            "ET3 Form submitting respondent not found in case data";
+    public static final String RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE =
+            "ET3 Form submitting respondent name is empty or blank";
 
     private ET3FormConstants() {
         // Add a private constructor to hide the implicit public one.

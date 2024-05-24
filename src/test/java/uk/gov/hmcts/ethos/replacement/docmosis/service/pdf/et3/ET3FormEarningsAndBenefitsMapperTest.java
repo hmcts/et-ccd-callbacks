@@ -60,7 +60,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapper
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCheckboxValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCorrectedCheckboxValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCorrectedDetailValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.cloneObject;
 
 class ET3FormEarningsAndBenefitsMapperTest {
 

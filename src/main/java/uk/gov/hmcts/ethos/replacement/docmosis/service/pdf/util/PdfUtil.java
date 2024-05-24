@@ -21,9 +21,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_LINE_FEED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_SPACE;
 
-public final class PdfMapperUtil {
+public final class PdfUtil {
 
-    private PdfMapperUtil() {
+    private PdfUtil() {
         // Utility classes should not have a public or default constructor.
     }
 
@@ -246,5 +246,4 @@ public final class PdfMapperUtil {
         Gson gson = new Gson();
         return classType.cast(gson.fromJson(gson.toJson(object), object.getClass()));
     }
-
 }

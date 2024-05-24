@@ -32,10 +32,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_REPRESENTATIVE_FIELD_REFERENCE_FOR_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.VIDEO_HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfAddressField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfTextField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfAddressField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfTextField;
 
 public final class ET3FormRepresentativeMapper {
 

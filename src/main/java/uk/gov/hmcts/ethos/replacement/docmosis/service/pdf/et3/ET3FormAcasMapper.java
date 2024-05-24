@@ -10,8 +10,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_ACAS_FIELD_AGREEMENT_NO_REASON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putConditionalPdfField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putConditionalPdfField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
 
 public final class ET3FormAcasMapper {
 

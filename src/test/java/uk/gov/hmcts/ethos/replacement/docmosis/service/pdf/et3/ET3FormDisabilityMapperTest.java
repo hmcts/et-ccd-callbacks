@@ -26,10 +26,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormDisabilityMapper.mapDisability;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_DUMMY_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_DISABILITY_DETAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCheckBoxNotApplicableValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCheckboxValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperTestUtil.getCorrectedDetailValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfMapperUtil.cloneObject;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.cloneObject;
 
 class ET3FormDisabilityMapperTest {
 
@@ -57,7 +58,7 @@ class ET3FormDisabilityMapperTest {
         assertThat(pdfFields.get(TXT_PDF_DISABILITY_DETAILS)).contains(
                 getCorrectedDetailValue(respondentSumType.getEt3ResponseRespondentSupportNeeded(), YES_CAPITALISED,
                         respondentSumType.getEt3ResponseRespondentSupportDetails(),
-                        TXT_PDF_DISABILITY_DETAILS)
+                        TEST_PDF_DISABILITY_DETAIL)
         );
     }
 

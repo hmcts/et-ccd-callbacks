@@ -30,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -181,6 +182,7 @@ public class Et1ReppedService {
         documentList.addAll(acasCertificates);
         caseData.setClaimantDocumentCollection(documentList);
         caseData.setDocumentCollection(documentList);
+        DocumentHelper.setDocumentNumbers(caseData);
     }
 
     /**

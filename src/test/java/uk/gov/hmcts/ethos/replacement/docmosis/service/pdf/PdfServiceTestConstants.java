@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf;
 
-public class PdfServiceTestConstants {
+public final class PdfServiceTestConstants {
 
     public static final String TEST_DOCUMENT_URL = "/testdocument/binary";
     public static final String TEST_DOCUMENT_MARKUP = "<a>some test markup</a>";

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,14 +42,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_EXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_FIELD_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.cloneObject;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.formatDate;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putConditionalPdfField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfAddressField;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfCheckboxFieldWhenOther;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfUtil.putPdfTextField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.cloneObject;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.formatDate;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putConditionalPdfField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfAddressField;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfCheckboxFieldWhenActualValueContainsExpectedValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfCheckboxFieldWhenOther;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfTextField;
 
 class PdfMapperUtilTest {
 

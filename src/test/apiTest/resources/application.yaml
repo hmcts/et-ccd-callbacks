@@ -155,3 +155,5 @@ cron:
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
 
+pdf:
+  et3form: "ET3_0224.pdf"

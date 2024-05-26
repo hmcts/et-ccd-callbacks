@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util;
 
 import java.util.List;
 
@@ -6,9 +6,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
-public final class PdfMapperTestUtil {
+public final class ET3FormTestUtil {
 
-    private PdfMapperTestUtil() {
+    private ET3FormTestUtil() {
         // Utility classes should not have a public or default constructor.
     }
 

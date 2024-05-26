@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang3.ObjectUtils;
@@ -21,9 +21,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_LINE_FEED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_SPACE;
 
-public final class PdfUtil {
+public final class ET3FormUtil {
 
-    private PdfUtil() {
+    private ET3FormUtil() {
         // Utility classes should not have a public or default constructor.
     }
 

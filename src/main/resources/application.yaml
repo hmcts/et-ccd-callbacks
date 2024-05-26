@@ -208,3 +208,6 @@ cron:
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:200}
+
+pdf:
+  et3form: "ET3_0224.pdf"

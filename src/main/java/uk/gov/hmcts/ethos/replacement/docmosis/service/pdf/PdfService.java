@@ -9,7 +9,6 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -135,7 +134,7 @@ public class PdfService {
 
     private DocumentInfo generateDocumentInfo(String documentName, URI documentSelfPath, String markupURL) {
         return DocumentInfo.builder()
-                .type(MediaType.APPLICATION_PDF_VALUE)
+                .type(APPLICATION_PDF_VALUE)
                 .description(documentName)
                 .markUp(markupURL)
                 .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")

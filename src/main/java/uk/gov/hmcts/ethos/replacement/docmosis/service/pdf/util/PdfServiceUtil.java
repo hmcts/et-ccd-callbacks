@@ -6,7 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
 @Slf4j
-public class PdfServiceUtil {
+public final class PdfServiceUtil {
 
     private PdfServiceUtil() {
         // Utility classes should not have a public or default constructor.

@@ -7,7 +7,7 @@ public final class PdfServiceConstants {
 
     public static final String PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF =
             "Exception occurred while mapping case data to template PDF";
-    public static final byte[] EMPTY_BYTE_ARRAY = new byte[]{};
+    public static final byte[] EMPTY_BYTE_ARRAY = {};
 
     public static final String PDF_SERVICE_CLASS_NAME = "PdfService";
     public static final String ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME = "createET3FormByteArray";

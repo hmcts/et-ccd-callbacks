@@ -93,21 +93,16 @@ public class MultipleReferenceService {
         SubmitMultipleEvent multiShell = getMultipleByReference(adminUserToken, caseType, multipleRef);
 
         String caseId = caseDetails.getCaseId();
-        if (String.valueOf(multiShell.getCaseId()).isBlank()) {
+        String multipleId = String.valueOf(multiShell.getCaseId());
+        MultipleData multipleShell = multiShell.getCaseData();
+        if (multipleId.equals("0") || multipleShell == null) {
             log.warn("Add Respondent Representative to Multiple failed. "
-                    + "Multiple Id not found for case {}, with MultipleReference {}", caseId, multipleRef);
+                    + "Multiple not found for case {}, with MultipleReference {}", caseId, multipleRef);
             return;
         }
 
         String jurisdiction = caseDetails.getJurisdiction();
-        String multipleId = String.valueOf(multiShell.getCaseId());
         addUserToMultiple(adminUserToken, jurisdiction, caseType, multipleId, userToAddId);
-
-        MultipleData multipleShell = multiShell.getCaseData();
-        if (multipleShell == null) {
-            log.warn("MultipleData is null for case {}", caseId);
-            return;
-        }
 
         String caseRef = caseDetails.getCaseData().getEthosCaseReference();
         updateMultipleLegalRepCollection(

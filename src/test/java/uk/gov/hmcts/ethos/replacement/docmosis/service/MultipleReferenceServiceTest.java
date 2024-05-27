@@ -28,6 +28,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendin
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,9 +41,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 @ExtendWith(SpringExtension.class)
 class MultipleReferenceServiceTest {
@@ -77,6 +76,7 @@ class MultipleReferenceServiceTest {
         caseData = new CaseData();
         caseData.setEthosCaseReference("6000001/2024");
         caseData.setMultipleFlag(YES);
+        caseData.setMultipleReference("6000001");
 
         caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -86,7 +86,6 @@ class MultipleReferenceServiceTest {
 
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
-
     }
 
     @Test
@@ -117,6 +116,34 @@ class MultipleReferenceServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 multipleReferenceService.createReference("invalid-case-type-id")
         );
+    }
+
+    @Test
+    void validateSubcaseIsOfMultiple_NoErrors() {
+        List<String> actual = multipleReferenceService.validateSubcaseIsOfMultiple(caseData);
+        assertEquals(0, actual.size());
+    }
+
+    @Test
+    void validateSubcaseIsOfMultiple_NotMultiple() {
+        caseData.setMultipleFlag(NO);
+        List<String> actual = multipleReferenceService.validateSubcaseIsOfMultiple(caseData);
+        assertEquals(1, actual.size());
+    }
+
+    @Test
+    void validateSubcaseIsOfMultiple_NoMultipleReference() {
+        caseData.setMultipleReference("");
+        List<String> actual = multipleReferenceService.validateSubcaseIsOfMultiple(caseData);
+        assertEquals(1, actual.size());
+    }
+
+    @Test
+    void validateSubcaseIsOfMultiple_NullMultipleReferences() {
+        caseData.setMultipleFlag(null);
+        caseData.setMultipleReference(null);
+        List<String> actual = multipleReferenceService.validateSubcaseIsOfMultiple(caseData);
+        assertEquals(2, actual.size());
     }
 
     @Test
@@ -169,6 +196,28 @@ class MultipleReferenceServiceTest {
         if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
             assertTrue(exceptionMessage.contains("call failed"));
         }
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+        verify(multipleCasesSendingService, never()).sendUpdateToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldAddLegalRepToMultiple_getMultipleByReference_MultipleNotFound() throws IOException {
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        MultipleCaseSearchResult expectedMultipleCaseSearchResult =
+                new MultipleCaseSearchResult(1L, new ArrayList<>());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
+
+        multipleReferenceService.addLegalRepToMultiple(caseDetails, "someLegalRepId");
+
+        verify(restTemplate).exchange(
+                anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(MultipleCaseSearchResult.class));
         verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
         verify(multipleCasesSendingService, never()).sendUpdateToMultiple(any(), any(), any(), any(), any());
     }

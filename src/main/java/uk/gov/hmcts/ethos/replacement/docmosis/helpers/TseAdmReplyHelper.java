@@ -81,7 +81,7 @@ public final class TseAdmReplyHelper {
                 .orElse(null);
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
+    private static TseAdminReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
         String selectedCmoRespondent = caseData.getTseAdmReplyCmoSelectPartyRespond();
         return TseAdminReplyData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))

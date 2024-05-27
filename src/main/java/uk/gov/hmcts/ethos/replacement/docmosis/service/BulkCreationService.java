@@ -77,35 +77,40 @@ public class BulkCreationService {
                 bulkRequestPayload.setBulkDetails(bulkDetails);
             } else {
                 // 4) Create an event to update multiple reference field to all cases using PERSISTENT QUEUE
-
-                List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
-                log.info("ETHOS CASE REF COLLECTION: " + ethosCaseRefCollection);
-                if (ethosCaseRefCollection.isEmpty()) {
-                    log.warn("EMPTY CASE REF COLLECTION");
-                } else {
-
-                    String username = userIdamService.getUserDetails(userToken).getEmail();
-                    PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
-                            username,
-                            ethosCaseRefCollection,
-                            PersistentQHelper.getCreationDataModel(ethosCaseRefCollection.get(0),
-                                    bulkDetails.getCaseData().getMultipleReference(),
-                                    bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp()),
-                            bulkCasesPayload.getErrors(),
-                            bulkDetails.getCaseData().getMultipleReference(),
-                            createUpdatesBusSender,
-                            String.valueOf(ethosCaseRefCollection.size()),
-                            bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp());
-
-                }
-                bulkRequestPayload.setBulkDetails(bulkDetails);
-
+                updateMultipleRefForAllCases(bulkDetails, bulkCasesPayload, userToken, bulkRequestPayload);
             }
         } else {
             bulkRequestPayload.setBulkDetails(bulkDetails);
         }
         bulkRequestPayload.setErrors(bulkCasesPayload.getErrors());
         return bulkRequestPayload;
+    }
+
+    private void updateMultipleRefForAllCases(BulkDetails bulkDetails,
+                                              BulkCasesPayload bulkCasesPayload,
+                                              String userToken,
+                                              BulkRequestPayload bulkRequestPayload) {
+        List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
+        log.info("ETHOS CASE REF COLLECTION: " + ethosCaseRefCollection);
+        if (ethosCaseRefCollection.isEmpty()) {
+            log.warn("EMPTY CASE REF COLLECTION");
+        } else {
+
+            String username = userIdamService.getUserDetails(userToken).getEmail();
+            PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
+                    username,
+                    ethosCaseRefCollection,
+                    PersistentQHelper.getCreationDataModel(ethosCaseRefCollection.get(0),
+                            bulkDetails.getCaseData().getMultipleReference(),
+                            bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp()),
+                    bulkCasesPayload.getErrors(),
+                    bulkDetails.getCaseData().getMultipleReference(),
+                    createUpdatesBusSender,
+                    String.valueOf(ethosCaseRefCollection.size()),
+                    bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp());
+
+        }
+        bulkRequestPayload.setBulkDetails(bulkDetails);
     }
 
     private void createCaseEventsToUpdateMultipleRef(List<SubmitEvent> submitEvents, BulkDetails bulkDetails,

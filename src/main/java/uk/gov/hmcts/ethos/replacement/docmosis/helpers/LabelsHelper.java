@@ -220,9 +220,9 @@ public final class LabelsHelper {
 
         List<AddressLabelTypeItem> labelTypeItemList = new ArrayList<>();
 
-        AddressLabelType addressLabelType = new AddressLabelType();
-        AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
         for (RespondentSumTypeItem activeRespondent : activeRespondents) {
+
+            AddressLabelType addressLabelType = new AddressLabelType();
             RespondentSumType respondentSumType = activeRespondent.getValue();
 
             addressLabelType.setPrintLabel(printRespondentsLabels);
@@ -235,6 +235,7 @@ public final class LabelsHelper {
             addressLabelType.setLabelEntityReference(REF);
             addressLabelType.setLabelCaseReference(ethosCaseReference);
 
+            AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
             addressLabelTypeItem.setId(UUID.randomUUID().toString());
             addressLabelTypeItem.setValue(addressLabelType);
 
@@ -279,9 +280,8 @@ public final class LabelsHelper {
 
         List<AddressLabelTypeItem> labelTypeItemList = new ArrayList<>();
 
-        AddressLabelType addressLabelType = new AddressLabelType();
-        AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
         for (RepresentedTypeRItem representedTypeRItem : repCollection) {
+            AddressLabelType addressLabelType = new AddressLabelType();
             RepresentedTypeR representedTypeR = representedTypeRItem.getValue();
 
             addressLabelType.setPrintLabel(printRespondentsRepsLabels);
@@ -302,6 +302,7 @@ public final class LabelsHelper {
 
             addressLabelType.setLabelCaseReference(ethosCaseReference);
 
+            AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
             addressLabelTypeItem.setId(UUID.randomUUID().toString());
             addressLabelTypeItem.setValue(addressLabelType);
 

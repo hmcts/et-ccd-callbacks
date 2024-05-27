@@ -199,6 +199,10 @@ public class MultipleReferenceService {
                     GenericTypeItem<String> legalRepList = GenericTypeItem.from(legalRepId);
                     details.getValue().getLegalRepIds().add(legalRepList);
                 }
+                else {
+                    log.info("Legal Rep already exists in collection");
+                    return;
+                }
                 break;
             }
         }
@@ -208,7 +212,6 @@ public class MultipleReferenceService {
             GenericTypeItem<SubCaseLegalRepDetails> newDetails =
                     GenericTypeItem.from(new SubCaseLegalRepDetails(caseRef, newLegalRepList));
             legalRepCollection.add(newDetails);
-            log.warn("legalRepCollection: {}", legalRepCollection);
         }
 
         multiDataToUpdate.setLegalRepCollection(legalRepCollection);

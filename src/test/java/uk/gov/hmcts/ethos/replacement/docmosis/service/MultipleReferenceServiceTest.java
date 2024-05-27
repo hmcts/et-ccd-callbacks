@@ -17,6 +17,9 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -147,7 +150,89 @@ class MultipleReferenceServiceTest {
     }
 
     @Test
-    void shouldAddLegalRepToMultiple_Success() throws IOException {
+    void shouldAddLegalRepToMultiple_LR_Exists_In_Collection() throws IOException {
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+
+        List<SubmitMultipleEvent> multipleEvents = getMultipleEvents();
+
+        ListTypeItem<String> newLegalRepList = ListTypeItem.from("someLegalRepId");
+        GenericTypeItem<SubCaseLegalRepDetails> expectedDetails =
+                GenericTypeItem.from(new SubCaseLegalRepDetails(caseData.getEthosCaseReference(), newLegalRepList));
+
+        ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = new ListTypeItem<>();
+        legalRepCollection.add(expectedDetails);
+
+        multipleEvents.get(0).getCaseData().setLegalRepCollection(legalRepCollection);
+
+        MultipleCaseSearchResult expectedMultipleCaseSearchResult =
+                new MultipleCaseSearchResult(1L, multipleEvents);
+
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
+        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+
+        multipleReferenceService.addLegalRepToMultiple(caseDetails, "someLegalRepId");
+
+        verify(restTemplate).exchange(
+                anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(MultipleCaseSearchResult.class));
+        verify(ccdClient, times(1)).addUserToMultiple(any(), any(), any(), any(), any());
+        verify(multipleCasesSendingService, never()).sendUpdateToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldAddLegalRepToMultiple_Existing_LR_Collection() throws IOException {
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+
+        List<SubmitMultipleEvent> multipleEvents = getMultipleEvents();
+
+        ListTypeItem<String> newLegalRepList = ListTypeItem.from("someOtherLegalRepId");
+        GenericTypeItem<SubCaseLegalRepDetails> expectedDetails =
+                GenericTypeItem.from(new SubCaseLegalRepDetails(caseData.getEthosCaseReference(), newLegalRepList));
+
+        ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = new ListTypeItem<>();
+        legalRepCollection.add(expectedDetails);
+
+        multipleEvents.get(0).getCaseData().setLegalRepCollection(legalRepCollection);
+
+        MultipleCaseSearchResult expectedMultipleCaseSearchResult =
+                new MultipleCaseSearchResult(1L, multipleEvents);
+
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
+        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+
+        multipleReferenceService.addLegalRepToMultiple(caseDetails, "someLegalRepId");
+
+        verify(restTemplate).exchange(
+                anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(MultipleCaseSearchResult.class));
+        verify(ccdClient, times(1)).addUserToMultiple(any(), any(), any(), any(), any());
+        verify(multipleCasesSendingService, times(1))
+                .sendUpdateToMultiple(any(), any(), any(), multipleDataCaptor.capture(), any());
+
+        MultipleData multiData = multipleDataCaptor.getValue();
+        assertEquals(1, multiData.getLegalRepCollection().size());
+        assertEquals(caseData.getEthosCaseReference(),
+                multiData.getLegalRepCollection().get(0).getValue().getCaseReference());
+        assertEquals("someOtherLegalRepId",
+                multiData.getLegalRepCollection().get(0).getValue().getLegalRepIds().get(0).getValue());
+        assertEquals("someLegalRepId",
+                multiData.getLegalRepCollection().get(0).getValue().getLegalRepIds().get(1).getValue());
+    }
+
+    @Test
+    void shouldAddLegalRepToMultiple_Empty_LR_Collection() throws IOException {
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         MultipleCaseSearchResult expectedMultipleCaseSearchResult =

@@ -110,9 +110,9 @@ public class AddLegalRepToMultipleController {
     public ResponseEntity<CCDCallbackResponse> completeAddLegalRepToMultiple(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
-        String caseId = ccdRequest.getCaseDetails().getCaseId();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
         log.info("Issue Add Legal Rep to Multiple complete requested for case reference ---> {}",
-                caseId);
+                caseDetails.getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -121,7 +121,8 @@ public class AddLegalRepToMultipleController {
 
         return ResponseEntity.ok(CCDCallbackResponse
                 .builder()
-                .confirmation_header(String.format(ADD_USER_COMPLETE, caseId))
+                .confirmation_header(
+                        String.format(ADD_USER_COMPLETE, caseDetails.getCaseData().getEthosCaseReference()))
                 .build());
     }
 }

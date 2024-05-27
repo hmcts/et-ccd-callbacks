@@ -88,29 +88,28 @@ public class MultipleReferenceService {
 
     public void addLegalRepToMultiple(CaseDetails caseDetails, String userToAddId) throws IOException {
         String adminUserToken = adminUserService.getAdminUserToken();
-
-        String caseId = caseDetails.getCaseId();
         String caseType = MultiplesHelper.appendMultipleSuffix(caseDetails.getCaseTypeId());
         String multipleRef = caseDetails.getCaseData().getMultipleReference();
         SubmitMultipleEvent multiShell = getMultipleByReference(adminUserToken, caseType, multipleRef);
 
+        String caseId = caseDetails.getCaseId();
         if (String.valueOf(multiShell.getCaseId()).isBlank()) {
             log.warn("Add Respondent Representative to Multiple failed. "
                     + "Multiple Id not found for case {}, with MultipleReference {}", caseId, multipleRef);
             return;
         }
 
-        String multipleId = String.valueOf(multiShell.getCaseId());
         String jurisdiction = caseDetails.getJurisdiction();
-
+        String multipleId = String.valueOf(multiShell.getCaseId());
         addUserToMultiple(adminUserToken, jurisdiction, caseType, multipleId, userToAddId);
 
-        String caseRef = caseDetails.getCaseData().getEthosCaseReference();
         MultipleData multipleShell = multiShell.getCaseData();
         if (multipleShell == null) {
             log.warn("MultipleData is null for case {}", caseId);
             return;
         }
+
+        String caseRef = caseDetails.getCaseData().getEthosCaseReference();
         updateMultipleLegalRepCollection(
                 adminUserToken, caseType, jurisdiction, multipleShell, multipleId, caseRef, userToAddId);
     }

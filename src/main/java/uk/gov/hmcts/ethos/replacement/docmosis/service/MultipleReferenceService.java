@@ -198,8 +198,7 @@ public class MultipleReferenceService {
                         item -> legalRepId.equals(item.getValue()))) {
                     GenericTypeItem<String> legalRepList = GenericTypeItem.from(legalRepId);
                     details.getValue().getLegalRepIds().add(legalRepList);
-                }
-                else {
+                } else {
                     log.info("Legal Rep already exists in collection");
                     return;
                 }

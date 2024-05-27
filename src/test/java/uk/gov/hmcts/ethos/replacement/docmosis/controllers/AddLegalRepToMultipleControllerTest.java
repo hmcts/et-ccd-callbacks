@@ -81,7 +81,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void startAddLegalRepToMultipleTest() throws Exception {
+    void startAddLegalRepToMultipleTest_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleReferenceService.validateSubcaseIsOfMultiple(any())).thenReturn(new ArrayList<>());
         mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
@@ -90,6 +90,25 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()));
+    }
+
+    @Test
+    void startAddLegalRepToMultiple_TokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void startAddLegalRepToMultiple_BadRequest() throws Exception {
+        mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
+                        .content("bad request")
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

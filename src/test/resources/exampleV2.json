@@ -168,22 +168,6 @@
           }
         }
       ],
-      "respondentType": {
-        "respondent_address": {
-          "AddressLine1": "32",
-          "AddressLine2": "Street",
-          "AddressLine3": "Long",
-          "Country": "UK",
-          "County": "Southern",
-          "PostCode": "BI234",
-          "PostTown": "Birmingham"
-        },
-        "respondent_contact_preference": "Phone",
-        "respondent_email": "josh@gmail.com",
-        "respondent_name": "Josh",
-        "respondent_phone1": "07577136570",
-        "respondent_phone2": "07577136570"
-      },
       "scheduleType": {
         "scheduleAttendance": [
           {

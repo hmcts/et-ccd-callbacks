@@ -3,19 +3,17 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -28,12 +26,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepre
 @Service
 public class CcdCaseAssignment {
 
-    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String LEGAL_REP_ID_NOT_FOUND_ERROR =
             "Add Respondent Representative to Multiple failed. Legal Rep Id not found for case {}";
 
     private final RestTemplate restTemplate;
-    private final AuthTokenGenerator serviceAuthTokenGenerator;
+    private final CcdClient ccdClient;
     private final FeatureToggleService featureToggleService;
     private final AdminUserService adminUserService;
     private final NocCcdService nocCcdService;
@@ -43,7 +40,7 @@ public class CcdCaseAssignment {
     private final String applyNocAssignmentsApiPath;
 
     public CcdCaseAssignment(RestTemplate restTemplate,
-                             AuthTokenGenerator serviceAuthTokenGenerator,
+                             CcdClient ccdClient,
                              FeatureToggleService featureToggleService,
                              AdminUserService adminUserService,
                              NocCcdService nocCcdService,
@@ -52,7 +49,7 @@ public class CcdCaseAssignment {
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath
     ) {
         this.restTemplate = restTemplate;
-        this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
+        this.ccdClient = ccdClient;
         this.featureToggleService = featureToggleService;
         this.adminUserService = adminUserService;
         this.nocCcdService = nocCcdService;
@@ -64,12 +61,10 @@ public class CcdCaseAssignment {
     public CCDCallbackResponse applyNoc(final CallbackRequest callback, String userToken) throws IOException {
         requireNonNull(callback, "callback must not be null");
 
-        final String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
-
         HttpEntity<CallbackRequest> requestEntity =
                 new HttpEntity<>(
                         callback,
-                        createHeaders(serviceAuthorizationToken, userToken)
+                        ccdClient.buildHeaders(userToken)
                 );
 
         ResponseEntity<CCDCallbackResponse> response;
@@ -98,15 +93,6 @@ public class CcdCaseAssignment {
 
     public CCDCallbackResponse applyNocAsAdmin(CallbackRequest callbackRequest) throws IOException {
         return this.applyNoc(callbackRequest, adminUserService.getAdminUserToken());
-    }
-
-    public HttpHeaders createHeaders(String serviceAuthorizationToken, String accessToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        headers.set(HttpHeaders.AUTHORIZATION, accessToken);
-        headers.set(SERVICE_AUTHORIZATION, serviceAuthorizationToken);
-        return headers;
     }
 
     private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails) throws IOException {

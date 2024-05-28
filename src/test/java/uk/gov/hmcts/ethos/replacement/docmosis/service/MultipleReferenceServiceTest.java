@@ -64,8 +64,6 @@ class MultipleReferenceServiceTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
-    private CcdCaseAssignment ccdCaseAssignment;
-    @Mock
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @Mock
     private CcdClient ccdClient;
@@ -82,7 +80,7 @@ class MultipleReferenceServiceTest {
     private CaseData caseData;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         caseData = new CaseData();
         caseData.setEthosCaseReference("6000001/2024");
         caseData.setMultipleFlag(YES);
@@ -99,7 +97,7 @@ class MultipleReferenceServiceTest {
 
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-        when(ccdCaseAssignment.createHeaders(any(), any())).thenReturn(new HttpHeaders());
+        when(ccdClient.buildHeaders(any())).thenReturn(new HttpHeaders());
     }
 
     @Test

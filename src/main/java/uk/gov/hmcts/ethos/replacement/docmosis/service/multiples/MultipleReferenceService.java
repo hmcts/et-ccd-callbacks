@@ -26,9 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefEngl
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefScotlandRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,8 +45,6 @@ public class MultipleReferenceService {
     private final MultipleRefEnglandWalesRepository multipleRefEnglandWalesRepository;
     private final MultipleRefScotlandRepository multipleRefScotlandRepository;
     private final RestTemplate restTemplate;
-    private final CcdCaseAssignment ccdCaseAssignment;
-    private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final CcdClient ccdClient;
     private final MultipleCasesSendingService multipleCasesSendingService;
     private final AdminUserService adminUserService;
@@ -106,14 +102,14 @@ public class MultipleReferenceService {
 
     private SubmitMultipleEvent getMultipleByReference(String adminUserToken,
                                                       String caseType,
-                                                      String multipleReference) {
+                                                      String multipleReference) throws IOException {
         String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);
         String requestBody = ESHelper.getBulkSearchQuery(multipleReference);
 
         HttpEntity<String> request =
                 new HttpEntity<>(
                         requestBody,
-                        ccdCaseAssignment.createHeaders(serviceAuthTokenGenerator.generate(), adminUserToken)
+                        ccdClient.buildHeaders(adminUserToken)
                 );
 
         ResponseEntity<MultipleCaseSearchResult> response;

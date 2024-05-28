@@ -4,19 +4,16 @@ import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.helpers.ESHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -29,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefEngl
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefScotlandRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -37,9 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -51,6 +47,7 @@ public class MultipleReferenceService {
     private final MultipleRefEnglandWalesRepository multipleRefEnglandWalesRepository;
     private final MultipleRefScotlandRepository multipleRefScotlandRepository;
     private final RestTemplate restTemplate;
+    private final CcdCaseAssignment ccdCaseAssignment;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final CcdClient ccdClient;
     private final MultipleCasesSendingService multipleCasesSendingService;
@@ -59,12 +56,9 @@ public class MultipleReferenceService {
     @Value("${ccd.data-store-api-url}")
     private String ccdDataStoreUrl;
 
-    public static final String NOT_MULTIPLE_ERROR = "The Case (%s) is not a Multiple";
-    public static final String MISSING_MULTIPLE_REFERENCE_ERROR = "The Case (%s) is missing a Multiple Reference";
-
-    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private static final String NOT_MULTIPLE_ERROR = "The Case (%s) is not a Multiple";
+    private static final String MISSING_MULTIPLE_REFERENCE_ERROR = "The Case (%s) is missing a Multiple Reference";
     private static final String SEARCH_CASES_FORMAT = "%s/searchCases?ctid=%s";
-    private static final String MULTIPLE_CASE_REFERENCE_KEYWORD = "data.multipleReference.keyword";
     private static final String ADD_USER_ERROR = "Call to add legal rep to Multiple Case failed for %s";
 
     public synchronized String createReference(String caseTypeId) {
@@ -110,16 +104,16 @@ public class MultipleReferenceService {
                 adminUserToken, caseType, jurisdiction, multipleShell, multipleId, caseRef, userToAddId);
     }
 
-    public SubmitMultipleEvent getMultipleByReference(String adminUserToken,
+    private SubmitMultipleEvent getMultipleByReference(String adminUserToken,
                                                       String caseType,
                                                       String multipleReference) {
         String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);
-        String requestBody = buildQueryForGetMultipleByReference(multipleReference);
+        String requestBody = ESHelper.getBulkSearchQuery(multipleReference);
 
         HttpEntity<String> request =
                 new HttpEntity<>(
                         requestBody,
-                        createHeaders(serviceAuthTokenGenerator.generate(), adminUserToken)
+                        ccdCaseAssignment.createHeaders(serviceAuthTokenGenerator.generate(), adminUserToken)
                 );
 
         ResponseEntity<MultipleCaseSearchResult> response;
@@ -146,7 +140,7 @@ public class MultipleReferenceService {
         return new SubmitMultipleEvent();
     }
 
-    public void addUserToMultiple(String adminUserToken,
+    private void addUserToMultiple(String adminUserToken,
                                String jurisdiction,
                                String caseType,
                                String multipleId,
@@ -176,7 +170,7 @@ public class MultipleReferenceService {
         }
     }
 
-    public void updateMultipleLegalRepCollection(
+    private void updateMultipleLegalRepCollection(
             String userToken,
             String caseTypeId,
             String jurisdiction,
@@ -217,23 +211,5 @@ public class MultipleReferenceService {
         multiDataToUpdate.setLegalRepCollection(legalRepCollection);
         multipleCasesSendingService.sendUpdateToMultiple(
                 userToken, caseTypeId, jurisdiction, multiDataToUpdate, multipleId);
-    }
-
-    private String buildQueryForGetMultipleByReference(String multipleReference) {
-        TermsQueryBuilder termsQueryBuilder = termsQuery(MULTIPLE_CASE_REFERENCE_KEYWORD, multipleReference);
-
-        return new SearchSourceBuilder()
-                .size(MAX_ES_SIZE)
-                .query(termsQueryBuilder)
-                .toString();
-    }
-
-    private HttpHeaders createHeaders(String serviceAuthorizationToken, String accessToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        headers.set(HttpHeaders.AUTHORIZATION, accessToken);
-        headers.set(SERVICE_AUTHORIZATION, serviceAuthorizationToken);
-        return headers;
     }
 }

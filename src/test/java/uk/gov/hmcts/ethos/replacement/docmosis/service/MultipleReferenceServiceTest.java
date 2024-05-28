@@ -8,6 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -63,6 +64,8 @@ class MultipleReferenceServiceTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
+    private CcdCaseAssignment ccdCaseAssignment;
+    @Mock
     private AuthTokenGenerator serviceAuthTokenGenerator;
     @Mock
     private CcdClient ccdClient;
@@ -93,6 +96,10 @@ class MultipleReferenceServiceTest {
 
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
+
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(ccdCaseAssignment.createHeaders(any(), any())).thenReturn(new HttpHeaders());
     }
 
     @Test
@@ -155,9 +162,6 @@ class MultipleReferenceServiceTest {
 
     @Test
     void shouldAddLegalRepToMultiple_LR_Exists_In_Collection() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-
         List<SubmitMultipleEvent> multipleEvents = getMultipleEvents();
 
         ListTypeItem<String> newLegalRepList = ListTypeItem.from("someLegalRepId");
@@ -191,9 +195,6 @@ class MultipleReferenceServiceTest {
 
     @Test
     void shouldAddLegalRepToMultiple_Existing_LR_Collection() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
-
         List<SubmitMultipleEvent> multipleEvents = getMultipleEvents();
 
         ListTypeItem<String> newLegalRepList = ListTypeItem.from("someOtherLegalRepId");
@@ -237,8 +238,6 @@ class MultipleReferenceServiceTest {
 
     @Test
     void shouldAddLegalRepToMultiple_Empty_LR_Collection() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         MultipleCaseSearchResult expectedMultipleCaseSearchResult =
                 new MultipleCaseSearchResult(1L, getMultipleEvents());
         when(restTemplate
@@ -268,8 +267,6 @@ class MultipleReferenceServiceTest {
 
     @Test
     void shouldAddLegalRepToMultiple_getMultipleByReference_Fail() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         when(restTemplate
                 .exchange(
                         anyString(),
@@ -291,8 +288,6 @@ class MultipleReferenceServiceTest {
 
     @Test
     void shouldAddLegalRepToMultiple_getMultipleByReference_MultipleNotFound() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         MultipleCaseSearchResult expectedMultipleCaseSearchResult =
                 new MultipleCaseSearchResult(1L, new ArrayList<>());
         when(restTemplate
@@ -313,8 +308,6 @@ class MultipleReferenceServiceTest {
 
     @Test
     void shouldAddLegalRepToMultiple_addUserToMultiple_Empty() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         MultipleCaseSearchResult expectedMultipleCaseSearchResult =
                 new MultipleCaseSearchResult(1L, getMultipleEvents());
         when(restTemplate
@@ -337,8 +330,6 @@ class MultipleReferenceServiceTest {
 
     @Test
     void shouldAddLegalRepToMultiple_addUserToMultiple_Fail() throws IOException {
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
         MultipleCaseSearchResult expectedMultipleCaseSearchResult =
                 new MultipleCaseSearchResult(1L, getMultipleEvents());
         when(restTemplate

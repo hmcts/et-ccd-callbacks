@@ -100,7 +100,7 @@ public class CcdCaseAssignment {
         return this.applyNoc(callbackRequest, adminUserService.getAdminUserToken());
     }
 
-    private HttpHeaders createHeaders(String serviceAuthorizationToken, String accessToken) {
+    public HttpHeaders createHeaders(String serviceAuthorizationToken, String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);

@@ -47,9 +47,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getPersonalisationForAcknowledgement;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -365,6 +371,22 @@ class TseHelperTest {
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("3", ""));
 
             assertNull(getRespondentSelectedApplicationType(caseData));
+        }
+
+        @Test
+        void shouldGetPersonalisationForAcknowledgement() {
+            CaseDetails caseDetails = new CaseDetails();
+            caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+            caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
+            caseDetails.setCaseData(caseData);
+
+            Map<String, Object> result = getPersonalisationForAcknowledgement(caseDetails, "testUrl");
+
+            assertEquals("1234", result.get(CASE_NUMBER));
+            assertEquals("First Last", result.get(CLAIMANT));
+            assertEquals("Respondent Name", result.get(RESPONDENTS));
+            assertEquals("Withdraw my claim", result.get(SHORT_TEXT));
+            assertEquals("testUrl", result.get(LINK_TO_EXUI));
         }
     }
 }

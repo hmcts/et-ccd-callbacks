@@ -42,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -436,6 +438,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
     }
 
     @Test
+    void bulkCreationLogicEmptySubmitEvents() {
+        bulkCasesPayload.setSubmitEvents(new ArrayList<>());
+        BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(
+                getBulkDetails(YES, "Single"),
+                bulkCasesPayload, "authToken", BULK_CREATION_STEP);
+        assertEquals(0, bulkRequestPayload.getBulkDetails().getCaseData().getCaseIdCollection().size());
+    }
+
+    @Test
      void bulkCreationLogicAfterSubmittedCallback() {
         BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(
                 getBulkDetails(YES, "Single"),
@@ -450,6 +461,17 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
                 getBulkDetails(YES, "Single"),
                 bulkCasesPayload, "authToken", UPDATE_SINGLES_PQ_STEP);
         assertNull(bulkRequestPayload.getBulkDetails().getCaseData().getMultipleReference());
+    }
+
+    @Test
+    void bulkCreationLogicEmptyCaseIdCollection() {
+        var bulkDetails = getBulkDetails(YES, "Single");
+        bulkDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        bulkCreationService.bulkCreationLogic(
+                bulkDetails,
+                bulkCasesPayload, "authToken", UPDATE_SINGLES_PQ_STEP);
+        verify(userIdamService, times(0)).getUserDetails("authToken");
     }
 
     @Test

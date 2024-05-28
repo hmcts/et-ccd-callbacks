@@ -15,7 +15,8 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples.AddLegalRepToMultipleController;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -38,11 +39,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
 
     private static final String START_ADD_LEGAL_REP_TO_MULTIPLE_URL =
-            "/startAddLegalRepToMultiple";
+            "/multiples/addLegalRepToMultiple/aboutToStart";
     private static final String SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL =
-            "/submitAddLegalRepToMultiple";
+            "/multiples/addLegalRepToMultiple/aboutToSubmit";
     private static final String COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL =
-            "/completeAddLegalRepToMultiple";
+            "/multiples/addLegalRepToMultiple/completed";
 
     @MockBean
     private MultipleReferenceService multipleReferenceService;

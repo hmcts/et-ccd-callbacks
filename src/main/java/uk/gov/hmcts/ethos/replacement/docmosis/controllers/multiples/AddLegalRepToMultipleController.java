@@ -60,11 +60,6 @@ public class AddLegalRepToMultipleController {
 
         log.info("START OF ADD LEGAL REP TO MULTIPLE ---> {}", ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         List<String> errors = multipleReferenceService.validateSubcaseIsOfMultiple(caseData);
@@ -92,11 +87,6 @@ public class AddLegalRepToMultipleController {
         String caseId = caseDetails.getCaseId();
         log.info("ISSUE ADD LEGAL REP TO MULTIPLE ABOUT TO SUBMIT ---> {}", caseId);
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         String userToAddId = userService.getUserDetails(userToken).getUid();
         multipleReferenceService.addLegalRepToMultiple(caseDetails, userToAddId);
 
@@ -115,11 +105,6 @@ public class AddLegalRepToMultipleController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         log.info("Issue Add Legal Rep to Multiple complete requested for case reference ---> {}",
                 caseDetails.getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         return ResponseEntity.ok(CCDCallbackResponse
                 .builder()

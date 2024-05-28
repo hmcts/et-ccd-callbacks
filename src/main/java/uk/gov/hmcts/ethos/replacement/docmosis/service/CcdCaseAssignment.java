@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepre
 public class CcdCaseAssignment {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
-    public static final String LEGAL_REP_ID_NOT_FOUND_ERROR =
+    private static final String LEGAL_REP_ID_NOT_FOUND_ERROR =
             "Add Respondent Representative to Multiple failed. Legal Rep Id not found for case {}";
 
     private final RestTemplate restTemplate;

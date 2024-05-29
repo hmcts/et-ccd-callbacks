@@ -164,13 +164,13 @@ public class CcdCaseAssignment {
         String jurisdiction = caseDetails.getJurisdiction();
 
         addUserToCase(adminUserToken, jurisdiction, caseType, multipleId, userToAddId);
-
-        String caseRef = caseDetails.getCaseData().getEthosCaseReference();
+    
         MultipleData multipleShell = multiShell.getCaseData();
         if (multipleShell == null) {
             log.info("MultipleData is null for case {}", caseId);
             return;
         }
+        String caseRef = caseDetails.getCaseData().getEthosCaseReference();
         updateMultipleLegalRepCollection(
                 adminUserToken, caseType, jurisdiction, multipleShell, multipleId, caseRef, userToAddId);
     }

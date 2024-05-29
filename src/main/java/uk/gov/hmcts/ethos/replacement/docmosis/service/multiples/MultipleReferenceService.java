@@ -100,7 +100,7 @@ public class MultipleReferenceService {
                 adminUserToken, caseType, jurisdiction, multipleShell, multipleId, caseRef, userToAddId);
     }
 
-    private SubmitMultipleEvent getMultipleByReference(String adminUserToken,
+    public SubmitMultipleEvent getMultipleByReference(String adminUserToken,
                                                       String caseType,
                                                       String multipleReference) throws IOException {
         String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);

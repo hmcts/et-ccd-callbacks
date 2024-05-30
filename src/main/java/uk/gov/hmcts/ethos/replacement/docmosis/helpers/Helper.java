@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
@@ -349,6 +350,14 @@ public final class Helper {
         return true;
     }
 
+    public static boolean isRespondentNonSystemUser(CaseData caseData) {
+        if (caseData != null) {
+            List<RepresentedTypeRItem>  repCollection = caseData.getRepCollection();
+            return !CollectionUtils.isEmpty(repCollection)
+                    && repCollection.stream().anyMatch(rep -> YES.equals(rep.getValue().getMyHmctsYesNo()));
+        }
+        return true;
+    }
     /**
      * Gets the last item in a list.
      * @param <T> the type of the elements in the list

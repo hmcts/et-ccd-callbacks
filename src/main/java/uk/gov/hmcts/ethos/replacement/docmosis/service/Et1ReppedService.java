@@ -34,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -353,7 +354,7 @@ public class Et1ReppedService {
      * @param caseDetails the case details
      * @param userToken the user token
      */
-    public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
+    public void assignCaseAccess(CaseDetails caseDetails, String userToken) throws IOException {
         UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
         OrganisationsResponse organisation = getOrganisationDetailsFromUserId(claimantRepUser.getUid());
 

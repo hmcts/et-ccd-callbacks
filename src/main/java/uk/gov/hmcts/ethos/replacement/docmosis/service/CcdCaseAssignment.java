@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRoleWithOrganisation;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferen
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
@@ -45,7 +43,6 @@ public class CcdCaseAssignment {
     private final String aacUrl;
     private final String applyNocAssignmentsApiPath;
     private final String ccdDataStoreUrl;
-    private final MultipleCasesSendingService multipleCasesSendingService;
 
     public CcdCaseAssignment(RestTemplate restTemplate,
                              CcdClient ccdClient,
@@ -130,86 +127,10 @@ public class CcdCaseAssignment {
         return "";
     }
 
-    public SubmitMultipleEvent getMultipleByReference(String adminUserToken,
-                                                        String caseType,
-                                                        String multipleReference) {
-        String getUrl = String.format(SEARCH_CASES_FORMAT, ccdDataStoreUrl, caseType);
-        String requestBody = buildQueryForGetMultipleByReference(multipleReference);
-
-        HttpEntity<String> request =
-                new HttpEntity<>(
-                        requestBody,
-                        createHeaders(serviceAuthTokenGenerator.generate(), adminUserToken)
-                );
-
-        ResponseEntity<MultipleCaseSearchResult> response;
-
-        try {
-            response = restTemplate
-                    .exchange(
-                            getUrl,
-                            HttpMethod.POST,
-                            request,
-                            MultipleCaseSearchResult.class
-                    );
-        } catch (RestClientResponseException exception) {
-            log.error("Error from ccd - {}", exception.getMessage());
-            throw exception;
-        }
-
-        MultipleCaseSearchResult resultBody = response.getBody();
-
-        if (resultBody != null && CollectionUtils.isNotEmpty(resultBody.getCases())) {
-            return resultBody.getCases().get(0);
-        }
-
-        return new SubmitMultipleEvent();
-    }
-
-    private String buildQueryForGetMultipleByReference(String multipleReference) {
-        TermsQueryBuilder termsQueryBuilder = termsQuery(MULTIPLE_CASE_REFERENCE_KEYWORD, multipleReference);
-
-        return new SearchSourceBuilder()
-                .size(MAX_ES_SIZE)
-                .query(termsQueryBuilder)
-                .toString();
-    }
-
-    private void addUserToCase(String adminUserToken,
-                               String jurisdiction,
-                               String caseType,
-                               String multipleId,
-                               String userToAddId) throws IOException {
-        Map<String, String> payload = Maps.newHashMap();
-        payload.put("id", userToAddId);
-
-        String errorMessage = String.format(ADD_USER_ERROR, multipleId);
-
-        try {
-            ResponseEntity<Object> response =
-                    ccdClient.addUserToMultiple(
-                            adminUserToken,
-                            jurisdiction,
-                            caseType,
-                            multipleId,
-                            payload);
-
-            if (response == null) {
-                throw new CaseCreationException(errorMessage);
-            }
-
-            log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
-        } catch (RestClientResponseException e) {
-            throw (CaseCreationException)
-                    new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
-        }
-    }
-
-    public void removeCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) {
-        String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
+    public void removeCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) throws IOException {
         String userToken = adminUserService.getAdminUserToken();
         HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
-                new HttpEntity<>(caseAssignmentUserRolesRequest, createHeaders(serviceAuthorizationToken, userToken));
+                new HttpEntity<>(caseAssignmentUserRolesRequest, ccdClient.buildHeaders(userToken));
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
@@ -226,11 +147,10 @@ public class CcdCaseAssignment {
             response.getStatusCodeValue());
     }
 
-    public void addCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) {
-        String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
+    public void addCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) throws IOException {
         String userToken = adminUserService.getAdminUserToken();
         HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
-                new HttpEntity<>(caseAssignmentUserRolesRequest, createHeaders(serviceAuthorizationToken, userToken));
+                new HttpEntity<>(caseAssignmentUserRolesRequest, ccdClient.buildHeaders(userToken));
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(

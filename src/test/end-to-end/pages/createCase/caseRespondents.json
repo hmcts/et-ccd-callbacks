@@ -7,5 +7,10 @@
   "et3_form_received_option_no" : "//input[@id='respondentCollection_0_responseReceived_No']",
   "respondent_enter_uk_postcode" : "//input[@id='respondentCollection_0_respondent_address_respondent_address_postcodeInput']",
   "respondent_select_an_address" : "//select[@id='respondentCollection_0_respondent_address_respondent_address_addressList']",
-  "find_address_button" : "//button[contains(text(),'Find address')]"
+  "find_address_button" : "//button[contains(text(),'Find address')]",
+  "individual" : "//input[@id='respondentCollection_0_respondentType-Individual']",
+  "organisation" : "//input[@id='respondentCollection_0_respondentType-Organisation']",
+  "individual_first_name" : "//input[@id='respondentCollection_0_respondentFirstName']",
+  "individual_last_name" : "//input[@id='respondentCollection_0_respondentLastName']",
+  "organisation_name" : "//input[@id='respondentCollection_0_respondentOrganisation']"
 }

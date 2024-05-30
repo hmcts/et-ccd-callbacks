@@ -52,6 +52,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("multiples");
     }
 
+    public boolean isEt1DocGenEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("et1-doc-gen");
+    }
+
     public boolean isMul2Enabled() {
         return this.featureToggleApi.isFeatureEnabled("MUL2");
     }

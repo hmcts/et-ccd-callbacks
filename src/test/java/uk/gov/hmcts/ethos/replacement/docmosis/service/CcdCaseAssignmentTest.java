@@ -13,6 +13,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -24,8 +27,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferen
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +49,10 @@ class CcdCaseAssignmentTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
+    private AdminUserService adminUserService;
+
+    @Mock
+    private AuthTokenGenerator serviceAuthTokenGenerator;
     private CcdClient ccdClient;
     @Mock
     private FeatureToggleService featureToggleService;
@@ -57,6 +67,10 @@ class CcdCaseAssignmentTest {
     private CcdCaseAssignment ccdCaseAssignment;
 
     private CallbackRequest callbackRequest;
+    @Mock
+    private MultipleCasesSendingService multipleCasesSendingService;
+    private MultipleDetails multipleDetails;
+    private CaseAssignmentUserRolesRequest rolesRequest;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -65,12 +79,17 @@ class CcdCaseAssignmentTest {
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId("600/11");
+        caseDetails.setCaseId("1234123412341234");
         caseDetails.setCaseTypeId("ET_EnglandWales_Multiple");
         caseDetails.setJurisdiction("EMPLOYMENT");
-
         callbackRequest = new CallbackRequest();
         callbackRequest.setCaseDetails(caseDetails);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminUserToken");
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+
+        rolesRequest = ccdCaseAssignment.getCaseAssignmentRequest(
+                Long.valueOf("1234123412341234"), UUID.randomUUID().toString(), "AA11BB", "[CREATOR]");
+        multipleDetails = new MultipleDetails();
         MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
 
@@ -190,6 +209,183 @@ class CcdCaseAssignmentTest {
 
         assertThat(expected).isEqualTo(actual);
         verify(multipleReferenceService, never()).addLegalRepToMultiple(any(), any());
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_MultipleId_NotFound() throws IOException {
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData())));
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
+
+        MultipleCaseSearchResult expectedMultipleCaseSearchResult =
+                new MultipleCaseSearchResult(1L, new ArrayList<>());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
+
+        CaseCreationException thrown = assertThrows(CaseCreationException.class, () -> {
+            ccdCaseAssignment.applyNoc(callbackRequest, "token");
+        });
+
+        assertThat(thrown.getMessage()).contains("Call to add legal rep to Multiple Case failed for");
+        verify(ccdClient, never()).addUserToMultiple(any(), any(), any(), eq(null), any());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_MultipleId_Empty() throws IOException {
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(expected));
+
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
+
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
+
+        Exception exception = assertThrows(RestClientResponseException.class,
+                () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
+
+        String exceptionMessage = exception.getMessage();
+        if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
+            assertTrue(exceptionMessage.contains("call failed"));
+        }
+    }
+
+    @Test
+    void removeUserRoles() {
+        CaseAssignmentUserRolesResponse expected = CaseAssignmentUserRolesResponse.builder()
+                .statusMessage("Case-User-Role assignments removed successfully")
+                .build();
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+                    eq(CaseAssignmentUserRolesResponse.class)))
+                .thenReturn(ResponseEntity.ok(expected));
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.removeCaseUserRoles(rolesRequest));
+    }
+
+    @Test
+    void removeUserRolesException() {
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+                eq(CaseAssignmentUserRolesResponse.class)))
+                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
+                        "Unauthorized", null, null, null));
+        assertThrows(RestClientResponseException.class, () -> ccdCaseAssignment.removeCaseUserRoles(rolesRequest),
+                "Unauthorised S2S service");
+    }
+
+    @Test
+    void addUserRoles() {
+        CaseAssignmentUserRolesResponse expected = CaseAssignmentUserRolesResponse.builder()
+                .statusMessage("Case-User-Role assignments created successfully")
+                .build();
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                    eq(CaseAssignmentUserRolesResponse.class)))
+                .thenReturn(ResponseEntity.ok(expected));
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.addCaseUserRoles(rolesRequest));
+    }
+
+    @Test
+    void addUserRolesException() {
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                eq(CaseAssignmentUserRolesResponse.class)))
+                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
+                        "Unauthorized", null, null, null));
+        assertThrows(RestClientResponseException.class, () -> ccdCaseAssignment.addCaseUserRoles(rolesRequest),
+                "Unauthorised S2S service");
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_ccdClientReturn_Empty() throws IOException {
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(expected));
+
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
+
+        MultipleCaseSearchResult expectedMultipleCaseSearchResult =
+                new MultipleCaseSearchResult(1L, getMultipleEvents());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
+
+        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(null);
+
+        Exception exception = assertThrows(CaseCreationException.class,
+                () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
+        assertEquals("Call to add legal rep to Multiple Case failed for 123", exception.getMessage());
+    }
+
+    @Test
+    void shouldCallCaseAssignmentNocMultiple_ccdClientReturn_Fail() throws IOException {
+        CCDCallbackResponse expected = new CCDCallbackResponse(callbackRequest.getCaseDetails().getCaseData());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(CCDCallbackResponse.class))
+        ).thenReturn(ResponseEntity.ok(expected));
+
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+        when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
+
+        MultipleCaseSearchResult expectedMultipleCaseSearchResult =
+                new MultipleCaseSearchResult(1L, getMultipleEvents());
+        when(restTemplate
+                .exchange(
+                        anyString(),
+                        eq(HttpMethod.POST),
+                        any(HttpEntity.class),
+                        eq(MultipleCaseSearchResult.class))
+        ).thenReturn(ResponseEntity.ok(expectedMultipleCaseSearchResult));
+
+        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any()))
+                .thenThrow(new RestClientResponseException("call failed", 400, "Bad Request", null, null, null));
+
+        Exception exception = assertThrows(CaseCreationException.class,
+                () -> ccdCaseAssignment.applyNoc(callbackRequest, "token"));
+        assertEquals("Call to add legal rep to Multiple Case failed for 123 with call failed", exception.getMessage());
     }
 
     private AuditEvent getAuditEvent() {

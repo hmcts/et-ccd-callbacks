@@ -113,11 +113,11 @@ public final class UploadDocumentHelper {
      * @param caseData where the data is stored
      */
     public static void convertLegacyDocsToNewDocNaming(BaseCaseData caseData) {
-        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
+        if (CollectionUtils.isNotEmpty(caseData.getDocumentCollection())) {
             for (DocumentTypeItem documentTypeItem : caseData.getDocumentCollection()) {
                 DocumentType documentType = documentTypeItem.getValue();
                 if (isNullOrEmpty(documentType.getTopLevelDocuments())
-                        && !isNullOrEmpty(documentType.getTypeOfDocument())) {
+                    && !isNullOrEmpty(documentType.getTypeOfDocument())) {
                     mapLegacyDocTypeToNewDocType(documentType);
                 }
             }

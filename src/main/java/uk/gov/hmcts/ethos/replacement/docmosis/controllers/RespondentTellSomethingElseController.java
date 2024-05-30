@@ -19,9 +19,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.time.LocalDate;
@@ -30,7 +30,6 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FUNCTION_NOT_AVAILABLE_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -44,6 +43,7 @@ public class RespondentTellSomethingElseController {
     private final VerifyTokenService verifyTokenService;
     private final RespondentTellSomethingElseService resTseService;
     private final TseService tseService;
+    private final UserIdamService userIdamService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -84,10 +84,13 @@ public class RespondentTellSomethingElseController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+
+        userIdamService.getUserDetails(userToken).getRoles();
+
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (Helper.isClaimantNonSystemUser(caseData)) {
-            caseData.setResTseNotAvailableWarning(YES);
-        }
+//        if (Helper.isClaimantNonSystemUser(caseData)) {
+//            caseData.setResTseNotAvailableWarning(YES);
+//        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -119,9 +122,9 @@ public class RespondentTellSomethingElseController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
-        if (Helper.isClaimantNonSystemUser(caseData)) {
-            errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
-        }
+//        if (Helper.isClaimantNonSystemUser(caseData)) {
+//            errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
+//        }
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

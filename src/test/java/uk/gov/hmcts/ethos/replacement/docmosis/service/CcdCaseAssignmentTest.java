@@ -13,6 +13,8 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -33,8 +35,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,11 +56,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class CcdCaseAssignmentTest {
     @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private AdminUserService adminUserService;
 
     @Mock
     private AuthTokenGenerator serviceAuthTokenGenerator;
-    @Mock
-    private AdminUserService adminUserService;
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
@@ -71,6 +75,7 @@ class CcdCaseAssignmentTest {
     @Mock
     private MultipleCasesSendingService multipleCasesSendingService;
     private MultipleDetails multipleDetails;
+    private CaseAssignmentUserRolesRequest rolesRequest;
 
     @BeforeEach
     void setUp() {
@@ -79,12 +84,16 @@ class CcdCaseAssignmentTest {
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId("600/11");
+        caseDetails.setCaseId("1234123412341234");
         caseDetails.setCaseTypeId("ET_EnglandWales_Multiple");
         caseDetails.setJurisdiction("EMPLOYMENT");
-
         callbackRequest = new CallbackRequest();
         callbackRequest.setCaseDetails(caseDetails);
+        when(adminUserService.getAdminUserToken()).thenReturn("adminUserToken");
+        when(serviceAuthTokenGenerator.generate()).thenReturn("token");
+
+        rolesRequest = ccdCaseAssignment.getCaseAssignmentRequest(
+                Long.valueOf("1234123412341234"), UUID.randomUUID().toString(), "AA11BB", "[CREATOR]");
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         multipleCasesSendingService = new MultipleCasesSendingService(ccdClient);
@@ -311,6 +320,50 @@ class CcdCaseAssignmentTest {
         if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
             assertTrue(exceptionMessage.contains("call failed"));
         }
+    }
+
+    @Test
+    void removeUserRoles() {
+        CaseAssignmentUserRolesResponse expected = CaseAssignmentUserRolesResponse.builder()
+                .statusMessage("Case-User-Role assignments removed successfully")
+                .build();
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+                    eq(CaseAssignmentUserRolesResponse.class)))
+                .thenReturn(ResponseEntity.ok(expected));
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.removeCaseUserRoles(rolesRequest));
+    }
+
+    @Test
+    void removeUserRolesException() {
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.DELETE), any(HttpEntity.class),
+                eq(CaseAssignmentUserRolesResponse.class)))
+                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
+                        "Unauthorized", null, null, null));
+        assertThrows(RestClientResponseException.class, () -> ccdCaseAssignment.removeCaseUserRoles(rolesRequest),
+                "Unauthorised S2S service");
+    }
+
+    @Test
+    void addUserRoles() {
+        CaseAssignmentUserRolesResponse expected = CaseAssignmentUserRolesResponse.builder()
+                .statusMessage("Case-User-Role assignments created successfully")
+                .build();
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                    eq(CaseAssignmentUserRolesResponse.class)))
+                .thenReturn(ResponseEntity.ok(expected));
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.addCaseUserRoles(rolesRequest));
+    }
+
+    @Test
+    void addUserRolesException() {
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                eq(CaseAssignmentUserRolesResponse.class)))
+                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
+                        "Unauthorized", null, null, null));
+        assertThrows(RestClientResponseException.class, () -> ccdCaseAssignment.addCaseUserRoles(rolesRequest),
+                "Unauthorised S2S service");
     }
 
     @Test

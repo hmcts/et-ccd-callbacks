@@ -21,6 +21,8 @@ module.exports =  async function () {
     I.fillField(caseResp.acas_certificate_number_input,'ACAS1234');
     I.fillField(caseResp.respondent_phone_number,'05909671016');
     I.checkOption(caseResp.et3_form_received_option_no);
+    I.checkOption(caseResp.organisation)
+    I.fillField(caseResp.organisation_name, 'Respondent Name');
     I.fillField(caseResp.respondent_enter_uk_postcode,'YO18 7LT');
     I.click(caseResp.find_address_button);
     I.wait(2);

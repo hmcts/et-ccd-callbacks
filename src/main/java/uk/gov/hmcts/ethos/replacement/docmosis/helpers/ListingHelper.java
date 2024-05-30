@@ -154,9 +154,8 @@ public final class ListingHelper {
 
             log.info("getHearingDuration");
             listingType.setHearingDay(index + 1 + " of " + hearingCollectionSize);
-            listingType.setEstHearingLength(!isNullOrEmpty(DocumentHelper.getHearingDuration(hearingType))
-                    ? DocumentHelper.getHearingDuration(hearingType)
-                    : " ");
+            listingType.setEstHearingLength(isNullOrEmpty(DocumentHelper.getHearingDuration(hearingType)) ? " "
+                    : DocumentHelper.getHearingDuration(hearingType));
 
             listingType.setHearingReadingDeliberationMembersChambers(isNullOrEmpty(
                     dateListedType.getHearingTypeReadingDeliberation()) || !SCOTLAND_HEARING_LIST.contains(

@@ -376,7 +376,7 @@ dependencies {
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.2'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.1-RELEASE'
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.8.0'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.3'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'

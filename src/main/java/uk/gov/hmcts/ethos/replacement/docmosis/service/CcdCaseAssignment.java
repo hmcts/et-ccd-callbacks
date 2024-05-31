@@ -16,6 +16,9 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRoleWithOrganisation;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -31,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendin
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -71,8 +75,7 @@ public class CcdCaseAssignment {
                              MultipleCasesSendingService multipleCasesSendingService,
                              @Value("${assign_case_access_api_url}") String aacUrl,
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath,
-                             @Value("${ccd.data-store-api-url}") String ccdDataStoreUrl
-    ) {
+                             @Value("${ccd.data-store-api-url}") String ccdDataStoreUrl) {
         this.restTemplate = restTemplate;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
         this.adminUserService = adminUserService;
@@ -107,7 +110,7 @@ public class CcdCaseAssignment {
                     );
 
         } catch (RestClientResponseException exception) {
-            log.info("Error form ccd - {}", exception.getMessage());
+            log.info("Error from ccd - {}", exception.getMessage());
             throw exception;
         }
 
@@ -295,5 +298,65 @@ public class CcdCaseAssignment {
             throw (CaseCreationException)
                     new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
         }
+    }
+
+    public void removeCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) {
+        String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
+        String userToken = adminUserService.getAdminUserToken();
+        HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
+                new HttpEntity<>(caseAssignmentUserRolesRequest, createHeaders(serviceAuthorizationToken, userToken));
+        ResponseEntity<CaseAssignmentUserRolesResponse> response;
+        try {
+            response = restTemplate.exchange(
+                ccdDataStoreUrl + "/case-users",
+                HttpMethod.DELETE,
+                requestEntity,
+                CaseAssignmentUserRolesResponse.class);
+        } catch (RestClientResponseException exception) {
+            log.info("Error from CCD - {}", exception.getMessage());
+            throw exception;
+        }
+
+        log.info("Remove case user roles. Http status received from CCD API; {}",
+            response.getStatusCodeValue());
+    }
+
+    public void addCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) {
+        String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
+        String userToken = adminUserService.getAdminUserToken();
+        HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
+                new HttpEntity<>(caseAssignmentUserRolesRequest, createHeaders(serviceAuthorizationToken, userToken));
+        ResponseEntity<CaseAssignmentUserRolesResponse> response;
+        try {
+            response = restTemplate.exchange(
+                ccdDataStoreUrl + "/case-users",
+                HttpMethod.POST,
+                requestEntity,
+                    CaseAssignmentUserRolesResponse.class);
+        } catch (RestClientResponseException exception) {
+            log.info("Error from CCD - {}", exception.getMessage());
+            throw exception;
+        }
+
+        log.info("Add case user roles. Http status received from CCD API; {}",
+            response.getStatusCodeValue());
+    }
+
+    public CaseAssignmentUserRolesRequest getCaseAssignmentRequest(Long caseId, String userId, String orgId,
+                                                                   String role) {
+        return CaseAssignmentUserRolesRequest.builder()
+                .caseAssignmentUserRolesWithOrganisation(
+                        List.of(getCaseAssignmentUserRole(caseId, orgId, role, userId))
+                ).build();
+    }
+
+    private CaseAssignmentUserRoleWithOrganisation getCaseAssignmentUserRole(Long caseId, String orgId,
+                                                                             String role, String userId) {
+        return CaseAssignmentUserRoleWithOrganisation.builder()
+                .organisationId(orgId)
+                .caseDataId(String.valueOf(caseId))
+                .caseRole(role)
+                .userId(userId)
+                .build();
     }
 }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import uk.gov.hmcts.rse.ccd.lib.ControlPlane;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;

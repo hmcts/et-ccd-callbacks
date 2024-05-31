@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ public class MultipleCreationService {
     private final MultipleHelperService multipleHelperService;
     private final SubMultipleUpdateService subMultipleUpdateService;
     private final MultipleTransferService multipleTransferService;
+    private final CaseManagementLocationService caseManagementLocationService;
 
     public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
@@ -51,6 +53,10 @@ public class MultipleCreationService {
 
         multipleDetails.getCaseData().setState(OPEN_STATE);
 
+        log.info("Set Case Management Location");
+        MultipleData multipleData = multipleDetails.getCaseData();
+        caseManagementLocationService.setCaseManagementLocation(multipleData);
+
         log.info("Check if creation is coming from Case Transfer");
 
         multipleTransferService.populateDataIfComingFromCT(userToken, multipleDetails, errors);
@@ -59,8 +65,8 @@ public class MultipleCreationService {
 
         getLeadMarkUpAndAddLeadToCaseIds(userToken, multipleDetails);
 
-        if (!multipleDetails.getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
-                && !multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
+        if (!multipleData.getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
+                && !multipleData.getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
 
             log.info("Multiple Creation UI");
 
@@ -219,7 +225,7 @@ public class MultipleCreationService {
     private void addDataToMultiple(MultipleData multipleData) {
 
         if (multipleData.getMultipleSource() == null
-                || multipleData.getMultipleSource().trim().equals("")) {
+                || multipleData.getMultipleSource().trim().isEmpty()) {
 
             multipleData.setMultipleSource(MANUALLY_CREATED_POSITION);
 

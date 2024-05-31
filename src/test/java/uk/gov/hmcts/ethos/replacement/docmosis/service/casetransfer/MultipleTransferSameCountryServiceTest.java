@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.MultipleDataBuilder;
 
@@ -41,6 +42,9 @@ class MultipleTransferSameCountryServiceTest {
 
     @Mock
     CaseTransferEventService caseTransferEventService;
+
+    @Mock
+    CaseManagementLocationService caseManagementLocationService;
 
     @Captor
     ArgumentCaptor<CaseTransferEventParams> caseTransferEventParamsArgumentCaptor;

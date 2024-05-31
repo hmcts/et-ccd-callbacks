@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,8 @@ class MultipleCreationServiceTest {
     private SubMultipleUpdateService subMultipleUpdateService;
     @Mock
     private MultipleTransferService multipleTransferService;
+    @Mock
+    private CaseManagementLocationService caseManagementLocationService;
 
     @InjectMocks
     private MultipleCreationService multipleCreationService;
@@ -47,6 +50,7 @@ class MultipleCreationServiceTest {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         ethosCaseRefCollection = MultiplesHelper.getCaseIds(multipleDetails.getCaseData());
+
         //Adding lead to the case id collection
         ethosCaseRefCollection.add(0, "21006/2020");
         userToken = "authString";

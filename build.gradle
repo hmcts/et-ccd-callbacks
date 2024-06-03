@@ -312,7 +312,7 @@ ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'com.google.guava', version: '33.2.0-jre') {
+        dependencySet(group: 'com.google.guava', version: '33.2.1-jre') {
             entry 'guava'
         }
         dependencySet(group: 'io.netty', version: '4.1.110.Final') {
@@ -396,7 +396,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'com.github.hmcts:fortify-client:1.4.1:all', {
+    testImplementation 'com.github.hmcts:fortify-client:1.4.2:all', {
         exclude module: 'commons-io'
     }
 

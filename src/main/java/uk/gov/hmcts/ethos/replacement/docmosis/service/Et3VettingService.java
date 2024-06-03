@@ -42,7 +42,7 @@ public class Et3VettingService {
      * @param caseData The object containing case data
      */
     public void saveEt3VettingToRespondent(CaseData caseData, DocumentInfo documentInfo) {
-        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel().trim();
         RespondentSumTypeItem respondent = getRespondentForCase(respondentName, caseData);
 
         respondent.getValue().setEt3Vetting(copyEt3FieldsFromCaseDataToRespondent(caseData));
@@ -68,7 +68,7 @@ public class Et3VettingService {
      * @param caseData The object containing case data
      */
     public void restoreEt3VettingFromRespondentOntoCaseData(CaseData caseData) {
-        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel().trim();
         RespondentSumTypeItem respondent = getRespondentForCase(respondentName, caseData);
 
         Et3VettingType et3Vetting = getEt3VettingTypeForRespondent(respondent);

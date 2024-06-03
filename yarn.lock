@@ -3929,6 +3929,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:1.6.8":
+  version: 1.6.8
+  resolution: "axios@npm:1.6.8"
+  dependencies:
+    follow-redirects: ^1.15.6
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: bf007fa4b207d102459300698620b3b0873503c6d47bf5a8f6e43c0c64c90035a4f698b55027ca1958f61ab43723df2781c38a99711848d232cad7accbcdfcdd
+  languageName: node
+  linkType: hard
+
 "axios@npm:1.7.2":
   version: 1.7.2
   resolution: "axios@npm:1.7.2"
@@ -5536,6 +5547,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:12.0.0, commander@npm:~12.0.0":
+  version: 12.0.0
+  resolution: "commander@npm:12.0.0"
+  checksum: bce9e243dc008baba6b8d923f95b251ad115e6e7551a15838d7568abebcca0fc832da1800cf37caf37852f35ce4b7fb794ba7a4824b88c5adb1395f9268642df
+  languageName: node
+  linkType: hard
+
 "commander@npm:^10.0.0":
   version: 10.0.1
   resolution: "commander@npm:10.0.1"
@@ -5568,13 +5586,6 @@ __metadata:
   version: 9.5.0
   resolution: "commander@npm:9.5.0"
   checksum: c7a3e27aa59e913b54a1bafd366b88650bc41d6651f0cbe258d4ff09d43d6a7394232a4dadd0bf518b3e696fdf595db1028a0d82c785b88bd61f8a440cecfade
-  languageName: node
-  linkType: hard
-
-"commander@npm:~12.0.0":
-  version: 12.0.0
-  resolution: "commander@npm:12.0.0"
-  checksum: bce9e243dc008baba6b8d923f95b251ad115e6e7551a15838d7568abebcca0fc832da1800cf37caf37852f35ce4b7fb794ba7a4824b88c5adb1395f9268642df
   languageName: node
   linkType: hard
 
@@ -7569,7 +7580,7 @@ __metadata:
     sinon: 18.0.0
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 3.5.0
+    sonarqube-scanner: 4.0.1
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
@@ -7864,15 +7875,6 @@ __metadata:
   version: 0.1.8
   resolution: "eyes@npm:0.1.8"
   checksum: c31703a92bf36ba75ee8d379ee7985c24ee6149f3a6175f44cec7a05b178c38bce9836d3ca48c9acb0329a960ac2c4b2ead4e60cdd4fe6e8c92cad7cd6913687
-  languageName: node
-  linkType: hard
-
-"fancy-log@npm:2.0.0":
-  version: 2.0.0
-  resolution: "fancy-log@npm:2.0.0"
-  dependencies:
-    color-support: ^1.1.3
-  checksum: 5652bf35e6a0be68bc011cf38706c78c7724808311e88905a3e4623d0e86168f084a9f38109dce2b2f78078ae704e4b55095effda743b4795c37f30ddb70497e
   languageName: node
   linkType: hard
 
@@ -9346,6 +9348,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hpagent@npm:1.2.0":
+  version: 1.2.0
+  resolution: "hpagent@npm:1.2.0"
+  checksum: b029da695edae438cee4da2a437386f9db4ac27b3ceb7306d02e1b586c9c194741ed2e943c8a222e0cfefaf27ee3f863aca7ba1721b0950a2a19bf25bc0d85e2
+  languageName: node
+  linkType: hard
+
 "html-escaper@npm:^2.0.0":
   version: 2.0.2
   resolution: "html-escaper@npm:2.0.2"
@@ -9492,16 +9501,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"https-proxy-agent@npm:7.0.4, https-proxy-agent@npm:^7.0.3, https-proxy-agent@npm:^7.0.4":
-  version: 7.0.4
-  resolution: "https-proxy-agent@npm:7.0.4"
-  dependencies:
-    agent-base: ^7.0.2
-    debug: 4
-  checksum: daaab857a967a2519ddc724f91edbbd388d766ff141b9025b629f92b9408fc83cee8a27e11a907aede392938e9c398e240d643e178408a59e4073539cde8cfe9
-  languageName: node
-  linkType: hard
-
 "https-proxy-agent@npm:^2.1.0":
   version: 2.2.4
   resolution: "https-proxy-agent@npm:2.2.4"
@@ -9519,6 +9518,16 @@ __metadata:
     agent-base: ^7.0.2
     debug: 4
   checksum: 088969a0dd476ea7a0ed0a2cf1283013682b08f874c3bc6696c83fa061d2c157d29ef0ad3eb70a2046010bb7665573b2388d10fdcb3e410a66995e5248444292
+  languageName: node
+  linkType: hard
+
+"https-proxy-agent@npm:^7.0.3, https-proxy-agent@npm:^7.0.4":
+  version: 7.0.4
+  resolution: "https-proxy-agent@npm:7.0.4"
+  dependencies:
+    agent-base: ^7.0.2
+    debug: 4
+  checksum: daaab857a967a2519ddc724f91edbbd388d766ff141b9025b629f92b9408fc83cee8a27e11a907aede392938e9c398e240d643e178408a59e4073539cde8cfe9
   languageName: node
   linkType: hard
 
@@ -12225,21 +12234,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mkdirp@npm:3.0.1, mkdirp@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "mkdirp@npm:3.0.1"
-  bin:
-    mkdirp: dist/cjs/src/bin.js
-  checksum: 972deb188e8fb55547f1e58d66bd6b4a3623bf0c7137802582602d73e6480c1c2268dcbafbfb1be466e00cc7e56ac514d7fd9334b7cf33e3e2ab547c16f83a8d
-  languageName: node
-  linkType: hard
-
 "mkdirp@npm:^2.1.3":
   version: 2.1.6
   resolution: "mkdirp@npm:2.1.6"
   bin:
     mkdirp: dist/cjs/src/bin.js
   checksum: 8a1d09ffac585e55f41c54f445051f5bc33a7de99b952bb04c576cafdf1a67bb4bae8cb93736f7da6838771fbf75bc630430a3a59e1252047d2278690bd150ee
+  languageName: node
+  linkType: hard
+
+"mkdirp@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "mkdirp@npm:3.0.1"
+  bin:
+    mkdirp: dist/cjs/src/bin.js
+  checksum: 972deb188e8fb55547f1e58d66bd6b4a3623bf0c7137802582602d73e6480c1c2268dcbafbfb1be466e00cc7e56ac514d7fd9334b7cf33e3e2ab547c16f83a8d
   languageName: node
   linkType: hard
 
@@ -12604,15 +12613,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-downloader-helper@npm:2.1.9":
-  version: 2.1.9
-  resolution: "node-downloader-helper@npm:2.1.9"
-  bin:
-    ndh: bin/ndh
-  checksum: 9e25e4eb7014798fdb52c50aaeacd5acaed8ad3be9785d37a177dbe520057f577d51b6fce662d1ace9934559a6dca93b04843d472b092072f24418684a416bf6
-  languageName: node
-  linkType: hard
-
 "node-fetch@npm:^2.2.0, node-fetch@npm:^2.6.0, node-fetch@npm:^2.6.11, node-fetch@npm:^2.6.12":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
@@ -12635,6 +12635,13 @@ __metadata:
     fetch-blob: ^3.1.4
     formdata-polyfill: ^4.0.10
   checksum: 06a04095a2ddf05b0830a0d5302699704d59bda3102894ea64c7b9d4c865ecdff2d90fd042df7f5bc40337266961cb6183dcc808ea4f3000d024f422b462da92
+  languageName: node
+  linkType: hard
+
+"node-forge@npm:^1.3.1":
+  version: 1.3.1
+  resolution: "node-forge@npm:1.3.1"
+  checksum: 08fb072d3d670599c89a1704b3e9c649ff1b998256737f0e06fbd1a5bf41cae4457ccaee32d95052d80bbafd9ffe01284e078c8071f0267dc9744e51c5ed42a9
   languageName: node
   linkType: hard
 
@@ -15756,21 +15763,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:3.5.0":
-  version: 3.5.0
-  resolution: "sonarqube-scanner@npm:3.5.0"
+"sonarqube-scanner@npm:4.0.1":
+  version: 4.0.1
+  resolution: "sonarqube-scanner@npm:4.0.1"
   dependencies:
     adm-zip: 0.5.12
-    fancy-log: 2.0.0
-    https-proxy-agent: 7.0.4
+    axios: 1.6.8
+    commander: 12.0.0
+    fs-extra: 11.2.0
+    hpagent: 1.2.0
     jest-sonar-reporter: 2.0.0
-    mkdirp: 3.0.1
-    node-downloader-helper: 2.1.9
-    progress: 2.0.3
+    node-forge: ^1.3.1
+    proxy-from-env: ^1.1.0
+    semver: 7.6.0
     slugify: 1.6.6
+    tar-stream: 3.1.7
   bin:
-    sonar-scanner: src/bin/sonar-scanner
-  checksum: 2a8317ce6bf725223c800c7f867dc1f74120720e6fe26a9f8be4e40efb2a9c3960bb3c4792630a7b6a8b1764476f2bfc8cd45eba35d0b31b56627cf3db38c174
+    sonar-scanner: bin/sonar-scanner
+  checksum: 3dfd85f27cbd1b4640569af452fb30c8dca0ac12209ec137196b1e0799f90b405f3f2ec5c6edbba639bb9d1bf04c84e26e280cc08a162328f8511c6fe95d9606
   languageName: node
   linkType: hard
 

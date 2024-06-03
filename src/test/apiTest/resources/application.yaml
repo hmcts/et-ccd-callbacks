@@ -119,6 +119,7 @@ template:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
     respondentSubmittedNotificationForTribunal:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
+  et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
 
 
 
@@ -154,6 +155,7 @@ cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
+  et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
 
 pdf:
   et3form: "ET3_0224.pdf"

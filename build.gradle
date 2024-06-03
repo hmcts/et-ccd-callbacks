@@ -11,7 +11,7 @@ plugins {
     id 'io.freefair.lombok' version '8.6'
     id 'org.sonarqube' version '5.0.0.4638'
     id 'pmd'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1030'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1214'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -336,13 +336,15 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.7.0'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'3.12.0'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.0.0'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.13.1'
+    implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
+
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.4'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.1'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.2'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -356,7 +358,7 @@ dependencies {
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.2'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-RC1'
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
@@ -376,7 +378,7 @@ dependencies {
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.2'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.1-RELEASE'
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.8.0'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.3'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
@@ -387,7 +389,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.4.1'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.5.0'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.0'
 
@@ -413,8 +415,9 @@ dependencies {
     testImplementation(platform('org.junit:junit-bom:5.10.2'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.8'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.0'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.9'
@@ -456,7 +459,7 @@ bootWithCCD {
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
-
+    environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos'
     // ccd-data-store-api
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
@@ -480,19 +483,13 @@ bootWithCCD {
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
-    // cftlib extra compose files for Work Allocation
-    // The idea is that we can use this env var to boot the WA containers alongside the rest by setting
-    // its value to "wa-docker-compose.yml"
-    // might become more relevant in future, but for now we don't need it
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
-
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'
 
 }
 
-pmdMain.maxFailures = 317
-pmdTest.maxFailures = 206
+pmdMain.maxFailures = 315
+pmdTest.maxFailures = 207
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

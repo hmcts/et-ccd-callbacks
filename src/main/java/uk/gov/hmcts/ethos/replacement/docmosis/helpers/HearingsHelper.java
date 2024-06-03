@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -21,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
@@ -233,6 +235,9 @@ public final class HearingsHelper {
         if (hearing.getHearingVenueScotland() != null) {
             return hearing.getHearingVenueScotland();
         }
-        return hearing.getHearingVenue().getSelectedLabel();
+        if (ObjectUtils.isEmpty(hearing.getHearingVenue())) {
+            return "";
+        }
+        return defaultIfEmpty(hearing.getHearingVenue().getSelectedLabel(), "");
     }
 }

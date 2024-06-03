@@ -21,14 +21,11 @@ public class SingleReferenceService {
 
     public synchronized String createReference(String caseTypeId) {
         int currentYear = LocalDate.now().getYear();
-        switch (caseTypeId) {
-            case ENGLANDWALES_CASE_TYPE_ID:
-                return singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear);
-            case SCOTLAND_CASE_TYPE_ID:
-                return singleRefScotlandRepository.ethosCaseRefGen(currentYear);
-            default:
-                throw new IllegalArgumentException(
-                        String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));
-        }
+        return switch (caseTypeId) {
+            case ENGLANDWALES_CASE_TYPE_ID -> singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear);
+            case SCOTLAND_CASE_TYPE_ID -> singleRefScotlandRepository.ethosCaseRefGen(currentYear);
+            default -> throw new IllegalArgumentException(
+                    String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));
+        };
     }
 }

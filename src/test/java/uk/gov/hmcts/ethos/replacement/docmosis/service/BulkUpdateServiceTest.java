@@ -68,6 +68,10 @@ class BulkUpdateServiceTest {
     private UserIdamService userIdamService;
     @Mock
     private CreateUpdatesBusSender createUpdatesBusSender;
+    @Mock
+    private CaseManagementLocationService caseManagementLocationService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private CCDRequest ccdRequest;
     private BulkRequest bulkRequest;
@@ -126,9 +130,11 @@ class BulkUpdateServiceTest {
         submitBulkEvent = new SubmitBulkEvent();
         submitBulkEvent.setCaseId(1111);
         submitBulkEvent.setCaseData(bulkData);
-        bulkUpdateService = new BulkUpdateService(ccdClient, userIdamService, createUpdatesBusSender);
+        bulkUpdateService = new BulkUpdateService(ccdClient, userIdamService,
+                createUpdatesBusSender, caseManagementLocationService, featureToggleService);
         bulkRequestPayload = new BulkRequestPayload();
         bulkRequestPayload.setBulkDetails(bulkDetails);
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
     }
 
     @Test

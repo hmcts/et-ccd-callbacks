@@ -11,6 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +38,8 @@ class MultipleCreationServiceTest {
     private MultipleTransferService multipleTransferService;
     @Mock
     private CaseManagementLocationService caseManagementLocationService;
+    @Mock
+    FeatureToggleService featureToggleService;
 
     @InjectMocks
     private MultipleCreationService multipleCreationService;

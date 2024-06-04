@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,6 +43,7 @@ public class MultipleCreationService {
     private final SubMultipleUpdateService subMultipleUpdateService;
     private final MultipleTransferService multipleTransferService;
     private final CaseManagementLocationService caseManagementLocationService;
+    private final FeatureToggleService featureToggleService;
 
     public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
@@ -53,9 +55,11 @@ public class MultipleCreationService {
 
         multipleDetails.getCaseData().setState(OPEN_STATE);
 
-        log.info("Set Case Management Location");
         MultipleData multipleData = multipleDetails.getCaseData();
-        caseManagementLocationService.setCaseManagementLocation(multipleData);
+        if (featureToggleService.isMultiplesEnabled()) {
+            log.info("Setting Case Management Location");
+            caseManagementLocationService.setCaseManagementLocation(multipleData);
+        }
 
         log.info("Check if creation is coming from Case Transfer");
 

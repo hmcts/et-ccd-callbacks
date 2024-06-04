@@ -64,17 +64,20 @@ public class BulkUpdateService {
     private final UserIdamService userIdamService;
     private final CreateUpdatesBusSender createUpdatesBusSender;
     private final CaseManagementLocationService caseManagementLocationService;
+    private final FeatureToggleService featureToggleService;
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
 
     @Autowired
     public BulkUpdateService(CcdClient ccdClient, UserIdamService userIdamService,
                              CreateUpdatesBusSender createUpdatesBusSender,
-                             CaseManagementLocationService caseManagementLocationService) {
+                             CaseManagementLocationService caseManagementLocationService,
+                             FeatureToggleService featureToggleService) {
         this.ccdClient = ccdClient;
         this.userIdamService = userIdamService;
         this.createUpdatesBusSender = createUpdatesBusSender;
         this.caseManagementLocationService = caseManagementLocationService;
+        this.featureToggleService = featureToggleService;
     }
 
     public BulkRequestPayload bulkUpdateLogic(BulkDetails bulkDetails, String userToken) {
@@ -355,7 +358,9 @@ public class BulkUpdateService {
             if (!isNullOrEmpty(managingOfficeNewValue)) {
                 updated = true;
                 caseData.setManagingOffice(managingOfficeNewValue);
-                caseManagementLocationService.setCaseManagementLocation(caseData);
+                if (featureToggleService.isMultiplesEnabled()) {
+                    caseManagementLocationService.setCaseManagementLocation(caseData);
+                }
             }
             String claimantRepNewValue = bulkData.getClaimantRepV2();
             if (!isNullOrEmpty(claimantRepNewValue)) {

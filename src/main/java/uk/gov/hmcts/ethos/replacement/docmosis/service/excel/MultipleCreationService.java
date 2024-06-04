@@ -12,9 +12,9 @@ import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -67,18 +67,18 @@ public class MultipleCreationService {
 
         log.info("Get lead case link and add to the collection case Ids");
 
-        getLeadMarkUpAndAddLeadToCaseIds(userToken, multipleDetails);
+        setLeadMarkUpAndAddLeadToCaseIds(userToken, multipleDetails);
 
-        if (!multipleData.getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
-                && !multipleData.getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
+        if (multipleData.getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
+                || multipleData.getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
+
+            multipleCreationET1OnlineMigration(userToken, multipleDetails);
+
+        } else {
 
             log.info("Multiple Creation UI");
 
             multipleCreationUI(userToken, multipleDetails, errors);
-
-        } else {
-
-            multipleCreationET1OnlineMigration(userToken, multipleDetails);
 
         }
 
@@ -158,7 +158,7 @@ public class MultipleCreationService {
 
     private void multipleCreationMigrationLogic(MultipleDetails multipleDetails,
                                                            List<MultipleObject> multipleObjectList,
-                                                           HashSet<String> subMultipleNames) {
+                                                           Set<String> subMultipleNames) {
 
         List<CaseMultipleTypeItem> caseMultipleTypeItemList = multipleDetails.getCaseData().getCaseMultipleCollection();
 
@@ -237,21 +237,13 @@ public class MultipleCreationService {
 
     }
 
-    private void getLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {
+    private void setLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {
 
         MultipleData multipleData = multipleDetails.getCaseData();
 
         String leadCase;
 
-        if (!isNullOrEmpty(multipleData.getLeadCase())) {
-
-            log.info("Adding lead case introduced by user: " + multipleData.getLeadCase());
-
-            MultiplesHelper.addLeadToCaseIds(multipleData, multipleData.getLeadCase());
-
-            leadCase = multipleData.getLeadCase();
-
-        } else {
+        if (isNullOrEmpty(multipleData.getLeadCase())) {
 
             if (multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
 
@@ -266,6 +258,14 @@ public class MultipleCreationService {
                 leadCase = MultiplesHelper.getLeadFromCaseIds(multipleData);
 
             }
+
+        } else {
+
+            log.info("Adding lead case introduced by user: " + multipleData.getLeadCase());
+
+            MultiplesHelper.addLeadToCaseIds(multipleData, multipleData.getLeadCase());
+
+            leadCase = multipleData.getLeadCase();
 
         }
 
@@ -282,7 +282,11 @@ public class MultipleCreationService {
         String refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
                 multipleDetails.getCaseData().getMultipleReference());
 
-        if (!ethosCaseRefCollection.isEmpty()) {
+        if (ethosCaseRefCollection.isEmpty()) {
+
+            log.info("Empty case ref collection");
+
+        } else {
 
             multipleHelperService.sendCreationUpdatesToSinglesWithoutConfirmation(userToken,
                     multipleDetails.getCaseTypeId(),
@@ -292,10 +296,6 @@ public class MultipleCreationService {
                     ethosCaseRefCollection,
                     ethosCaseRefCollection.get(0),
                     refMarkup);
-
-        } else {
-
-            log.info("Empty case ref collection");
 
         }
     }

@@ -74,6 +74,7 @@ class MultipleTransferSameCountryServiceTest {
         SortedMap<String, Object> multipleObjects = createMultipleObjects(ethosCaseReferences);
         when(excelReadingService.readExcel(userToken, excelFileBinaryUrl, Collections.emptyList(),
                 multipleDetails.getCaseData(), FilterExcelType.ALL)).thenReturn(multipleObjects);
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
 
         List<String> errors = multipleTransferSameCountryService.transferMultiple(multipleDetails, userToken);
 

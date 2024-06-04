@@ -134,6 +134,7 @@ class BulkUpdateServiceTest {
                 createUpdatesBusSender, caseManagementLocationService, featureToggleService);
         bulkRequestPayload = new BulkRequestPayload();
         bulkRequestPayload.setBulkDetails(bulkDetails);
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
     }
 
     @Test

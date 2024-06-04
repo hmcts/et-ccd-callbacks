@@ -21,7 +21,9 @@ public final class MarkdownHelper {
       <details class="govuk-details"> <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">%s</span></summary>
       <div class="govuk-details__text">
+      
       %s
+      
       </div> </details>
       
         """;

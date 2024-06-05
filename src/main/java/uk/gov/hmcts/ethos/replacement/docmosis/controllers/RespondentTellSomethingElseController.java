@@ -90,7 +90,7 @@ public class RespondentTellSomethingElseController {
         userIdamService.getUserDetails(userToken).getRoles();
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (Helper.isClaimantNonSystemUser(caseData)) {
+        if (Helper.isClaimantNonSystemUser(caseData) && Helper.isRespondentNonSystemUser(caseData)) {
             caseData.setResTseNotAvailableWarning(YES);
         }
 

@@ -5,19 +5,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples.AddLegalRepToMultipleController;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
+
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,15 +35,20 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({IssueInitialConsiderationDirectionsWAController.class, JsonMapper.class})
-class IssueInitialConsiderationDirectionsWAControllerTest extends BaseControllerTest {
+@WebMvcTest({AddLegalRepToMultipleController.class, JsonMapper.class})
+class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
 
-    private static final String START_INITIAL_CONSIDERATION_DIRECTIONS_URL =
-            "/startIssueInitialConsiderationDirectionsWA";
-    private static final String SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL =
-            "/submitIssueInitialConsiderationDirectionsWA";
-    private static final String COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL =
-            "/completeIssueInitialConsiderationDirectionsWA";
+    private static final String START_ADD_LEGAL_REP_TO_MULTIPLE_URL =
+            "/multiples/addLegalRepToMultiple/aboutToStart";
+    private static final String SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL =
+            "/multiples/addLegalRepToMultiple/aboutToSubmit";
+    private static final String COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL =
+            "/multiples/addLegalRepToMultiple/completed";
+
+    @MockBean
+    private MultipleReferenceService multipleReferenceService;
+    @MockBean
+    private UserIdamService userService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -45,6 +59,8 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
 
     @Autowired
     private JsonMapper jsonMapper;
+
+    private UserDetails userDetails;
 
     @BeforeEach
     @Override
@@ -60,25 +76,49 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
             .build();
+
+        userDetails = new UserDetails();
+        userDetails.setUid("Test UUID");
     }
 
     @Test
-    void startInitialConsiderationTest() throws Exception {
+    void startAddLegalRepToMultipleTest_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(START_INITIAL_CONSIDERATION_DIRECTIONS_URL)
+        when(multipleReferenceService.validateSubcaseIsOfMultiple(any())).thenReturn(new ArrayList<>());
+        mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                 .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()));
     }
 
     @Test
-    void submitInitialConsideration_TokenOk() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
+    void startAddLegalRepToMultiple_TokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void startAddLegalRepToMultiple_BadRequest() throws Exception {
+        mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
+                        .content("bad request")
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void submitAddLegalRepToMultiple_TokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(userService.getUserDetails(AUTH_TOKEN)).thenReturn(userDetails);
+        mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
@@ -87,50 +127,50 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    void submitInitialConsideration_TokenFail() throws Exception {
+    void submitAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
+        mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void submitInitialConsideration_BadRequest() throws Exception {
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
+    void submitAddLegalRepToMultiple_BadRequest() throws Exception {
+        mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content("bad request")
-                        .header("Authorization", AUTH_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void initICCompleteTokenOk() throws Exception {
+    void completeAddLegalRepToMultiple_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL)
+        mvc.perform(post(COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.confirmation_header", notNullValue()));
     }
 
     @Test
-    void initICCompleteTokenFail() throws Exception {
+    void completeAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL)
+        mvc.perform(post(COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void initICCompleteBadRequest() throws Exception {
-        mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL)
+    void completeAddLegalRepToMultiple_BadRequest() throws Exception {
+        mvc.perform(post(COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content("bad request")
-                        .header("Authorization", AUTH_TOKEN)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

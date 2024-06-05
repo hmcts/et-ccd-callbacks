@@ -279,10 +279,10 @@ class ET3FormMapperTest {
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MISS)).contains(
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS.equals(selectedTitle)
                         ? YES_CAPITALISED : STRING_EMPTY);
-        assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(isOtherTitle(selectedTitle)
-                ? YES_CAPITALISED : STRING_EMPTY);
-        assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(isOtherTitle(selectedTitle)
-                ? selectedTitle : STRING_EMPTY);
+        if (isOtherTitle(selectedTitle)) {
+            assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(YES_CAPITALISED);
+            assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(selectedTitle);
+        }
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_NAME)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_NAME);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_NUMBER)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_NUMBER);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_TYPE)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_TYPE);
@@ -474,7 +474,7 @@ class ET3FormMapperTest {
                 getCheckboxValue(respondentSumType.getEt3ResponseRespondentContestClaim(),
                         NO_CAPITALISED, NO_LOWERCASE));
         assertThat(pdfFields.get(TXT_PDF_RESPONSE_FIELD_CONTEST_CLAIM_CORRECT_FACTS)).contains(
-                getCorrectedDetailValue(respondentSumType.getEt3ResponseRespondentContestClaim(), NO_CAPITALISED,
+                getCorrectedDetailValue(respondentSumType.getEt3ResponseRespondentContestClaim(), YES_CAPITALISED,
                         respondentSumType.getEt3ResponseContestClaimDetails(),
                         TEST_PDF_RESPONSE_CONTEST_CLAIM_CORRECT_FACTS)
         );

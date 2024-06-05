@@ -32,7 +32,7 @@ public final class ET3FormResponseMapper {
                 YES_LOWERCASE, YES_CAPITALISED, respondentSumType.getEt3ResponseRespondentContestClaim());
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields, CHECKBOX_PDF_RESPONSE_FIELD_CONTEST_CLAIM_NO,
                 NO_LOWERCASE, NO_CAPITALISED, respondentSumType.getEt3ResponseRespondentContestClaim());
-        putConditionalPdfField(pdfFields, TXT_PDF_RESPONSE_FIELD_CONTEST_CLAIM_CORRECT_FACTS, NO_CAPITALISED,
+        putConditionalPdfField(pdfFields, TXT_PDF_RESPONSE_FIELD_CONTEST_CLAIM_CORRECT_FACTS, YES_CAPITALISED,
                 respondentSumType.getEt3ResponseRespondentContestClaim(),
                 respondentSumType.getEt3ResponseContestClaimDetails());
     }

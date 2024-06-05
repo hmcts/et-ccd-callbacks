@@ -152,7 +152,6 @@ public final class ET3FormRespondentMapper {
                 || CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MRS.equalsIgnoreCase(selectedTitle)
                 || CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS.equalsIgnoreCase(selectedTitle)
                 || CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MS.equalsIgnoreCase(selectedTitle)) {
-            putPdfTextField(pdfFields, CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER, STRING_EMPTY);
             putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER, STRING_EMPTY);
             return;
         }

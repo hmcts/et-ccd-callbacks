@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -10,7 +11,6 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
@@ -31,11 +31,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceCons
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_CLASS_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_CASE_TYPE_ID_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_DOCUMENT_NAME_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_PARSING_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PUT_PDF_FIELD_METHOD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.STREAM_CLOSURE_CLASS_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.UNABLE_TO_CLOSE_STREAM_FOR_PDF_TEMPLATE;
@@ -153,7 +153,7 @@ public class PdfService {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         InputStream stream = ObjectUtils.isEmpty(cl) || StringUtils.isBlank(pdfSource) ? null
                 : cl.getResourceAsStream(pdfSource);
-        if (!ObjectUtils.isEmpty(stream)) {
+        if (ObjectUtils.isNotEmpty(stream)) {
             try (PDDocument pdfDocument = Loader.loadPDF(Objects.requireNonNull(stream.readAllBytes()))) {
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
@@ -162,7 +162,7 @@ public class PdfService {
                         .entrySet()) {
                     String entryKey = entry.getKey();
                     Optional<String> entryValue = entry.getValue();
-                    if (entryValue.isPresent()) {
+                    if (entryValue.isPresent() && StringUtils.isNotBlank(entryValue.get())) {
                         putPdfField(caseData, pdfForm, entryValue, entryKey);
                     }
                 }
@@ -182,13 +182,17 @@ public class PdfService {
     }
 
     private static void putPdfField(CaseData caseData, PDAcroForm pdfForm, Optional<String> entryValue,
-                                   String entryKey) throws PdfServiceException {
+                                    String entryKey) {
         try {
             PDField pdfField = pdfForm.getField(entryKey);
             pdfField.setValue(entryValue.orElse(STRING_EMPTY));
         } catch (IOException ioe) {
-            throw new PdfServiceException(ioe.getMessage(), ioe, PDF_SERVICE_PARSING_ERROR,
-                    caseData.getEthosCaseReference(), PDF_SERVICE_CLASS_NAME, PUT_PDF_FIELD_METHOD_NAME);
+            String fieldValue = ObjectUtils.isNotEmpty(entryValue) && entryValue.isPresent()
+                    ? entryValue.get() : STRING_EMPTY;
+            logException(String.format(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE,
+                            fieldValue, entryKey),
+                    caseData.getEthosCaseReference(), ioe.getMessage(),
+                    PDF_SERVICE_CLASS_NAME, PUT_PDF_FIELD_METHOD_NAME);
         }
     }
 

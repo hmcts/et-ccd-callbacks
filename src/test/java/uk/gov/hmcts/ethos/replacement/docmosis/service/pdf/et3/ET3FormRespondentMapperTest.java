@@ -12,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.platform.commons.util.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MRS;
@@ -91,10 +91,10 @@ class ET3FormRespondentMapperTest {
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_MISS)).contains(
                 CHECKBOX_PDF_RESPONDENT_EXPECTED_VALUE_TITLE_MISS.equals(selectedTitle)
                         ? YES_CAPITALISED : STRING_EMPTY);
-        assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(isOtherTitle(selectedTitle)
-                ? YES_CAPITALISED : STRING_EMPTY);
-        assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(isOtherTitle(selectedTitle)
-                ? selectedTitle : STRING_EMPTY);
+        if (isOtherTitle(selectedTitle)) {
+            assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(YES_CAPITALISED);
+            assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_TITLE_OTHER)).contains(selectedTitle);
+        }
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_NAME)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_NAME);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_NUMBER)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_NUMBER);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_TYPE)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_TYPE);

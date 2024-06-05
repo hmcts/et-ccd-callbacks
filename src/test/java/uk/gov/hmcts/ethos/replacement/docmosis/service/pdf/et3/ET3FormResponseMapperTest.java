@@ -50,7 +50,7 @@ class ET3FormResponseMapperTest {
                 getCheckboxValue(respondentSumType.getEt3ResponseRespondentContestClaim(),
                         NO_CAPITALISED, NO_LOWERCASE));
         assertThat(pdfFields.get(TXT_PDF_RESPONSE_FIELD_CONTEST_CLAIM_CORRECT_FACTS)).contains(
-                getCorrectedDetailValue(respondentSumType.getEt3ResponseRespondentContestClaim(), NO_CAPITALISED,
+                getCorrectedDetailValue(respondentSumType.getEt3ResponseRespondentContestClaim(), YES_CAPITALISED,
                         respondentSumType.getEt3ResponseContestClaimDetails(),
                         TEST_PDF_RESPONSE_CONTEST_CLAIM_CORRECT_FACTS)
         );
@@ -69,7 +69,7 @@ class ET3FormResponseMapperTest {
 
         RespondentSumType respondentSumTypeContestYesDetailsDummyValue = cloneObject(respondentSumTypeAllValues,
                 RespondentSumType.class);
-        respondentSumTypeContestYesDetailsDummyValue.setEt3ResponseRespondentContestClaim(YES_CAPITALISED);
+        respondentSumTypeContestYesDetailsDummyValue.setEt3ResponseRespondentContestClaim(NO_CAPITALISED);
         respondentSumTypeContestYesDetailsDummyValue.setEt3ResponseContestClaimDetails(TEST_DUMMY_VALUE);
 
         RespondentSumType respondentSumTypeContestYesDetailsEmpty = cloneObject(respondentSumTypeAllValues,

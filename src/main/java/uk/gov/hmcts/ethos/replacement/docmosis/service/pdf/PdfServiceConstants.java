@@ -30,6 +30,8 @@ public final class PdfServiceConstants {
             "To create PDF file document name should not be empty";
     public static final String PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY =
             "To create PDF file pdf template should not be empty";
+    public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE =
+            "Unable to put pdf field, field value: %s, field name: %s";
 
     private PdfServiceConstants() {
         // Add a private constructor to hide the implicit public one.

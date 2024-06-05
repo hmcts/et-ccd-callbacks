@@ -742,7 +742,7 @@ public class CaseActionsForCaseWorkerController {
     })
     public ResponseEntity<CCDCallbackResponse> amendHearing(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("AMEND HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -753,6 +753,10 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+
+        if (featureToggleService.isMul2Enabled()) {
+            caseManagementForCaseWorkerService.setNextListedDateOnMultiple(ccdRequest.getCaseDetails());
+        }
         return getCallbackRespEntityNoErrors(caseData);
     }
 

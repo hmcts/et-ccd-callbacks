@@ -29,9 +29,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -54,6 +57,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -82,6 +86,8 @@ public class CaseManagementForCaseWorkerService {
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
     private final CaseManagementLocationService caseManagementLocationService;
+    private final MultipleReferenceService multipleReferenceService;
+    private final MultipleCasesSendingService multipleCasesSendingService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -110,7 +116,9 @@ public class CaseManagementForCaseWorkerService {
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
                                               CaseManagementLocationService caseManagementLocationService,
-                                              @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl) {
+                                              MultipleReferenceService multipleReferenceService,
+                                              @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl,
+                                              MultipleCasesSendingService multipleCasesSendingService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
@@ -118,7 +126,9 @@ public class CaseManagementForCaseWorkerService {
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
         this.caseManagementLocationService = caseManagementLocationService;
+        this.multipleReferenceService = multipleReferenceService;
         this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
+        this.multipleCasesSendingService = multipleCasesSendingService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -149,7 +159,10 @@ public class CaseManagementForCaseWorkerService {
 
     public void claimantDefaults(CaseData caseData) {
         String claimantTypeOfClaimant = caseData.getClaimantTypeOfClaimant();
-        if (!isNullOrEmpty(claimantTypeOfClaimant)) {
+
+        if (isNullOrEmpty(claimantTypeOfClaimant)) {
+            caseData.setClaimant(MISSING_CLAIMANT);
+        } else {
             if (claimantTypeOfClaimant.equals(INDIVIDUAL_TYPE_CLAIMANT)) {
                 String claimantFirstNames = nullCheck(caseData.getClaimantIndType().getClaimantFirstNames());
                 String claimantLastName = nullCheck(caseData.getClaimantIndType().getClaimantLastName());
@@ -157,9 +170,8 @@ public class CaseManagementForCaseWorkerService {
             } else {
                 caseData.setClaimant(nullCheck(caseData.getClaimantCompany()));
             }
-        } else {
-            caseData.setClaimant(MISSING_CLAIMANT);
         }
+
         if (featureToggleService.isHmcEnabled()) {
             caseData.setClaimantId(UUID.randomUUID().toString());
         }
@@ -321,6 +333,33 @@ public class CaseManagementForCaseWorkerService {
             }
             caseData.setNextListedDate(nextListedDate.split("T")[0]);
         }
+    }
+
+    public void setNextListedDateOnMultiple(CaseDetails details) throws IOException {
+        CaseData caseData = details.getCaseData();
+        if (StringUtils.isEmpty(caseData.getMultipleReference()) || !YES.equals(caseData.getLeadClaimant())) {
+            return;
+        }
+
+        String adminToken = adminUserService.getAdminUserToken();
+        String multipleCaseTypeId = details.getCaseTypeId() + "_Multiple";
+        SubmitMultipleEvent multiple = multipleReferenceService.getMultipleByReference(
+            adminToken,
+            multipleCaseTypeId,
+            caseData.getMultipleReference()
+        );
+
+        var multipleData = multiple.getCaseData();
+
+        multipleData.setNextListedDate(caseData.getNextListedDate());
+
+        multipleCasesSendingService.sendUpdateToMultiple(
+            adminToken, 
+            multipleCaseTypeId, 
+            EMPLOYMENT, 
+            multipleData, 
+            String.valueOf(multiple.getCaseId())
+        );
     }
 
     private List<String> getListedDates(HearingTypeItem hearingTypeItem) {

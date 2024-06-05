@@ -30,9 +30,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -80,7 +82,7 @@ public class Et1ReppedService {
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
-            TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST);
+            TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER);
 
     /**
      * Validates the postcode and region.
@@ -181,6 +183,7 @@ public class Et1ReppedService {
         documentList.addAll(acasCertificates);
         caseData.setClaimantDocumentCollection(documentList);
         caseData.setDocumentCollection(documentList);
+        DocumentHelper.setDocumentNumbers(caseData);
     }
 
     /**
@@ -351,7 +354,7 @@ public class Et1ReppedService {
      * @param caseDetails the case details
      * @param userToken the user token
      */
-    public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
+    public void assignCaseAccess(CaseDetails caseDetails, String userToken) throws IOException {
         UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
         OrganisationsResponse organisation = getOrganisationDetailsFromUserId(claimantRepUser.getUid());
 

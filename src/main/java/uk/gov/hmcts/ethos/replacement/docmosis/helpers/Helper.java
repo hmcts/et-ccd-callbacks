@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
@@ -345,6 +346,24 @@ public final class Helper {
     public static boolean isClaimantNonSystemUser(CaseData caseData) {
         if (caseData != null) {
             return caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null;
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the respondent is a non-system user.
+     * A non-system user respondent refers to the cases that have been
+     * transferred from legacy ECM or a paper based claim
+     * which a caseworker would manually create in ExUI.
+     *
+     * @param caseData The case data to check for respondent user type.
+     * @return true if the respondent is a non-system user, false otherwise.
+     */
+    public static boolean isRespondentNonSystemUser(CaseData caseData) {
+        if (caseData != null) {
+            List<RepresentedTypeRItem>  repCollection = caseData.getRepCollection();
+            return !CollectionUtils.isEmpty(repCollection)
+                    && repCollection.stream().anyMatch(rep -> YES.equals(rep.getValue().getMyHmctsYesNo()));
         }
         return true;
     }

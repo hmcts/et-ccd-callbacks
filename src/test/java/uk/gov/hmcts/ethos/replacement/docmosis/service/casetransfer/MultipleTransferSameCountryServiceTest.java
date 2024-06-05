@@ -10,6 +10,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.MultipleDataBuilder;
 
@@ -42,6 +44,12 @@ class MultipleTransferSameCountryServiceTest {
     @Mock
     CaseTransferEventService caseTransferEventService;
 
+    @Mock
+    CaseManagementLocationService caseManagementLocationService;
+
+    @Mock
+    FeatureToggleService featureToggleService;
+
     @Captor
     ArgumentCaptor<CaseTransferEventParams> caseTransferEventParamsArgumentCaptor;
 
@@ -66,6 +74,7 @@ class MultipleTransferSameCountryServiceTest {
         SortedMap<String, Object> multipleObjects = createMultipleObjects(ethosCaseReferences);
         when(excelReadingService.readExcel(userToken, excelFileBinaryUrl, Collections.emptyList(),
                 multipleDetails.getCaseData(), FilterExcelType.ALL)).thenReturn(multipleObjects);
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
 
         List<String> errors = multipleTransferSameCountryService.transferMultiple(multipleDetails, userToken);
 

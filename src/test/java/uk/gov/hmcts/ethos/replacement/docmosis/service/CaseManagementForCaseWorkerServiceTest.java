@@ -46,6 +46,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -139,7 +140,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @MockBean
     private CaseManagementLocationService caseManagementLocationService;
     @MockBean
-    private CcdCaseAssignment ccdCaseAssignment;
+    private MultipleReferenceService multipleReferenceService;
     @MockBean
     private MultipleCasesSendingService multipleCasesSendingService;
 
@@ -238,8 +239,8 @@ class CaseManagementForCaseWorkerServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
-                adminUserService, caseManagementLocationService, ccdGatewayBaseUrl,
-                ccdCaseAssignment, multipleCasesSendingService);
+                adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
+                multipleCasesSendingService);
     }
 
     private static Address getAddress() {
@@ -1368,7 +1369,7 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    void testSetNextListedDateOnMultiple() {
+    void testSetNextListedDateOnMultiple() throws IOException {
         CaseDetails details = new CaseDetails();
         details.setCaseData(new CaseData());
         details.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
@@ -1384,7 +1385,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         String adminToken = "adminToken";
         when(adminUserService.getAdminUserToken()).thenReturn(adminToken);
-        when(ccdCaseAssignment.getMultipleByReference(any(), any(), any())).thenReturn(event);
+        when(multipleReferenceService.getMultipleByReference(any(), any(), any())).thenReturn(event);
 
         caseManagementForCaseWorkerService.setNextListedDateOnMultiple(details);
 

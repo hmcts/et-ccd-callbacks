@@ -161,5 +161,71 @@
       }
     ],
     "overrideAll": true
+  },
+  {
+    "email": "admin@hmcts.net",
+    "id": "742b9798-e552-3495-bb86-23431260031c",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "judge",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "ET_EnglandWales",
+          "jurisdiction": "EMPLOYMENT"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "et.caseadmin@hmcts.net",
+    "id": "852b9798-e552-3495-bb86-23431260031c",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "case-allocator",
+        "grantType": "STANDARD",
+        "roleCategory": "ADMIN",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "ET_EnglandWales",
+          "jurisdiction": "EMPLOYMENT"
+        },
+        "authorisations": []
+      },
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "hearing-centre-admin",
+        "grantType": "STANDARD",
+        "roleCategory": "ADMIN",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "ET_EnglandWales",
+          "jurisdiction": "EMPLOYMENT"
+        },
+        "authorisations": []
+      },
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "hearing-centre-team-leader",
+        "grantType": "STANDARD",
+        "roleCategory": "ADMIN",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "ET_EnglandWales",
+          "jurisdiction": "EMPLOYMENT"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
   }
 ]

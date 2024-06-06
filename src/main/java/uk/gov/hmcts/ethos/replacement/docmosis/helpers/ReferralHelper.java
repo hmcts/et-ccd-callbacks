@@ -147,10 +147,10 @@ public final class ReferralHelper {
                         new String[]{"Next hearing date", getNearestHearingToReferral(leadCase, "None")},
                         new String[]{REFERRAL_SUBJECT, updateItem.getUpdateReferralSubject()},
                         new String[]{"Details of the referral",
-                                updateItem.getUpdateReferralDetails().replace("\n", "<br>")},
+                                formatReferralDetails(updateItem.getUpdateReferralDetails())},
                         new String[]{DOCUMENTS, createDocLinkFromCollection(updateItem.getUpdateReferralDocument())},
                         new String[]{"Recommended instructions",
-                                updateItem.getUpdateReferralInstruction().replace("\n", "<br>")},
+                                formatReferralDetails(updateItem.getUpdateReferralInstruction())},
                         new String[]{"Updated by", updateItem.getUpdateReferredBy()},
                         new String[]{"Updated date", updateItem.getUpdateReferralDate() + CLOSE_PRE_TAG})))
                 .map(updateRow -> createTwoColumnTable(
@@ -228,10 +228,10 @@ public final class ReferralHelper {
                         new String[]{"Referral date", referral.getReferralDate()},
                         new String[]{"Next hearing date", getNearestHearingToReferral(leadCase, "None")},
                         new String[]{REFERRAL_SUBJECT, referral.getReferralSubject()},
-                        new String[]{"Details of the referral", referral.getReferralDetails().replace("\n", "<br>")},
+                        new String[]{"Details of the referral", formatReferralDetails(referral.getReferralDetails())},
                         new String[]{DOCUMENTS, referralDocLink},
                         new String[]{"Recommended instructions",
-                                referral.getReferralInstruction().replace("\n", "<br>") + CLOSE_PRE_TAG}));
+                                formatReferralDetails(referral.getReferralInstruction()) + CLOSE_PRE_TAG}));
     }
 
     private static String getReferralDocLink(DocumentTypeItem documentTypeItem) {
@@ -272,10 +272,10 @@ public final class ReferralHelper {
                         new String[]{"Referral date", reply.getReplyDate()},
                         new String[]{"Hearing date", getNearestHearingToReferral(leadCase, "None")},
                         new String[]{REFERRAL_SUBJECT, reply.getReferralSubject()},
-                        new String[]{"Directions", reply.getDirectionDetails().replace("\n", "<br>")},
+                        new String[]{"Directions", formatReferralDetails(reply.getDirectionDetails())},
                         new String[]{DOCUMENTS, createDocLinkFromCollection(reply.getReplyDocument())},
-                        new String[]{"General Notes", defaultIfEmpty(reply.getReplyGeneralNotes().replace("\n", "<br>"),
-                                "-") + CLOSE_PRE_TAG})))
+                        new String[]{"General Notes",
+                                formatReferralDetails(reply.getReplyGeneralNotes()) + CLOSE_PRE_TAG})))
                 .map(replyRows -> createTwoColumnTable(
                         new String[]{"Reply %s".formatted(singleReply ? "1" : count.incrementAndGet()), ""},
                         Stream.of(replyRows)
@@ -812,6 +812,10 @@ public final class ReferralHelper {
 
     private static String getReferralDocumentName(ReferralType referral) {
         return String.format(REFERRAL_DOCUMENT_NAME, referral.getReferralNumber(), referral.getReferralSubject());
+    }
+
+    private static String formatReferralDetails(String text) {
+        return isNullOrEmpty(text) ? "-" : text.replace("\n", "<br>");
     }
 
 }

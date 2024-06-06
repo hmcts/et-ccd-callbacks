@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
@@ -24,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class HelperTest {
 
@@ -145,6 +149,30 @@ public class HelperTest {
         caseData.setHubLinksStatuses(new HubLinksStatuses());
         boolean actual3 = Helper.isClaimantNonSystemUser(caseData);
         assertFalse(actual3);
+    }
+
+    @Test
+    void isRespondentNonSystemUser() {
+        CaseData caseData = new CaseData();
+
+        caseData.setRepCollection(new ArrayList<>());
+        boolean actual = Helper.isRespondentNonSystemUser(caseData);
+        assertFalse(actual);
+
+        RepresentedTypeR typeR = new RepresentedTypeR();
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setValue(typeR);
+        caseData.setRepCollection(Collections.singletonList(representedTypeRItem));
+        boolean actual2 = Helper.isRespondentNonSystemUser(caseData);
+        assertFalse(actual2);
+
+        typeR.setMyHmctsYesNo(YES);
+        boolean actual3 = Helper.isRespondentNonSystemUser(caseData);
+        assertTrue(actual3);
+
+        typeR.setMyHmctsYesNo(NO);
+        boolean actual4 = Helper.isRespondentNonSystemUser(caseData);
+        assertFalse(actual4);
     }
 
     @Test

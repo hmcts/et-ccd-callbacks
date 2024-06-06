@@ -18,7 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
@@ -56,7 +56,7 @@ class Et3ResponseServiceTest {
     @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
-    private PdfService pdfService;
+    private PdfBoxService pdfBoxService;
     private EmailService emailService;
     private CaseData caseData;
     private DocumentInfo documentInfo;
@@ -65,7 +65,7 @@ class Et3ResponseServiceTest {
     void setUp() {
         emailService = spy(new EmailUtils());
 
-        et3ResponseService = new Et3ResponseService(documentManagementService, pdfService, emailService);
+        et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, emailService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -93,7 +93,7 @@ class Et3ResponseServiceTest {
                     new ConcurrentHashMap<String, Optional<String>>());
             when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
                     .thenReturn(new URI("testUri"));
-            when(pdfService.generatePdfDocumentInfo(any(), anyString(),
+            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
                     anyString(), anyString(), anyString())).thenReturn(null);
             CaseData testGeneratePdfCaseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
             DocumentInfo documentInfo1 = et3ResponseService.generateEt3ResponseDocument(testGeneratePdfCaseData,
@@ -110,7 +110,7 @@ class Et3ResponseServiceTest {
                     new ConcurrentHashMap<String, Optional<String>>());
             when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
                     .thenReturn(new URI("testUri"));
-            when(pdfService.generatePdfDocumentInfo(any(), anyString(),
+            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
                     anyString(), anyString(), anyString())).thenReturn(documentInfo);
             assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
                     ENGLANDWALES_CASE_TYPE_ID));

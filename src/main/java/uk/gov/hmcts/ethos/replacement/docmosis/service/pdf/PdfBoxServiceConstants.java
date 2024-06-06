@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf;
 /**
  *  Defines PDF Service Constants.
  */
-public final class PdfServiceConstants {
+public final class PdfBoxServiceConstants {
 
     public static final String PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF =
             "Exception occurred while mapping case data to template PDF";
@@ -12,7 +12,6 @@ public final class PdfServiceConstants {
     public static final String PDF_SERVICE_CLASS_NAME = "PdfService";
     public static final String ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME = "createET3FormByteArray";
     public static final String PUT_PDF_FIELD_METHOD_NAME = "putPdfField";
-    public static final String PDF_SERVICE_PARSING_ERROR = "Error while parsing PDF file for entry key \"%s\"";
     public static final String STREAM_CLOSURE_CLASS_NAME = "safeClose";
     public static final String UNABLE_TO_CLOSE_STREAM_FOR_PDF_TEMPLATE =
             "Unable to close input stream for the template PDF file";
@@ -33,7 +32,7 @@ public final class PdfServiceConstants {
     public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE =
             "Unable to put pdf field, field value: %s, field name: %s";
 
-    private PdfServiceConstants() {
+    private PdfBoxServiceConstants() {
         // Add a private constructor to hide the implicit public one.
     }
 }

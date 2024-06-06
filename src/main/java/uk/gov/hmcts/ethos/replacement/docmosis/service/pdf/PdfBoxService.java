@@ -24,34 +24,34 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.EMPTY_BYTE_ARRAY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_DOCUMENT_CREATED_LOG_INFO;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_CLASS_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_CASE_TYPE_ID_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_DOCUMENT_NAME_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.PUT_PDF_FIELD_METHOD_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.STREAM_CLOSURE_CLASS_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.UNABLE_TO_CLOSE_STREAM_FOR_PDF_TEMPLATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfServiceConstants.UNABLE_TO_PROCESS_PDF_SOURCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.EMPTY_BYTE_ARRAY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_DOCUMENT_CREATED_LOG_INFO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_CLASS_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_CASE_TYPE_ID_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_DOCUMENT_NAME_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PUT_PDF_FIELD_METHOD_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.STREAM_CLOSURE_CLASS_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.UNABLE_TO_CLOSE_STREAM_FOR_PDF_TEMPLATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.UNABLE_TO_PROCESS_PDF_SOURCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper.mapEt3Form;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfServiceUtil.logException;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfBoxServiceUtil.logException;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
  */
 @Slf4j
-@Service("pdfService")
+@Service
 @RequiredArgsConstructor
-public class PdfService {
+public class PdfBoxService {
 
     private final DocumentManagementService documentManagementService;
     @Value("${ccd_gateway_base_url}")
@@ -71,10 +71,10 @@ public class PdfService {
      */
     public DocumentInfo generatePdfDocumentInfo(CaseData caseData, String userToken, String caseTypeId,
                                                 String documentName, String pdfTemplate)
-            throws IOException, PdfServiceException {
+            throws IOException, PdfBoxServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
             Throwable exception = new Throwable(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
-            throw new PdfServiceException(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY, exception,
+            throw new PdfBoxServiceException(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY, exception,
                     PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY, CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE,
                     PDF_SERVICE_CLASS_NAME, GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME);
         }
@@ -106,10 +106,10 @@ public class PdfService {
                                                                        String exceptionMessage,
                                                                        String firstWord,
                                                                        String caseReferenceNumber)
-            throws PdfServiceException {
+            throws PdfBoxServiceException {
         if (StringUtils.isBlank(stringValue)) {
             Throwable throwable = new Throwable(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
-            throw new PdfServiceException(exceptionMessage, throwable, firstWord, caseReferenceNumber,
+            throw new PdfBoxServiceException(exceptionMessage, throwable, firstWord, caseReferenceNumber,
                     PDF_SERVICE_CLASS_NAME, GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME);
         }
     }
@@ -169,7 +169,7 @@ public class PdfService {
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 pdfDocument.save(byteArrayOutputStream);
                 return byteArrayOutputStream.toByteArray();
-            } catch (PdfServiceException e) {
+            } catch (PdfBoxServiceException e) {
                 logException(PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF,
                         caseData.getEthosCaseReference(), e.getMessage(), PDF_SERVICE_CLASS_NAME,
                         ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME);

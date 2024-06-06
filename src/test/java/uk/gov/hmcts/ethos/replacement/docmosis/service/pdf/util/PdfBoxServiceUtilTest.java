@@ -4,9 +4,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfServiceUtil.logException;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util.PdfBoxServiceUtil.logException;
 
-class PdfServiceUtilTest {
+class PdfBoxServiceUtilTest {
 
     @ParameterizedTest
     @CsvSource(value = {"Test First Word:Test Reference Number:Test Message:Test Class Name:Test Method Name",

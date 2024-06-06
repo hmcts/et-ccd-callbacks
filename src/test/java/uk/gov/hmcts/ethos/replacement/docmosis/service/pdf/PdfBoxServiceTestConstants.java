@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf;
 
-public final class PdfServiceTestConstants {
+public final class PdfBoxServiceTestConstants {
 
     public static final String TEST_DOCUMENT_URL = "/testdocument/binary";
     public static final String TEST_DOCUMENT_MARKUP = "<a>some test markup</a>";
@@ -9,7 +9,7 @@ public final class PdfServiceTestConstants {
     public static final String TEST_DOCUMENT_NAME = "test document name";
     public static final String TEST_PDF_TEMPLATE = "test pdf template";
 
-    private PdfServiceTestConstants() {
+    private PdfBoxServiceTestConstants() {
         // Add a private constructor to hide the implicit public one.
     }
 }

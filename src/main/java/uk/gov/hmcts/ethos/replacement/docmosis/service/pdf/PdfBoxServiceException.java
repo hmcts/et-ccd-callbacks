@@ -8,16 +8,16 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
 /**
- * Is thrown when an exception occurs whiles converting case data in pdf in {@link PdfService}.
+ * Is thrown when an exception occurs whiles converting case data in pdf in {@link PdfBoxService}.
  * for example an IOException is encountered while loading pdf template
  */
 @Slf4j
-public class PdfServiceException extends Exception {
+public class PdfBoxServiceException extends Exception {
     @Serial
     private static final long serialVersionUID = 304268196018404976L;
 
     /**
-     * Creates a {@link PdfServiceException} with an error message and the cause of the error and
+     * Creates a {@link PdfBoxServiceException} with an error message and the cause of the error and
      * logs exception with the values to make it easier to find in Azure logs.
      * @param message main message of the exception
      * @param cause main throwable cause of the exception
@@ -26,8 +26,8 @@ public class PdfServiceException extends Exception {
      * @param className class name where the exception occurred
      * @param methodName method of the exception occurred
      */
-    public PdfServiceException(String message, Throwable cause, String firstWord, String caseReferenceNumber,
-                               String className, String methodName) {
+    public PdfBoxServiceException(String message, Throwable cause, String firstWord, String caseReferenceNumber,
+                                  String className, String methodName) {
         super(message, cause);
         log.error("*************EXCEPTION OCCURED*************"
                 + "\nERROR DESCRIPTION: " + (isNotBlank(firstWord) ? firstWord : STRING_EMPTY)

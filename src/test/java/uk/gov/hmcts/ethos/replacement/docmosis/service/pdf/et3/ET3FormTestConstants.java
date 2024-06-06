@@ -62,8 +62,8 @@ public final class ET3FormTestConstants {
 
     //ET3FormEarningsBenefitsMapperTest CONSTANTS
     public static final String TEST_PDF_EARNINGS_BENEFITS_CORRECT_HOURS = "36";
-    public static final String TEST_PDF_EARNINGS_BENEFITS_PAY_BEFORE_TAX = "35000";
-    public static final String TEST_PDF_EARNINGS_BENEFITS_PAY_TAKE_HOME = "30000";
+    public static final String TEST_PDF_EARNINGS_BENEFITS_PAY_BEFORE_TAX = "35000.00";
+    public static final String TEST_PDF_EARNINGS_BENEFITS_PAY_TAKE_HOME = "30000.00";
     public static final String TEST_PDF_EARNINGS_BENEFITS_CORRECT_NOTICE_PERIOD =
             "His notice period was only for 3 weeks";
     public static final String TEST_PDF_EARNINGS_BENEFITS_CORRECT_PENSION_AND_OTHER_BENEFITS =

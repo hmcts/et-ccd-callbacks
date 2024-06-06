@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.WEEKLY_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.YES_LOWERCASE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.correctCurrency;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putConditionalPdfField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfCheckboxFieldWhenExpectedValueEqualsActualValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfCheckboxFieldWhenOther;
@@ -99,7 +100,7 @@ public final class ET3FormEarningsAndBenefitsMapper {
                 TXT_PDF_EARNINGS_BENEFITS_FIELD_PAY_BEFORE_TAX,
                 NO_CAPITALISED,
                 respondentSumType.getEt3ResponseEarningDetailsCorrect(),
-                respondentSumType.getEt3ResponsePayBeforeTax());
+                correctCurrency(respondentSumType.getEt3ResponsePayBeforeTax()));
         putConditionalPdfField(pdfFields,
                 CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_PAY_BEFORE_TAX_WEEKLY,
                 NO_CAPITALISED,
@@ -119,7 +120,7 @@ public final class ET3FormEarningsAndBenefitsMapper {
                 TXT_PDF_EARNINGS_BENEFITS_FIELD_NORMAL_TAKE_HOME_PAY,
                 NO_CAPITALISED,
                 respondentSumType.getEt3ResponseEarningDetailsCorrect(),
-                respondentSumType.getEt3ResponsePayTakehome());
+                correctCurrency(respondentSumType.getEt3ResponsePayTakehome()));
         putConditionalPdfField(pdfFields,
                 CHECKBOX_PDF_EARNINGS_BENEFITS_FIELD_NORMAL_TAKE_HOME_PAY_WEEKLY,
                 NO_CAPITALISED,

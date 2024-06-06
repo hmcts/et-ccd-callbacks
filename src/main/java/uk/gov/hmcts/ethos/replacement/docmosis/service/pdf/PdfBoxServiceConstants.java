@@ -31,6 +31,12 @@ public final class PdfBoxServiceConstants {
             "To create PDF file pdf template should not be empty";
     public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE =
             "Unable to put pdf field, field value: %s, field name: %s";
+    public static final char CHARACTER_DOT = '.';
+    public static final int ZERO = 0;
+    public static final int ONE = 1;
+    public static final int TWO = 2;
+    public static final String STRING_ZERO = "0";
+    public static final String CURRENCY_DECIMAL_ZERO_WITH_DOT = ".00";
 
     private PdfBoxServiceConstants() {
         // Add a private constructor to hide the implicit public one.

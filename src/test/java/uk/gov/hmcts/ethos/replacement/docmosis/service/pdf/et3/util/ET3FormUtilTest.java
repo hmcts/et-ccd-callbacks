@@ -43,7 +43,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_EXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_FIELD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.cloneObject;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.correctCurrency;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.formatDate;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putConditionalPdfField;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.putPdfAddressField;
@@ -145,13 +144,6 @@ class ET3FormUtilTest {
     void testPutPdfAddressField(Address address, String expectedAddress) {
         putPdfAddressField(pdfFields, TXT_PDF_RESPONDENT_FIELD_ADDRESS, address);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_ADDRESS)).contains(expectedAddress);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"null:''", "'':''", "0.256:0.256", "25.36:25.36", "5000000:50000.00", ".125:0.125"},
-            delimiter = ':', nullValues = {"null"})
-    void testCorrectCurrency(String valueToCorrect, String expectedValue) {
-        assertThat(correctCurrency(valueToCorrect)).contains(expectedValue);
     }
 
     @Test

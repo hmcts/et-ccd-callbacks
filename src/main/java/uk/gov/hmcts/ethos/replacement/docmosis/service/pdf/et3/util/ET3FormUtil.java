@@ -246,28 +246,4 @@ public final class ET3FormUtil {
         Gson gson = new Gson();
         return classType.cast(gson.fromJson(gson.toJson(object), object.getClass()));
     }
-
-    /**
-     * Converts given value to currency. Value is coming from frontend with extra 2 ZEROs. That is why
-     * we are adding a dot(.) in between last 2 digits to format it as currency.
-     * Code checks if the entered value has any (.). If it has returns the value and checks if the value's length is
-     * less than 2. If it is less than 2 returns the value adding .00, If value is empty then returns an empty string.
-     * @param value entered by user but added extra 2 zeros.
-     * @return string that has a dot(.) before the ending 2 zeros.
-     */
-    public static String correctCurrency(String value) {
-        if (isBlank(value)) {
-            return STRING_EMPTY;
-        }
-        if (value.indexOf(".") == 0) {
-            return "0" + value;
-        }
-        if (value.indexOf(".") >= 1) {
-            return value;
-        }
-        if (value.length() < 2) {
-            return value + ".00";
-        }
-        return value.substring(0, value.length() - 2) + "." + value.substring(value.length() - 2);
-    }
 }

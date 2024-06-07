@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.stream.Stream;
 
@@ -43,7 +42,7 @@ class PdfBoxServiceTest {
     DocumentManagementService documentManagementService;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() {
         mockDocumentManagement();
         pdfBoxService = new PdfBoxService(documentManagementService);
     }

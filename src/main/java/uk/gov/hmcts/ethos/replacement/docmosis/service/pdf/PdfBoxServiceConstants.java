@@ -38,6 +38,7 @@ public final class PdfBoxServiceConstants {
     public static final int TWO = 2;
     public static final String STRING_ZERO = "0";
     public static final String CURRENCY_DECIMAL_ZERO_WITH_DOT = ".00";
+    public static final String PDF_OUTPUT_FILE_NAME_PREFIX = "ET3_Form_Respondent_Document";
 
     private PdfBoxServiceConstants() {
         // Add a private constructor to hide the implicit public one.

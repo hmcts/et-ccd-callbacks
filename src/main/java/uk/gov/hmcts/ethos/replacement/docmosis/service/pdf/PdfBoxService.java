@@ -28,6 +28,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceC
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_DOCUMENT_CREATED_LOG_INFO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_OUTPUT_FILE_NAME_PREFIX;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_CLASS_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY;
@@ -116,7 +117,9 @@ public class PdfBoxService {
     }
 
     private static String generatePdfFileName(CaseData caseData, String documentName) {
-        return String.format(documentName, caseData.getSubmitEt3Respondent().getSelectedLabel());
+        return String.format(documentName, ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent())
+                || StringUtils.isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel())
+                ? PDF_OUTPUT_FILE_NAME_PREFIX : caseData.getSubmitEt3Respondent().getSelectedLabel());
     }
 
     private DocumentInfo createDocumentInfoFromBytes(String authToken, byte[] bytes, String documentName,
@@ -150,7 +153,7 @@ public class PdfBoxService {
      * @return a byte array of the generated pdf file.
      * @throws IOException if there is an issue reading the pdf template
      */
-    private byte[] convertCaseToPdfAsByteArray(CaseData caseData, String pdfSource) throws IOException {
+    public byte[] convertCaseToPdfAsByteArray(CaseData caseData, String pdfSource) throws IOException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         InputStream stream = ObjectUtils.isEmpty(cl) || StringUtils.isBlank(pdfSource) ? null
                 : cl.getResourceAsStream(pdfSource);

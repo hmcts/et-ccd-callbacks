@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public final class InvalidCharacterCheck {
@@ -20,6 +21,7 @@ public final class InvalidCharacterCheck {
             + "for the %s";
     public static final String DOUBLE_SPACE_ERROR = "%s contains a double space for case %s. Please correct this before"
             + " for the %s";
+    private static final List<String> DOCUMENT_CHARS_TO_REPLACE = List.of("@", "/", "\\", "'");
 
     private InvalidCharacterCheck() {
     }
@@ -107,5 +109,17 @@ public final class InvalidCharacterCheck {
         } else {
             return false;
         }
+    }
+
+    public static String sanitizePartyName(String partyName) {
+        if (isNullOrEmpty(partyName)) {
+            return "";
+        }
+
+        String sanitizedName = partyName;
+        for (String charToReplace : DOCUMENT_CHARS_TO_REPLACE) {
+            sanitizedName = sanitizedName.replace(charToReplace, " ");
+        }
+        return sanitizedName;
     }
 }

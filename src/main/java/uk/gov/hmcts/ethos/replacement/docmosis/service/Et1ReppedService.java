@@ -159,7 +159,7 @@ public class Et1ReppedService {
             }
 
             List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
-                    userToken);
+                    userToken, caseDetails.getCaseTypeId());
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
@@ -234,7 +234,8 @@ public class Et1ReppedService {
                 : "ET1 - " + caseData.getClaimant() + ".pdf";
     }
 
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {
+    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken,
+                                                                  String caseTypeId) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -250,7 +251,7 @@ public class Et1ReppedService {
         List<DocumentInfo> documentInfoList = acasNumbers.stream()
                 .map(acasNumber -> {
                     try {
-                        return acasService.getAcasCertificates(caseData, acasNumber, userToken);
+                        return acasService.getAcasCertificates(caseData, acasNumber, userToken, caseTypeId);
                     } catch (JsonProcessingException e) {
                         log.error("Failed to retrieve ACAS Certificate", e);
                         return null;

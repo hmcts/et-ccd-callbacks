@@ -449,15 +449,6 @@ bootJar {
     }
 }
 
-configurations.every {
-    it -> it.resolutionStrategy.eachDependency { dep -> {
-            if(dep.requested.name.contains('jackson-databind')) {
-                dep.useVersion("2.16.0")
-            }
-        }
-    }
-}
-
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }

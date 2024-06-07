@@ -42,7 +42,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -72,6 +76,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -133,6 +139,10 @@ class CaseManagementForCaseWorkerServiceTest {
     private EmailService emailService;
     @MockBean
     private CaseManagementLocationService caseManagementLocationService;
+    @MockBean
+    private MultipleReferenceService multipleReferenceService;
+    @MockBean
+    private MultipleCasesSendingService multipleCasesSendingService;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -229,7 +239,8 @@ class CaseManagementForCaseWorkerServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
-                adminUserService, caseManagementLocationService, ccdGatewayBaseUrl);
+                adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
+                multipleCasesSendingService);
     }
 
     private static Address getAddress() {
@@ -1355,6 +1366,37 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
 
         assertNull(caseData.getClaimantId());
+    }
+
+    @Test
+    void testSetNextListedDateOnMultiple() throws IOException {
+        CaseDetails details = new CaseDetails();
+        details.setCaseData(new CaseData());
+        details.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        details.getCaseData().setMultipleReference("6000001");
+        String nextListedDate = "2020-03-05";
+        details.getCaseData().setNextListedDate(nextListedDate);
+        details.getCaseData().setLeadClaimant(YES);
+
+        MultipleData multipleData = MultipleData.builder().build();
+        SubmitMultipleEvent event = new SubmitMultipleEvent();
+        event.setCaseId(Long.valueOf("1716474017962374"));
+        event.setCaseData(multipleData);
+
+        String adminToken = "adminToken";
+        when(adminUserService.getAdminUserToken()).thenReturn(adminToken);
+        when(multipleReferenceService.getMultipleByReference(any(), any(), any())).thenReturn(event);
+
+        caseManagementForCaseWorkerService.setNextListedDateOnMultiple(details);
+
+        assertEquals(nextListedDate, multipleData.getNextListedDate());
+        multipleData.setNextListedDate(nextListedDate);
+        verify(multipleCasesSendingService, times(1))
+            .sendUpdateToMultiple(adminToken,
+                ENGLANDWALES_BULK_CASE_TYPE_ID,
+                EMPLOYMENT,
+                multipleData,
+                "1716474017962374");
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

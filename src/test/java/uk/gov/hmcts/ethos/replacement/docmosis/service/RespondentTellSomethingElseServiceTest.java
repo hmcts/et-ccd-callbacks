@@ -498,7 +498,7 @@ class RespondentTellSomethingElseServiceTest {
         DocumentType actualDocumentType = documentCollection.get(0).getValue();
 
         assertThat(documentCollection.size(), is(1));
-        System.out.println(actualDocumentType);
+
         assertEquals(selectedApplication, actualDocumentType.getShortDescription());
 
     }
@@ -753,7 +753,7 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(caseData.getResTseDocument5(), is(nullValue()));
         assertThat(caseData.getResTseDocument6(), is(nullValue()));
         assertThat(caseData.getResTseDocument7(), is(nullValue()));
-        assertThat(caseData.getResTseDocument8(), is(nullValue()));
-        assertThat(caseData.getResTseDocument9(), is(nullValue()));
+        assertThat(caseData.getResTseDocument11(), is(nullValue()));
+        assertThat(caseData.getResTseDocument12(), is(nullValue()));
     }
 }

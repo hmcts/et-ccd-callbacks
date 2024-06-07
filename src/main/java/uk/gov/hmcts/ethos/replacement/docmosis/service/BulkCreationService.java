@@ -77,40 +77,35 @@ public class BulkCreationService {
                 bulkRequestPayload.setBulkDetails(bulkDetails);
             } else {
                 // 4) Create an event to update multiple reference field to all cases using PERSISTENT QUEUE
-                updateMultipleRefForAllCases(bulkDetails, bulkCasesPayload, userToken, bulkRequestPayload);
+
+                List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
+                log.info("ETHOS CASE REF COLLECTION: " + ethosCaseRefCollection);
+                if (ethosCaseRefCollection.isEmpty()) {
+                    log.info("EMPTY CASE REF COLLECTION");
+                } else {
+
+                    String username = userIdamService.getUserDetails(userToken).getEmail();
+                    PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
+                            username,
+                            ethosCaseRefCollection,
+                            PersistentQHelper.getCreationDataModel(ethosCaseRefCollection.get(0),
+                                    bulkDetails.getCaseData().getMultipleReference(),
+                                    bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp()),
+                            bulkCasesPayload.getErrors(),
+                            bulkDetails.getCaseData().getMultipleReference(),
+                            createUpdatesBusSender,
+                            String.valueOf(ethosCaseRefCollection.size()),
+                            bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp());
+
+                }
+                bulkRequestPayload.setBulkDetails(bulkDetails);
+
             }
         } else {
             bulkRequestPayload.setBulkDetails(bulkDetails);
         }
         bulkRequestPayload.setErrors(bulkCasesPayload.getErrors());
         return bulkRequestPayload;
-    }
-
-    private void updateMultipleRefForAllCases(BulkDetails bulkDetails,
-                                              BulkCasesPayload bulkCasesPayload,
-                                              String userToken,
-                                              BulkRequestPayload bulkRequestPayload) {
-        List<String> ethosCaseRefCollection = BulkHelper.getCaseIds(bulkDetails);
-        log.info("ETHOS CASE REF COLLECTION: " + ethosCaseRefCollection);
-        if (ethosCaseRefCollection.isEmpty()) {
-            log.warn("EMPTY CASE REF COLLECTION");
-        } else {
-
-            String username = userIdamService.getUserDetails(userToken).getEmail();
-            PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,
-                    username,
-                    ethosCaseRefCollection,
-                    PersistentQHelper.getCreationDataModel(ethosCaseRefCollection.get(0),
-                            bulkDetails.getCaseData().getMultipleReference(),
-                            bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp()),
-                    bulkCasesPayload.getErrors(),
-                    bulkDetails.getCaseData().getMultipleReference(),
-                    createUpdatesBusSender,
-                    String.valueOf(ethosCaseRefCollection.size()),
-                    bulkDetails.getCaseData().getMultipleReferenceLinkMarkUp());
-
-        }
-        bulkRequestPayload.setBulkDetails(bulkDetails);
     }
 
     private void createCaseEventsToUpdateMultipleRef(List<SubmitEvent> submitEvents, BulkDetails bulkDetails,
@@ -188,6 +183,7 @@ public class BulkCreationService {
             }
 
             if (isPersistentQ) {
+
                 if (!caseIds.contains(ethosCaseRef) && multipleCaseIds.contains(ethosCaseRef)) {
                     detachCasesList.add(ethosCaseRef);
                 } else {
@@ -196,13 +192,18 @@ public class BulkCreationService {
                     attachCasesList.add(ethosCaseRef);
                 }
             } else {
-                executeBulkCreationTask(caseIds,
-                        multipleCaseIds,
-                        bulkDetails,
-                        authToken,
-                        submitEvent,
-                        ethosCaseRef,
-                        multipleTypeItemList);
+                ExecutorService executor = Executors.newFixedThreadPool(NUMBER_THREADS);
+                if (!caseIds.contains(ethosCaseRef) && multipleCaseIds.contains(ethosCaseRef)) {
+                    executor.execute(new BulkCreationTask(bulkDetails, submitEvent, authToken, " ",
+                            SINGLE_CASE_TYPE, ccdClient));
+                } else {
+                    multipleTypeItemList.add(BulkHelper.getMultipleTypeItemFromSubmitEvent(submitEvent,
+                            bulkDetails.getCaseData().getMultipleReference()));
+                    executor.execute(new BulkCreationTask(bulkDetails, submitEvent, authToken,
+                            bulkDetails.getCaseData().getMultipleReference(), MULTIPLE_CASE_TYPE, ccdClient));
+                }
+                executor.shutdown();
+
             }
         }
 
@@ -235,26 +236,6 @@ public class BulkCreationService {
         }
 
         return multipleTypeItemList;
-    }
-
-    private void executeBulkCreationTask(List<String> caseIds,
-                                         List<String> multipleCaseIds,
-                                         BulkDetails bulkDetails,
-                                         String authToken,
-                                         SubmitEvent submitEvent,
-                                         String ethosCaseRef,
-                                         List<MultipleTypeItem> multipleTypeItemList) {
-        ExecutorService executor = Executors.newFixedThreadPool(NUMBER_THREADS);
-        if (!caseIds.contains(ethosCaseRef) && multipleCaseIds.contains(ethosCaseRef)) {
-            executor.execute(new BulkCreationTask(bulkDetails, submitEvent, authToken, " ",
-                    SINGLE_CASE_TYPE, ccdClient));
-        } else {
-            multipleTypeItemList.add(BulkHelper.getMultipleTypeItemFromSubmitEvent(submitEvent,
-                    bulkDetails.getCaseData().getMultipleReference()));
-            executor.execute(new BulkCreationTask(bulkDetails, submitEvent, authToken,
-                    bulkDetails.getCaseData().getMultipleReference(), MULTIPLE_CASE_TYPE, ccdClient));
-        }
-        executor.shutdown();
     }
 
 }

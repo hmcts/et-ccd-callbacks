@@ -14,7 +14,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.model.acas.AcasCertificate;
 import uk.gov.hmcts.ecm.common.model.acas.AcasCertificateRequest;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -48,7 +47,8 @@ public class AcasService {
         this.acasApiKey = acasApiKey;
     }
 
-    public List<String> getAcasCertificate(CaseData caseData, String authToken) throws JsonProcessingException {
+    public List<String> getAcasCertificate(CaseData caseData, String authToken, String caseTypeId)
+            throws JsonProcessingException {
         if (isNullOrEmpty(caseData.getAcasCertificate())) {
             return List.of("ACAS Certificate cannot be null or empty");
         }
@@ -59,7 +59,7 @@ public class AcasService {
             if (ObjectUtils.isEmpty(acasCertificateObject)) {
                 return List.of("Error reading ACAS Certificate");
             }
-        } catch (HttpClientErrorException errorException) {
+        } catch (Exception errorException) {
             log.error("Error retrieving ACAS Certificate with exception : " + errorException.getMessage());
             return List.of("Error retrieving ACAS Certificate");
         }
@@ -71,7 +71,7 @@ public class AcasService {
 
         DocumentInfo documentInfo;
         try {
-            documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken);
+            documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId);
         } catch (Exception exception) {
             log.error("Error converting ACAS Certificate with exception : " + exception.getMessage());
             return List.of("Error uploading ACAS Certificate");
@@ -90,7 +90,8 @@ public class AcasService {
         return objectMapper.readValue(certificate, AcasCertificate.class);
     }
 
-    private DocumentInfo convertCertificateToPdf(CaseData caseData, AcasCertificate acasCertificate, String authToken) {
+    private DocumentInfo convertCertificateToPdf(CaseData caseData, AcasCertificate acasCertificate, String authToken,
+                                                 String caseTypeId) {
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
             .filter(r -> acasCertificate.getCertificateNumber().equals(
                     defaultIfEmpty(r.getValue().getRespondentAcas(), "")))
@@ -102,7 +103,7 @@ public class AcasService {
         byte[] pdfData = Base64.getDecoder().decode(acasCertificate.getCertificateDocument());
         return tornadoService.createDocumentInfoFromBytes(authToken, pdfData,
                 "ACAS Certificate" + acasName + " - " + acasCertificate.getCertificateNumber() + ".pdf",
-                TribunalOffice.getCaseTypeId(caseData.getManagingOffice()));
+                caseTypeId);
     }
 
     private ResponseEntity<Object> fetchAcasCertificates(String... acasCertificate) {
@@ -118,4 +119,24 @@ public class AcasService {
                 Object.class
         );
     }
+
+    public DocumentInfo getAcasCertificates(CaseData caseData, String acasNumber, String authToken,
+                                            String caseTypeId)
+            throws JsonProcessingException {
+        Object acasCertificateObject;
+        try {
+            acasCertificateObject = fetchAcasCertificates(acasNumber).getBody();
+            AcasCertificate acasCertificate = convertAcasResponse((ArrayList) acasCertificateObject);
+            DocumentInfo documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId);
+            documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document", documentInfo.getDescription()));
+            return documentInfo;
+        } catch (HttpClientErrorException errorException) {
+            log.error("Error retrieving ACAS Certificate with exception : " + errorException.getMessage());
+            throw errorException;
+        } catch (JsonProcessingException e) {
+            log.error("Error converting ACAS Certificate with exception : " + e.getMessage());
+            throw e;
+        }
+    }
+
 }

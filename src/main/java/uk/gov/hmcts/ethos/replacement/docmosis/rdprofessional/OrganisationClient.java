@@ -38,4 +38,15 @@ public interface OrganisationClient {
             @PathVariable("orgId") String userId
     );
 
+    @GetMapping(
+            value = "/refdata/internal/v1/organisations/orgDetails/{userId}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    ResponseEntity<OrganisationsResponse> retrieveOrganisationDetailsByUserId(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken,
+            @PathVariable("userId") String userId
+    );
+
 }

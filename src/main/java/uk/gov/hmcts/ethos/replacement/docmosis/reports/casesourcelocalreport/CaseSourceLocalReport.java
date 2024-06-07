@@ -73,11 +73,9 @@ public class CaseSourceLocalReport {
         }
         int totalCases = manuallyCreatedCases + et1OnlineCases + eccCases + migrationCases;
 
-        float manuallyCreatedPercent = (totalCases == 0)
-                ? 0 : ((float) manuallyCreatedCases / totalCases) * 100;
+        float manuallyCreatedPercent = (totalCases == 0) ? 0 : ((float) manuallyCreatedCases / totalCases) * 100;
 
-        float et1OnlinePercent = (totalCases == 0)
-                ? 0 : ((float) et1OnlineCases / totalCases) * 100;
+        float et1OnlinePercent = (totalCases == 0) ? 0 : ((float) et1OnlineCases / totalCases) * 100;
 
         float eccPercent = (totalCases == 0) ? 0 : ((float) eccCases / totalCases) * 100;
 

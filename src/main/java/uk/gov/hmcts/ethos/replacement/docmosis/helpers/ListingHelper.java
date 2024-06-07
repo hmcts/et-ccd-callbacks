@@ -84,8 +84,8 @@ public final class ListingHelper {
     private static final String LISTING_NEWLINE = "\"listing\":[\n";
     private static final String ARRAY_ELEMENT_CLOSING_NEWLINE = "}],\n";
     static final List<String> REPORTS = Arrays.asList(BROUGHT_FORWARD_REPORT, CLAIMS_ACCEPTED_REPORT,
-            LIVE_CASELOAD_REPORT, CASES_COMPLETED_REPORT, CASES_AWAITING_JUDGMENT_REPORT, TIME_TO_FIRST_HEARING_REPORT,
-            SERVING_CLAIMS_REPORT, CASE_SOURCE_LOCAL_REPORT, HEARINGS_TO_JUDGEMENTS_REPORT,
+        LIVE_CASELOAD_REPORT, CASES_COMPLETED_REPORT, CASES_AWAITING_JUDGMENT_REPORT, TIME_TO_FIRST_HEARING_REPORT,
+        SERVING_CLAIMS_REPORT, CASE_SOURCE_LOCAL_REPORT, HEARINGS_TO_JUDGEMENTS_REPORT,
             HEARINGS_BY_HEARING_TYPE_REPORT, NO_CHANGE_IN_CURRENT_POSITION_REPORT,
             MEMBER_DAYS_REPORT, RESPONDENTS_REPORT, SESSION_DAYS_REPORT, ECC_REPORT, CLAIMS_BY_HEARING_VENUE_REPORT);
     private static final List<String> SCOTLAND_HEARING_LIST = List.of("Reading Day", "Deliberation Day",
@@ -139,8 +139,8 @@ public final class ListingHelper {
                     : " ");
             listingType.setJudicialMediation(
                     isNullOrEmpty(hearingType.getJudicialMediation()) || NO.equals(hearingType.getJudicialMediation())
-                            ? " "
-                            : hearingType.getJudicialMediation());
+                    ? " "
+                    : hearingType.getJudicialMediation());
 
             log.info("getVenueFromDateListedType");
             listingType.setCauseListVenue(getVenueFromDateListedType(dateListedType));
@@ -154,8 +154,8 @@ public final class ListingHelper {
 
             log.info("getHearingDuration");
             listingType.setHearingDay(index + 1 + " of " + hearingCollectionSize);
-            listingType.setEstHearingLength(isNullOrEmpty(DocumentHelper.getHearingDuration(hearingType))
-                    ? " " : DocumentHelper.getHearingDuration(hearingType));
+            listingType.setEstHearingLength(isNullOrEmpty(DocumentHelper.getHearingDuration(hearingType)) ? " "
+                    : DocumentHelper.getHearingDuration(hearingType));
 
             listingType.setHearingReadingDeliberationMembersChambers(isNullOrEmpty(
                     dateListedType.getHearingTypeReadingDeliberation()) || !SCOTLAND_HEARING_LIST.contains(
@@ -335,7 +335,7 @@ public final class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingDate(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListDate(),
-                        () -> new TreeMap<>(getDateComparator()), toList()));
+                    () -> new TreeMap<>(getDateComparator()), toList()));
     }
 
     private static Iterator<Map.Entry<String, List<ListingTypeItem>>> getEntriesByDate(StringBuilder sb,
@@ -401,7 +401,7 @@ public final class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingRoom(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getHearingRoom(),
-                        () -> new TreeMap<>(getVenueComparator()), toList()));
+                    () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingSubCollection
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingRoom(listingTypeItem.getValue()))
@@ -426,7 +426,7 @@ public final class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingVenue(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListVenue(),
-                        () -> new TreeMap<>(getVenueComparator()), toList()));
+                    () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingData.getListingCollection()
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingVenue(listingTypeItem.getValue()))
@@ -825,3 +825,4 @@ public final class ListingHelper {
         return NO_DOCUMENT_FOUND;
     }
 }
+

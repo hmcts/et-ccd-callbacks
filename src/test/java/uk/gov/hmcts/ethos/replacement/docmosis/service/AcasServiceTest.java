@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
@@ -48,6 +51,7 @@ class AcasServiceTest {
     private CaseData caseData;
     private RestTemplate restTemplate;
     private List<String> errors;
+    private DocumentInfo documentInfo;
 
     private static final String ACAS_BASE_URL = "https://api-dev-acas-01.azure-api.net/ECCLUAT";
     private static final String ACAS_API_KEY = "dummyApiKey";
@@ -75,7 +79,7 @@ class AcasServiceTest {
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(acasCertificate));
-        DocumentInfo documentInfo = DocumentInfo.builder()
+        documentInfo = DocumentInfo.builder()
                 .description("ACAS Certificate - R111111/11/11")
                 .url("http://test.com/documents/random-uuid")
                 .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
@@ -86,8 +90,7 @@ class AcasServiceTest {
 
     @Test
     void getAcasCertificate() throws JsonProcessingException {
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN);
-        System.out.println(errors);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(0, errors.size());
     }
 
@@ -96,7 +99,7 @@ class AcasServiceTest {
     @ValueSource(strings = "")
     void nullOrEmptyAcasCert(String certifcateNumber) throws JsonProcessingException {
         caseData.setAcasCertificate(certifcateNumber);
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(1, errors.size());
     }
 
@@ -105,7 +108,7 @@ class AcasServiceTest {
         getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals("Error retrieving ACAS Certificate", errors.get(0));
     }
 
@@ -116,9 +119,26 @@ class AcasServiceTest {
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(NOT_FOUND_OBJECT));
-        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN);
+        errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals("No ACAS Certificate found", errors.get(0));
 
+    }
+
+    @Test
+    void getAcasCertificates() throws JsonProcessingException {
+        DocumentInfo actual = acasService.getAcasCertificates(caseData, "R111111/11/11", AUTH_TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(documentInfo.getDescription(), actual.getDescription());
+    }
+
+    @Test
+    void getAcasCertificatesHttpException() {
+        getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
+        assertThrows(HttpClientErrorException.class,
+                () -> acasService.getAcasCertificates(caseData, "R111111/11/11", AUTH_TOKEN,
+                        ENGLANDWALES_CASE_TYPE_ID));
     }
 
     private MockRestServiceServer getMockServer() {

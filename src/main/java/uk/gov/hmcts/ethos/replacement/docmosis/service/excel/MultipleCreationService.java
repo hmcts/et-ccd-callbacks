@@ -12,7 +12,9 @@ import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,6 +42,8 @@ public class MultipleCreationService {
     private final MultipleHelperService multipleHelperService;
     private final SubMultipleUpdateService subMultipleUpdateService;
     private final MultipleTransferService multipleTransferService;
+    private final CaseManagementLocationService caseManagementLocationService;
+    private final FeatureToggleService featureToggleService;
 
     public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
@@ -51,6 +55,12 @@ public class MultipleCreationService {
 
         multipleDetails.getCaseData().setState(OPEN_STATE);
 
+        MultipleData multipleData = multipleDetails.getCaseData();
+        if (featureToggleService.isMultiplesEnabled()) {
+            log.info("Setting Case Management Location");
+            caseManagementLocationService.setCaseManagementLocation(multipleData);
+        }
+
         log.info("Check if creation is coming from Case Transfer");
 
         multipleTransferService.populateDataIfComingFromCT(userToken, multipleDetails, errors);
@@ -59,8 +69,8 @@ public class MultipleCreationService {
 
         setLeadMarkUpAndAddLeadToCaseIds(userToken, multipleDetails);
 
-        if (multipleDetails.getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
-                || multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
+        if (multipleData.getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
+                || multipleData.getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
 
             multipleCreationET1OnlineMigration(userToken, multipleDetails);
 
@@ -219,7 +229,7 @@ public class MultipleCreationService {
     private void addDataToMultiple(MultipleData multipleData) {
 
         if (multipleData.getMultipleSource() == null
-                || multipleData.getMultipleSource().trim().equals("")) {
+                || multipleData.getMultipleSource().trim().isEmpty()) {
 
             multipleData.setMultipleSource(MANUALLY_CREATED_POSITION);
 
@@ -274,7 +284,7 @@ public class MultipleCreationService {
 
         if (ethosCaseRefCollection.isEmpty()) {
 
-            log.warn("Empty case ref collection");
+            log.info("Empty case ref collection");
 
         } else {
 

@@ -27,6 +27,7 @@ public class VerifyTokenService {
     private String idamJwkUrl;
 
     private final JWSVerifierFactory jwsVerifierFactory;
+    public static final String INVALID_TOKEN = "Invalid Token {}";
 
     public VerifyTokenService() {
         this.jwsVerifierFactory = new DefaultJWSVerifierFactory();

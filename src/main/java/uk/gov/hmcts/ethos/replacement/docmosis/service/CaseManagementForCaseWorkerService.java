@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -28,9 +29,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -53,6 +57,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -81,6 +86,8 @@ public class CaseManagementForCaseWorkerService {
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
     private final CaseManagementLocationService caseManagementLocationService;
+    private final MultipleReferenceService multipleReferenceService;
+    private final MultipleCasesSendingService multipleCasesSendingService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -109,7 +116,9 @@ public class CaseManagementForCaseWorkerService {
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
                                               CaseManagementLocationService caseManagementLocationService,
-                                              @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl) {
+                                              MultipleReferenceService multipleReferenceService,
+                                              @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl,
+                                              MultipleCasesSendingService multipleCasesSendingService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
@@ -117,7 +126,9 @@ public class CaseManagementForCaseWorkerService {
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
         this.caseManagementLocationService = caseManagementLocationService;
+        this.multipleReferenceService = multipleReferenceService;
         this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
+        this.multipleCasesSendingService = multipleCasesSendingService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -148,6 +159,7 @@ public class CaseManagementForCaseWorkerService {
 
     public void claimantDefaults(CaseData caseData) {
         String claimantTypeOfClaimant = caseData.getClaimantTypeOfClaimant();
+
         if (isNullOrEmpty(claimantTypeOfClaimant)) {
             caseData.setClaimant(MISSING_CLAIMANT);
         } else {
@@ -159,6 +171,7 @@ public class CaseManagementForCaseWorkerService {
                 caseData.setClaimant(nullCheck(caseData.getClaimantCompany()));
             }
         }
+
         if (featureToggleService.isHmcEnabled()) {
             caseData.setClaimantId(UUID.randomUUID().toString());
         }
@@ -322,6 +335,33 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setNextListedDateOnMultiple(CaseDetails details) throws IOException {
+        CaseData caseData = details.getCaseData();
+        if (StringUtils.isEmpty(caseData.getMultipleReference()) || !YES.equals(caseData.getLeadClaimant())) {
+            return;
+        }
+
+        String adminToken = adminUserService.getAdminUserToken();
+        String multipleCaseTypeId = details.getCaseTypeId() + "_Multiple";
+        SubmitMultipleEvent multiple = multipleReferenceService.getMultipleByReference(
+            adminToken,
+            multipleCaseTypeId,
+            caseData.getMultipleReference()
+        );
+
+        var multipleData = multiple.getCaseData();
+
+        multipleData.setNextListedDate(caseData.getNextListedDate());
+
+        multipleCasesSendingService.sendUpdateToMultiple(
+            adminToken, 
+            multipleCaseTypeId, 
+            EMPLOYMENT, 
+            multipleData, 
+            String.valueOf(multiple.getCaseId())
+        );
+    }
+
     private List<String> getListedDates(HearingTypeItem hearingTypeItem) {
         HearingType hearingType = hearingTypeItem.getValue();
         List<String> dates = new ArrayList<>();
@@ -341,7 +381,7 @@ public class CaseManagementForCaseWorkerService {
         // get a target case data using the source case data and elastic search query
         List<SubmitEvent> submitEvent = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 caseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
-        if (isEmpty(submitEvent)) {
+        if (CollectionUtils.isEmpty(submitEvent)) {
             return;
         }
 
@@ -409,27 +449,22 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
-        if (!isEmpty(hearingCollection)) {
-            for (HearingTypeItem hearingTypeItem : hearingCollection) {
+        if (!isEmpty(caseData.getHearingCollection())) {
+            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 HearingType hearingType = hearingTypeItem.getValue();
-                List<DateListedTypeItem> hearingDateCollection = hearingType.getHearingDateCollection();
-                if (!isEmpty(hearingDateCollection)) {
-                    for (DateListedTypeItem dateListedTypeItem : hearingDateCollection) {
+                if (!isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                    for (DateListedTypeItem dateListedTypeItem
+                            : hearingTypeItem.getValue().getHearingDateCollection()) {
                         DateListedType dateListedType = dateListedTypeItem.getValue();
-                        setDateListedType(dateListedType);
+                        if (dateListedType.getHearingStatus() == null) {
+                            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+                            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
+                            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
+                        }
                         populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                     }
                 }
             }
-        }
-    }
-
-    private static void setDateListedType(DateListedType dateListedType) {
-        if (dateListedType.getHearingStatus() == null) {
-            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
-            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
         }
     }
 

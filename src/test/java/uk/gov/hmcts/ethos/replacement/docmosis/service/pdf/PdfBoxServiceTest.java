@@ -28,6 +28,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceC
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_DOCUMENT_NAME_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.ET3_FORM_PDF_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_DOCUMENT_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_DOCUMENT_NAME;
@@ -67,19 +68,21 @@ class PdfBoxServiceTest {
                     documentName, pdfTemplate)).hasMessage(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
             return;
         }
-        if (isExceptionThrownForEmptyStringByMessage(userToken, PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY,
+        if (isExceptionThrownForEmptyValueWithExpectedMessage(userToken, PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY,
                 caseData, userToken, caseTypeId, documentName, pdfTemplate)) {
             return;
         }
-        if (isExceptionThrownForEmptyStringByMessage(caseTypeId, PDF_SERVICE_EXCEPTION_WHEN_CASE_TYPE_ID_EMPTY,
+        if (isExceptionThrownForEmptyValueWithExpectedMessage(caseTypeId, PDF_SERVICE_EXCEPTION_WHEN_CASE_TYPE_ID_EMPTY,
                 caseData, userToken, caseTypeId, documentName, pdfTemplate)) {
             return;
         }
-        if (isExceptionThrownForEmptyStringByMessage(documentName, PDF_SERVICE_EXCEPTION_WHEN_DOCUMENT_NAME_EMPTY,
+        if (isExceptionThrownForEmptyValueWithExpectedMessage(documentName,
+                PDF_SERVICE_EXCEPTION_WHEN_DOCUMENT_NAME_EMPTY,
                 caseData, userToken, caseTypeId, documentName, pdfTemplate)) {
             return;
         }
-        if (isExceptionThrownForEmptyStringByMessage(pdfTemplate, PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY,
+        if (isExceptionThrownForEmptyValueWithExpectedMessage(pdfTemplate,
+                PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY,
                 caseData, userToken, caseTypeId, documentName, pdfTemplate)) {
             return;
         }
@@ -92,13 +95,14 @@ class PdfBoxServiceTest {
         assertThat(documentInfo.getMarkUp()).isEqualTo(TEST_DOCUMENT_MARKUP);
     }
 
-    private boolean isExceptionThrownForEmptyStringByMessage(String stringValue, String message, CaseData caseData,
-                                                       String userToken, String caseTypeId, String documentName,
-                                                       String pdfTemplate) {
-        if (StringUtils.isBlank(stringValue)) {
+    private boolean isExceptionThrownForEmptyValueWithExpectedMessage(String emptyValue, String expectedMessage,
+                                                                      CaseData caseData, String userToken,
+                                                                      String caseTypeId, String documentName,
+                                                                      String pdfTemplate) {
+        if (StringUtils.isBlank(emptyValue)) {
             assertThatThrownBy(() -> pdfBoxService
                     .generatePdfDocumentInfo(caseData, userToken, caseTypeId, documentName, pdfTemplate))
-                    .hasMessage(message);
+                    .hasMessage(expectedMessage);
             return true;
         }
         return false;
@@ -108,16 +112,13 @@ class PdfBoxServiceTest {
         CaseData caseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         return Stream.of(Arguments.of(
                 caseData, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME, TEST_PDF_TEMPLATE),
-                Arguments.of(
-                        null, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME, TEST_PDF_TEMPLATE),
-                Arguments.of(
-                        caseData, null, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME, TEST_PDF_TEMPLATE),
-                Arguments.of(
-                        caseData, TEST_USER_TOKEN, null, TEST_DOCUMENT_NAME, TEST_PDF_TEMPLATE),
-                Arguments.of(
-                        caseData, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, null, TEST_PDF_TEMPLATE),
-                Arguments.of(
-                        caseData, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME, null));
+                Arguments.of(caseData, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME, ET3_FORM_PDF_TEMPLATE),
+                Arguments.of(null, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME,
+                        TEST_PDF_TEMPLATE),
+                Arguments.of(caseData, null, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME, TEST_PDF_TEMPLATE),
+                Arguments.of(caseData, TEST_USER_TOKEN, null, TEST_DOCUMENT_NAME, TEST_PDF_TEMPLATE),
+                Arguments.of(caseData, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, null, TEST_PDF_TEMPLATE),
+                Arguments.of(caseData, TEST_USER_TOKEN, TEST_CASE_TYPE_ID, TEST_DOCUMENT_NAME, null));
     }
 
 }

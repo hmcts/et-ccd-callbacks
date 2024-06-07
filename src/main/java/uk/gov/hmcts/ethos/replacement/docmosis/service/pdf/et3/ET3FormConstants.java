@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 public final class ET3FormConstants {
 
     // GENERIC CONSTANTS
-    public static final String ET3_FORM_PDF_TEMPLATE = "ET3_0224.pdf";
     public static final String STRING_EMPTY = StringUtils.EMPTY;
     public static final String STRING_SPACE = StringUtils.SPACE;
     public static final String STRING_COMMA_WITH_SPACE = ", ";

@@ -8,7 +8,6 @@ public final class PdfBoxServiceConstants {
     public static final String PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF =
             "Exception occurred while mapping case data to template PDF";
     public static final byte[] EMPTY_BYTE_ARRAY = {};
-
     public static final String PDF_SERVICE_CLASS_NAME = "PdfService";
     public static final String ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME = "createET3FormByteArray";
     public static final String PUT_PDF_FIELD_METHOD_NAME = "putPdfField";
@@ -21,6 +20,8 @@ public final class PdfBoxServiceConstants {
     public static final String PDF_DOCUMENT_CREATED_LOG_INFO = "URI documentSelfPath uploaded and created: %s";
     public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY =
             "To create PDF file case data should not be empty";
+    public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_REQUIRED_FIELD_EMPTY =
+            "One of the required parameters was empty. You can find details in the logs";
     public static final String PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY =
             "To create PDF file user token should not be empty";
     public static final String PDF_SERVICE_EXCEPTION_WHEN_CASE_TYPE_ID_EMPTY =

@@ -6,26 +6,16 @@ import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
-import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
 public class Et3ResponseControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
-
     private static final String ABOUT_TO_START_URL = "/et3Response/aboutToStart";
     private static final String MID_EVENT_URL = "/et3Response/midEmploymentDates";
     private static final String ABOUT_TO_SUBMIT_URL = "/et3Response/aboutToSubmit";
@@ -34,20 +24,12 @@ public class Et3ResponseControllerFunctionalTest extends BaseFunctionalTest {
 
     @BeforeAll
     public void setUpCaseData() {
-        CaseData caseData = CaseDataBuilder.builder()
-                .withEthosCaseReference("testCaseReference")
-                .withClaimant("claimant")
-                .build();
-
-        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
-        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
-        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
-        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "Boris Johnson")));
-        caseData.setTribunalCorrespondenceEmail("respondent@unrepresented.com");
+        CaseData caseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("123")
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
     }
 
@@ -92,21 +74,4 @@ public class Et3ResponseControllerFunctionalTest extends BaseFunctionalTest {
                 .log()
                 .all(true);
     }
-
-    private RespondentSumTypeItem createRespondentType() {
-        RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName("Boris Johnson");
-
-        Address respondentET3Address = new Address();
-        respondentET3Address.setPostCode("DH1 1AJ");
-        respondentSumType.setResponseRespondentAddress(respondentET3Address);
-        respondentSumType.setEt3ResponseHearingRespondent(List.of("Phone hearings"));
-        respondentSumType.setEt3ResponseHearingRepresentative(List.of("rep"));
-
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(respondentSumType);
-
-        return respondentSumTypeItem;
-    }
-
 }

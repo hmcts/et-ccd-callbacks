@@ -175,16 +175,15 @@ public class BundlesRespondentService {
 
     private void removeHearingBundles(CaseData caseData,
                                       List<GenericTypeItem<HearingBundleType>> bundlesCollection) {
+        if (CollectionUtils.isEmpty(bundlesCollection)) {
+            return;
+        }
 
         List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection =
                 caseData.getRemovedHearingBundlesCollection();
         if (removedHearingBundlesCollection == null) {
             removedHearingBundlesCollection = new ArrayList<>();
             caseData.setRemovedHearingBundlesCollection(removedHearingBundlesCollection);
-        }
-
-        if (CollectionUtils.isEmpty(bundlesCollection)) {
-            return;
         }
 
         String selectedBundle = caseData.getRemoveHearingBundleSelect().getSelectedCode();

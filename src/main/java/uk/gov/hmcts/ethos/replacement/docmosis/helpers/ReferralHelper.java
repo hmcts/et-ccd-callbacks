@@ -56,6 +56,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.getHearingVenue;
@@ -110,7 +111,7 @@ public final class ReferralHelper {
      */
     public static String populateHearingReferralDetails(CaseData caseData) {
         String hearingDetails = populateHearingDetails(caseData);
-        String referralDetails = createTwoColumnTable(new String[]{"Referral", ""}, Stream.of(
+        String referralDetails = createTwoColumnTable(new String[]{"Referral", EMPTY_STRING}, Stream.of(
                 populateReferralDetails(caseData, caseData)).flatMap(Collection::stream).toList()) + BREAKS;
         String referralUpdateDetails = populateUpdateDetails(caseData, caseData);
         String referralReplyDetails = populateReplyDetails(caseData, caseData);
@@ -122,7 +123,7 @@ public final class ReferralHelper {
      */
     public static String populateHearingReferralDetails(MultipleData caseData, CaseData leadCase) {
         String hearingDetails = populateHearingDetails(leadCase);
-        String referralDetails = createTwoColumnTable(new String[]{"Referral", ""}, Stream.of(
+        String referralDetails = createTwoColumnTable(new String[]{"Referral", EMPTY_STRING}, Stream.of(
                 populateReferralDetails(caseData, leadCase)).flatMap(Collection::stream).toList()) + BREAKS;
         String referralUpdateDetails = populateUpdateDetails(caseData, leadCase);
         String referralReplyDetails = populateReplyDetails(caseData, leadCase);
@@ -154,7 +155,7 @@ public final class ReferralHelper {
                         new String[]{"Updated by", updateItem.getUpdateReferredBy()},
                         new String[]{"Updated date", updateItem.getUpdateReferralDate() + CLOSE_PRE_TAG})))
                 .map(updateRow -> createTwoColumnTable(
-                        new String[]{"Update %s".formatted(singleUpdate ? "1" : count.incrementAndGet()), ""},
+                        new String[]{"Update %s".formatted(singleUpdate ? "1" : count.incrementAndGet()), EMPTY_STRING},
                         Stream.of(updateRow).flatMap(Collection::stream).toList()) + BREAKS)
                 .collect(Collectors.joining()));
     }
@@ -197,7 +198,7 @@ public final class ReferralHelper {
                                 hearingType.getHearingEstLengthNum() + " " + hearingType.getHearingEstLengthNumType()
                                 + CLOSE_PRE_TAG}));
                 sb.append(createTwoColumnTable(
-                        new String[]{"Hearing %s".formatted(hearingType.getHearingNumber()), ""},
+                        new String[]{"Hearing %s".formatted(hearingType.getHearingNumber()), EMPTY_STRING},
                         Stream.of(hearingDetail)
                                 .flatMap(Collection::stream)
                                 .toList()))
@@ -205,7 +206,7 @@ public final class ReferralHelper {
             }
         });
         if (isNullOrEmpty(sb.toString())) {
-            return "";
+            return EMPTY_STRING;
         }
         return detailsWrapper("Hearings", sb.toString());
     }
@@ -277,7 +278,7 @@ public final class ReferralHelper {
                         new String[]{"General Notes",
                                 formatReferralDetails(reply.getReplyGeneralNotes()) + CLOSE_PRE_TAG})))
                 .map(replyRows -> createTwoColumnTable(
-                        new String[]{"Reply %s".formatted(singleReply ? "1" : count.incrementAndGet()), ""},
+                        new String[]{"Reply %s".formatted(singleReply ? "1" : count.incrementAndGet()), EMPTY_STRING},
                         Stream.of(replyRows)
                                 .flatMap(Collection::stream)
                                 .toList()) + BREAKS)

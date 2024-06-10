@@ -26,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 
 public final class HearingsHelper {
 
@@ -236,8 +237,8 @@ public final class HearingsHelper {
             return hearing.getHearingVenueScotland();
         }
         if (ObjectUtils.isEmpty(hearing.getHearingVenue())) {
-            return "";
+            return EMPTY_STRING;
         }
-        return defaultIfEmpty(hearing.getHearingVenue().getSelectedLabel(), "");
+        return defaultIfEmpty(hearing.getHearingVenue().getSelectedLabel(), EMPTY_STRING);
     }
 }

@@ -327,8 +327,7 @@ class BundlesRespondentServiceTest {
         bundlesRespondentService.removeHearingBundles(englandCaseData);
 
         // Assert
-        assertTrue(englandCaseData.getRemovedHearingBundlesCollection() == null ||
-                englandCaseData.getRemovedHearingBundlesCollection().isEmpty());
+        assertNull(englandCaseData.getRemovedHearingBundlesCollection());
     }
 
     private void setupEnglandCaseData(String agreedDocWith, String butReason, String disagree,

@@ -89,8 +89,8 @@ __metadata:
   linkType: hard
 
 "@babel/eslint-parser@npm:^7.17.0":
-  version: 7.24.6
-  resolution: "@babel/eslint-parser@npm:7.24.6"
+  version: 7.24.7
+  resolution: "@babel/eslint-parser@npm:7.24.7"
   dependencies:
     "@nicolo-ribaudo/eslint-scope-5-internals": 5.1.1-v1
     eslint-visitor-keys: ^2.1.0
@@ -98,7 +98,7 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.11.0
     eslint: ^7.5.0 || ^8.0.0 || ^9.0.0
-  checksum: 90fa58eef884c0a480fc51c0ed8e56f04c5b4dc7656066d1f994b4bea1a546173d82551fc98996bb2b203bfb32fa4e8c4b7b5d8a03b0bec51665d1382813dfbe
+  checksum: 0e08ccecfe48cf9dacd96fb46747014b9c3683882ae6886a17a666533f0d5e99b61e31e3992ffee0efc67d805ae8be9b2a6342ce5d66a36de8d99d88c9a244a0
   languageName: node
   linkType: hard
 
@@ -4799,14 +4799,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-as-promised@npm:7.1.2":
-  version: 7.1.2
-  resolution: "chai-as-promised@npm:7.1.2"
+"chai-as-promised@npm:8.0.0":
+  version: 8.0.0
+  resolution: "chai-as-promised@npm:8.0.0"
   dependencies:
-    check-error: ^1.0.2
+    check-error: ^2.0.0
   peerDependencies:
     chai: ">= 2.1.2 < 6"
-  checksum: 671ee980054eb23a523875c1d22929a2ac05d89b5428e1fd12800f54fc69baf41014667b87e2368e2355ee2a3140d3e3d7d5a1f8638b07cfefd7fe38a149e3f6
+  checksum: 89a1b9702171e006ba9551909c67f0780b768185651f3bd831d74a0951b9405b5761fe2c80c46096c46829ffe62803e68c33bc782279edf386d4be08fe6c3b67
   languageName: node
   linkType: hard
 
@@ -5010,13 +5010,6 @@ __metadata:
   version: 1.0.1
   resolution: "charset@npm:1.0.1"
   checksum: adf747e7bc76c0e47dbfbb555ef376f5adb2e67cad35718f19a2d02e27589345ccaf3c6170c185d2cc82298241f8478cdcdcab8be8ec429bf56807885f3c5300
-  languageName: node
-  linkType: hard
-
-"check-error@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "check-error@npm:1.0.2"
-  checksum: d9d106504404b8addd1ee3f63f8c0eaa7cd962a1a28eb9c519b1c4a1dc7098be38007fc0060f045ee00f075fbb7a2a4f42abcf61d68323677e11ab98dc16042e
   languageName: node
   linkType: hard
 
@@ -7220,8 +7213,8 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-jest@npm:^28.0.0":
-  version: 28.5.0
-  resolution: "eslint-plugin-jest@npm:28.5.0"
+  version: 28.6.0
+  resolution: "eslint-plugin-jest@npm:28.6.0"
   dependencies:
     "@typescript-eslint/utils": ^6.0.0 || ^7.0.0
   peerDependencies:
@@ -7233,7 +7226,7 @@ __metadata:
       optional: true
     jest:
       optional: true
-  checksum: 73ba168fb028db0765027c9e7844fe37cb6b660125929e72c5cf5c8e0fd4e67e7136409583256cf6267e066e1aa0be498c0ee729d1f3babaef4a3e7bdac428a8
+  checksum: 5abcef6933445ae0017dcea6cafacb4aaab6619f8660d1097667dd040129b4efa3f1284ded1c2605c7d14c11c976c725912f660dcdec8278c6f6ce793ff9dab6
   languageName: node
   linkType: hard
 
@@ -7542,7 +7535,7 @@ __metadata:
     "@wdio/types": ^8.0.0
     axios: 1.7.2
     chai: 4.4.1
-    chai-as-promised: 7.1.2
+    chai-as-promised: 8.0.0
     chai-http: 4.4.0
     codeceptjs: 3.6.2
     codeceptjs-saucehelper: ^1.4.0

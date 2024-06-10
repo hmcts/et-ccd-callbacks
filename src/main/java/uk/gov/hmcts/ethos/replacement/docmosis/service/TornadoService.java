@@ -390,17 +390,20 @@ public class TornadoService {
             case ET1_VETTING_PDF -> {
                 dmStoreDocumentName = String.format(ET1_VETTING_OUTPUT_NAME,
                         sanitizePartyName(caseData.getClaimant()));
-                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        dmStoreDocumentName);
             }
             case ET3_PROCESSING_PDF -> {
                 dmStoreDocumentName = String.format("ET3 Processing - %s.pdf",
                         sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
-                return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        dmStoreDocumentName);
             }
             case ET3_RESPONSE_PDF -> {
                 dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
                         sanitizePartyName(caseData.getSubmitEt3Respondent().getSelectedLabel()));
-                return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        dmStoreDocumentName);
             }
             case INITIAL_CONSIDERATION_PDF -> {
                 return InitialConsiderationHelper.getDocumentRequest(

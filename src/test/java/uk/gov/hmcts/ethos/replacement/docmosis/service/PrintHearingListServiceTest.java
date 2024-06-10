@@ -30,7 +30,7 @@ class PrintHearingListServiceTest {
     VenueService venueService;
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testInitPrintHearingListsPopulatesEnglandWalesVenues")
     void testInitPrintHearingListsPopulatesEnglandWalesVenues(TribunalOffice tribunalOffice) {
         List<DynamicValueType> venues = List.of(DynamicValueType.create("venue1", "Venue 1"),
                 DynamicValueType.create("venue2", "Venue 2"));
@@ -56,7 +56,7 @@ class PrintHearingListServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testInitPrintHearingListPopulatesScotlandVenues")
     void testInitiPrintHearingListPopulatesScotlandVenues(TribunalOffice tribunalOffice) {
         mockScotlandVenueService();
         CaseData caseData = new CaseData();
@@ -91,7 +91,7 @@ class PrintHearingListServiceTest {
         assertNull(caseData.getPrintHearingDetails().getListingVenue());
     }
 
-    private static Stream<Arguments> testInitiPrintHearingListPopulatesScotlandVenues() {
+    private static Stream<Arguments> testInitPrintHearingListPopulatesScotlandVenues() {
         return TribunalOffice.SCOTLAND_OFFICES.stream().map(Arguments::of);
     }
 

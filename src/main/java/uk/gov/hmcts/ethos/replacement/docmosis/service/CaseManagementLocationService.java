@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
+import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 
 import java.util.Objects;
@@ -44,7 +45,7 @@ public class CaseManagementLocationService {
         caseData.setCaseManagementLocationCode(Objects.toString(caseManagementLocationCode, ""));
     }
 
-    public void setCaseManagementLocation(CaseData caseData) {
+    public void setCaseManagementLocation(BaseCaseData caseData) {
         String managingOfficeName = caseData.getManagingOffice();
         if (isNullOrEmpty(managingOfficeName)) {
             log.debug("leave `caseManagementLocation` blank since it may be the multiCourts case.");

@@ -120,8 +120,29 @@ class MultipleHelperServiceTest {
                 multipleDetails.getCaseData().getLeadCase(),
                 "");
         assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/1232121232\">21006/2020</a>",
-                multipleDetails.getCaseData().getLeadCase());
+                multipleDetails.getCaseData().getLeadCase());    
         assertNull(multipleDetails.getCaseData().getLeadCaseId());
+    }
+
+    @Test
+    void addLeadMarkUpMultiple2On() {
+        submitEventList.get(0).getCaseData().setNextListedDate("2020-01-01");
+
+        when(singleCasesReadingService.retrieveSingleCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData().getLeadCase(),
+                multipleDetails.getCaseData().getMultipleSource()))
+                .thenReturn(submitEventList.get(0));
+
+        when(featureToggleService.isMul2Enabled()).thenReturn(true);
+
+        multipleHelperService.addLeadMarkUp(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData(),
+                multipleDetails.getCaseData().getLeadCase(),
+                "");
+
+        assertEquals("2020-01-01", multipleDetails.getCaseData().getNextListedDate());
     }
 
     @Test

@@ -50,7 +50,7 @@ class FileLocationFixedListSheetImporterTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testImportSheet")
     void testImportSheet(TribunalOffice tribunalOffice, String sheetName, int expectedFileLocations) {
         XSSFSheet sheet = workbook.getSheet(sheetName);
 
@@ -59,7 +59,7 @@ class FileLocationFixedListSheetImporterTest {
         verify(fileLocationRepository, times(expectedFileLocations)).save(any(FileLocation.class));
     }
 
-    private static Stream<Arguments> testImportSheet() { //NOPMD - parameterized tests
+    private static Stream<Arguments> testImportSheet() {
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "Scotland Scrubbed", 46),
                 Arguments.of(TribunalOffice.BRISTOL, "Bristol Scrubbed", 162),

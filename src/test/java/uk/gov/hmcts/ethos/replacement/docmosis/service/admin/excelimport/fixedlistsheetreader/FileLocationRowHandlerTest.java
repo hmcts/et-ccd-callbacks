@@ -42,7 +42,7 @@ class FileLocationRowHandlerTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testAcceptTrue")
     void testAcceptTrue(TribunalOffice tribunalOffice, String rowId) {
         Row row = createRow(rowId, "fileLocationCode", "fileLocationName");
         FileLocationRowHandler fileLocationRowHandler = new FileLocationRowHandler(mock(FileLocationRepository.class));
@@ -50,7 +50,7 @@ class FileLocationRowHandlerTest {
         assertTrue(fileLocationRowHandler.accept(tribunalOffice, row));
     }
 
-    private static Stream<Arguments> testAcceptTrue() { //NOPMD - parameterized tests
+    private static Stream<Arguments> testAcceptTrue() {
         return Stream.of(
           Arguments.of(TribunalOffice.ABERDEEN, "fl_Locations_Aberdeen"),
                 Arguments.of(TribunalOffice.BRISTOL, "fl_Location"),
@@ -71,7 +71,7 @@ class FileLocationRowHandlerTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testAcceptFalse")
     void testAcceptFalse(TribunalOffice tribunalOffice, String rowId) {
         Row row = createRow(rowId, "fileLocationCode", "fileLocationName");
         FileLocationRowHandler fileLocationRowHandler = new FileLocationRowHandler(mock(FileLocationRepository.class));
@@ -79,7 +79,7 @@ class FileLocationRowHandlerTest {
         assertFalse(fileLocationRowHandler.accept(tribunalOffice, row));
     }
 
-    private static Stream<Arguments> testAcceptFalse() { //NOPMD - parameterized tests
+    private static Stream<Arguments> testAcceptFalse() {
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "fl_Location"),
                 Arguments.of(TribunalOffice.BRISTOL, "fl_Locations_Bristol"),

@@ -66,7 +66,11 @@ public class MultipleHelperService {
                         newLeadCase));
                 if (featureToggleService.isMultiplesEnabled()) {
                     multipleData.setLeadCaseId(leadCaseId);
-                    multipleData.setLeadEthosCaseRef(newLeadCase);
+                    multipleData.setLeadEthosCaseRef(newLeadCase); 
+                }
+
+                if (featureToggleService.isMul2Enabled()) {
+                    multipleData.setNextListedDate(submitEvent.getCaseData().getNextListedDate());
                 }
 
             } else {

@@ -67,7 +67,7 @@
         "@wdio/types": "^8.0.0",
         "chai": "4.4.1",
         "chai-as-promised": "8.0.0",
-        "chai-http": "4.4.0",
+        "chai-http": "5.0.0",
         "codeceptjs": "3.6.2",
         "codeceptjs-saucehelper": "^1.4.0",
         "eslint": "9.4.0",

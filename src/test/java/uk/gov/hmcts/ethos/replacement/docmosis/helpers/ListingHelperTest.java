@@ -1085,7 +1085,7 @@ class ListingHelperTest {
                 + "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, "
                 + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, "
                 + "hearingReadingDeliberationMembersChambers= )";
-        ListingDetails listingDetails = generateListingDetails("listingDetailsTest1.json");
+        listingDetails = generateListingDetails("listingDetailsTest1.json");
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 

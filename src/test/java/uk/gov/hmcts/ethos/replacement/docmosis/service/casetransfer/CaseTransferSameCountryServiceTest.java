@@ -336,7 +336,7 @@ class CaseTransferSameCountryServiceTest {
         if (hearingStatus != null) {
             builder.withHearing("1", null, null, null, null,
                     null, null)
-                    .withHearingSession(0, "1", "2021-12-25", hearingStatus, false);
+                    .withHearingSession(0, "2021-12-25", hearingStatus, false);
         }
 
         return builder.buildAsCaseDetails(caseTypeId, EMPLOYMENT_JURISDICTION_TYPE);

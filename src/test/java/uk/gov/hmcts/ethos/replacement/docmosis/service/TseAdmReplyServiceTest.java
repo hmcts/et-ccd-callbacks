@@ -328,7 +328,7 @@ class TseAdmReplyServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("saveTseAdmReplyDataFromCaseData")
     void saveTseAdmReplyDataFromCaseData(String requestSelectPartyRespond,
                                                                   String cmoSelectPartyRespond,
                                                                   String respondentResponseRequired,

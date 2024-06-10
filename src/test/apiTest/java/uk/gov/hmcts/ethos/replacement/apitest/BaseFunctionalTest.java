@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.apitest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -35,10 +37,14 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
@@ -125,7 +131,7 @@ public abstract class BaseFunctionalTest {
         String triggerFormat = "%s/caseworkers/%s/jurisdictions/EMPLOYMENT/case-types/%s/event-triggers/%s/token";
         String triggerUrl = String.format(triggerFormat, ccdDataStoreUrl, userId, caseTypeId, name);
         RequestBuilder requestBuilder = get(triggerUrl)
-                .setHeader("Authorization", userToken)
+                .setHeader(AUTHORIZATION, userToken)
                 .setHeader("ServiceAuthorization", serviceToken)
                 .setHeader("Content-Type", "application/json");
 
@@ -137,7 +143,7 @@ public abstract class BaseFunctionalTest {
 
         String postFormat = "%s/caseworkers/%s/jurisdictions/EMPLOYMENT/case-types/%s/cases";
         RequestBuilder submitRequest = post(String.format(postFormat, ccdDataStoreUrl, userId, caseTypeId))
-                .setHeader("Authorization", userToken)
+                .setHeader(AUTHORIZATION, userToken)
                 .setHeader("ServiceAuthorization", serviceToken)
                 .setHeader("Content-Type", "application/json")
                 .setEntity(caseEntity);
@@ -153,5 +159,12 @@ public abstract class BaseFunctionalTest {
         try (BufferedReader reader = new BufferedReader(in)) {
             return reader.lines().collect(Collectors.joining("\n"));
         }
+    }
+
+    public CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource(jsonFileName)).toURI())));
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, CaseDetails.class);
     }
 }

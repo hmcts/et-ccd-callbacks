@@ -16,6 +16,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
  * Helper class for formatting strings into markdown.
  */
 public final class MarkdownHelper {
+
+    private static final String DETAILS_SUMMARY = """
+      <details class="govuk-details"> <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">%s</span></summary>
+      <div class="govuk-details__text">
+      
+      %s
+      
+      </div> </details>
+      
+        """;
+
     private MarkdownHelper() {
         // Access through static methods
     }
@@ -41,7 +53,7 @@ public final class MarkdownHelper {
      * @return formatted string representing data in a two column Markdown table
      */
     public static String createTwoColumnTable(String[] header, Stream<List<String[]>> rows) {
-        List<String[]> listRows = rows.flatMap(List::stream).collect(Collectors.toList());
+        List<String[]> listRows = rows.flatMap(List::stream).toList();
         return createTwoColumnTable(header, listRows);
     }
 
@@ -88,7 +100,7 @@ public final class MarkdownHelper {
         return documents.stream()
             .filter(Objects::nonNull)
             .flatMap(o -> addDocumentRow(o.getValue(), title).stream())
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
@@ -121,5 +133,9 @@ public final class MarkdownHelper {
         ArrayList<String[]> rows = new ArrayList<>();
         rows.add(new String[] {item1, item2});
         return rows;
+    }
+
+    public static String detailsWrapper(String heading, String body) {
+        return DETAILS_SUMMARY.formatted(heading, body);
     }
 }

@@ -27,7 +27,10 @@ def secrets = [
                 secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
                 secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
                 secret('et-judge-4-password', 'ET_JUDGE_4_PASSWORD'),
-                secret('idam-client-secret', 'IDAM_CLIENT_SECRET')
+                secret('idam-client-secret', 'IDAM_CLIENT_SECRET'),
+                secret('et-cos-s2s-secret', 'ET_COS_S2S_SECRET'),
+                secret('cos-system-user', 'ET_COS_SYSTEM_USER'),
+                secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD')
         ],
         "s2s-${params.ENVIRONMENT}":  [
                 secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
@@ -64,6 +67,21 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest()
     enableCrossBrowserTest()
     enableFortifyScan()
+
+    before('crossBrowserTest') {
+        sh """
+           yarn install
+           yarn playwright install
+        """
+    }
+
+    before('fullFunctionalTest') {
+        env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+        env.ET_COS_URL = "http://et-cos-aat.service.core-compute-aat.internal"
+        env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
+        env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+        env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    }
 
     afterAlways('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'

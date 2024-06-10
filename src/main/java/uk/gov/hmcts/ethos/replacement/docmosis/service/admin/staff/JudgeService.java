@@ -117,7 +117,9 @@ public class JudgeService {
         int selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
 
         List<Judge> findJudge = judgeRepository.findById(selectedId);
-        if (!findJudge.isEmpty()) {
+        if (findJudge.isEmpty()) {
+            errors.add(SAVE_ERROR_MESSAGE);
+        } else {
             Judge thisJudge = findJudge.get(0);
             thisJudge.setName(adminData.getJudgeName());
             thisJudge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
@@ -128,8 +130,6 @@ public class JudgeService {
             } else {
                 judgeRepository.save(thisJudge);
             }
-        } else {
-            errors.add(SAVE_ERROR_MESSAGE);
         }
 
         return errors;

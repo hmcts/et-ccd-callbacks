@@ -32,6 +32,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -235,7 +236,7 @@ public class EventValidationService {
 
             //populate the rep collection with the new & updated rep entries and
             //sort the collection by respondent name
-            updatedRepList.sort((o1, o2) -> o1.getValue().getRespRepName().compareTo(o2.getValue().getRespRepName()));
+            updatedRepList.sort(Comparator.comparing(o -> o.getValue().getRespRepName()));
             caseData.setRepCollection(updatedRepList);
         }
 

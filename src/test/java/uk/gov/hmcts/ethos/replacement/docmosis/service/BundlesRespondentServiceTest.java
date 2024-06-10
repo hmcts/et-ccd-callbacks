@@ -38,20 +38,20 @@ class BundlesRespondentServiceTest {
         bundlesRespondentService = new BundlesRespondentService();
         englandCaseData = CaseDataBuilder.builder()
                 .withHearing("1", "Hearing", "Judge", "Bodmin", List.of("In person"), "60", "Days", "Sit Alone")
-                .withHearingSession(0, "1", "2069-05-16T01:00:00.000", "Listed", false)
-                .withHearingSession(0, "2", "2022-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(0, "2069-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(0, "2022-05-16T01:00:00.000", "Listed", false)
                 .withHearing("2", "Costs Hearing", "Judge", "ROIT", List.of("Video"), "60", "Days", "Sit Alone")
-                .withHearingSession(1, "1", "2069-05-16T01:00:00.000", "Listed", false)
-                .withHearingSession(1, "2", "2070-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(1, "2069-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(1, "2070-05-16T01:00:00.000", "Listed", false)
                 .build();
 
         scotlandCaseData = CaseDataBuilder.builder()
                 .withHearingScotland("1", "Hearing", "Judge", TribunalOffice.EDINBURGH, "Venue")
-                .withHearingSession(0, "1", "2069-05-16T01:00:00.000", "Listed", false)
-                .withHearingSession(0, "2", "2022-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(0, "2069-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(0, "2022-05-16T01:00:00.000", "Listed", false)
                 .withHearingScotland("2", "Costs Hearing", "Judge", TribunalOffice.ABERDEEN, "Venue")
-                .withHearingSession(1, "1", "2069-05-16T01:00:00.000", "Listed", false)
-                .withHearingSession(1, "2", "2070-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(1, "2069-05-16T01:00:00.000", "Listed", false)
+                .withHearingSession(1, "2070-05-16T01:00:00.000", "Listed", false)
                 .build();
     }
 

@@ -7,12 +7,14 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RemovedHearingBundleItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -40,6 +42,8 @@ public class BundlesRespondentService {
     private static final String BUT = "But";
     private static final String EXCEEDED_CHAR_LIMIT = "This field must be 2500 characters or less";
     private static final int MAX_CHAR_TEXT_AREA = 2500;
+    private static final String SELECT_CLAIMANT_HEARING_BUNDLES = "selectClaimantHearingBundles";
+    private static final String SELECT_RESPONDENT_HEARING_BUNDLES = "selectRespondentHearingBundles";
 
     public void clearInputData(CaseData caseData) {
         caseData.setBundlesRespondentPrepareDocNotesShow(null);
@@ -50,6 +54,9 @@ public class BundlesRespondentService {
         caseData.setBundlesRespondentUploadFile(null);
         caseData.setBundlesRespondentWhatDocuments(null);
         caseData.setBundlesRespondentWhoseDocuments(null);
+        caseData.setHearingBundleRemoveReason(null);
+        caseData.setRemoveHearingBundleSelect(null);
+        caseData.setRemoveBundleDropDownSelectedParty(null);
     }
 
     /**
@@ -151,5 +158,80 @@ public class BundlesRespondentService {
                 .build()
             )
         );
+    }
+
+    /**
+     * Removes a hearing bundle from the collection.
+     */
+    public void removeHearingBundles(CaseData caseData) {
+        String selectedParty = caseData.getRemoveBundleDropDownSelectedParty();
+
+        if (SELECT_CLAIMANT_HEARING_BUNDLES.equals(selectedParty)) {
+            removeHearingBundles(caseData, caseData.getBundlesClaimantCollection());
+        } else if (SELECT_RESPONDENT_HEARING_BUNDLES.equals(selectedParty)) {
+            removeHearingBundles(caseData, caseData.getBundlesRespondentCollection());
+        }
+    }
+
+    private void removeHearingBundles(CaseData caseData,
+                                      List<GenericTypeItem<HearingBundleType>> bundlesCollection) {
+        if (CollectionUtils.isEmpty(bundlesCollection)) {
+            return;
+        }
+
+        List<GenericTypeItem<RemovedHearingBundleItem>> removedHearingBundlesCollection =
+                caseData.getRemovedHearingBundlesCollection();
+        if (removedHearingBundlesCollection == null) {
+            removedHearingBundlesCollection = new ArrayList<>();
+            caseData.setRemovedHearingBundlesCollection(removedHearingBundlesCollection);
+        }
+
+        String selectedBundle = caseData.getRemoveHearingBundleSelect().getSelectedCode();
+
+        GenericTypeItem<HearingBundleType> bundleToRemove = bundlesCollection.stream()
+                .filter(bundle -> bundle.getId().equals(selectedBundle))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Bundle not found in the collection"));
+
+        bundlesCollection.removeIf(bundle -> bundle.getId().equals(selectedBundle));
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("d MMMM yyyy HH:mm");
+        removedHearingBundlesCollection.add(
+            GenericTypeItem.from(RemovedHearingBundleItem.builder()
+                .bundleName(bundleToRemove.getValue().getUploadFile().getDocumentFilename())
+                .removedDateTime(dateTimeFormatter.print(DateTime.now()))
+                .removedReason(caseData.getHearingBundleRemoveReason())
+                .build()
+            )
+        );
+    }
+
+    public void populateSelectRemoveHearingBundle(CaseData caseData) {
+        String selectedParty = caseData.getRemoveBundleDropDownSelectedParty();
+        if (SELECT_CLAIMANT_HEARING_BUNDLES.equals(selectedParty)) {
+            populateSelectRemoveHearingBundle(caseData.getBundlesClaimantCollection(), caseData);
+        } else if (SELECT_RESPONDENT_HEARING_BUNDLES.equals(selectedParty)) {
+            populateSelectRemoveHearingBundle(caseData.getBundlesRespondentCollection(), caseData);
+        }
+    }
+
+    private void populateSelectRemoveHearingBundle(List<GenericTypeItem<HearingBundleType>> bundlesCollection,
+                                                   CaseData caseData) {
+        if (CollectionUtils.isEmpty(bundlesCollection)) {
+            return;
+        }
+        DynamicFixedListType listType = DynamicFixedListType.from(bundlesCollection.stream()
+                .map(this::createHearingBundlesValueType)
+                .toList()
+        );
+        caseData.setRemoveHearingBundleSelect(listType);
+    }
+
+    private DynamicValueType createHearingBundlesValueType(GenericTypeItem<HearingBundleType> hearingBundleType) {
+        String label = String.format("%s - %s",
+                hearingBundleType.getValue().getFormattedSelectedHearing(),
+                hearingBundleType.getValue().getUploadFile().getDocumentFilename()
+        );
+        return DynamicValueType.create(hearingBundleType.getId(), label);
     }
 }

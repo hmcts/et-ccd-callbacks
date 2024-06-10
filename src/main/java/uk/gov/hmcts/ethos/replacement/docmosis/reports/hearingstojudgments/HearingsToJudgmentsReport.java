@@ -152,12 +152,13 @@ public final class HearingsToJudgmentsReport {
 
     private List<HearingWithJudgment> getHearingsAndJudgmentsCollection(HearingTypeItem hearingTypeItem,
                                                                         List<JudgementTypeItem> judgmentsCollection) {
-        HearingType hearingType = hearingTypeItem.getValue();
+
         List<HearingWithJudgment> hearingJudgmentsList = new ArrayList<>();
         if (!isValidHearing(hearingTypeItem)) {
             return hearingJudgmentsList;
         }
 
+        HearingType hearingType = hearingTypeItem.getValue();
         for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
             DateListedType dateListedType = dateListedTypeItem.getValue();
             LocalDate hearingListedDate = LocalDate.parse(dateListedType.getListedDate(), OLD_DATE_TIME_PATTERN);

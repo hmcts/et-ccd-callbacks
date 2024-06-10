@@ -118,7 +118,7 @@ public class BulkUpdateService {
                             multipleTypeItemListAux, searchTypeItemList);
                 }
                 // 6) Create an event for each update single & bulk and assign lead
-                BulkDetails bulkDetailsAux = BulkHelper.setMultipleCollection(bulkDetails,
+                BulkDetails bulkDetailsAux = BulkHelper.getMultipleCollection(bulkDetails,
                         createUpdateEventsAndAssignLead(multipleTypeItemListAux, bulkDetails, userToken,
                                 submitBulkEventSubmitEventType));
                 bulkRequestPayload.setBulkDetails(bulkDetailsAux);
@@ -263,15 +263,16 @@ public class BulkUpdateService {
                                                               String multipleReference) {
         try {
             MultRefComplexType multRefComplexType = new MultRefComplexType();
-            if (!isNullOrEmpty(multipleReference)) {
-                List<SubmitBulkEvent> submitBulkEvents = ccdClient.retrieveBulkCasesElasticSearch(authToken,
-                        bulkDetails.getCaseTypeId(), multipleReference);
-                if (submitBulkEvents.isEmpty()) {
-                    multRefComplexType.setExist(false);
-                } else {
-                    multRefComplexType.setExist(true);
-                    multRefComplexType.setSubmitBulkEvent(submitBulkEvents.get(0));
-                }
+            if (isNullOrEmpty(multipleReference)) {
+                return multRefComplexType;
+            }
+            List<SubmitBulkEvent> submitBulkEvents = ccdClient.retrieveBulkCasesElasticSearch(authToken,
+                    bulkDetails.getCaseTypeId(), multipleReference);
+            if (submitBulkEvents.isEmpty()) {
+                multRefComplexType.setExist(false);
+            } else {
+                multRefComplexType.setExist(true);
+                multRefComplexType.setSubmitBulkEvent(submitBulkEvents.get(0));
             }
             return multRefComplexType;
         } catch (Exception ex) {

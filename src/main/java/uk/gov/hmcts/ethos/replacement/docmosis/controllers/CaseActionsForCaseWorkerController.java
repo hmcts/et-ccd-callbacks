@@ -86,9 +86,12 @@ public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
-    private static final String TWO_HUNDERED = "200";
-    private static final String FOUR_HUNDERED = "400";
-    private static final String FIVE_HUNDERED = "500";
+    private static final String TWO_HUNDRED = "200";
+    private static final String FOUR_HUNDRED = "400";
+    private static final String FIVE_HUNDRED = "500";
+    private static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
+    private static final String BAD_REQUEST = "Bad Request";
+    private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
@@ -119,12 +122,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> createCase(
             @RequestBody CCDRequest ccdRequest,
@@ -145,12 +148,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/retrieveCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "retrieve a case for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     @Deprecated
     public ResponseEntity<CCDCallbackResponse> retrieveCase(
@@ -174,12 +177,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/retrieveCases", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "retrieve cases for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> retrieveCases(
             @RequestBody CCDRequest ccdRequest,
@@ -201,12 +204,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/updateCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update a case for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> updateCase(
             @RequestBody CCDRequest ccdRequest,
@@ -227,12 +230,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/preDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update pre default values in a case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> preDefaultValues(
             @RequestBody CCDRequest ccdRequest,
@@ -253,12 +256,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/postDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update the case with some default values after submitted.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> postDefaultValues(
             @RequestBody CCDRequest ccdRequest,
@@ -313,12 +316,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add HMCTSServiceId to supplementary_data on a case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> addServiceId(
             @RequestBody CCDRequest ccdRequest,
@@ -337,9 +340,9 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/initialiseAmendCaseDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case data for amendCaseDetails and amendCaseDetailsClosed events")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully"),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY),
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> initialiseAmendCaseDetails(
             @RequestBody CCDRequest ccdRequest,
@@ -367,12 +370,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendCaseDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend the case details for a single case and validates receipt date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> amendCaseDetails(
             @RequestBody CCDRequest ccdRequest,
@@ -424,12 +427,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/migrateCaseLinkDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amends the case link details of a transferred single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
                 content = { @Content(mediaType = "application/json",
                         schema = @Schema(implementation = CCDCallbackResponse.class))
                 }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> migrateCaseLinkDetails(
             @RequestBody CCDRequest ccdRequest,
@@ -444,12 +447,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendClaimantDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend the case claimant details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> amendClaimantDetails(
             @RequestBody CCDRequest ccdRequest,
@@ -480,12 +483,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend respondent details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> amendRespondentDetails(
             @RequestBody CCDRequest ccdRequest,
@@ -540,12 +543,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendRespondentRepresentative", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend respondent representative for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> amendRespondentRepresentative(
             @RequestBody CCDRequest ccdRequest,
@@ -580,9 +583,9 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping("/amendRespondentRepSubmitted")
     @Operation(summary = "processes notice of change update after amending respondent representatives")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully"),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY),
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public void amendRespondentRepSubmitted(@RequestBody CallbackRequest callbackRequest) {
         log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> "
@@ -597,12 +600,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicRespondentRepresentativeNames", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the respondents names into a dynamic list")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> dynamicRespondentRepresentativeNames(
             @RequestBody CCDRequest ccdRequest,
@@ -623,12 +626,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/updateHearing", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update hearing details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> updateHearing(
             @RequestBody CCDRequest ccdRequest,
@@ -649,12 +652,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/allocateHearing", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update postponed date when allocating a hearing.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> allocateHearing(
             @RequestBody CCDRequest ccdRequest,
@@ -675,12 +678,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/restrictedCases", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "change restricted reporting for a single case")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> restrictedCases(
             @RequestBody CCDRequest ccdRequest,
@@ -707,12 +710,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicRestrictedReporting", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates a dynamic list for restricted reporting")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> dynamicRestrictedReporting(
             @RequestBody CCDRequest ccdRequest,
@@ -733,12 +736,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendHearing", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend hearing details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> amendHearing(
             @RequestBody CCDRequest ccdRequest,
@@ -763,12 +766,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/midEventAmendHearing", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "mid event amend hearing details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> midEventAmendHearing(
             @RequestBody CCDRequest ccdRequest,
@@ -790,12 +793,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendCaseState", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend the case state for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> amendCaseState(
             @RequestBody CCDRequest ccdRequest,
@@ -822,12 +825,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/midRespondentAddress", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the mid dynamic fixed list with the respondent addresses.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> midRespondentAddress(
             @RequestBody CCDRequest ccdRequest,
@@ -847,12 +850,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/jurisdictionValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates jurisdiction entries to prevent duplicates.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> jurisdictionValidation(
             @RequestBody CCDRequest ccdRequest,
@@ -875,12 +878,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/addAmendJurisdiction", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend jurisdiction details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> addAmendJurisdiction(
             @RequestBody CCDRequest ccdRequest,
@@ -900,12 +903,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/midRespondentECC", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the mid dynamic list with the respondent names.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> midRespondentECC(
             @RequestBody CCDRequest ccdRequest,
@@ -926,12 +929,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/createECC", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a new Employer Contract Claim.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> createECC(
             @RequestBody CCDRequest ccdRequest,
@@ -954,12 +957,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/linkOriginalCaseECC", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "send an update to the original case with the new ECC reference created to link it.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> linkOriginalCaseECC(
             @RequestBody CCDRequest ccdRequest,
@@ -980,12 +983,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/singleCaseMultipleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the multiple and sub multiple in the single case when moving to a multiple.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> singleCaseMultipleMidEventValidation(
             @RequestBody CCDRequest ccdRequest,
@@ -1012,12 +1015,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/hearingMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the hearing number and the hearing days to prevent their creation.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> hearingMidEventValidation(
             @RequestBody CCDRequest ccdRequest,
@@ -1037,12 +1040,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicListBfActions", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate bf actions in dynamic lists.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> dynamicListBfActions(
             @RequestBody CCDRequest ccdRequest,
@@ -1063,12 +1066,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/bfActions", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "updates the dateEntered by the user with the current date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> bfActions(
             @RequestBody CCDRequest ccdRequest,
@@ -1089,12 +1092,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicJudgments", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the dynamic lists for judgements")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> dynamicJudgementList(
             @RequestBody CCDRequest ccdRequest,
@@ -1114,12 +1117,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/judgementSubmitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the dynamic lists for judgements")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> judgementSubmitted(
             @RequestBody CCDRequest ccdRequest,
@@ -1139,12 +1142,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/judgmentValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates jurisdiction codes within judgement collection.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> judgmentValidation(
             @RequestBody CCDRequest ccdRequest,
@@ -1165,12 +1168,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/depositValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates deposit amount and deposit refunded.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> depositValidation(
             @RequestBody CCDRequest ccdRequest,
@@ -1191,12 +1194,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicDepositOrder", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the respondents names into a dynamic list")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> dynamicDepositOrder(
             @RequestBody CCDRequest ccdRequest,
@@ -1216,12 +1219,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/aboutToStartDisposal", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update the position type to case closed.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStartDisposal(
             @RequestBody CCDRequest ccdRequest,
@@ -1259,12 +1262,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendFixCaseAPI", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend case details in Fix Case API")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> amendFixCaseAPI(
             @RequestBody CCDRequest ccdRequest,
@@ -1284,12 +1287,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/reinstateClosedCaseMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates position type when reinstate closed case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDERED, description = "Accessed successfully",
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = FOUR_HUNDERED, description = "Bad Request"),
-        @ApiResponse(responseCode = FIVE_HUNDERED, description = "Internal Server Error")
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> reinstateClosedCaseMidEventValidation(
             @RequestBody CCDRequest ccdRequest,

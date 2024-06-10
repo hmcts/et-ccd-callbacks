@@ -97,7 +97,7 @@ public class ReplyToReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         clearReferralDataFromCaseData(caseData);
-        caseData.setIsJudge(ReferralHelper.isJudge(userIdamService.getUserDetails(userToken).getRoles()));
+        caseData.setIsJudge(ReferralHelper.stringIsJudge(userIdamService.getUserDetails(userToken).getRoles()));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
         return getCallbackRespEntityNoErrors(caseData);
     }

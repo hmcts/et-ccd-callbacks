@@ -117,7 +117,7 @@ public class ExcelReadingService {
         }
     }
 
-    private void getSubMultipleObjects(SortedMap<String, Object> multipleObjects, String ethosCaseRef,
+    private void setSubMultipleObjects(SortedMap<String, Object> multipleObjects, String ethosCaseRef,
                                        String subMultiple) {
 
         if (multipleObjects.containsKey(subMultiple)) {
@@ -131,7 +131,7 @@ public class ExcelReadingService {
 
     }
 
-    private void getFlagObjects(SortedMap<String, Object> multipleObjects, String subMultiple,
+    private void setFlagObjects(SortedMap<String, Object> multipleObjects, String subMultiple,
                                 String flag1, String flag2, String flag3, String flag4) {
 
         populateTreeMapWithSet(multipleObjects, HEADER_2, subMultiple);
@@ -160,12 +160,12 @@ public class ExcelReadingService {
     private void filterSubMultiple(Row currentRow, MultipleData multipleData,
                                    SortedMap<String, Object> multipleObjects) {
         if (isMultipleInFlagsAndBelongsSubMultiple(currentRow, multipleData)) {
-            getSubMultipleObjects(multipleObjects,
+            setSubMultipleObjects(multipleObjects,
                     getCellValue(currentRow.getCell(0)),
                     getCellValue(currentRow.getCell(1)));
         } else {
             if (isMultipleInFlags(currentRow, multipleData)) {
-                getSubMultipleObjects(multipleObjects,
+                setSubMultipleObjects(multipleObjects,
                         getCellValue(currentRow.getCell(0)),
                         NOT_ALLOCATED);
             }
@@ -194,7 +194,7 @@ public class ExcelReadingService {
                 }
 
             } else if (filter.equals(FilterExcelType.DL_FLAGS)) {
-                getFlagObjects(multipleObjects,
+                setFlagObjects(multipleObjects,
                         getCellValue(currentRow.getCell(1)),
                         getCellValue(currentRow.getCell(2)),
                         getCellValue(currentRow.getCell(3)),
@@ -251,7 +251,7 @@ public class ExcelReadingService {
 
     private boolean isMultipleInFlagsAndBelongsSubMultiple(Row currentRow, MultipleData multipleData) {
 
-        return !getCellValue(currentRow.getCell(1)).equals("")
+        return !getCellValue(currentRow.getCell(1)).isEmpty()
                 && isFilterPassed(currentRow.getCell(2), multipleData.getFlag1())
                 && isFilterPassed(currentRow.getCell(3), multipleData.getFlag2())
                 && isFilterPassed(currentRow.getCell(4), multipleData.getFlag3())
@@ -267,7 +267,7 @@ public class ExcelReadingService {
 
         } else {
 
-            return getCellValue(cell).equals("");
+            return getCellValue(cell).isEmpty();
         }
 
     }

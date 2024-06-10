@@ -87,7 +87,7 @@ public class ReplyToReferralMultiplesController {
         log.info("ABOUT TO START REPLY TO REFERRAL ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
         MultipleData caseData = request.getCaseDetails().getCaseData();
-        caseData.setIsJudge(ReferralHelper.isJudge(userIdamService.getUserDetails(userToken).getRoles()));
+        caseData.setIsJudge(ReferralHelper.stringIsJudge(userIdamService.getUserDetails(userToken).getRoles()));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
         return multipleResponse(caseData, null);
     }

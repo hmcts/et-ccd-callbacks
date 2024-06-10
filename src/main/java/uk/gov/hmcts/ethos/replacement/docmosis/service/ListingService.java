@@ -139,7 +139,7 @@ public class ListingService {
         return caseData;
     }
 
-    public ListingData setManagingOfficeAndCourtAddressFromCaseData(CaseData caseData) {
+    public ListingData getManagingOfficeAndCourtAddressFromCaseData(CaseData caseData) {
         ListingData listingData = caseData.getPrintHearingCollection();
         listingData.setTribunalCorrespondenceAddress(caseData.getTribunalCorrespondenceAddress());
         listingData.setTribunalCorrespondenceTelephone(caseData.getTribunalCorrespondenceTelephone());
@@ -255,11 +255,11 @@ public class ListingService {
     public String getSelectedOfficeForPrintLists(CaseData caseData) {
         if (caseData.getPrintHearingDetails().getListingVenue() != null) {
             return caseData.getManagingOffice();
-        } else if (!isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
-            return caseData.getPrintHearingDetails().getListingVenueScotland();
-        } else {
+        } else if (isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
             throw new IllegalStateException("Unable to get selected office from "
                     + "printing details for case reference " + caseData.getEthosCaseReference());
+        } else {
+            return caseData.getPrintHearingDetails().getListingVenueScotland();
         }
     }
 
@@ -372,7 +372,6 @@ public class ListingService {
             return true;
         } else {
             String venueSearched;
-            String venueToSearch = ListingVenueHelper.getListingVenue(listingData);
 
             if (ListingVenueHelper.isAllScottishVenues(listingData)) {
                 venueSearched = dateListedTypeItem.getValue().hasHearingVenue()
@@ -387,7 +386,7 @@ public class ListingService {
                 }
 
             }
-            return venueSearched.trim().equals(venueToSearch.trim());
+            return venueSearched.trim().equals(ListingVenueHelper.getListingVenue(listingData).trim());
         }
     }
 

@@ -9,13 +9,13 @@ import lombok.Setter;
 @RequiredArgsConstructor
 
 public class HearingsByHearingTypeReportSummary2Hdr {
+    private ReportFields fields;
+
     HearingsByHearingTypeReportSummary2Hdr(String subSplit) {
         fields = new ReportFields();
         fields.setSubSplit(subSplit);
         initReportFields(fields);
     }
-
-    private ReportFields fields;
 
     private void initReportFields(ReportFields reportFields) {
         reportFields.setHearingCount("0");

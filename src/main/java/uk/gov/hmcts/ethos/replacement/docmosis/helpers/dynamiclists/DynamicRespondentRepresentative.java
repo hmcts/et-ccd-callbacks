@@ -23,6 +23,7 @@ public final class DynamicRespondentRepresentative {
 
             if (CollectionUtils.isNotEmpty(caseData.getRepCollection())) {
                 ListIterator<RepresentedTypeRItem> repItr = caseData.getRepCollection().listIterator();
+
                 while (repItr.hasNext()) {
                     DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
                     dynamicFixedListType.setListItems(listItems);
@@ -31,6 +32,7 @@ public final class DynamicRespondentRepresentative {
                     if (respRepCollection.getValue().getDynamicRespRepName() == null) {
                         repItr.next().getValue().setDynamicRespRepName(dynamicFixedListType);
                         String respRepName = respRepCollection.getValue().getRespRepName();
+
                         dynamicValueType.setLabel(respRepName);
                         dynamicValueType.setCode(respRepName);
                     } else {

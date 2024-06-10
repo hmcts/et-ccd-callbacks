@@ -63,7 +63,7 @@ public class DepositOrderValidationService {
                 depositTypeItem.getValue().setDepositRequestedBy(RESPONDENT_TITLE);
             } else if (dynamicRequestedBy.startsWith("C:")) {
                 depositTypeItem.getValue().setDepositRequestedBy(CLAIMANT_TITLE);
-            } else if (dynamicRequestedBy.equals("Tribunal")) {
+            } else if ("Tribunal".equals(dynamicRequestedBy)) {
                 depositTypeItem.getValue().setDepositRequestedBy("Tribunal");
             } else {
                 errors.add(UNABLE_TO_FIND_PARTY);

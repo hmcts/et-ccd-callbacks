@@ -57,21 +57,21 @@ public class BulkCreationService {
         if (bulkCasesPayload.getErrors().isEmpty()) {
             // 1) Retrieve cases by ethos reference
             List<SubmitEvent> submitEvents = bulkCasesPayload.getSubmitEvents();
-            if (action.equals(BULK_CREATION_STEP)) {
+            if (BULK_CREATION_STEP.equals(action)) {
                 // 2) Create multiple ref number
                 bulkDetails.getCaseData().setMultipleReference(bulkSearchService.generateMultipleRef(bulkDetails));
                 // 3) Add list of cases to the multiple bulk case collection
                 if (submitEvents.isEmpty()) {
-                    bulkRequestPayload.setBulkDetails(BulkHelper.setMultipleCollection(bulkDetails,
+                    bulkRequestPayload.setBulkDetails(BulkHelper.getMultipleCollection(bulkDetails,
                             bulkDetails.getCaseData().getMultipleCollection()));
                 } else {
                     List<MultipleTypeItem> multipleTypeItemList =
                             BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents,
                             bulkDetails.getCaseData().getMultipleReference());
                     bulkRequestPayload.setBulkDetails(
-                            BulkHelper.setMultipleCollection(bulkDetails, multipleTypeItemList));
+                            BulkHelper.getMultipleCollection(bulkDetails, multipleTypeItemList));
                 }
-            } else if (action.equals(UPDATE_SINGLES_STEP)) {
+            } else if (UPDATE_SINGLES_STEP.equals(action)) {
                 // 4) Create an event to update multiple reference field to all cases
                 createCaseEventsToUpdateMultipleRef(submitEvents, bulkDetails, userToken);
                 bulkRequestPayload.setBulkDetails(bulkDetails);
@@ -124,7 +124,7 @@ public class BulkCreationService {
         BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
         BulkCasesPayload bulkCasesPayload = updateBulkRequest(bulkRequest, authToken, isPersistentQ);
         if (bulkCasesPayload.getErrors().isEmpty()) {
-            bulkRequest.setCaseDetails(BulkHelper.setMultipleCollection(bulkRequest.getCaseDetails(),
+            bulkRequest.setCaseDetails(BulkHelper.getMultipleCollection(bulkRequest.getCaseDetails(),
                     bulkCasesPayload.getMultipleTypeItems()));
             bulkRequest.setCaseDetails(BulkHelper.clearSearchCollection(bulkRequest.getCaseDetails()));
         }

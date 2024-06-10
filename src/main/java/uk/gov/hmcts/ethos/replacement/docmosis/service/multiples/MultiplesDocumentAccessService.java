@@ -35,13 +35,6 @@ public final class MultiplesDocumentAccessService {
     }
 
     public void setMultipleDocumentsToCorrectTab(MultipleData multipleData) {
-        List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
-
-        List<DocumentTypeItem> selectedDocs = docs.stream()
-                .filter(doc -> multipleData.getDocumentSelect().getValue().stream()
-                        .anyMatch(code -> code.getCode().equals(doc.getId())))
-                .toList();
-
         if (multipleData.getClaimantDocumentCollection() == null) {
             multipleData.setClaimantDocumentCollection(new ArrayList<>());
         }
@@ -59,6 +52,12 @@ public final class MultiplesDocumentAccessService {
         if (documentAccess == null) {
             return;
         }
+
+        List<DocumentTypeItem> docs = multipleData.getDocumentCollection();
+        List<DocumentTypeItem> selectedDocs = docs.stream()
+                .filter(doc -> multipleData.getDocumentSelect().getValue().stream()
+                        .anyMatch(code -> code.getCode().equals(doc.getId())))
+                .toList();
 
         switch (documentAccess) {
             case "Citizens":

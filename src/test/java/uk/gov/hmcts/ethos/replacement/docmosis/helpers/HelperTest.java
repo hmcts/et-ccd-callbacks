@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -163,5 +164,12 @@ public class HelperTest {
         list.add("test");
         list.add("test2");
         assertEquals("test2", Helper.getLast(list));
+    }
+
+    @Test
+    void shouldGenerateEmptySignificantItem() {
+        var sigItem = Helper.generateSignificantItem(null, new ArrayList<>());
+        assertNotNull(sigItem);
+        assertNull(sigItem.getUrl());
     }
 }

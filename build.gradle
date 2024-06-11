@@ -417,7 +417,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.8'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.0'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.10'
@@ -435,7 +435,7 @@ dependencies {
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.16.1'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
 
-    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
+    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 

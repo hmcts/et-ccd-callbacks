@@ -18,6 +18,8 @@ import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,18 +40,21 @@ public class MultipleBatchUpdate2Service {
     private final ExcelReadingService excelReadingService;
     private final MultipleHelperService multipleHelperService;
     private final CcdClient ccdClient;
+    private final MultipleReferenceService multipleReferenceService;
 
     @Autowired
     public MultipleBatchUpdate2Service(ExcelDocManagementService excelDocManagementService,
                                        MultipleCasesReadingService multipleCasesReadingService,
                                        ExcelReadingService excelReadingService,
                                        MultipleHelperService multipleHelperService,
-                                       CcdClient ccdClient) {
+                                       CcdClient ccdClient,
+                                       MultipleReferenceService multipleReferenceService) {
         this.excelDocManagementService = excelDocManagementService;
         this.multipleCasesReadingService = multipleCasesReadingService;
         this.excelReadingService = excelReadingService;
         this.multipleHelperService = multipleHelperService;
         this.ccdClient = ccdClient;
+        this.multipleReferenceService = multipleReferenceService;
     }
 
     public void batchUpdate2Logic(String userToken,
@@ -162,10 +167,13 @@ public class MultipleBatchUpdate2Service {
         SubmitMultipleEvent updatedMultiple = getUpdatedMultiple(userToken, updatedCaseTypeId, updatedMultipleRef);
 
         MultipleData updatedMultipleData = updatedMultiple.getCaseData();
+        String updatedJurisdiction = multipleDetails.getJurisdiction();
 
         log.info("Update the legal rep collection for updated Multiple");
         if (oldLegalRepsCollection != null && !oldLegalRepsCollection.isEmpty()) {
-            transferLegalRepCollection(updatedMultipleData, multipleObjectsFiltered, oldLegalRepsCollection);
+            List<String> legalRepsToAdd =
+                    transferLegalRepCollection(updatedMultipleData, multipleObjectsFiltered, oldLegalRepsCollection);
+            addLegalRepsToMultiple(updatedJurisdiction, updatedCaseTypeId, updatedMultipleRef, legalRepsToAdd);
         }
 
         log.info("Add the lead case markUp");
@@ -175,7 +183,6 @@ public class MultipleBatchUpdate2Service {
 
         multipleHelperService.addLeadMarkUp(userToken, updatedCaseTypeId, updatedMultipleData, updatedLeadCase, "");
 
-        String updatedJurisdiction = multipleDetails.getJurisdiction();
         String updatedMultipleCaseId = String.valueOf(updatedMultiple.getCaseId());
         multipleHelperService.moveCasesAndSendUpdateToMultiple(userToken, updatedSubMultipleRef, updatedJurisdiction,
                 updatedCaseTypeId, updatedMultipleCaseId, updatedMultipleData, multipleObjectsFiltered, errors);
@@ -186,25 +193,28 @@ public class MultipleBatchUpdate2Service {
                 errors, multipleObjectsFiltered, updatedLeadCase, updatedMultipleCaseId);
     }
 
-    private void transferLegalRepCollection(MultipleData multipleData,
-                                            List<String> casesBeingMoved,
-                                            ListTypeItem<SubCaseLegalRepDetails> allOldLegalRepsCollection) {
+    private List<String> transferLegalRepCollection(MultipleData multipleData,
+                                                    List<String> casesBeingMoved,
+                                                    ListTypeItem<SubCaseLegalRepDetails> allOldLegalRepsCollection) {
+        List<String> legalRepsToAdd = new ArrayList<>();
+
         ListTypeItem<SubCaseLegalRepDetails> filteredLegalRepsCollection =
                 filterLegalRepCollection(casesBeingMoved, allOldLegalRepsCollection);
         if (filteredLegalRepsCollection.isEmpty()) {
-            return;
+            return legalRepsToAdd;
         }
 
-        ListTypeItem<SubCaseLegalRepDetails> newLegalRepCollection = multipleData.getLegalRepCollection();
-        if (newLegalRepCollection == null || newLegalRepCollection.isEmpty()) {
-            multipleData.setLegalRepCollection(filteredLegalRepsCollection);
-            return;
-        }
+        ListTypeItem<SubCaseLegalRepDetails> newLegalRepCollection =
+                multipleData.getLegalRepCollection() == null || multipleData.getLegalRepCollection().isEmpty()
+                ? new ListTypeItem<>()
+                : multipleData.getLegalRepCollection();
 
         ListTypeItem<SubCaseLegalRepDetails> collectedLegalRepCollection =
                 ListTypeItem.concat(newLegalRepCollection, filteredLegalRepsCollection);
 
         multipleData.setLegalRepCollection(collectedLegalRepCollection);
+
+        return pullLegalRepsFromCollection(null, filteredLegalRepsCollection);
     }
 
     private ListTypeItem<SubCaseLegalRepDetails> filterLegalRepCollection(
@@ -220,6 +230,18 @@ public class MultipleBatchUpdate2Service {
         }
 
         return legalRepsToMoveCollection;
+    }
+
+    private void addLegalRepsToMultiple(String jurisdiction,
+                                        String caseType,
+                                        String multipleId,
+                                        List<String> legalRepsToAdd) {
+        if (!legalRepsToAdd.isEmpty()) {
+            multipleReferenceService.addUsersToMultiple(jurisdiction,
+                    caseType,
+                    multipleId,
+                    legalRepsToAdd);
+        }
     }
 
     private String checkIfNewMultipleWasEmpty(String updatedLeadCase, List<String> multipleObjectsFiltered) {
@@ -311,7 +333,7 @@ public class MultipleBatchUpdate2Service {
         String multipleReference = multipleDetails.getCaseData().getMultipleReference();
         ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = multipleDetails.getCaseData().getLegalRepCollection();
 
-        List<String> legalRepsToRemove = getLegalRepsToRemove(casesBeingRemoved, legalRepCollection);
+        List<String> legalRepsToRemove = pullLegalRepsFromCollection(casesBeingRemoved, legalRepCollection);
 
         if (legalRepsToRemove.isEmpty()) {
             log.info("No LegalReps to be removed from : {}", multipleReference);
@@ -336,18 +358,22 @@ public class MultipleBatchUpdate2Service {
         multipleDetails.getCaseData().setLegalRepCollection(newLegalRepCollection);
     }
 
-    private static @NotNull List<String> getLegalRepsToRemove(List<String> casesBeingRemoved,
-                                                              ListTypeItem<SubCaseLegalRepDetails> legalRepCollection) {
-        List<String> legalRepsToRemove = new ArrayList<>();
+    private static @NotNull List<String> pullLegalRepsFromCollection(
+            List<String> filteredCases,
+            ListTypeItem<SubCaseLegalRepDetails> legalRepCollection) {
+        boolean filter = filteredCases != null && !filteredCases.isEmpty();
+
+        List<String> legalReps = new ArrayList<>();
         for (GenericTypeItem<SubCaseLegalRepDetails> caseDetails : legalRepCollection) {
             SubCaseLegalRepDetails currentCaseDetails = caseDetails.getValue();
-            if (casesBeingRemoved.contains(currentCaseDetails.getCaseReference())) {
-                for (GenericTypeItem<String> legalRepId : currentCaseDetails.getLegalRepIds()) {
-                    legalRepsToRemove.add(legalRepId.getValue());
-                }
+            if (filter && !filteredCases.contains(currentCaseDetails.getCaseReference())) {
+                continue;
+            }
+            for (GenericTypeItem<String> legalRepId : currentCaseDetails.getLegalRepIds()) {
+                legalReps.add(legalRepId.getValue());
             }
         }
-        return legalRepsToRemove;
+        return legalReps;
     }
 
     private List<MultipleObject> removeCasesInMultiple(List<String> multipleObjectsFiltered,

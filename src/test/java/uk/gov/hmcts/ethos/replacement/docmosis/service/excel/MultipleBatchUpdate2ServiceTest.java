@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +53,8 @@ class MultipleBatchUpdate2ServiceTest {
     private MultipleHelperService multipleHelperService;
     @Mock
     private CcdClient ccdClient;
+    @Mock
+    private MultipleReferenceService multipleReferenceService;
 
     @InjectMocks
     private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
@@ -251,6 +254,7 @@ class MultipleBatchUpdate2ServiceTest {
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
         assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
+        verify(multipleReferenceService, never()).addUsersToMultiple(any(), any(), any(), any());
     }
 
     @Test
@@ -282,6 +286,7 @@ class MultipleBatchUpdate2ServiceTest {
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
         assertEquals(2, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
     }
 
     @Test
@@ -315,6 +320,7 @@ class MultipleBatchUpdate2ServiceTest {
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
         assertEquals(2, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
     }
 
     @Test
@@ -356,6 +362,7 @@ class MultipleBatchUpdate2ServiceTest {
         verifyNoMoreInteractions(ccdClient);
         assertEquals(1, multipleDetails.getCaseData().getLegalRepCollection().size());
         assertEquals(3, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
     }
 
     @Test

@@ -56,6 +56,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 
 @Service
 @Slf4j
@@ -231,7 +232,7 @@ public class Et1ReppedService {
 
     private String getEt1DocumentName(CaseData caseData, String pdfSource) {
         return ET1_CY_PDF.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
-                : "ET1 - " + caseData.getClaimant() + ".pdf";
+                : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 
     private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken,

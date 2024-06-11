@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -14,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.DOUBLE_SPACE_ERROR;
@@ -71,5 +75,21 @@ class InvalidCharacterCheckTest {
         casedata.setRepCollection(null);
         List<String> errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(casedata, "letter");
         assertEquals(0, errors.size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideStringsForSanitizePartyName")
+    void sanitizePartyName(String input, String expected) {
+        assertEquals(expected, InvalidCharacterCheck.sanitizePartyName(input));
+    }
+
+    private static Stream<Arguments> provideStringsForSanitizePartyName() {
+        return Stream.of(
+            Arguments.of("John Doe", "John Doe"),
+            Arguments.of("John O'Doe", "John O Doe"),
+            Arguments.of("John Doe/Jr", "John Doe Jr"),
+            Arguments.of("", ""),
+            Arguments.of(null, "")
+        );
     }
 }

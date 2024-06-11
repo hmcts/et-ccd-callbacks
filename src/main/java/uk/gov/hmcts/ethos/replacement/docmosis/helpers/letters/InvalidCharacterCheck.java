@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.elasticsearch.common.Strings;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public final class InvalidCharacterCheck {
@@ -20,6 +20,7 @@ public final class InvalidCharacterCheck {
             + "for the %s";
     public static final String DOUBLE_SPACE_ERROR = "%s contains a double space for case %s. Please correct this before"
             + " for the %s";
+    private static final List<String> DOCUMENT_CHARS_TO_REPLACE = List.of("@", "/", "\\", "'");
 
     private InvalidCharacterCheck() {
     }
@@ -32,7 +33,7 @@ public final class InvalidCharacterCheck {
     public static List<String> addInvalidCharsErrors(List<String> nameOfParties, String caseNo, String type) {
         List<String> errors = new ArrayList<>();
         for (String name : nameOfParties) {
-            if (!Strings.isNullOrEmpty(name)) {
+            if (!isNullOrEmpty(name)) {
                 if (name.contains("  ")) {
                     errors.add(String.format(DOUBLE_SPACE_ERROR, name, caseNo, type));
                 }
@@ -70,19 +71,19 @@ public final class InvalidCharacterCheck {
 
     private static List<String> findAllListingTypeParties(ListingType listingType) {
         List<String> parties = new ArrayList<>();
-        if (!Strings.isNullOrEmpty(listingType.getRespondent())
+        if (!isNullOrEmpty(listingType.getRespondent())
                 && !listingType.getRespondent().isBlank()) {
             parties.add("Respondent " + listingType.getRespondent());
         }
-        if (!Strings.isNullOrEmpty(listingType.getClaimantName())
+        if (!isNullOrEmpty(listingType.getClaimantName())
                 && !listingType.getClaimantName().isBlank()) {
             parties.add("Claimant " + listingType.getClaimantName());
         }
-        if (!Strings.isNullOrEmpty(listingType.getRespondentRepresentative())
+        if (!isNullOrEmpty(listingType.getRespondentRepresentative())
                 && !listingType.getRespondentRepresentative().isBlank()) {
             parties.add("Respondent Rep " + listingType.getRespondentRepresentative());
         }
-        if (!Strings.isNullOrEmpty(listingType.getClaimantRepresentative())
+        if (!isNullOrEmpty(listingType.getClaimantRepresentative())
                 && !listingType.getClaimantRepresentative().isBlank()) {
             parties.add("Claimant Rep " + listingType.getClaimantRepresentative());
         }
@@ -107,5 +108,17 @@ public final class InvalidCharacterCheck {
         } else {
             return false;
         }
+    }
+
+    public static String sanitizePartyName(String partyName) {
+        if (isNullOrEmpty(partyName)) {
+            return "";
+        }
+
+        String sanitizedName = partyName;
+        for (String charToReplace : DOCUMENT_CHARS_TO_REPLACE) {
+            sanitizedName = sanitizedName.replace(charToReplace, " ");
+        }
+        return sanitizedName;
     }
 }

@@ -162,8 +162,7 @@ public class PdfBoxService {
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
 
-                for (Map.Entry<String, Optional<String>> entry : mapEt3Form(caseData)
-                        .entrySet()) {
+                for (Map.Entry<String, Optional<String>> entry : mapEt3Form(caseData).entrySet()) {
                     String entryKey = entry.getKey();
                     Optional<String> entryValue = entry.getValue();
                     if (entryValue.isPresent() && StringUtils.isNotBlank(entryValue.get())) {

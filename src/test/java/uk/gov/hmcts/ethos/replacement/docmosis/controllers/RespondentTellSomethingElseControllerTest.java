@@ -172,7 +172,7 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(tseService).validateGiveDetails(ccdRequest.getCaseDetails().getCaseData());
+        verify(resTseService).validateGiveDetails(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test

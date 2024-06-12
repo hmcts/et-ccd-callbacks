@@ -156,7 +156,7 @@ public class RespondentTellSomethingElseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = tseService.validateGiveDetails(caseData);
+        List<String> errors = resTseService.validateGiveDetails(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

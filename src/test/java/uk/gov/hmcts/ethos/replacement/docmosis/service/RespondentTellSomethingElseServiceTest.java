@@ -113,6 +113,7 @@ class RespondentTellSomethingElseServiceTest {
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
 
+    private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
     private static final String EXPECTED_EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
         + "Response due | Number of responses | Status "
@@ -142,12 +143,98 @@ class RespondentTellSomethingElseServiceTest {
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
     }
 
+    @ParameterizedTest
+    @MethodSource("selectedApplicationList")
+    void validateGiveDetails_Blank_ReturnErrorMsg(String selectedApplication) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        List<String> errors = respondentTellSomethingElseService.validateGiveDetails(caseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is(GIVE_DETAIL_MISSING));
+    }
+
+    @ParameterizedTest
+    @MethodSource("selectedApplicationList")
+    void validateGiveDetails_HasDoc_NoErrorMsg(String selectedApplication) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        setDocForSelectedApplication(caseData);
+        List<String> errors = respondentTellSomethingElseService.validateGiveDetails(caseData);
+        assertThat(errors.size(), is(0));
+    }
+
+    @ParameterizedTest
+    @MethodSource("selectedApplicationList")
+    void validateGiveDetails_HasTextBox_NoErrorMsg(String selectedApplication) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        setTextBoxForSelectedApplication(caseData);
+        List<String> errors = respondentTellSomethingElseService.validateGiveDetails(caseData);
+        assertThat(errors.size(), is(0));
+    }
+
+    private static Stream<Arguments> selectedApplicationList() {
+        return Stream.of(
+                Arguments.of(TSE_APP_AMEND_RESPONSE),
+                Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS),
+                Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED),
+                Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH),
+                Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL),
+                Arguments.of(TSE_APP_ORDER_OTHER_PARTY),
+                Arguments.of(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE),
+                Arguments.of(TSE_APP_POSTPONE_A_HEARING),
+                Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT),
+                Arguments.of(TSE_APP_RESTRICT_PUBLICITY),
+                Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM),
+                Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER));
+    }
+
+    private void setDocForSelectedApplication(CaseData caseData) {
+        switch (caseData.getResTseSelectApplication()) {
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseDocument1(createDocumentType("documentUrl"));
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseDocument2(createDocumentType("documentUrl"));
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseDocument3(createDocumentType("documentUrl"));
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseDocument4(createDocumentType("documentUrl"));
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseDocument5(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseDocument6(createDocumentType("documentUrl"));
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE ->
+                caseData.setResTseDocument7(createDocumentType("documentUrl"));
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseDocument8(createDocumentType("documentUrl"));
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseDocument9(createDocumentType("documentUrl"));
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseDocument10(createDocumentType("documentUrl"));
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM ->
+                caseData.setResTseDocument11(createDocumentType("documentUrl"));
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseDocument12(createDocumentType("documentUrl"));
+            default -> {
+            }
+        }
+    }
+
     private UploadedDocumentType createDocumentType(String documentUrl) {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentBinaryUrl("binaryUrl/documents/");
         uploadedDocumentType.setDocumentFilename("testFileName");
         uploadedDocumentType.setDocumentUrl(documentUrl);
         return uploadedDocumentType;
+    }
+
+    private void setTextBoxForSelectedApplication(CaseData caseData) {
+        switch (caseData.getResTseSelectApplication()) {
+            case TSE_APP_AMEND_RESPONSE -> caseData.setResTseTextBox1("Not Blank");
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> caseData.setResTseTextBox2("Not Blank");
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> caseData.setResTseTextBox3("Not Blank");
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> caseData.setResTseTextBox4("Not Blank");
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> caseData.setResTseTextBox5("Not Blank");
+            case TSE_APP_ORDER_OTHER_PARTY -> caseData.setResTseTextBox6("Not Blank");
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> caseData.setResTseTextBox7("Not Blank");
+            case TSE_APP_POSTPONE_A_HEARING -> caseData.setResTseTextBox8("Not Blank");
+            case TSE_APP_RECONSIDER_JUDGEMENT -> caseData.setResTseTextBox9("Not Blank");
+            case TSE_APP_RESTRICT_PUBLICITY -> caseData.setResTseTextBox10("Not Blank");
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> caseData.setResTseTextBox11("Not Blank");
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> caseData.setResTseTextBox12("Not Blank");
+            default -> {
+            }
+        }
     }
 
     @ParameterizedTest

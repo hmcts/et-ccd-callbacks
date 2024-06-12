@@ -33,7 +33,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -57,7 +56,6 @@ public class TseService {
             "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
     private static final String RULE92_DETAILS =
             "Details of why you do not want to inform the other party";
-    private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
 
     private final DocumentManagementService documentManagementService;
 
@@ -432,21 +430,5 @@ public class TseService {
         return String.format("Application %d - %s.pdf",
                 getNextApplicationNumber(caseData) - 1,
                 caseData.getResTseSelectApplication());
-    }
-
-    /**
-     * Validate Give Details (free text box) or file upload is mandatory.
-     *
-     * @param caseData in which the case details are extracted from
-     * @return errors Error message
-     */
-    public List<String> validateGiveDetails(CaseData caseData) {
-        List<String> errors = new ArrayList<>();
-        RespondentTSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
-        if (selectedAppData.getResTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
-            errors.add(GIVE_DETAIL_MISSING);
-        }
-        return errors;
     }
 }

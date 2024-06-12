@@ -195,7 +195,7 @@ public class BundlesRespondentService {
 
         bundlesCollection.removeIf(bundle -> bundle.getId().equals(selectedBundle));
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("d MMMM yyyy HH:mm");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("d MMMM yyyy");
         removedHearingBundlesCollection.add(
             GenericTypeItem.from(RemovedHearingBundleItem.builder()
                 .bundleName(bundleToRemove.getValue().getUploadFile().getDocumentFilename())

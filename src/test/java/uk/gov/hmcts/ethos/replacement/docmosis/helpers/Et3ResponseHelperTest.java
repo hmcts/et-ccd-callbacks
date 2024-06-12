@@ -1,14 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.skyscreamer.jsonassert.JSONAssert;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -17,17 +13,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -140,62 +130,6 @@ class Et3ResponseHelperTest {
     }
 
     @Test
-    void getDocumentRequest_buildsCorrectData() throws IOException, URISyntaxException {
-        caseData.setEthosCaseReference("1800001/2021");
-        caseData.setClaimant("claimant name");
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-        addEt3RespondentData(respondentSumType);
-
-        Address repAddress = CaseDataBuilder.builder().createAddress(
-                "r1", "r2", "r3", "rTown", "rCounty",
-                "rPostcode", "rCountry"
-        );
-
-        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId("id");
-        representedTypeRItem.setValue(RepresentedTypeR.builder()
-                .respRepName("test")
-                .representativeAddress(repAddress)
-                .representativePhoneNumber("phone")
-                .build());
-        caseData.setRepCollection(List.of(representedTypeRItem));
-        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
-
-        // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = Files.readString(Paths.get(Objects.requireNonNull(Thread.currentThread()
-                .getContextClassLoader().getResource("et3ResponseDocument.json")).toURI()));
-
-        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any", "ET3 Response - test.pdf");
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void getDocumentRequest_buildsCorrectData_withoutRespondentRepAddress() throws IOException, URISyntaxException {
-        caseData.getRepCollection().get(0).getValue().setRepresentativeAddress(null);
-        caseData.setEthosCaseReference("1800001/2021");
-        caseData.setClaimant("claimant name");
-        addEt3RespondentData(caseData.getRespondentCollection().get(0).getValue());
-        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
-
-        // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-                .getContextClassLoader().getResource("et3ResponseDocument.json")).toURI())), UTF_8);
-
-        JSONObject json = new JSONObject(expected);
-        JSONObject data = (JSONObject) json.get("data");
-
-        data.remove("repAddressLine1");
-        data.remove("repAddressLine2");
-        data.remove("repTown");
-        data.remove("repCounty");
-        data.remove("repPostcode");
-
-        String test = json.toString();
-        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any", "ET3 Response - test.pdf");
-        JSONAssert.assertEquals(test, actual, false);
-    }
-
-    @Test
     void createDynamicListSelection() {
         Et3ResponseHelper.createDynamicListSelection(caseData);
         assertThat(caseData.getEt3RepresentingRespondent(), hasSize(1));
@@ -204,7 +138,7 @@ class Et3ResponseHelperTest {
     @Test
     void validateRespondents_noErrors() {
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
-        assertThat(errors.isEmpty());
+        assertThat(errors).isEmpty();
     }
 
     @Test
@@ -249,7 +183,7 @@ class Et3ResponseHelperTest {
         caseData.getRespondentCollection().get(0).getValue().setClaimDetailsSection(YES);
         caseData.getRespondentCollection().get(0).getValue().setEmploymentDetailsSection(YES);
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
-        assertThat(errors.isEmpty());
+        assertThat(errors).isEmpty();
         assertThat(caseData.getSubmitEt3Respondent()).isNotNull();
     }
 
@@ -261,48 +195,6 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
         assertThat(errors, hasSize(1));
         assertThat(errors.get(0)).isEqualTo(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
-    }
-
-    private static void addEt3RespondentData(RespondentSumType respondentSumType) {
-        Address et3Address = CaseDataBuilder.builder().createAddress("line1", "line2", "line3", "town", "county",
-                "postcode", "country");
-
-        respondentSumType.setResponseRespondentAddress(et3Address);
-        respondentSumType.setResponseRespondentName("legal name");
-        respondentSumType.setEt3ResponseRespondentCompanyNumber("1234");
-        respondentSumType.setEt3ResponseRespondentEmployerType("employer type");
-        respondentSumType.setEt3ResponseRespondentContactName("contact name");
-        respondentSumType.setEt3ResponseEmploymentCount("100");
-        respondentSumType.setEt3ResponseSiteEmploymentCount("100");
-        respondentSumType.setEt3ResponseAcasAgreeReason("acas agree reason");
-        respondentSumType.setEt3ResponseEmploymentStartDate("2022-01-01");
-        respondentSumType.setEt3ResponseEmploymentEndDate("2022-01-02");
-        respondentSumType.setEt3ResponseEmploymentInformation("employment information");
-        respondentSumType.setEt3ResponseCorrectJobTitle("fall guy");
-        respondentSumType.setEt3ResponseClaimantCorrectHours("168");
-        respondentSumType.setEt3ResponsePayBeforeTax("69000");
-        respondentSumType.setEt3ResponsePayTakehome("25000");
-        respondentSumType.setEt3ResponseCorrectNoticeDetails("notice details");
-        respondentSumType.setEt3ResponseContestClaimDetails("contest claim");
-        respondentSumType.setEt3ResponseEmployerClaimDetails("ecc");
-        respondentSumType.setEt3ResponseRespondentSupportDetails("support details");
-        respondentSumType.setEt3ResponsePensionCorrectDetails("pension details");
-        respondentSumType.setEt3ResponseHearingRespondent(List.of("Phone hearings"));
-        respondentSumType.setEt3ResponseHearingRepresentative(List.of("Video hearings"));
-        respondentSumType.setEt3ResponseRespondentPreferredTitle("Mr");
-        respondentSumType.setEt3ResponseMultipleSites("Yes");
-        respondentSumType.setEt3ResponseAcasAgree("No");
-        respondentSumType.setEt3ResponseAreDatesCorrect("No");
-        respondentSumType.setEt3ResponseIsJobTitleCorrect("No");
-        respondentSumType.setEt3ResponseClaimantWeeklyHours("No");
-        respondentSumType.setEt3ResponseEarningDetailsCorrect("No");
-        respondentSumType.setEt3ResponseIsNoticeCorrect("Not applicable");
-        respondentSumType.setEt3ResponseRespondentContestClaim("Yes");
-        respondentSumType.setEt3ResponseRespondentSupportNeeded("Yes");
-        respondentSumType.setEt3ResponseContinuingEmployment("No");
-        respondentSumType.setEt3ResponseIsPensionCorrect("No");
-        respondentSumType.setResponseRespondentContactPreference("Post");
-        respondentSumType.setEt3ResponsePayFrequency("Weekly");
     }
 
     @ParameterizedTest

@@ -10,10 +10,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
-import java.net.URI;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,22 +40,22 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 class PdfBoxServiceTest {
 
     PdfBoxService pdfBoxService;
-    DocumentManagementService documentManagementService;
+    TornadoService tornadoService;
 
     @BeforeEach
     public void setUp() {
-        mockDocumentManagement();
-        pdfBoxService = new PdfBoxService(documentManagementService);
+        mockTornadoService();
+        pdfBoxService = new PdfBoxService(tornadoService);
     }
 
-    private void mockDocumentManagement() {
-        documentManagementService = mock(DocumentManagementService.class);
-        String documentUrl = TEST_DOCUMENT_URL;
-        URI uri = URI.create(documentUrl);
-        when(documentManagementService.uploadDocument(anyString(), any(byte[].class),
-                anyString(), anyString(), anyString())).thenReturn(uri);
-        when(documentManagementService.generateDownloadableURL(uri)).thenReturn(documentUrl);
-        when(documentManagementService.generateMarkupDocument(anyString())).thenReturn(TEST_DOCUMENT_MARKUP);
+    private void mockTornadoService() {
+        tornadoService = mock(TornadoService.class);
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(byte[].class), anyString(), anyString()))
+                .thenReturn(new DocumentInfo(
+                        APPLICATION_PDF_VALUE,
+                        TEST_DOCUMENT_NAME,
+                        TEST_DOCUMENT_URL,
+                        TEST_DOCUMENT_MARKUP));
     }
 
     @ParameterizedTest

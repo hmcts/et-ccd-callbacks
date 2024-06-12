@@ -17,7 +17,6 @@ public final class PdfBoxServiceConstants {
     public static final String UNABLE_TO_PROCESS_PDF_SOURCE = "Unable to process pdf template file %s";
     public static final String GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME = "generatePdfDocumentInfo";
     public static final String ET3_RESPONSE_PDF_FILE_NAME = "%s-ET3_Response.pdf";
-    public static final String PDF_DOCUMENT_CREATED_LOG_INFO = "URI documentSelfPath uploaded and created: %s";
     public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY =
             "To create PDF file case data should not be empty";
     public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_REQUIRED_FIELD_EMPTY =
@@ -31,7 +30,7 @@ public final class PdfBoxServiceConstants {
     public static final String PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY =
             "To create PDF file pdf template should not be empty";
     public static final String PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE =
-            "Unable to put pdf field, field value: %s, field name: %s";
+            "Unable to put pdf field, field name: %s";
     public static final char CHARACTER_DOT = '.';
     public static final int ZERO = 0;
     public static final int ONE = 1;

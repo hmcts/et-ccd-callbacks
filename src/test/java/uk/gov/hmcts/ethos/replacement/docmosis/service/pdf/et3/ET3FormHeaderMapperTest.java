@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_DATE_RECEIVED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_RFT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_RTF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormHeaderMapper.mapHeader;
@@ -45,10 +45,10 @@ class ET3FormHeaderMapperTest {
         if (ObjectUtils.isEmpty(respondentSumType.getEt3ResponseRespondentSupportDocument())
                 && ObjectUtils.isEmpty(respondentSumType.getEt3ResponseEmployerClaimDocument())
                 && CollectionUtils.isEmpty(respondentSumType.getEt3ResponseContestClaimDocument())) {
-            assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RFT))
+            assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF))
                     .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS);
         } else {
-            assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RFT))
+            assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF))
                     .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS);
         }
     }

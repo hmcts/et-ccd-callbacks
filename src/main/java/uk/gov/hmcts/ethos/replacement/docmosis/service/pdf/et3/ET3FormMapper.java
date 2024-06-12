@@ -7,7 +7,7 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public final class ET3FormMapper {
         // Add a private constructor to hide the implicit public one.
     }
 
-    public static Map<String, Optional<String>> mapEt3Form(CaseData caseData) throws PdfBoxServiceException {
+    public static Map<String, Optional<String>> mapEt3Form(CaseData caseData) throws GenericServiceException {
         checkCaseData(caseData);
         String submitRespondent = caseData.getSubmitEt3Respondent().getSelectedLabel();
         Stream<RespondentSumTypeItem> respondentSumTypeStream = caseData.getRespondentCollection().stream()
@@ -54,9 +54,10 @@ public final class ET3FormMapper {
         if (ObjectUtils.isEmpty(respondentSumTypeStream)) {
             Throwable throwable = new NotFoundException(
                     RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE);
-            throw new PdfBoxServiceException(RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE, throwable,
-                    RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD + caseData.getSubmitEt3Respondent().getSelectedLabel(),
-                    caseData.getEthosCaseReference(), ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_MAPPER_METHOD_NAME);
+            throw new GenericServiceException(RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE,
+                    throwable, RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD
+                    + caseData.getSubmitEt3Respondent().getSelectedLabel(), caseData.getEthosCaseReference(),
+                    ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_MAPPER_METHOD_NAME);
         }
 
         Optional<RespondentSumTypeItem> selectedRespondent = respondentSumTypeStream.findFirst();
@@ -66,9 +67,10 @@ public final class ET3FormMapper {
                 || ObjectUtils.isEmpty(selectedRespondent.get().getValue())) {
             Throwable throwable = new NotFoundException(
                     RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE);
-            throw new PdfBoxServiceException(RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE, throwable,
-                    RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD + caseData.getSubmitEt3Respondent().getSelectedLabel(),
-                    caseData.getEthosCaseReference(), ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_MAPPER_METHOD_NAME);
+            throw new GenericServiceException(RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE,
+                    throwable, RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD
+                    + caseData.getSubmitEt3Respondent().getSelectedLabel(), caseData.getEthosCaseReference(),
+                    ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_MAPPER_METHOD_NAME);
         }
         ConcurrentMap<String, Optional<String>> pdfFields = new ConcurrentHashMap<>();
         RespondentSumType respondentSumType = selectedRespondent.get().getValue();
@@ -85,33 +87,33 @@ public final class ET3FormMapper {
         return pdfFields;
     }
 
-    private static void checkCaseData(CaseData caseData) throws PdfBoxServiceException {
+    private static void checkCaseData(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
             Throwable throwable = new NotFoundException(CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE);
-            throw new PdfBoxServiceException(CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE, throwable,
+            throw new GenericServiceException(CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE, throwable,
                     CASE_DATA_NOT_FOUND_EXCEPTION_FIRST_WORD, CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE,
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_MAPPER_METHOD_NAME);
         }
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             Throwable throwable = new NotFoundException(RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE);
-            throw new PdfBoxServiceException(RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE, throwable,
+            throw new GenericServiceException(RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE, throwable,
                     RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_FIRST_WORD, caseData.getEthosCaseReference(),
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_CASE_DATA_CHECK_METHOD_NAME);
         }
         checkCaseDataSubmitRespondentCollection(caseData);
     }
 
-    private static void checkCaseDataSubmitRespondentCollection(CaseData caseData) throws PdfBoxServiceException {
+    private static void checkCaseDataSubmitRespondentCollection(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent())
                 || ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent().getValue())) {
             Throwable throwable = new NotFoundException(RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
-            throw new PdfBoxServiceException(RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, throwable,
+            throw new GenericServiceException(RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, throwable,
                     RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, caseData.getEthosCaseReference(),
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_CASE_DATA_CHECK_METHOD_NAME);
         }
         if (StringUtils.isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel())) {
             Throwable throwable = new NotFoundException(RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
-            throw new PdfBoxServiceException(RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, throwable,
+            throw new GenericServiceException(RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, throwable,
                     RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, caseData.getEthosCaseReference(),
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_CASE_DATA_CHECK_METHOD_NAME);
         }

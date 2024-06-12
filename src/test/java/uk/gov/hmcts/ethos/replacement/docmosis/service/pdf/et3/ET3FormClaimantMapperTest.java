@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;

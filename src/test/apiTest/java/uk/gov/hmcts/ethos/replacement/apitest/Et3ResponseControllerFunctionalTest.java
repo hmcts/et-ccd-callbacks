@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;

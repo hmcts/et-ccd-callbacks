@@ -12,7 +12,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_YYYY_MM_DD_DASH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_DATE_RECEIVED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_RFT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_RTF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.formatDate;
@@ -37,7 +37,7 @@ public final class ET3FormHeaderMapper {
         putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_CASE_NUMBER, caseData.getEthosCaseReference());
         putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_DATE_RECEIVED, formatDate(caseData.getReceiptDate(),
                 DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_DD_MM_YYYY_DASH));
-        putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_RFT,
+        putPdfTextField(pdfFields, TXT_PDF_HEADER_FIELD_RTF,
                 isEmpty(respondentSumType.getEt3ResponseContestClaimDocument())
                 && isEmpty(respondentSumType.getEt3ResponseEmployerClaimDocument())
                 && isEmpty(respondentSumType.getEt3ResponseRespondentSupportDocument())

@@ -20,9 +20,9 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ResourceLoader;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.net.URI;

@@ -9,7 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseDocument;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
 
@@ -41,7 +41,7 @@ public final class RespondentTellSomethingElseHelper {
     public static String getDocumentRequest(CaseData caseData, String accessKey)
             throws JsonProcessingException {
 
-        RespondentTSEApplicationTypeData selectedAppData = getSelectedApplicationType(caseData);
+        TSEApplicationTypeData selectedAppData = getSelectedApplicationType(caseData);
         GenericTseApplicationTypeItem lastApp = getCurrentGenericTseApplicationTypeItem(caseData);
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
@@ -73,43 +73,43 @@ public final class RespondentTellSomethingElseHelper {
             .get(caseData.getGenericTseApplicationCollection().size() - 1);
     }
 
-    public static RespondentTSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
+    public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case TSE_APP_AMEND_RESPONSE:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument1(), caseData.getResTseTextBox1());
             case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument2(), caseData.getResTseTextBox2());
             case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument3(), caseData.getResTseTextBox3());
             case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument4(), caseData.getResTseTextBox4());
             case TSE_APP_CONTACT_THE_TRIBUNAL:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument5(), caseData.getResTseTextBox5());
             case TSE_APP_ORDER_OTHER_PARTY:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument6(), caseData.getResTseTextBox6());
             case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument7(), caseData.getResTseTextBox7());
             case TSE_APP_POSTPONE_A_HEARING:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument8(), caseData.getResTseTextBox8());
             case TSE_APP_RECONSIDER_JUDGEMENT:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument9(), caseData.getResTseTextBox9());
             case TSE_APP_RESTRICT_PUBLICITY:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument10(), caseData.getResTseTextBox10());
             case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument11(), caseData.getResTseTextBox11());
             case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                return new RespondentTSEApplicationTypeData(
+                return new TSEApplicationTypeData(
                         caseData.getResTseDocument12(), caseData.getResTseTextBox12());
             default:
                 throw new IllegalArgumentException(String.format("Unexpected application type %s",
@@ -117,15 +117,15 @@ public final class RespondentTellSomethingElseHelper {
         }
     }
 
-    private static String getDocumentName(RespondentTSEApplicationTypeData selectedAppData) {
-        if (selectedAppData == null || selectedAppData.getResTseDocument() == null) {
+    private static String getDocumentName(TSEApplicationTypeData selectedAppData) {
+        if (selectedAppData == null || selectedAppData.getUploadedTseDocument() == null) {
             return null;
         }
 
-        return selectedAppData.getResTseDocument().getDocumentFilename();
+        return selectedAppData.getUploadedTseDocument().getDocumentFilename();
     }
 
-    private static String getTextBoxDetails(RespondentTSEApplicationTypeData selectedAppData) {
+    private static String getTextBoxDetails(TSEApplicationTypeData selectedAppData) {
         if (selectedAppData == null) {
             return "";
         }

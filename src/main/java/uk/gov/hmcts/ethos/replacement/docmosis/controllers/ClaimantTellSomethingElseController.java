@@ -85,7 +85,7 @@ public class ClaimantTellSomethingElseController {
             @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = tseService.validateGiveDetails(caseData);
+        List<String> errors = claimantTseService.validateGiveDetails(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

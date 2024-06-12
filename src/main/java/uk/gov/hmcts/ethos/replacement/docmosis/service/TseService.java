@@ -21,7 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -171,10 +171,10 @@ public class TseService {
     }
 
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
-        RespondentTSEApplicationTypeData selectedAppData =
+        TSEApplicationTypeData selectedAppData =
                 RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
-        respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
+        respondentTseType.setDocumentUpload(selectedAppData.getUploadedTseDocument());
     }
 
     private void clearRespondentTseDataFromCaseData(CaseData caseData) {

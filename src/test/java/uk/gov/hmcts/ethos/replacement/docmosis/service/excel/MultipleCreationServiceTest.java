@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationSer
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +63,7 @@ class MultipleCreationServiceTest {
     }
 
     @Test
-    void bulkCreationLogic() {
+    void bulkCreationLogic() throws IOException {
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
@@ -73,7 +74,7 @@ class MultipleCreationServiceTest {
     }
 
     @Test
-    void bulkCreationLogicWithMultipleReference() {
+    void bulkCreationLogicWithMultipleReference() throws IOException {
         multipleDetails.getCaseData().setMultipleReference("2100001");
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
@@ -85,7 +86,7 @@ class MultipleCreationServiceTest {
     }
 
     @Test
-    void bulkCreationLogicETOnline() {
+    void bulkCreationLogicETOnline() throws IOException {
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,
@@ -98,7 +99,7 @@ class MultipleCreationServiceTest {
     }
 
     @Test
-    void bulkCreationLogicMigration() {
+    void bulkCreationLogicMigration() throws IOException {
         multipleDetails.getCaseData().setLeadCase("");
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
         multipleDetails.getCaseData().setMultipleSource(MIGRATION_CASE_SOURCE);
@@ -115,7 +116,7 @@ class MultipleCreationServiceTest {
     }
 
     @Test
-    void bulkCreationLogicMigrationEmptyCaseMultipleCollection() {
+    void bulkCreationLogicMigrationEmptyCaseMultipleCollection() throws IOException {
         multipleDetails.getCaseData().setLeadCase("");
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
         multipleDetails.getCaseData().setMultipleSource(MIGRATION_CASE_SOURCE);
@@ -132,7 +133,7 @@ class MultipleCreationServiceTest {
     }
 
     @Test
-    void bulkCreationLogicEmptyCaseIdCollection() {
+    void bulkCreationLogicEmptyCaseIdCollection() throws IOException {
         multipleDetails.getCaseData().setCaseIdCollection(new ArrayList<>());
         multipleDetails.getCaseData().setLeadCase(null);
         multipleCreationService.bulkCreationLogic(userToken,
@@ -145,7 +146,7 @@ class MultipleCreationServiceTest {
     }
 
     @Test
-    void bulkCreationLogicWithNullMultipleRef() {
+    void bulkCreationLogicWithNullMultipleRef() throws IOException {
         multipleDetails.getCaseData().setMultipleReference(null);
         multipleCreationService.bulkCreationLogic(userToken,
                 multipleDetails,

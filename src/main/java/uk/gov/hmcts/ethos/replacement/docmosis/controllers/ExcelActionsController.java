@@ -43,6 +43,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadServi
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleUpdateService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +98,7 @@ public class ExcelActionsController {
     })
     public ResponseEntity<MultipleCallbackResponse> createMultiple(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("CREATE MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

@@ -136,7 +136,7 @@ public class MultipleReferenceService {
         return new SubmitMultipleEvent();
     }
 
-    private void addUserToMultiple(String adminUserToken,
+    public void addUserToMultiple(String adminUserToken,
                                String jurisdiction,
                                String caseType,
                                String multipleId,

@@ -173,7 +173,8 @@ public class MultipleBatchUpdate2Service {
         if (oldLegalRepsCollection != null && !oldLegalRepsCollection.isEmpty()) {
             List<String> legalRepsToAdd =
                     transferLegalRepCollection(updatedMultipleData, multipleObjectsFiltered, oldLegalRepsCollection);
-            addLegalRepsToMultiple(updatedJurisdiction, updatedCaseTypeId, updatedMultipleRef, legalRepsToAdd);
+            String updatedMultipleId = String.valueOf(updatedMultiple.getCaseId());
+            addLegalRepsToMultiple(updatedJurisdiction, updatedCaseTypeId, updatedMultipleId, legalRepsToAdd);
         }
 
         log.info("Add the lead case markUp");

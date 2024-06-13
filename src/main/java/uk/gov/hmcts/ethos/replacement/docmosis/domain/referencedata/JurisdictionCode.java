@@ -63,8 +63,8 @@ public enum JurisdictionCode {
     PEN("Failure of the Secretary of State to pay unpaid contributions to a pensions scheme following an "
         + "application for payment to be made"),
     PLD("Suffer a detriment and/or dismissal due to requesting or taking leave for family and domestic reasons "
-            + "including maternity, paternity, adoption, parental bereavement, ante-natal care or carers leave or time off "
-            + "to assist a dependant"),
+            + "including maternity, paternity, adoption, parental bereavement, ante-natal care or carers leave or time "
+            + "off to assist a dependant"),
     PTE("Suffer less favourable treatment and/or dismissal as a result of being a part time employee by "
         + "comparison to a full-time employee"),
     RPTS("Failure of the SOS to pay a redundancy payment following an application to the NI fund"),
@@ -96,8 +96,8 @@ public enum JurisdictionCode {
         + "result of a transfer of an undertaking"),
     PID("Suffered a detriment and/or dismissal due to exercising rights under the Public Interest Disclosure"
         + " Act"),
-    DAG("Discrimination, including harassment or discrimination based on association or perception on grounds of "
-            + "age"),
+    DAG("Discrimination, including harassment or discrimination based on association or perception on grounds"
+            + " of age"),
     DDA("Suffered a detriment, discrimination, including indirect discrimination, and discrimination based "
             + "on association or perception, harassment and/or dismissal on grounds of disability or failure of "
             + "employer to make reasonable adjustments"),

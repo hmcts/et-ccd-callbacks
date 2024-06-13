@@ -34,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -85,7 +86,7 @@ public class CaseManagementForCaseWorkerService {
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
     private final CaseManagementLocationService caseManagementLocationService;
-    private final CcdCaseAssignment ccdCaseAssignment;
+    private final MultipleReferenceService multipleReferenceService;
     private final MultipleCasesSendingService multipleCasesSendingService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
@@ -115,8 +116,8 @@ public class CaseManagementForCaseWorkerService {
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
                                               CaseManagementLocationService caseManagementLocationService,
+                                              MultipleReferenceService multipleReferenceService,
                                               @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl,
-                                              CcdCaseAssignment ccdCaseAssignment,
                                               MultipleCasesSendingService multipleCasesSendingService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
@@ -125,8 +126,8 @@ public class CaseManagementForCaseWorkerService {
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
         this.caseManagementLocationService = caseManagementLocationService;
+        this.multipleReferenceService = multipleReferenceService;
         this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
-        this.ccdCaseAssignment = ccdCaseAssignment;
         this.multipleCasesSendingService = multipleCasesSendingService;
     }
 
@@ -334,7 +335,7 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    public void setNextListedDateOnMultiple(CaseDetails details) {
+    public void setNextListedDateOnMultiple(CaseDetails details) throws IOException {
         CaseData caseData = details.getCaseData();
         if (StringUtils.isEmpty(caseData.getMultipleReference()) || !YES.equals(caseData.getLeadClaimant())) {
             return;
@@ -342,7 +343,7 @@ public class CaseManagementForCaseWorkerService {
 
         String adminToken = adminUserService.getAdminUserToken();
         String multipleCaseTypeId = details.getCaseTypeId() + "_Multiple";
-        SubmitMultipleEvent multiple = ccdCaseAssignment.getMultipleByReference(
+        SubmitMultipleEvent multiple = multipleReferenceService.getMultipleByReference(
             adminToken,
             multipleCaseTypeId,
             caseData.getMultipleReference()

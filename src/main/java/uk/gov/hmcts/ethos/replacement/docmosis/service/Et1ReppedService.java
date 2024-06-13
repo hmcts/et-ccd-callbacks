@@ -34,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 
 @Service
 @Slf4j
@@ -158,7 +160,7 @@ public class Et1ReppedService {
             }
 
             List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
-                    userToken);
+                    userToken, caseDetails.getCaseTypeId());
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
@@ -230,10 +232,11 @@ public class Et1ReppedService {
 
     private String getEt1DocumentName(CaseData caseData, String pdfSource) {
         return ET1_CY_PDF.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
-                : "ET1 - " + caseData.getClaimant() + ".pdf";
+                : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {
+    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken,
+                                                                  String caseTypeId) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -249,7 +252,7 @@ public class Et1ReppedService {
         List<DocumentInfo> documentInfoList = acasNumbers.stream()
                 .map(acasNumber -> {
                     try {
-                        return acasService.getAcasCertificates(caseData, acasNumber, userToken);
+                        return acasService.getAcasCertificates(caseData, acasNumber, userToken, caseTypeId);
                     } catch (JsonProcessingException e) {
                         log.error("Failed to retrieve ACAS Certificate", e);
                         return null;
@@ -353,7 +356,7 @@ public class Et1ReppedService {
      * @param caseDetails the case details
      * @param userToken the user token
      */
-    public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
+    public void assignCaseAccess(CaseDetails caseDetails, String userToken) throws IOException {
         UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
         OrganisationsResponse organisation = getOrganisationDetailsFromUserId(claimantRepUser.getUid());
 

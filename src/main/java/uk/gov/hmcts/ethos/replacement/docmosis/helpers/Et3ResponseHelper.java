@@ -149,11 +149,13 @@ public final class Et3ResponseHelper {
     /**
      * Formats data needed for the ET3 Response form document.
      *
-     * @param caseData  data for the case
-     * @param accessKey required to use docmosis
+     * @param caseData            data for the case
+     * @param accessKey           required to use docmosis
+     * @param dmStoreDocumentName name of the document in dmStore
      * @return document request for docmosis to create the final ET3 Response form
      */
-    public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getDocumentRequest(CaseData caseData, String accessKey, String dmStoreDocumentName)
+            throws JsonProcessingException {
         if (caseData.getSubmitEt3Respondent() == null || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             throw new NotFoundException("submitEt3Respondent or respondentCollection is null");
         }
@@ -222,7 +224,7 @@ public final class Et3ResponseHelper {
 
         Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
                 .accessKey(accessKey)
-                .outputName(OUTPUT_NAME)
+                .outputName(dmStoreDocumentName)
                 .templateName(TEMPLATE_NAME)
                 .et3ResponseData(data)
                 .build();

@@ -124,7 +124,7 @@ public class Et1ReppedController {
     })
     public ResponseEntity<CCDCallbackResponse> createCaseSubmitted(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) throws IOException {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         et1ReppedService.assignCaseAccess(ccdRequest.getCaseDetails(), userToken);

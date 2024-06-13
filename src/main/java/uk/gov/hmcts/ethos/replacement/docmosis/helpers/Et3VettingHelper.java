@@ -414,12 +414,15 @@ public final class Et3VettingHelper {
 
     /**
      * This method generates the request which will be sent to Docmosis to generate the document.
-     * @param caseData where the data is stored
-     * @param userToken token to access tornado
+     *
+     * @param caseData            where the data is stored
+     * @param userToken           token to access tornado
+     * @param dmStoreDocumentName the name of the document in DM Store
      * @return a string which contains a JSON payload which contains the data needed to generate the document
      * @throws JsonProcessingException if the JSON cannot be correctly generated
      */
-    public static String getDocumentRequest(CaseData caseData, String userToken) throws JsonProcessingException {
+    public static String getDocumentRequest(CaseData caseData, String userToken, String dmStoreDocumentName)
+            throws JsonProcessingException {
         Et3VettingData et3VettingData = Et3VettingData.builder()
                 .ethosCaseReference(caseData.getEthosCaseReference())
                 .et3IsThereAnEt3Response(defaultIfEmpty(caseData.getEt3IsThereAnEt3Response(), null))
@@ -478,7 +481,7 @@ public final class Et3VettingHelper {
 
         Et3VettingDocument et3VettingDocument = Et3VettingDocument.builder()
                 .accessKey(userToken)
-                .outputName(OUTPUT_NAME)
+                .outputName(dmStoreDocumentName)
                 .templateName(TEMPLATE_NAME)
                 .et3VettingData(et3VettingData)
                 .build();

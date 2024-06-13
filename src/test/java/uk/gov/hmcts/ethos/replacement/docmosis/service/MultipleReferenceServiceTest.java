@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -348,6 +350,21 @@ class MultipleReferenceServiceTest {
         assertEquals("Call to add legal rep to Multiple Case failed for 123 with call failed",
                 exception.getMessage());
         verify(multipleCasesSendingService, never()).sendUpdateToMultiple(any(), any(), any(), any(), any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0,1,10})
+    void shouldAddLegalRepsToMultiple_Success(Integer number) throws IOException {
+        List<String> legalRepList = new ArrayList<>();
+        for (int i = 0; i < number; i++) {
+            legalRepList.add("lr" + number);
+        }
+
+        when(ccdClient.addUserToMultiple(any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok().build());
+
+        multipleReferenceService.addUsersToMultiple("jurisdiction", "caseType", "multipleId", legalRepList);
+
+        verify(ccdClient, times(number)).addUserToMultiple(any(), any(), any(), any(), any());
     }
 
     private List<SubmitMultipleEvent> getMultipleEvents() {

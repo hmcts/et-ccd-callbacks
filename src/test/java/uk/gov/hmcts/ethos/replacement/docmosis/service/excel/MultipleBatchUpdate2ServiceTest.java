@@ -412,6 +412,34 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
+    void batchUpdate2LogicDetachCases_Overlap() throws IOException {
+        ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = addCaseLegalRepDetails(multipleObjects);
+
+        legalRepCollection.get(0).getValue().getLegalRepIds().get(0).setValue("DuplicateLRid");
+        legalRepCollection.get(2).getValue().getLegalRepIds().get(0).setValue("DuplicateLRid");
+
+        multipleDetails.getCaseData().setLegalRepCollection(legalRepCollection);
+
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+        when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
+                .thenReturn("245003/2020");
+
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+        multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verify(ccdClient, times(3)).removeUserFromMultiple(
+                any(), any(), any(), any(), any());
+        verifyNoMoreInteractions(ccdClient);
+        assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
+    }
+
+    @Test
     void batchUpdate2LogicDetachCases_RemoveLRs_ccdClientEmpty() throws IOException {
         multipleDetails.getCaseData().setLegalRepCollection(addCaseLegalRepDetails(multipleObjects));
 

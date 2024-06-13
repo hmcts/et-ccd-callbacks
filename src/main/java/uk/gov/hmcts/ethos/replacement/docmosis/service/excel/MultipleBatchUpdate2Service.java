@@ -196,12 +196,10 @@ public class MultipleBatchUpdate2Service {
     private List<String> transferLegalRepCollection(MultipleData multipleData,
                                                     List<String> casesBeingMoved,
                                                     ListTypeItem<SubCaseLegalRepDetails> allOldLegalRepsCollection) {
-        List<String> legalRepsToAdd = new ArrayList<>();
-
         ListTypeItem<SubCaseLegalRepDetails> filteredLegalRepsCollection =
                 filterLegalRepCollection(casesBeingMoved, allOldLegalRepsCollection);
         if (filteredLegalRepsCollection.isEmpty()) {
-            return legalRepsToAdd;
+            return new ArrayList<>();
         }
 
         ListTypeItem<SubCaseLegalRepDetails> newLegalRepCollection =
@@ -214,7 +212,10 @@ public class MultipleBatchUpdate2Service {
 
         multipleData.setLegalRepCollection(collectedLegalRepCollection);
 
-        return pullLegalRepsFromCollection(null, filteredLegalRepsCollection);
+        return filteredLegalRepsCollection.stream()
+                .flatMap(subCase -> subCase.getValue().getLegalRepIds().stream())
+                .map(GenericTypeItem::getValue)
+                .toList();
     }
 
     private ListTypeItem<SubCaseLegalRepDetails> filterLegalRepCollection(
@@ -333,7 +334,19 @@ public class MultipleBatchUpdate2Service {
         String multipleReference = multipleDetails.getCaseData().getMultipleReference();
         ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = multipleDetails.getCaseData().getLegalRepCollection();
 
-        List<String> legalRepsToRemove = pullLegalRepsFromCollection(casesBeingRemoved, legalRepCollection);
+        List<String> legalRepsToRetain = legalRepCollection.stream()
+                .filter(subCase -> !casesBeingRemoved.contains(subCase.getValue().getCaseReference()))
+                .flatMap(subCase -> subCase.getValue().getLegalRepIds().stream())
+                .map(GenericTypeItem::getValue)
+                .toList();
+
+        List<String> legalRepsToRemove = legalRepCollection.stream()
+                .filter(subCase -> casesBeingRemoved.contains(subCase.getValue().getCaseReference()))
+                .flatMap(subCase -> subCase.getValue().getLegalRepIds().stream())
+                .filter(legalRep -> !legalRepsToRetain.contains(legalRep.getValue()))
+                .map(GenericTypeItem::getValue)
+                .toList();
+
 
         if (legalRepsToRemove.isEmpty()) {
             log.info("No LegalReps to be removed from : {}", multipleReference);
@@ -356,24 +369,6 @@ public class MultipleBatchUpdate2Service {
             }
         }
         multipleDetails.getCaseData().setLegalRepCollection(newLegalRepCollection);
-    }
-
-    private static @NotNull List<String> pullLegalRepsFromCollection(
-            List<String> filteredCases,
-            ListTypeItem<SubCaseLegalRepDetails> legalRepCollection) {
-        boolean filter = filteredCases != null && !filteredCases.isEmpty();
-
-        List<String> legalReps = new ArrayList<>();
-        for (GenericTypeItem<SubCaseLegalRepDetails> caseDetails : legalRepCollection) {
-            SubCaseLegalRepDetails currentCaseDetails = caseDetails.getValue();
-            if (filter && !filteredCases.contains(currentCaseDetails.getCaseReference())) {
-                continue;
-            }
-            for (GenericTypeItem<String> legalRepId : currentCaseDetails.getLegalRepIds()) {
-                legalReps.add(legalRepId.getValue());
-            }
-        }
-        return legalReps;
     }
 
     private List<MultipleObject> removeCasesInMultiple(List<String> multipleObjectsFiltered,

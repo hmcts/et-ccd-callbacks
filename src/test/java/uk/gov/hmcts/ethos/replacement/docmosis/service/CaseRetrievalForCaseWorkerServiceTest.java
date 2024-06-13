@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.util.Pair;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -19,12 +20,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -115,11 +118,14 @@ class CaseRetrievalForCaseWorkerServiceTest {
         String authToken = "authToken";
 
         List<SubmitEvent> submitEvents = getSubmitEvent();
-        when(ccdClient.retrieveTransferredCaseElasticSearch(any(), any(), any())).thenReturn(submitEvents);
-        List<SubmitEvent> result = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId,
-                authToken, List.of("ET_EnglandWales"));
+        when(ccdClient.retrieveTransferredCaseElasticSearch(any(), any(), any()))
+                .thenReturn(submitEvents);
+        Pair<String, List<SubmitEvent>> result =
+                caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId, authToken,
+                        List.of("ET_EnglandWales"));
 
-        Assert.assertEquals(submitEvents, result);
+        assertEquals(submitEvents.get(0), result.getSecond().get(0));
+        assertEquals("ET_EnglandWales", result.getFirst());
     }
 
     @Test
@@ -128,10 +134,12 @@ class CaseRetrievalForCaseWorkerServiceTest {
         String authToken = "authToken";
         List<SubmitEvent> submitEvents = getSubmitEvent();
         when(ccdClient.retrieveTransferredCaseElasticSearch(any(), any(), any())).thenReturn(submitEvents);
-        List<SubmitEvent> result = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId,
+        Pair<String, List<SubmitEvent>> result =
+                caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId,
                 authToken, new ArrayList<>());
         assertNotNull(result);
-        Assert.assertEquals(0, result.size());
+        Assert.assertEquals(EMPTY_STRING, result.getFirst());
+        assertTrue(result.getSecond().isEmpty());
     }
 
     @Test

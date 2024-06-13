@@ -73,13 +73,13 @@ public class ClaimantTellSomethingElseController {
     @PostMapping(value = "/validateGiveDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Claimant Tell Something Else About To Start Event")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
                     }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> validateGiveDetails(
             @RequestBody CCDRequest ccdRequest) {

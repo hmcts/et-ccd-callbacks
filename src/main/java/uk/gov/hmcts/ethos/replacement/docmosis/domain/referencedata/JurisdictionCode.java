@@ -20,7 +20,7 @@ public enum JurisdictionCode {
         + "or pressure to discriminate (including preliminary action before a claim to the county court)"),
     EAP("Failure to provide equal pay for equal value work"),
     FCT("Failure of the employer to consult with an employee rep. or trade union or a transferor with a "
-        + "transferee about a proposed transfer and failure to notify employee liability information"),
+            + "transferee about a proposed transfer"),
     FLW("Suffer a detriment and/or dismissal for claiming under the flexible working regulations or be "
         + "subject to a breach of procedure"),
     FML("Failure to pay remuneration whilst suspended from work for health and safety reasons whilst pregnant"
@@ -31,8 +31,8 @@ public enum JurisdictionCode {
         + "terms"),
     FTE("Suffered less favourable treatment and/or dismissal as a fixed term employee, than a full-time "
         + "employee or, on becoming permanent, failed to receive a written statement of confirmation from employer"),
-    FTO("Failure to allow time off for trade union activities or duties, for ante-natal care or for public "
-        + "duties"),
+    FTO("Failure to allow time off for trade union activities or duties, for ante-natal care, for adoption, "
+            + "for parental leave, for carer’s leave or for public duties"),
     FTP("Failure to provide a  guarantee payment"),
     FTR("Failure to pay remuneration whilst suspended for medical reasons"),
     FTS("Failure to allow time off to seek work during a redundancy situation"),
@@ -54,7 +54,7 @@ public enum JurisdictionCode {
     LSO("Loss of office as a result of the reorganisation of a statutory body"),
     MWA("Appeal against an enforcement or penalty notice issued by Her Majesty's Revenue & Customs"),
     MWD("Suffer a detriment and/or dismissal related to failure to pay the minimum wage or allow access to "
-        + "records"),
+            + "records"),
     NNA("Appeal against an unlawful act on a notice issued by EHRC"),
     PAC("Failure of the employer to comply with a certificate of exemption or to deduct funds from employees "
         + "pay in order to contribute to a trade union political fund"),
@@ -62,8 +62,9 @@ public enum JurisdictionCode {
         + "subscriptions"),
     PEN("Failure of the Secretary of State to pay unpaid contributions to a pensions scheme following an "
         + "application for payment to be made"),
-    PLD("Suffer a detriment and/or dismissal due to requesting or taking paternity, adoption, parental "
-        + "bereavement leave or time off to assist a dependant"),
+    PLD("Suffer a detriment and/or dismissal due to requesting or taking leave for family and domestic reasons "
+            + "including maternity, paternity, adoption, parental bereavement, ante-natal care or carers leave or time off "
+            + "to assist a dependant"),
     PTE("Suffer less favourable treatment and/or dismissal as a result of being a part time employee by "
         + "comparison to a full-time employee"),
     RPTS("Failure of the SOS to pay a redundancy payment following an application to the NI fund"),
@@ -77,7 +78,7 @@ public enum JurisdictionCode {
     TUE("Suffer discrimination in obtaining employment due to membership or non-membership of a trade union;"
         + " or refused employment or suffered a detriment for a reason related to a blacklist"),
     TUM("Suffer a detriment and/or dismissal relating to being, not being or proposing to become a trade "
-        + "union member"),
+            + "union member"),
     TUR("(a)  Failure of the employer to consult or report about training in relation to a bargaining unit (b)"
         + "  Suffered a detriment on grounds related to recognition of a trade union for collective bargaining"),
     TUS("Suffer discrimination in obtaining the services of an employment agency due to membership or "
@@ -95,27 +96,27 @@ public enum JurisdictionCode {
         + "result of a transfer of an undertaking"),
     PID("Suffered a detriment and/or dismissal due to exercising rights under the Public Interest Disclosure"
         + " Act"),
-    DAG("Discrimination, including indirect discrimination, harassment or victimisation or discrimination based "
-        + "on association or perception on grounds of age"),
-    DDA("Suffered a detriment, discrimination, including indirect discrimination, and discrimination based on "
-        + "association or perception, harassment, victimisation and/or dismissal on grounds of disability or "
-        + "failure of employer to make reasonable adjustments"),
+    DAG("Discrimination, including harassment or discrimination based on association or perception on grounds of "
+            + "age"),
+    DDA("Suffered a detriment, discrimination, including indirect discrimination, and discrimination based "
+            + "on association or perception, harassment and/or dismissal on grounds of disability or failure of "
+            + "employer to make reasonable adjustments"),
     DOD("Suffered a detriment and/or dismissal resulting from requiring time off for other (non-work but not "
         + "Health and Safety) duties, study, training or seeking work"),
-    RRD("Discrimination, including indirect discrimination, discrimination based on association or perception,"
-        + " harassment or victimisation on grounds of race or ethnic origin"),
-    SXD("Discrimination, including indirect discrimination, discrimination based on association or perception,"
-        + " harassment or victimisation on grounds of sex, marriage and civil partnership or gender reassignment"),
-    DSO("Discrimination, including indirect discrimination, discrimination based on association or perception,"
-        + " harassment or victimisation on grounds of sexual orientation"),
+    RRD("Discrimination, including indirect discrimination based on association or perception or harassment on "
+            + "grounds of race or ethnic origin"),
+    SXD("Discrimination, including indirect discrimination, discrimination based on association or perception, "
+            + "or harassment on grounds of sex, marriage and civil partnership"),
+    DSO("Discrimination, including indirect discrimination, discrimination based on association or perception or "
+            + "harassment on grounds of sexual orientation"),
     MAT("Suffer a detriment and/or dismissal on grounds of pregnancy, childbirth or maternity "),
     RPT("Failure to pay a redundancy payment"),
     WA("Failure of employer to pay or unauthorised deductions have been made (including Parental Bereavement Pay)"),
     WTRAL("Complaint by a worker that employer has failed to allow them to take or to pay them for statutory "
         + "annual leave entitlement"),
     WTR("Failure to limit weekly or night working time, or to ensure rest breaks"),
-    DRB("Discrimination, including indirect discrimination, discrimination based on association or perception,"
-        + " harassment or victimisation on grounds of religion or belief");
+    DRB("Discrimination, including indirect discrimination, discrimination based on association or perception or "
+            + "harassment on grounds of religion or belief");
 
     @Getter
     public final String description;

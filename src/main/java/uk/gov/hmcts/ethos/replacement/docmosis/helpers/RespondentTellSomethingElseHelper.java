@@ -52,6 +52,8 @@ public final class RespondentTellSomethingElseHelper {
                 ? lastApp.getValue().getDate() : UtilHelper.formatCurrentDate(LocalDate.now()))
             .resTseDocument(getDocumentName(selectedAppData))
             .resTseTextBox(getTextBoxDetails(selectedAppData))
+            .resTseCopyToOtherPartyYesOrNo(defaultIfEmpty(caseData.getResTseCopyToOtherPartyYesOrNo(), null))
+            .resTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getResTseCopyToOtherPartyTextArea(), null))
             .build();
 
         RespondentTellSomethingElseDocument document = RespondentTellSomethingElseDocument.builder()

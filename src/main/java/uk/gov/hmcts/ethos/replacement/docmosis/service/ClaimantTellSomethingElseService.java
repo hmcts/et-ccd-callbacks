@@ -17,7 +17,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @RequiredArgsConstructor
 public class ClaimantTellSomethingElseService {
 
-    private static final String MISSING_DETAILS = "Missing details";
+    private static final String MISSING_DETAILS = "Please upload a document or provide details in the text box.";
 
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();

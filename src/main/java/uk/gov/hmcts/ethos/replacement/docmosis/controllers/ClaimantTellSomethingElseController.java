@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantTellSomethingElseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 
 import java.util.List;
 
@@ -32,7 +31,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/claimantTSE")
 public class ClaimantTellSomethingElseController {
 
-    private final TseService tseService;
     private final ClaimantTellSomethingElseService claimantTseService;
 
     /**

@@ -99,7 +99,7 @@ public class TribunalOfficesService {
         }
 
         caseData.setManagingOffice(managingOffice);
-        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId) {
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             caseData.setAllocatedOffice(managingOffice);
         }
     }

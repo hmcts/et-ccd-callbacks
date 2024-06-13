@@ -168,13 +168,13 @@ public class MultipleBatchUpdate2Service {
 
         MultipleData updatedMultipleData = updatedMultiple.getCaseData();
         String updatedJurisdiction = multipleDetails.getJurisdiction();
+        String updatedMultipleCaseId = String.valueOf(updatedMultiple.getCaseId());
 
         log.info("Update the legal rep collection for updated Multiple");
         if (oldLegalRepsCollection != null && !oldLegalRepsCollection.isEmpty()) {
             List<String> legalRepsToAdd =
                     transferLegalRepCollection(updatedMultipleData, multipleObjectsFiltered, oldLegalRepsCollection);
-            String updatedMultipleId = String.valueOf(updatedMultiple.getCaseId());
-            addLegalRepsToMultiple(updatedJurisdiction, updatedCaseTypeId, updatedMultipleId, legalRepsToAdd);
+            addLegalRepsToMultiple(updatedJurisdiction, updatedCaseTypeId, updatedMultipleCaseId, legalRepsToAdd);
         }
 
         log.info("Add the lead case markUp");
@@ -184,7 +184,6 @@ public class MultipleBatchUpdate2Service {
 
         multipleHelperService.addLeadMarkUp(userToken, updatedCaseTypeId, updatedMultipleData, updatedLeadCase, "");
 
-        String updatedMultipleCaseId = String.valueOf(updatedMultiple.getCaseId());
         multipleHelperService.moveCasesAndSendUpdateToMultiple(userToken, updatedSubMultipleRef, updatedJurisdiction,
                 updatedCaseTypeId, updatedMultipleCaseId, updatedMultipleData, multipleObjectsFiltered, errors);
 

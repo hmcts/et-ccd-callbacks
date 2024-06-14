@@ -353,7 +353,7 @@ class MultipleReferenceServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0,1,10})
+    @ValueSource(ints = {0, 1, 10})
     void shouldAddLegalRepsToMultiple_Success(Integer number) throws IOException {
         List<String> legalRepList = new ArrayList<>();
         for (int i = 0; i < number; i++) {

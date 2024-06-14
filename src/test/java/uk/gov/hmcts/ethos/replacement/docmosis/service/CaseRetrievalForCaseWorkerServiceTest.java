@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -26,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -153,6 +156,38 @@ class CaseRetrievalForCaseWorkerServiceTest {
                 caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(currentCaseId,
                         authToken, null)
         );
+    }
+
+    @Test
+    void testCaseRefRetrievalRequest_Success() throws Exception {
+        String expectedEthosRef = "6000445/2020";
+        when(ccdClient.retrieveTransferredCaseReference(any(), any(), any(), any()))
+                .thenReturn(expectedEthosRef);
+        String actualEthosRef = caseRetrievalForCaseWorkerService.caseRefRetrievalRequest(any(), any(), any(), any());
+
+        assertEquals(expectedEthosRef, actualEthosRef);
+        verify(ccdClient, times(1))
+                .retrieveTransferredCaseReference(any(), any(), any(), any());
+    }
+
+    @Test
+    void testCaseRefRetrievalRequest_Exception() throws Exception {
+        String errorMessage = "test case ref retrieval error";
+        when(ccdClient.retrieveTransferredCaseReference(any(), any(), any(), any()))
+                .thenThrow(new RuntimeException(errorMessage));
+        String currentCaseId = "123_456";
+        String authToken = "authToken";
+        Exception exception = assertThrows(CaseCreationException.class, () -> {
+            caseRetrievalForCaseWorkerService.caseRefRetrievalRequest(authToken, "TEST_CASE_TYPE_ID",
+                    "EMPLOYMENT", currentCaseId);
+        });
+
+        String expectedMessage = "Failed to retrieve case for : " + currentCaseId + errorMessage;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+        verify(ccdClient, times(1))
+                .retrieveTransferredCaseReference(any(), any(), any(), any());
     }
 
     private List<SubmitEvent> getSubmitEvent() {

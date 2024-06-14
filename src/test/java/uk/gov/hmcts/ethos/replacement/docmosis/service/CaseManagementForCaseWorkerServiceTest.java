@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
@@ -90,6 +91,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
@@ -982,35 +984,35 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void testSetMigratedCaseLinkDetails_Success() {
         String caseDetailsId = "123";
-        String caseId = "caseId";
+        String caseId = "23_457_865";
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(caseDetailsId);
         CaseData caseData = new CaseData();
         caseData.setCcdID(caseId);
         caseDetails.setCaseData(caseData);
 
-        List<SubmitEvent> submitEventList22 = new ArrayList<>();
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(123);
-        submitEvent.setCaseData(caseData);
-        submitEventList22.add(submitEvent);
-
         SubmitEvent submitEventSourceCase = new SubmitEvent();
         submitEventSourceCase.setCaseId(123_457_865);
         CaseData sourceCaseData = new CaseData();
         sourceCaseData.setCcdID("123_455");
-        sourceCaseData.setEthosCaseReference("EthosCaseRef");
         submitEventSourceCase.setCaseData(sourceCaseData);
+        SubmitEvent fullSourceCase = new SubmitEvent();
+        sourceCaseData.setEthosCaseReference("EthosCaseRef");
+        fullSourceCase.setCaseData(sourceCaseData);
+
+        SubmitEvent submitEventLocal = new SubmitEvent();
+        submitEventLocal.setCaseId(123_45);
 
         when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 anyString(), anyString(), anyList()))
-                .thenReturn(submitEventList22);
-        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(any(), any(), any(), any()))
-                .thenReturn(submitEventSourceCase);
+                .thenReturn(Pair.of("testSourceCaseType", List.of(submitEventSourceCase)));
+        when(caseRetrievalForCaseWorkerService.caseRefRetrievalRequest(any(), any(), any(), any()))
+                .thenReturn(fullSourceCase.getCaseData().getEthosCaseReference());
 
         caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(AUTH_TOKEN, caseDetails);
         assertEquals("<a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/"
-                + caseDetailsId + "\">EthosCaseRef</a>", caseDetails.getCaseData().getTransferredCaseLink());
+                + submitEventSourceCase.getCaseId()
+                + "\">EthosCaseRef</a>", caseDetails.getCaseData().getTransferredCaseLink());
     }
 
     @Test
@@ -1039,7 +1041,8 @@ class CaseManagementForCaseWorkerServiceTest {
         caseDetails.setCaseData(caseData);
         String authToken = "authToken";
         when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
-                caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(new ArrayList<>());
+                caseId, authToken, List.of("ET_EnglandWales")))
+                .thenReturn(Pair.of(EMPTY_STRING, new ArrayList<>()));
 
         caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
 
@@ -1056,7 +1059,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         List<SubmitEvent> submitEventList = new ArrayList<>();
         SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(123_45);
+        submitEvent.setCaseId(12_345);
         submitEventList.add(submitEvent);
         SubmitEvent fullSourceCase = new SubmitEvent();
         CaseData sourceCaseData = new CaseData();
@@ -1065,7 +1068,8 @@ class CaseManagementForCaseWorkerServiceTest {
         String authToken = "authToken";
 
         when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
-                caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(submitEventList);
+                caseId, authToken, List.of("ET_EnglandWales")))
+                .thenReturn(Pair.of("Leeds", submitEventList));
         when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(anyString(), anyString(),
                 anyString(), anyString())).thenReturn(fullSourceCase);
 

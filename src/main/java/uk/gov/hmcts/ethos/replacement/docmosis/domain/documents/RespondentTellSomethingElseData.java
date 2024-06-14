@@ -20,5 +20,9 @@ public class RespondentTellSomethingElseData {
     private String resTseDocument;
     @JsonProperty("resTseTextBox")
     private String resTseTextBox;
+    @JsonProperty("resTseCopyToOtherPartyYesOrNo")
+    private String resTseCopyToOtherPartyYesOrNo;
+    @JsonProperty("resTseCopyToOtherPartyTextArea")
+    private String resTseCopyToOtherPartyTextArea;
 
 }

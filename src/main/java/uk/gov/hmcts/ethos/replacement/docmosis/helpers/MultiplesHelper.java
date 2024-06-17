@@ -69,22 +69,16 @@ public final class MultiplesHelper {
     }
 
     // MID EVENTS COLLECTIONS HAVE KEY AS NULL BUT WITH VALUES!
-    public static List<String> getCaseIdsForMidEvent(MultipleData multipleData) {
-
-        if (multipleData.getCaseIdCollection() != null
-                && !multipleData.getCaseIdCollection().isEmpty()) {
-
-            return multipleData.getCaseIdCollection().stream()
-                    .filter(caseId -> caseId.getValue().getEthosCaseReference() != null)
-                    .map(caseId -> caseId.getValue().getEthosCaseReference())
-                    .distinct()
-                    .toList();
-
-        } else {
-
+    public static List<String> getCaseIdsForMidEvent(List<CaseIdTypeItem> caseIdCollection) {
+        if (caseIdCollection == null || caseIdCollection.isEmpty()) {
             return new ArrayList<>();
-
         }
+
+        return caseIdCollection.stream()
+                .filter(caseId -> caseId.getValue().getEthosCaseReference() != null)
+                .map(caseId -> caseId.getValue().getEthosCaseReference())
+                .distinct()
+                .toList();
     }
 
     public static List<CaseIdTypeItem> filterDuplicatedAndEmptyCaseIds(MultipleData multipleData) {

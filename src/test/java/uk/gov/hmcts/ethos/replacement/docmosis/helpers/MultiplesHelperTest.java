@@ -10,10 +10,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -119,10 +116,52 @@ class MultiplesHelperTest {
         assertEquals(MultiplesHelper.createCollectionOrderedByCaseRef(refList), expectedResult);
     }
 
+    @Test
+    void getCaseIdsForMidEvent_Null() {
+        multipleData.setCaseIdCollection(null);
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsForMidEvent_Empty() {
+        createCaseIdCollection(multipleData, 0);
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsForMidEvent() {
+        createCaseIdCollection(multipleData, 10);
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
+
+        assertEquals(10, caseIdList.size());
+        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]", caseIdList.toString());
+    }
+
+    private void createCaseIdCollection(MultipleData multipleData, int numberCases) {
+        List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
+
+        for (int i = 0; i < numberCases; i++) {
+            caseIdCollection.add(createCaseIdTypeItem(String.valueOf(i), String.valueOf(i)));
+        }
+
+        multipleData.setCaseIdCollection(caseIdCollection);
+
+    }
+
     private CaseIdTypeItem createCaseIdTypeItem(String id, String value) {
 
         CaseType caseType = new CaseType();
         caseType.setEthosCaseReference(value);
+
         CaseIdTypeItem caseIdTypeItem = new CaseIdTypeItem();
         caseIdTypeItem.setId(id);
         caseIdTypeItem.setValue(caseType);

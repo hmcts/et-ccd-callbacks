@@ -71,7 +71,8 @@ public class MultipleCreationMidEventValidationService {
 
             }
 
-            List<String> ethosCaseRefCollection = MultiplesHelper.getCaseIdsForMidEvent(multipleData);
+            List<String> ethosCaseRefCollection =
+                    MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
 
             log.info("Validating case id collection size: " + ethosCaseRefCollection.size());
 

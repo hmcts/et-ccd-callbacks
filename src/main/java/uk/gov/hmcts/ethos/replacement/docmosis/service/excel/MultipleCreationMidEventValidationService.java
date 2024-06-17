@@ -41,47 +41,37 @@ public class MultipleCreationMidEventValidationService {
         this.singleCasesReadingService = singleCasesReadingService;
     }
 
-    public void multipleCreationValidationLogic(String userToken, MultipleDetails multipleDetails,
-                                                List<String> errors, boolean amendAction) {
+    public void multipleCreationValidationLogic(String userToken,
+                                                MultipleDetails multipleDetails,
+                                                List<String> errors,
+                                                boolean amendAction) {
 
-        if (multipleDetails.getCaseData().getMultipleSource() != null
-                &&
-                !amendAction
-                &&
-                (multipleDetails.getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
-                        || multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)
-                )) {
-
+        MultipleData multipleData = multipleDetails.getCaseData();
+        String multipleSource = multipleData.getMultipleSource();
+        if (!amendAction
+                && (ET1_ONLINE_CASE_SOURCE.equals(multipleSource) || MIGRATION_CASE_SOURCE.equals(multipleSource))) {
             log.info("Skipping validation as ET1 Online Case");
 
         } else {
-
             log.info("Validating multiple creation");
-
-            MultipleData multipleData = multipleDetails.getCaseData();
-
             log.info("Checking lead case");
 
-            if (!isNullOrEmpty(multipleData.getLeadCase()) && !amendAction) {
-
-                log.info("Validating lead case introduced by user: " + multipleData.getLeadCase());
+            if (!amendAction && !isNullOrEmpty(multipleData.getLeadCase())) {
+                log.info("Validating lead case introduced by user: {}", multipleData.getLeadCase());
 
                 validateCases(userToken, multipleDetails,
                         new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())), errors, true);
-
             }
 
             List<String> ethosCaseRefCollection =
                     MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
 
-            log.info("Validating case id collection size: " + ethosCaseRefCollection.size());
+            log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
 
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
             validateCases(userToken, multipleDetails, ethosCaseRefCollection, errors, false);
-
         }
-
     }
 
     private void validateCaseReferenceCollectionSize(List<String> ethosCaseRefCollection, List<String> errors) {

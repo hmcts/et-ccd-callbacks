@@ -32,6 +32,8 @@ public class MultipleCreationMidEventValidationService {
     public static final String LEAD_EXIST_ERROR = " lead case does not exist.";
     public static final String CASE_BELONGS_DIFFERENT_OFFICE = "Case %s is managed by %s";
     public static final String LEAD_CASE_BELONGS_DIFFERENT_OFFICE = "Lead case %s is managed by %s";
+    public static final String CASE_COLLECTION_EXCEEDED_MAX_SIZE =
+            "There are %s cases in the multiple. The limit is %s.";
     public static final int MULTIPLE_MAX_SIZE = 50;
 
     private final SingleCasesReadingService singleCasesReadingService;
@@ -80,8 +82,9 @@ public class MultipleCreationMidEventValidationService {
         if (ethosCaseRefCollection.size() > MULTIPLE_MAX_SIZE) {
             log.info("Case id collection reached the max size");
 
-            errors.add("There are " + ethosCaseRefCollection.size() + " cases in the multiple."
-                    + " The limit is " + MULTIPLE_MAX_SIZE + ".");
+            String errorMessage =
+                    String.format(CASE_COLLECTION_EXCEEDED_MAX_SIZE, ethosCaseRefCollection.size(), MULTIPLE_MAX_SIZE);
+            errors.add(errorMessage);
         }
     }
 

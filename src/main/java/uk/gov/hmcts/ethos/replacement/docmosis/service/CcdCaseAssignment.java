@@ -102,6 +102,10 @@ public class CcdCaseAssignment {
     }
 
     private void addRespondentRepresentativeToMultiple(CaseDetails caseDetails) throws IOException {
+        if (!YES.equals(caseDetails.getCaseData().getMultipleFlag())) {
+            return;
+        }
+        
         String adminUserToken = adminUserService.getAdminUserToken();
         String caseId = caseDetails.getCaseId();
         String userToAddId = getEventTriggerUserId(adminUserToken, caseId);

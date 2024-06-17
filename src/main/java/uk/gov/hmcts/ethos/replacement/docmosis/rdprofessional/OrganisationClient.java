@@ -52,7 +52,7 @@ public interface OrganisationClient {
     );
 
     @GetMapping(
-        value = "/refdata/internal/v1/organisations/{orgId}/users",
+        value = "/refdata/internal/v1/organisations/{orgId}/users?returnRoles=false",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )

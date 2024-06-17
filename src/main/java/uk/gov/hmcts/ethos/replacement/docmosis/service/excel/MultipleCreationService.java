@@ -16,6 +16,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.LegalRepDataModel;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -35,7 +38,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -79,7 +84,7 @@ public class MultipleCreationService {
     private final AdminUserService adminUserService;
     private final OrganisationClient organisationClient;
     private final AuthTokenGenerator authTokenGenerator;
-    private final MultipleCasesSendingService multipleCasesSendingService;
+    private final CreateUpdatesBusSender createUpdatesBusSender;
 
     public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) throws IOException {
 
@@ -147,6 +152,8 @@ public class MultipleCreationService {
         
         List<String> orgIds = getUniqueOrganisations(cases);
 
+        printDebug("orgIds", orgIds);
+
         List<OrganisationUsersIdamUser> users = orgIds.stream()
             .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
             .flatMap(o -> o.getBody().getUsers().stream())
@@ -159,46 +166,33 @@ public class MultipleCreationService {
         HashMap<Long, String> caseIdsMap = buildCaseIdsMap(cases);
         printDebug("caseIdsMap", caseIdsMap);
 
-        HashMap<String, Boolean> processedEmails = new HashMap<>();
-
-        if (multipleData.getLegalRepCollection() == null) {
-            multipleData.setLegalRepCollection(new ListTypeItem<SubCaseLegalRepDetails>());
-        }
+        HashMap<String, List<String>> legalRepsByCaseId = new HashMap<>();
 
         for (Entry<Long, List<String>> byCase : emails.entrySet()) {
             
+            legalRepsByCaseId.put(byCase.getKey().toString(), new ArrayList<>());
+
             for (String userEmail : byCase.getValue()){
-                if (processedEmails.containsKey(userEmail)) {
-                    continue;
-                }
-
                 String legalRepId = legalrepMap.get(userEmail);
-                String ethosRef = caseIdsMap.get(byCase.getKey());
 
-                multipleReferenceService.addUserToMultiple(token, EMPLOYMENT,
-                    multipleCaseTypeId, token, singleCaseTypeId);
-
-                updateLegalRepCollection(multipleData.getLegalRepCollection(), ethosRef, legalRepId);
-                processedEmails.put(userEmail, true);
+                legalRepsByCaseId.get(byCase.getKey().toString()).add(legalRepId);
             }
         }
 
-        multipleCasesSendingService.sendUpdateToMultiple(
-            token, multipleCaseTypeId, EMPLOYMENT, multipleData, multipleDetails.getCaseId());
-    }
+        CreateUpdatesDto createUpdatesDto = CreateUpdatesDto.builder()
+            .caseTypeId(multipleCaseTypeId)
+            .jurisdiction(multipleDetails.getJurisdiction())
+            .multipleRef(multipleDetails.getCaseId())
+            .ethosCaseRefCollection(List.of())
+            .build();
 
-    private void updateLegalRepCollection(ListTypeItem<SubCaseLegalRepDetails> legalReps, String caseRef, String id) {
-        Optional<SubCaseLegalRepDetails> subCase = legalReps.findFirst(o -> caseRef.equals(o.getCaseReference()));
-        
-        if (subCase.isPresent()) {
-            legalReps.addAsItem(SubCaseLegalRepDetails.builder()
-                .caseReference(caseRef)
-                .legalRepIds(ListTypeItem.from(id))
-                .build());
+        DataModelParent legalRepDto = LegalRepDataModel.builder()
+            .legalRepIdsByCase(legalRepsByCaseId)
+            .caseType(multipleCaseTypeId)
+            .multipleReference(multipleDetails.getCaseId())
+            .build();
 
-        } else {
-            subCase.get().getLegalRepIds().addDistinct(id);
-        }
+        createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, legalRepDto, List.of(cases.get(0).getCaseData().getEthosCaseReference()), "1");
     }
 
     private HashMap<Long, String> buildCaseIdsMap(List<SubmitEvent> cases) {

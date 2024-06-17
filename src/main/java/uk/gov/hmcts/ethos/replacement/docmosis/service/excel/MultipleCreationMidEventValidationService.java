@@ -56,10 +56,12 @@ public class MultipleCreationMidEventValidationService {
             log.info("Validating multiple creation");
             log.info("Checking lead case");
 
+            String caseTypeId = multipleDetails.getCaseTypeId();
+            String managingOffice = multipleDetails.getCaseData().getManagingOffice();
             if (!amendAction && !isNullOrEmpty(multipleData.getLeadCase())) {
                 log.info("Validating lead case introduced by user: {}", multipleData.getLeadCase());
 
-                validateCases(userToken, multipleDetails,
+                validateCases(userToken, caseTypeId, managingOffice,
                         new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())), errors, true);
             }
 
@@ -70,50 +72,46 @@ public class MultipleCreationMidEventValidationService {
 
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
-            validateCases(userToken, multipleDetails, ethosCaseRefCollection, errors, false);
+            validateCases(userToken, caseTypeId, managingOffice, ethosCaseRefCollection, errors, false);
         }
     }
 
     private void validateCaseReferenceCollectionSize(List<String> ethosCaseRefCollection, List<String> errors) {
-
         if (ethosCaseRefCollection.size() > MULTIPLE_MAX_SIZE) {
-
             log.info("Case id collection reached the max size");
 
-            errors.add("There are " + ethosCaseRefCollection.size() + " cases in the multiple. The limit is "
-                    + MULTIPLE_MAX_SIZE + ".");
-
+            errors.add("There are " + ethosCaseRefCollection.size() + " cases in the multiple."
+                    + " The limit is " + MULTIPLE_MAX_SIZE + ".");
         }
-
     }
 
-    private void validateCases(String userToken, MultipleDetails multipleDetails, List<String> caseRefCollection,
-                               List<String> errors, boolean isLead) {
+    private void validateCases(String userToken,
+                               String caseTypeId,
+                               String managingOffice,
+                               List<String> caseRefCollection,
+                               List<String> errors,
+                               boolean isLead) {
 
         if (!caseRefCollection.isEmpty()) {
-
-            List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
-                    multipleDetails.getCaseTypeId(), caseRefCollection, MANUALLY_CREATED_POSITION);
+            List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(
+                    userToken, caseTypeId, caseRefCollection, MANUALLY_CREATED_POSITION);
 
             log.info("Validate number of cases returned");
-
             validateNumberCasesReturned(submitEvents, errors, isLead, caseRefCollection);
 
             log.info("Validating cases");
+            boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId);
 
-            boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(multipleDetails.getCaseTypeId());
-            validateSingleCasesState(submitEvents, errors, isLead, multipleDetails.getCaseData().getManagingOffice(),
-                    isScotland);
-
+            validateSingleCasesState(submitEvents, errors, isLead, managingOffice, isScotland);
         }
-
     }
 
-    private void validateNumberCasesReturned(List<SubmitEvent> submitEvents, List<String> errors, boolean isLead,
+    private void validateNumberCasesReturned(List<SubmitEvent> submitEvents,
+                                             List<String> errors,
+                                             boolean isLead,
                                              List<String> caseRefCollection) {
 
         if (caseRefCollection.size() != submitEvents.size()) {
-
             log.info("List returned is different");
 
             List<String> listCasesDoNotExistError = caseRefCollection.stream()
@@ -124,19 +122,18 @@ public class MultipleCreationMidEventValidationService {
                     .toList();
 
             if (!listCasesDoNotExistError.isEmpty()) {
-
                 String errorMessage = isLead ? LEAD_EXIST_ERROR : CASE_EXIST_ERROR;
 
                 errors.add(listCasesDoNotExistError + errorMessage);
-
             }
-
         }
-
     }
 
-    private void validateSingleCasesState(List<SubmitEvent> submitEvents, List<String> errors, boolean isLead,
-                                          String managingOffice, boolean isScotland) {
+    private void validateSingleCasesState(List<SubmitEvent> submitEvents,
+                                          List<String> errors,
+                                          boolean isLead,
+                                          String managingOffice,
+                                          boolean isScotland) {
 
         List<String> listCasesStateError = new ArrayList<>();
 
@@ -145,20 +142,16 @@ public class MultipleCreationMidEventValidationService {
         for (SubmitEvent submitEvent : submitEvents) {
 
             if (!submitEvent.getState().equals(ACCEPTED_STATE)) {
-
                 log.info("VALIDATION ERROR: state of single case not Accepted");
 
                 listCasesStateError.add(submitEvent.getCaseData().getEthosCaseReference());
-
             }
 
             if (submitEvent.getCaseData().getMultipleReference() != null
                     && !submitEvent.getCaseData().getMultipleReference().trim().isEmpty()) {
-
                 log.info("VALIDATION ERROR: already another multiple");
 
                 listCasesMultipleError.add(submitEvent.getCaseData().getEthosCaseReference());
-
             }
 
             if (!isScotland && !isNullOrEmpty(submitEvent.getCaseData().getManagingOffice())
@@ -168,25 +161,18 @@ public class MultipleCreationMidEventValidationService {
                         submitEvent.getCaseData().getEthosCaseReference(),
                         submitEvent.getCaseData().getManagingOffice()));
             }
-
         }
 
         if (!listCasesStateError.isEmpty()) {
-
             String errorMessage = isLead ? LEAD_STATE_ERROR : CASE_STATE_ERROR;
 
             errors.add(listCasesStateError + errorMessage);
-
         }
 
         if (!listCasesMultipleError.isEmpty()) {
-
             String errorMessage = isLead ? LEAD_BELONG_MULTIPLE_ERROR : CASE_BELONG_MULTIPLE_ERROR;
 
             errors.add(listCasesMultipleError + errorMessage);
-
         }
-
     }
-
 }

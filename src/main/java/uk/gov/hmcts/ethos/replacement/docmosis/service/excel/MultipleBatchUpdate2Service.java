@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,8 @@ import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,125 +39,107 @@ public class MultipleBatchUpdate2Service {
     private final ExcelReadingService excelReadingService;
     private final MultipleHelperService multipleHelperService;
     private final CcdClient ccdClient;
+    private final MultipleReferenceService multipleReferenceService;
 
     @Autowired
     public MultipleBatchUpdate2Service(ExcelDocManagementService excelDocManagementService,
                                        MultipleCasesReadingService multipleCasesReadingService,
                                        ExcelReadingService excelReadingService,
                                        MultipleHelperService multipleHelperService,
-                                       CcdClient ccdClient) {
+                                       CcdClient ccdClient,
+                                       MultipleReferenceService multipleReferenceService) {
         this.excelDocManagementService = excelDocManagementService;
         this.multipleCasesReadingService = multipleCasesReadingService;
         this.excelReadingService = excelReadingService;
         this.multipleHelperService = multipleHelperService;
         this.ccdClient = ccdClient;
+        this.multipleReferenceService = multipleReferenceService;
     }
 
     public void batchUpdate2Logic(String userToken,
                                   MultipleDetails multipleDetails,
                                   List<String> errors,
                                   SortedMap<String, Object> multipleObjects) {
-
         MultipleData multipleData = multipleDetails.getCaseData();
-
         log.info("Batch update type = 2");
 
         String convertToSingle = multipleData.getMoveCases().getConvertToSingle();
-
         log.info("Convert to singles {}", convertToSingle);
 
         List<String> multipleObjectsFiltered = new ArrayList<>(multipleObjects.keySet());
-
         log.info("Update multiple state to open when batching update2 as there will be No Confirmation when updates");
 
         multipleDetails.getCaseData().setState(OPEN_STATE);
 
         if (convertToSingle.equals(YES)) {
-
             removeCasesFromCurrentMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
 
             log.info("Sending detach updates to singles");
-
             multipleHelperService.sendDetachUpdatesToSinglesWithoutConfirmation(
                     userToken, multipleDetails, errors, multipleObjects);
 
         } else {
-
             MoveCasesType moveCasesType = multipleData.getMoveCases();
             String updatedMultipleRef = moveCasesType.getUpdatedMultipleRef();
             String updatedSubMultipleRef = moveCasesType.getUpdatedSubMultipleRef();
             String currentMultipleRef = multipleData.getMultipleReference();
 
             if (currentMultipleRef.equals(updatedMultipleRef)) {
-
                 log.info("Updates to the same multiple");
 
                 if (isNullOrEmpty(updatedSubMultipleRef)) {
-
                     log.info("Keep cases in the same sub-multiple");
 
                 } else {
-
                     log.info("Reading excel and add sub multiple references");
                     readExcelAndAddSubMultipleRef(userToken, multipleDetails, errors,
                             multipleObjectsFiltered, updatedSubMultipleRef);
+
                 }
 
             } else {
-
                 log.info("Updates to different multiple");
-
-                updateToDifferentMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered,
-                        multipleObjects, updatedMultipleRef, updatedSubMultipleRef);
+                updateToDifferentMultiple(userToken, multipleDetails, errors,
+                        multipleObjectsFiltered, updatedMultipleRef, updatedSubMultipleRef);
 
             }
-
         }
-
     }
 
     private void performActionsWithNewLeadCase(String userToken, MultipleDetails multipleDetails, List<String> errors,
                                                String oldLeadCase, List<String> multipleObjectsFiltered) {
-
-        String newLeadCase = multipleHelperService.getLeadCaseFromExcel(userToken,
-                multipleDetails.getCaseData(), errors);
+        MultipleData multipleData = multipleDetails.getCaseData();
+        String newLeadCase = multipleHelperService.getLeadCaseFromExcel(userToken, multipleData, errors);
 
         if (newLeadCase.isEmpty()) {
-
             log.info("Removing lead as it has been already taken out");
-
-            multipleDetails.getCaseData().setLeadCase(null);
+            multipleData.setLeadCase(null);
 
         } else {
-
             if (multipleObjectsFiltered.contains(oldLeadCase)) {
-
                 log.info("Changing the lead case to: {} as old lead case: {} has been taken out",
                         newLeadCase,
                         oldLeadCase);
 
-                multipleHelperService.addLeadMarkUp(userToken, multipleDetails.getCaseTypeId(),
-                        multipleDetails.getCaseData(), newLeadCase, "");
+                String multipleCaseTypeId = multipleDetails.getCaseTypeId();
+                multipleHelperService.addLeadMarkUp(userToken, multipleCaseTypeId, multipleData, newLeadCase, "");
 
                 log.info("Sending single update with the lead flag");
 
+                String multipleCaseId = multipleDetails.getCaseId();
+                String multipleJurisdiction = multipleDetails.getJurisdiction();
                 multipleHelperService.sendCreationUpdatesToSinglesWithoutConfirmation(
-                        userToken, multipleDetails.getCaseTypeId(),
-                        multipleDetails.getJurisdiction(), multipleDetails.getCaseData(), errors,
-                        new ArrayList<>(Collections.singletonList(newLeadCase)), newLeadCase,
-                        multipleDetails.getCaseId());
+                        userToken, multipleCaseTypeId, multipleJurisdiction, multipleData, errors,
+                        new ArrayList<>(Collections.singletonList(newLeadCase)), newLeadCase, multipleCaseId);
 
             }
-
         }
-
     }
 
     private void removeCasesFromCurrentMultiple(String userToken,
                                                 MultipleDetails multipleDetails,
                                                 List<String> errors,
                                                 List<String> multipleObjectsFiltered) {
-
         log.info("Read current excel and remove cases in multiple");
         readCurrentExcelAndRemoveCasesInMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
 
@@ -170,53 +153,103 @@ public class MultipleBatchUpdate2Service {
                                            MultipleDetails multipleDetails,
                                            List<String> errors,
                                            List<String> multipleObjectsFiltered,
-                                           SortedMap<String, Object> multipleObjects,
                                            String updatedMultipleRef,
                                            String updatedSubMultipleRef) {
 
+        MultipleData oldMultipleData = multipleDetails.getCaseData();
+        log.info("Retrieve Legal Reps from current MultipleDetails: {}", oldMultipleData.getMultipleReference());
+        ListTypeItem<SubCaseLegalRepDetails> oldLegalRepsCollection = oldMultipleData.getLegalRepCollection();
+
         removeCasesFromCurrentMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
 
-        SubmitMultipleEvent updatedMultiple = getUpdatedMultiple(userToken,
-                multipleDetails.getCaseTypeId(), updatedMultipleRef);
+        String updatedCaseTypeId = multipleDetails.getCaseTypeId();
+        SubmitMultipleEvent updatedMultiple = getUpdatedMultiple(userToken, updatedCaseTypeId, updatedMultipleRef);
 
         MultipleData updatedMultipleData = updatedMultiple.getCaseData();
-
-        String updatedCaseTypeId = multipleDetails.getCaseTypeId();
-
         String updatedJurisdiction = multipleDetails.getJurisdiction();
+        String updatedMultipleCaseId = String.valueOf(updatedMultiple.getCaseId());
+
+        log.info("Update the legal rep collection for updated Multiple");
+        if (oldLegalRepsCollection != null && !oldLegalRepsCollection.isEmpty()) {
+            List<String> legalRepsToAdd =
+                    transferLegalRepCollection(updatedMultipleData, multipleObjectsFiltered, oldLegalRepsCollection);
+            addLegalRepsToMultiple(updatedJurisdiction, updatedCaseTypeId, updatedMultipleCaseId, legalRepsToAdd);
+        }
 
         log.info("Add the lead case markUp");
-
-        String getCurrentNewMultipleLeadCase =
+        String updatedMultipleDataLeadCase =
                 multipleHelperService.getLeadCaseFromExcel(userToken, updatedMultipleData, errors);
+        String updatedLeadCase = checkIfNewMultipleWasEmpty(updatedMultipleDataLeadCase, multipleObjectsFiltered);
 
-        String updatedLeadCase = checkIfNewMultipleWasEmpty(getCurrentNewMultipleLeadCase,
-                new ArrayList<>(multipleObjects.keySet()));
+        multipleHelperService.addLeadMarkUp(userToken, updatedCaseTypeId, updatedMultipleData, updatedLeadCase, "");
 
-        multipleHelperService.addLeadMarkUp(userToken, updatedCaseTypeId, updatedMultipleData,
-                updatedLeadCase, "");
-
-        multipleHelperService.moveCasesAndSendUpdateToMultiple(userToken, updatedSubMultipleRef,
-                updatedJurisdiction, updatedCaseTypeId, String.valueOf(updatedMultiple.getCaseId()),
-                updatedMultipleData, multipleObjectsFiltered, errors);
+        multipleHelperService.moveCasesAndSendUpdateToMultiple(userToken, updatedSubMultipleRef, updatedJurisdiction,
+                updatedCaseTypeId, updatedMultipleCaseId, updatedMultipleData, multipleObjectsFiltered, errors);
 
         log.info("Sending creation updates to singles");
+        multipleHelperService.sendCreationUpdatesToSinglesWithoutConfirmation(
+                userToken, updatedCaseTypeId, updatedJurisdiction, updatedMultipleData,
+                errors, multipleObjectsFiltered, updatedLeadCase, updatedMultipleCaseId);
+    }
 
-        multipleHelperService.sendCreationUpdatesToSinglesWithoutConfirmation(userToken, updatedCaseTypeId,
-                updatedJurisdiction, updatedMultipleData, errors,
-                new ArrayList<>(multipleObjects.keySet()), updatedLeadCase,
-                String.valueOf(updatedMultiple.getCaseId()));
+    private List<String> transferLegalRepCollection(MultipleData multipleData,
+                                                    List<String> casesBeingMoved,
+                                                    ListTypeItem<SubCaseLegalRepDetails> allOldLegalRepsCollection) {
+        ListTypeItem<SubCaseLegalRepDetails> filteredLegalRepsCollection =
+                filterLegalRepCollection(casesBeingMoved, allOldLegalRepsCollection);
+        if (filteredLegalRepsCollection.isEmpty()) {
+            return new ArrayList<>();
+        }
 
+        ListTypeItem<SubCaseLegalRepDetails> newLegalRepCollection =
+                multipleData.getLegalRepCollection() == null || multipleData.getLegalRepCollection().isEmpty()
+                ? new ListTypeItem<>()
+                : multipleData.getLegalRepCollection();
+
+        ListTypeItem<SubCaseLegalRepDetails> collectedLegalRepCollection =
+                ListTypeItem.concat(newLegalRepCollection, filteredLegalRepsCollection);
+
+        multipleData.setLegalRepCollection(collectedLegalRepCollection);
+
+        return filteredLegalRepsCollection.stream()
+                .flatMap(subCase -> subCase.getValue().getLegalRepIds().stream())
+                .map(GenericTypeItem::getValue)
+                .toList();
+    }
+
+    private ListTypeItem<SubCaseLegalRepDetails> filterLegalRepCollection(
+            List<String> casesBeingMoved,
+            ListTypeItem<SubCaseLegalRepDetails> allLegalRepsCollection) {
+        ListTypeItem<SubCaseLegalRepDetails> legalRepsToMoveCollection = new ListTypeItem<>();
+
+        for (GenericTypeItem<SubCaseLegalRepDetails> caseDetails : allLegalRepsCollection) {
+            SubCaseLegalRepDetails currentCaseDetails = caseDetails.getValue();
+            if (casesBeingMoved.contains(currentCaseDetails.getCaseReference())) {
+                legalRepsToMoveCollection.add(caseDetails);
+            }
+        }
+
+        return legalRepsToMoveCollection;
+    }
+
+    private void addLegalRepsToMultiple(String jurisdiction,
+                                        String caseType,
+                                        String multipleId,
+                                        List<String> legalRepsToAdd) {
+        if (!legalRepsToAdd.isEmpty()) {
+            multipleReferenceService.addUsersToMultiple(jurisdiction,
+                    caseType,
+                    multipleId,
+                    legalRepsToAdd);
+        }
     }
 
     private String checkIfNewMultipleWasEmpty(String updatedLeadCase, List<String> multipleObjectsFiltered) {
-
         if (updatedLeadCase.isEmpty() && !multipleObjectsFiltered.isEmpty()) {
             return multipleObjectsFiltered.get(0);
         }
 
         return updatedLeadCase;
-
     }
 
     private void readExcelAndAddSubMultipleRef(String userToken,
@@ -297,11 +330,21 @@ public class MultipleBatchUpdate2Service {
             String userToken,
             MultipleDetails multipleDetails,
             List<String> casesBeingRemoved) {
-
         String multipleReference = multipleDetails.getCaseData().getMultipleReference();
         ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = multipleDetails.getCaseData().getLegalRepCollection();
 
-        List<String> legalRepsToRemove = getLegalRepsToRemove(casesBeingRemoved, legalRepCollection);
+        List<String> legalRepsToRetain = legalRepCollection.stream()
+                .filter(subCase -> !casesBeingRemoved.contains(subCase.getValue().getCaseReference()))
+                .flatMap(subCase -> subCase.getValue().getLegalRepIds().stream())
+                .map(GenericTypeItem::getValue)
+                .toList();
+
+        List<String> legalRepsToRemove = legalRepCollection.stream()
+                .filter(subCase -> casesBeingRemoved.contains(subCase.getValue().getCaseReference()))
+                .flatMap(subCase -> subCase.getValue().getLegalRepIds().stream())
+                .filter(legalRep -> !legalRepsToRetain.contains(legalRep.getValue()))
+                .map(GenericTypeItem::getValue)
+                .toList();
 
         if (legalRepsToRemove.isEmpty()) {
             log.info("No LegalReps to be removed from : {}", multipleReference);
@@ -324,20 +367,6 @@ public class MultipleBatchUpdate2Service {
             }
         }
         multipleDetails.getCaseData().setLegalRepCollection(newLegalRepCollection);
-    }
-
-    private static @NotNull List<String> getLegalRepsToRemove(List<String> casesBeingRemoved,
-                                                              ListTypeItem<SubCaseLegalRepDetails> legalRepCollection) {
-        List<String> legalRepsToRemove = new ArrayList<>();
-        for (GenericTypeItem<SubCaseLegalRepDetails> caseDetails : legalRepCollection) {
-            SubCaseLegalRepDetails currentCaseDetails = caseDetails.getValue();
-            if (casesBeingRemoved.contains(currentCaseDetails.getCaseReference())) {
-                for (GenericTypeItem<String> legalRepId : currentCaseDetails.getLegalRepIds()) {
-                    legalRepsToRemove.add(legalRepId.getValue());
-                }
-            }
-        }
-        return legalRepsToRemove;
     }
 
     private List<MultipleObject> removeCasesInMultiple(List<String> multipleObjectsFiltered,

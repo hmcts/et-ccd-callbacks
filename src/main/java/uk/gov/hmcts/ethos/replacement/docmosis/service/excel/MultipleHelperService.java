@@ -216,7 +216,8 @@ public class MultipleHelperService {
 
     }
 
-    public void sendCreationUpdatesToSinglesWithoutConfirmation(String userToken, String caseTypeId,
+    public void sendCreationUpdatesToSinglesWithoutConfirmation(String userToken,
+                                                                String caseTypeId,
                                                                 String jurisdiction,
                                                                 MultipleData updatedMultipleData,
                                                                 List<String> errors,

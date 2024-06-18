@@ -160,7 +160,7 @@ public class MultipleReferenceService {
             }
 
             log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
-        } catch (RestClientResponseException e) {
+        } catch (RestClientResponseException | IOException e) {
             throw (CaseCreationException)
                     new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
         }

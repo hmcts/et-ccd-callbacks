@@ -136,6 +136,17 @@ public class MultipleReferenceService {
         return new SubmitMultipleEvent();
     }
 
+    public void addUsersToMultiple(String jurisdiction,
+        String caseType,
+        String multipleId,
+        List<String> usersToAdd) throws IOException {
+        String adminUserToken = adminUserService.getAdminUserToken();
+
+        for (String userToAddId : usersToAdd) {
+            addUserToMultiple(adminUserToken, jurisdiction, caseType, multipleId, userToAddId);
+        }
+    }
+
     public void addUserToMultiple(String adminUserToken,
                                String jurisdiction,
                                String caseType,

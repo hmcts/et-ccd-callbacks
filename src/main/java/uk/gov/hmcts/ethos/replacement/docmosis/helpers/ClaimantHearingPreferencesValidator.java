@@ -13,8 +13,8 @@ import java.util.List;
  */
 public final class ClaimantHearingPreferencesValidator {
 
-    static final String VIDEO_PREFERENCE = "Video";
-    static final String PHONE_PREFERENCE = "Phone";
+    public static final String VIDEO_PREFERENCE = "Video";
+    public static final String PHONE_PREFERENCE = "Phone";
     static final String NEITHER_PREFERENCE = "Neither";
     static final String INVALID_HEARING_PREFERENCE_OPTIONS_MESSAGE =
             "Hearing preferences cannot contain Neither and another option";

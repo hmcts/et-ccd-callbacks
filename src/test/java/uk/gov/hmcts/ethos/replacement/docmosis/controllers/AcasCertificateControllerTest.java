@@ -36,6 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({AcasCertificateController.class, JsonbMapper.class})
@@ -61,14 +62,17 @@ class AcasCertificateControllerTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         CaseData caseData = new CaseData();
         caseData.setAcasCertificate("R111111/11/11");
-        ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
     }
 
     @Test
     void retrieveAcasCert_Success() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(acasService.getAcasCertificate(any(), anyString())).thenReturn(new ArrayList<>());
+        when(acasService.getAcasCertificate(any(), anyString(), anyString())).thenReturn(new ArrayList<>());
         mockMvc.perform(post(RETRIEVE_ACAS_CERT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -77,7 +81,7 @@ class AcasCertificateControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(acasService, times(1)).getAcasCertificate(any(), anyString());
+        verify(acasService, times(1)).getAcasCertificate(any(), anyString(), anyString());
     }
 
     @Test
@@ -88,7 +92,7 @@ class AcasCertificateControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(acasService, never()).getAcasCertificate(any(), anyString());
+        verify(acasService, never()).getAcasCertificate(any(), anyString(), anyString());
     }
 
     @Test
@@ -99,14 +103,14 @@ class AcasCertificateControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content("error"))
                 .andExpect(status().isBadRequest());
-        verify(acasService, never()).getAcasCertificate(any(), anyString());
+        verify(acasService, never()).getAcasCertificate(any(), anyString(), anyString());
     }
 
     @Test
     void acasConfirmation_Success() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(acasService.getAcasCertificate(any(), anyString())).thenReturn(new ArrayList<>());
+        when(acasService.getAcasCertificate(any(), anyString(), anyString())).thenReturn(new ArrayList<>());
         mockMvc.perform(post(ACAS_CONFIRMATION_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

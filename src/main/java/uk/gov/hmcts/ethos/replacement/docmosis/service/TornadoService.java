@@ -48,6 +48,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.ET1_VETTING_OUTPUT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 
 @Slf4j
@@ -387,18 +388,22 @@ public class TornadoService {
             throws JsonProcessingException {
         switch (documentName) {
             case ET1_VETTING_PDF -> {
-                dmStoreDocumentName = String.format(ET1_VETTING_OUTPUT_NAME, caseData.getClaimant());
-                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                dmStoreDocumentName = String.format(ET1_VETTING_OUTPUT_NAME,
+                        sanitizePartyName(caseData.getClaimant()));
+                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        dmStoreDocumentName);
             }
             case ET3_PROCESSING_PDF -> {
                 dmStoreDocumentName = String.format("ET3 Processing - %s.pdf",
-                        caseData.getEt3ChooseRespondent().getSelectedLabel());
-                return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                        sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
+                return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        dmStoreDocumentName);
             }
             case ET3_RESPONSE_PDF -> {
                 dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
-                        caseData.getSubmitEt3Respondent().getSelectedLabel());
-                return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                        sanitizePartyName(caseData.getSubmitEt3Respondent().getSelectedLabel()));
+                return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        dmStoreDocumentName);
             }
             case INITIAL_CONSIDERATION_PDF -> {
                 return InitialConsiderationHelper.getDocumentRequest(

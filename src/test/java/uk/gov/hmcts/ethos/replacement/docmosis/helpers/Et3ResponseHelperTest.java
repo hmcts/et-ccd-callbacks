@@ -165,7 +165,7 @@ class Et3ResponseHelperTest {
         String expected = Files.readString(Paths.get(Objects.requireNonNull(Thread.currentThread()
                 .getContextClassLoader().getResource("et3ResponseDocument.json")).toURI()));
 
-        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
+        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any", "ET3 Response - test.pdf");
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -191,7 +191,7 @@ class Et3ResponseHelperTest {
         data.remove("repPostcode");
 
         String test = json.toString();
-        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
+        String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any", "ET3 Response - test.pdf");
         JSONAssert.assertEquals(test, actual, false);
     }
 

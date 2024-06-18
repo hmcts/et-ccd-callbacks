@@ -27,6 +27,7 @@ public enum JurisdictionCode {
         + " or on mat. leave"),
     FPA("Application by an employee that an employer has failed to pay a protected award as ordered by a "
         + "tribunal"),
+    FPI("Failure of a transferor to provide employee liability information to a transferee"),
     FTC("Failure to provide a written statement of terms and conditions and any subsequent changes to those "
         + "terms"),
     FTE("Suffered less favourable treatment and/or dismissal as a fixed term employee, than a full-time "
@@ -44,6 +45,8 @@ public enum JurisdictionCode {
     FWP("Failure to provide a written pay statement or an adequate pay statement"),
     FWS("Failure to provide a written statement of reasons for dismissal or the contents of the statement "
         + "are disputed"),
+    GRA("Discrimination, including indirect discrimination, discrimination based on association or "
+        + "perception, or harassment because of gender reassignment"),
     HAS("Appeal against an enforcement, improvement or prohibition notice imposed by the HSE or Environmental"
         + " Health Inspector, or by the Environment Agency"),
     HSD("Failure to pay for or allow time off to carry out Safety Rep duties or undertake training"),
@@ -77,6 +80,7 @@ public enum JurisdictionCode {
         + "correct procedures/reject request based on incorrect facts"),
     TUE("Suffer discrimination in obtaining employment due to membership or non-membership of a trade union;"
         + " or refused employment or suffered a detriment for a reason related to a blacklist"),
+    TUI("Suffer an inducement relating to union membership, activities or collective bargaining"),
     TUM("Suffer a detriment and/or dismissal relating to being, not being or proposing to become a trade "
             + "union member"),
     TUR("(a)  Failure of the employer to consult or report about training in relation to a bargaining unit (b)"
@@ -89,6 +93,7 @@ public enum JurisdictionCode {
     TXC("Appeal against \"Failure to pay an Employment Tribunal award Penalty\""),
     UDC("Unfair dismissal after exercising or claiming a statutory right"),
     UIA("Unfair dismissal in connection to a lock out, strike or other industrial action"),
+    VIC("Subjected to a detriment because of a protected act"),
     WTA("Appeal by a person who has been served with an improvement or prohibition notice under the Working "
         + "Time Regulations 1998"),
     BOC("(a) Claim of an employee for breach of contract of employment (b) Employer contract claim"),

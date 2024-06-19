@@ -3,14 +3,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADD_CASES_TO_MULTIPLE_AMENDMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LEAD_CASE_AMENDMENT;
@@ -23,6 +24,10 @@ public class MultipleAmendService {
     private final ExcelDocManagementService excelDocManagementService;
     private final MultipleAmendLeadCaseService multipleAmendLeadCaseService;
     private final MultipleAmendCaseIdsService multipleAmendCaseIdsService;
+
+    private static final List<String> TYPES_OF_AMENDMENT = Arrays.asList(
+            LEAD_CASE_AMENDMENT,
+            ADD_CASES_TO_MULTIPLE_AMENDMENT);
 
     @Autowired
     public MultipleAmendService(ExcelReadingService excelReadingService,
@@ -38,35 +43,31 @@ public class MultipleAmendService {
     public void bulkAmendMultipleLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
         log.info("Read excel to amend multiple");
+        MultipleData multipleData = multipleDetails.getCaseData();
         SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(
-                        userToken, MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                        errors, multipleDetails.getCaseData(), FilterExcelType.ALL);
+                        userToken, MultiplesHelper.getExcelBinaryUrl(multipleData),
+                        errors, multipleData, FilterExcelType.ALL);
 
         List<?> newMultipleObjects = new ArrayList<>();
 
-        if (Stream.of(LEAD_CASE_AMENDMENT, ADD_CASES_TO_MULTIPLE_AMENDMENT)
-                .anyMatch(multipleDetails.getCaseData().getTypeOfAmendmentMSL()::contains)) {
+        List<String> typesOfAmendment = multipleData.getTypeOfAmendmentMSL();
+        if (TYPES_OF_AMENDMENT.stream().anyMatch(typesOfAmendment::contains)) {
 
-            if (multipleDetails.getCaseData().getTypeOfAmendmentMSL().contains(LEAD_CASE_AMENDMENT)) {
+            if (typesOfAmendment.contains(LEAD_CASE_AMENDMENT)) {
                 log.info("Amend lead case logic");
-                newMultipleObjects = multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(userToken,
-                        multipleDetails, errors, multipleObjects);
+                newMultipleObjects = multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(
+                        userToken, multipleDetails, errors, multipleObjects);
             }
 
-            if (multipleDetails.getCaseData().getTypeOfAmendmentMSL().contains(ADD_CASES_TO_MULTIPLE_AMENDMENT)
-                    && errors.isEmpty()) {
-
+            if (typesOfAmendment.contains(ADD_CASES_TO_MULTIPLE_AMENDMENT) && errors.isEmpty()) {
                 log.info("Amend case ids logic");
-                newMultipleObjects = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(userToken,
-                        multipleDetails, errors, multipleObjects);
+                newMultipleObjects = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(
+                        userToken, multipleDetails, errors, multipleObjects);
             }
 
             if (errors.isEmpty()) {
-
                 log.info("Create a new Excel");
-                excelDocManagementService.generateAndUploadExcel(newMultipleObjects, userToken,
-                        multipleDetails);
-
+                excelDocManagementService.generateAndUploadExcel(newMultipleObjects, userToken, multipleDetails);
             }
 
         }
@@ -76,7 +77,5 @@ public class MultipleAmendService {
         multipleDetails.getCaseData().setAmendLeadCase(null);
         multipleDetails.getCaseData().setCaseIdCollection(null);
         multipleDetails.getCaseData().setTypeOfAmendmentMSL(null);
-
     }
-
 }

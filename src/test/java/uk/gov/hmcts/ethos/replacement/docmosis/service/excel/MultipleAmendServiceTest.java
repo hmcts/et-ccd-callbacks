@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,19 +55,27 @@ class MultipleAmendServiceTest {
     }
 
     @Test
-    void bulkAmendMultipleLogic() {
+    void bulkAmendMultipleLogic_AllTypes() {
         multipleDetails.getCaseData().setTypeOfAmendmentMSL(typeOfAmendmentMSL);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(anyString(), any(), anyList(), any()))
                 .thenReturn(getMultipleObjectsList());
+
         multipleAmendService.bulkAmendMultipleLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
-        verify(excelDocManagementService, times(1)).generateAndUploadExcel(
-                getMultipleObjectsList(),
-                userToken,
-                multipleDetails);
+
+        assertNull(multipleDetails.getCaseData().getAmendLeadCase());
+        assertNull(multipleDetails.getCaseData().getCaseIdCollection());
+        assertNull(multipleDetails.getCaseData().getTypeOfAmendmentMSL());
+
+        verify(multipleAmendLeadCaseService, times(1))
+                .bulkAmendLeadCaseLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, times(1))
+                .bulkAmendCaseIdsLogic(any(), any(), any(), any());
+        verify(excelDocManagementService, times(1))
+                .generateAndUploadExcel(getMultipleObjectsList(), userToken, multipleDetails);
         verifyNoMoreInteractions(excelDocManagementService);
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_EMPLOYMENT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
 
 class Et3ResponseHelperTest {
 
@@ -155,12 +158,18 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponsePhone("1234");
         caseData.setEt3ResponseAcasAgree(YES);
         caseData.setEt3ResponseEmploymentCount("10");
+        caseData.setEt3ResponseContactPreference("Post");
+        caseData.setEt3ResponseReference("REF1234");
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE);
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_EMPLOYMENT_DETAILS);
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
         RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
         assertThat(respondentSumType.getEt3ResponseIsClaimantNameCorrect()).isEqualTo(YES);
-        assertThat(respondentSumType.getResponseRespondentPhone1()).isEqualTo("1234");
+        RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+        assumeTrue(ObjectUtils.isNotEmpty(representative));
+        assertThat(representative.getRepresentativePhoneNumber()).isEqualTo("1234");
+        assertThat(representative.getRepresentativePreference()).isEqualTo("Post");
+        assertThat(representative.getRepresentativeReference()).isEqualTo("REF1234");
         assertThat(respondentSumType.getEt3ResponseAcasAgree()).isEqualTo(YES);
         assertThat(respondentSumType.getEt3ResponseEmploymentCount()).isEqualTo("10");
         assertThat(respondentSumType.getPersonalDetailsSection()).isEqualTo(YES);

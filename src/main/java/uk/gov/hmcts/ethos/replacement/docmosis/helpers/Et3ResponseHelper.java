@@ -5,8 +5,10 @@ import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.time.LocalDate;
@@ -15,8 +17,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -196,7 +202,7 @@ public final class Et3ResponseHelper {
     private static void addEt3Data(CaseData caseData, String eventId, String respondentSelected,
                                    RespondentSumTypeItem respondent) {
         RespondentSumType respondentSumType = switch (eventId) {
-            case ET3_RESPONSE -> addPersonalDetailsToRespondent(caseData, respondent.getValue());
+            case ET3_RESPONSE -> addPersonalDetailsToRespondentOrRepresentative(caseData, respondent.getValue());
             case ET3_RESPONSE_EMPLOYMENT_DETAILS -> addEmploymentDetailsToRespondent(caseData, respondent.getValue());
             case ET3_RESPONSE_DETAILS -> addClaimDetailsToRespondent(caseData, respondent.getValue());
             default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
@@ -221,14 +227,31 @@ public final class Et3ResponseHelper {
         return respondent;
     }
 
-    private static RespondentSumType addPersonalDetailsToRespondent(CaseData caseData, RespondentSumType respondent) {
+    private static RespondentSumType addPersonalDetailsToRespondentOrRepresentative(CaseData caseData,
+                                                                                    RespondentSumType respondent) {
         respondent.setEt3ResponseIsClaimantNameCorrect(caseData.getEt3ResponseIsClaimantNameCorrect());
         respondent.setEt3ResponseClaimantNameCorrection(caseData.getEt3ResponseClaimantNameCorrection());
         respondent.setResponseRespondentName(caseData.getEt3ResponseRespondentLegalName());
         respondent.setResponseRespondentAddress(caseData.getEt3RespondentAddress());
-        respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone());
+        RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+        if (representative != null) {
+            // This should be mapped to Representative
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // existing statement respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone())
+            // replaced with representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone())
+            representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            // This should be mapped to Representative
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // existing statement respondent.setResponseRespondentContactPreference(
+            // caseData.getEt3ResponseContactPreference())
+            // replaced with representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference())
+            representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference());
+            // There weren't any mapping of reference for correspondence - representative.
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // added this field to representative
+            representative.setRepresentativeReference(caseData.getEt3ResponseReference());
+        }
         respondent.setResponseReference(caseData.getEt3ResponseReference());
-        respondent.setResponseRespondentContactPreference(caseData.getEt3ResponseContactPreference());
         respondent.setEt3ResponseContactReason(caseData.getEt3ResponseContactReason());
         respondent.setEt3ResponseRespondentCompanyNumber(caseData.getEt3ResponseRespondentCompanyNumber());
         respondent.setEt3ResponseRespondentEmployerType(caseData.getEt3ResponseRespondentEmployerType());
@@ -245,6 +268,12 @@ public final class Et3ResponseHelper {
     }
 
     private static RespondentSumType addEmploymentDetailsToRespondent(CaseData caseData, RespondentSumType respondent) {
+        RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+        if (representative != null) {
+            caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
+            caseData.setEt3ResponseContactPreference(representative.getRepresentativePreference());
+            caseData.setEt3ResponseReference(representative.getRepresentativeReference());
+        }
         respondent.setEt3ResponseEmploymentCount(caseData.getEt3ResponseEmploymentCount());
         respondent.setEt3ResponseMultipleSites(caseData.getEt3ResponseMultipleSites());
         respondent.setEt3ResponseSiteEmploymentCount(caseData.getEt3ResponseSiteEmploymentCount());
@@ -452,4 +481,30 @@ public final class Et3ResponseHelper {
 
     }
 
+    public static RepresentedTypeR findRepresentativeFromCaseData(CaseData caseData) {
+        if (isCaseDataRespondentEmpty(caseData)) {
+            return null;
+        }
+        Stream<RepresentedTypeRItem> selectedRepresentativeStream = caseData.getRepCollection().stream().filter(
+                rep -> isNotEmpty(rep.getValue()) && rep.getValue().getRespRepName().equals(
+                        caseData.getSubmitEt3Respondent().getSelectedLabel()
+                )
+        );
+        if (isEmpty(selectedRepresentativeStream)) {
+            return null;
+        }
+        Optional<RepresentedTypeRItem> selectedRepresentative = selectedRepresentativeStream.findFirst();
+        if (selectedRepresentative.isEmpty()
+                || isEmpty(selectedRepresentative.get())
+                || isEmpty(selectedRepresentative.get().getValue())) {
+            return null;
+        }
+        return selectedRepresentative.get().getValue();
+    }
+
+    private static boolean isCaseDataRespondentEmpty(CaseData caseData) {
+        return isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || isEmpty(caseData.getSubmitEt3Respondent())
+                || isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel());
+    }
 }

@@ -165,7 +165,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_EXPECTED_VALUE_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_EXPECTED_VALUE_CONTACT_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_EXPECTED_VALUE_CONTACT_TYPE_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_EXPECTED_VALUE_CONTACT_TYPE_POST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_EXPECTED_VALUE_DX;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_EXPECTED_VALUE_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_RESPONDENT_EXPECTED_VALUE_EMPLOYEE_NUMBER_CLAIMANT_WORK_PLACE;
@@ -296,8 +296,9 @@ class ET3FormMapperTest {
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_MOBILE_NUMBER))
                 .contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_MOBILE_NUMBER);
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_EMAIL))
-                .contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_CONTACT_TYPE_EMAIL);
-        assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_POST)).contains(STRING_EMPTY);
+                .contains(STRING_EMPTY);
+        assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_POST)).contains(
+                TEST_PDF_RESPONDENT_EXPECTED_VALUE_CONTACT_TYPE_POST);
         assertThat(pdfFields.get(TXT_PDF_RESPONDENT_FIELD_EMAIL)).contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_EMAIL);
         assertThat(pdfFields.get(CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_VIDEO))
                 .contains(TEST_PDF_RESPONDENT_EXPECTED_VALUE_HEARING_TYPE_VIDEO);

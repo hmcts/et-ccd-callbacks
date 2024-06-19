@@ -1,17 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Stream;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_POST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_REPRESENTATIVE_FIELD_PHONE_HEARINGS;
@@ -52,57 +50,36 @@ public final class ET3FormRepresentativeMapper {
     public static void mapRepresentative(CaseData caseData,
                                          RespondentSumType respondentSumType,
                                          ConcurrentMap<String, Optional<String>> pdfFields) {
-        if (isCaseDataRespondentEmpty(caseData)) {
-            return;
+        RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+        if (isNotEmpty(representative)) {
+            putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_NAME, representative.getNameOfRepresentative());
+            putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_ORGANISATION_NAME,
+                    representative.getNameOfOrganisation());
+            putPdfAddressField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_ADDRESS,
+                    representative.getRepresentativeAddress());
+            putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_POSTCODE,
+                    isEmpty(representative.getRepresentativeAddress()) ? STRING_EMPTY
+                            : representative.getRepresentativeAddress().getPostCode());
+            putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_PHONE_NUMBER,
+                    representative.getRepresentativePhoneNumber());
+            putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_MOBILE_PHONE_NUMBER,
+                    representative.getRepresentativeMobileNumber());
+            putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_REFERENCE_FOR_CORRESPONDENCE,
+                    representative.getRepresentativeReference());
+            putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
+                    CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_EMAIL, EMAIL_LOWERCASE,
+                    EMAIL_CAPITALISED, representative.getRepresentativePreference());
+            putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
+                    CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_POST, POST_LOWERCASE, POST_CAPITALISED,
+                    representative.getRepresentativePreference());
+            putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_EMAIL_ADDRESS,
+                    representative.getRepresentativeEmailAddress());
+            putPdfCheckboxFieldWhenActualValueContainsExpectedValue(pdfFields,
+                    CHECKBOX_PDF_REPRESENTATIVE_FIELD_VIDEO_HEARINGS, YES_CAPITALISED, VIDEO_HEARINGS,
+                    respondentSumType.getEt3ResponseHearingRepresentative());
+            putPdfCheckboxFieldWhenActualValueContainsExpectedValue(pdfFields,
+                    CHECKBOX_PDF_REPRESENTATIVE_FIELD_PHONE_HEARINGS, YES_CAPITALISED, PHONE_HEARINGS,
+                    respondentSumType.getEt3ResponseHearingRepresentative());
         }
-        Stream<RepresentedTypeRItem> selectedRepresentativeStream = caseData.getRepCollection().stream().filter(
-                rep -> ObjectUtils.isNotEmpty(rep.getValue()) && rep.getValue().getRespRepName().equals(
-                        caseData.getSubmitEt3Respondent().getSelectedLabel()
-                )
-        );
-        if (ObjectUtils.isEmpty(selectedRepresentativeStream)) {
-            return;
-        }
-        Optional<RepresentedTypeRItem> selectedRepresentative = selectedRepresentativeStream.findFirst();
-        if (selectedRepresentative.isEmpty()
-                || ObjectUtils.isEmpty(selectedRepresentative.get())
-                || ObjectUtils.isEmpty(selectedRepresentative.get().getValue())) {
-            return;
-        }
-        RepresentedTypeR representative = selectedRepresentative.get().getValue();
-        putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_NAME, representative.getNameOfRepresentative());
-        putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_ORGANISATION_NAME,
-                representative.getNameOfOrganisation());
-        putPdfAddressField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_ADDRESS,
-                representative.getRepresentativeAddress());
-        putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_POSTCODE,
-                ObjectUtils.isEmpty(representative.getRepresentativeAddress())
-                        ? STRING_EMPTY : representative.getRepresentativeAddress().getPostCode());
-        putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_PHONE_NUMBER,
-                representative.getRepresentativePhoneNumber());
-        putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_MOBILE_PHONE_NUMBER,
-                representative.getRepresentativeMobileNumber());
-        putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_REFERENCE_FOR_CORRESPONDENCE,
-                representative.getRepresentativeReference());
-        putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
-                CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_EMAIL, EMAIL_LOWERCASE, EMAIL_CAPITALISED,
-                representative.getRepresentativePreference());
-        putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
-                CHECKBOX_PDF_REPRESENTATIVE_FIELD_COMMUNICATION_PREFERENCE_POST, POST_LOWERCASE, POST_CAPITALISED,
-                representative.getRepresentativePreference());
-        putPdfTextField(pdfFields, TXT_PDF_REPRESENTATIVE_FIELD_EMAIL_ADDRESS,
-                representative.getRepresentativeEmailAddress());
-        putPdfCheckboxFieldWhenActualValueContainsExpectedValue(pdfFields,
-                CHECKBOX_PDF_REPRESENTATIVE_FIELD_VIDEO_HEARINGS, YES_CAPITALISED, VIDEO_HEARINGS,
-                respondentSumType.getEt3ResponseHearingRepresentative());
-        putPdfCheckboxFieldWhenActualValueContainsExpectedValue(pdfFields,
-                CHECKBOX_PDF_REPRESENTATIVE_FIELD_PHONE_HEARINGS, YES_CAPITALISED, PHONE_HEARINGS,
-                respondentSumType.getEt3ResponseHearingRepresentative());
-    }
-
-    private static boolean isCaseDataRespondentEmpty(CaseData caseData) {
-        return ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())
-                || ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent())
-                || isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel());
     }
 }

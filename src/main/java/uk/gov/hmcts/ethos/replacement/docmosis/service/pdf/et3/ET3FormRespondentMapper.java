@@ -102,19 +102,19 @@ public final class ET3FormRespondentMapper {
                         ? STRING_EMPTY : respondentSumType.getResponseRespondentAddress().getPostCode());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_DX, respondentSumType.getEt3ResponseDXAddress());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_PHONE_NUMBER,
-                respondentSumType.getResponseRespondentPhone1());
+                respondentSumType.getRespondentPhone1());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_MOBILE_NUMBER,
-                respondentSumType.getResponseRespondentPhone2());
+                respondentSumType.getRespondentPhone2());
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_EMAIL,
                 EMAIL_LOWERCASE,
                 EMAIL_CAPITALISED,
-                respondentSumType.getResponseRespondentContactPreference());
+                respondentSumType.getRespondentContactPreference());
         putPdfCheckboxFieldWhenExpectedValueEqualsActualValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_CONTACT_TYPE_POST,
                 POST_LOWERCASE,
                 POST_CAPITALISED,
-                respondentSumType.getResponseRespondentContactPreference());
+                respondentSumType.getRespondentContactPreference());
         putPdfTextField(pdfFields, TXT_PDF_RESPONDENT_FIELD_EMAIL, respondentSumType.getRespondentEmail());
         putPdfCheckboxFieldWhenActualValueContainsExpectedValue(pdfFields,
                 CHECKBOX_PDF_RESPONDENT_FIELD_HEARING_TYPE_VIDEO,

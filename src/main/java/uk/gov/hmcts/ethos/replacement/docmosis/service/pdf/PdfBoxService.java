@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,8 @@ import java.util.Optional;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.EMPTY_BYTE_ARRAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.HELVETICA_PDFBOX_CHARACTER_CODE_1;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.HELVETICA_PDFBOX_CHARACTER_CODE_2;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_OUTPUT_FILE_NAME_PREFIX;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_CLASS_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_ERROR_NOT_ABLE_TO_MAP_CASE_DATA_TO_TEMPLATE_PDF;
@@ -37,6 +42,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceC
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PUT_PDF_FIELD_METHOD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.STREAM_CLOSURE_CLASS_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.UNABLE_TO_CLOSE_STREAM_FOR_PDF_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.UNABLE_TO_PROCESS_PDF_SOURCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE;
@@ -126,9 +132,13 @@ public class PdfBoxService {
                 : cl.getResourceAsStream(pdfSource);
         if (stream != null) {
             try (PDDocument pdfDocument = Loader.loadPDF(Objects.requireNonNull(stream.readAllBytes()))) {
+                PDResources resources = new PDResources();
+                resources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE), PDType1Font.TIMES_ROMAN);
+                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1), PDType1Font.HELVETICA);
+                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2), PDType1Font.HELVETICA);
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
-
+                pdfForm.setDefaultResources(resources);
                 for (Map.Entry<String, Optional<String>> entry : mapEt3Form(caseData).entrySet()) {
                     String entryKey = entry.getKey();
                     Optional<String> entryValue = entry.getValue();

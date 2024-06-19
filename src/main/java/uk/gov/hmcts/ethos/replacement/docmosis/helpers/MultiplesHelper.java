@@ -52,8 +52,7 @@ public final class MultiplesHelper {
 
     public static List<String> getCaseIds(MultipleData multipleData) {
 
-        if (multipleData.getCaseIdCollection() != null
-                && !multipleData.getCaseIdCollection().isEmpty()) {
+        if (collectionNotNullOrEmpty(multipleData.getCaseIdCollection())) {
 
             return multipleData.getCaseIdCollection().stream()
                     .filter(key -> key.getId() != null && !key.getId().equals("null"))
@@ -70,7 +69,7 @@ public final class MultiplesHelper {
 
     // MID EVENTS COLLECTIONS HAVE KEY AS NULL BUT WITH VALUES!
     public static List<String> getCaseIdsForMidEvent(List<CaseIdTypeItem> caseIdCollection) {
-        if (caseIdCollection == null || caseIdCollection.isEmpty()) {
+        if (!collectionNotNullOrEmpty(caseIdCollection)) {
             return new ArrayList<>();
         }
 
@@ -83,8 +82,7 @@ public final class MultiplesHelper {
 
     public static List<CaseIdTypeItem> filterDuplicatedAndEmptyCaseIds(MultipleData multipleData) {
 
-        if (multipleData.getCaseIdCollection() != null
-                && !multipleData.getCaseIdCollection().isEmpty()) {
+        if (collectionNotNullOrEmpty(multipleData.getCaseIdCollection())) {
 
             return multipleData.getCaseIdCollection().stream()
                     .filter(caseId ->
@@ -262,7 +260,7 @@ public final class MultiplesHelper {
 
     public static List<String> generateSubMultipleStringCollection(MultipleData multipleData) {
 
-        if (multipleData.getSubMultipleCollection() != null && !multipleData.getSubMultipleCollection().isEmpty()) {
+        if (collectionNotNullOrEmpty(multipleData.getSubMultipleCollection())) {
 
             return multipleData.getSubMultipleCollection().stream()
                     .map(subMultipleTypeItem -> subMultipleTypeItem.getValue().getSubMultipleName())
@@ -371,4 +369,7 @@ public final class MultiplesHelper {
         return UtilHelper.getListingCaseTypeId(caseTypeId) + MULTIPLE_SUFFIX;
     }
 
+    private static <T> boolean collectionNotNullOrEmpty(List<T> collection) {
+        return collection != null && !collection.isEmpty();
+    }
 }

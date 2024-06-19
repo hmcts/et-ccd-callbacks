@@ -26,29 +26,28 @@ public class MultipleAmendCaseIdsService {
         this.multipleHelperService = multipleHelperService;
     }
 
-    public List<MultipleObject> bulkAmendCaseIdsLogic(String userToken, MultipleDetails multipleDetails,
-                                                      List<String> errors, SortedMap<String, Object> multipleObjects) {
+    public List<MultipleObject> bulkAmendCaseIdsLogic(String userToken,
+                                                      MultipleDetails multipleDetails,
+                                                      List<String> errors,
+                                                      SortedMap<String, Object> multipleObjects) {
+        MultipleData multipleData = multipleDetails.getCaseData();
+        List<String> newEthosCaseRefCollection = MultiplesHelper.getCaseIds(multipleData);
 
-        List<String> newEthosCaseRefCollection = MultiplesHelper.getCaseIds(multipleDetails.getCaseData());
-
-        log.info("Calculate union new and old cases for multipleReference:"
-                + multipleDetails.getCaseData().getMultipleReference());
+        log.info("Calculate union new and old cases for multipleReference:{}", multipleData.getMultipleReference());
         List<String> unionLists = concatNewAndOldCases(multipleObjects, newEthosCaseRefCollection);
 
-        String multipleLeadCase = getCurrentLead(multipleDetails.getCaseData(), unionLists.get(0));
+        String multipleLeadCase = getCurrentLead(multipleData, unionLists.get(0));
 
         if (!newEthosCaseRefCollection.isEmpty()) {
-
             log.info("Updating {} singles of multiple with reference {} ",
-                    newEthosCaseRefCollection.size(), multipleDetails.getCaseData().getMultipleReference());
+                    newEthosCaseRefCollection.size(), 
+                    multipleData.getMultipleReference());
 
             multipleHelperService.sendUpdatesToSinglesLogic(userToken, multipleDetails, errors, multipleLeadCase,
                     multipleObjects, newEthosCaseRefCollection);
-
         }
 
         return generateMultipleObjects(unionLists, multipleObjects);
-
     }
 
     private String getCurrentLead(MultipleData multipleData, String newLead) {
@@ -66,7 +65,7 @@ public class MultipleAmendCaseIdsService {
     private List<String> concatNewAndOldCases(SortedMap<String, Object> multipleObjects,
                                               List<String> newEthosCaseRefCollection) {
 
-        log.info("EthosCaseRefCollection: " + newEthosCaseRefCollection);
+        log.info("EthosCaseRefCollection: {}", newEthosCaseRefCollection);
 
         return Stream.concat(newEthosCaseRefCollection.stream(), multipleObjects.keySet().stream())
                 .distinct().toList();

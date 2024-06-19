@@ -467,13 +467,13 @@ public class ExcelActionsController {
     @PostMapping(value = "/multipleRemoveCaseIdsMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates if single cases are right on the multiple creation.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = MultipleCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MultipleCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> multipleRemoveCaseIdsMidEventValidation(
             @RequestBody MultipleRequest multipleRequest,

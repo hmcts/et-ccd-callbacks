@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -34,6 +35,8 @@ public class MultipleCreationMidEventValidationService {
     public static final String LEAD_CASE_BELONGS_DIFFERENT_OFFICE = "Lead case %s is managed by %s";
     public static final String CASE_COLLECTION_EXCEEDED_MAX_SIZE =
             "There are %s cases in the multiple. The limit is %s.";
+    public static final String LEAD_CASE_CANNOT_BE_REMOVED = " lead case cannot be removed.";
+    public static final String CASE_NOT_BELONG_TO_MULTIPLE_ERROR = " cases are not a part of the multiple.";
     public static final int MULTIPLE_MAX_SIZE = 50;
 
     private final SingleCasesReadingService singleCasesReadingService;
@@ -75,6 +78,65 @@ public class MultipleCreationMidEventValidationService {
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
             validateCases(userToken, caseTypeId, managingOffice, ethosCaseRefCollection, errors, false);
+        }
+    }
+
+    public void multipleRemoveCasesValidationLogic(
+            String userToken,
+            MultipleDetails multipleDetails,
+            List<String> errors) {
+
+        MultipleData multipleData = multipleDetails.getCaseData();
+
+        log.info("Validating multiple case removals");
+        List<String> ethosCaseRefCollection =
+                MultiplesHelper.getCaseIdsForMidEvent(multipleData.getAltCaseIdCollection());
+
+        if (ethosCaseRefCollection.isEmpty()) {
+            return;
+        }
+
+        log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
+        validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
+
+        String caseTypeId = multipleDetails.getCaseTypeId();
+        List<SubmitEvent> casesToBeRemoved = singleCasesReadingService.retrieveSingleCases(
+                userToken, caseTypeId, ethosCaseRefCollection, MANUALLY_CREATED_POSITION);
+
+        String leadCaseRef = MultiplesHelper.getCurrentLead(multipleData.getLeadCase());
+        String multipleRef = multipleData.getMultipleReference();
+        validateCasesForRemoval(leadCaseRef, multipleRef, ethosCaseRefCollection, casesToBeRemoved, errors);
+    }
+
+    private void validateCasesForRemoval(String leadCaseReference,
+                                         String multipleReference,
+                                         List<String> caseRefCollection,
+                                         List<SubmitEvent> casesToBeRemoved,
+                                         List<String> errors) {
+
+        log.info("Validate number of cases returned");
+        validateNumberCasesReturned(casesToBeRemoved, errors, false, caseRefCollection);
+
+        log.info("Validating cases");
+        List<String> listCasesNotBelongError = new ArrayList<>();
+        for (SubmitEvent submitEvent : casesToBeRemoved) {
+            CaseData caseBeingValidated = submitEvent.getCaseData();
+
+            if (leadCaseReference.equals(caseBeingValidated.getEthosCaseReference())) {
+                log.info("VALIDATION ERROR: case is lead case and cannot be removed");
+                errors.add(leadCaseReference + LEAD_CASE_CANNOT_BE_REMOVED);
+            }
+
+            if (isNullOrEmpty(caseBeingValidated.getMultipleReference())
+                || !multipleReference.equals(caseBeingValidated.getMultipleReference())) {
+                log.info("VALIDATION ERROR: case does not belong to this multiple");
+
+                listCasesNotBelongError.add(submitEvent.getCaseData().getEthosCaseReference());
+            }
+        }
+
+        if (!listCasesNotBelongError.isEmpty()) {
+            errors.add(listCasesNotBelongError + CASE_NOT_BELONG_TO_MULTIPLE_ERROR);
         }
     }
 

@@ -464,6 +464,37 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    @PostMapping(value = "/multipleRemoveCaseIdsMidEventValidation", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "validates if single cases are right on the multiple creation.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = MultipleCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<MultipleCallbackResponse> multipleRemoveCaseIdsMidEventValidation(
+            @RequestBody MultipleRequest multipleRequest,
+            @RequestHeader("Authorization") String userToken) {
+        log.info("MULTIPLE REMOVE CASES MID EVENT VALIDATION ---> "
+                + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        List<String> errors = new ArrayList<>();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
+
+        multipleCreationMidEventValidationService.multipleRemoveCasesValidationLogic(
+                userToken, multipleDetails, errors);
+
+        return getMultipleCallbackRespEntity(errors, multipleDetails);
+    }
+
     @PostMapping(value = "/multipleAmendCaseIdsMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates if single cases are right on the multiple amend case ids.")
     @ApiResponses(value = {

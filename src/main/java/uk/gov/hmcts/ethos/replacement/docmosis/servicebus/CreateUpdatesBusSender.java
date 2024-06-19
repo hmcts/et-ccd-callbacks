@@ -74,7 +74,12 @@ public class CreateUpdatesBusSender {
 
     private void sendMessageToDbQueue(CreateUpdatesDto createUpdatesDto, DataModelParent dataModelParent,
             String updateSize) {
-        log.info("Started sending messages to work table");
+        log.error("Started sending messages to work table");
+
+        log.error("\\/\\/\\/\\/\\" + createUpdatesDto.toString());
+        log.error("\\/\\/\\/\\/\\" + dataModelParent.toString());
+        log.error("\\/\\/\\/\\/\\" + chunkSize);
+        log.error("\\/\\/\\/\\/\\" + updateSize);
 
         List<CreateUpdatesMsg> createUpdatesMsgList = CreateUpdatesHelper.getCreateUpdatesMessagesCollection(
                 createUpdatesDto,
@@ -82,8 +87,13 @@ public class CreateUpdatesBusSender {
                 chunkSize,
                 updateSize);
 
+        log.error("\\/\\/\\/\\/\\Created messages: " + createUpdatesMsgList.size());
+
         try (Connection conn = dataSource.getConnection()) {
-            createUpdatesMsgList.forEach(msg -> sendMessage(conn, msg));
+            createUpdatesMsgList.forEach(msg -> {
+                log.error("\\/\\/\\/\\/\\" + msg.toString());
+                sendMessage(conn, msg); 
+            });
         } catch (SQLException ex) {
             log.error(ex.getMessage());
         }

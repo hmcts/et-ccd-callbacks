@@ -179,19 +179,22 @@ public class MultipleCreationService {
             }
         }
 
+        printDebug("multipleDetails", multipleData);
+
         CreateUpdatesDto createUpdatesDto = CreateUpdatesDto.builder()
             .caseTypeId(multipleCaseTypeId)
             .jurisdiction(multipleDetails.getJurisdiction())
             .multipleRef(multipleDetails.getCaseId())
-            .ethosCaseRefCollection(List.of())
+            .ethosCaseRefCollection(List.of(cases.get(0).getCaseData().getEthosCaseReference()))
             .build();
 
         DataModelParent legalRepDto = LegalRepDataModel.builder()
             .legalRepIdsByCase(legalRepsByCaseId)
             .caseType(multipleCaseTypeId)
-            .multipleReference(multipleDetails.getCaseId())
+            .multipleName(multipleDetails.getCaseData().getMultipleName())
             .build();
 
+        log.error("\\/\\/\\/\\/\\Creating data for message queue message");
         createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, legalRepDto, List.of(cases.get(0).getCaseData().getEthosCaseReference()), "1");
     }
 

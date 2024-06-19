@@ -301,7 +301,7 @@ public class ExcelActionsController {
     })
     public ResponseEntity<MultipleCallbackResponse> batchUpdate(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("BATCH UPDATE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

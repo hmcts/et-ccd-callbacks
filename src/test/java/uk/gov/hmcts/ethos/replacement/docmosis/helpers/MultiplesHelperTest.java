@@ -132,7 +132,7 @@ class MultiplesHelperTest {
 
     @Test
     void getCaseIdsForMidEvent_Empty() {
-        createCaseIdCollection(multipleData, 0);
+        multipleData.setCaseIdCollection(createCaseIdCollection(0));
 
         List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
 
@@ -142,7 +142,7 @@ class MultiplesHelperTest {
 
     @Test
     void getCaseIdsForMidEvent() {
-        createCaseIdCollection(multipleData, 10);
+        multipleData.setCaseIdCollection(createCaseIdCollection(10));
 
         List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
 
@@ -150,19 +150,47 @@ class MultiplesHelperTest {
         assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]", caseIdList.toString());
     }
 
-    private void createCaseIdCollection(MultipleData multipleData, int numberCases) {
+    @Test
+    void getCaseIdsFromCollection_Null() {
+        multipleData.setAltCaseIdCollection(null);
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsFromCollection(multipleData.getAltCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsFromCollection_Empty() {
+        multipleData.setAltCaseIdCollection(createCaseIdCollection(0));
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsFromCollection(multipleData.getAltCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsFromCollection() {
+        multipleData.setAltCaseIdCollection(createCaseIdCollection(10));
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsFromCollection(multipleData.getAltCaseIdCollection());
+
+        assertEquals(10, caseIdList.size());
+        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]", caseIdList.toString());
+    }
+
+    private List<CaseIdTypeItem> createCaseIdCollection(int numberCases) {
         List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
 
         for (int i = 0; i < numberCases; i++) {
             caseIdCollection.add(createCaseIdTypeItem(String.valueOf(i), String.valueOf(i)));
         }
 
-        multipleData.setCaseIdCollection(caseIdCollection);
-
+        return caseIdCollection;
     }
 
     private CaseIdTypeItem createCaseIdTypeItem(String id, String value) {
-
         CaseType caseType = new CaseType();
         caseType.setEthosCaseReference(value);
 
@@ -170,6 +198,5 @@ class MultiplesHelperTest {
         caseIdTypeItem.setId(id);
         caseIdTypeItem.setValue(caseType);
         return caseIdTypeItem;
-
     }
 }

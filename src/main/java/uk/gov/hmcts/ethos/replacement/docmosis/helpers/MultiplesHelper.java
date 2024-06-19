@@ -51,9 +51,7 @@ public final class MultiplesHelper {
     }
 
     public static List<String> getCaseIds(MultipleData multipleData) {
-
         if (collectionNotNullOrEmpty(multipleData.getCaseIdCollection())) {
-
             return multipleData.getCaseIdCollection().stream()
                     .filter(key -> key.getId() != null && !key.getId().equals("null"))
                     .map(caseId -> caseId.getValue().getEthosCaseReference())
@@ -61,10 +59,20 @@ public final class MultiplesHelper {
                     .collect(Collectors.toList());
 
         } else {
-
             return new ArrayList<>();
-
         }
+    }
+
+    public static List<String> getCaseIdsFromCollection(List<CaseIdTypeItem> caseIdCollection) {
+        if (!collectionNotNullOrEmpty(caseIdCollection)) {
+            return new ArrayList<>();
+        }
+
+        return caseIdCollection.stream()
+                .filter(key -> key.getId() != null && !key.getId().equals("null"))
+                .map(caseId -> caseId.getValue().getEthosCaseReference())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     // MID EVENTS COLLECTIONS HAVE KEY AS NULL BUT WITH VALUES!

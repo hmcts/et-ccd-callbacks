@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 
-@Slf4j
 @Service
 public class FeatureToggleService {
 
@@ -18,10 +17,6 @@ public class FeatureToggleService {
 
     public boolean isFeatureEnabled(String feature) {
         return this.featureToggleApi.isFeatureEnabled(feature);
-    }
-
-    public boolean isMultiplesDBEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("muldb");
     }
 
     public boolean isGlobalSearchEnabled() {

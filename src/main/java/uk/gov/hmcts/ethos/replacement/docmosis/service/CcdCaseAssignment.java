@@ -105,7 +105,7 @@ public class CcdCaseAssignment {
         if (!YES.equals(caseDetails.getCaseData().getMultipleFlag())) {
             return;
         }
-        
+
         String adminUserToken = adminUserService.getAdminUserToken();
         String caseId = caseDetails.getCaseId();
         String userToAddId = getEventTriggerUserId(adminUserToken, caseId);

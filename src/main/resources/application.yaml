@@ -74,7 +74,6 @@ feature:
     enabled: 'false'
 
 queue:
-  chunkSize: 500
   create-updates:
     queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
     send:

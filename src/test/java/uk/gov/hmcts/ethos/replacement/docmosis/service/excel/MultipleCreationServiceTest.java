@@ -9,6 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 
@@ -42,6 +44,8 @@ class MultipleCreationServiceTest {
     private CaseManagementLocationService caseManagementLocationService;
     @Mock
     FeatureToggleService featureToggleService;
+    @Mock
+    private AdminUserService adminUserService;
 
     @InjectMocks
     private MultipleCreationService multipleCreationService;
@@ -53,6 +57,7 @@ class MultipleCreationServiceTest {
     @BeforeEach
     public void setUp() {
         multipleDetails = new MultipleDetails();
+        multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         ethosCaseRefCollection = MultiplesHelper.getCaseIds(multipleDetails.getCaseData());
 

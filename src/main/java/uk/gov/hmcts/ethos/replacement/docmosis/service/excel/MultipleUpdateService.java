@@ -25,7 +25,8 @@ public class MultipleUpdateService {
     private final MultipleBatchUpdate2Service multipleBatchUpdate2Service;
     private final MultipleBatchUpdate3Service multipleBatchUpdate3Service;
 
-    public void bulkUpdateLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) throws IOException {
+    public void bulkUpdateLogic(String userToken, MultipleDetails multipleDetails, List<String> errors)
+        throws IOException {
 
         log.info("Read excel to update logic");
 

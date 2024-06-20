@@ -1,32 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.LegalRepDataModel;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.et.common.model.ccd.types.SubCaseLegalRepDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
@@ -38,26 +26,22 @@ import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
@@ -86,7 +70,8 @@ public class MultipleCreationService {
     private final AuthTokenGenerator authTokenGenerator;
     private final CreateUpdatesBusSender createUpdatesBusSender;
 
-    public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) throws IOException {
+    public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors)
+        throws IOException {
 
         log.info("Add data to the multiple");
 
@@ -109,7 +94,9 @@ public class MultipleCreationService {
         log.info("Get lead case link and add to the collection case Ids");
 
         setLeadMarkUpAndAddLeadToCaseIds(userToken, multipleDetails);
-        addLegalRepsFromSinglesCases(multipleDetails);
+        if (featureToggleService.isMul2Enabled()) {
+            addLegalRepsFromSinglesCases(multipleDetails);
+        }
 
         if (multipleData.getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
                 || multipleData.getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
@@ -159,11 +146,11 @@ public class MultipleCreationService {
             .flatMap(o -> o.getBody().getUsers().stream())
             .collect(Collectors.toList());
 
-        HashMap<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
+        Map<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
         printDebug("emails", emails);
-        HashMap<String, String> legalrepMap = buildEmailIdMap(users);
+        Map<String, String> legalrepMap = buildEmailIdMap(users);
         printDebug("legalrepMap", legalrepMap);
-        HashMap<Long, String> caseIdsMap = buildCaseIdsMap(cases);
+        Map<Long, String> caseIdsMap = buildCaseIdsMap(cases);
         printDebug("caseIdsMap", caseIdsMap);
 
         HashMap<String, List<String>> legalRepsByCaseId = new HashMap<>();
@@ -172,7 +159,7 @@ public class MultipleCreationService {
             
             legalRepsByCaseId.put(byCase.getKey().toString(), new ArrayList<>());
 
-            for (String userEmail : byCase.getValue()){
+            for (String userEmail : byCase.getValue()) {
                 String legalRepId = legalrepMap.get(userEmail);
 
                 legalRepsByCaseId.get(byCase.getKey().toString()).add(legalRepId);
@@ -180,12 +167,13 @@ public class MultipleCreationService {
         }
 
         printDebug("multipleDetails", multipleData);
+        var ethosList = List.of(cases.get(0).getCaseData().getEthosCaseReference());
 
         CreateUpdatesDto createUpdatesDto = CreateUpdatesDto.builder()
             .caseTypeId(multipleCaseTypeId)
             .jurisdiction(multipleDetails.getJurisdiction())
             .multipleRef(multipleDetails.getCaseId())
-            .ethosCaseRefCollection(List.of(cases.get(0).getCaseData().getEthosCaseReference()))
+            .ethosCaseRefCollection(ethosList)
             .build();
 
         DataModelParent legalRepDto = LegalRepDataModel.builder()
@@ -194,11 +182,10 @@ public class MultipleCreationService {
             .multipleName(multipleDetails.getCaseData().getMultipleName())
             .build();
 
-        log.error("\\/\\/\\/\\/\\Creating data for message queue message");
-        createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, legalRepDto, List.of(cases.get(0).getCaseData().getEthosCaseReference()), "1");
+        createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, legalRepDto, ethosList, "1");
     }
 
-    private HashMap<Long, String> buildCaseIdsMap(List<SubmitEvent> cases) {
+    private Map<Long, String> buildCaseIdsMap(List<SubmitEvent> cases) {
         HashMap<Long, String> caseIds = new HashMap<>();
         for (SubmitEvent event : cases) {
             caseIds.put(event.getCaseId(), event.getCaseData().getEthosCaseReference());
@@ -206,7 +193,7 @@ public class MultipleCreationService {
         return caseIds;
     }
 
-    private HashMap<String, String> buildEmailIdMap(List<OrganisationUsersIdamUser> users) {
+    private Map<String, String> buildEmailIdMap(List<OrganisationUsersIdamUser> users) {
         HashMap<String, String> emailIdMap = new HashMap<>();
         for (OrganisationUsersIdamUser user : users) {
             emailIdMap.put(user.getEmail(), user.getUserIdentifier());
@@ -214,14 +201,14 @@ public class MultipleCreationService {
         return emailIdMap;
     }
 
-    private HashMap<Long, List<String>> getUniqueLegalRepEmails(List<SubmitEvent> cases) {
+    private Map<Long, List<String>> getUniqueLegalRepEmails(List<SubmitEvent> cases) {
         HashMap<Long, List<String>> caseRepEmails = new HashMap<Long, List<String>>();
 
         for (SubmitEvent caseData : cases) {
             List<String> repEmails = caseData.getCaseData().getRepCollection().stream()
-               .map(o -> o.getValue().getRepresentativeEmailAddress())
-               .filter(Objects::nonNull)
-               .collect(Collectors.toList());
+                .map(o -> o.getValue().getRepresentativeEmailAddress())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
             caseRepEmails.put(caseData.getCaseId(), repEmails);
         }

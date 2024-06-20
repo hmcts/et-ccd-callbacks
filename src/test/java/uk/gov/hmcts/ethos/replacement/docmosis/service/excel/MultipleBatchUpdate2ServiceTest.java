@@ -28,6 +28,8 @@ import java.util.TreeMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -89,7 +91,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicDetachCases() {
+    void batchUpdate2LogicDetachCases() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -108,7 +110,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicDetachCasesEmptyNewLeadCase() {
+    void batchUpdate2LogicDetachCasesEmptyNewLeadCase() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -126,7 +128,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicSameMultipleEmptySubMultiple() {
+    void batchUpdate2LogicSameMultipleEmptySubMultiple() throws IOException {
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
@@ -135,7 +137,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicSameMultipleWithSubMultiple() {
+    void batchUpdate2LogicSameMultipleWithSubMultiple() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
@@ -152,7 +154,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicDifferentEmptyMultiple() {
+    void batchUpdate2LogicDifferentEmptyMultiple() throws IOException {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -176,7 +178,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicDifferentMultipleEmptySubMultiple() {
+    void batchUpdate2LogicDifferentMultipleEmptySubMultiple() throws IOException {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -201,7 +203,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicDifferentMultipleWithSubMultiple() {
+    void batchUpdate2LogicDifferentMultipleWithSubMultiple() throws IOException {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -483,7 +485,7 @@ class MultipleBatchUpdate2ServiceTest {
 
     private void checkAndThrowException(MultipleBatchUpdate2Service service,
                                         String userToken,
-                                        MultipleDetails multipleDetails) throws CaseCreationException {
+                                        MultipleDetails multipleDetails) throws CaseCreationException, IOException {
         service.batchUpdate2Logic(userToken, multipleDetails, new ArrayList<>(),
                 multipleObjectsFlags);
         if (multipleDetails.getCaseData().getLegalRepCollection().size() != 4) {

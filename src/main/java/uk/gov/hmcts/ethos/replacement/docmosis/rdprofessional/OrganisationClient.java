@@ -11,7 +11,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi.SERVICE_AUTHORIZATION;

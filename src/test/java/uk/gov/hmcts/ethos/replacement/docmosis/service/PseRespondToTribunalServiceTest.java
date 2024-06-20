@@ -465,7 +465,7 @@ class PseRespondToTribunalServiceTest {
 
         assertEquals("0", notificationType.getSendNotificationResponsesCount());
 
-        pseRespondToTribService.addRespondentResponseToJON(caseData);
+        pseRespondToTribService.addRespondentResponseToJON(caseData, "token");
 
         PseResponseType savedResponse = notificationType.getRespondCollection().get(0).getValue();
 

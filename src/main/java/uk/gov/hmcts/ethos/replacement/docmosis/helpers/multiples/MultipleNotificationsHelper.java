@@ -7,6 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.DateUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGroup;
@@ -45,13 +46,24 @@ public final class MultipleNotificationsHelper {
                 // Filter notifications sent from the multiple
                 if (StringUtils.isNotEmpty(notification.getNotificationSentFrom())
                         && notification.getNotificationSentFrom().equals(multipleRef)) {
-                    String responseReceived = isEmpty(notification.getRespondCollection()) ? NO : YES;
+
+                    String responseReceived;
+                    List<PseResponseTypeItem> responses;
+                    if (isEmpty(notification.getRespondCollection())) {
+                        responseReceived = NO;
+                        responses = new ArrayList<>();
+                    } else {
+                        responseReceived = YES;
+                        responses = notification.getRespondCollection();
+                    }
+
                     notificationGroups.add(NotificationGroup.builder()
                             .caseNumber(schedulePayload.getEthosCaseRef())
                             .date(notification.getDate())
                             .responseReceived(responseReceived)
                             .notificationTitle(notification.getSendNotificationTitle())
                             .notificationSubjectString(notification.getSendNotificationSubjectString())
+                            .respondCollection(responses)
                             .build()
                     );
                 }

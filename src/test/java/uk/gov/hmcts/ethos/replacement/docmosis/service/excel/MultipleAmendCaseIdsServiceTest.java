@@ -16,14 +16,20 @@ import java.util.List;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 class MultipleAmendCaseIdsServiceTest {
 
-    @Mock
-    private MultipleHelperService multipleHelperService;
     @InjectMocks
     private MultipleAmendCaseIdsService multipleAmendCaseIdsService;
+
+    @Mock
+    private MultipleHelperService multipleHelperService;
 
     private TreeMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
@@ -39,23 +45,49 @@ class MultipleAmendCaseIdsServiceTest {
 
     @Test
     void bulkAmendCaseIdsLogic() {
-        List<MultipleObject> multipleObjectList = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(userToken,
-                multipleDetails,
-                new ArrayList<>(),
-                multipleObjects);
+        List<MultipleObject> multipleObjectList =
+                multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(
+                        userToken,
+                        multipleDetails,
+                        new ArrayList<>(),
+                        multipleObjects);
 
+        verify(multipleHelperService, times(1))
+                .sendUpdatesToSinglesLogic(any(), any(), any(), eq("21006/2020"), any(), any());
         assertEquals(multipleObjectList, getMultipleObjectsList());
     }
 
     @Test
-    void bulkAmendCaseIdsLogicEmptyLead() {
+    void bulkAmendCaseIdsLogic_EmptyLead() {
         multipleDetails.getCaseData().setLeadCase(null);
-        List<MultipleObject>  multipleObjectList = multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(userToken,
-                multipleDetails,
-                new ArrayList<>(),
-                multipleObjects);
+        List<MultipleObject>  multipleObjectList =
+                multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(
+                        userToken,
+                        multipleDetails,
+                        new ArrayList<>(),
+                        multipleObjects);
 
+        verify(multipleHelperService, times(1))
+                .sendUpdatesToSinglesLogic(any(), any(), any(), eq("245000/2020"), any(), any());
         assertEquals(multipleObjectList, getMultipleObjectsList());
+    }
+
+    @Test
+    void bulkAmendCaseIdsLogic_EmptyCaseIdCollection() {
+        multipleDetails.getCaseData().setCaseIdCollection(null);
+        List<MultipleObject>  multipleObjectList =
+                multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(
+                        userToken,
+                        multipleDetails,
+                        new ArrayList<>(),
+                        multipleObjects);
+
+        verify(multipleHelperService, never())
+                .sendUpdatesToSinglesLogic(any(), any(), any(), any(), any(), any());
+
+        List<MultipleObject> expectedList = getMultipleObjectsList();
+        expectedList.remove(1);
+        assertEquals(multipleObjectList, expectedList);
     }
 
     private List<MultipleObject> getMultipleObjectsList() {

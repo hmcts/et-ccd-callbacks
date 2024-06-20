@@ -10,7 +10,9 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -36,7 +38,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.HEADER_1;
+import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.NEW_LINE_CELL;
+import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.REPLIES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.RESPONSE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
@@ -48,7 +53,8 @@ public class NotificationsExcelReportService {
     public static final String DATE_FORMAT = "dd-MMM-yyyy HH:mm:ss";
     private static final String FILE_NAME = "notifications_extract.xlsx";
     private static final String BINARY = "/binary";
-    private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, RESPONSE));
+    private static final String UNKNOWN = "Unknown";
+    private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, RESPONSE, REPLIES));
     private final ExcelReadingService excelReadingService;
     private final NotificationScheduleService notificationScheduleService;
     private final DocumentManagementService documentManagementService;
@@ -121,6 +127,8 @@ public class NotificationsExcelReportService {
                 .documentBinaryUrl(documentSelfPath + BINARY)
                 .build();
 
+        log.warn("Doc url - {}", uploadedDocumentType.getDocumentBinaryUrl());
+
         if (multipleData.getNotificationsExtract() == null) {
             multipleData.setNotificationsExtract(new NotificationsExtract());
         }
@@ -174,9 +182,30 @@ public class NotificationsExcelReportService {
                 createCell(row, columnIndex, notificationGroup.getCaseNumber(), cellStyle);
                 columnIndex++;
                 createCell(row, columnIndex, notificationGroup.getResponseReceived(), cellStyle);
+                columnIndex++;
+                createCell(row, columnIndex, getFormattedReplies(notificationGroup.getRespondCollection()), cellStyle);
                 rowIndex[0]++;
             }
         }
+    }
+
+    private String getFormattedReplies(List<PseResponseTypeItem> respondCollection) {
+        if (respondCollection.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (PseResponseTypeItem pseResponseTypeItem : respondCollection) {
+            PseResponseType response = pseResponseTypeItem.getValue();
+            String name = isNotEmpty(response.getAuthor()) ? response.getAuthor() : UNKNOWN;
+            sb.append("Reply: ").append(response.getResponse())
+                    .append(NEW_LINE_CELL)
+                    .append("Name: ")
+                    .append(name).append(", ").append(response.getFrom())
+                    .append(NEW_LINE_CELL)
+                    .append("-------------")
+                    .append(NEW_LINE_CELL);
+        }
+        return sb.toString();
     }
 
     private void setSectionHeaders(XSSFWorkbook workbook,

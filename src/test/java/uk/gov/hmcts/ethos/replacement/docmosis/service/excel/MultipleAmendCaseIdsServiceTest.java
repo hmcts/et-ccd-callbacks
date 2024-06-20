@@ -6,14 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +28,8 @@ class MultipleAmendCaseIdsServiceTest {
 
     @Mock
     private MultipleHelperService multipleHelperService;
+    @Mock
+    private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
 
     private TreeMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
@@ -38,9 +38,48 @@ class MultipleAmendCaseIdsServiceTest {
     @BeforeEach
     public void setUp() {
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
+
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
+
         userToken = "authString";
+    }
+
+    @Test
+    void bulkRemoveCaseIdsLogic() {
+        List<CaseIdTypeItem> altCaseIdCollection = new ArrayList<>();
+        altCaseIdCollection.add(CaseIdTypeItem.from("245000/2020"));
+        multipleDetails.getCaseData().setAltCaseIdCollection(altCaseIdCollection);
+
+        multipleAmendCaseIdsService.bulkRemoveCaseIdsLogic(
+                userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjects);
+
+        verify(multipleBatchUpdate2Service, times(1))
+                .removeCasesFromCurrentMultiple(any(), any(), any(), eq(List.of("245000/2020")));
+
+        SortedMap<String, Object> expectedRemoveMultipleObjects = new TreeMap<>();
+        expectedRemoveMultipleObjects.put("245000/2020", multipleObjects.get("245000/2020"));
+        verify(multipleHelperService, times(1))
+                .sendDetachUpdatesToSinglesWithoutConfirmation(any(), any(), any(), eq(expectedRemoveMultipleObjects));
+    }
+
+    @Test
+    void bulkRemoveCaseIdsLogic_EmptyList() {
+        multipleDetails.getCaseData().setAltCaseIdCollection(null);
+
+        multipleAmendCaseIdsService.bulkRemoveCaseIdsLogic(
+                userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjects);
+
+        verify(multipleBatchUpdate2Service, never())
+                .removeCasesFromCurrentMultiple(any(), any(), any(), any());
+        verify(multipleHelperService, never())
+                .sendDetachUpdatesToSinglesWithoutConfirmation(any(), any(), any(), any());
     }
 
     @Test

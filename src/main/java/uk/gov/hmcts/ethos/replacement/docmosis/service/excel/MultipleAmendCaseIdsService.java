@@ -9,8 +9,11 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -20,10 +23,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class MultipleAmendCaseIdsService {
 
     private final MultipleHelperService multipleHelperService;
+    private final MultipleBatchUpdate2Service multipleBatchUpdate2Service;
 
     @Autowired
-    public MultipleAmendCaseIdsService(MultipleHelperService multipleHelperService) {
+    public MultipleAmendCaseIdsService(MultipleHelperService multipleHelperService,
+                                       MultipleBatchUpdate2Service multipleBatchUpdate2Service) {
         this.multipleHelperService = multipleHelperService;
+        this.multipleBatchUpdate2Service = multipleBatchUpdate2Service;
     }
 
     public List<MultipleObject> bulkAmendCaseIdsLogic(String userToken,
@@ -40,7 +46,7 @@ public class MultipleAmendCaseIdsService {
 
         if (!newEthosCaseRefCollection.isEmpty()) {
             log.info("Updating {} singles of multiple with reference {} ",
-                    newEthosCaseRefCollection.size(), 
+                    newEthosCaseRefCollection.size(),
                     multipleData.getMultipleReference());
 
             multipleHelperService.sendUpdatesToSinglesLogic(userToken, multipleDetails, errors, multipleLeadCase,
@@ -48,6 +54,36 @@ public class MultipleAmendCaseIdsService {
         }
 
         return generateMultipleObjects(unionLists, multipleObjects);
+    }
+
+    public void bulkRemoveCaseIdsLogic(String userToken,
+                                       MultipleDetails multipleDetails,
+                                       List<String> errors,
+                                       SortedMap<String, Object> allMultipleObjects) {
+        List<String> toBeRemovedEthosCaseRefCollection =
+                MultiplesHelper.getCaseIdsFromCollection(multipleDetails.getCaseData().getAltCaseIdCollection());
+
+        if (!toBeRemovedEthosCaseRefCollection.isEmpty()) {
+            multipleBatchUpdate2Service.removeCasesFromCurrentMultiple(
+                    userToken, multipleDetails, errors, toBeRemovedEthosCaseRefCollection);
+
+            SortedMap<String, Object> removedMultipleObjects =
+                    getMultipleObjectsToRemove(allMultipleObjects, toBeRemovedEthosCaseRefCollection);
+
+            log.info("Sending detach updates to singles");
+            multipleHelperService.sendDetachUpdatesToSinglesWithoutConfirmation(
+                    userToken, multipleDetails, errors, removedMultipleObjects);
+        }
+    }
+
+    private SortedMap<String, Object> getMultipleObjectsToRemove(SortedMap<String, Object> allMultipleObjects,
+                                                                 List<String> toBeRemovedList) {
+        SortedMap<String, Object> multipleObjectsToRemove = new TreeMap<>(allMultipleObjects);
+
+        Set<String> toBeRemovedSet = new HashSet<>(toBeRemovedList);
+        multipleObjectsToRemove.entrySet().removeIf(entry -> !toBeRemovedSet.contains(entry.getKey()));
+
+        return multipleObjectsToRemove;
     }
 
     private String getCurrentLead(MultipleData multipleData, String newLead) {

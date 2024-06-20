@@ -19,12 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADD_CASES_TO_MULTIPLE_AMENDMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LEAD_CASE_AMENDMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REMOVE_CASES_FROM_MULTIPLE_AMENDMENT;
 
 @ExtendWith(SpringExtension.class)
 class MultipleAmendServiceTest {
@@ -43,44 +45,143 @@ class MultipleAmendServiceTest {
     private TreeMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
     private String userToken;
-    private List<String> typeOfAmendmentMSL;
+    private List<String> errors;
 
     @BeforeEach
     public void setUp() {
-        typeOfAmendmentMSL = new ArrayList<>(Arrays.asList(LEAD_CASE_AMENDMENT, ADD_CASES_TO_MULTIPLE_AMENDMENT));
+        userToken = "authString";
+        errors = new ArrayList<>();
+
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
+
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
-        userToken = "authString";
     }
 
     @Test
     void bulkAmendMultipleLogic_AllTypes() {
-        multipleDetails.getCaseData().setTypeOfAmendmentMSL(typeOfAmendmentMSL);
+        multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(
+                LEAD_CASE_AMENDMENT,
+                ADD_CASES_TO_MULTIPLE_AMENDMENT,
+                REMOVE_CASES_FROM_MULTIPLE_AMENDMENT));
+
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
+        when(multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(anyString(), any(), anyList(), any()))
+                .thenReturn(getMultipleObjectsListFromLeadService());
         when(multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(anyString(), any(), anyList(), any()))
-                .thenReturn(getMultipleObjectsList());
+                .thenReturn(getMultipleObjectsListFromAmendService());
 
-        multipleAmendService.bulkAmendMultipleLogic(userToken,
-                multipleDetails,
-                new ArrayList<>());
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
 
         assertNull(multipleDetails.getCaseData().getAmendLeadCase());
         assertNull(multipleDetails.getCaseData().getCaseIdCollection());
         assertNull(multipleDetails.getCaseData().getTypeOfAmendmentMSL());
+        assertNull(multipleDetails.getCaseData().getAltCaseIdCollection());
 
         verify(multipleAmendLeadCaseService, times(1))
                 .bulkAmendLeadCaseLogic(any(), any(), any(), any());
         verify(multipleAmendCaseIdsService, times(1))
                 .bulkAmendCaseIdsLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, times(1))
+                .bulkRemoveCaseIdsLogic(any(), any(), any(), any());
         verify(excelDocManagementService, times(1))
-                .generateAndUploadExcel(getMultipleObjectsList(), userToken, multipleDetails);
+                .generateAndUploadExcel(getMultipleObjectsListFromAmendService(), userToken, multipleDetails);
         verifyNoMoreInteractions(excelDocManagementService);
     }
 
+    @Test
+    void bulkAmendMultipleLogic_WithErrors() {
+        errors.add("Oh No!");
+        multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(LEAD_CASE_AMENDMENT));
+
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+        when(multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(anyString(), any(), anyList(), any()))
+                .thenReturn(getMultipleObjectsListFromLeadService());
+
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
+
+        assertNull(multipleDetails.getCaseData().getAmendLeadCase());
+        assertNull(multipleDetails.getCaseData().getCaseIdCollection());
+        assertNull(multipleDetails.getCaseData().getTypeOfAmendmentMSL());
+        assertNull(multipleDetails.getCaseData().getAltCaseIdCollection());
+
+        verify(multipleAmendLeadCaseService, times(1))
+                .bulkAmendLeadCaseLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, never())
+                .bulkAmendCaseIdsLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, never())
+                .bulkRemoveCaseIdsLogic(any(), any(), any(), any());
+        verify(excelDocManagementService, never())
+                .generateAndUploadExcel(getMultipleObjectsListFromLeadService(), userToken, multipleDetails);
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @Test
+    void bulkAmendMultipleLogic_LeadCase() {
+        multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(LEAD_CASE_AMENDMENT));
+
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+        when(multipleAmendLeadCaseService.bulkAmendLeadCaseLogic(anyString(), any(), anyList(), any()))
+                .thenReturn(getMultipleObjectsListFromLeadService());
+
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
+
+        assertNull(multipleDetails.getCaseData().getAmendLeadCase());
+        assertNull(multipleDetails.getCaseData().getCaseIdCollection());
+        assertNull(multipleDetails.getCaseData().getTypeOfAmendmentMSL());
+        assertNull(multipleDetails.getCaseData().getAltCaseIdCollection());
+
+        verify(multipleAmendLeadCaseService, times(1))
+                .bulkAmendLeadCaseLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, never())
+                .bulkAmendCaseIdsLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, never())
+                .bulkRemoveCaseIdsLogic(any(), any(), any(), any());
+        verify(excelDocManagementService, times(1))
+                .generateAndUploadExcel(getMultipleObjectsListFromLeadService(), userToken, multipleDetails);
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @Test
+    void bulkAmendMultipleLogic_AddCases() {
+        multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(ADD_CASES_TO_MULTIPLE_AMENDMENT));
+
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+        when(multipleAmendCaseIdsService.bulkAmendCaseIdsLogic(anyString(), any(), anyList(), any()))
+                .thenReturn(getMultipleObjectsListFromAmendService());
+
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
+
+        assertNull(multipleDetails.getCaseData().getAmendLeadCase());
+        assertNull(multipleDetails.getCaseData().getCaseIdCollection());
+        assertNull(multipleDetails.getCaseData().getTypeOfAmendmentMSL());
+        assertNull(multipleDetails.getCaseData().getAltCaseIdCollection());
+
+        verify(multipleAmendLeadCaseService, never())
+                .bulkAmendLeadCaseLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, times(1))
+                .bulkAmendCaseIdsLogic(any(), any(), any(), any());
+        verify(multipleAmendCaseIdsService, never())
+                .bulkRemoveCaseIdsLogic(any(), any(), any(), any());
+        verify(excelDocManagementService, times(1))
+                .generateAndUploadExcel(getMultipleObjectsListFromAmendService(), userToken, multipleDetails);
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    private List<Object> getMultipleObjectsListFromLeadService() {
+        return new ArrayList<>(getMultipleObjectsList());
+    }
+
+    private List<MultipleObject> getMultipleObjectsListFromAmendService() {
+        return new ArrayList<>(getMultipleObjectsList());
+    }
+
     private List<MultipleObject> getMultipleObjectsList() {
-        return new ArrayList<>(Arrays.asList(
+        return Arrays.asList(
                 MultipleObject.builder()
                         .subMultiple("245000")
                         .ethosCaseRef("245000/2020")
@@ -120,7 +221,6 @@ class MultipleAmendServiceTest {
                         .flag2("BB")
                         .flag3("")
                         .flag4("")
-                        .build()));
+                        .build());
     }
-
 }

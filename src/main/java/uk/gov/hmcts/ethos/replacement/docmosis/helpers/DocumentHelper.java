@@ -118,14 +118,14 @@ public final class DocumentHelper {
         INITIAL_CONSIDERATION,
         APP_FOR_A_WITNESS_ORDER_C,
         REFERRAL_JUDICIAL_DIRECTION,
+        "Referral/Judicial direction",
         COT3,
         OTHER,
         REJECTION_OF_CLAIM,
         "Rejection of Claim",
         CLAIM_REJECTED,
         CONTACT_THE_TRIBUNAL_C,
-        TRIBUNAL_CASE_FILE,
-        "Referral/Judicial direction"
+        TRIBUNAL_CASE_FILE
     );
     private static final List<String> RESPONDENT_APPLICATION_DOC_TYPE = List.of(
         APP_TO_AMEND_RESPONSE,

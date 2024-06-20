@@ -46,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
@@ -60,6 +61,39 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_WITNESS_ORDER_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_WITNESS_ORDER_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_C_TO_DO_SOMETHING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_R_TO_DO_SOMETHING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CHANGE_OF_PARTYS_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIM_REJECTED;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.COT3;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.C_HAS_NOT_COMPLIED_WITH_AN_ORDER_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_PROCESSING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.OTHER;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REFERRAL_JUDICIAL_DIRECTION;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_OF_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.R_HAS_NOT_COMPLIED_WITH_AN_ORDER_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ALL_OR_PART_CLAIM;
 import static uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem.fromUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
@@ -78,6 +112,50 @@ public final class DocumentHelper {
     public static final String HEARING_TIME = "\"Hearing_time\":\"";
     public static final String HEARING_DATE_TIME = "\"Hearing_date_time\":\"";
     public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
+    public static final List<String> HIDDEN_DOCUMENT_TYPES = List.of(
+        ET1_VETTING,
+        ET3_PROCESSING,
+        INITIAL_CONSIDERATION,
+        APP_FOR_A_WITNESS_ORDER_C,
+        REFERRAL_JUDICIAL_DIRECTION,
+        COT3,
+        OTHER,
+        REJECTION_OF_CLAIM,
+        "Rejection of Claim",
+        CLAIM_REJECTED,
+        CONTACT_THE_TRIBUNAL_C,
+        TRIBUNAL_CASE_FILE,
+        "Referral/Judicial direction"
+    );
+    private static final List<String> RESPONDENT_APPLICATION_DOC_TYPE = List.of(
+        APP_TO_AMEND_RESPONSE,
+        CHANGE_OF_PARTYS_DETAILS,
+        C_HAS_NOT_COMPLIED_WITH_AN_ORDER_R,
+        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R,
+        CONTACT_THE_TRIBUNAL_R,
+        APP_TO_ORDER_THE_C_TO_DO_SOMETHING,
+        APP_FOR_A_WITNESS_ORDER_R,
+        APP_TO_POSTPONE_R,
+        APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_R,
+        APP_TO_RESTRICT_PUBLICITY_R,
+        APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM,
+        APP_TO_VARY_OR_REVOKE_AN_ORDER_R
+    );
+    private static final List<String> CLAIMANT_APPLICATION_DOC_TYPE = List.of(
+        WITHDRAWAL_OF_ALL_OR_PART_CLAIM,
+        CHANGE_OF_PARTYS_DETAILS,
+        APP_TO_POSTPONE_C,
+        APP_TO_VARY_OR_REVOKE_AN_ORDER_C,
+        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C,
+        APP_TO_AMEND_CLAIM,
+        APP_TO_ORDER_THE_R_TO_DO_SOMETHING,
+        APP_FOR_A_WITNESS_ORDER_C,
+        R_HAS_NOT_COMPLIED_WITH_AN_ORDER_C,
+        APP_TO_RESTRICT_PUBLICITY_C,
+        APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE,
+        APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C,
+        CONTACT_THE_TRIBUNAL_C
+    );
 
     private DocumentHelper() {
     }
@@ -1021,25 +1099,32 @@ public final class DocumentHelper {
             return;
         }
 
-        List<String> docTypes = List.of("ET1 Vetting", "ET3 Processing", "Initial Consideration",
-                "App for a Witness Order - C", "Referral/Judicial Direction", "COT3", "Other", "Rejection of Claim",
-                "Claim rejected", "Contact the tribunal about something else - C", "Tribunal case file",
-                "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-                .filter(d -> ObjectUtils.isNotEmpty(d.getValue().getUploadedDocument()))
-                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
-                .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData).contains(
-                d.getValue().getUploadedDocument().getDocumentBinaryUrl())
-            ).toList());
+            .filter(d -> ObjectUtils.isNotEmpty(d.getValue().getUploadedDocument()))
+            .filter(d -> !containsTypeOfDocument(d.getValue()))
+            .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData)
+                .contains(d.getValue().getUploadedDocument().getDocumentBinaryUrl())).toList());
     }
 
-    private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
+    private static boolean containsTypeOfDocument(DocumentType documentType) {
         String typeOfDocument = ObjectUtils.isNotEmpty(documentType.getDocumentType())
-                ? documentType.getDocumentType() : documentType.getTypeOfDocument();
+            ? documentType.getDocumentType()
+            : documentType.getTypeOfDocument();
         if (ObjectUtils.isEmpty(typeOfDocument)) {
             return false;
         }
-        return types.contains(typeOfDocument);
+        return getMergedList().contains(typeOfDocument);
+    }
+
+    private static List<String> getMergedList() {
+        return Stream.of(
+                HIDDEN_DOCUMENT_TYPES,
+                RESPONDENT_APPLICATION_DOC_TYPE,
+                CLAIMANT_APPLICATION_DOC_TYPE
+            )
+            .flatMap(List::stream)
+            .distinct()
+            .toList();
     }
 
     @NotNull
@@ -1103,7 +1188,7 @@ public final class DocumentHelper {
                 throw new IllegalArgumentException("The document number is invalid");
             }
         } else {
-            documentCollection.add(docTypeItem);   
+            documentCollection.add(docTypeItem);
         }
     }
 }

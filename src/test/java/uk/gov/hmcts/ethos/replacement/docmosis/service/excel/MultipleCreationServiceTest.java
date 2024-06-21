@@ -194,7 +194,7 @@ class MultipleCreationServiceTest {
         when(featureToggleService.isMul2Enabled()).thenReturn(true);
 
         SubmitEvent event = new SubmitEvent();
-        event.setCaseId(1718968200);
+        event.setCaseId(1_718_968_200);
         event.setCaseData(new CaseData());
         event.getCaseData().setEthosCaseReference("6000001/2024");
 

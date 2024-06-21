@@ -193,7 +193,7 @@ public class NotificationsExcelReportService {
         if (respondCollection.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(50 * respondCollection.size());
         for (PseResponseTypeItem pseResponseTypeItem : respondCollection) {
             PseResponseType response = pseResponseTypeItem.getValue();
             String name = isNotEmpty(response.getAuthor()) ? response.getAuthor() : UNKNOWN;

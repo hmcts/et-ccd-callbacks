@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,18 +118,21 @@ public class MultipleCreationService {
 
     }
 
-    private void printDebug(String name, Object obj) throws JsonProcessingException {
-        log.error("/\\/\\/\\/\\" + name + "is: " + new ObjectMapper().writeValueAsString(obj));
-    }
-
     private void addLegalRepsFromSinglesCases(MultipleDetails multipleDetails) throws IOException {
-        // Get legalreps from lead case and non lead cases
         MultipleData multipleData = multipleDetails.getCaseData();
         String leadCaseId = multipleData.getLeadCaseId();
         List<String> caseIds = multipleData.getCaseIdCollection().stream()
             .map(o -> o.getValue().getEthosCaseReference())
             .collect(Collectors.toList());
-        caseIds.add(leadCaseId);
+
+        if (!isNullOrEmpty(leadCaseId)) {
+            caseIds.add(leadCaseId);
+        }
+
+        if (caseIds.isEmpty()) {
+            // No cases linked to this multiple means no legal reps to add
+            return;
+        }
 
         String token = adminUserService.getAdminUserToken();
         String multipleCaseTypeId = multipleDetails.getCaseTypeId();
@@ -136,22 +140,16 @@ public class MultipleCreationService {
         
         List<SubmitEvent> cases = ccdClient.retrieveCasesElasticSearch(token, singleCaseTypeId, caseIds);
         log.error("Retrieved {} cases from ES", cases.size());
-        
-        List<String> orgIds = getUniqueOrganisations(cases);
 
-        printDebug("orgIds", orgIds);
+        List<String> orgIds = getUniqueOrganisations(cases);
 
         List<OrganisationUsersIdamUser> users = orgIds.stream()
             .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
             .flatMap(o -> o.getBody().getUsers().stream())
-            .collect(Collectors.toList());
+            .toList();
 
         Map<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
-        printDebug("emails", emails);
         Map<String, String> legalrepMap = buildEmailIdMap(users);
-        printDebug("legalrepMap", legalrepMap);
-        Map<Long, String> caseIdsMap = buildCaseIdsMap(cases);
-        printDebug("caseIdsMap", caseIdsMap);
 
         HashMap<String, List<String>> legalRepsByCaseId = new HashMap<>();
 
@@ -166,7 +164,6 @@ public class MultipleCreationService {
             }
         }
 
-        printDebug("multipleDetails", multipleData);
         var ethosList = List.of(cases.get(0).getCaseData().getEthosCaseReference());
 
         CreateUpdatesDto createUpdatesDto = CreateUpdatesDto.builder()
@@ -185,14 +182,6 @@ public class MultipleCreationService {
         createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, legalRepDto, ethosList, "1");
     }
 
-    private Map<Long, String> buildCaseIdsMap(List<SubmitEvent> cases) {
-        HashMap<Long, String> caseIds = new HashMap<>();
-        for (SubmitEvent event : cases) {
-            caseIds.put(event.getCaseId(), event.getCaseData().getEthosCaseReference());
-        }
-        return caseIds;
-    }
-
     private Map<String, String> buildEmailIdMap(List<OrganisationUsersIdamUser> users) {
         HashMap<String, String> emailIdMap = new HashMap<>();
         for (OrganisationUsersIdamUser user : users) {
@@ -202,13 +191,13 @@ public class MultipleCreationService {
     }
 
     private Map<Long, List<String>> getUniqueLegalRepEmails(List<SubmitEvent> cases) {
-        HashMap<Long, List<String>> caseRepEmails = new HashMap<Long, List<String>>();
+        HashMap<Long, List<String>> caseRepEmails = new HashMap<>();
 
         for (SubmitEvent caseData : cases) {
             List<String> repEmails = caseData.getCaseData().getRepCollection().stream()
                 .map(o -> o.getValue().getRepresentativeEmailAddress())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
             caseRepEmails.put(caseData.getCaseId(), repEmails);
         }
@@ -225,7 +214,7 @@ public class MultipleCreationService {
             .filter(Objects::nonNull)
             .map(o -> o.getOrganisationID())
             .distinct()
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private void multipleCreationUI(String userToken, MultipleDetails multipleDetails, List<String> errors) {

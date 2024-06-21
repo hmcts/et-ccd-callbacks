@@ -379,6 +379,7 @@ public final class MultiplesHelper {
     private static <T> boolean collectionHasValues(List<T> collection) {
         return collection != null && !collection.isEmpty();
     }
+
     private static <T> boolean collectionIsEmpty(List<T> collection) {
         return !collectionHasValues(collection);
     }

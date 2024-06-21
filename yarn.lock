@@ -1211,15 +1211,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cucumber/messages@npm:24.1.0":
-  version: 24.1.0
-  resolution: "@cucumber/messages@npm:24.1.0"
+"@cucumber/messages@npm:25.0.1":
+  version: 25.0.1
+  resolution: "@cucumber/messages@npm:25.0.1"
   dependencies:
     "@types/uuid": 9.0.8
     class-transformer: 0.5.1
-    reflect-metadata: 0.2.1
+    reflect-metadata: 0.2.2
     uuid: 9.0.1
-  checksum: 9c82968394f7ff046a0d389dd4b90e5bef78b9b1045504de45abcdc9b53ca6143211c9bf92a86034ea63dccb1476cab892eebdfe6d4eecfc6731a82e2f7dea8d
+  checksum: c3a428d7e30f4e479b94cd90dbe2c89ab30d5517af49f71e9268939bafe67d7c22b1fddaa858e5ed33cc9f92dad9cec8b1f677fcb46d174d8caef9d20ed13c8a
   languageName: node
   linkType: hard
 
@@ -4795,14 +4795,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-exclude@npm:2.1.0":
-  version: 2.1.0
-  resolution: "chai-exclude@npm:2.1.0"
+"chai-exclude@npm:2.1.1":
+  version: 2.1.1
+  resolution: "chai-exclude@npm:2.1.1"
   dependencies:
     fclone: ^1.0.11
   peerDependencies:
     chai: ">= 4.0.0 < 5"
-  checksum: 29d964d9f667bd2c8e0e5e597c299550ff13e41b737450d6f91aa4a28064e24f034c1296c85a1d0ba5ebc2a01188f4147dc60bda0f46382f8fb851052f770bb3
+  checksum: b9445387d8bec33dfa354c50e291618741d9150b6fbe0efb2ea72ce17560f36a998d6299a5622a10f25928098906c89801424bbfdccd8946eca00de593693027
   languageName: node
   linkType: hard
 
@@ -5372,23 +5372,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codeceptjs@npm:3.6.3":
-  version: 3.6.3
-  resolution: "codeceptjs@npm:3.6.3"
+"codeceptjs@npm:3.6.4":
+  version: 3.6.4
+  resolution: "codeceptjs@npm:3.6.4"
   dependencies:
     "@codeceptjs/configure": 1.0.1
     "@codeceptjs/detox-helper": 1.0.7
     "@codeceptjs/helper": 2.0.4
     "@cucumber/cucumber-expressions": 17
     "@cucumber/gherkin": 26
-    "@cucumber/messages": 24.1.0
+    "@cucumber/messages": 25.0.1
     "@xmldom/xmldom": 0.8.10
     acorn: 8.11.3
     arrify: 2.0.1
     axios: 1.7.2
     chai: 5.1.1
     chai-deep-match: 1.2.1
-    chai-exclude: 2.1.0
+    chai-exclude: 2.1.1
     chai-json-schema: 1.5.1
     chai-json-schema-ajv: 5.2.4
     chai-match-pattern: 1.3.0
@@ -5407,7 +5407,7 @@ __metadata:
     glob: 6.0.1
     html-minifier-terser: 7.2.0
     inquirer: 6.5.2
-    joi: 17.13.0
+    joi: 17.13.1
     js-beautify: 1.15.1
     lodash.clonedeep: 4.5.0
     lodash.merge: 4.6.2
@@ -5428,7 +5428,7 @@ __metadata:
       optional: true
   bin:
     codeceptjs: bin/codecept.js
-  checksum: 77d2463930e9f068aed6ea89aebc317ca286a44355506cf5835e90b323430e53e08a3380cdd90d882e687ce96ccfb72ad7ab118237075b601a0ae7fec14add78
+  checksum: 1d5f9f74fde27e88d4741094c30b73c1cec8b89ad931598512c9317a05c5bc89447f63b72abe6bdb49aba336e7c3bb93cbac267810d7c72d205b31da1beaf411
   languageName: node
   linkType: hard
 
@@ -7542,7 +7542,7 @@ __metadata:
     chai: 4.4.1
     chai-as-promised: 8.0.0
     chai-http: 5.0.0
-    codeceptjs: 3.6.3
+    codeceptjs: 3.6.4
     codeceptjs-saucehelper: ^1.4.0
     cross-env: 7.0.3
     eslint: 9.5.0
@@ -7561,14 +7561,14 @@ __metadata:
     mocha-multi: 1.1.7
     mochawesome: 7.1.3
     nock: 13.5.4
-    nodemon: 3.1.3
+    nodemon: 3.1.4
     nsp: 3.2.1
     otp: 1.1.2
     pa11y: 8.0.0
     playwright: ^1.35.1
     playwright-core: ^1.35.1
     proxyquire: 2.1.3
-    puppeteer: 22.11.1
+    puppeteer: 22.11.2
     randomstring: 1.3.0
     request: 2.88.2
     request-promise-native: 1.0.9
@@ -10672,16 +10672,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:17.13.0":
-  version: 17.13.0
-  resolution: "joi@npm:17.13.0"
+"joi@npm:17.13.1":
+  version: 17.13.1
+  resolution: "joi@npm:17.13.1"
   dependencies:
     "@hapi/hoek": ^9.3.0
     "@hapi/topo": ^5.1.0
     "@sideway/address": ^4.1.5
     "@sideway/formula": ^3.0.1
     "@sideway/pinpoint": ^2.0.0
-  checksum: ecde54b0705f21929939a72e958d96ba7dd2a6578ba7bf711c060f54b765a081dc67d09f7f4761a76cc4d659f6d880dca72287200801dc51485a350795131f84
+  checksum: e755140446a0e0fb679c0f512d20dfe1625691de368abe8069507c9bccae5216b5bb56b5a83100a600808b1753ab44fdfdc9933026268417f84b6e0832a9604e
   languageName: node
   linkType: hard
 
@@ -12714,9 +12714,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:3.1.3":
-  version: 3.1.3
-  resolution: "nodemon@npm:3.1.3"
+"nodemon@npm:3.1.4":
+  version: 3.1.4
+  resolution: "nodemon@npm:3.1.4"
   dependencies:
     chokidar: ^3.5.2
     debug: ^4
@@ -12730,7 +12730,7 @@ __metadata:
     undefsafe: ^2.0.5
   bin:
     nodemon: bin/nodemon.js
-  checksum: ac2fa8865ab292b7ddf66731487acca4b4282b2728361e0de633c0c74cd705d6a0852b52f785c09469d959241d038ba824f50375622e687a2a318be747d9cd9d
+  checksum: 3f003fc2c7bdaba559108320f188b7cb063220455e5da218ff3bf4f7468ad7059852da6e35a52b8c690cc27f6e36a433a9ad1f1bdb8096ec1ee3d930629cbeca
   languageName: node
   linkType: hard
 
@@ -14187,16 +14187,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer-core@npm:22.11.1":
-  version: 22.11.1
-  resolution: "puppeteer-core@npm:22.11.1"
+"puppeteer-core@npm:22.11.2":
+  version: 22.11.2
+  resolution: "puppeteer-core@npm:22.11.2"
   dependencies:
     "@puppeteer/browsers": 2.2.3
     chromium-bidi: 0.5.23
     debug: 4.3.5
     devtools-protocol: 0.0.1299070
-    ws: 8.17.0
-  checksum: 52e36732a54f8d6811129de5377bff1645293f6e95a0b3cd2f20eb318b4f8c75d1cb529293df1897b8576ee1c0d2b411b34dc3d96787b4ed08f9e405c2c00a45
+    ws: 8.17.1
+  checksum: 377bce7384246b5a44415ab646524b9825805ca157fc1d5109cbdaae4a5ebf5e5a31bfd2e19f3dbcd14182f29c0da23777ddfe355ff93d6c5735ab9765132acf
   languageName: node
   linkType: hard
 
@@ -14232,17 +14232,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:22.11.1":
-  version: 22.11.1
-  resolution: "puppeteer@npm:22.11.1"
+"puppeteer@npm:22.11.2":
+  version: 22.11.2
+  resolution: "puppeteer@npm:22.11.2"
   dependencies:
     "@puppeteer/browsers": 2.2.3
     cosmiconfig: 9.0.0
     devtools-protocol: 0.0.1299070
-    puppeteer-core: 22.11.1
+    puppeteer-core: 22.11.2
   bin:
     puppeteer: lib/esm/puppeteer/node/cli.js
-  checksum: 2b4674561610f078d573ce2bfd760b295b9c56135eba016e252fcb2e8151168af27041c4631cf02635e4c9bcd226c8cbadc59b562375d9cb27541d7deba1bd30
+  checksum: 6cbd0fa93b022dd1d4bd67f56bbbf8595b79dcbdb0652b8104488672cb33cbcf4ed35ce81da608d0d8045d5871d0f54394a50638d2ab369eb56f71609b606d6d
   languageName: node
   linkType: hard
 
@@ -14630,10 +14630,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reflect-metadata@npm:0.2.1":
-  version: 0.2.1
-  resolution: "reflect-metadata@npm:0.2.1"
-  checksum: 772f552a544e04b999c1bf2c868225fef10032274e9d9e315bc3e7a687a504b8b115fa71966665b9619acfd323123a941f892b593250140da809330d41564181
+"reflect-metadata@npm:0.2.2":
+  version: 0.2.2
+  resolution: "reflect-metadata@npm:0.2.2"
+  checksum: a66c7b583e4efdd8f3c3124fbff33da2d0c86d8280617516308b32b2159af7a3698c961db3246387f56f6316b1d33a608f39bb2b49d813316dfc58f6d3bf3210
   languageName: node
   linkType: hard
 
@@ -17797,9 +17797,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.17.0":
-  version: 8.17.0
-  resolution: "ws@npm:8.17.0"
+"ws@npm:8.17.1":
+  version: 8.17.1
+  resolution: "ws@npm:8.17.1"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -17808,7 +17808,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 147ef9eab0251364e1d2c55338ad0efb15e6913923ccbfdf20f7a8a6cb8f88432bcd7f4d8f66977135bfad35575644f9983201c1a361019594a4e53977bf6d4e
+  checksum: 442badcce1f1178ec87a0b5372ae2e9771e07c4929a3180321901f226127f252441e8689d765aa5cfba5f50ac60dd830954afc5aeae81609aefa11d3ddf5cecf
   languageName: node
   linkType: hard
 

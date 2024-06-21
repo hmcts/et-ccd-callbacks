@@ -25,7 +25,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
@@ -51,12 +50,12 @@ public final class MultiplesHelper {
     }
 
     public static List<String> getCaseIds(MultipleData multipleData) {
-        if (collectionNotNullOrEmpty(multipleData.getCaseIdCollection())) {
+        if (collectionHasValues(multipleData.getCaseIdCollection())) {
             return multipleData.getCaseIdCollection().stream()
                     .filter(key -> key.getId() != null && !key.getId().equals("null"))
                     .map(caseId -> caseId.getValue().getEthosCaseReference())
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
 
         } else {
             return new ArrayList<>();
@@ -64,7 +63,7 @@ public final class MultiplesHelper {
     }
 
     public static List<String> getCaseIdsFromCollection(List<CaseIdTypeItem> caseIdCollection) {
-        if (!collectionNotNullOrEmpty(caseIdCollection)) {
+        if (collectionIsEmpty(caseIdCollection)) {
             return new ArrayList<>();
         }
 
@@ -72,12 +71,12 @@ public final class MultiplesHelper {
                 .filter(key -> key.getId() != null && !key.getId().equals("null"))
                 .map(caseId -> caseId.getValue().getEthosCaseReference())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // MID EVENTS COLLECTIONS HAVE KEY AS NULL BUT WITH VALUES!
     public static List<String> getCaseIdsForMidEvent(List<CaseIdTypeItem> caseIdCollection) {
-        if (!collectionNotNullOrEmpty(caseIdCollection)) {
+        if (collectionIsEmpty(caseIdCollection)) {
             return new ArrayList<>();
         }
 
@@ -90,7 +89,7 @@ public final class MultiplesHelper {
 
     public static List<CaseIdTypeItem> filterDuplicatedAndEmptyCaseIds(MultipleData multipleData) {
 
-        if (collectionNotNullOrEmpty(multipleData.getCaseIdCollection())) {
+        if (collectionHasValues(multipleData.getCaseIdCollection())) {
 
             return multipleData.getCaseIdCollection().stream()
                     .filter(caseId ->
@@ -268,7 +267,7 @@ public final class MultiplesHelper {
 
     public static List<String> generateSubMultipleStringCollection(MultipleData multipleData) {
 
-        if (collectionNotNullOrEmpty(multipleData.getSubMultipleCollection())) {
+        if (collectionHasValues(multipleData.getSubMultipleCollection())) {
 
             return multipleData.getSubMultipleCollection().stream()
                     .map(subMultipleTypeItem -> subMultipleTypeItem.getValue().getSubMultipleName())
@@ -377,7 +376,10 @@ public final class MultiplesHelper {
         return UtilHelper.getListingCaseTypeId(caseTypeId) + MULTIPLE_SUFFIX;
     }
 
-    private static <T> boolean collectionNotNullOrEmpty(List<T> collection) {
+    private static <T> boolean collectionHasValues(List<T> collection) {
         return collection != null && !collection.isEmpty();
+    }
+    private static <T> boolean collectionIsEmpty(List<T> collection) {
+        return !collectionHasValues(collection);
     }
 }

@@ -133,7 +133,7 @@ public class MultipleCreationService {
 
         String token = adminUserService.getAdminUserToken();
         String multipleCaseTypeId = multipleDetails.getCaseTypeId();
-        String singleCaseTypeId = multipleCaseTypeId.replace("_Multiple", "");
+        String singleCaseTypeId = MultiplesHelper.removeMultipleSuffix(multipleCaseTypeId);
         
         List<SubmitEvent> cases = ccdClient.retrieveCasesElasticSearch(token, singleCaseTypeId, caseIds);
         log.error("Retrieved {} cases from ES", cases.size());

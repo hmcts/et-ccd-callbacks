@@ -81,7 +81,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        mockHelper.verify(() -> Helper.isRespondentNonSystemUser(any()), times(1));
+        mockHelper.verify(() -> Helper.isRespondentSystemUser(any()), times(1));
     }
 
     @Test

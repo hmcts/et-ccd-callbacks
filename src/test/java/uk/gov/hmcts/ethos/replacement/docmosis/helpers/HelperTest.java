@@ -156,22 +156,22 @@ public class HelperTest {
         CaseData caseData = new CaseData();
 
         caseData.setRepCollection(new ArrayList<>());
-        boolean actual = Helper.isRespondentNonSystemUser(caseData);
+        boolean actual = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual);
 
         RepresentedTypeR typeR = new RepresentedTypeR();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(typeR);
         caseData.setRepCollection(Collections.singletonList(representedTypeRItem));
-        boolean actual2 = Helper.isRespondentNonSystemUser(caseData);
+        boolean actual2 = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual2);
 
         typeR.setMyHmctsYesNo(YES);
-        boolean actual3 = Helper.isRespondentNonSystemUser(caseData);
+        boolean actual3 = Helper.isRespondentSystemUser(caseData);
         assertTrue(actual3);
 
         typeR.setMyHmctsYesNo(NO);
-        boolean actual4 = Helper.isRespondentNonSystemUser(caseData);
+        boolean actual4 = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual4);
     }
 

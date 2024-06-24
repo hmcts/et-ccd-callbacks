@@ -91,6 +91,7 @@ public class MultiplesSendNotificationController {
                 errors
         );
 
+        multiplesSendNotificationService.setSendNotificationDocumentsToDocumentCollection(caseData);
         multiplesSendNotificationService.clearSendNotificationFields(caseData);
         return getMultipleCallbackRespEntity(errors, caseDetails);
     }

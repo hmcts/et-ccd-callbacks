@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeMultiple;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -193,6 +194,13 @@ public class MultiplesSendNotificationService {
         sendNotificationType.setNotificationSentFrom(multipleData.getMultipleReference());
 
         return sendNotificationType;
+    }
+
+    public void setSendNotificationDocumentsToDocumentCollection(MultipleData multipleData) {
+
+        List<DocumentTypeItem> uploadedDoc = multipleData.getSendNotificationUploadDocument();
+
+        multipleData.getDocumentCollection().add((DocumentTypeItem) uploadedDoc);
     }
 
     public void clearSendNotificationFields(MultipleData multipleData) {

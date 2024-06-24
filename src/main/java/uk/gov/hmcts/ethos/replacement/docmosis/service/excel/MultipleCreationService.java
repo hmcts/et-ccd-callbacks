@@ -117,14 +117,9 @@ public class MultipleCreationService {
 
     private void addLegalRepsFromSinglesCases(MultipleDetails multipleDetails) throws IOException {
         MultipleData multipleData = multipleDetails.getCaseData();
-        String leadCaseId = multipleData.getLeadCaseId();
         List<String> caseIds = multipleData.getCaseIdCollection().stream()
             .map(o -> o.getValue().getEthosCaseReference())
             .collect(Collectors.toList());
-
-        if (!isNullOrEmpty(leadCaseId)) {
-            caseIds.add(leadCaseId);
-        }
 
         if (caseIds.isEmpty()) {
             // No cases linked to this multiple means no legal reps to add
@@ -136,7 +131,7 @@ public class MultipleCreationService {
         String singleCaseTypeId = MultiplesHelper.removeMultipleSuffix(multipleCaseTypeId);
         
         List<SubmitEvent> cases = ccdClient.retrieveCasesElasticSearch(token, singleCaseTypeId, caseIds);
-        log.error("Retrieved {} cases from ES", cases.size());
+        log.info("Retrieved {} cases from ES when adding legalreps to newly created multiple", cases.size());
 
         List<String> orgIds = getUniqueOrganisations(cases);
 

@@ -59,7 +59,7 @@ public class MultipleBatchUpdate2Service {
     public void batchUpdate2Logic(String userToken,
                                   MultipleDetails multipleDetails,
                                   List<String> errors,
-                                  SortedMap<String, Object> multipleObjects) {
+                                  SortedMap<String, Object> multipleObjects) throws IOException {
         MultipleData multipleData = multipleDetails.getCaseData();
         log.info("Batch update type = 2");
 
@@ -154,7 +154,7 @@ public class MultipleBatchUpdate2Service {
                                            List<String> errors,
                                            List<String> multipleObjectsFiltered,
                                            String updatedMultipleRef,
-                                           String updatedSubMultipleRef) {
+                                           String updatedSubMultipleRef) throws IOException {
 
         MultipleData oldMultipleData = multipleDetails.getCaseData();
         log.info("Retrieve Legal Reps from current MultipleDetails: {}", oldMultipleData.getMultipleReference());
@@ -235,7 +235,7 @@ public class MultipleBatchUpdate2Service {
     private void addLegalRepsToMultiple(String jurisdiction,
                                         String caseType,
                                         String multipleId,
-                                        List<String> legalRepsToAdd) {
+                                        List<String> legalRepsToAdd) throws IOException {
         if (!legalRepsToAdd.isEmpty()) {
             multipleReferenceService.addUsersToMultiple(jurisdiction,
                     caseType,

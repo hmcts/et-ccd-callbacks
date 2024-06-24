@@ -106,6 +106,19 @@ public class MultipleBatchUpdate2Service {
         }
     }
 
+    public void removeCasesFromCurrentMultiple(String userToken,
+                                               MultipleDetails multipleDetails,
+                                               List<String> errors,
+                                               List<String> multipleObjectsFiltered) {
+        log.info("Read current excel and remove cases in multiple");
+        readCurrentExcelAndRemoveCasesInMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
+
+        log.info("Perform actions with the new lead if exists");
+        String oldLeadCase = MultiplesHelper.getCurrentLead(multipleDetails.getCaseData().getLeadCase());
+        performActionsWithNewLeadCase(userToken, multipleDetails, errors, oldLeadCase, multipleObjectsFiltered);
+
+    }
+
     private void performActionsWithNewLeadCase(String userToken, MultipleDetails multipleDetails, List<String> errors,
                                                String oldLeadCase, List<String> multipleObjectsFiltered) {
         MultipleData multipleData = multipleDetails.getCaseData();
@@ -134,19 +147,6 @@ public class MultipleBatchUpdate2Service {
 
             }
         }
-    }
-
-    private void removeCasesFromCurrentMultiple(String userToken,
-                                                MultipleDetails multipleDetails,
-                                                List<String> errors,
-                                                List<String> multipleObjectsFiltered) {
-        log.info("Read current excel and remove cases in multiple");
-        readCurrentExcelAndRemoveCasesInMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
-
-        log.info("Perform actions with the new lead if exists");
-        String oldLeadCase = MultiplesHelper.getCurrentLead(multipleDetails.getCaseData().getLeadCase());
-        performActionsWithNewLeadCase(userToken, multipleDetails, errors, oldLeadCase, multipleObjectsFiltered);
-
     }
 
     private void updateToDifferentMultiple(String userToken,

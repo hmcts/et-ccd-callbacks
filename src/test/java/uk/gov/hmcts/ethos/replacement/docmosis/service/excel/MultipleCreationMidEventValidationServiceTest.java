@@ -11,7 +11,6 @@ import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
@@ -24,6 +23,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
@@ -55,8 +58,85 @@ class MultipleCreationMidEventValidationServiceTest {
     }
 
     @Test
-    void multipleCreationValidationLogicCaseDoesNotExist() {
+    void multipleRemoveCasesValidationLogic_NoCasesPassedIn() {
+        multipleCreationMidEventValidationService.multipleRemoveCasesValidationLogic(
+                userToken,
+                multipleDetails,
+                errors);
 
+        verify(singleCasesReadingService, never()).retrieveSingleCases(
+                any(), any(), any(), any());
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void multipleRemoveCasesValidationLogic_MaxSizeExceeded() {
+        multipleDetails.getCaseData().setAltCaseIdCollection(createCaseIdCollection(55));
+
+        multipleCreationMidEventValidationService.multipleRemoveCasesValidationLogic(
+                userToken,
+                multipleDetails,
+                errors);
+
+        verify(singleCasesReadingService, times(1)).retrieveSingleCases(
+                any(), any(), any(), any());
+
+        assertEquals(2, errors.size());
+        assertEquals("There are 55 cases in the multiple. The limit is 50.", errors.get(0));
+        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,"
+                + " 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, "
+                + "48, 49, 50, 51, 52, 53, 54] cases do not exist.", errors.get(1));
+    }
+
+    @Test
+    void multipleRemoveCasesValidationLogic_TryRemoveLeadCase() {
+        List<SubmitEvent> cases = getSubmitEvents();
+        cases.remove(1);
+        String leadRef = cases.get(0).getCaseData().getEthosCaseReference();
+        String multiRef = cases.get(0).getCaseData().getMultipleReference();
+
+        multipleDetails.getCaseData().setAltCaseIdCollection(createCaseIdCollection(1));
+        multipleDetails.getCaseData().getAltCaseIdCollection().get(0).getValue().setEthosCaseReference(leadRef);
+        multipleDetails.getCaseData().setLeadCase(leadRef);
+
+        multipleDetails.getCaseData().setMultipleReference(multiRef);
+
+        when(singleCasesReadingService.retrieveSingleCases(any(), any(), any(), any())).thenReturn(cases);
+
+        multipleCreationMidEventValidationService.multipleRemoveCasesValidationLogic(
+                userToken,
+                multipleDetails,
+                errors);
+
+        verify(singleCasesReadingService, times(1)).retrieveSingleCases(
+                any(), any(), any(), any());
+
+        assertEquals(1, errors.size());
+        assertEquals("245000/2020 lead case cannot be removed.", errors.get(0));
+
+    }
+
+    @Test
+    void multipleRemoveCasesValidationLogic_CaseNotPartOfMultiple() {
+        multipleDetails.getCaseData().setAltCaseIdCollection(createCaseIdCollection(2));
+        when(singleCasesReadingService.retrieveSingleCases(any(), any(), any(), any())).thenReturn(getSubmitEvents());
+
+        multipleCreationMidEventValidationService.multipleRemoveCasesValidationLogic(
+                userToken,
+                multipleDetails,
+                errors);
+
+        verify(singleCasesReadingService, times(1)).retrieveSingleCases(
+                any(), any(), any(), any());
+
+        assertEquals(1, errors.size());
+        assertEquals("[245000/2020, 245001/2020] cases are not a part of the multiple.", errors.get(0));
+
+    }
+
+    @Test
+    void multipleCreationValidationLogic_CaseDoesNotExist() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 
@@ -81,13 +161,12 @@ class MultipleCreationMidEventValidationServiceTest {
 
         assertEquals(1, errors.size());
         assertEquals("[245000/2020, 245001/2020] cases do not exist.", errors.get(0));
-
     }
 
     @Test
-    void multipleCreationValidationLogicMaxSizeAndLeadCaseDoesNotExist() {
+    void multipleCreationValidationLogic_MaxSizeAndLeadCaseDoesNotExist() {
 
-        createCaseIdCollection(multipleDetails.getCaseData(), 60);
+        multipleDetails.getCaseData().setCaseIdCollection(createCaseIdCollection(60));
 
         multipleCreationMidEventValidationService.multipleCreationValidationLogic(
                 userToken,
@@ -105,7 +184,7 @@ class MultipleCreationMidEventValidationServiceTest {
     }
 
     @Test
-    void multipleCreationValidationLogicWrongStateAndMultipleErrorEmptyLead() {
+    void multipleCreationValidationLogic_WrongStateAndMultipleErrorEmptyLead() {
 
         multipleDetails.getCaseData().setLeadCase(null);
 
@@ -129,7 +208,7 @@ class MultipleCreationMidEventValidationServiceTest {
     }
 
     @Test
-    void multipleCreationValidationLogicET1OnlineCase() {
+    void multipleCreationValidationLogic_ET1OnlineCase() {
 
         multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
 
@@ -144,7 +223,7 @@ class MultipleCreationMidEventValidationServiceTest {
     }
 
     @Test
-    void multipleCreationValidationLogicMigrationCase() {
+    void multipleCreationValidationLogic_MigrationCase() {
 
         multipleDetails.getCaseData().setMultipleSource(MIGRATION_CASE_SOURCE);
 
@@ -159,7 +238,7 @@ class MultipleCreationMidEventValidationServiceTest {
     }
 
     @Test
-    void multipleAmendCaseIdsValidationLogicCaseDoesNotExist() {
+    void multipleAmendCaseIdsValidationLogic_CaseDoesNotExist() {
 
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
@@ -233,22 +312,17 @@ class MultipleCreationMidEventValidationServiceTest {
                 "245001/2020", TribunalOffice.DUNDEE.getOfficeName())));
     }
 
-    private void createCaseIdCollection(MultipleData multipleData, int numberCases) {
-
+    private List<CaseIdTypeItem> createCaseIdCollection(int numberCases) {
         List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
 
         for (int i = 0; i < numberCases; i++) {
-
             caseIdCollection.add(createCaseIdType(String.valueOf(i)));
-
         }
 
-        multipleData.setCaseIdCollection(caseIdCollection);
-
+        return caseIdCollection;
     }
 
     private CaseIdTypeItem createCaseIdType(String ethosCaseReference) {
-
         CaseType caseType = new CaseType();
         caseType.setEthosCaseReference(ethosCaseReference);
 
@@ -257,11 +331,9 @@ class MultipleCreationMidEventValidationServiceTest {
         caseIdTypeItem.setValue(caseType);
 
         return caseIdTypeItem;
-
     }
 
     private static List<SubmitEvent> getSubmitEvents() {
-
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245000/2020");
         caseData.setMultipleReference("245000");
@@ -282,6 +354,5 @@ class MultipleCreationMidEventValidationServiceTest {
         submitEvent1.setCaseId(1_232_121_233);
 
         return new ArrayList<>(Arrays.asList(submitEvent, submitEvent1));
-
     }
 }

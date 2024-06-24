@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -32,6 +33,10 @@ public class MultipleCreationMidEventValidationService {
     public static final String LEAD_EXIST_ERROR = " lead case does not exist.";
     public static final String CASE_BELONGS_DIFFERENT_OFFICE = "Case %s is managed by %s";
     public static final String LEAD_CASE_BELONGS_DIFFERENT_OFFICE = "Lead case %s is managed by %s";
+    public static final String CASE_COLLECTION_EXCEEDED_MAX_SIZE =
+            "There are %s cases in the multiple. The limit is %s.";
+    public static final String LEAD_CASE_CANNOT_BE_REMOVED = " lead case cannot be removed.";
+    public static final String CASE_NOT_BELONG_TO_MULTIPLE_ERROR = " cases are not a part of the multiple.";
     public static final int MULTIPLE_MAX_SIZE = 50;
 
     private final SingleCasesReadingService singleCasesReadingService;
@@ -41,88 +46,137 @@ public class MultipleCreationMidEventValidationService {
         this.singleCasesReadingService = singleCasesReadingService;
     }
 
-    public void multipleCreationValidationLogic(String userToken, MultipleDetails multipleDetails,
-                                                List<String> errors, boolean amendAction) {
+    public void multipleCreationValidationLogic(String userToken,
+                                                MultipleDetails multipleDetails,
+                                                List<String> errors,
+                                                boolean amendAction) {
 
-        if (multipleDetails.getCaseData().getMultipleSource() != null
-                &&
-                !amendAction
-                &&
-                (multipleDetails.getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
-                        || multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)
-                )) {
-
+        MultipleData multipleData = multipleDetails.getCaseData();
+        String multipleSource = multipleData.getMultipleSource();
+        if (!amendAction
+                && (ET1_ONLINE_CASE_SOURCE.equals(multipleSource) || MIGRATION_CASE_SOURCE.equals(multipleSource))) {
             log.info("Skipping validation as ET1 Online Case");
 
         } else {
-
             log.info("Validating multiple creation");
-
-            MultipleData multipleData = multipleDetails.getCaseData();
-
             log.info("Checking lead case");
 
-            if (!isNullOrEmpty(multipleData.getLeadCase()) && !amendAction) {
+            String caseTypeId = multipleDetails.getCaseTypeId();
+            String managingOffice = multipleDetails.getCaseData().getManagingOffice();
+            if (!amendAction && !isNullOrEmpty(multipleData.getLeadCase())) {
+                log.info("Validating lead case introduced by user: {}", multipleData.getLeadCase());
 
-                log.info("Validating lead case introduced by user: " + multipleData.getLeadCase());
-
-                validateCases(userToken, multipleDetails,
+                validateCases(userToken, caseTypeId, managingOffice,
                         new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())), errors, true);
-
             }
 
-            List<String> ethosCaseRefCollection = MultiplesHelper.getCaseIdsForMidEvent(multipleData);
+            List<String> ethosCaseRefCollection =
+                    MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
 
-            log.info("Validating case id collection size: " + ethosCaseRefCollection.size());
+            log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
 
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
-            validateCases(userToken, multipleDetails, ethosCaseRefCollection, errors, false);
+            validateCases(userToken, caseTypeId, managingOffice, ethosCaseRefCollection, errors, false);
+        }
+    }
 
+    public void multipleRemoveCasesValidationLogic(
+            String userToken,
+            MultipleDetails multipleDetails,
+            List<String> errors) {
+
+        MultipleData multipleData = multipleDetails.getCaseData();
+
+        log.info("Validating multiple case removals");
+        List<String> ethosCaseRefCollection =
+                MultiplesHelper.getCaseIdsForMidEvent(multipleData.getAltCaseIdCollection());
+
+        if (ethosCaseRefCollection.isEmpty()) {
+            return;
         }
 
+        log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
+        validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
+
+        String caseTypeId = multipleDetails.getCaseTypeId();
+        List<SubmitEvent> casesToBeRemoved = singleCasesReadingService.retrieveSingleCases(
+                userToken, caseTypeId, ethosCaseRefCollection, MANUALLY_CREATED_POSITION);
+
+        String leadCaseRef = MultiplesHelper.getCurrentLead(multipleData.getLeadCase());
+        String multipleRef = multipleData.getMultipleReference();
+        validateCasesForRemoval(leadCaseRef, multipleRef, ethosCaseRefCollection, casesToBeRemoved, errors);
+    }
+
+    private void validateCasesForRemoval(String leadCaseReference,
+                                         String multipleReference,
+                                         List<String> caseRefCollection,
+                                         List<SubmitEvent> casesToBeRemoved,
+                                         List<String> errors) {
+
+        log.info("Validate number of cases returned");
+        validateNumberCasesReturned(casesToBeRemoved, errors, false, caseRefCollection);
+
+        log.info("Validating cases");
+        List<String> listCasesNotBelongError = new ArrayList<>();
+        for (SubmitEvent submitEvent : casesToBeRemoved) {
+            CaseData caseBeingValidated = submitEvent.getCaseData();
+
+            if (leadCaseReference.equals(caseBeingValidated.getEthosCaseReference())) {
+                log.info("VALIDATION ERROR: case is lead case and cannot be removed");
+                errors.add(leadCaseReference + LEAD_CASE_CANNOT_BE_REMOVED);
+            }
+
+            if (isNullOrEmpty(caseBeingValidated.getMultipleReference())
+                || !multipleReference.equals(caseBeingValidated.getMultipleReference())) {
+                log.info("VALIDATION ERROR: case does not belong to this multiple");
+
+                listCasesNotBelongError.add(submitEvent.getCaseData().getEthosCaseReference());
+            }
+        }
+
+        if (!listCasesNotBelongError.isEmpty()) {
+            errors.add(listCasesNotBelongError + CASE_NOT_BELONG_TO_MULTIPLE_ERROR);
+        }
     }
 
     private void validateCaseReferenceCollectionSize(List<String> ethosCaseRefCollection, List<String> errors) {
-
         if (ethosCaseRefCollection.size() > MULTIPLE_MAX_SIZE) {
-
             log.info("Case id collection reached the max size");
 
-            errors.add("There are " + ethosCaseRefCollection.size() + " cases in the multiple. The limit is "
-                    + MULTIPLE_MAX_SIZE + ".");
-
+            String errorMessage =
+                    String.format(CASE_COLLECTION_EXCEEDED_MAX_SIZE, ethosCaseRefCollection.size(), MULTIPLE_MAX_SIZE);
+            errors.add(errorMessage);
         }
-
     }
 
-    private void validateCases(String userToken, MultipleDetails multipleDetails, List<String> caseRefCollection,
-                               List<String> errors, boolean isLead) {
+    private void validateCases(String userToken,
+                               String caseTypeId,
+                               String managingOffice,
+                               List<String> caseRefCollection,
+                               List<String> errors,
+                               boolean isLead) {
 
         if (!caseRefCollection.isEmpty()) {
-
-            List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
-                    multipleDetails.getCaseTypeId(), caseRefCollection, MANUALLY_CREATED_POSITION);
+            List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(
+                    userToken, caseTypeId, caseRefCollection, MANUALLY_CREATED_POSITION);
 
             log.info("Validate number of cases returned");
-
             validateNumberCasesReturned(submitEvents, errors, isLead, caseRefCollection);
 
             log.info("Validating cases");
+            boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId);
 
-            boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(multipleDetails.getCaseTypeId());
-            validateSingleCasesState(submitEvents, errors, isLead, multipleDetails.getCaseData().getManagingOffice(),
-                    isScotland);
-
+            validateSingleCasesState(submitEvents, errors, isLead, managingOffice, isScotland);
         }
-
     }
 
-    private void validateNumberCasesReturned(List<SubmitEvent> submitEvents, List<String> errors, boolean isLead,
+    private void validateNumberCasesReturned(List<SubmitEvent> submitEvents,
+                                             List<String> errors,
+                                             boolean isLead,
                                              List<String> caseRefCollection) {
 
         if (caseRefCollection.size() != submitEvents.size()) {
-
             log.info("List returned is different");
 
             List<String> listCasesDoNotExistError = caseRefCollection.stream()
@@ -133,19 +187,18 @@ public class MultipleCreationMidEventValidationService {
                     .toList();
 
             if (!listCasesDoNotExistError.isEmpty()) {
-
                 String errorMessage = isLead ? LEAD_EXIST_ERROR : CASE_EXIST_ERROR;
 
                 errors.add(listCasesDoNotExistError + errorMessage);
-
             }
-
         }
-
     }
 
-    private void validateSingleCasesState(List<SubmitEvent> submitEvents, List<String> errors, boolean isLead,
-                                          String managingOffice, boolean isScotland) {
+    private void validateSingleCasesState(List<SubmitEvent> submitEvents,
+                                          List<String> errors,
+                                          boolean isLead,
+                                          String managingOffice,
+                                          boolean isScotland) {
 
         List<String> listCasesStateError = new ArrayList<>();
 
@@ -154,20 +207,16 @@ public class MultipleCreationMidEventValidationService {
         for (SubmitEvent submitEvent : submitEvents) {
 
             if (!submitEvent.getState().equals(ACCEPTED_STATE)) {
-
                 log.info("VALIDATION ERROR: state of single case not Accepted");
 
                 listCasesStateError.add(submitEvent.getCaseData().getEthosCaseReference());
-
             }
 
             if (submitEvent.getCaseData().getMultipleReference() != null
                     && !submitEvent.getCaseData().getMultipleReference().trim().isEmpty()) {
-
                 log.info("VALIDATION ERROR: already another multiple");
 
                 listCasesMultipleError.add(submitEvent.getCaseData().getEthosCaseReference());
-
             }
 
             if (!isScotland && !isNullOrEmpty(submitEvent.getCaseData().getManagingOffice())
@@ -177,25 +226,18 @@ public class MultipleCreationMidEventValidationService {
                         submitEvent.getCaseData().getEthosCaseReference(),
                         submitEvent.getCaseData().getManagingOffice()));
             }
-
         }
 
         if (!listCasesStateError.isEmpty()) {
-
             String errorMessage = isLead ? LEAD_STATE_ERROR : CASE_STATE_ERROR;
 
             errors.add(listCasesStateError + errorMessage);
-
         }
 
         if (!listCasesMultipleError.isEmpty()) {
-
             String errorMessage = isLead ? LEAD_BELONG_MULTIPLE_ERROR : CASE_BELONG_MULTIPLE_ERROR;
 
             errors.add(listCasesMultipleError + errorMessage);
-
         }
-
     }
-
 }

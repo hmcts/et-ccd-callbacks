@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -24,7 +25,8 @@ public class MultipleUpdateService {
     private final MultipleBatchUpdate2Service multipleBatchUpdate2Service;
     private final MultipleBatchUpdate3Service multipleBatchUpdate3Service;
 
-    public void bulkUpdateLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
+    public void bulkUpdateLogic(String userToken, MultipleDetails multipleDetails, List<String> errors)
+        throws IOException {
 
         log.info("Read excel to update logic");
 
@@ -61,7 +63,7 @@ public class MultipleUpdateService {
     private void batchUpdateLogic(String userToken,
                                   MultipleDetails multipleDetails,
                                   List<String> errors,
-                                  SortedMap<String, Object> multipleObjects) {
+                                  SortedMap<String, Object> multipleObjects) throws IOException {
 
         String batchUpdateType = multipleDetails.getCaseData().getBatchUpdateType();
 

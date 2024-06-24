@@ -14,6 +14,13 @@
       "lastName": "Organisation1",
       "email": "superuser@etorganisation1.com",
       "idamStatus": "Active"
+    },
+    {
+      "userIdentifier": "4a2f72bd-ac02-31a5-a105-301ccd19cab7",
+      "firstName": "A",
+      "lastName": "User",
+      "email": "legalrep@hmcts.net",
+      "idamStatus": "Active"
     }
   ]
 }

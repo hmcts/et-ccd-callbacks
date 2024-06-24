@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,9 +28,12 @@ import java.util.TreeMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -51,37 +55,43 @@ class MultipleBatchUpdate2ServiceTest {
     private MultipleHelperService multipleHelperService;
     @Mock
     private CcdClient ccdClient;
+    @Mock
+    private MultipleReferenceService multipleReferenceService;
 
     @InjectMocks
     private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
 
+    private String userToken;
     private TreeMap<String, Object> multipleObjectsFlags;
     private TreeMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
-    private String userToken;
     private List<SubmitMultipleEvent> submitMultipleEvents;
 
     @BeforeEach
     public void setUp() {
+        userToken = "authString";
+
         multipleObjectsFlags = MultipleUtil.getMultipleObjectsFlags();
+
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
+
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseId("245000");
         multipleDetails.setJurisdiction("EMPLOYMENT");
         multipleDetails.setCaseTypeId("ET_EnglandWales_Multiple");
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         multipleDetails.getCaseData().setCaseIdCollection(null);
-        userToken = "authString";
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("246000");
         moveCasesType.setUpdatedSubMultipleRef("");
         moveCasesType.setConvertToSingle(YES);
         multipleDetails.getCaseData().setMoveCases(moveCasesType);
+
         submitMultipleEvents = MultipleUtil.getSubmitMultipleEvents();
     }
 
     @Test
-    void batchUpdate2LogicDetachCases() {
+    void batchUpdate2LogicDetachCases() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -100,7 +110,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicDetachCasesEmptyNewLeadCase() {
+    void batchUpdate2LogicDetachCasesEmptyNewLeadCase() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
@@ -118,7 +128,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicSameMultipleEmptySubMultiple() {
+    void batchUpdate2LogicSameMultipleEmptySubMultiple() throws IOException {
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
@@ -127,7 +137,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicSameMultipleWithSubMultiple() {
+    void batchUpdate2LogicSameMultipleWithSubMultiple() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
@@ -144,7 +154,7 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
-    void batchUpdate2LogicDifferentEmptyMultiple() {
+    void batchUpdate2LogicDifferentEmptyMultiple() throws IOException {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -153,19 +163,22 @@ class MultipleBatchUpdate2ServiceTest {
                 .thenReturn("");
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
         multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
+
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
                 new ArrayList<>(),
                 multipleObjectsFlags);
+
         verify(excelDocManagementService, times(1)).generateAndUploadExcel(
                 anyList(),
                 anyString(),
                 any());
         verifyNoMoreInteractions(excelDocManagementService);
+        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
     }
 
     @Test
-    void batchUpdate2LogicDifferentMultipleEmptySubMultiple() {
+    void batchUpdate2LogicDifferentMultipleEmptySubMultiple() throws IOException {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -174,19 +187,23 @@ class MultipleBatchUpdate2ServiceTest {
                 .thenReturn("245003/2020");
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
         multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
+        multipleDetails.getCaseData().setLegalRepCollection(new ListTypeItem<>());
+
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
                 new ArrayList<>(),
                 multipleObjectsFlags);
+
         verify(excelDocManagementService, times(1)).generateAndUploadExcel(
                 anyList(),
                 anyString(),
                 any());
         verifyNoMoreInteractions(excelDocManagementService);
+        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
     }
 
     @Test
-    void batchUpdate2LogicDifferentMultipleWithSubMultiple() {
+    void batchUpdate2LogicDifferentMultipleWithSubMultiple() throws IOException {
         when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(userToken,
                 multipleDetails.getCaseTypeId(),
                 "246001")
@@ -196,15 +213,158 @@ class MultipleBatchUpdate2ServiceTest {
         multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
         multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
         multipleDetails.getCaseData().getMoveCases().setUpdatedSubMultipleRef("246001/1");
+
         multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
                 multipleDetails,
                 new ArrayList<>(),
                 multipleObjectsFlags);
+
         verify(excelDocManagementService, times(1)).generateAndUploadExcel(
                 anyList(),
                 anyString(),
                 any());
         verifyNoMoreInteractions(excelDocManagementService);
+        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
+    }
+
+    @Test
+    void batchUpdate2Logic_TransferCases_EmptyFilteredList() throws IOException {
+        multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
+        multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
+        multipleObjects.keySet().removeAll(multipleObjectsFlags.keySet());
+        multipleDetails.getCaseData().setLegalRepCollection(addCaseLegalRepDetails(multipleObjects));
+
+        when(excelReadingService.readExcel(
+                anyString(), anyString(), anyList(), any(), any())
+        ).thenReturn(multipleObjects);
+        when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(
+                userToken, multipleDetails.getCaseTypeId(), "246001")
+        ).thenReturn(submitMultipleEvents);
+        when(multipleHelperService.getLeadCaseFromExcel(
+                anyString(), any(), anyList())
+        ).thenReturn("245003/2020");
+
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+        multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verify(ccdClient, never()).removeUserFromMultiple(any(), any(), any(), any(), any());
+        verifyNoMoreInteractions(ccdClient);
+        assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
+        assertNull(submitMultipleEvents.get(0).getCaseData().getLegalRepCollection());
+        verify(multipleReferenceService, never()).addUsersToMultiple(any(), any(), any(), any());
+    }
+
+    @Test
+    void batchUpdate2Logic_TransferCases_LRsCollInNewMultiple_Null() throws IOException {
+        multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
+        multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
+        multipleDetails.getCaseData().setLegalRepCollection(addCaseLegalRepDetails(multipleObjects));
+
+        when(excelReadingService.readExcel(
+                anyString(), anyString(), anyList(), any(), any())
+        ).thenReturn(multipleObjects);
+        when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(
+                userToken, multipleDetails.getCaseTypeId(), "246001")
+        ).thenReturn(submitMultipleEvents);
+        when(multipleHelperService.getLeadCaseFromExcel(
+                anyString(), any(), anyList())
+        ).thenReturn("245003/2020");
+
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+        multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verify(ccdClient, times(4)).removeUserFromMultiple(
+                any(), any(), any(), any(), any());
+        verifyNoMoreInteractions(ccdClient);
+        assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
+        assertEquals(2, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
+    }
+
+    @Test
+    void batchUpdate2Logic_TransferCases_LRsCollInNewMultiple_Empty() throws IOException {
+        multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
+        multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
+        multipleDetails.getCaseData().setLegalRepCollection(addCaseLegalRepDetails(multipleObjects));
+
+        submitMultipleEvents.get(0).getCaseData().setLegalRepCollection(new ListTypeItem<>());
+
+        when(excelReadingService.readExcel(
+                anyString(), anyString(), anyList(), any(), any())
+        ).thenReturn(multipleObjects);
+        when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(
+                userToken, multipleDetails.getCaseTypeId(), "246001")
+        ).thenReturn(submitMultipleEvents);
+        when(multipleHelperService.getLeadCaseFromExcel(
+                anyString(), any(), anyList())
+        ).thenReturn("245003/2020");
+
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+        multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verify(ccdClient, times(4)).removeUserFromMultiple(
+                any(), any(), any(), any(), any());
+        verifyNoMoreInteractions(ccdClient);
+        assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
+        assertEquals(2, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
+    }
+
+    @Test
+    void batchUpdate2Logic_TransferCases_LRsCollInNewMultiple_NotEmpty() throws IOException {
+        multipleDetails.getCaseData().getMoveCases().setConvertToSingle(NO);
+        multipleDetails.getCaseData().getMoveCases().setUpdatedMultipleRef("246001");
+
+        ListTypeItem<SubCaseLegalRepDetails> lrCollection = addCaseLegalRepDetails(multipleObjects);
+        ListTypeItem<SubCaseLegalRepDetails> oldCollection = new ListTypeItem<>();
+        oldCollection.add(lrCollection.get(0));
+        oldCollection.add(lrCollection.get(1));
+        oldCollection.add(lrCollection.get(2));
+        ListTypeItem<SubCaseLegalRepDetails> newCollection = new ListTypeItem<>();
+        newCollection.add(lrCollection.get(3));
+
+        multipleDetails.getCaseData().setLegalRepCollection(oldCollection);
+        submitMultipleEvents.get(0).getCaseData().setLegalRepCollection(newCollection);
+
+        when(excelReadingService.readExcel(
+                anyString(), anyString(), anyList(), any(), any())
+        ).thenReturn(multipleObjects);
+        when(multipleCasesReadingService.retrieveMultipleCasesWithRetries(
+                userToken, multipleDetails.getCaseTypeId(), "246001")
+        ).thenReturn(submitMultipleEvents);
+        when(multipleHelperService.getLeadCaseFromExcel(
+                anyString(), any(), anyList())
+        ).thenReturn("245003/2020");
+
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+        multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verify(ccdClient, times(4)).removeUserFromMultiple(
+                any(), any(), any(), any(), any());
+        verifyNoMoreInteractions(ccdClient);
+        assertEquals(1, multipleDetails.getCaseData().getLegalRepCollection().size());
+        assertEquals(3, submitMultipleEvents.get(0).getCaseData().getLegalRepCollection().size());
+        verify(multipleReferenceService, times(1)).addUsersToMultiple(any(), any(), any(), any());
     }
 
     @Test
@@ -254,6 +414,34 @@ class MultipleBatchUpdate2ServiceTest {
     }
 
     @Test
+    void batchUpdate2LogicDetachCases_Overlap() throws IOException {
+        ListTypeItem<SubCaseLegalRepDetails> legalRepCollection = addCaseLegalRepDetails(multipleObjects);
+
+        legalRepCollection.get(0).getValue().getLegalRepIds().get(0).setValue("DuplicateLRid");
+        legalRepCollection.get(2).getValue().getLegalRepIds().get(0).setValue("DuplicateLRid");
+
+        multipleDetails.getCaseData().setLegalRepCollection(legalRepCollection);
+
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjects);
+        when(multipleHelperService.getLeadCaseFromExcel(anyString(), any(), anyList()))
+                .thenReturn("245003/2020");
+
+        when(ccdClient.removeUserFromMultiple(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+        multipleBatchUpdate2Service.batchUpdate2Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verify(ccdClient, times(3)).removeUserFromMultiple(
+                any(), any(), any(), any(), any());
+        verifyNoMoreInteractions(ccdClient);
+        assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
+    }
+
+    @Test
     void batchUpdate2LogicDetachCases_RemoveLRs_ccdClientEmpty() throws IOException {
         multipleDetails.getCaseData().setLegalRepCollection(addCaseLegalRepDetails(multipleObjects));
 
@@ -297,7 +485,7 @@ class MultipleBatchUpdate2ServiceTest {
 
     private void checkAndThrowException(MultipleBatchUpdate2Service service,
                                         String userToken,
-                                        MultipleDetails multipleDetails) throws CaseCreationException {
+                                        MultipleDetails multipleDetails) throws CaseCreationException, IOException {
         service.batchUpdate2Logic(userToken, multipleDetails, new ArrayList<>(),
                 multipleObjectsFlags);
         if (multipleDetails.getCaseData().getLegalRepCollection().size() != 4) {

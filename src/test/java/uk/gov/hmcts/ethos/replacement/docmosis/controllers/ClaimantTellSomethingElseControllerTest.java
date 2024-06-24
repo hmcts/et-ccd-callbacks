@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantTellSomethingElseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,9 +37,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 @WebMvcTest({ClaimantTellSomethingElseController.class, JsonMapper.class})
 class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/claimantTSE/aboutToStart";
+    private static final String ABOUT_TO_SUBMIT_URL = "/claimantTSE/aboutToSubmit";
 
     @MockBean
     ClaimantTellSomethingElseService claimantTseService;
+    @MockBean
+    private TseService tseService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -91,5 +96,19 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void aboutToSubmitRespondentTSE_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), true);
     }
 }

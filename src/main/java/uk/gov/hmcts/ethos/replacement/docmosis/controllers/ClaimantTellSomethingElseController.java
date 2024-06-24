@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantTellSomethingElseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class ClaimantTellSomethingElseController {
 
     private final ClaimantTellSomethingElseService claimantTseService;
+    private final TseService tseService;
 
     /**
      * Callback endpoint to be called when the event ClaimantTSE is about to start.
@@ -86,5 +89,26 @@ public class ClaimantTellSomethingElseController {
         List<String> errors = claimantTseService.validateGiveDetails(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitClaimantTSE(
+            @RequestBody CCDRequest ccdRequest) {
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        tseService.createApplication(caseData, true);
+        tseService.clearApplicationData(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 }

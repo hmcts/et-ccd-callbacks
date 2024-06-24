@@ -53,8 +53,8 @@ public class ClaimantTellSomethingElseController {
             @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (Helper.isRespondentNonSystemUser(caseData)) {
-            caseData.setResTseNotAvailableWarning(YES);
+        if (Boolean.FALSE.equals(Helper.isRespondentSystemUser(caseData))) {
+            caseData.setClaimantTseRespNotAvailable(YES);
         }
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -359,9 +359,9 @@ public final class Helper {
      * @param caseData The case data to check for respondent user type.
      * @return true if the respondent is a non-system user, false otherwise.
      */
-    public static boolean isRespondentNonSystemUser(CaseData caseData) {
+    public static boolean isRespondentSystemUser(CaseData caseData) {
         if (caseData != null) {
-            List<RepresentedTypeRItem>  repCollection = caseData.getRepCollection();
+            List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
             return !CollectionUtils.isEmpty(repCollection)
                     && repCollection.stream().anyMatch(rep -> YES.equals(rep.getValue().getMyHmctsYesNo()));
         }

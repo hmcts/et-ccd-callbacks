@@ -83,6 +83,7 @@ public final class SendNotificationUtil {
                                 .id(UUID.randomUUID().toString())
                                 .value(PseResponseType.builder()
                                         .from(CLAIMANT_TITLE)
+                                        .response("Please cancel")
                                         .author("Barry White")
                                         .build())
                                 .build()))

@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -119,14 +120,83 @@ class MultiplesHelperTest {
         assertEquals(MultiplesHelper.createCollectionOrderedByCaseRef(refList), expectedResult);
     }
 
-    private CaseIdTypeItem createCaseIdTypeItem(String id, String value) {
+    @Test
+    void getCaseIdsForMidEvent_Null() {
+        multipleData.setCaseIdCollection(null);
 
+        List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsForMidEvent_Empty() {
+        multipleData.setCaseIdCollection(createCaseIdCollection(0));
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsForMidEvent() {
+        multipleData.setCaseIdCollection(createCaseIdCollection(10));
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
+
+        assertEquals(10, caseIdList.size());
+        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsFromCollection_Null() {
+        multipleData.setAltCaseIdCollection(null);
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsFromCollection(multipleData.getAltCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsFromCollection_Empty() {
+        multipleData.setAltCaseIdCollection(createCaseIdCollection(0));
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsFromCollection(multipleData.getAltCaseIdCollection());
+
+        assertEquals(0, caseIdList.size());
+        assertEquals("[]", caseIdList.toString());
+    }
+
+    @Test
+    void getCaseIdsFromCollection() {
+        multipleData.setAltCaseIdCollection(createCaseIdCollection(10));
+
+        List<String> caseIdList = MultiplesHelper.getCaseIdsFromCollection(multipleData.getAltCaseIdCollection());
+
+        assertEquals(10, caseIdList.size());
+        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]", caseIdList.toString());
+    }
+
+    private List<CaseIdTypeItem> createCaseIdCollection(int numberCases) {
+        List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
+
+        for (int i = 0; i < numberCases; i++) {
+            caseIdCollection.add(createCaseIdTypeItem(String.valueOf(i), String.valueOf(i)));
+        }
+
+        return caseIdCollection;
+    }
+
+    private CaseIdTypeItem createCaseIdTypeItem(String id, String value) {
         CaseType caseType = new CaseType();
         caseType.setEthosCaseReference(value);
+
         CaseIdTypeItem caseIdTypeItem = new CaseIdTypeItem();
         caseIdTypeItem.setId(id);
         caseIdTypeItem.setValue(caseType);
         return caseIdTypeItem;
-
     }
 }

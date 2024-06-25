@@ -248,7 +248,7 @@ class MultipleNotificationServiceTest {
     }
 
     @Test
-    public void testSetSendNotificationDocumentsToDocumentCollectionWithEmptyUploadDoc() {
+    void testSetSendNotificationDocumentsToDocumentCollectionWithEmptyUploadDoc() {
 
         MultipleData multipleData = new MultipleData();
         List<DocumentTypeItem> uploadedDoc = new ArrayList<>();
@@ -260,7 +260,7 @@ class MultipleNotificationServiceTest {
     }
 
     @Test
-    public void testSetSendNotificationDocumentsToDocumentCollectionWithEmptyDocumentCollection() {
+    void testSetSendNotificationDocumentsToDocumentCollectionWithEmptyDocumentCollection() {
 
         MultipleData multipleData = new MultipleData();
         List<DocumentTypeItem> uploadedDoc = new ArrayList<>();
@@ -274,7 +274,7 @@ class MultipleNotificationServiceTest {
     }
 
     @Test
-    public void testSetSendNotificationDocumentsToDocumentCollectionWithNonEmptyDocumentCollection() {
+    void testSetSendNotificationDocumentsToDocumentCollectionWithNonEmptyDocumentCollection() {
 
         MultipleData multipleData = new MultipleData();
         List<DocumentTypeItem> documentCollection = new ArrayList<>();

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Import;
@@ -35,8 +34,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 @Import(HttpClientConfiguration.class)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public class IdamApiConsumerTest {
-    @Autowired
-    IdamApi idamApi;
+    final IdamApi idamApi;
+
+    public IdamApiConsumerTest(final IdamApi idamApi) {
+        this.idamApi = idamApi;
+    }
 
     private static final String AUTH_TOKEN = "Bearer someAuthorizationToken";
 

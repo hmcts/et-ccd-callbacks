@@ -219,16 +219,16 @@ tasks.register('runContractTests', Test) {
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-    systemProperty 'pact.rootDir', "pacts"
-    testLogging.showStandardStreams = true
 }
 
 tasks.register('runAndPublishConsumerPactTests', Test) {
-    logger.lifecycle("Runs pact consumer Tests")
-
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
 }
+
+runAndPublishConsumerPactTests.dependsOn runContractTests
+
+runAndPublishConsumerPactTests.finalizedBy pactVerify
 
 rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
@@ -238,18 +238,7 @@ rootProject.tasks.named("processFunctionalResources") {
     duplicatesStrategy = 'include'
 }
 
-runAndPublishConsumerPactTests.finalizedBy pactPublish
 
-pact {
-    broker {
-        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-    }
-    publish {
-        pactDirectory = 'pacts'
-        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
-        version = project.pacticipantVersion
-    }
-}
 
 tasks.register('fortifyScan', JavaExec) {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"

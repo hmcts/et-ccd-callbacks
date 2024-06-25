@@ -3,6 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.webjars.NotFoundException;
@@ -16,6 +19,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -66,13 +70,21 @@ class Et3VettingServiceTest {
         doCallRealMethod().when(documentManagementService).addDocumentToDocumentField(documentInfo);
     }
 
-    @Test
-    void whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted() {
+    @ParameterizedTest
+    @MethodSource("whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted")
+    void whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted(String respondent) {
+        caseData.getRespondentCollection().get(0).getValue().setRespondentName(respondent);
         et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
         RespondentSumType result = caseData.getRespondentCollection().get(0).getValue();
 
-        assertThat(result.getEt3VettingCompleted(),
-            equalTo(YES));
+        assertThat(result.getEt3VettingCompleted(), equalTo(YES));
+    }
+
+    private static Stream<Arguments> whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted() {
+        return Stream.of(
+                Arguments.of("Antonio Vazquez"),
+                Arguments.of("Antonio Vazquez ") // Trailing space
+        );
     }
 
     @Test

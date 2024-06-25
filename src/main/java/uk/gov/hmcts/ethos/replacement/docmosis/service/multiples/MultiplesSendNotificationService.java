@@ -197,10 +197,19 @@ public class MultiplesSendNotificationService {
     }
 
     public void setSendNotificationDocumentsToDocumentCollection(MultipleData multipleData) {
-
         List<DocumentTypeItem> uploadedDoc = multipleData.getSendNotificationUploadDocument();
 
-        multipleData.getDocumentCollection().add((DocumentTypeItem) uploadedDoc);
+        if (CollectionUtils.isEmpty(uploadedDoc)) {
+            return;
+        }
+
+        List<DocumentTypeItem> documentCollection = multipleData.getDocumentCollection();
+        if (CollectionUtils.isEmpty(documentCollection)) {
+            multipleData.setDocumentCollection(uploadedDoc);
+            return;
+        }
+
+        documentCollection.addAll(uploadedDoc);
     }
 
     public void clearSendNotificationFields(MultipleData multipleData) {

@@ -141,6 +141,12 @@ public class MultipleCreationService {
             .toList();
 
         Map<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
+
+        if (emails.isEmpty()) {
+            // No need to ask message-handler to update permissions if all cases have no have legal reps
+            return;
+        }
+
         Map<String, String> legalrepMap = buildEmailIdMap(users);
 
         HashMap<String, List<String>> legalRepsByCaseId = new HashMap<>();
@@ -186,6 +192,9 @@ public class MultipleCreationService {
         HashMap<Long, List<String>> caseRepEmails = new HashMap<>();
 
         for (SubmitEvent caseData : cases) {
+            if (caseData.getCaseData().getRepCollection() == null) {
+                continue;
+            }
             List<String> repEmails = caseData.getCaseData().getRepCollection().stream()
                 .map(o -> o.getValue().getRepresentativeEmailAddress())
                 .filter(Objects::nonNull)

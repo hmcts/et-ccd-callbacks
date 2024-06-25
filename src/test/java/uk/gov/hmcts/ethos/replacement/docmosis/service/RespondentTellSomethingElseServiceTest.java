@@ -480,7 +480,7 @@ class RespondentTellSomethingElseServiceTest {
             .withClaimantHearingPreference(ENGLISH_LANGUAGE)
             .withRespondent("Father Ted", NO, null, false)
             .withHearing("1", "Hearing", "Judge", "Bodmin", List.of("In person"), "60", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2069-05-16T01:00:00.000", "Listed", false)
+            .withHearingSession(0, "2069-05-16T01:00:00.000", "Listed", false)
             .build();
         caseData.setResTseSelectApplication(selectedApplication);
         caseData.setResTseCopyToOtherPartyYesOrNo(YES);

@@ -45,7 +45,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -168,7 +167,7 @@ public class CaseDataBuilder {
         return hearingTypeItem;
     }
 
-    public CaseDataBuilder withHearingSession(int hearingIndex, String number, String listedDate, String hearingStatus,
+    public CaseDataBuilder withHearingSession(int hearingIndex, String listedDate, String hearingStatus,
                                               boolean disposed) {
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
@@ -538,7 +537,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withChangeOrganisationRequestField(Organisation organisationToAdd,
                                                               Organisation organisationToRemove,
-                                                              DynamicFixedListType caseRoleID,
                                                               LocalDateTime requestTimestamp,
                                                               ChangeOrganisationApprovalStatus approvalStatus) {
         DynamicValueType caseRoleIDValue = DynamicValueType.create("[SOLICITORA]", "Respondent Solicitor");
@@ -563,7 +561,7 @@ public class CaseDataBuilder {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                .collect(Collectors.toList());
+                .toList();
         caseData.setAssignOffice(DynamicFixedListType.from(tribunalOffices));
         caseData.getAssignOffice().setValue(DynamicValueType.create(selectedOffice, selectedOffice));
         return this;
@@ -618,5 +616,16 @@ public class CaseDataBuilder {
     public CaseDataBuilder withCaseSource(String caseSource) {
         caseData.setCaseSource(caseSource);
         return this;
+    }
+
+    public static Address createGenericAddress() {
+        Address address = new Address();
+        address.setAddressLine1("Line 1");
+        address.setAddressLine2("Line 2");
+        address.setAddressLine3("Line 3");
+        address.setPostTown("Town");
+        address.setPostCode("Postcode");
+        address.setCountry("Country");
+        return address;
     }
 }

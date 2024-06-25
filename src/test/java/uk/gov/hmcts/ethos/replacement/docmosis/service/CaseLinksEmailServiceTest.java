@@ -97,9 +97,7 @@ class CaseLinksEmailServiceTest {
                 .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
                         "length num", "type", "Yes")
                 .withHearingSession(
-                        0,
-                        "1",
-                        "2029-11-25T12:11:00.000",
+                        0, "2029-11-25T12:11:00.000",
                         Constants.HEARING_STATUS_LISTED,
                         true)
                 .withCaseLinks(caseLinks)

@@ -8,6 +8,8 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ public class MultipleTransferSameCountryService {
 
     private final ExcelReadingService excelReadingService;
     private final CaseTransferEventService caseTransferEventService;
+    private final CaseManagementLocationService caseManagementLocationService;
+    private final FeatureToggleService  featureToggleService;
 
     public List<String> transferMultiple(MultipleDetails multipleDetails, String userToken) {
         MultipleData multipleData = multipleDetails.getCaseData();
@@ -57,6 +61,11 @@ public class MultipleTransferSameCountryService {
         transferSingleCases(userToken, multipleDetails, errors, multipleObjects);
 
         multipleData.setManagingOffice(multipleData.getOfficeMultipleCT().getSelectedCode());
+        if (featureToggleService.isMultiplesEnabled()) {
+            log.info("Setting Case Management Location");
+            caseManagementLocationService.setCaseManagementLocation(multipleData);
+        }
+
         multipleData.setOfficeMultipleCT(null);
     }
 

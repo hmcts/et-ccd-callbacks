@@ -79,7 +79,7 @@ class DigitalCaseFileServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("shouldSetBundleConfiguration")
     void shouldSetBundleConfiguration(String bundleConfig, String expectedConfig) {
         caseData.setBundleConfiguration(bundleConfig);
         digitalCaseFileService.setBundleConfig(caseData);

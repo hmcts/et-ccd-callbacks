@@ -87,7 +87,7 @@ class ClerkServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testInitialiseClerkResponsibleListingDataEnglandWales")
     void testInitialiseClerkResponsibleListingDataEnglandWales(TribunalOffice tribunalOffice) {
         CourtWorkerService courtWorkerService = mockCourtWorkerService(tribunalOffice);
         ListingData listingData = new ListingData();

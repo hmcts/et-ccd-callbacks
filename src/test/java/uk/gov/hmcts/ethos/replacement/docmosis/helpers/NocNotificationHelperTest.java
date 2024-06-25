@@ -66,16 +66,12 @@ class NocNotificationHelperTest {
             .withRespondent("Respondent", YES, "2022-03-01", "res@rep.com", false)
             .withChangeOrganisationRequestField(
                 organisationToAdd,
-                organisationToRemove,
-                null,
-                null,
+                organisationToRemove, null,
                 null)
             .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
                         "length num", "type", "Yes")
             .withHearingSession(
-                        0,
-                        "1",
-                        "2029-11-25T12:11:00.000",
+                        0, "2029-11-25T12:11:00.000",
                         Constants.HEARING_STATUS_LISTED,
                         true)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);

@@ -24,7 +24,7 @@ class RespondentReportElasticSearchQueryTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("queryShouldNotIncludeManagingOffice")
     void queryShouldNotIncludeManagingOffice(String managingOffice) {
         String dateToSearchFrom = "2020-02-02";
         String dateToSearchTo = "2020-02-20";
@@ -51,7 +51,7 @@ class RespondentReportElasticSearchQueryTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("queryShouldIncludeManagingOffice")
     void queryShouldIncludeManagingOffice(String managingOffice) {
         String dateToSearchFrom = "2020-02-02";
         String dateToSearchTo = "2020-02-20";

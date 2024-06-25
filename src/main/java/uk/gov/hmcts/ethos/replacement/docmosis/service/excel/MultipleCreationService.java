@@ -143,7 +143,7 @@ public class MultipleCreationService {
         Map<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
 
         if (emails.isEmpty()) {
-            // No need to ask message-handler to update permissions if all cases have no have legal reps
+            // No need to ask message-handler to update permissions if all cases have no legal reps
             return;
         }
 

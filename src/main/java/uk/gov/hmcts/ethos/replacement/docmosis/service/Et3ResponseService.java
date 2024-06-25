@@ -82,7 +82,7 @@ public class Et3ResponseService {
         String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel();
 
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
-                .filter(r -> respondentSelected.equals(r.getValue().getRespondentName()))
+                .filter(r -> respondentSelected.equals(r.getValue().getRespondentName().trim()))
                 .findFirst();
         if (respondent.isPresent()) {
             respondent.get().getValue().setEt3Form(uploadedDocument);

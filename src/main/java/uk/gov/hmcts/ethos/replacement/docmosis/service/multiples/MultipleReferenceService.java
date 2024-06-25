@@ -137,9 +137,9 @@ public class MultipleReferenceService {
     }
 
     public void addUsersToMultiple(String jurisdiction,
-                                   String caseType,
-                                   String multipleId,
-                                   List<String> usersToAdd) {
+        String caseType,
+        String multipleId,
+        List<String> usersToAdd) throws IOException {
         String adminUserToken = adminUserService.getAdminUserToken();
 
         for (String userToAddId : usersToAdd) {
@@ -147,11 +147,11 @@ public class MultipleReferenceService {
         }
     }
 
-    private void addUserToMultiple(String adminUserToken,
-                                   String jurisdiction,
-                                   String caseType,
-                                   String multipleId,
-                                   String userToAddId) {
+    public void addUserToMultiple(String adminUserToken,
+                               String jurisdiction,
+                               String caseType,
+                               String multipleId,
+                               String userToAddId) throws IOException {
         Map<String, String> payload = Maps.newHashMap();
         payload.put("id", userToAddId);
 

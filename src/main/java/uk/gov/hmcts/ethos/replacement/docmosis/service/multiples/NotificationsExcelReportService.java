@@ -123,8 +123,6 @@ public class NotificationsExcelReportService {
                 .documentBinaryUrl(documentSelfPath + BINARY)
                 .build();
 
-        log.warn("Doc url - {}", uploadedDocumentType.getDocumentBinaryUrl());
-
         if (multipleData.getNotificationsExtract() == null) {
             multipleData.setNotificationsExtract(new NotificationsExtract());
         }

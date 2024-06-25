@@ -248,7 +248,7 @@ class MultipleNotificationServiceTest {
     }
 
     @Test
-    public void testSetSendNotificationDocumentsToDocumentCollection_withEmptyUploadDoc_shouldNotAddToDocumentCollection() {
+    public void testSetSendNotificationDocumentsToDocumentCollectionWithEmptyUploadDoc() {
 
         MultipleData multipleData = new MultipleData();
         List<DocumentTypeItem> uploadedDoc = new ArrayList<>();
@@ -260,7 +260,7 @@ class MultipleNotificationServiceTest {
     }
 
     @Test
-    public void testSetSendNotificationDocumentsToDocumentCollection_withEmptyDocumentCollection_shouldAddUploadDocToDocumentCollection() {
+    public void testSetSendNotificationDocumentsToDocumentCollectionWithEmptyDocumentCollection() {
 
         MultipleData multipleData = new MultipleData();
         List<DocumentTypeItem> uploadedDoc = new ArrayList<>();
@@ -274,7 +274,7 @@ class MultipleNotificationServiceTest {
     }
 
     @Test
-    public void testSetSendNotificationDocumentsToDocumentCollection_withNonEmptyDocumentCollection_shouldAddUploadDocToDocumentCollection() {
+    public void testSetSendNotificationDocumentsToDocumentCollectionWithNonEmptyDocumentCollection() {
 
         MultipleData multipleData = new MultipleData();
         List<DocumentTypeItem> documentCollection = new ArrayList<>();

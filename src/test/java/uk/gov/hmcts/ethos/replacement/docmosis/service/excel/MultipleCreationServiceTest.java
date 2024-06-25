@@ -268,4 +268,28 @@ class MultipleCreationServiceTest {
                 new ArrayList<>());
         verifyNoMoreInteractions(excelDocManagementService);
     }
+
+    @Test
+    void addLegalRepsFromSinglesCases_noRep() throws IOException {
+        when(featureToggleService.isMul2Enabled()).thenReturn(true);
+
+        SubmitEvent event = new SubmitEvent();
+        event.setCaseId(1_718_968_200);
+        event.setCaseData(new CaseData());
+        event.getCaseData().setEthosCaseReference("6000001/2024");
+        event.getCaseData().setRepCollection(null);
+
+        when(ccdClient.retrieveCasesElasticSearch(any(), any(), any())).thenReturn(List.of(event));
+        multipleDetails.getCaseData().setMultipleSource(ET1_ONLINE_CASE_SOURCE);
+        multipleCreationService.bulkCreationLogic(userToken,
+                multipleDetails,
+                new ArrayList<>());
+
+        verify(excelDocManagementService, times(1)).writeAndUploadExcelDocument(ethosCaseRefCollection,
+                userToken,
+                multipleDetails,
+                new ArrayList<>());
+        verifyNoMoreInteractions(excelDocManagementService);
+        verifyNoMoreInteractions(createUpdatesBusSender);
+    }
 }

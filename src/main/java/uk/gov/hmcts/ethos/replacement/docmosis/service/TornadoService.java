@@ -19,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
@@ -397,12 +396,6 @@ public class TornadoService {
                 dmStoreDocumentName = String.format("ET3 Processing - %s.pdf",
                         sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        dmStoreDocumentName);
-            }
-            case ET3_RESPONSE_PDF -> {
-                dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
-                        sanitizePartyName(caseData.getSubmitEt3Respondent().getSelectedLabel()));
-                return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
                         dmStoreDocumentName);
             }
             case INITIAL_CONSIDERATION_PDF -> {

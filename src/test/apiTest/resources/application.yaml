@@ -157,3 +157,5 @@ cron:
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
 
+pdf:
+  et3form: "ET3_0224.pdf"

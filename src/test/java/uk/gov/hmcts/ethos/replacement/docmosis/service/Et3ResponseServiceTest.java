@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -105,6 +106,15 @@ class Et3ResponseServiceTest {
         assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
         assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getCategoryId(),
                 is("C18"));
+    }
+
+    @Test
+    void assertDataSavedWithTrailingSpace() {
+        caseData.getRespondentCollection().get(0).getValue().setRespondentName("Antonio Vazquez ");
+        et3ResponseService.saveEt3Response(caseData, documentInfo);
+
+        assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
+        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseReceived());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.SneakyThrows;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
@@ -15,21 +18,24 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -42,7 +48,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.ExcessiveImports"})
@@ -51,8 +57,7 @@ class Et3ResponseServiceTest {
     @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
-    private TornadoService tornadoService;
-
+    private PdfBoxService pdfBoxService;
     private EmailService emailService;
     private CaseData caseData;
     private DocumentInfo documentInfo;
@@ -61,7 +66,7 @@ class Et3ResponseServiceTest {
     void setUp() {
         emailService = spy(new EmailUtils());
 
-        et3ResponseService = new Et3ResponseService(documentManagementService, tornadoService, emailService);
+        et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, emailService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -82,30 +87,45 @@ class Et3ResponseServiceTest {
     }
 
     @Test
-    void generateEt3ProcessingDocument() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-            anyString(), anyString())).thenReturn(documentInfo);
-        DocumentInfo documentInfo1 = et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
-            ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(documentInfo1, is(documentInfo));
+    @SneakyThrows
+    void generateEt3ProcessingDocumentNullWithoutException() {
+        try (MockedStatic<ET3FormMapper> et3FormMapperMockedStatic = Mockito.mockStatic(ET3FormMapper.class)) {
+            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any())).thenReturn(
+                    new ConcurrentHashMap<String, Optional<String>>());
+            when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
+                    .thenReturn(new URI("testUri"));
+            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
+                    anyString(), anyString(), anyString())).thenReturn(null);
+            CaseData testGeneratePdfCaseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
+            DocumentInfo documentInfo1 = et3ResponseService.generateEt3ResponseDocument(testGeneratePdfCaseData,
+                    "userToken", ENGLANDWALES_CASE_TYPE_ID);
+            assertThat(documentInfo1).isNull();
+        }
     }
 
     @Test
-    void generateEt3ProcessingDocumentExceptions() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-            anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(Exception.class, () -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
-            ENGLANDWALES_CASE_TYPE_ID));
+    @SneakyThrows
+    void generateEt3ProcessingDocumentNoExceptions() {
+        try (MockedStatic<ET3FormMapper> et3FormMapperMockedStatic = Mockito.mockStatic(ET3FormMapper.class)) {
+            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any())).thenReturn(
+                    new ConcurrentHashMap<String, Optional<String>>());
+            when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
+                    .thenReturn(new URI("testUri"));
+            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
+                    anyString(), anyString(), anyString())).thenReturn(documentInfo);
+            assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
+                    ENGLANDWALES_CASE_TYPE_ID));
+        }
     }
 
     @Test
     void assertThatEt3DocumentIsSaved() {
         et3ResponseService.saveEt3Response(caseData, documentInfo);
 
-        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(caseData.getDocumentCollection()).hasSize(1);
         assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
-        assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getCategoryId(),
-                is("C18"));
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getCategoryId())
+                .isEqualTo("C18");
     }
 
     @Test
@@ -131,7 +151,7 @@ class Et3ResponseServiceTest {
                 List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
         );
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
-        assertThat(caseData.getDocumentCollection().size(), is(3));
+        assertThat(caseData.getDocumentCollection()).hasSize(3);
     }
 
     @Test
@@ -141,7 +161,7 @@ class Et3ResponseServiceTest {
                 List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
         );
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
-        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(caseData.getDocumentCollection()).hasSize(1);
     }
 
     @Test
@@ -152,7 +172,7 @@ class Et3ResponseServiceTest {
         );
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
-        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(caseData.getDocumentCollection()).hasSize(1);
     }
 
     @Test

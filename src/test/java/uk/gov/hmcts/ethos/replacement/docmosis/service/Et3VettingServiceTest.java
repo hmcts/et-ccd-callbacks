@@ -71,7 +71,7 @@ class Et3VettingServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted")
+    @MethodSource("whenGivenASubmittedEt3ResponseShouldSetEt3VettingCompleted")
     void whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted(String respondent) {
         caseData.getRespondentCollection().get(0).getValue().setRespondentName(respondent);
         et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
@@ -80,7 +80,7 @@ class Et3VettingServiceTest {
         assertThat(result.getEt3VettingCompleted(), equalTo(YES));
     }
 
-    private static Stream<Arguments> whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted() {
+    private static Stream<Arguments> whenGivenASubmittedEt3ResponseShouldSetEt3VettingCompleted() {
         return Stream.of(
                 Arguments.of("Antonio Vazquez"),
                 Arguments.of("Antonio Vazquez ") // Trailing space

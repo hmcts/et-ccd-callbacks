@@ -149,7 +149,7 @@ public class MultipleBatchUpdate3Service {
             multipleData.getBatchUpdateClaimantRep() != null
                 && !multipleData.getBatchUpdateClaimantRep().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateJurisdiction() != null
-                && !multipleData.getBatchUpdateJurisdiction().getValue().getCode().equals(SELECT_NONE_VALUE)
+                    && !multipleData.getBatchUpdateJurisdiction().isEmpty()
                 || multipleData.getBatchUpdateRespondent() != null
                 && !multipleData.getBatchUpdateRespondent().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateJudgment() != null

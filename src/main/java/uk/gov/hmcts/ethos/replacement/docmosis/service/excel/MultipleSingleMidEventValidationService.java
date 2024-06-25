@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -126,18 +127,13 @@ public class MultipleSingleMidEventValidationService {
 
         log.info("Checking JurCodesCollection");
 
-        List<DynamicValueType> jurCodesCollection = new ArrayList<>();
+        List<JurCodesTypeItem> jurCodesCollection = new ArrayList<>();
 
         if (submitEvent.getCaseData().getJurCodesCollection() != null) {
-
-            jurCodesCollection = submitEvent.getCaseData().getJurCodesCollection().stream()
-                    .map(jurCodesTypeItem ->
-                            DynamicListHelper.getDynamicValue(jurCodesTypeItem.getValue().getJuridictionCodesList()))
-                    .collect(Collectors.toList());
-
+            jurCodesCollection = submitEvent.getCaseData().getJurCodesCollection();
         }
 
-        multipleData.setBatchUpdateJurisdiction(populateDynamicList(jurCodesCollection));
+        multipleData.setBatchUpdateJurisdiction(jurCodesCollection);
 
         log.info("Checking RespondentCollection");
 

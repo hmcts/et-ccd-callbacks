@@ -1,11 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
@@ -242,5 +245,49 @@ class MultipleNotificationServiceTest {
         assertNull(multipleData.getSendNotificationEccQuestion());
         assertNull(multipleData.getSendNotificationWhoCaseOrder());
         assertNull(multipleData.getSendNotificationNotifyLeadCase());
+    }
+
+    @Test
+    public void testSetSendNotificationDocumentsToDocumentCollection_withEmptyUploadDoc_shouldNotAddToDocumentCollection() {
+
+        MultipleData multipleData = new MultipleData();
+        List<DocumentTypeItem> uploadedDoc = new ArrayList<>();
+        multipleData.setSendNotificationUploadDocument(uploadedDoc);
+
+        multiplesSendNotificationService.setSendNotificationDocumentsToDocumentCollection(multipleData);
+
+        Assertions.assertTrue(CollectionUtils.isEmpty(multipleData.getDocumentCollection()));
+    }
+
+    @Test
+    public void testSetSendNotificationDocumentsToDocumentCollection_withEmptyDocumentCollection_shouldAddUploadDocToDocumentCollection() {
+
+        MultipleData multipleData = new MultipleData();
+        List<DocumentTypeItem> uploadedDoc = new ArrayList<>();
+        uploadedDoc.add(new DocumentTypeItem());
+        multipleData.setSendNotificationUploadDocument(uploadedDoc);
+
+        multiplesSendNotificationService.setSendNotificationDocumentsToDocumentCollection(multipleData);
+
+        Assertions.assertFalse(CollectionUtils.isEmpty(multipleData.getDocumentCollection()));
+        assertEquals(1, multipleData.getDocumentCollection().size());
+    }
+
+    @Test
+    public void testSetSendNotificationDocumentsToDocumentCollection_withNonEmptyDocumentCollection_shouldAddUploadDocToDocumentCollection() {
+
+        MultipleData multipleData = new MultipleData();
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        documentCollection.add(new DocumentTypeItem());
+        multipleData.setDocumentCollection(documentCollection);
+
+        List<DocumentTypeItem> uploadedDoc = new ArrayList<>();
+        uploadedDoc.add(new DocumentTypeItem());
+        multipleData.setSendNotificationUploadDocument(uploadedDoc);
+
+        multiplesSendNotificationService.setSendNotificationDocumentsToDocumentCollection(multipleData);
+
+        Assertions.assertFalse(CollectionUtils.isEmpty(multipleData.getDocumentCollection()));
+        assertEquals(2, multipleData.getDocumentCollection().size());
     }
 }

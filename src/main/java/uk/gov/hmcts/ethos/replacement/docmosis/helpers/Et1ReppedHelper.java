@@ -340,8 +340,10 @@ public class Et1ReppedHelper {
     private static ClaimantWorkAddressType claimantWorkAddress(CaseData caseData) {
         ClaimantWorkAddressType claimantWorkAddressType = new ClaimantWorkAddressType();
         if (YES.equals(caseData.getDidClaimantWorkAtSameAddress())) {
+            caseData.setClaimantWorkAddressQuestion(YES);
             claimantWorkAddressType.setClaimantWorkAddress(caseData.getRespondentAddress());
         } else if (NO.equals(caseData.getDidClaimantWorkAtSameAddress())) {
+            caseData.setClaimantWorkAddressQuestion(NO);
             return caseData.getClaimantWorkAddress();
         }
         return null;

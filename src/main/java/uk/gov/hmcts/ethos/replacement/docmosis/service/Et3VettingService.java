@@ -96,7 +96,7 @@ public class Et3VettingService {
     private RespondentSumTypeItem getRespondentForCase(String respondentName, CaseData caseData) {
         Optional<RespondentSumTypeItem> respondent =
             caseData.getRespondentCollection().stream()
-                .filter(o -> respondentName.equals(o.getValue().getRespondentName()))
+                .filter(o -> respondentName.equals(o.getValue().getRespondentName().trim()))
                 .findFirst();
 
         if (respondent.isEmpty()) {

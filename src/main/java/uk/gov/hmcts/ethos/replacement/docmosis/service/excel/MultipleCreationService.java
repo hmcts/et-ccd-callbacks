@@ -199,6 +199,7 @@ public class MultipleCreationService {
 
     private List<String> getUniqueOrganisations(List<SubmitEvent> cases) {
         return cases.stream()
+            .filter(o -> o.getCaseData().getRepCollection() != null)
             .flatMap(o -> o.getCaseData().getRepCollection().stream())
             .map(RepresentedTypeRItem::getValue)
             .filter(Objects::nonNull)

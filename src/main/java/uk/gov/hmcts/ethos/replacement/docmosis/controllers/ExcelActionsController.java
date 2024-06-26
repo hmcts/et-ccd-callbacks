@@ -43,6 +43,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadServi
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleUpdateService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +98,7 @@ public class ExcelActionsController {
     })
     public ResponseEntity<MultipleCallbackResponse> createMultiple(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("CREATE MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -300,7 +301,7 @@ public class ExcelActionsController {
     })
     public ResponseEntity<MultipleCallbackResponse> batchUpdate(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("BATCH UPDATE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -460,6 +461,37 @@ public class ExcelActionsController {
 
         multipleCreationMidEventValidationService.multipleCreationValidationLogic(
                 userToken, multipleDetails, errors, false);
+
+        return getMultipleCallbackRespEntity(errors, multipleDetails);
+    }
+
+    @PostMapping(value = "/multipleRemoveCaseIdsMidEventValidation", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "validates if single cases are right on the multiple creation.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MultipleCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<MultipleCallbackResponse> multipleRemoveCaseIdsMidEventValidation(
+            @RequestBody MultipleRequest multipleRequest,
+            @RequestHeader("Authorization") String userToken) {
+        log.info("MULTIPLE REMOVE CASES MID EVENT VALIDATION ---> "
+                + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        List<String> errors = new ArrayList<>();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
+
+        multipleCreationMidEventValidationService.multipleRemoveCasesValidationLogic(
+                userToken, multipleDetails, errors);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }

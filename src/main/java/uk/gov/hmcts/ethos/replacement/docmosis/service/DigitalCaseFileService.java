@@ -10,16 +10,12 @@ import uk.gov.hmcts.et.common.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
 import uk.gov.hmcts.et.common.model.bundle.BundleDocument;
 import uk.gov.hmcts.et.common.model.bundle.BundleDocumentDetails;
-import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +28,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class DigitalCaseFileService {
     private final AuthTokenGenerator authTokenGenerator;
     private final BundleApiClient bundleApiClient;
-    private static final String DOCUMENT_INDEX_NAME = "%s - %s - %s";
 
     @Value("${em-ccd-orchestrator.config.default}")
     private String defaultBundle;
@@ -93,7 +88,7 @@ public class DigitalCaseFileService {
     }
 
     private BundleDetails createBundleDetails(CaseData caseData) {
-        List<BundleDocumentDetails> caseDocs = getDocsForDcf(caseData);
+        List<BundleDocumentDetails> caseDocs = DigitalCaseFileHelper.getDocsForDcf(caseData);
         List<BundleDocument> bundleDocuments = caseDocs.stream()
                 .map(bundleDocumentDetails -> BundleDocument.builder()
                         .value(bundleDocumentDetails)
@@ -110,39 +105,6 @@ public class DigitalCaseFileService {
                 .pageNumberFormat("numberOfPages")
                 .documents(bundleDocuments)
                 .build();
-    }
-
-    private List<BundleDocumentDetails> getDocsForDcf(CaseData caseData) {
-        return caseData.getDocumentCollection().stream()
-                .map(GenericTypeItem::getValue)
-                .filter(doc -> doc.getUploadedDocument() != null && isExcludedFromDcf(doc))
-                .map(doc -> BundleDocumentDetails.builder()
-                        .name(getDocumentName(doc))
-                        .sourceDocument(DocumentLink.builder()
-                                .documentUrl(doc.getUploadedDocument().getDocumentUrl())
-                                .documentBinaryUrl(doc.getUploadedDocument().getDocumentBinaryUrl())
-                                .documentFilename(doc.getUploadedDocument().getDocumentFilename())
-                                .build())
-                        .build())
-                .toList();
-    }
-
-    private static String getDocumentName(DocumentType doc) {
-        String docType = isNullOrEmpty(doc.getDocumentType())
-                ? ""
-                : " - " + doc.getDocumentType();
-        String docFileName = isNullOrEmpty(doc.getUploadedDocument().getDocumentFilename())
-                ? ""
-                : " - " + doc.getUploadedDocument().getDocumentFilename();
-        String docDate = isNullOrEmpty(doc.getDateOfCorrespondence())
-                ? ""
-                : " - " + LocalDate.parse(doc.getDateOfCorrespondence())
-                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        return doc.getDocNumber()  + docType + docFileName + docDate;
-    }
-
-    private static boolean isExcludedFromDcf(DocumentType doc) {
-        return CollectionUtils.isEmpty(doc.getExcludeFromDcf()) || !YES.equals(doc.getExcludeFromDcf().get(0));
     }
 }
 

@@ -212,8 +212,8 @@ public class BundlesRespondentController {
         <html>
             <body>
                 <tag><h2>What happens next</h2></tag>
-                <h2>The tribunal will let you know</h2>
-                <h2> if they have any questions about the hearing documents you have submitted.</h2>
+                <h2>The tribunal will let you know
+                if they have any questions about the hearing documents you have submitted.</h2>
             </body>
         </html>""";
 
@@ -226,6 +226,62 @@ public class BundlesRespondentController {
                 .confirmation_header(header)
                 .confirmation_body(body)
                 .build());
+    }
+
+    @PostMapping(value = "/removeHearingBundle", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Remove a hearing bundle")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Removed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> removeHearingBundle(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        throwIfBundlesFlagDisabled();
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        try {
+            bundlesRespondentService.removeHearingBundles(caseData);
+            bundlesRespondentService.clearInputData(caseData);
+            return getCallbackRespEntityNoErrors(caseData);
+        } catch (Exception e) {
+            log.error("Error removing hearing bundle", e);
+            return getCallbackRespEntityErrors(List.of(e.getMessage()), caseData);
+        }
+    }
+
+    /**
+     * Populates the hearing bundle list on page 2 based on the party selected.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/midPopulateRemoveHearingBundles", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the hearing bundle list on page 2")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midPopulateRemoveHearingBundles(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        throwIfBundlesFlagDisabled();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        bundlesRespondentService.populateSelectRemoveHearingBundle(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     private void throwIfBundlesFlagDisabled() {

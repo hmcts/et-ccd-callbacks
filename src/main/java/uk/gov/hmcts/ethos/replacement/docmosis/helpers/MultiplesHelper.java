@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
@@ -44,15 +46,13 @@ public final class MultiplesHelper {
     public static final List<String> HEADERS = new ArrayList<>(Arrays.asList(
             HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5, HEADER_6));
     public static final String SELECT_ALL = "All";
+    public static final String MULTIPLE_SUFFIX = "_Multiple";
 
     private MultiplesHelper() {
     }
 
     public static List<String> getCaseIds(MultipleData multipleData) {
-
-        if (multipleData.getCaseIdCollection() != null
-                && !multipleData.getCaseIdCollection().isEmpty()) {
-
+        if (CollectionUtils.isNotEmpty(multipleData.getCaseIdCollection())) {
             return multipleData.getCaseIdCollection().stream()
                     .filter(key -> key.getId() != null && !key.getId().equals("null"))
                     .map(caseId -> caseId.getValue().getEthosCaseReference())
@@ -60,35 +60,38 @@ public final class MultiplesHelper {
                     .collect(Collectors.toList());
 
         } else {
-
             return new ArrayList<>();
-
         }
     }
 
-    // MID EVENTS COLLECTIONS HAVE KEY AS NULL BUT WITH VALUES!
-    public static List<String> getCaseIdsForMidEvent(MultipleData multipleData) {
-
-        if (multipleData.getCaseIdCollection() != null
-                && !multipleData.getCaseIdCollection().isEmpty()) {
-
-            return multipleData.getCaseIdCollection().stream()
-                    .filter(caseId -> caseId.getValue().getEthosCaseReference() != null)
-                    .map(caseId -> caseId.getValue().getEthosCaseReference())
-                    .distinct()
-                    .toList();
-
-        } else {
-
+    public static List<String> getCaseIdsFromCollection(List<CaseIdTypeItem> caseIdCollection) {
+        if (CollectionUtils.isEmpty(caseIdCollection)) {
             return new ArrayList<>();
-
         }
+
+        return caseIdCollection.stream()
+                .filter(key -> key.getId() != null && !key.getId().equals("null"))
+                .map(caseId -> caseId.getValue().getEthosCaseReference())
+                .distinct()
+                .toList();
+    }
+
+    // MID EVENTS COLLECTIONS HAVE KEY AS NULL BUT WITH VALUES!
+    public static List<String> getCaseIdsForMidEvent(List<CaseIdTypeItem> caseIdCollection) {
+        if (CollectionUtils.isEmpty(caseIdCollection)) {
+            return new ArrayList<>();
+        }
+
+        return caseIdCollection.stream()
+                .filter(caseId -> caseId.getValue().getEthosCaseReference() != null)
+                .map(caseId -> caseId.getValue().getEthosCaseReference())
+                .distinct()
+                .toList();
     }
 
     public static List<CaseIdTypeItem> filterDuplicatedAndEmptyCaseIds(MultipleData multipleData) {
 
-        if (multipleData.getCaseIdCollection() != null
-                && !multipleData.getCaseIdCollection().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(multipleData.getCaseIdCollection())) {
 
             return multipleData.getCaseIdCollection().stream()
                     .filter(caseId ->
@@ -266,7 +269,7 @@ public final class MultiplesHelper {
 
     public static List<String> generateSubMultipleStringCollection(MultipleData multipleData) {
 
-        if (multipleData.getSubMultipleCollection() != null && !multipleData.getSubMultipleCollection().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(multipleData.getSubMultipleCollection())) {
 
             return multipleData.getSubMultipleCollection().stream()
                     .map(subMultipleTypeItem -> subMultipleTypeItem.getValue().getSubMultipleName())
@@ -363,4 +366,15 @@ public final class MultiplesHelper {
         return bos.toByteArray();
     }
 
+    public static String removeMultipleSuffix(String caseTypeId) {
+        return caseTypeId.replace(MULTIPLE_SUFFIX, "");
+    }
+
+    public static String appendMultipleSuffix(String caseTypeId) {
+        return caseTypeId + MULTIPLE_SUFFIX;
+    }
+
+    public static String getListingMultipleCaseTypeId(String caseTypeId) {
+        return UtilHelper.getListingCaseTypeId(caseTypeId) + MULTIPLE_SUFFIX;
+    }
 }

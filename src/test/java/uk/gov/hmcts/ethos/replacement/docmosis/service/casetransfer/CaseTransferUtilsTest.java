@@ -169,7 +169,7 @@ class CaseTransferUtilsTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .withBfAction(YES)
                 .withHearing("1", "HearingType", "Judge", null, null, null, null)
-                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_HEARD, true)
+                .withHearingSession(0, "2021-12-25", HEARING_STATUS_HEARD, true)
                 .build();
 
         List<String> errors = caseTransferUtils.validateCase(caseData);
@@ -198,7 +198,7 @@ class CaseTransferUtilsTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference(ethosCaseReference)
                 .withHearing("1", "HearingType", "Judge", null, null, null, null)
-                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_LISTED, true)
+                .withHearingSession(0, "2021-12-25", HEARING_STATUS_LISTED, true)
                 .build();
 
         List<String> errors = caseTransferUtils.validateCase(caseData);
@@ -215,7 +215,7 @@ class CaseTransferUtilsTest {
                 .withEthosCaseReference(ethosCaseReference)
                 .withBfAction(null)
                 .withHearing("1", "HearingType", "Judge", null, null, null, null)
-                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_LISTED, true)
+                .withHearingSession(0, "2021-12-25", HEARING_STATUS_LISTED, true)
                 .build();
 
         List<String> errors = caseTransferUtils.validateCase(caseData);

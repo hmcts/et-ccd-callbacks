@@ -54,36 +54,35 @@ class MemberDaysReportDocTest {
         listingData.getReportDetails().add(detailItem);
 
         StringBuilder expectedDetailRowContent = new StringBuilder(339);
-        expectedDetailRowContent.append("\"Listed_date\":\"").append(NEW_LINE);
-        expectedDetailRowContent.append("\"Report_Office\":\"").append(NEW_LINE);
-        expectedDetailRowContent.append("\"Total_Full_Days\":\"").append(NEW_LINE);
-        expectedDetailRowContent.append("\"Total_Half_Days\":\"").append(NEW_LINE);
-        expectedDetailRowContent.append("\"Total_Days\":\"").append(NEW_LINE);
+        expectedDetailRowContent.append("\"Listed_date\":\"").append(NEW_LINE)
+                .append("\"Report_Office\":\"").append(NEW_LINE)
+                .append("\"Total_Full_Days\":\"").append(NEW_LINE)
+                .append("\"Total_Half_Days\":\"").append(NEW_LINE)
+                .append("\"Total_Days\":\"").append(NEW_LINE)
+                .append("\"memberDaySummaryItems\":[").append('\n')
+                .append("],").append('\n')
+                .append("\"reportDetails\":[").append('\n')
+                .append('{').append('\n')
+                .append("\"Detail_Hearing_Date\":\"")
+                .append(nullCheck(detailItem.getHearingDate())).append(NEW_LINE)
+                .append("\"Employee_Member\":\"")
+                .append(nullCheck(detailItem.getEmployeeMember())).append(NEW_LINE)
+                .append("\"Employer_Member\":\"")
+                .append(nullCheck(detailItem.getEmployerMember())).append(NEW_LINE)
+                .append("\"Case_Reference\":\"")
+                .append(nullCheck(detailItem.getCaseReference())).append(NEW_LINE)
+                .append("\"Hearing_Number\":\"")
+                .append(nullCheck(detailItem.getHearingNumber())).append(NEW_LINE)
+                .append("\"Hearing_Type\":\"")
+                .append(nullCheck(detailItem.getHearingType())).append(NEW_LINE)
+                .append("\"Hearing_Clerk\":\"")
+                .append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE);
 
-        expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append('\n');
-        expectedDetailRowContent.append("],").append('\n');
-
-        expectedDetailRowContent.append("\"reportDetails\":[").append('\n');
-        expectedDetailRowContent.append('{').append('\n');
-        expectedDetailRowContent.append("\"Detail_Hearing_Date\":\"")
-            .append(nullCheck(detailItem.getHearingDate())).append(NEW_LINE);
-        expectedDetailRowContent.append("\"Employee_Member\":\"")
-            .append(nullCheck(detailItem.getEmployeeMember())).append(NEW_LINE);
-        expectedDetailRowContent.append("\"Employer_Member\":\"")
-            .append(nullCheck(detailItem.getEmployerMember())).append(NEW_LINE);
-        expectedDetailRowContent.append("\"Case_Reference\":\"")
-            .append(nullCheck(detailItem.getCaseReference())).append(NEW_LINE);
-        expectedDetailRowContent.append("\"Hearing_Number\":\"")
-            .append(nullCheck(detailItem.getHearingNumber())).append(NEW_LINE);
-        expectedDetailRowContent.append("\"Hearing_Type\":\"")
-            .append(nullCheck(detailItem.getHearingType())).append(NEW_LINE);
-        expectedDetailRowContent.append("\"Hearing_Clerk\":\"")
-            .append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE);
         double durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
         expectedDetailRowContent.append("\"Hearing_Duration\":\"")
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
-            .append("\"\n");
-        expectedDetailRowContent.append("}]").append(",\n");
+            .append("\"\n")
+                .append("}]").append(",\n");
         StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());

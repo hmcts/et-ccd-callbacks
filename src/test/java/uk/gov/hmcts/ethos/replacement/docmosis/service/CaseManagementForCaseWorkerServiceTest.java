@@ -3,13 +3,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
@@ -40,7 +43,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -61,6 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -69,6 +77,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -81,6 +91,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
@@ -93,6 +104,9 @@ class CaseManagementForCaseWorkerServiceTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
     private static final String HMCTS_SERVICE_ID = "BHA1";
+
+    @Value("${ccd_gateway_base_url}")
+    private String ccdGatewayBaseUrl;
 
     @InjectMocks
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -108,7 +122,6 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest ccdRequest15;
     private CCDRequest ccdRequest21;
     private CCDRequest ccdRequest22;
-
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
@@ -128,6 +141,10 @@ class CaseManagementForCaseWorkerServiceTest {
     private EmailService emailService;
     @MockBean
     private CaseManagementLocationService caseManagementLocationService;
+    @MockBean
+    private MultipleReferenceService multipleReferenceService;
+    @MockBean
+    private MultipleCasesSendingService multipleCasesSendingService;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -224,7 +241,8 @@ class CaseManagementForCaseWorkerServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
-                adminUserService, caseManagementLocationService);
+                adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
+                multipleCasesSendingService);
     }
 
     private static Address getAddress() {
@@ -338,7 +356,6 @@ class CaseManagementForCaseWorkerServiceTest {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("PostTown");
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setCountry("Country");
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostCode("PostCode");
-
         }
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
@@ -401,7 +418,6 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
 
         assertEquals(3, caseData.getRespondentCollection().size());
-
         assertEquals("Antonio Vazquez", caseData.getRespondentCollection().get(0).getValue().getRespondentName());
         assertEquals(NO, caseData.getRespondentCollection().get(0).getValue().getResponseStruckOut());
         assertEquals("Juan Garcia", caseData.getRespondentCollection().get(1).getValue().getRespondentName());
@@ -966,6 +982,103 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
+    void testSetMigratedCaseLinkDetails_Success() {
+        String caseDetailsId = "123";
+        String caseId = "23_457_865";
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(caseDetailsId);
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+
+        SubmitEvent submitEventSourceCase = new SubmitEvent();
+        submitEventSourceCase.setCaseId(123_457_865);
+        CaseData sourceCaseData = new CaseData();
+        sourceCaseData.setCcdID("123_455");
+        submitEventSourceCase.setCaseData(sourceCaseData);
+        SubmitEvent fullSourceCase = new SubmitEvent();
+        sourceCaseData.setEthosCaseReference("EthosCaseRef");
+        fullSourceCase.setCaseData(sourceCaseData);
+
+        SubmitEvent submitEventLocal = new SubmitEvent();
+        submitEventLocal.setCaseId(123_45);
+
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                anyString(), anyString(), anyList()))
+                .thenReturn(Pair.of("testSourceCaseType", List.of(submitEventSourceCase)));
+        when(caseRetrievalForCaseWorkerService.caseRefRetrievalRequest(any(), any(), any(), any()))
+                .thenReturn(fullSourceCase.getCaseData().getEthosCaseReference());
+
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(AUTH_TOKEN, caseDetails);
+        assertEquals("<a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/"
+                + submitEventSourceCase.getCaseId()
+                + "\">EthosCaseRef</a>", caseDetails.getCaseData().getTransferredCaseLink());
+    }
+
+    @Test
+    void testSetMigratedCaseLinkDetails_When_SubmitEventListIsNull() {
+        String caseId = "caseId";
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+
+        String authToken = "authToken";
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                caseId, authToken, List.of("ET_EnglandWales"))).thenReturn(null);
+
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
+
+        assertEquals(null, caseDetails.getCaseData().getTransferredCaseLink());
+    }
+
+    @Test
+    void testSetMigratedCaseLinkDetails_When_SubmitEventListIsEmpty() {
+        String caseId = "caseId";
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+        String authToken = "authToken";
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                caseId, authToken, List.of("ET_EnglandWales")))
+                .thenReturn(Pair.of(EMPTY_STRING, new ArrayList<>()));
+
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
+
+        assertNull(caseDetails.getCaseData().getTransferredCaseLink());
+    }
+
+    @Test
+    void testSetMigratedCaseLinkDetails_When_EthosCaseReferenceIsNull() {
+        String caseId = "caseId";
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(caseId);
+        caseDetails.setCaseData(caseData);
+
+        List<SubmitEvent> submitEventList = new ArrayList<>();
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(12_345);
+        submitEventList.add(submitEvent);
+        SubmitEvent fullSourceCase = new SubmitEvent();
+        CaseData sourceCaseData = new CaseData();
+        sourceCaseData.setEthosCaseReference(null);
+        fullSourceCase.setCaseData(sourceCaseData);
+        String authToken = "authToken";
+
+        when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                caseId, authToken, List.of("ET_EnglandWales")))
+                .thenReturn(Pair.of("Leeds", submitEventList));
+        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(anyString(), anyString(),
+                anyString(), anyString())).thenReturn(fullSourceCase);
+
+        caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(authToken, caseDetails);
+
+        Assert.assertNull(caseDetails.getCaseData().getTransferredCaseLink());
+    }
+
+    @Test
     void respondentExtension_defaultValueNo() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
@@ -1257,6 +1370,37 @@ class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
 
         assertNull(caseData.getClaimantId());
+    }
+
+    @Test
+    void testSetNextListedDateOnMultiple() throws IOException {
+        CaseDetails details = new CaseDetails();
+        details.setCaseData(new CaseData());
+        details.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        details.getCaseData().setMultipleReference("6000001");
+        String nextListedDate = "2020-03-05";
+        details.getCaseData().setNextListedDate(nextListedDate);
+        details.getCaseData().setLeadClaimant(YES);
+
+        MultipleData multipleData = MultipleData.builder().build();
+        SubmitMultipleEvent event = new SubmitMultipleEvent();
+        event.setCaseId(Long.valueOf("1716474017962374"));
+        event.setCaseData(multipleData);
+
+        String adminToken = "adminToken";
+        when(adminUserService.getAdminUserToken()).thenReturn(adminToken);
+        when(multipleReferenceService.getMultipleByReference(any(), any(), any())).thenReturn(event);
+
+        caseManagementForCaseWorkerService.setNextListedDateOnMultiple(details);
+
+        assertEquals(nextListedDate, multipleData.getNextListedDate());
+        multipleData.setNextListedDate(nextListedDate);
+        verify(multipleCasesSendingService, times(1))
+            .sendUpdateToMultiple(adminToken,
+                ENGLANDWALES_BULK_CASE_TYPE_ID,
+                EMPLOYMENT,
+                multipleData,
+                "1716474017962374");
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

@@ -290,6 +290,19 @@ class CaseTransferSameCountryServiceTest {
                 caseDetails, USER_TOKEN));
     }
 
+    @Test
+    void caseTransferShouldTransferSameOfficeWithBfActionAndHearingListed() {
+        String officeCT = TribunalOffice.MANCHESTER.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(officeCT, officeCT, HEARING_STATUS_LISTED);
+        addBfAction(caseDetails.getCaseData(), null);
+        when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
+                .thenReturn(List.of(caseDetails.getCaseData()));
+        List<String> errors = caseTransferSameCountryService.transferCase(caseDetails, USER_TOKEN);
+
+        assertEquals(0, errors.size());
+        verify(caseTransferUtils, never()).validateCase(caseDetails.getCaseData());
+    }
+
     private void verifyCaseTransferEventParams(String expectedEthosCaseReference,
                                                String expectedSourceEthosCaseReference, String expectedManagingOffice,
                                                CaseTransferEventParams params) {
@@ -323,7 +336,7 @@ class CaseTransferSameCountryServiceTest {
         if (hearingStatus != null) {
             builder.withHearing("1", null, null, null, null,
                     null, null)
-                    .withHearingSession(0, "1", "2021-12-25", hearingStatus, false);
+                    .withHearingSession(0, "2021-12-25", hearingStatus, false);
         }
 
         return builder.buildAsCaseDetails(caseTypeId, EMPLOYMENT_JURISDICTION_TYPE);

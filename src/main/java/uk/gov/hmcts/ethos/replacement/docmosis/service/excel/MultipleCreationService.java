@@ -5,6 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.LegalRepDataModel;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
@@ -12,12 +20,24 @@ import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
@@ -40,8 +60,16 @@ public class MultipleCreationService {
     private final MultipleHelperService multipleHelperService;
     private final SubMultipleUpdateService subMultipleUpdateService;
     private final MultipleTransferService multipleTransferService;
+    private final CaseManagementLocationService caseManagementLocationService;
+    private final FeatureToggleService featureToggleService;
+    private final CcdClient ccdClient;
+    private final AdminUserService adminUserService;
+    private final OrganisationClient organisationClient;
+    private final AuthTokenGenerator authTokenGenerator;
+    private final CreateUpdatesBusSender createUpdatesBusSender;
 
-    public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
+    public void bulkCreationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors)
+        throws IOException {
 
         log.info("Add data to the multiple");
 
@@ -51,24 +79,33 @@ public class MultipleCreationService {
 
         multipleDetails.getCaseData().setState(OPEN_STATE);
 
+        MultipleData multipleData = multipleDetails.getCaseData();
+        if (featureToggleService.isMultiplesEnabled()) {
+            log.info("Setting Case Management Location");
+            caseManagementLocationService.setCaseManagementLocation(multipleData);
+        }
+
         log.info("Check if creation is coming from Case Transfer");
 
         multipleTransferService.populateDataIfComingFromCT(userToken, multipleDetails, errors);
 
         log.info("Get lead case link and add to the collection case Ids");
 
-        getLeadMarkUpAndAddLeadToCaseIds(userToken, multipleDetails);
+        setLeadMarkUpAndAddLeadToCaseIds(userToken, multipleDetails);
+        if (featureToggleService.isMul2Enabled()) {
+            addLegalRepsFromSinglesCases(multipleDetails);
+        }
 
-        if (!multipleDetails.getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
-                && !multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
+        if (multipleData.getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
+                || multipleData.getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
+
+            multipleCreationET1OnlineMigration(userToken, multipleDetails);
+
+        } else {
 
             log.info("Multiple Creation UI");
 
             multipleCreationUI(userToken, multipleDetails, errors);
-
-        } else {
-
-            multipleCreationET1OnlineMigration(userToken, multipleDetails);
 
         }
 
@@ -76,6 +113,110 @@ public class MultipleCreationService {
 
         clearingMultipleCreationPayload(multipleDetails);
 
+    }
+
+    private void addLegalRepsFromSinglesCases(MultipleDetails multipleDetails) throws IOException {
+        MultipleData multipleData = multipleDetails.getCaseData();
+        List<String> caseIds = multipleData.getCaseIdCollection().stream()
+            .map(o -> o.getValue().getEthosCaseReference())
+            .collect(Collectors.toList());
+
+        if (caseIds.isEmpty()) {
+            // No cases linked to this multiple means no legal reps to add
+            return;
+        }
+
+        String token = adminUserService.getAdminUserToken();
+        String multipleCaseTypeId = multipleDetails.getCaseTypeId();
+        String singleCaseTypeId = MultiplesHelper.removeMultipleSuffix(multipleCaseTypeId);
+        
+        List<SubmitEvent> cases = ccdClient.retrieveCasesElasticSearch(token, singleCaseTypeId, caseIds);
+        log.info("Retrieved {} cases from ES when adding legalreps to newly created multiple", cases.size());
+
+        List<String> orgIds = getUniqueOrganisations(cases);
+
+        List<OrganisationUsersIdamUser> users = orgIds.stream()
+            .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
+            .flatMap(o -> o.getBody().getUsers().stream())
+            .toList();
+
+        Map<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
+
+        if (emails.isEmpty()) {
+            // No need to ask message-handler to update permissions if all cases have no legal reps
+            return;
+        }
+
+        Map<String, String> legalrepMap = buildEmailIdMap(users);
+
+        HashMap<String, List<String>> legalRepsByCaseId = new HashMap<>();
+
+        for (Entry<Long, List<String>> byCase : emails.entrySet()) {
+            
+            legalRepsByCaseId.put(byCase.getKey().toString(), new ArrayList<>());
+
+            for (String userEmail : byCase.getValue()) {
+                String legalRepId = legalrepMap.get(userEmail);
+
+                legalRepsByCaseId.get(byCase.getKey().toString()).add(legalRepId);
+            }
+        }
+
+        var ethosList = List.of(cases.get(0).getCaseData().getEthosCaseReference());
+
+        CreateUpdatesDto createUpdatesDto = CreateUpdatesDto.builder()
+            .caseTypeId(multipleCaseTypeId)
+            .jurisdiction(multipleDetails.getJurisdiction())
+            .multipleRef(multipleDetails.getCaseId())
+            .ethosCaseRefCollection(ethosList)
+            .build();
+
+        DataModelParent legalRepDto = LegalRepDataModel.builder()
+            .legalRepIdsByCase(legalRepsByCaseId)
+            .caseType(multipleCaseTypeId)
+            .multipleName(multipleDetails.getCaseData().getMultipleName())
+            .build();
+
+        createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, legalRepDto, ethosList, "1");
+    }
+
+    private Map<String, String> buildEmailIdMap(List<OrganisationUsersIdamUser> users) {
+        HashMap<String, String> emailIdMap = new HashMap<>();
+        for (OrganisationUsersIdamUser user : users) {
+            emailIdMap.put(user.getEmail(), user.getUserIdentifier());
+        }
+        return emailIdMap;
+    }
+
+    private Map<Long, List<String>> getUniqueLegalRepEmails(List<SubmitEvent> cases) {
+        HashMap<Long, List<String>> caseRepEmails = new HashMap<>();
+
+        for (SubmitEvent caseData : cases) {
+            if (caseData.getCaseData().getRepCollection() == null) {
+                continue;
+            }
+            List<String> repEmails = caseData.getCaseData().getRepCollection().stream()
+                .map(o -> o.getValue().getRepresentativeEmailAddress())
+                .filter(Objects::nonNull)
+                .toList();
+
+            caseRepEmails.put(caseData.getCaseId(), repEmails);
+        }
+
+        return caseRepEmails;
+    }
+
+    private List<String> getUniqueOrganisations(List<SubmitEvent> cases) {
+        return cases.stream()
+            .filter(o -> o.getCaseData().getRepCollection() != null)
+            .flatMap(o -> o.getCaseData().getRepCollection().stream())
+            .map(RepresentedTypeRItem::getValue)
+            .filter(Objects::nonNull)
+            .map(RepresentedTypeR::getRespondentOrganisation)
+            .filter(Objects::nonNull)
+            .map(o -> o.getOrganisationID())
+            .distinct()
+            .toList();
     }
 
     private void multipleCreationUI(String userToken, MultipleDetails multipleDetails, List<String> errors) {
@@ -148,7 +289,7 @@ public class MultipleCreationService {
 
     private void multipleCreationMigrationLogic(MultipleDetails multipleDetails,
                                                            List<MultipleObject> multipleObjectList,
-                                                           HashSet<String> subMultipleNames) {
+                                                           Set<String> subMultipleNames) {
 
         List<CaseMultipleTypeItem> caseMultipleTypeItemList = multipleDetails.getCaseData().getCaseMultipleCollection();
 
@@ -219,7 +360,7 @@ public class MultipleCreationService {
     private void addDataToMultiple(MultipleData multipleData) {
 
         if (multipleData.getMultipleSource() == null
-                || multipleData.getMultipleSource().trim().equals("")) {
+                || multipleData.getMultipleSource().trim().isEmpty()) {
 
             multipleData.setMultipleSource(MANUALLY_CREATED_POSITION);
 
@@ -227,21 +368,13 @@ public class MultipleCreationService {
 
     }
 
-    private void getLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {
+    private void setLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {
 
         MultipleData multipleData = multipleDetails.getCaseData();
 
         String leadCase;
 
-        if (!isNullOrEmpty(multipleData.getLeadCase())) {
-
-            log.info("Adding lead case introduced by user: " + multipleData.getLeadCase());
-
-            MultiplesHelper.addLeadToCaseIds(multipleData, multipleData.getLeadCase());
-
-            leadCase = multipleData.getLeadCase();
-
-        } else {
+        if (isNullOrEmpty(multipleData.getLeadCase())) {
 
             if (multipleDetails.getCaseData().getMultipleSource().equals(MIGRATION_CASE_SOURCE)) {
 
@@ -256,6 +389,14 @@ public class MultipleCreationService {
                 leadCase = MultiplesHelper.getLeadFromCaseIds(multipleData);
 
             }
+
+        } else {
+
+            log.info("Adding lead case introduced by user: " + multipleData.getLeadCase());
+
+            MultiplesHelper.addLeadToCaseIds(multipleData, multipleData.getLeadCase());
+
+            leadCase = multipleData.getLeadCase();
 
         }
 
@@ -272,7 +413,11 @@ public class MultipleCreationService {
         String refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
                 multipleDetails.getCaseData().getMultipleReference());
 
-        if (!ethosCaseRefCollection.isEmpty()) {
+        if (ethosCaseRefCollection.isEmpty()) {
+
+            log.info("Empty case ref collection");
+
+        } else {
 
             multipleHelperService.sendCreationUpdatesToSinglesWithoutConfirmation(userToken,
                     multipleDetails.getCaseTypeId(),
@@ -282,10 +427,6 @@ public class MultipleCreationService {
                     ethosCaseRefCollection,
                     ethosCaseRefCollection.get(0),
                     refMarkup);
-
-        } else {
-
-            log.info("Empty case ref collection");
 
         }
     }

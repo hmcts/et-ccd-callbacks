@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 /**
  * ET1 Vetting Helper provides methods to assist with the ET1 vetting event.
@@ -38,15 +39,17 @@ public final class Et1VettingHelper {
     /**
      * This method generates the data in a JSON format stored in a String which allows Tornado to process the
      * information.
-     * @param caseData contains the data from ET1 Vetting
-     * @param userToken contains the authentication token
+     *
+     * @param caseData            contains the data from ET1 Vetting
+     * @param userToken           contains the authentication token
+     * @param dmStoreDocumentName contains the name of the document to be stored in DM Store
      * @return a string which contains the data in JSON Format which Tornado can use to process and generate the
-     document
+     *      document
      * @throws JsonProcessingException if the JSON cannot be generated correctly, an error would be thrown. This could
-     be due to an illegal character potentially existing in the data
+     *                                 be due to an illegal character potentially existing in the data
      */
-    public static String getDocumentRequest(CaseData caseData,
-                                            String userToken) throws JsonProcessingException {
+    public static String getDocumentRequest(CaseData caseData, String userToken, String dmStoreDocumentName)
+            throws JsonProcessingException {
         Et1VettingData et1VettingData = Et1VettingData.builder()
                 .ethosCaseReference(caseData.getEthosCaseReference())
                 .et1VettingCanServeClaimYesOrNo(defaultIfEmpty(caseData.getEt1VettingCanServeClaimYesOrNo(), null))
@@ -149,14 +152,14 @@ public final class Et1VettingHelper {
                         defaultIfEmpty(caseData.getEt1VettingAdditionalInformationTextArea(), null))
                 .et1DateCompleted(
                         defaultIfEmpty(caseData.getEt1DateCompleted(),
-                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
+                                LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT))))
 
                 .et1VettingCompletedBy(defaultIfEmpty(caseData.getEt1VettingCompletedBy(), null))
                 .build();
 
         Et1VettingDocument et1VettingDocument = Et1VettingDocument.builder()
                 .accessKey(userToken)
-                .outputName(String.format(ET1_VETTING_OUTPUT_NAME, caseData.getClaimant()))
+                .outputName(dmStoreDocumentName)
                 .templateName(TEMPLATE_NAME)
                 .et1VettingData(et1VettingData)
                 .build();

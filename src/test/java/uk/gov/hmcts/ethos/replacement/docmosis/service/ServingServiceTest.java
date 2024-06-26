@@ -144,7 +144,7 @@ class ServingServiceTest {
 
     @ParameterizedTest
     @MethodSource("saveServingDocToDocumentCollectionParameter")
-    void saveServingDocToDocumentCollection(String servingTypeOfDoc, String resultTypeOfDoc) throws Exception {
+    void saveServingDocToDocumentCollection(String servingTypeOfDoc, String resultTypeOfDoc) {
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(servingTypeOfDoc);
 

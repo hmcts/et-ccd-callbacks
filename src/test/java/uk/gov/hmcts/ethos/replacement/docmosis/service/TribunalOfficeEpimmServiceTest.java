@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.CourtLocations;
 
@@ -22,6 +23,8 @@ class TribunalOfficeEpimmServiceTest {
 
     @InjectMocks
     private TribunalOfficesService tribunalOfficesService;
+    @MockBean
+    private PostcodeToOfficeService postcodeToOfficeService;
 
     @MockBean
     private TribunalOfficesConfiguration config;
@@ -39,7 +42,7 @@ class TribunalOfficeEpimmServiceTest {
 
     @BeforeEach
     void setUp() {
-        tribunalOfficesService = new TribunalOfficesService(config);
+        tribunalOfficesService = new TribunalOfficesService(config, postcodeToOfficeService);
         office = TribunalOffice.valueOfOfficeName("Manchester");
 
         CourtLocations courtLocation = new CourtLocations();

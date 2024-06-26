@@ -30,9 +30,9 @@ class ClaimsByHearingVenueExcelReportCreationServiceTest {
         detailEntry.setRespondentET3Postcode("TE5 TE1");
         reportData.getReportDetails().add(detailEntry);
         excelCreationService = mock(ExcelCreationService.class);
-        doAnswer((i) -> null).when(excelCreationService).initializeReportHeaders(anyString(),
+        doAnswer(i -> null).when(excelCreationService).initializeReportHeaders(anyString(),
                 anyString(), any(), any(), any());
-        doAnswer((i) -> null).when(excelCreationService).addReportAdminDetails(
+        doAnswer(i -> null).when(excelCreationService).addReportAdminDetails(
                 any(), any(), anyInt(), anyString(), anyInt());
         service = new ClaimsByHearingVenueExcelReportCreationService(excelCreationService);
     }

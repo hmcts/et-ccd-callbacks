@@ -6,14 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -29,12 +27,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({IssueInitialConsiderationDirectionsWAController.class, JsonMapper.class})
-@ContextConfiguration(classes = DocmosisApplication.class)
 class IssueInitialConsiderationDirectionsWAControllerTest extends BaseControllerTest {
 
-    private static final String START_INITIAL_CONSIDERATION_DIRECTIONS_UR =
+    private static final String START_INITIAL_CONSIDERATION_DIRECTIONS_URL =
             "/startIssueInitialConsiderationDirectionsWA";
-    private static final String SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_UR =
+    private static final String SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL =
             "/submitIssueInitialConsiderationDirectionsWA";
     private static final String COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL =
             "/completeIssueInitialConsiderationDirectionsWA";
@@ -68,7 +65,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     @Test
     void startInitialConsiderationTest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(START_INITIAL_CONSIDERATION_DIRECTIONS_UR)
+        mvc.perform(post(START_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -79,7 +76,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     @Test
     void submitInitialConsideration_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_UR)
+        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -92,7 +89,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     @Test
     void submitInitialConsideration_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_UR)
+        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -101,7 +98,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
 
     @Test
     void submitInitialConsideration_BadRequest() throws Exception {
-        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_UR)
+        mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content("bad request")
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))

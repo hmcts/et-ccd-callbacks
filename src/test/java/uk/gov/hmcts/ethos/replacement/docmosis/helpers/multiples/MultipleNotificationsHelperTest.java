@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGroup;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.SendNotificationUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,5 +81,17 @@ class MultipleNotificationsHelperTest {
         assertEquals(2, result.size());
         assertEquals("6 Aug 2022", result.get(0).getKey().getRight());
         assertEquals("7 Aug 2022", result.get(1).getKey().getRight());
+    }
+
+    @Test
+    void shouldFormatReply() {
+        List<PseResponseTypeItem> responses =
+                SendNotificationUtil.sendNotificationNotifyBothPartiesWithResponse().getValue().getRespondCollection();
+        String result = MultipleNotificationsHelper.getAndFormatReplies(responses);
+        assertEquals("""
+                Reply: Please cancel
+                Name: Barry White, Claimant
+                -------------
+                """, result);
     }
 }

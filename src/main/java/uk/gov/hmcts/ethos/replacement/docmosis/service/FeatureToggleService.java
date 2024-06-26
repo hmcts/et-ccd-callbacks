@@ -18,6 +18,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
+    public boolean isMultiplesDBEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("muldb");
+    }
+
     public boolean isGlobalSearchEnabled() {
         return this.featureToggleApi.isFeatureEnabled("global_search_enabled");
     }

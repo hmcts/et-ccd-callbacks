@@ -102,4 +102,23 @@ withNightlyPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
 
+    afterAlways('smoketest:aat') {
+        loadVaultSecrets(inTestTrue)
+        stage('Accessibility') {
+            yarnBuilder.yarn('tests:a11y')
+            publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : "functional-output/accessibility-report",
+                    reportFiles          : 'a11y.html',
+                    reportName           : 'Accessibility results'
+            ])
+        }
+        loadVaultSecrets(inTestFalse)
+        sh """
+       yarn playwright install
+    """
+    }
+
 }

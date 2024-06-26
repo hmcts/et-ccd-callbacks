@@ -8,6 +8,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -137,7 +139,11 @@ public class MultipleSingleMidEventValidationService {
 
         }
 
-        multipleData.setBatchUpdateJurisdiction(populateDynamicList(jurCodesCollection));
+        DynamicListType dynamicList = new DynamicListType();
+        dynamicList.setDynamicList(new DynamicFixedListType());
+        dynamicList.getDynamicList().setListItems(jurCodesCollection);
+
+        multipleData.setBatchUpdateJurisdictionList(ListTypeItem.from(dynamicList));
 
         log.info("Checking RespondentCollection");
 

@@ -58,8 +58,8 @@ public class CaseFlagsDataMigrationController {
         caseFlagsService.setupCaseFlags(caseData);
         log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
                 ccdRequest.getCaseDetails().getCaseTypeId(),
-                caseData.getClaimantFlags().getPartyName(),
-                caseData.getRespondentFlags().getPartyName());
+                caseData.getClaimantInternalFlags().getPartyName(),
+                caseData.getRespondentInternalFlags().getPartyName());
 
         return getCallbackRespEntityErrors(List.of(), caseData);
     }

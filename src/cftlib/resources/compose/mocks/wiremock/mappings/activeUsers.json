@@ -3,11 +3,11 @@
     "method": "GET",
     "urlPath": "/refdata/external/v1/organisations/users",
     "queryParameters": {
-      "size": {
-        "equalTo": "50"
+      "status": {
+        "equalTo": "Active"
       },
-      "page": {
-        "equalTo": "0"
+      "returnRoles": {
+        "equalTo": "false"
       }
     }
   },
@@ -16,6 +16,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/activeUsers.json"
+    "bodyFileName": "activeUsers.json"
   }
 }

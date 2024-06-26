@@ -1,13 +1,13 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/commondata/lov/categories/CaseLinkingReasonCode"
+    "url": "/refdata/location/orgServices?ccdCaseType=EMPLOYMENT"
   },
   "response": {
     "status": 200,
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/case-links.json"
+    "bodyFileName": "locationByCaseTypeMappingResponse.json"
   }
 }

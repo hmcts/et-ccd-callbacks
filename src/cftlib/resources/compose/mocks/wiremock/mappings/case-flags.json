@@ -5,6 +5,9 @@
     "queryParameters": {
       "flag-type": {
         "equalTo": "CASE"
+      },
+      "welsh-required": {
+        "equalTo": "Y"
       }
     }
   },
@@ -13,6 +16,6 @@
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/case-flags.json"
+    "bodyFileName": "case-flags.json"
   }
 }

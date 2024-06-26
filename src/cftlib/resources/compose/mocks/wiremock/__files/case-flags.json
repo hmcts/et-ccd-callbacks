@@ -9,15 +9,18 @@
           "defaultStatus": "Active",
           "externallyAvailable": false,
           "flagCode": "CATGRY",
+          "nativeFlagCode": "CF0001",
           "childFlags": [
             {
               "name": "Urgent case",
-              "hearingRelevant": true,
-              "flagComment": false,
+              "hearingRelevant": false,
+              "flagComment": true,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "CF0007",
+              "nativeFlagCode": "CF0007",
               "childFlags": [],
+              "name_cy": "Achos brys",
               "isParent": false,
               "Path": [
                 "Case"
@@ -25,12 +28,14 @@
             },
             {
               "name": "RRO (Restricted Reporting Order / Anonymisation)",
-              "hearingRelevant": false,
-              "flagComment": false,
+              "hearingRelevant": true,
+              "flagComment": true,
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "CF0012",
+              "nativeFlagCode": "CF0012",
               "childFlags": [],
+              "name_cy": "RRO (Gorchymyn Cyfyngiadau Adrodd / Anhysbys)",
               "isParent": false,
               "Path": [
                 "Case"
@@ -43,7 +48,9 @@
               "defaultStatus": "Active",
               "externallyAvailable": false,
               "flagCode": "CF0014",
+              "nativeFlagCode": "CF0014",
               "childFlags": [],
+              "name_cy": "Ffurflenni a chyfathrebiadau Cymraeg",
               "isParent": false,
               "Path": [
                 "Case"
@@ -53,16 +60,19 @@
               "name": "Other",
               "hearingRelevant": true,
               "flagComment": true,
-              "defaultStatus": "Active",
-              "externallyAvailable": false,
+              "defaultStatus": "Requested",
+              "externallyAvailable": true,
               "flagCode": "OT0001",
+              "nativeFlagCode": "OT0001",
               "childFlags": [],
+              "name_cy": "Arall",
               "isParent": false,
               "Path": [
                 "Case"
               ]
             }
           ],
+          "name_cy": "Achos",
           "isParent": true,
           "Path": [
             ""

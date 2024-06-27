@@ -44,7 +44,7 @@ def sonarExclusions =
          '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
          '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
          '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
-         '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java',
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
 ]
 
 sonarqube {
@@ -384,7 +384,7 @@ dependencies {
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.111.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.111.Final'
-    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.7.0'
+    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.0.0'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.0'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'

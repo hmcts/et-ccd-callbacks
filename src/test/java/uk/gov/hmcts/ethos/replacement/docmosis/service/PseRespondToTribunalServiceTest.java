@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -44,6 +45,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -84,6 +86,7 @@ class PseRespondToTribunalServiceTest {
     private static final String LINK_TO_EXUI = "linkToExUI";
     private static final String CITIZEN_HUB_URL = "citizenUrl";
     private static final String EXUI_URL = "exuiUrl";
+    private static final String AUTHOR = "Barry White";
 
     @MockBean
     private UserIdamService userIdamService;
@@ -105,6 +108,7 @@ class PseRespondToTribunalServiceTest {
         ReflectionTestUtils.setField(pseRespondToTribService, "cyNotificationToClaimantTemplateId", WELSH_TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
+
     }
 
     @Test
@@ -432,6 +436,11 @@ class PseRespondToTribunalServiceTest {
     void addRespondentResponseToJON(String response, String hasSupportingMaterial,
                                                 int supportingDocsSize, String copyOtherParty, String copyDetails) {
 
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
+        UserDetails userDetails = new UserDetails();
+        userDetails.setName(AUTHOR);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
+
         caseData.setSendNotificationCollection(List.of(
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
@@ -465,7 +474,7 @@ class PseRespondToTribunalServiceTest {
 
         assertEquals("0", notificationType.getSendNotificationResponsesCount());
 
-        pseRespondToTribService.addRespondentResponseToJON(caseData);
+        pseRespondToTribService.addRespondentResponseToJON(caseData, "token");
 
         PseResponseType savedResponse = notificationType.getRespondCollection().get(0).getValue();
 
@@ -475,6 +484,7 @@ class PseRespondToTribunalServiceTest {
         assertEquals(copyOtherParty, savedResponse.getCopyToOtherParty());
         assertEquals(copyDetails, savedResponse.getCopyNoGiveDetails());
         assertEquals("1", notificationType.getSendNotificationResponsesCount());
+        assertEquals(AUTHOR, savedResponse.getAuthor());
 
         if (supportingDocsSize > 0) {
             assertEquals(savedResponse.getSupportingMaterial().size(), supportingDocsSize);

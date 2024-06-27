@@ -374,12 +374,14 @@ public class Et1ReppedHelper {
         claimantOtherType.setClaimantOccupation(caseData.getClaimantJobTitle());
         claimantOtherType.setClaimantEmployedFrom(caseData.getClaimantStartDate());
         claimantOtherType.setClaimantEmployedTo(caseData.getClaimantEndDate());
-        switch (claimantOtherType.getStillWorking()) {
-            case WORKING -> claimantStillWorkingNoticePeriod(caseData, claimantOtherType);
-            case NOTICE -> claimantNoticePeriod(caseData, claimantOtherType);
-            case NO_LONGER_WORKING -> claimantNoLongerWorking(caseData, claimantOtherType);
-            default -> {
-                // Do nothing for unmatched values
+        if (claimantOtherType.getStillWorking() != null) {
+            switch (claimantOtherType.getStillWorking()) {
+                case WORKING -> claimantStillWorkingNoticePeriod(caseData, claimantOtherType);
+                case NOTICE -> claimantNoticePeriod(caseData, claimantOtherType);
+                case NO_LONGER_WORKING -> claimantNoLongerWorking(caseData, claimantOtherType);
+                default -> {
+                    // Do nothing for unmatched values
+                }
             }
         }
         claimantOtherType.setClaimantAverageWeeklyHours(caseData.getClaimantAverageWeeklyWorkHours());

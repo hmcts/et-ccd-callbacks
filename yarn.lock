@@ -7574,7 +7574,7 @@ __metadata:
     request-promise-native: 1.0.9
     require-directory: 2.1.1
     rewire: 7.0.0
-    selenium-standalone: 9.5.0
+    selenium-standalone: 10.0.0
     sinon: 18.0.0
     sinon-chai: 3.7.0
     sonar-scanner: 3.1.0
@@ -15244,9 +15244,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selenium-standalone@npm:9.5.0":
-  version: 9.5.0
-  resolution: "selenium-standalone@npm:9.5.0"
+"selenium-standalone@npm:10.0.0":
+  version: 10.0.0
+  resolution: "selenium-standalone@npm:10.0.0"
   dependencies:
     commander: ^8.3.0
     cross-spawn: ^7.0.3
@@ -15255,6 +15255,8 @@ __metadata:
     find-process: ^1.4.7
     fkill: ^7.2.1
     got: ^11.8.6
+    http-proxy-agent: ^7.0.2
+    https-proxy-agent: ^7.0.4
     is-port-reachable: ^3.0.0
     lodash.mapvalues: ^4.6.0
     lodash.merge: ^4.6.2
@@ -15267,7 +15269,7 @@ __metadata:
     yauzl: ^3.1.2
   bin:
     selenium-standalone: bin/selenium-standalone
-  checksum: 76092a5021172b946a9a0e73bd9a9d7c1f4051c34d059907b3236447acce2e1fcf0c2b5a45df5e9832e035c2fa35f75f4efc9b21bc5198a4b522303c7511f418
+  checksum: e503fdfafcbdd01f16dd8d8d73fe50df8a9830f35dbd901d5acccff43dd58bda79cf67bcf7872ccbc1f3f42fd6d55f819421f6e4cb8c6d86c827c31de4170253
   languageName: node
   linkType: hard
 

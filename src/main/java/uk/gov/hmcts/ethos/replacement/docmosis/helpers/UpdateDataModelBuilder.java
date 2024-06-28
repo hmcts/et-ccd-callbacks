@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import org.apache.commons.compress.utils.Lists;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -81,7 +82,7 @@ public final class UpdateDataModelBuilder {
     private static List<JurCodesType> getJurCodesList(ListTypeItem<DynamicListType> batchUpdateJurisdictionsList,
         CaseData caseData) {
         if (batchUpdateJurisdictionsList == null) {
-            return null;
+            return Lists.newArrayList();
         }
         return batchUpdateJurisdictionsList
                .map(jurCode -> getJurCodesType(jurCode.getDynamicList(), caseData))

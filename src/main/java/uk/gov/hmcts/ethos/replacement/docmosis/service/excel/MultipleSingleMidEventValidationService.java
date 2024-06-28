@@ -140,8 +140,7 @@ public class MultipleSingleMidEventValidationService {
         }
 
         DynamicListType dynamicList = new DynamicListType();
-        dynamicList.setDynamicList(new DynamicFixedListType());
-        dynamicList.getDynamicList().setListItems(jurCodesCollection);
+        dynamicList.setDynamicList(populateDynamicList(jurCodesCollection));
 
         multipleData.setBatchUpdateJurisdictionList(ListTypeItem.from(dynamicList));
 

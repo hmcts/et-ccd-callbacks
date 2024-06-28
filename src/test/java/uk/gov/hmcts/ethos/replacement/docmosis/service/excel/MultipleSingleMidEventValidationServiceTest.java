@@ -72,7 +72,7 @@ class MultipleSingleMidEventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(SELECT_NONE_VALUE, multipleDetails.getCaseData().getBatchUpdateClaimantRep().getValue().getCode());
-        assertEquals(0, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
+        assertEquals(1, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
                 .getDynamicList().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondent().getListItems().size());
         assertEquals(SELECT_NONE_VALUE, multipleDetails
@@ -164,7 +164,7 @@ class MultipleSingleMidEventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateClaimantRep().getListItems().size());
-        assertEquals(1, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
+        assertEquals(2, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
                 .getDynamicList().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondent().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondentRep().getListItems().size());
@@ -207,7 +207,7 @@ class MultipleSingleMidEventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(1, multipleDetails.getCaseData().getBatchUpdateClaimantRep().getListItems().size());
-        assertEquals(1, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
+        assertEquals(2, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
                 .getDynamicList().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondent().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondentRep().getListItems().size());

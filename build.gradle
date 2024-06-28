@@ -433,7 +433,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.16.1'
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
@@ -489,7 +489,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 308
+pmdMain.maxFailures = 306
 pmdTest.maxFailures = 207
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

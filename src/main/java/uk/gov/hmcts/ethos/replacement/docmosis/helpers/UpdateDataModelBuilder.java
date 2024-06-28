@@ -90,11 +90,7 @@ public final class UpdateDataModelBuilder {
     }
 
     private static JurCodesType getJurCodesType(DynamicFixedListType batchUpdateJurisdiction, CaseData caseData) {
-        if (caseData == null) {
-            return null;
-        }
-
-        if (batchUpdateJurisdiction == null) {
+        if (caseData == null || batchUpdateJurisdiction == null) {
             return null;
         }
 

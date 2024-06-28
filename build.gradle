@@ -336,7 +336,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.1.2'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.1.3'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.15.2'
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
 
@@ -433,7 +433,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.16.1'
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
@@ -489,7 +489,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 308
+pmdMain.maxFailures = 306
 pmdTest.maxFailures = 207
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

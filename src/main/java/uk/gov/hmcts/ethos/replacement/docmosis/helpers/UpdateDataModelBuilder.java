@@ -80,6 +80,9 @@ public final class UpdateDataModelBuilder {
 
     private static List<JurCodesType> getJurCodesList(ListTypeItem<DynamicListType> batchUpdateJurisdictionsList,
         CaseData caseData) {
+        if (batchUpdateJurisdictionsList == null) {
+            return null;
+        }
         return batchUpdateJurisdictionsList
                .map(jurCode -> getJurCodesType(jurCode.getDynamicList(), caseData))
                .toList();

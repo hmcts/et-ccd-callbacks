@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.util.ArrayList;
@@ -32,14 +31,15 @@ public class ClaimantTellSomethingElseService {
     }
 
     public void populateClaimantTse(CaseData caseData) {
-        ClaimantTse claimantTse = caseData.getClaimantTse();
+        ClaimantTse claimantTse = new ClaimantTse();
         claimantTse.setContactApplicationType(caseData.getClaimantTseSelectApplication());
         claimantTse.setCopyToOtherPartyYesOrNo(caseData.getClaimantTseRule92());
         claimantTse.setCopyToOtherPartyText(caseData.getClaimantTseRule92AnsNoGiveDetails());
 
         TSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
+                ClaimantTellSomethingElseHelper.getSelectedApplicationType(caseData);
         claimantTse.setContactApplicationText(selectedAppData.getSelectedTextBox());
         claimantTse.setContactApplicationFile(selectedAppData.getUploadedTseDocument());
+        caseData.setClaimantTse(claimantTse);
     }
 }

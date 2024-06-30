@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/claimantTSE/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/claimantTSE/aboutToSubmit";
+    private static final String COMPLETE_APPLICATION_URL = "/claimantTSE/completeApplication";
 
     @MockBean
     ClaimantTellSomethingElseService claimantTseService;
@@ -110,5 +111,18 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), true);
+    }
+
+    @Test
+    void completeApplication_Success() throws Exception {
+        mockMvc.perform(post(COMPLETE_APPLICATION_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_body", notNullValue()))
+                .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

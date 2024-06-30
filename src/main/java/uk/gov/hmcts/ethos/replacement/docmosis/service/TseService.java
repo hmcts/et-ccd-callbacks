@@ -118,9 +118,8 @@ public class TseService {
      * @param caseData contains all the case data.
      */
     public void clearApplicationData(CaseData caseData) {
-        caseData.setClaimantTse(null);
+        clearClaimantTseDataFromCaseData(caseData);
         clearRespondentTseDataFromCaseData(caseData);
-
     }
 
     private void addClaimantData(CaseData caseData, GenericTseApplicationType application) {
@@ -206,6 +205,16 @@ public class TseService {
         caseData.setResTseDocument10(null);
         caseData.setResTseDocument11(null);
         caseData.setResTseDocument12(null);
+    }
+
+    private void clearClaimantTseDataFromCaseData(CaseData caseData) {
+        caseData.setClaimantTse(null);
+        caseData.setClaimantTseSelectApplication(null);
+        caseData.setClaimantTseRule92(null);
+        caseData.setClaimantTseRule92AnsNoGiveDetails(null);
+
+        caseData.setClaimantTseDocument13(null);
+        caseData.setClaimantTseTextBox13(null);
     }
 
     /**

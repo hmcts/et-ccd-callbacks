@@ -106,6 +106,9 @@ public class ClaimantTellSomethingElseController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
+        claimantTseService.populateClaimantTse(caseData);
+        tseService.createApplication(caseData, true);
+        tseService.clearApplicationData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

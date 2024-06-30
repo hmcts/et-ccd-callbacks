@@ -133,7 +133,6 @@ public class TseService {
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
         application.setApplicationState(IN_PROGRESS);
-
     }
 
     private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {

@@ -136,7 +136,18 @@ public class MultipleReferenceService {
         return new SubmitMultipleEvent();
     }
 
-    private void addUserToMultiple(String adminUserToken,
+    public void addUsersToMultiple(String jurisdiction,
+        String caseType,
+        String multipleId,
+        List<String> usersToAdd) throws IOException {
+        String adminUserToken = adminUserService.getAdminUserToken();
+
+        for (String userToAddId : usersToAdd) {
+            addUserToMultiple(adminUserToken, jurisdiction, caseType, multipleId, userToAddId);
+        }
+    }
+
+    public void addUserToMultiple(String adminUserToken,
                                String jurisdiction,
                                String caseType,
                                String multipleId,
@@ -160,7 +171,7 @@ public class MultipleReferenceService {
             }
 
             log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
-        } catch (RestClientResponseException e) {
+        } catch (RestClientResponseException | IOException e) {
             throw (CaseCreationException)
                     new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
         }

@@ -106,7 +106,7 @@ public class TseService {
      */
     public void removeStoredApplication(CaseData caseData) {
         String applicationId = caseData.getClaimantTse().getStoredApplicationId();
-        if (applicationId != null) {
+        if (caseData.getTseApplicationStoredCollection() != null && applicationId != null) {
             caseData.getTseApplicationStoredCollection().removeIf(item -> item.getId().equals(applicationId));
         }
     }

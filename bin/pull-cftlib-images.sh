@@ -18,3 +18,25 @@ docker pull docker.elastic.co/logstash/logstash:7.16.1
 docker pull hmctspublic.azurecr.io/xui/webapp:latest
 # Download XUI Manage Organisations
 docker pull hmctspublic.azurecr.io/xui/mo-webapp:latest
+
+# COMPOSE IMAGES
+# Download AZURITE
+docker pull mcr.microsoft.com/azure-storage/azurite
+# Download wiremock
+docker pull wiremock/wiremock:latest
+
+
+#*************************WORK ALLOCATION*****************************
+# Download camunda
+# docker pull hmctsprivate.azurecr.io/camunda/bpm:latest
+# Download CCD Message Publisher
+# docker pull hmctspublic.azurecr.io/ccd/message-publisher:latest
+# Download WA Workflow API
+# docker pull hmctspublic.azurecr.io/wa/workflow-api:latest
+# Download WA Task Management API
+# docker pull hmctspublic.azurecr.io/wa/task-management-api:latest
+# Download Case Event Handler
+# docker pull hmctspublic.azurecr.io/wa/case-event-handler:latest
+# Download Task Monitor
+# docker pull hmctspublic.azurecr.io/wa/task-monitor:latest
+# Download

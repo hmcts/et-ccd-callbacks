@@ -3,16 +3,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
-public final class ClaimantTellSomethingElseHelper {
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
 
-    private static final String TSE_APP_WITHDRAW_CLAIM = "Withdraw all or part of claim";
+public final class ClaimantTellSomethingElseHelper {
 
     private ClaimantTellSomethingElseHelper() {
     }
 
     public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
         switch (caseData.getClaimantTseSelectApplication()) {
-            case TSE_APP_WITHDRAW_CLAIM:
+            case CLAIMANT_TSE_WITHDRAW_CLAIM:
                 return new TSEApplicationTypeData(
                         caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13());
             default:

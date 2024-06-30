@@ -40,14 +40,25 @@ public class ClaimantTellSomethingElseController {
 
     private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_NO = "<hr>"
             + "<h3>What happens next</h3>"
-            + "<p>The tribunal will consider all correspondence and let you know what happens next.</p>";
+            + "<p>The tribunal will consider all correspondence and let you know what happens next.</p>" +
+            "<hr>";
 
-    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES = "<hr>"
+    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE = "<hr>"
+            + "<h3>What happens next</h3>"
+            + "<p>You must submit your application after copying the correspondence to the other party.</p>"
+            + "<p>To copy this correspondence to the other party, you must send it to them by post or email. "
+            + "You must include all supporting documents.</p>"
+            + "<p>View this correspondence (opens in new tab)"
+            + "<p>View the supporting documents: [file_name_of supporting doc]</p>" +
+            "<hr>";
+
+    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE = "<hr>"
             + "<h3>What happens next</h3>"
             + "<p>You have sent a copy of your application to the claimant. They will have until %s to respond.</p>"
             + "<p>If they do respond, they are expected to copy their response to you.</p>"
             + "<p>You may be asked to supply further information. "
-            + "The tribunal will consider all correspondence and let you know what happens next.</p>";
+            + "The tribunal will consider all correspondence and let you know what happens next.</p>" +
+            "<hr>";
 
     /**
      * Callback endpoint to be called when the event ClaimantTSE is about to start.
@@ -147,10 +158,15 @@ public class ClaimantTellSomethingElseController {
             @RequestBody CCDRequest ccdRequest) {
 
         String ansRule92 = ccdRequest.getCaseDetails().getCaseData().getClaimantTseRule92();
+        String isRespOffline = ccdRequest.getCaseDetails().getCaseData().getClaimantTseRespNotAvailable();
         String body;
         if (YES.equals(ansRule92)) {
-            body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES,
+            if (YES.equals(isRespOffline)) {
+                body = APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
+            } else {
+                body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE,
                     UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+            }
         } else {
             body = APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
         }

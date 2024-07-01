@@ -49,15 +49,16 @@ public class ExcelDocManagementService {
 
     public void uploadExcelDocument(String userToken, MultipleDetails multipleDetails, byte[] excelBytes) {
         MultipleData multipleData = multipleDetails.getCaseData();
-        log.info("Multiple Name is: " + multipleData.getMultipleName() + "for multiple reference: "
-                + multipleData.getMultipleReference());
+        log.info("Multiple Name is: {}for multiple reference: {}",
+                multipleData.getMultipleName(),
+                multipleData.getMultipleReference());
         URI documentSelfPath = documentManagementService.uploadDocument(userToken, excelBytes,
                 MultiplesHelper.generateExcelDocumentName(multipleData), APPLICATION_EXCEL_VALUE,
                 multipleDetails.getCaseTypeId());
 
-        log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
+        log.info("URI documentSelfPath uploaded and created: {}", documentSelfPath.toString());
 
-        log.info("Add document to multiple with reference:" + multipleData.getMultipleReference());
+        log.info("Add document to multiple with reference:{}", multipleData.getMultipleReference());
 
         addDocumentToMultiple(userToken, multipleData, documentSelfPath);
 

@@ -11,7 +11,7 @@ plugins {
     id 'io.freefair.lombok' version '8.6'
     id 'org.sonarqube' version '5.0.0.4638'
     id 'pmd'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1030'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1214'
 }
 
 group = 'uk.gov.hmcts.et'

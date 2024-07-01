@@ -179,6 +179,7 @@ public final class MultipleUtil {
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantLastName("Mike");
         caseData.setClaimantIndType(claimantIndType);
+        caseData.setClaimant("Horatio Hornblower");
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Andrew Smith");
         respondentSumType.setRespondentAddress(address);

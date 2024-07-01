@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleType;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.ExcelGenerationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -329,7 +330,7 @@ public final class MultiplesHelper {
             } else if (item instanceof MultipleObject multipleObject) {
                 ethosCaseRef = multipleObject.getEthosCaseRef();
             } else if (item instanceof SchedulePayload schedulePayload) {
-                ethosCaseRef = (schedulePayload.getEthosCaseRef());
+                ethosCaseRef = schedulePayload.getEthosCaseRef();
             } else {
                 log.info("unrecognised input object type: {}", item.getClass());
                 break;
@@ -360,7 +361,7 @@ public final class MultiplesHelper {
             workbook.close();
         } catch (IOException e) {
             log.error("Error generating the excel");
-            throw new RuntimeException("Error generating the excel", e);
+            throw new ExcelGenerationException("Error generating the excel", e);
         }
 
         return bos.toByteArray();

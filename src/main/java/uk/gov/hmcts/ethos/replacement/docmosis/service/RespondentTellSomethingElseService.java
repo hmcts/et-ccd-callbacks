@@ -39,13 +39,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CITIZEN_PORTAL_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE_PLUS_7;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET_CY;
@@ -198,7 +198,7 @@ public class RespondentTellSomethingElseService {
             emailService.sendEmail(
                 getEmailTemplate(isWelsh, caseData.getResTseSelectApplication()),
                 claimantEmail,
-                claimantPersonalisation(caseDetails, bytes)
+                claimantPersonalisation(caseDetails, bytes, isWelsh)
             );
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
@@ -225,13 +225,11 @@ public class RespondentTellSomethingElseService {
      * @return KeyValue mappings needed to populate the email
      * @throws NotificationClientException When the document cannot be uploaded
      */
-    private Map<String, Object> claimantPersonalisation(CaseDetails caseDetails, byte[] document)
+    private Map<String, Object> claimantPersonalisation(CaseDetails caseDetails, byte[] document, boolean isWelsh)
             throws NotificationClientException {
 
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
-        boolean isWelsh = featureToggleService.isWelshEnabled()
-                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String shortText = isWelsh
                 ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
                 : caseData.getResTseSelectApplication();
@@ -249,7 +247,7 @@ public class RespondentTellSomethingElseService {
                 SHORT_TEXT, shortText,
                 DATE_PLUS_7, datePlus7,
                 LINK_TO_DOCUMENT, documentJson,
-                CITIZEN_PORTAL_LINK, citizenPortalLink
+                LINK_TO_CITIZEN_HUB, citizenPortalLink
         );
     }
 

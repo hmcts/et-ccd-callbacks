@@ -402,7 +402,7 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
             + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
-        assertTrue(((String) personalisation.get("citizenPortalLink")).endsWith(WELSH_LANGUAGE_PARAM));
+        assertTrue(((String) personalisation.get("linkToCitizenHub")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 
     @ParameterizedTest
@@ -469,7 +469,7 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
             + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
-        assertTrue(((String) personalisation.get("citizenPortalLink")).endsWith(WELSH_LANGUAGE_PARAM));
+        assertTrue(((String) personalisation.get("linkToCitizenHub")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 
     private CaseData createCaseDataWithHearing(String selectedApplication) {

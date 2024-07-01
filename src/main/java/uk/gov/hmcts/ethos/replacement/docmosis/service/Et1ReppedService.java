@@ -84,7 +84,7 @@ public class Et1ReppedService {
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
             TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER,
-            TribunalOffice.NEWCASTLE);
+            TribunalOffice.NEWCASTLE, TribunalOffice.WATFORD);
 
     /**
      * Validates the postcode and region.

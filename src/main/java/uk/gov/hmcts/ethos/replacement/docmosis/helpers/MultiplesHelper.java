@@ -324,12 +324,12 @@ public final class MultiplesHelper {
 
         for (Object item : list) {
             String ethosCaseRef;
-            if (item instanceof String) {
-                ethosCaseRef = (String) item;
-            } else if (item instanceof MultipleObject) {
-                ethosCaseRef = ((MultipleObject) item).getEthosCaseRef();
-            } else if (item instanceof SchedulePayload) {
-                ethosCaseRef = ((SchedulePayload) item).getEthosCaseRef();
+            if (item instanceof String string) {
+                ethosCaseRef = string;
+            } else if (item instanceof MultipleObject multipleObject) {
+                ethosCaseRef = multipleObject.getEthosCaseRef();
+            } else if (item instanceof SchedulePayload schedulePayload) {
+                ethosCaseRef = (schedulePayload.getEthosCaseRef());
             } else {
                 log.info("unrecognised input object type: {}", item.getClass());
                 break;

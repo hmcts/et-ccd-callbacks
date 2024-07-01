@@ -91,16 +91,16 @@ public class ExcelDocManagementService {
     public void writeAndUploadExcelDocument(List<?> multipleCollection, String userToken,
                                             MultipleDetails multipleDetails, List<String> subMultipleCollection) {
         MultipleData multipleData = multipleDetails.getCaseData();
-        log.info("MultipleName is: " + multipleData.getMultipleName() + "for multiple reference: "
-                + multipleData.getMultipleReference());
+        log.info("MultipleName is: {}for multiple reference: {}",
+                multipleData.getMultipleName(),
+                multipleData.getMultipleReference());
         byte[] excelBytes = excelCreationService.writeExcel(multipleCollection, subMultipleCollection,
-                multipleData.getLeadCase());
+                multipleData.getLeadCase(), userToken, multipleDetails.getCaseTypeId());
         uploadExcelDocument(userToken, multipleDetails, excelBytes);
 
-        log.info("Add multiple case counter for multipleReference:" + multipleData.getMultipleReference());
+        log.info("Add multiple case counter for multipleReference:{}", multipleData.getMultipleReference());
 
         multipleData.setCaseCounter(String.valueOf(multipleCollection.size()));
-
     }
 
     public CaseImporterFile populateCaseImporterFile(String userToken, UploadedDocumentType uploadedDocumentType) {

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -82,6 +83,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService.ALL_OFFICES;
 
 @RequiredArgsConstructor
@@ -158,7 +160,7 @@ public class ListingService {
         try {
             List<SubmitEvent> submitEvents = getListingHearingsSearch(listingDetails, authToken);
             if (submitEvents != null) {
-                log.info(CASES_SEARCHED + submitEvents.size());
+                log.info(CASES_SEARCHED + "{}", submitEvents.size());
                 List<ListingTypeItem> listingTypeItems = new ArrayList<>();
                 for (SubmitEvent submitEvent : submitEvents) {
                     if (submitEvent.getCaseData().getHearingCollection() != null
@@ -227,7 +229,7 @@ public class ListingService {
 
         return ccdClient.buildAndGetElasticSearchRequest(authToken,
                 UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
-                getESQuery(dateFrom, dateTo, venueToSearchMapping, venueToSearch));
+                getESQuery(dateFrom, dateTo, venueToSearchMapping, venueToSearch, listingData.getManagingOffice()));
     }
 
     private String getFieldNameForVenueToSearch(String caseTypeId) {
@@ -238,11 +240,10 @@ public class ListingService {
         }
     }
 
-    private String getESQuery(String dateFrom, String dateTo, String key, String venue) {
+    private String getESQuery(String dateFrom, String dateTo, String key, String venue, String managingOffice) {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
-                .filter(new RangeQueryBuilder(
-                        ELASTICSEARCH_FIELD_HEARING_LISTED_DATE)
-                        .gte(dateFrom).lte(dateTo));
+                .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE).gte(dateFrom).lte(dateTo))
+                .filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
 
         if (!ALL_VENUES.equals(venue)) {
             boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
@@ -368,11 +369,11 @@ public class ListingService {
                                        DateListedTypeItem dateListedTypeItem,
                                        String caseTypeId,
                                        String caseReference) {
+        String venueSearched;
+        String venueToSearch = ListingVenueHelper.getListingVenue(listingData);
         if (areAllVenuesSelected(listingData, dateListedTypeItem, caseTypeId)) {
             return true;
         } else {
-            String venueSearched;
-            String venueToSearch = ListingVenueHelper.getListingVenue(listingData);
 
             if (ListingVenueHelper.isAllScottishVenues(listingData)) {
                 venueSearched = dateListedTypeItem.getValue().hasHearingVenue()
@@ -382,7 +383,7 @@ public class ListingService {
                 try {
                     venueSearched = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
                 } catch (IllegalStateException ex) {
-                    log.error("Unable to get venue code for case reference " + caseReference, ex);
+                    log.error("Unable to get venue code for case reference {}", caseReference, ex);
                     return false;
                 }
 

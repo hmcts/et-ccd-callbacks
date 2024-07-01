@@ -59,7 +59,7 @@ public class MultipleBatchUpdate2Service {
     public void batchUpdate2Logic(String userToken,
                                   MultipleDetails multipleDetails,
                                   List<String> errors,
-                                  SortedMap<String, Object> multipleObjects) {
+                                  SortedMap<String, Object> multipleObjects) throws IOException {
         MultipleData multipleData = multipleDetails.getCaseData();
         log.info("Batch update type = 2");
 
@@ -106,6 +106,19 @@ public class MultipleBatchUpdate2Service {
         }
     }
 
+    public void removeCasesFromCurrentMultiple(String userToken,
+                                               MultipleDetails multipleDetails,
+                                               List<String> errors,
+                                               List<String> multipleObjectsFiltered) {
+        log.info("Read current excel and remove cases in multiple");
+        readCurrentExcelAndRemoveCasesInMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
+
+        log.info("Perform actions with the new lead if exists");
+        String oldLeadCase = MultiplesHelper.getCurrentLead(multipleDetails.getCaseData().getLeadCase());
+        performActionsWithNewLeadCase(userToken, multipleDetails, errors, oldLeadCase, multipleObjectsFiltered);
+
+    }
+
     private void performActionsWithNewLeadCase(String userToken, MultipleDetails multipleDetails, List<String> errors,
                                                String oldLeadCase, List<String> multipleObjectsFiltered) {
         MultipleData multipleData = multipleDetails.getCaseData();
@@ -136,25 +149,12 @@ public class MultipleBatchUpdate2Service {
         }
     }
 
-    private void removeCasesFromCurrentMultiple(String userToken,
-                                                MultipleDetails multipleDetails,
-                                                List<String> errors,
-                                                List<String> multipleObjectsFiltered) {
-        log.info("Read current excel and remove cases in multiple");
-        readCurrentExcelAndRemoveCasesInMultiple(userToken, multipleDetails, errors, multipleObjectsFiltered);
-
-        log.info("Perform actions with the new lead if exists");
-        String oldLeadCase = MultiplesHelper.getCurrentLead(multipleDetails.getCaseData().getLeadCase());
-        performActionsWithNewLeadCase(userToken, multipleDetails, errors, oldLeadCase, multipleObjectsFiltered);
-
-    }
-
     private void updateToDifferentMultiple(String userToken,
                                            MultipleDetails multipleDetails,
                                            List<String> errors,
                                            List<String> multipleObjectsFiltered,
                                            String updatedMultipleRef,
-                                           String updatedSubMultipleRef) {
+                                           String updatedSubMultipleRef) throws IOException {
 
         MultipleData oldMultipleData = multipleDetails.getCaseData();
         log.info("Retrieve Legal Reps from current MultipleDetails: {}", oldMultipleData.getMultipleReference());
@@ -235,7 +235,7 @@ public class MultipleBatchUpdate2Service {
     private void addLegalRepsToMultiple(String jurisdiction,
                                         String caseType,
                                         String multipleId,
-                                        List<String> legalRepsToAdd) {
+                                        List<String> legalRepsToAdd) throws IOException {
         if (!legalRepsToAdd.isEmpty()) {
             multipleReferenceService.addUsersToMultiple(jurisdiction,
                     caseType,

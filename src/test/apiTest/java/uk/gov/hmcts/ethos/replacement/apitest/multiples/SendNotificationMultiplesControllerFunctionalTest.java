@@ -26,7 +26,7 @@ public class SendNotificationMultiplesControllerFunctionalTest extends BaseFunct
     private MultipleRequest request;
 
     @BeforeAll
-    public void setUpCaseData() throws IOException, InterruptedException {
+    public void setUpCaseData() throws IOException {
         request = new MultipleRequest();
         MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);

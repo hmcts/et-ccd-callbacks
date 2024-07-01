@@ -139,7 +139,7 @@ public class PseRespondToTribunalService {
      * Create a new element in the responses list and assign the PSE data from CaseData to it.
      * @param caseData contains all the case data
      */
-    public void addRespondentResponseToJON(CaseData caseData) {
+    public void addRespondentResponseToJON(CaseData caseData, String userToken) {
         SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
         List<PseResponseTypeItem> responses = sendNotificationType.getRespondCollection();
         if (CollectionUtils.isEmpty(responses)) {
@@ -147,20 +147,24 @@ public class PseRespondToTribunalService {
             responses = sendNotificationType.getRespondCollection();
         }
 
+        PseResponseType response = PseResponseType.builder()
+                .from(RESPONDENT_TITLE)
+                .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .response(caseData.getPseRespondentOrdReqResponseText())
+                .hasSupportingMaterial(caseData.getPseRespondentOrdReqHasSupportingMaterial())
+                .supportingMaterial(caseData.getPseRespondentOrdReqUploadDocument())
+                .copyToOtherParty(caseData.getPseRespondentOrdReqCopyToOtherParty())
+                .copyNoGiveDetails(caseData.getPseRespondentOrdReqCopyNoGiveDetails())
+                .build();
+
+        if (featureToggleService.isMultiplesEnabled()) {
+            response.setAuthor(userIdamService.getUserDetails(userToken).getName());
+        }
+
         responses.add(
             PseResponseTypeItem.builder()
                 .id(UUID.randomUUID().toString())
-                .value(
-                    PseResponseType.builder()
-                        .from(RESPONDENT_TITLE)
-                        .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                        .response(caseData.getPseRespondentOrdReqResponseText())
-                        .hasSupportingMaterial(caseData.getPseRespondentOrdReqHasSupportingMaterial())
-                        .supportingMaterial(caseData.getPseRespondentOrdReqUploadDocument())
-                        .copyToOtherParty(caseData.getPseRespondentOrdReqCopyToOtherParty())
-                        .copyNoGiveDetails(caseData.getPseRespondentOrdReqCopyNoGiveDetails())
-                        .build()
-                ).build());
+                .value(response).build());
 
         sendNotificationType.setSendNotificationResponsesCount(String.valueOf(responses.size()));
     }

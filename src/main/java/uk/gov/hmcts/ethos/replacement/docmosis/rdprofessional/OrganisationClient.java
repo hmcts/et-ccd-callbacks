@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 
 import java.util.List;
@@ -47,6 +48,17 @@ public interface OrganisationClient {
             @RequestHeader(AUTHORIZATION) String authorisation,
             @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken,
             @PathVariable("userId") String userId
+    );
+
+    @GetMapping(
+        value = "/refdata/internal/v1/organisations/{orgId}/users?returnRoles=false",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    ResponseEntity<OrganisationUsersResponse> getOrganisationUsers(
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken,
+        @PathVariable("orgId") String orgId
     );
 
 }

@@ -37,7 +37,9 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.HEADER_1;
+import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.REPLIES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.RESPONSE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper.getAndFormatReplies;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
@@ -48,7 +50,7 @@ public class NotificationsExcelReportService {
     public static final String DATE_FORMAT = "dd-MMM-yyyy HH:mm:ss";
     private static final String FILE_NAME = "notifications_extract.xlsx";
     private static final String BINARY = "/binary";
-    private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, RESPONSE));
+    private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, RESPONSE, REPLIES));
     private final ExcelReadingService excelReadingService;
     private final NotificationScheduleService notificationScheduleService;
     private final DocumentManagementService documentManagementService;
@@ -174,6 +176,8 @@ public class NotificationsExcelReportService {
                 createCell(row, columnIndex, notificationGroup.getCaseNumber(), cellStyle);
                 columnIndex++;
                 createCell(row, columnIndex, notificationGroup.getResponseReceived(), cellStyle);
+                columnIndex++;
+                createCell(row, columnIndex, getAndFormatReplies(notificationGroup.getRespondCollection()), cellStyle);
                 rowIndex[0]++;
             }
         }

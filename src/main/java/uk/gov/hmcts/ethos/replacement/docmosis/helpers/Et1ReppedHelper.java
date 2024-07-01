@@ -340,8 +340,10 @@ public class Et1ReppedHelper {
     private static ClaimantWorkAddressType claimantWorkAddress(CaseData caseData) {
         ClaimantWorkAddressType claimantWorkAddressType = new ClaimantWorkAddressType();
         if (YES.equals(caseData.getDidClaimantWorkAtSameAddress())) {
+            caseData.setClaimantWorkAddressQuestion(YES);
             claimantWorkAddressType.setClaimantWorkAddress(caseData.getRespondentAddress());
         } else if (NO.equals(caseData.getDidClaimantWorkAtSameAddress())) {
+            caseData.setClaimantWorkAddressQuestion(NO);
             return caseData.getClaimantWorkAddress();
         }
         return null;
@@ -372,12 +374,14 @@ public class Et1ReppedHelper {
         claimantOtherType.setClaimantOccupation(caseData.getClaimantJobTitle());
         claimantOtherType.setClaimantEmployedFrom(caseData.getClaimantStartDate());
         claimantOtherType.setClaimantEmployedTo(caseData.getClaimantEndDate());
-        switch (claimantOtherType.getStillWorking()) {
-            case WORKING -> claimantStillWorkingNoticePeriod(caseData, claimantOtherType);
-            case NOTICE -> claimantNoticePeriod(caseData, claimantOtherType);
-            case NO_LONGER_WORKING -> claimantNoLongerWorking(caseData, claimantOtherType);
-            default -> {
-                // Do nothing for unmatched values
+        if (claimantOtherType.getStillWorking() != null) {
+            switch (claimantOtherType.getStillWorking()) {
+                case WORKING -> claimantStillWorkingNoticePeriod(caseData, claimantOtherType);
+                case NOTICE -> claimantNoticePeriod(caseData, claimantOtherType);
+                case NO_LONGER_WORKING -> claimantNoLongerWorking(caseData, claimantOtherType);
+                default -> {
+                    // Do nothing for unmatched values
+                }
             }
         }
         claimantOtherType.setClaimantAverageWeeklyHours(caseData.getClaimantAverageWeeklyWorkHours());

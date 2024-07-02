@@ -147,16 +147,15 @@ public class MultipleBatchUpdate3Service {
     }
 
     private boolean checkAnyChange(MultipleData multipleData) {
-        return
-            multipleData.getBatchUpdateClaimantRep() != null
+        return hasJurisdictionListChanged(multipleData.getBatchUpdateJurisdictionList())
+                && multipleData.getBatchUpdateClaimantRep() != null
                 && !multipleData.getBatchUpdateClaimantRep().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateRespondent() != null
                 && !multipleData.getBatchUpdateRespondent().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateJudgment() != null
                 && !multipleData.getBatchUpdateJudgment().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateRespondentRep() != null
-                && !multipleData.getBatchUpdateRespondentRep().getValue().getCode().equals(SELECT_NONE_VALUE)
-                && hasJurisdictionListChanged(multipleData.getBatchUpdateJurisdictionList());
+                && !multipleData.getBatchUpdateRespondentRep().getValue().getCode().equals(SELECT_NONE_VALUE);
     }
 
     private boolean hasJurisdictionListChanged(ListTypeItem<DynamicListType> jurisdictionList) {

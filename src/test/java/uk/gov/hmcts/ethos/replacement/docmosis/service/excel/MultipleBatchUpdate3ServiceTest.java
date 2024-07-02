@@ -201,4 +201,63 @@ class MultipleBatchUpdate3ServiceTest {
 
     }
 
+    @Test
+    void batchUpdate3LogicJurisdictionNull() {
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(null);
+        multipleDetails.getCaseData().setBatchUpdateRespondent(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJudgment(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateRespondentRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+
+        multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
+
+        when(singleCasesReadingService.retrieveSingleCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData().getBatchUpdateCase(),
+                multipleDetails.getCaseData().getMultipleSource()))
+                .thenReturn(submitEvents.get(0));
+
+        multipleBatchUpdate3Service.batchUpdate3Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verifyNoMoreInteractions(multipleHelperService);
+
+        assertEquals(OPEN_STATE, multipleDetails.getCaseData().getState());
+    }
+
+    @Test
+    void batchUpdate3LogicJurisdictions() {
+        DynamicListType noneList = new DynamicListType();
+        noneList.setDynamicList(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        DynamicListType dagList = new DynamicListType();
+        dagList.setDynamicList(MultipleUtil.generateDynamicList("DAG"));
+
+        multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(ListTypeItem.from(noneList, dagList));
+        multipleDetails.getCaseData().setBatchUpdateRespondent(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJudgment(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateRespondentRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+
+        multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
+
+        when(singleCasesReadingService.retrieveSingleCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData().getBatchUpdateCase(),
+                multipleDetails.getCaseData().getMultipleSource()))
+                .thenReturn(submitEvents.get(0));
+
+        multipleBatchUpdate3Service.batchUpdate3Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verifyNoMoreInteractions(multipleHelperService);
+
+        assertEquals(OPEN_STATE, multipleDetails.getCaseData().getState());
+
+    }
 }

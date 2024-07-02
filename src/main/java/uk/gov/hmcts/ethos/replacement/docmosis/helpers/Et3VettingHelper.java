@@ -119,7 +119,7 @@ public final class Et3VettingHelper {
      * address data are unavailable
      * @param caseData contains all the case data
      */
-    public static void getRespondentNameAndAddress(CaseData caseData) {
+    public static void setRespondentNameAndAddress(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         if (CollectionUtils.isEmpty(respondentCollection))  {

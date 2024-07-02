@@ -12,6 +12,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEPOSIT_REFUNDED_GREATER_DEPOSIT_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UNABLE_TO_FIND_PARTY;
 
 @Service("depositOrderValidationService")
@@ -63,8 +64,8 @@ public class DepositOrderValidationService {
                 depositTypeItem.getValue().setDepositRequestedBy(RESPONDENT_TITLE);
             } else if (dynamicRequestedBy.startsWith("C:")) {
                 depositTypeItem.getValue().setDepositRequestedBy(CLAIMANT_TITLE);
-            } else if (dynamicRequestedBy.equals("Tribunal")) {
-                depositTypeItem.getValue().setDepositRequestedBy("Tribunal");
+            } else if (TRIBUNAL.equals(dynamicRequestedBy)) {
+                depositTypeItem.getValue().setDepositRequestedBy(TRIBUNAL);
             } else {
                 errors.add(UNABLE_TO_FIND_PARTY);
             }

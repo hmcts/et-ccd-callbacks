@@ -74,7 +74,7 @@ public class DocumentGenerationService {
         if (templateName.equals(ADDRESS_LABELS_TEMPLATE)) {
             String ewSection = DocumentHelper.getEWSectionName(caseData.getCorrespondenceType());
             caseData.setAddressLabelCollection(new ArrayList<>());
-            String sectionName = ewSection.equals("")
+            String sectionName = ewSection.isEmpty()
                     ? DocumentHelper.getScotSectionName(caseData.getCorrespondenceScotType())
                     : ewSection;
             log.info("midAddressLabels - sectionName : " + sectionName);
@@ -232,7 +232,6 @@ public class DocumentGenerationService {
     }
 
     public BulkDocumentInfo processBulkDocumentRequest(BulkRequest bulkRequest, String authToken) {
-        BulkDocumentInfo bulkDocumentInfo = new BulkDocumentInfo();
         BulkDetails bulkDetails = bulkRequest.getCaseDetails();
         List<String> errors = new ArrayList<>();
         String markUps = "";
@@ -264,6 +263,7 @@ public class DocumentGenerationService {
         } catch (Exception ex) {
             throw new DocumentManagementException(MESSAGE + bulkDetails.getCaseId() + ex.getMessage());
         }
+        BulkDocumentInfo bulkDocumentInfo = new BulkDocumentInfo();
         bulkDocumentInfo.setErrors(errors);
         bulkDocumentInfo.setMarkUps(markUps);
         log.info("Markups: " + markUps);
@@ -271,7 +271,6 @@ public class DocumentGenerationService {
     }
 
     public BulkDocumentInfo processBulkScheduleRequest(BulkRequest bulkRequest, String authToken) {
-        BulkDocumentInfo bulkDocumentInfo = new BulkDocumentInfo();
         BulkData bulkData = bulkRequest.getCaseDetails().getCaseData();
         String caseTypeId = bulkRequest.getCaseDetails().getCaseTypeId();
         List<String> errors = new ArrayList<>();
@@ -285,6 +284,7 @@ public class DocumentGenerationService {
         } catch (Exception ex) {
             throw new DocumentManagementException(MESSAGE + bulkRequest.getCaseDetails().getCaseId() + ex.getMessage());
         }
+        BulkDocumentInfo bulkDocumentInfo = new BulkDocumentInfo();
         bulkDocumentInfo.setErrors(errors);
         bulkDocumentInfo.setMarkUps(documentInfo.getMarkUp() != null ? documentInfo.getMarkUp() : " ");
         bulkDocumentInfo.setDocumentInfo(documentInfo);

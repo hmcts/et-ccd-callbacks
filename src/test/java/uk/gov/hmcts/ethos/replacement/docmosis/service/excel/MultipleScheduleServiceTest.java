@@ -16,6 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,8 +42,8 @@ class MultipleScheduleServiceTest {
     @InjectMocks
     private MultipleScheduleService multipleScheduleService;
 
-    private TreeMap<String, Object> multipleObjectsFlags;
-    private TreeMap<String, Object> multipleObjectsSubMultiple;
+    private SortedMap<String, Object> multipleObjectsFlags;
+    private SortedMap<String, Object> multipleObjectsSubMultiple;
     private MultipleDetails multipleDetails;
     private Set<SchedulePayloadEvent> schedulePayloadEvents;
     private String userToken;
@@ -162,9 +163,9 @@ class MultipleScheduleServiceTest {
 
     }
 
-    private TreeMap<String, Object> createBigTreeMap() {
+    private SortedMap<String, Object> createBigTreeMap() {
 
-        TreeMap<String, Object> treeMap = new TreeMap<>();
+        SortedMap<String, Object> treeMap = new TreeMap<>();
 
         for (int i = 0; i < SCHEDULE_LIMIT_CASES + 1; i++) {
             treeMap.put(String.valueOf(i), "Dummy");

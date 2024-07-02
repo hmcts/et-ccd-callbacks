@@ -83,7 +83,7 @@ public class AcasService {
         return new ArrayList<>();
     }
 
-    private static AcasCertificate convertAcasResponse(ArrayList acasCertificate) throws JsonProcessingException {
+    private static AcasCertificate convertAcasResponse(List acasCertificate) throws JsonProcessingException {
         Object cert = acasCertificate.get(0);
         ObjectMapper objectMapper = new ObjectMapper();
         String certificate = objectMapper.writeValueAsString(cert);

@@ -165,7 +165,7 @@ public class DocumentGenerationController {
         if (errors.isEmpty()) {
 
             DefaultValues defaultValues = getPostDefaultValues(caseDetails);
-            defaultValuesReaderService.getCaseData(caseDetails.getCaseData(), defaultValues);
+            defaultValuesReaderService.setCaseData(caseDetails.getCaseData(), defaultValues);
             DocumentInfo documentInfo = documentGenerationService.processDocumentRequest(ccdRequest, userToken);
             documentGenerationService.updateBfActions(documentInfo, caseDetails.getCaseData());
             caseDetails.getCaseData().setDocMarkUp(documentInfo.getMarkUp());

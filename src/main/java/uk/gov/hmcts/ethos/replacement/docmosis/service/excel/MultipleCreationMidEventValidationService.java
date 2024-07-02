@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -212,8 +213,7 @@ public class MultipleCreationMidEventValidationService {
                 listCasesStateError.add(submitEvent.getCaseData().getEthosCaseReference());
             }
 
-            if (submitEvent.getCaseData().getMultipleReference() != null
-                    && !submitEvent.getCaseData().getMultipleReference().trim().isEmpty()) {
+            if (StringUtils.isNotBlank(submitEvent.getCaseData().getMultipleReference())) {
                 log.info("VALIDATION ERROR: already another multiple");
 
                 listCasesMultipleError.add(submitEvent.getCaseData().getEthosCaseReference());

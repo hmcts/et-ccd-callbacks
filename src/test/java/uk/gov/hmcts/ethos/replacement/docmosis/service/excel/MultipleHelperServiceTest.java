@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,7 +70,7 @@ class MultipleHelperServiceTest {
     private String userToken;
     private List<SubmitEvent> submitEventList;
     private List<SubmitMultipleEvent> submitMultipleEvents;
-    private TreeMap<String, Object> multipleObjects;
+    private SortedMap<String, Object> multipleObjects;
     private String gatewayURL;
 
     @BeforeEach

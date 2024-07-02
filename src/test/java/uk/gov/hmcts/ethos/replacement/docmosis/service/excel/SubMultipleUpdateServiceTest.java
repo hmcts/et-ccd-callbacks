@@ -11,7 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SubMultipleReferenceService;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -37,7 +37,7 @@ class SubMultipleUpdateServiceTest {
     @InjectMocks
     private SubMultipleUpdateService subMultipleUpdateService;
 
-    private TreeMap<String, Object> multipleObjectsAll;
+    private SortedMap<String, Object> multipleObjectsAll;
     private MultipleDetails multipleDetails;
     private String userToken;
 

@@ -9,10 +9,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.ExcelGenerationException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesSchedulePrinter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,21 +48,26 @@ public class ScheduleCreationService {
 
     public byte[] writeSchedule(MultipleData multipleData, List<SchedulePayload> schedulePayloads,
                                 SortedMap<String, Object> multipleObjectsFiltered) {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(SCHEDULE_SHEET_NAME);
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet(SCHEDULE_SHEET_NAME);
 
-        initializeHeaders(workbook, sheet, multipleData);
+            initializeHeaders(workbook, sheet, multipleData);
 
-        if (Arrays.asList(MULTIPLE_SCHEDULE_CONFIG, MULTIPLE_SCHEDULE_DETAILED_CONFIG)
-                .contains(multipleData.getScheduleDocName())) {
-            initializeData(workbook, sheet, schedulePayloads, multipleData.getScheduleDocName());
-        } else {
-            initializeSubMultipleDataLogic(workbook, sheet, multipleData, schedulePayloads, multipleObjectsFiltered);
+            if (Arrays.asList(MULTIPLE_SCHEDULE_CONFIG, MULTIPLE_SCHEDULE_DETAILED_CONFIG)
+                    .contains(multipleData.getScheduleDocName())) {
+                initializeData(workbook, sheet, schedulePayloads, multipleData.getScheduleDocName());
+            } else {
+                initializeSubMultipleDataLogic(workbook, sheet, multipleData,
+                        schedulePayloads, multipleObjectsFiltered);
+            }
+
+            MultiplesSchedulePrinter.adjustColumnSize(sheet);
+
+            return MultiplesHelper.writeExcelFileToByteArray(workbook);
+        } catch (IOException e) {
+            log.error("Error generating the excel");
+            throw new ExcelGenerationException("Error generating the excel", e);
         }
-
-        MultiplesSchedulePrinter.adjustColumnSize(sheet);
-
-        return MultiplesHelper.writeExcelFileToByteArray(workbook);
     }
 
     private void initializeHeaders(XSSFWorkbook workbook, XSSFSheet sheet, MultipleData multipleData) {

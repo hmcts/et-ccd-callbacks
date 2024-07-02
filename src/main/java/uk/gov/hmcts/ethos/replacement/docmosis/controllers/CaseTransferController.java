@@ -254,7 +254,7 @@ public class CaseTransferController {
             caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
         }
         DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());
-        defaultValuesReaderService.getCaseData(caseData, defaultValues);
+        defaultValuesReaderService.setCaseData(caseData, defaultValues);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
         if (featureToggleService.isHmcEnabled()) {

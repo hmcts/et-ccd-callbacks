@@ -76,9 +76,11 @@ class StaffImportServiceTest {
         ExcelReadingService excelReadingService = mock(ExcelReadingService.class);
         File file = new File(StaffImportServiceTest.class.getClassLoader()
                 .getResource("admin/StaffImportFile.xlsx").getFile());
-        XSSFWorkbook workbook = new XSSFWorkbook(file);
-        when(excelReadingService.readWorkbook(userToken, documentBinaryUrl)).thenReturn(workbook);
-        return excelReadingService;
+        try (XSSFWorkbook workbook = new XSSFWorkbook(file)) {
+            when(excelReadingService.readWorkbook(userToken, documentBinaryUrl)).thenReturn(workbook);
+            return excelReadingService;
+        }
+
     }
 
     private AdminData createAdminData(String documentBinaryUrl) {

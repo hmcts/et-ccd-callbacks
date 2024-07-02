@@ -356,7 +356,7 @@ public class Et1ReppedHelper {
         NewEmploymentType newEmploymentType = new NewEmploymentType();
         newEmploymentType.setNewJob(getFirstListItem(caseData.getClaimantNewJob()));
         newEmploymentType.setNewlyEmployedFrom(caseData.getClaimantNewJobStartDate());
-        newEmploymentType.setNewPayBeforeTax(caseData.getClaimantNewJobPayBeforeTax());
+        newEmploymentType.setNewPayBeforeTax(formatPay(caseData.getClaimantNewJobPayBeforeTax()));
         newEmploymentType.setNewJobPayInterval(getFirstListItem(caseData.getClaimantNewJobPayPeriod()));
         return newEmploymentType;
     }
@@ -385,8 +385,8 @@ public class Et1ReppedHelper {
             }
         }
         claimantOtherType.setClaimantAverageWeeklyHours(caseData.getClaimantAverageWeeklyWorkHours());
-        claimantOtherType.setClaimantPayBeforeTax(caseData.getClaimantPayBeforeTax());
-        claimantOtherType.setClaimantPayAfterTax(caseData.getClaimantPayAfterTax());
+        claimantOtherType.setClaimantPayBeforeTax(formatPay(caseData.getClaimantPayBeforeTax()));
+        claimantOtherType.setClaimantPayAfterTax(formatPay(caseData.getClaimantPayAfterTax()));
         claimantOtherType.setClaimantPayCycle(CollectionUtils.isEmpty(caseData.getClaimantPayType())
                                               || caseData.getClaimantPayType().get(0).equals(
                 NOT_SURE)
@@ -397,7 +397,7 @@ public class Et1ReppedHelper {
                 || caseData.getClaimantPensionContribution().get(0).equals(NOT_SURE)
                 ? null
                 : caseData.getClaimantPensionContribution().get(0));
-        claimantOtherType.setClaimantPensionWeeklyContribution(caseData.getClaimantWeeklyPension());
+        claimantOtherType.setClaimantPensionWeeklyContribution(formatPay(caseData.getClaimantWeeklyPension()));
         claimantOtherType.setClaimantBenefits(getFirstListItem(caseData.getClaimantEmployeeBenefits()));
         claimantOtherType.setClaimantBenefitsDetail(caseData.getClaimantBenefits());
         return claimantOtherType;
@@ -606,5 +606,15 @@ public class Et1ReppedHelper {
             return Collections.singletonList("Please provide details of the claim");
         }
         return Collections.emptyList();
+    }
+
+    private static String formatPay(String pay) {
+        if (isNullOrEmpty(pay)) {
+            return null;
+        } else if (pay.length() < 3) {
+            return pay;
+        } else {
+            return pay.substring(0, pay.length() - 2);
+        }
     }
 }

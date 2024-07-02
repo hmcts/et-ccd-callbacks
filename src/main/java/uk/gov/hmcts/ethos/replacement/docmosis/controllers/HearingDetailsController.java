@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
 
@@ -32,11 +34,14 @@ public class HearingDetailsController {
 
     private final VerifyTokenService verifyTokenService;
     private final HearingDetailsService hearingDetailsService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     public HearingDetailsController(VerifyTokenService verifyTokenService,
-                                    HearingDetailsService hearingDetailsService) {
+                                    HearingDetailsService hearingDetailsService,
+                                    CaseManagementForCaseWorkerService caseManagementForCaseWorkerService) {
         this.verifyTokenService = verifyTokenService;
         this.hearingDetailsService = hearingDetailsService;
+        this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
     }
 
     @PostMapping(value = "/initialiseHearings", consumes = APPLICATION_JSON_VALUE)
@@ -116,8 +121,9 @@ public class HearingDetailsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        hearingDetailsService.updateCase(ccdRequest.getCaseDetails());
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        hearingDetailsService.updateCase(caseDetails);
+        caseManagementForCaseWorkerService.setNextListedDate(caseDetails.getCaseData());
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

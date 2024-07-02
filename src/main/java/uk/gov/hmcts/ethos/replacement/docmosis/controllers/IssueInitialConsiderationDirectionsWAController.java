@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 public class IssueInitialConsiderationDirectionsWAController {
 
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final VerifyTokenService verifyTokenService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IICD_HDR =
@@ -81,6 +83,7 @@ public class IssueInitialConsiderationDirectionsWAController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

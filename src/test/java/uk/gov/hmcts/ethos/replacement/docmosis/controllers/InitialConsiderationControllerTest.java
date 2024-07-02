@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
@@ -54,6 +55,9 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
 
     @MockBean
     private InitialConsiderationService initialConsiderationService;
+
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @MockBean
     private DocumentManagementService documentManagementService;

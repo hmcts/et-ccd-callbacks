@@ -16,6 +16,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -55,6 +56,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     private WebApplicationContext applicationContext;
     @MockBean
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockBean
     private TornadoService tornadoService;
     private MockMvc mvc;

@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -52,7 +53,8 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
 
     @MockBean
     private TseRespondentReplyService tseRespondentReplyService;
-
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private MockedStatic<Helper> mockHelper;
     private CCDRequest ccdRequest;
 

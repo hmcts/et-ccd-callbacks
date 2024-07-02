@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.cle
 @RestController
 public class CreateReferralController {
 
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final ReferralService referralService;
     private final UserIdamService userIdamService;
     private final DocumentManagementService documentManagementService;
@@ -183,7 +185,7 @@ public class CreateReferralController {
         }
 
         clearReferralDataFromCaseData(caseData);
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

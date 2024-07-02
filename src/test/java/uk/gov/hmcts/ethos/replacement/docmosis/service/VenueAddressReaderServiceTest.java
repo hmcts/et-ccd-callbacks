@@ -243,8 +243,18 @@ class VenueAddressReaderServiceTest {
 
     @Test
     void getVenueAddressForHearing_ThrowsArgumentException() {
+        VenueAddress venueAddress = new VenueAddress();
+        venueAddress.setVenue("Glasgow3");
+        venueAddress.setAddress("");
+        List<VenueAddress> venueAddressList = List.of(venueAddress);
+        String officeName = TribunalOffice.GLASGOW.getOfficeName();
+        when(venueAddressesService.getTribunalVenueAddresses(officeName))
+                .thenReturn(venueAddressList);
+        HearingType hearingType = new HearingType();
         assertThrows(IllegalArgumentException.class, () ->
-                venueAddressReaderService.getVenueAddress(new HearingType(), "NotFound", "")
+                venueAddressReaderService.getVenueAddress(hearingType,
+                        "NotFound",
+                        officeName)
         );
     }
 

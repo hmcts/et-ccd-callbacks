@@ -70,7 +70,7 @@ public class Et1DocumentGenerationTask {
             CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
                     String.valueOf(submitEvent.getCaseId()), "generateEt1Documents");
             CaseDetails caseDetails = ccdRequest.getCaseDetails();
-            if (ObjectUtils.isEmpty((caseDetails.getCaseData().getRequiresSubmissionDocuments()))
+            if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRequiresSubmissionDocuments())
                                     || NO.equals(caseDetails.getCaseData().getRequiresSubmissionDocuments())) {
                 return;
             }

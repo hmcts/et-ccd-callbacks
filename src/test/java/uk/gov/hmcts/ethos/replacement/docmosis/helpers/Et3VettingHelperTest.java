@@ -328,7 +328,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
 
         assertNull(caseData.getEt3NameAddressRespondent());
     }
@@ -349,7 +349,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
             + "address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"
             + "&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
@@ -371,7 +371,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
             + "address &#09&#09 None Given</pre><hr>";
 
@@ -393,7 +393,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; None Given<br><br>"
             + "Contact address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09"
             + "&#09&#09&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
@@ -416,7 +416,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
             + "address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"
             + "&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09"
@@ -440,7 +440,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
 
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact"
             + " address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"

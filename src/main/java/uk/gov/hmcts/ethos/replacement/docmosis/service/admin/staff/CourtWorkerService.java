@@ -34,7 +34,7 @@ public class CourtWorkerService {
 
     public List<String> addCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        CourtWorker courtWorker = setCourtWorker(adminData);
+        CourtWorker courtWorker = getCourtWorker(adminData);
 
         checkIfCourtWorkerCodeExists(courtWorker, errors);
         checkIfCourtWorkerNameExists(courtWorker, errors);
@@ -144,7 +144,7 @@ public class CourtWorkerService {
         }
     }
 
-    private CourtWorker setCourtWorker(AdminData adminData) {
+    private CourtWorker getCourtWorker(AdminData adminData) {
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(
                 adminData.getAdminCourtWorker().getTribunalOffice());
         CourtWorkerType courtWorkerType = CourtWorkerType.valueOf(

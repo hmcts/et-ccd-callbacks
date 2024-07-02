@@ -245,7 +245,6 @@ public class TseAdmReplyService {
      * Send notify emails to Respondents (or LR if they are assigned).
      */
     public Map<String, Object> sendNotifyEmailsToRespondents(CaseDetails caseDetails, String userToken) {
-        Map<String, Object> personalisationHashMap;
         CaseData caseData = caseDetails.getCaseData();
         if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
             return Collections.emptyMap();
@@ -254,6 +253,7 @@ public class TseAdmReplyService {
         String customisedText = isResponseRequired(caseData, RESPONDENT_TITLE)
                 ? RESPONSE_REQUIRED : RESPONSE_NOT_REQUIRED;
 
+        Map<String, Object> personalisationHashMap;
         personalisationHashMap = buildPersonalisation(caseData.getEthosCaseReference(),
                 caseDetails.getCaseId(), customisedText, getUploadedDocumentContent(caseData, userToken));
 

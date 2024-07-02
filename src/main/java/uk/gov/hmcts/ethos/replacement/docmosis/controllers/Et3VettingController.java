@@ -192,7 +192,7 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

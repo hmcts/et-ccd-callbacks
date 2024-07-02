@@ -70,7 +70,7 @@ public class ServingService {
         if (CollectionUtils.isNotEmpty(docList)) {
             documentLinks = docList
                 .stream()
-                .filter(d -> d.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE))
+                .filter(d -> SERVING_DOCUMENT_OTHER_TYPE.equals(d.getValue().getTypeOfDocument()))
                 .map(this::createDocLinkBinary)
                 .collect(Collectors.joining());
         }

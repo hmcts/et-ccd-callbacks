@@ -1,12 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import org.apache.commons.compress.utils.Lists;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -49,7 +53,7 @@ public final class UpdateDataModelBuilder {
                 .isClaimantRepRemovalUpdate(multipleData.getBatchRemoveClaimantRep())
 
                 .representativeClaimantType(getRepresentativeClaimantType(multipleData, caseData))
-                .jurCodesType(getJurCodesType(multipleData, caseData))
+                .jurCodesList(getJurCodesList(multipleData.getBatchUpdateJurisdictionList(), caseData))
                 .respondentSumType(getRespondentSumType(multipleData, caseData))
                 .judgementType(getJudgementType(multipleData, caseData))
                 .representedType(getRespondentRepType(multipleData, caseData))
@@ -75,26 +79,36 @@ public final class UpdateDataModelBuilder {
         }
     }
 
-    private static JurCodesType getJurCodesType(MultipleData multipleData, CaseData caseData) {
-        if (caseData == null) {
+    private static List<JurCodesType> getJurCodesList(ListTypeItem<DynamicListType> batchUpdateJurisdictionsList,
+        CaseData caseData) {
+        if (batchUpdateJurisdictionsList == null) {
+            return Lists.newArrayList();
+        }
+        return batchUpdateJurisdictionsList
+               .map(jurCode -> getJurCodesType(jurCode.getDynamicList(), caseData))
+               .toList();
+    }
+
+    private static JurCodesType getJurCodesType(DynamicFixedListType batchUpdateJurisdiction, CaseData caseData) {
+        if (caseData == null || batchUpdateJurisdiction == null) {
             return null;
         }
 
+        DynamicValueType jurisdictions = batchUpdateJurisdiction.getValue();
         List<JurCodesTypeItem> jurCodesCollection = caseData.getJurCodesCollection();
 
-        if (multipleData.getBatchUpdateJurisdiction() != null
-                && multipleData.getBatchUpdateJurisdiction().getValue() != null
-                && jurCodesCollection != null) {
-            String jurCodeToSearch = multipleData.getBatchUpdateJurisdiction().getValue().getLabel();
-            Optional<JurCodesTypeItem> jurCodesTypeItemOptional =
-                    jurCodesCollection.stream()
-                            .filter(jurCodesTypeItem ->
-                                    jurCodesTypeItem.getValue().getJuridictionCodesList().equals(jurCodeToSearch))
-                            .findAny();
+        if (jurisdictions == null || jurCodesCollection == null) {
+            return null;
+        }
 
-            if (jurCodesTypeItemOptional.isPresent()) {
-                return jurCodesTypeItemOptional.get().getValue();
-            }
+        String jurCodeToSearch = jurisdictions.getLabel();
+        Optional<JurCodesTypeItem> jurCodesTypeItemOptional =
+                jurCodesCollection.stream()
+                        .filter(o -> o.getValue().getJuridictionCodesList().equals(jurCodeToSearch))
+                        .findAny();
+
+        if (jurCodesTypeItemOptional.isPresent()) {
+            return jurCodesTypeItemOptional.get().getValue();
         }
 
         return null;

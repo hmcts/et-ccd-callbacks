@@ -60,7 +60,7 @@ public final class UpdateDataModelBuilder {
 
     private static String getFixCase(MultipleData multipleData) {
         if (isNullOrEmpty(multipleData.getIsFixCase())
-                || NO.equals(multipleData.getIsFixCase())) {
+            || NO.equals(multipleData.getIsFixCase())) {
             return NO;
         } else {
             return YES;

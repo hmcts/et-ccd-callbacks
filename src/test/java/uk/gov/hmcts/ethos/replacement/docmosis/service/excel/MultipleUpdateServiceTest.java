@@ -6,11 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BATCH_UPDATE_TYPE_2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BATCH_UPDATE_TYPE_3;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 
 @ExtendWith(SpringExtension.class)
@@ -37,6 +43,8 @@ class MultipleUpdateServiceTest {
     private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
     @Mock
     private MultipleBatchUpdate3Service multipleBatchUpdate3Service;
+    @Mock
+    private MultipleHelperService multipleHelperService;
 
     @InjectMocks
     private MultipleUpdateService multipleUpdateService;
@@ -92,6 +100,50 @@ class MultipleUpdateServiceTest {
         multipleUpdateService.bulkUpdateLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
+        assertEquals(UPDATING_STATE, multipleDetails.getCaseData().getState());
+        verify(multipleBatchUpdate3Service, times(1)).batchUpdate3Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+        verifyNoMoreInteractions(multipleBatchUpdate3Service);
+    }
+
+    @Test
+    void bulkUpdate3LogicWithNoneJurisdiction() throws IOException {
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjectsFlags);
+        multipleDetails.getCaseData().setBatchUpdateType(BATCH_UPDATE_TYPE_3);
+        multipleUpdateService.bulkUpdateLogic(userToken,
+                multipleDetails,
+                new ArrayList<>());
+
+        DynamicListType list = new DynamicListType();
+        var listItems = List.of(DynamicValueType.create(SELECT_NONE_VALUE, SELECT_NONE_VALUE));
+        list.setDynamicList(DynamicFixedListType.from(listItems));
+        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(ListTypeItem.from(list));
+
+        assertEquals(UPDATING_STATE, multipleDetails.getCaseData().getState());
+        verify(multipleBatchUpdate3Service, times(1)).batchUpdate3Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+        verifyNoMoreInteractions(multipleBatchUpdate3Service);
+    }
+
+    @Test
+    void bulkUpdate3LogicWithAJurisdiction() throws IOException {
+        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
+                .thenReturn(multipleObjectsFlags);
+        multipleDetails.getCaseData().setBatchUpdateType(BATCH_UPDATE_TYPE_3);
+        multipleUpdateService.bulkUpdateLogic(userToken,
+                multipleDetails,
+                new ArrayList<>());
+
+        DynamicListType list = new DynamicListType();
+        var listItems = List.of(DynamicValueType.create("DAG", "DAG"));
+        list.setDynamicList(DynamicFixedListType.from(listItems));
+        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(ListTypeItem.from(list));
+
         assertEquals(UPDATING_STATE, multipleDetails.getCaseData().getState());
         verify(multipleBatchUpdate3Service, times(1)).batchUpdate3Logic(userToken,
                 multipleDetails,

@@ -9,8 +9,10 @@ import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -148,14 +150,24 @@ public class MultipleBatchUpdate3Service {
         return
             multipleData.getBatchUpdateClaimantRep() != null
                 && !multipleData.getBatchUpdateClaimantRep().getValue().getCode().equals(SELECT_NONE_VALUE)
-                || multipleData.getBatchUpdateJurisdiction() != null
-                && !multipleData.getBatchUpdateJurisdiction().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateRespondent() != null
                 && !multipleData.getBatchUpdateRespondent().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateJudgment() != null
                 && !multipleData.getBatchUpdateJudgment().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateRespondentRep() != null
-                && !multipleData.getBatchUpdateRespondentRep().getValue().getCode().equals(SELECT_NONE_VALUE);
+                && !multipleData.getBatchUpdateRespondentRep().getValue().getCode().equals(SELECT_NONE_VALUE)
+                && hasJurisdictionListChanged(multipleData.getBatchUpdateJurisdictionList());
+    }
+
+    private boolean hasJurisdictionListChanged(ListTypeItem<DynamicListType> jurisdictionList) {
+        if (jurisdictionList == null) {
+            return false;
+        }
+
+        return jurisdictionList.stream()
+            .filter(o -> o.getValue() != null)
+            .filter(o -> o.getValue().getDynamicList() != null)
+            .anyMatch(o -> !SELECT_NONE_VALUE.equals(o.getValue().getDynamicList().getSelectedCode()));
     }
 
 }

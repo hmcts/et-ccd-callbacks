@@ -277,7 +277,7 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             defaultValuesReaderService.setSubmissionReference(ccdRequest.getCaseDetails());
             DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
-            defaultValuesReaderService.getCaseData(caseData, defaultValues);
+            defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
@@ -400,7 +400,7 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             log.info("Post Default values loaded: " + defaultValues);
-            defaultValuesReaderService.getCaseData(caseData, defaultValues);
+            defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);

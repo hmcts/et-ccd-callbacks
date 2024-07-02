@@ -342,10 +342,9 @@ public class MultipleCreationService {
 
         MultipleData multipleData = multipleDetails.getCaseData();
 
-        if (multipleData.getMultipleReference() == null
-                || multipleData.getMultipleReference().trim().equals("")) {
+        if (StringUtils.isBlank(multipleData.getMultipleReference())) {
 
-            log.info("Case Type: " + multipleDetails.getCaseTypeId());
+            log.info("Case Type: {}", multipleDetails.getCaseTypeId());
 
             return multipleReferenceService.createReference(multipleDetails.getCaseTypeId());
 
@@ -358,7 +357,7 @@ public class MultipleCreationService {
 
     private void addDataToMultiple(MultipleData multipleData) {
 
-        if (StringUtils.isEmpty(multipleData.getMultipleSource())) {
+        if (StringUtils.isBlank(multipleData.getMultipleSource())) {
             multipleData.setMultipleSource(MANUALLY_CREATED_POSITION);
         }
 

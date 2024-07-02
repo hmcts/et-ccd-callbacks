@@ -9,10 +9,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -116,7 +114,7 @@ class UpdateDataModelBuilderTest {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
-        assertNull(updateDataModel.getJurCodesList().get(0));
+        assertNull(updateDataModel.getJurCodesType());
     }
 
     @Test
@@ -124,7 +122,7 @@ class UpdateDataModelBuilderTest {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, JURISDICTION, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
-        assertEquals(JURISDICTION, updateDataModel.getJurCodesList().get(0).getJuridictionCodesList());
+        assertEquals(JURISDICTION, updateDataModel.getJurCodesType().getJuridictionCodesList());
     }
 
     @Test
@@ -132,7 +130,7 @@ class UpdateDataModelBuilderTest {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, UNKNOWN_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
-        assertNull(updateDataModel.getJurCodesList().get(0));
+        assertNull(updateDataModel.getJurCodesType());
     }
 
     @Test
@@ -226,9 +224,7 @@ class UpdateDataModelBuilderTest {
                                             String respondentRepresentative) {
         MultipleData multipleData = new MultipleData();
         multipleData.setBatchUpdateClaimantRep(new DynamicFixedListType(claimantRepresentative));
-        DynamicListType dynamicList = new DynamicListType();
-        dynamicList.setDynamicList(new DynamicFixedListType(jurisdiction));
-        multipleData.setBatchUpdateJurisdictionList(ListTypeItem.from(dynamicList));
+        multipleData.setBatchUpdateJurisdiction(new DynamicFixedListType(jurisdiction));
         multipleData.setBatchUpdateRespondent(new DynamicFixedListType(respondent));
         multipleData.setBatchUpdateJudgment(new DynamicFixedListType(judgement));
         multipleData.setBatchUpdateRespondentRep(new DynamicFixedListType(respondentRepresentative));

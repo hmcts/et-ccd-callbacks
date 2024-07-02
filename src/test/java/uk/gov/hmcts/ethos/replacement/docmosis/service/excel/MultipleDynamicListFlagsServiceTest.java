@@ -11,7 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
@@ -29,7 +29,7 @@ class MultipleDynamicListFlagsServiceTest {
     private MultipleDynamicListFlagsService multipleDynamicListFlagsService;
 
     private MultipleDetails multipleDetails;
-    private TreeMap<String, Object> multipleObjectsDLFlags;
+    private SortedMap<String, Object> multipleObjectsDLFlags;
     private String userToken;
 
     @BeforeEach

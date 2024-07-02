@@ -1,12 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -14,8 +10,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseDocument;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,10 +17,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -36,14 +32,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 public final class Et3ResponseHelper {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-00700.docx";
-    private static final String OUTPUT_NAME = "ET3 Response.pdf";
     private static final String CLAIMANT_NAME_TABLE = "<pre> ET1 claimant name&#09&#09&#09&#09 %s</pre><hr>";
     private static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
     private static final String END_DATE_MUST_BE_AFTER_THE_START_DATE = "End date must be after the start date";
-    private static final String CHECKED = "■"; // U+25A0
-    private static final String UNCHECKED = "□"; // U+25A1
     public static final String ET3_RESPONSE = "et3Response";
     public static final String ET3_RESPONSE_EMPLOYMENT_DETAILS = "et3ResponseEmploymentDetails";
     public static final String ET3_RESPONSE_DETAILS = "et3ResponseDetails";
@@ -100,214 +91,6 @@ public final class Et3ResponseHelper {
         }
 
         return errors;
-    }
-
-    private static void setValue(String value, Consumer<String> fn) {
-        if (fn == null) {
-            return;
-        }
-        fn.accept(value);
-    }
-
-    private static void setCheck(String option, Consumer<String> yes, Consumer<String> no, Consumer<String> other) {
-        setValue(UNCHECKED, yes);
-        setValue(UNCHECKED, no);
-        setValue(UNCHECKED, other);
-
-        if ("Yes".equals(option)) {
-            setValue(CHECKED, yes);
-        } else if ("No".equals(option)) {
-            setValue(CHECKED, no);
-        } else {
-            setValue(CHECKED, other);
-        }
-    }
-
-    private static void setTitle(Et3ResponseData data, String title) {
-        data.setTitleMr(UNCHECKED);
-        data.setTitleMrs(UNCHECKED);
-        data.setTitleMiss(UNCHECKED);
-        data.setTitleMs(UNCHECKED);
-        data.setTitleOther(UNCHECKED);
-
-        if (isNullOrEmpty(title)) {
-            return;
-        }
-
-        switch (title) {
-            case "Mr" -> data.setTitleMr(CHECKED);
-            case "Mrs" -> data.setTitleMrs(CHECKED);
-            case "Miss" -> data.setTitleMiss(CHECKED);
-            case "Ms" -> data.setTitleMs(CHECKED);
-            default -> {
-                data.setTitleOther(CHECKED);
-                data.setTitleText(title);
-            }
-        }
-    }
-
-    /**
-     * Formats data needed for the ET3 Response form document.
-     *
-     * @param caseData  data for the case
-     * @param accessKey required to use docmosis
-     * @return document request for docmosis to create the final ET3 Response form
-     */
-    public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
-        if (caseData.getSubmitEt3Respondent() == null || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            throw new NotFoundException("submitEt3Respondent or respondentCollection is null");
-        }
-        String submitRespondent = caseData.getSubmitEt3Respondent().getSelectedLabel();
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().stream()
-                .filter(r -> submitRespondent.equals(r.getValue().getRespondentName()))
-                .toList().get(0).getValue();
-
-        Et3ResponseData data = Et3ResponseData.builder()
-            .ethosCaseReference(caseData.getEthosCaseReference())
-            .et3ResponseClaimantName(isNullOrEmpty(respondentSumType.getEt3ResponseClaimantNameCorrection())
-                    ? caseData.getClaimant()
-                    : respondentSumType.getEt3ResponseClaimantNameCorrection())
-            .et3ResponseRespondentLegalName(defaultIfEmpty(respondentSumType.getResponseRespondentName(), null))
-            .et3ResponseRespondentCompanyNumber(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseRespondentCompanyNumber(), null))
-            .et3ResponseRespondentEmployerType(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseRespondentEmployerType(), null))
-            .et3ResponseRespondentContactName(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseRespondentContactName(), null))
-            .respondentAddressLine1(
-                    defaultIfEmpty(respondentSumType.getResponseRespondentAddress().getAddressLine1(), null))
-            .respondentAddressLine2(
-                    defaultIfEmpty(respondentSumType.getResponseRespondentAddress().getAddressLine2(), null))
-            .respondentCity(defaultIfEmpty(respondentSumType.getResponseRespondentAddress().getPostTown(), null))
-            .respondentPostcode(defaultIfEmpty(respondentSumType.getResponseRespondentAddress().getPostCode(), null))
-            .et3ResponseDXAddress(defaultIfEmpty(respondentSumType.getEt3ResponseDXAddress(), null))
-            .et3ResponsePhone(defaultIfEmpty(respondentSumType.getResponseRespondentPhone1(), null))
-            .et3ResponseEmploymentCount(defaultIfEmpty(respondentSumType.getEt3ResponseEmploymentCount(), null))
-            .et3ResponseSiteEmploymentCount(defaultIfEmpty(respondentSumType.getEt3ResponseSiteEmploymentCount(), null))
-            .et3ResponseAcasAgreeReason(defaultIfEmpty(respondentSumType.getEt3ResponseAcasAgreeReason(), null))
-            .et3ResponseEmploymentStartDate(defaultIfEmpty(respondentSumType.getEt3ResponseEmploymentStartDate(), null))
-            .et3ResponseEmploymentEndDate(defaultIfEmpty(respondentSumType.getEt3ResponseEmploymentEndDate(), null))
-            .et3ResponseEmploymentInformation(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseEmploymentInformation(), null))
-            .et3ResponseCorrectJobTitle(defaultIfEmpty(respondentSumType.getEt3ResponseCorrectJobTitle(), null))
-            .et3ResponseClaimantCorrectHours(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseClaimantCorrectHours(), null))
-            .et3ResponsePayBeforeTax(defaultIfEmpty(respondentSumType.getEt3ResponsePayBeforeTax(), null))
-            .et3ResponsePayTakehome(defaultIfEmpty(respondentSumType.getEt3ResponsePayTakehome(), null))
-            .et3ResponseCorrectNoticeDetails(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseCorrectNoticeDetails(), null))
-            .et3ResponseContestClaimDetails(defaultIfEmpty(respondentSumType.getEt3ResponseContestClaimDetails(), null))
-            .et3ResponseEmployerClaimDetails(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseEmployerClaimDetails(), null))
-            .et3ResponseRespondentSupportDetails(
-                    defaultIfEmpty(respondentSumType.getEt3ResponseRespondentSupportDetails(), null))
-            .et3ResponsePensionCorrectDetails(
-                    defaultIfEmpty(respondentSumType.getEt3ResponsePensionCorrectDetails(), null))
-            .hearingPhone(respondentSumType.getEt3ResponseHearingRespondent().contains("Phone hearings")
-                    ? CHECKED
-                    : UNCHECKED)
-            .hearingVideo(respondentSumType.getEt3ResponseHearingRespondent().contains("Video hearings")
-                    ? CHECKED
-                    : UNCHECKED)
-            .repHearingPhone(respondentSumType.getEt3ResponseHearingRepresentative().contains("Phone hearings")
-                    ? CHECKED
-                    : UNCHECKED)
-            .repHearingVideo(respondentSumType.getEt3ResponseHearingRepresentative().contains("Video hearings")
-                    ? CHECKED
-                    : UNCHECKED)
-            .build();
-
-        setTitle(data, respondentSumType.getEt3ResponseRespondentPreferredTitle());
-        et3CheckBoxes(caseData, respondentSumType, data);
-
-        Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
-                .accessKey(accessKey)
-                .outputName(OUTPUT_NAME)
-                .templateName(TEMPLATE_NAME)
-                .et3ResponseData(data)
-                .build();
-
-        return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
-    }
-
-    private static void et3CheckBoxes(CaseData caseData, RespondentSumType respondentSumType, Et3ResponseData data) {
-        setCheck(respondentSumType.getEt3ResponseMultipleSites(), data::setSiteYes, data::setSiteNo, null);
-        setCheck(respondentSumType.getEt3ResponseAcasAgree(), data::setAcasYes, data::setAcasNo, null);
-        setCheck(respondentSumType.getEt3ResponseAreDatesCorrect(),
-                data::setDatesYes, data::setDatesNo, data::setDatesNA);
-        setCheck(respondentSumType.getEt3ResponseIsJobTitleCorrect(),
-                data::setJobYes, data::setJobNo, data::setJobNA);
-        setCheck(respondentSumType.getEt3ResponseClaimantWeeklyHours(),
-                data::setHoursYes, data::setHoursNo, data::setHoursNA);
-        setCheck(respondentSumType.getEt3ResponseEarningDetailsCorrect(),
-                data::setEarnYes, data::setEarnNo, data::setEarnNA);
-        setCheck(respondentSumType.getEt3ResponseIsNoticeCorrect(),
-                data::setNoticeYes, data::setNoticeNo, data::setNoticeNA);
-        setCheck(respondentSumType.getEt3ResponseRespondentContestClaim(),
-                data::setContestYes, data::setContestNo, null);
-        setCheck(respondentSumType.getEt3ResponseRespondentSupportNeeded(),
-                data::setHelpYes, data::setHelpNo, data::setHelpNA);
-        setCheck(respondentSumType.getEt3ResponseEmployerClaim(), data::setEccYes, null, null);
-        setCheck(respondentSumType.getEt3ResponseContinuingEmployment(), data::setContinueYes, data::setContinueNo,
-                data::setContinueNA);
-        setCheck(respondentSumType.getEt3ResponseIsPensionCorrect(), data::setPensionYes, data::setPensionNo,
-                data::setPensionNA);
-        setCheck("Post".equals(respondentSumType.getResponseRespondentContactPreference()) ? "Yes" : "No",
-                data::setContactPost, data::setContactEmail, null);
-
-        addRepDetails(caseData, data);
-        data.setRepContactEmail(UNCHECKED);
-        data.setRepContactPost(UNCHECKED);
-        data.setBeforeWeekly(UNCHECKED);
-        data.setTakehomeWeekly(UNCHECKED);
-        data.setBeforeMonthly(UNCHECKED);
-        data.setTakehomeMonthly(UNCHECKED);
-        data.setBeforeAnnually(UNCHECKED);
-        data.setTakehomeAnnually(UNCHECKED);
-
-        if (NO.equals(respondentSumType.getEt3ResponseEarningDetailsCorrect())
-                && respondentSumType.getEt3ResponsePayFrequency() != null) {
-            if ("Weekly".equals(respondentSumType.getEt3ResponsePayFrequency())) {
-                data.setBeforeWeekly(CHECKED);
-                data.setTakehomeWeekly(CHECKED);
-            } else if ("Monthly".equals(respondentSumType.getEt3ResponsePayFrequency())) {
-                data.setBeforeMonthly(CHECKED);
-                data.setTakehomeMonthly(CHECKED);
-            } else {
-                data.setBeforeAnnually(CHECKED);
-                data.setTakehomeAnnually(CHECKED);
-            }
-        }
-    }
-
-    private static void addRepDetails(CaseData caseData, Et3ResponseData data) {
-        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
-            return;
-        }
-        Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
-                rep -> rep.getValue().getRespRepName().equals(
-                        caseData.getSubmitEt3Respondent().getSelectedLabel()
-                )
-        ).findFirst();
-
-        if (representative.isPresent()) {
-            RepresentedTypeR rep = representative.get().getValue();
-            data.setRepName(rep.getNameOfRepresentative());
-            data.setRepOrgName(rep.getNameOfOrganisation());
-
-            Address address = rep.getRepresentativeAddress();
-
-            if (address != null) {
-                data.setRepAddressLine1(address.getAddressLine1());
-                data.setRepAddressLine2(address.getAddressLine2());
-                data.setRepTown(address.getPostTown());
-                data.setRepCounty(address.getCounty());
-                data.setRepPostcode(address.getPostCode());
-            }
-
-            data.setRepPhoneNumber(rep.getRepresentativePhoneNumber());
-            data.setRepEmailAddress(rep.getRepresentativeEmailAddress());
-        }
     }
 
     /**
@@ -419,7 +202,7 @@ public final class Et3ResponseHelper {
     private static void addEt3Data(CaseData caseData, String eventId, String respondentSelected,
                                    RespondentSumTypeItem respondent) {
         RespondentSumType respondentSumType = switch (eventId) {
-            case ET3_RESPONSE -> addPersonalDetailsToRespondent(caseData, respondent.getValue());
+            case ET3_RESPONSE -> addPersonalDetailsToRespondentOrRepresentative(caseData, respondent.getValue());
             case ET3_RESPONSE_EMPLOYMENT_DETAILS -> addEmploymentDetailsToRespondent(caseData, respondent.getValue());
             case ET3_RESPONSE_DETAILS -> addClaimDetailsToRespondent(caseData, respondent.getValue());
             default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
@@ -444,14 +227,31 @@ public final class Et3ResponseHelper {
         return respondent;
     }
 
-    private static RespondentSumType addPersonalDetailsToRespondent(CaseData caseData, RespondentSumType respondent) {
+    private static RespondentSumType addPersonalDetailsToRespondentOrRepresentative(CaseData caseData,
+                                                                                    RespondentSumType respondent) {
         respondent.setEt3ResponseIsClaimantNameCorrect(caseData.getEt3ResponseIsClaimantNameCorrect());
         respondent.setEt3ResponseClaimantNameCorrection(caseData.getEt3ResponseClaimantNameCorrection());
         respondent.setResponseRespondentName(caseData.getEt3ResponseRespondentLegalName());
         respondent.setResponseRespondentAddress(caseData.getEt3RespondentAddress());
-        respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone());
+        RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+        if (representative != null) {
+            // This should be mapped to Representative
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // existing statement respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone())
+            // replaced with representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone())
+            representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            // This should be mapped to Representative
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // existing statement respondent.setResponseRespondentContactPreference(
+            // caseData.getEt3ResponseContactPreference())
+            // replaced with representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference())
+            representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference());
+            // There weren't any mapping of reference for correspondence - representative.
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // added this field to representative
+            representative.setRepresentativeReference(caseData.getEt3ResponseReference());
+        }
         respondent.setResponseReference(caseData.getEt3ResponseReference());
-        respondent.setResponseRespondentContactPreference(caseData.getEt3ResponseContactPreference());
         respondent.setEt3ResponseContactReason(caseData.getEt3ResponseContactReason());
         respondent.setEt3ResponseRespondentCompanyNumber(caseData.getEt3ResponseRespondentCompanyNumber());
         respondent.setEt3ResponseRespondentEmployerType(caseData.getEt3ResponseRespondentEmployerType());
@@ -468,6 +268,12 @@ public final class Et3ResponseHelper {
     }
 
     private static RespondentSumType addEmploymentDetailsToRespondent(CaseData caseData, RespondentSumType respondent) {
+        RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+        if (representative != null) {
+            caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
+            caseData.setEt3ResponseContactPreference(representative.getRepresentativePreference());
+            caseData.setEt3ResponseReference(representative.getRepresentativeReference());
+        }
         respondent.setEt3ResponseEmploymentCount(caseData.getEt3ResponseEmploymentCount());
         respondent.setEt3ResponseMultipleSites(caseData.getEt3ResponseMultipleSites());
         respondent.setEt3ResponseSiteEmploymentCount(caseData.getEt3ResponseSiteEmploymentCount());
@@ -675,4 +481,30 @@ public final class Et3ResponseHelper {
 
     }
 
+    public static RepresentedTypeR findRepresentativeFromCaseData(CaseData caseData) {
+        if (isCaseDataRespondentEmpty(caseData)) {
+            return null;
+        }
+        Stream<RepresentedTypeRItem> selectedRepresentativeStream = caseData.getRepCollection().stream().filter(
+                rep -> isNotEmpty(rep.getValue()) && rep.getValue().getRespRepName().equals(
+                        caseData.getSubmitEt3Respondent().getSelectedLabel()
+                )
+        );
+        if (isEmpty(selectedRepresentativeStream)) {
+            return null;
+        }
+        Optional<RepresentedTypeRItem> selectedRepresentative = selectedRepresentativeStream.findFirst();
+        if (selectedRepresentative.isEmpty()
+                || isEmpty(selectedRepresentative.get())
+                || isEmpty(selectedRepresentative.get().getValue())) {
+            return null;
+        }
+        return selectedRepresentative.get().getValue();
+    }
+
+    private static boolean isCaseDataRespondentEmpty(CaseData caseData) {
+        return isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || isEmpty(caseData.getSubmitEt3Respondent())
+                || isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel());
+    }
 }

@@ -216,7 +216,7 @@ public class PseRespondToTribunalController {
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        pseRespondToTribunalService.addRespondentResponseToJON(caseDetails.getCaseData());
+        pseRespondToTribunalService.addRespondentResponseToJON(caseDetails.getCaseData(), userToken);
 
         pseRespondToTribunalService.sendAcknowledgeEmail(caseDetails, userToken);
         pseRespondToTribunalService.sendClaimantEmail(caseDetails);

@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -43,11 +45,14 @@ public class Et3ResponseService {
     public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response";
     public static final String ET3_CATEGORY_ID = "C18";
     private final DocumentManagementService documentManagementService;
-    private final TornadoService tornadoService;
+    private final PdfBoxService pdfBoxService;
     private final EmailService emailService;
 
     @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
+
+    @Value("${pdf.et3form}")
+    private String et3FormTemplate;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
@@ -60,8 +65,8 @@ public class Et3ResponseService {
      */
     public DocumentInfo generateEt3ResponseDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {
-            return tornadoService.generateEventDocument(caseData, userToken,
-                caseTypeId, "ET3 Response.pdf");
+            return pdfBoxService.generatePdfDocumentInfo(
+                    caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3FormTemplate);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
@@ -82,7 +87,7 @@ public class Et3ResponseService {
         String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel();
 
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
-                .filter(r -> respondentSelected.equals(r.getValue().getRespondentName()))
+                .filter(r -> respondentSelected.equals(r.getValue().getRespondentName().trim()))
                 .findFirst();
         if (respondent.isPresent()) {
             respondent.get().getValue().setEt3Form(uploadedDocument);

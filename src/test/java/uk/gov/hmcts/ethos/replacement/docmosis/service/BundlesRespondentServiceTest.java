@@ -198,14 +198,7 @@ class BundlesRespondentServiceTest {
         String butReason = "ButReason";
         String disagree = "Disagree";
         UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
-
-        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
-        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
-        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
-        englandCaseData.setBundlesRespondentUploadFile(file);
-        englandCaseData.setBundlesRespondentAgreedDocWith(YES);
-        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
-        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
+        setupEnglandCaseData(YES, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
 
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
         HearingBundleType actual = collection.get(0).getValue();
@@ -232,14 +225,7 @@ class BundlesRespondentServiceTest {
         String butReason = "ButReason";
         String disagree = "Disagree";
         UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
-
-        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
-        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
-        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
-        englandCaseData.setBundlesRespondentUploadFile(file);
-        englandCaseData.setBundlesRespondentAgreedDocWith(NO);
-        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
-        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
+        setupEnglandCaseData(NO, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
 
         bundlesRespondentService.addToBundlesCollection(englandCaseData);
         HearingBundleType actual = collection.get(0).getValue();
@@ -247,5 +233,113 @@ class BundlesRespondentServiceTest {
 
         assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));
         assertThat(actual.getAgreedDocWith(), is(expectedAgreedDocsWith));
+        assertThat(actual.getWhatDocuments(), is(witnessStatementsOnly));
+        assertThat(actual.getWhoseDocuments(), is(respondentsDocumentsOnly));
+        assertThat(actual.getUploadFile(), is(file));
+    }
+
+    @Test
+    void populateSelectRemoveHearingBundle_respondentCollection() {
+        // Setup bundle data
+        List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
+        englandCaseData.setBundlesRespondentCollection(hearingBundleCollection);
+        englandCaseData.setBundlesClaimantCollection(new ArrayList<>());
+
+        String respondentsDocumentsOnly = "Respondent's documents only";
+        String witnessStatementsOnly = "Witness statements only";
+        String butReason = "ButReason";
+        String disagree = "Disagree";
+        UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
+        setupEnglandCaseData(NO, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
+
+        // Assert bundle added
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+        assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(1));
+
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectRespondentHearingBundles");
+        // Populate remove select removal bundle collection
+        bundlesRespondentService.populateSelectRemoveHearingBundle(englandCaseData);
+
+        // Assert remove bundle collection populated
+        assertThat(englandCaseData.getRemoveHearingBundleSelect().getListItems().size(), is(1));
+        assertThat(englandCaseData.getRemoveHearingBundleSelect().getListItems().get(0).getLabel(),
+                is("1 Hearing - Bodmin - 16 May 2069 - file.txt"));
+    }
+
+    @Test
+    void populateSelectRemoveHearingBundle_claimantCollectionEmpty() {
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectClaimantHearingBundles");
+        // Populate remove select removal bundle collection
+        bundlesRespondentService.populateSelectRemoveHearingBundle(englandCaseData);
+
+        // Assert remove bundle collection populated
+        assertNull(englandCaseData.getRemoveHearingBundleSelect());
+    }
+
+    @Test
+    void removeHearingBundles_removeFromRespondentCollections() {
+        // Setup bundle data
+        List<GenericTypeItem<HearingBundleType>> hearingBundleCollection = new ArrayList<>();
+        englandCaseData.setBundlesRespondentCollection(hearingBundleCollection);
+        englandCaseData.setBundlesClaimantCollection(new ArrayList<>());
+
+        String respondentsDocumentsOnly = "Respondent's documents only";
+        String witnessStatementsOnly = "Witness statements only";
+        String butReason = "ButReason";
+        String disagree = "Disagree";
+        UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
+        setupEnglandCaseData(NO, butReason, disagree, respondentsDocumentsOnly, witnessStatementsOnly, file);
+
+        // Assert bundle added
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+        assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(1));
+
+        // Setup remove bundle collection
+        String bundleId = englandCaseData.getBundlesRespondentCollection().get(0).getId();
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectRespondentHearingBundles");
+        DynamicValueType bundleItem = DynamicValueType.create(bundleId, "Bundle");
+        DynamicFixedListType bundleItemList =
+                DynamicFixedListType.from(List.of(bundleItem));
+        bundleItemList.setValue(bundleItem);
+        englandCaseData.setRemoveHearingBundleSelect(bundleItemList);
+        englandCaseData.setHearingBundleRemoveReason("Remove reason");
+
+        // Remove bundle
+        int bundleSizeBefore = englandCaseData.getBundlesRespondentCollection().size();
+        int removedBundleSizeBefore = 0;
+        bundlesRespondentService.removeHearingBundles(englandCaseData);
+        int bundleSizeAfter = englandCaseData.getBundlesRespondentCollection().size();
+        int removedBundleSizeAfter = englandCaseData.getRemovedHearingBundlesCollection().size();
+
+        // Assert bundle removed
+        assertThat(bundleSizeAfter, is(bundleSizeBefore - 1));
+        assertThat(removedBundleSizeAfter, is(removedBundleSizeBefore + 1));
+        assertThat(englandCaseData.getRemovedHearingBundlesCollection().get(0).getValue().getRemovedReason(),
+                is("Remove reason"));
+    }
+
+    @Test
+    void removeHearingBundles_removeFromClaimantBundlesWhenEmpty() {
+        // Setup remove bundle collection
+        englandCaseData.setRemoveBundleDropDownSelectedParty("selectClaimantHearingBundles");
+
+        // Remove bundle
+        bundlesRespondentService.removeHearingBundles(englandCaseData);
+
+        // Assert
+        assertNull(englandCaseData.getRemovedHearingBundlesCollection());
+    }
+
+    private void setupEnglandCaseData(String agreedDocWith, String butReason, String disagree,
+                                      String respondentsDocumentsOnly, String witnessStatementsOnly,
+                                      UploadedDocumentType file) {
+
+        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
+        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
+        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
+        englandCaseData.setBundlesRespondentUploadFile(file);
+        englandCaseData.setBundlesRespondentAgreedDocWith(agreedDocWith);
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
     }
 }

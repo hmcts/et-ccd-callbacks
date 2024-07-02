@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.utils.DateUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGroup;
@@ -18,15 +19,18 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.NEW_LINE_CELL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class MultipleNotificationsHelper {
+    private static final String UNKNOWN = "Unknown";
+    private static final int DEFAULT_RESPONSE_CAPACITY = 200;
 
     private MultipleNotificationsHelper() {
-
     }
 
     /**
@@ -43,15 +47,26 @@ public final class MultipleNotificationsHelper {
             for (SendNotificationTypeItem sendNotificationTypeItem : schedulePayload.getSendNotificationCollection()) {
                 SendNotificationType notification = sendNotificationTypeItem.getValue();
                 // Filter notifications sent from the multiple
-                if (StringUtils.isNotEmpty(notification.getNotificationSentFrom())
+                if (isNotEmpty(notification.getNotificationSentFrom())
                         && notification.getNotificationSentFrom().equals(multipleRef)) {
-                    String responseReceived = isEmpty(notification.getRespondCollection()) ? NO : YES;
+
+                    String responseReceived;
+                    List<PseResponseTypeItem> responses;
+                    if (isEmpty(notification.getRespondCollection())) {
+                        responseReceived = NO;
+                        responses = new ArrayList<>();
+                    } else {
+                        responseReceived = YES;
+                        responses = notification.getRespondCollection();
+                    }
+
                     notificationGroups.add(NotificationGroup.builder()
                             .caseNumber(schedulePayload.getEthosCaseRef())
                             .date(notification.getDate())
                             .responseReceived(responseReceived)
                             .notificationTitle(notification.getSendNotificationTitle())
                             .notificationSubjectString(notification.getSendNotificationSubjectString())
+                            .respondCollection(responses)
                             .build()
                     );
                 }
@@ -91,5 +106,24 @@ public final class MultipleNotificationsHelper {
                                 DateUtils.parseDate(e.getKey().getRight(), new String[]{MONTH_STRING_DATE_FORMAT})
                         )
                 ).toList();
+    }
+
+    public static @NotNull String getAndFormatReplies(List<PseResponseTypeItem> respondCollection) {
+        if (respondCollection.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(DEFAULT_RESPONSE_CAPACITY * respondCollection.size());
+        for (PseResponseTypeItem pseResponseTypeItem : respondCollection) {
+            PseResponseType response = pseResponseTypeItem.getValue();
+            String name = isNotEmpty(response.getAuthor()) ? response.getAuthor() : UNKNOWN;
+            sb.append("Reply: ").append(response.getResponse())
+                    .append(NEW_LINE_CELL)
+                    .append("Name: ")
+                    .append(name).append(", ").append(response.getFrom())
+                    .append(NEW_LINE_CELL)
+                    .append("-------------")
+                    .append(NEW_LINE_CELL);
+        }
+        return sb.toString();
     }
 }

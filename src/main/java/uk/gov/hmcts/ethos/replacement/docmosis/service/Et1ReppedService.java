@@ -56,6 +56,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 
 @Service
 @Slf4j
@@ -82,7 +83,8 @@ public class Et1ReppedService {
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
-            TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER);
+            TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER,
+            TribunalOffice.NEWCASTLE);
 
     /**
      * Validates the postcode and region.
@@ -159,7 +161,7 @@ public class Et1ReppedService {
             }
 
             List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
-                    userToken);
+                    userToken, caseDetails.getCaseTypeId());
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
@@ -231,10 +233,11 @@ public class Et1ReppedService {
 
     private String getEt1DocumentName(CaseData caseData, String pdfSource) {
         return ET1_CY_PDF.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
-                : "ET1 - " + caseData.getClaimant() + ".pdf";
+                : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {
+    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken,
+                                                                  String caseTypeId) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -250,7 +253,7 @@ public class Et1ReppedService {
         List<DocumentInfo> documentInfoList = acasNumbers.stream()
                 .map(acasNumber -> {
                     try {
-                        return acasService.getAcasCertificates(caseData, acasNumber, userToken);
+                        return acasService.getAcasCertificates(caseData, acasNumber, userToken, caseTypeId);
                     } catch (JsonProcessingException e) {
                         log.error("Failed to retrieve ACAS Certificate", e);
                         return null;

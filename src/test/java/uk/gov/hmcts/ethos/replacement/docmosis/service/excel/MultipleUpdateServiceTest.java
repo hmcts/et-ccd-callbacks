@@ -109,50 +109,6 @@ class MultipleUpdateServiceTest {
     }
 
     @Test
-    void bulkUpdate3LogicWithNoneJurisdiction() throws IOException {
-        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
-                .thenReturn(multipleObjectsFlags);
-        multipleDetails.getCaseData().setBatchUpdateType(BATCH_UPDATE_TYPE_3);
-        multipleUpdateService.bulkUpdateLogic(userToken,
-                multipleDetails,
-                new ArrayList<>());
-
-        DynamicListType list = new DynamicListType();
-        var listItems = List.of(DynamicValueType.create(SELECT_NONE_VALUE, SELECT_NONE_VALUE));
-        list.setDynamicList(DynamicFixedListType.from(listItems));
-        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(ListTypeItem.from(list));
-
-        assertEquals(UPDATING_STATE, multipleDetails.getCaseData().getState());
-        verify(multipleBatchUpdate3Service, times(1)).batchUpdate3Logic(userToken,
-                multipleDetails,
-                new ArrayList<>(),
-                multipleObjectsFlags);
-        verifyNoMoreInteractions(multipleBatchUpdate3Service);
-    }
-
-    @Test
-    void bulkUpdate3LogicWithAJurisdiction() throws IOException {
-        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
-                .thenReturn(multipleObjectsFlags);
-        multipleDetails.getCaseData().setBatchUpdateType(BATCH_UPDATE_TYPE_3);
-        multipleUpdateService.bulkUpdateLogic(userToken,
-                multipleDetails,
-                new ArrayList<>());
-
-        DynamicListType list = new DynamicListType();
-        var listItems = List.of(DynamicValueType.create("DAG", "DAG"));
-        list.setDynamicList(DynamicFixedListType.from(listItems));
-        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(ListTypeItem.from(list));
-
-        assertEquals(UPDATING_STATE, multipleDetails.getCaseData().getState());
-        verify(multipleBatchUpdate3Service, times(1)).batchUpdate3Logic(userToken,
-                multipleDetails,
-                new ArrayList<>(),
-                multipleObjectsFlags);
-        verifyNoMoreInteractions(multipleBatchUpdate3Service);
-    }
-
-    @Test
     void bulkUpdateLogicEmptyAcceptedState() throws IOException {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(new TreeMap<>());

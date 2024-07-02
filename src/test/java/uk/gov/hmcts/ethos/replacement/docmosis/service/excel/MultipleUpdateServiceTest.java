@@ -37,8 +37,6 @@ class MultipleUpdateServiceTest {
     private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
     @Mock
     private MultipleBatchUpdate3Service multipleBatchUpdate3Service;
-    @Mock
-    private MultipleHelperService multipleHelperService;
 
     @InjectMocks
     private MultipleUpdateService multipleUpdateService;

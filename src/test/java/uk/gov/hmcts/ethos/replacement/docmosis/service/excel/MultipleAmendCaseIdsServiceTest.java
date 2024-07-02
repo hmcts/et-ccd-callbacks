@@ -35,7 +35,7 @@ class MultipleAmendCaseIdsServiceTest {
     @Mock
     private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
 
-    private TreeMap<String, Object> multipleObjects;
+    private SortedMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
     private String userToken;
 

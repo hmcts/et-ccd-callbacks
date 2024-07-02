@@ -135,17 +135,16 @@ public class MultipleCreationService {
 
         List<String> orgIds = getUniqueOrganisations(cases);
 
-        List<OrganisationUsersIdamUser> users = orgIds.stream()
-            .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
-            .flatMap(o -> o.getBody().getUsers().stream())
-            .toList();
-
         Map<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
 
         if (emails.isEmpty()) {
             // No need to ask message-handler to update permissions if all cases have no legal reps
             return;
         }
+        List<OrganisationUsersIdamUser> users = orgIds.stream()
+                .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
+                .flatMap(o -> o.getBody().getUsers().stream())
+                .toList();
 
         Map<String, String> legalrepMap = buildEmailIdMap(users);
 
@@ -359,11 +358,8 @@ public class MultipleCreationService {
 
     private void addDataToMultiple(MultipleData multipleData) {
 
-        if (multipleData.getMultipleSource() == null
-                || multipleData.getMultipleSource().trim().isEmpty()) {
-
+        if (StringUtils.isEmpty(multipleData.getMultipleSource())) {
             multipleData.setMultipleSource(MANUALLY_CREATED_POSITION);
-
         }
 
     }

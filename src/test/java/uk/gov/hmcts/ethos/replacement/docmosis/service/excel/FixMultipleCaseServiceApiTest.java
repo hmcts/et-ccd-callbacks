@@ -11,7 +11,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -31,7 +31,7 @@ class FixMultipleCaseServiceApiTest {
     @InjectMocks
     private FixMultipleCaseApiService fixMultipleCaseApiService;
 
-    private TreeMap<String, Object> multipleObjects;
+    private SortedMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
     private String userToken;
 

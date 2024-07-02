@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransfer
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,7 +67,7 @@ class MultipleTransferServiceTest {
 
     @InjectMocks
     private MultipleTransferService multipleTransferService;
-    private TreeMap<String, Object> multipleObjects;
+    private SortedMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
     private List<SubmitMultipleEvent> submitMultipleEvents;
     private List<SubmitEvent> submitEvents;

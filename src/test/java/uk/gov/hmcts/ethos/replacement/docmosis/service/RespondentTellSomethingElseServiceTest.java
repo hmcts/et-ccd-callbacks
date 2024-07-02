@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,8 +69,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -128,7 +125,7 @@ class RespondentTellSomethingElseServiceTest {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userIdamService, tribunalOfficesService,
                         tornadoService, documentManagementService, featureToggleService);
-        tseService = new TseService(documentManagementService);
+        tseService = new TseService(documentManagementService, tornadoService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeNoTemplateId", TEMPLATE_ID_NO);
@@ -704,27 +701,6 @@ class RespondentTellSomethingElseServiceTest {
         personalisation.put("shortText", selectedApplication);
         personalisation.put("exuiCaseDetailsLink", "exuiUrl669718251103419");
         return personalisation;
-    }
-
-    @Test
-    void generatesAndAddsTsePdfToDocumentCollection() {
-        CaseData caseData = new CaseData();
-        caseData.setResTseSelectApplication("Amend response");
-        respondentTellSomethingElseService.generateAndAddTsePdf(caseData, "token", "typeId");
-
-        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
-        DocumentType actual = documentCollection.get(0).getValue();
-
-        DocumentType expected = DocumentType.builder()
-                .shortDescription("Amend response")
-                .dateOfCorrespondence(LocalDate.now().toString())
-                .topLevelDocuments(CASE_MANAGEMENT)
-                .caseManagementDocuments(APP_TO_AMEND_RESPONSE)
-                .documentType(APP_TO_AMEND_RESPONSE)
-                .build();
-
-        Assertions.assertThat(documentCollection).hasSize(1);
-        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -42,7 +43,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_FILE_NAME;
 
 @Slf4j
 @Service
@@ -58,6 +62,7 @@ public class TseService {
             "Details of why you do not want to inform the other party";
 
     private final DocumentManagementService documentManagementService;
+    private final TornadoService tornadoService;
 
     /**
      * Creates a new TSE collection if it doesn't exist.
@@ -438,5 +443,37 @@ public class TseService {
         return String.format("Application %d - %s.pdf",
                 getNextApplicationNumber(caseData) - 1,
                 caseData.getResTseSelectApplication());
+    }
+
+    /**
+     * Generates and adds a pdf to summarise the respondent's TSE application to the document collection. Sets type
+     * of document to Respondent correspondence and sets the short description to a description of the application
+     * type.
+     *
+     * @param caseData contains all the case data
+     * @param userToken token used for authorisation
+     * @param caseTypeId reference which casetype the document will be uploaded to
+     */
+    public void generateAndAddTsePdf(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            if (isEmpty(caseData.getDocumentCollection())) {
+                caseData.setDocumentCollection(new ArrayList<>());
+            }
+            String applicationDocMapping =
+                    uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
+                            caseData.getResTseSelectApplication());
+            String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(applicationDocMapping);
+            caseData.getDocumentCollection().add(createDocumentTypeItemFromTopLevel(
+                    documentManagementService.addDocumentToDocumentField(
+                            tornadoService.generateEventDocument(caseData, userToken, caseTypeId, TSE_FILE_NAME)
+                    ),
+                    topLevel,
+                    applicationDocMapping,
+                    caseData.getResTseSelectApplication()
+            ));
+
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 }

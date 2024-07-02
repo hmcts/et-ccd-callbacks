@@ -11,13 +11,11 @@ public final class ClaimantTellSomethingElseHelper {
     }
 
     public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
-        switch (caseData.getClaimantTseSelectApplication()) {
-            case CLAIMANT_TSE_WITHDRAW_CLAIM:
-                return new TSEApplicationTypeData(
-                        caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13());
-            default:
-                throw new IllegalArgumentException(String.format("Unexpected application type %s",
-                        caseData.getResTseSelectApplication()));
+        if (caseData.getClaimantTseSelectApplication().equals(CLAIMANT_TSE_WITHDRAW_CLAIM)) {
+            return new TSEApplicationTypeData(
+                    caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13());
         }
+        throw new IllegalArgumentException(String.format("Unexpected application type %s",
+                caseData.getResTseSelectApplication()));
     }
 }

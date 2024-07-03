@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -22,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,8 +36,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 
 @ExtendWith(SpringExtension.class)
 class TseServiceTest {
@@ -48,8 +43,6 @@ class TseServiceTest {
     private TseService tseService;
     @MockBean
     private DocumentManagementService documentManagementService;
-    @MockBean
-    private TornadoService tornadoService;
 
     private static final String AUTH_TOKEN = "Bearer authToken";
     private static final String COPY_CORRESPONDENCE = "Do you want to copy this correspondence to the other party to "
@@ -57,7 +50,7 @@ class TseServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseService = new TseService(documentManagementService, tornadoService);
+        tseService = new TseService(documentManagementService);
         when(documentManagementService.displayDocNameTypeSizeLink(any(), any())).thenReturn("Document (txt, 1MB)");
     }
 
@@ -527,27 +520,6 @@ class TseServiceTest {
 
             assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN, false)).isEqualTo(expected);
         }
-    }
-
-    @Test
-    void generatesAndAddsTsePdfToDocumentCollection() {
-        CaseData caseData = new CaseData();
-        caseData.setResTseSelectApplication("Amend response");
-        tseService.generateAndAddTsePdf(caseData, "token", "typeId");
-
-        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
-        DocumentType actual = documentCollection.get(0).getValue();
-
-        DocumentType expected = DocumentType.builder()
-                .shortDescription("Amend response")
-                .dateOfCorrespondence(LocalDate.now().toString())
-                .topLevelDocuments(CASE_MANAGEMENT)
-                .caseManagementDocuments(APP_TO_AMEND_RESPONSE)
-                .documentType(APP_TO_AMEND_RESPONSE)
-                .build();
-
-        Assertions.assertThat(documentCollection).hasSize(1);
-        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     private CaseData setupCaseDataWithAnApplication() {

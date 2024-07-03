@@ -182,7 +182,7 @@ public class RespondentTellSomethingElseController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         tseService.createApplication(caseData, false);
-        tseService.generateAndAddTsePdf(caseData, userToken, caseDetails.getCaseTypeId());
+        resTseService.generateAndAddTsePdf(caseData, userToken, caseDetails.getCaseTypeId());
         resTseService.sendAcknowledgeEmail(caseDetails, userToken);
         resTseService.sendClaimantEmail(caseDetails);
         resTseService.sendAdminEmail(caseDetails);

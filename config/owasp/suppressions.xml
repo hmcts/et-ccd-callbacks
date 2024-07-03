@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <!--Below needs investigating as jackson library issues have caused issues in the past-->
-    <suppress until="2024-07-07Z">
+    <suppress until="2024-08-07Z">
         <notes><![CDATA[file name: jackson-databind-2.13.5.jar]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2023-35116</cve>

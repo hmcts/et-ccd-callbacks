@@ -147,8 +147,11 @@ public class MultipleBatchUpdate3Service {
     }
 
     private boolean checkAnyChange(MultipleData multipleData) {
-        return hasJurisdictionListChanged(multipleData.getBatchUpdateJurisdictionList())
-                && multipleData.getBatchUpdateClaimantRep() != null
+        if (hasJurisdictionListChanged(multipleData.getBatchUpdateJurisdictionList())) {
+            return true;
+        }
+
+        return multipleData.getBatchUpdateClaimantRep() != null
                 && !multipleData.getBatchUpdateClaimantRep().getValue().getCode().equals(SELECT_NONE_VALUE)
                 || multipleData.getBatchUpdateRespondent() != null
                 && !multipleData.getBatchUpdateRespondent().getValue().getCode().equals(SELECT_NONE_VALUE)

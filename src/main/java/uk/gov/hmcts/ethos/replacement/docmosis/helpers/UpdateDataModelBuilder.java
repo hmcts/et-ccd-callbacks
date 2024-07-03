@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -86,6 +87,7 @@ public final class UpdateDataModelBuilder {
         }
         return batchUpdateJurisdictionsList
                .map(jurCode -> getJurCodesType(jurCode.getDynamicList(), caseData))
+               .filter(Objects::nonNull)
                .toList();
     }
 

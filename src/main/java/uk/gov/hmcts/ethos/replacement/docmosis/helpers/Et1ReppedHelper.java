@@ -47,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstan
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.WORKING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantHearingPreferencesValidator.PHONE_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantHearingPreferencesValidator.VIDEO_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.UNEXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
@@ -390,12 +391,12 @@ public class Et1ReppedHelper {
         claimantOtherType.setClaimantPayCycle(CollectionUtils.isEmpty(caseData.getClaimantPayType())
                                               || caseData.getClaimantPayType().get(0).equals(
                 NOT_SURE)
-                ? null
+                ? EMPTY_STRING
                 : PAY_PERIODS.get(getFirstListItem(caseData.getClaimantPayType())));
         claimantOtherType.setClaimantPensionContribution(
                 CollectionUtils.isEmpty(caseData.getClaimantPensionContribution())
                 || caseData.getClaimantPensionContribution().get(0).equals(NOT_SURE)
-                ? null
+                ? EMPTY_STRING
                 : caseData.getClaimantPensionContribution().get(0));
         claimantOtherType.setClaimantPensionWeeklyContribution(formatPay(caseData.getClaimantWeeklyPension()));
         claimantOtherType.setClaimantBenefits(getFirstListItem(caseData.getClaimantEmployeeBenefits()));

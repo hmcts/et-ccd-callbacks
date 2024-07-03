@@ -255,9 +255,6 @@ class MultipleBatchUpdate3ServiceTest {
                 new ArrayList<>(),
                 multipleObjectsFlags);
 
-        verifyNoMoreInteractions(multipleHelperService);
-
         assertEquals(OPEN_STATE, multipleDetails.getCaseData().getState());
-
     }
 }

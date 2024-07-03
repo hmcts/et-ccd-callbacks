@@ -1,16 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.repository;
 
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * Shared container for Postgres database testing.
  */
 public final class EtCosPostgresqlContainer extends PostgreSQLContainer<EtCosPostgresqlContainer> {
-    private static final String IMAGE_VERSION = "postgres:11.1";
+    private static final DockerImageName myImage = DockerImageName
+            .parse("hmctspublic.azurecr.io/imported/postgres:16-alpine").asCompatibleSubstituteFor("postgres");
     private static EtCosPostgresqlContainer container;
 
     private EtCosPostgresqlContainer() {
-        super(IMAGE_VERSION);
+        super(myImage);
     }
 
     public static EtCosPostgresqlContainer getInstance() {

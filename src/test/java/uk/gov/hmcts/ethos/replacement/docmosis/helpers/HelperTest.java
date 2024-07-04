@@ -3,10 +3,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
@@ -19,11 +24,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class HelperTest {
 
@@ -163,5 +171,34 @@ public class HelperTest {
         list.add("test");
         list.add("test2");
         assertEquals("test2", Helper.getLast(list));
+    }
+
+    @ParameterizedTest
+    @MethodSource("claimantMyHmctsCaseParameter")
+    void claimantMyHmctsCase(String caseSource, String claimantReppedQuestion, RepresentedTypeC representedTypeC,
+                             boolean expected) {
+        CaseData caseData = new CaseData();
+        caseData.setCaseSource(caseSource);
+        caseData.setClaimantRepresentedQuestion(claimantReppedQuestion);
+        caseData.setRepresentativeClaimantType(representedTypeC);
+        assertEquals(expected, Helper.claimantMyHmctsCase(caseData));
+    }
+
+    private static Stream<Arguments> claimantMyHmctsCaseParameter() {
+        Organisation organisation = Organisation.builder()
+                .organisationID("dummyId")
+                .build();
+        RepresentedTypeC representedTypeC = new RepresentedTypeC();
+        representedTypeC.setMyHmctsOrganisation(organisation);
+        return Stream.of(
+            Arguments.of("ET1", NO, null, false),
+            Arguments.of("ET1", NO, representedTypeC, false),
+            Arguments.of("ET1", YES, null, false),
+            Arguments.of("ET1", YES, representedTypeC, false),
+            Arguments.of("MyHMCTS", NO, null, false),
+            Arguments.of("MyHMCTS", NO, representedTypeC, false),
+            Arguments.of("MyHMCTS", YES, null, false),
+            Arguments.of("MyHMCTS", YES, representedTypeC, true)
+        );
     }
 }

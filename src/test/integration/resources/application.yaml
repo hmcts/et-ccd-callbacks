@@ -50,6 +50,7 @@ template:
   et1Serving:
     claimant: fa49291f-49cf-4330-8031-c05c101eb32a
     respondent: 05af8477-7313-4ef1-9a8e-6b2d9d128b50
+    claimantRep: 680a0043-22c2-48e7-8e6a-a9d77b0b21fe
 
   et3Response:
     tribunal: d4ced02e-f381-491a-855d-950a283315c0

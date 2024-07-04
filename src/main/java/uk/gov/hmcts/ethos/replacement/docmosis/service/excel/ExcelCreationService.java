@@ -40,7 +40,6 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAM
 
 @Slf4j
 @Service("excelCreationService")
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @RequiredArgsConstructor
 public class ExcelCreationService {
     private static final int WIDTH = 256;

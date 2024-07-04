@@ -25,6 +25,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -54,6 +55,7 @@ public class ReplyToReferralController {
     private final DocumentManagementService documentManagementService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
+    private final DigitalCaseFileService digitalCaseFileService;
     @Value("${template.referral}")
     private String referralTemplateId;
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
@@ -89,6 +91,7 @@ public class ReplyToReferralController {
         clearReferralDataFromCaseData(caseData);
         caseData.setIsJudge(ReferralHelper.isJudge(userIdamService.getUserDetails(userToken).getRoles()));
         caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection()));
+        caseData.setReplyToReferralDcfLink(digitalCaseFileService.getReplyToReferralDCFLink(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

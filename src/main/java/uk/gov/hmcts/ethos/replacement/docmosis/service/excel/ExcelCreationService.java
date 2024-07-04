@@ -123,7 +123,7 @@ public class ExcelCreationService {
 
     private static CellStyle getStyleForClaimant(XSSFWorkbook workbook) {
         CellStyle styleForClaimant = getStyleForLocking(workbook, false);
-        styleForClaimant.setAlignment(HorizontalAlignment.LEFT);
+        styleForClaimant.setAlignment(HorizontalAlignment.CENTER);
         return styleForClaimant;
     }
 
@@ -185,10 +185,10 @@ public class ExcelCreationService {
     private void initializeHeaders(XSSFWorkbook workbook, XSSFSheet sheet) {
         XSSFRow rowHead = sheet.createRow(0);
         CellStyle styleForLocking = getStyleForLocking(workbook, false);
-
-        for (int j = 0; j < MultiplesHelper.HEADERS.size(); j++) {
-            rowHead.createCell(j).setCellValue(MultiplesHelper.HEADERS.get(j));
-            createCell(rowHead, j, MultiplesHelper.HEADERS.get(j), styleForLocking);
+        List<String> headers = MultiplesHelper.getHeaders();
+        for (int j = 0; j < headers.size(); j++) {
+            rowHead.createCell(j).setCellValue(headers.get(j));
+            createCell(rowHead, j, headers.get(j), styleForLocking);
         }
     }
 
@@ -257,7 +257,7 @@ public class ExcelCreationService {
         }
 
         if (multipleObject == null) {
-            for (int k = 0; k < MultiplesHelper.HEADERS.size() - 2; k++) {
+            for (int k = 0; k < MultiplesHelper.getHeaders().size() - 2; k++) {
                 columnIndex++;
                 if (k == 0 && !hasSubMultiples) {
                     createCell(row, columnIndex, "", styleForLocking);

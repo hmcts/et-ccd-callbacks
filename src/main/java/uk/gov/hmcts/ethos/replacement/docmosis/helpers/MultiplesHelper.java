@@ -17,7 +17,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.ExcelGenerationExcepti
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,16 +39,21 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_6;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_7;
 
 @Slf4j
 public final class MultiplesHelper {
 
-    public static final List<String> HEADERS = new ArrayList<>(Arrays.asList(
-            HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5, HEADER_6));
+    private static final List<String> HEADERS = new ArrayList<>(List.of(
+            HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5, HEADER_6, HEADER_7));
     public static final String SELECT_ALL = "All";
     public static final String MULTIPLE_SUFFIX = "_Multiple";
 
     private MultiplesHelper() {
+    }
+
+    public static List<String> getHeaders() {
+        return HEADERS;
     }
 
     public static List<String> getCaseIds(MultipleData multipleData) {

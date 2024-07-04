@@ -68,6 +68,8 @@ public class Constants {
     public static final String UNEXPECTED_VALUE = "Unexpected value: ";
     public static final String MONTH_STRING_DATE_FORMAT = "dd MMM yyyy";
     public static final String EMPTY_STRING = "";
+    public static final String DCF_LINK_MARK_UP =
+        "<a target=\"_blank\" href=\"%s\">Digital Case File (opens in new tab)</a><br>";
 
     private Constants() {
 

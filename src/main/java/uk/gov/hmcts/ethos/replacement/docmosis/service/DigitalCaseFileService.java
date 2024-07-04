@@ -25,6 +25,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DCF_LINK_MARK_UP;
 
 @RequiredArgsConstructor
 @Service
@@ -132,7 +133,7 @@ public class DigitalCaseFileService {
     private String formatReplyToReferralDCFLink(UploadedDocumentType uploadedDocumentType) {
         String documentBinaryUrl = uploadedDocumentType.getDocumentBinaryUrl();
         String link = documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
-        return String.format("<a target=\"_blank\" href=\"%s\">Digital Case File (opens in new tab)</a><br>", link);
+        return String.format(DCF_LINK_MARK_UP, link);
     }
 }
 

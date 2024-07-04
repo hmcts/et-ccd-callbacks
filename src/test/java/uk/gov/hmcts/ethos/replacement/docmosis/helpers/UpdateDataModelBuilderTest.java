@@ -116,7 +116,7 @@ class UpdateDataModelBuilderTest {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
-        assertNull(updateDataModel.getJurCodesList().get(0));
+        assertEquals(0, updateDataModel.getJurCodesList().size());
     }
 
     @Test
@@ -132,7 +132,7 @@ class UpdateDataModelBuilderTest {
         MultipleData multipleData = createMultipleData(
                 SELECT_NONE_VALUE, UNKNOWN_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
-        assertNull(updateDataModel.getJurCodesList().get(0));
+        assertEquals(0, updateDataModel.getJurCodesList().size());
     }
 
     @Test

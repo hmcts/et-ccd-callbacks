@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 class MultiplesHelperTest {
@@ -178,6 +180,17 @@ class MultiplesHelperTest {
 
         assertEquals(10, caseIdList.size());
         assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]", caseIdList.toString());
+    }
+
+    @Test
+    void isEmptyOrWhitespace() {
+        Boolean test1 = MultiplesHelper.isEmptyOrWhitespace(null);
+        Boolean test2 = MultiplesHelper.isEmptyOrWhitespace(" ");
+        Boolean test3 = MultiplesHelper.isEmptyOrWhitespace(" Hello World ");
+
+        assertTrue(test1);
+        assertTrue(test2);
+        assertFalse(test3);
     }
 
     private List<CaseIdTypeItem> createCaseIdCollection(int numberCases) {

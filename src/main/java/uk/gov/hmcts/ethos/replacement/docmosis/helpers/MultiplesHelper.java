@@ -377,4 +377,9 @@ public final class MultiplesHelper {
     public static String getListingMultipleCaseTypeId(String caseTypeId) {
         return UtilHelper.getListingCaseTypeId(caseTypeId) + MULTIPLE_SUFFIX;
     }
+
+    public static boolean isEmptyOrWhitespace(String str) {
+        // StringHelper version is deprecated
+        return str == null || str.trim().isEmpty();
+    }
 }

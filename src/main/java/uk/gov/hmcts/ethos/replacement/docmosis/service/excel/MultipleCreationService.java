@@ -46,6 +46,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOUR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.isEmptyOrWhitespace;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -358,14 +359,9 @@ public class MultipleCreationService {
     }
 
     private void addDataToMultiple(MultipleData multipleData) {
-
-        if (multipleData.getMultipleSource() == null
-                || multipleData.getMultipleSource().trim().isEmpty()) {
-
+        if (isEmptyOrWhitespace(multipleData.getMultipleSource())) {
             multipleData.setMultipleSource(MANUALLY_CREATED_POSITION);
-
         }
-
     }
 
     private void setLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {

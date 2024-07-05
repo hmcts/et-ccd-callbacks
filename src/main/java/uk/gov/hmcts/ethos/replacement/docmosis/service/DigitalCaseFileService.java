@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DCF_LINK_MARK_UP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DIGITAL_CASE_FILE;
 
 @RequiredArgsConstructor
 @Service
@@ -118,22 +120,21 @@ public class DigitalCaseFileService {
      */
     public String getReplyToReferralDCFLink(CaseData caseData) {
         if (caseData.getDigitalCaseFile() != null) {
-            return formatReplyToReferralDCFLink(caseData.getDigitalCaseFile().getUploadedDocument());
+            return formatReplyToReferralDCFLink(caseData.getDigitalCaseFile().getUploadedDocument(), DIGITAL_CASE_FILE);
         }
 
         return caseData.getDocumentCollection()
             .stream()
             .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(TRIBUNAL_CASE_FILE)
-                && defaultIfEmpty(d.getValue().getMiscDocuments(), "").equals(TRIBUNAL_CASE_FILE))
-            .map(d -> formatReplyToReferralDCFLink(d.getValue().getUploadedDocument()))
-            .findFirst()
-            .orElse("");
+                || defaultIfEmpty(d.getValue().getMiscDocuments(), "").equals(TRIBUNAL_CASE_FILE))
+            .map(d -> formatReplyToReferralDCFLink(d.getValue().getUploadedDocument(), TRIBUNAL_CASE_FILE))
+            .collect(Collectors.joining());
     }
 
-    private String formatReplyToReferralDCFLink(UploadedDocumentType uploadedDocumentType) {
+    private String formatReplyToReferralDCFLink(UploadedDocumentType uploadedDocumentType, String type) {
         String documentBinaryUrl = uploadedDocumentType.getDocumentBinaryUrl();
         String link = documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
-        return String.format(DCF_LINK_MARK_UP, link);
+        return String.format(DCF_LINK_MARK_UP, link, type);
     }
 }
 

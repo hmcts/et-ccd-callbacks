@@ -113,7 +113,7 @@ class DigitalCaseFileServiceTest {
         String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
 
         String expected = "<a target=\"_blank\" href=\"/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary\">"
-            + "Digital Case File (opens in new tab)</a><br>";
+            + "Digital case file (opens in new tab)</a><br>";
         assertEquals(expected, actual);
     }
 
@@ -125,7 +125,7 @@ class DigitalCaseFileServiceTest {
         String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
 
         String expected = "<a target=\"_blank\" href=\"/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary\">"
-            + "Digital Case File (opens in new tab)</a><br>";
+            + "Tribunal case file (opens in new tab)</a><br>";
         assertEquals(expected, actual);
     }
 
@@ -146,4 +146,12 @@ class DigitalCaseFileServiceTest {
         documentTypeItemList.add(documentTypeItem);
         return documentTypeItemList;
     }
+
+    @Test
+    void getReplyToReferralDCFLink_shouldReturnEmpty() {
+        String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
+        String expected = "";
+        assertEquals(expected, actual);
+    }
+
 }

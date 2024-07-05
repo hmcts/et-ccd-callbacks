@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -107,12 +108,14 @@ public class ClaimantTellSomethingElseController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitClaimantTSE(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         claimantTseService.populateClaimantTse(caseData);
         tseService.createApplication(caseData, true);
+        claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId());
         tseService.clearApplicationData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -138,8 +141,10 @@ public class ClaimantTellSomethingElseController {
     public ResponseEntity<CCDCallbackResponse> completeApplication(
             @RequestBody CCDRequest ccdRequest) {
 
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        String body = APPLICATION_COMPLETE_BODY + caseData.getDocMarkUp();
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-                .confirmation_body(APPLICATION_COMPLETE_BODY)
+                .confirmation_body(body)
                 .build());
     }
 }

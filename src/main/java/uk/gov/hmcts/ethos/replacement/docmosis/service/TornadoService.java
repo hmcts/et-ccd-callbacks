@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
@@ -62,6 +63,7 @@ public class TornadoService {
     private static final String ET3_RESPONSE_PDF = "ET3 Response.pdf";
     private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
     public static final String TSE_FILE_NAME = "Contact the tribunal.pdf";
+    public static final String CLAIMANT_TSE_FILE_NAME = "Claimant Contact the tribunal.pdf";
     public static final String REFERRAL_SUMMARY_PDF = "Referral Summary.pdf";
     public static final String TSE_REPLY = "TSE Reply.pdf";
     public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
@@ -405,6 +407,10 @@ public class TornadoService {
             case TSE_FILE_NAME -> {
                 dmStoreDocumentName = tseService.getTseDocumentName(caseData);
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            }
+            case CLAIMANT_TSE_FILE_NAME -> {
+                dmStoreDocumentName = tseService.getTseDocumentName(caseData);
+                return ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case REFERRAL_SUMMARY_PDF -> {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());

@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -23,9 +24,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.GIV
 public class ClaimantTellSomethingElseServiceTest {
     private ClaimantTellSomethingElseService claimantTellSomethingElseService;
 
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @MockBean
+    private TornadoService tornadoService;
+
     @BeforeEach
     void setUp() {
-        claimantTellSomethingElseService = new ClaimantTellSomethingElseService();
+        claimantTellSomethingElseService =
+                new ClaimantTellSomethingElseService(documentManagementService, tornadoService);
     }
 
     @ParameterizedTest

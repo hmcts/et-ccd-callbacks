@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_ADDRESS;
@@ -103,19 +102,12 @@ public final class NotificationHelper {
     }
 
     public static String getEmailAddressForClaimant(CaseData caseData) {
-        RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
-
-        if (representativeClaimantType == null || NO.equals(caseData.getClaimantRepresentedQuestion())) {
-            ClaimantType claimantType = caseData.getClaimantType();
-            if (claimantType == null) {
-                throw new NotFoundException("Could not find claimant");
-            }
-            String claimantEmailAddress = claimantType.getClaimantEmailAddress();
-            return isNullOrEmpty(claimantEmailAddress) ? "" : claimantEmailAddress;
+        ClaimantType claimantType = caseData.getClaimantType();
+        if (claimantType == null) {
+            throw new NotFoundException("Could not find claimant");
         }
-
-        String representativeEmailAddress = representativeClaimantType.getRepresentativeEmailAddress();
-        return isNullOrEmpty(representativeEmailAddress) ? "" : representativeEmailAddress;
+        String claimantEmailAddress = claimantType.getClaimantEmailAddress();
+        return isNullOrEmpty(claimantEmailAddress) ? "" : claimantEmailAddress;
     }
 
     private static String getNameOfRespondents(CaseData caseData) {

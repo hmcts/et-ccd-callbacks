@@ -82,6 +82,14 @@ class Et3NotificationServiceTest {
     }
 
     @Test
+    void et3NotificationService_shouldSendNotificationsToClaimant() {
+        caseDetails.getCaseData().setEt1OnlineSubmission(YES);
+        et3NotificationService.sendNotifications(caseDetails);
+        verify(emailService, times(1)).sendEmail(any(), eq("claimant@unrepresented.com"), personalisation.capture());
+        assertThat(personalisation.getValue()).containsEntry("linkToCitizenHub", "citizenUrl1234");
+    }
+
+    @Test
     void sendNotifications_shouldHandleMissingEmails() {
         caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
         caseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);

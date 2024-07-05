@@ -421,7 +421,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.10'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.11'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.42'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 

@@ -7,8 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ClaimantTellSomethingElseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ClaimantTellSomethingElseDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
@@ -42,25 +42,33 @@ public final class ClaimantTellSomethingElseHelper {
         TSEApplicationTypeData selectedAppData = getSelectedApplicationType(caseData);
         GenericTseApplicationTypeItem lastApp = getCurrentGenericTseApplicationTypeItem(caseData);
 
-        ClaimantTellSomethingElseData data = ClaimantTellSomethingElseData.builder()
-                .claimTseApplicant(CLAIMANT_TITLE)
+        RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
+                .resTseApplicant(CLAIMANT_TITLE)
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .claimTseSelectApplication(defaultIfEmpty(caseData.getClaimantTseSelectApplication(), null))
-                .claimTseApplicationDate(lastApp != null && StringUtils.isNotBlank(lastApp.getValue().getDate())
+                .resTseSelectApplication(defaultIfEmpty(caseData.getClaimantTseSelectApplication(), null))
+                .resTseApplicationDate(lastApp != null && StringUtils.isNotBlank(lastApp.getValue().getDate())
                         ? lastApp.getValue().getDate() : UtilHelper.formatCurrentDate(LocalDate.now()))
-                .claimTseDocument(getDocumentName(selectedAppData))
-                .claimTseTextBox(getTextBoxDetails(selectedAppData))
-                .claimTseCopyToOtherPartyYesOrNo(defaultIfEmpty(caseData.getClaimantTseRule92(), null))
-                .claimTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getClaimantTseRule92AnsNoGiveDetails(), null))
+                .resTseDocument(getDocumentName(selectedAppData))
+                .resTseTextBox(getTextBoxDetails(selectedAppData))
+                .resTseCopyToOtherPartyYesOrNo(defaultIfEmpty(caseData.getClaimantTseRule92(), null))
+                .resTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getClaimantTseRule92AnsNoGiveDetails(), null))
                 .build();
 
-        ClaimantTellSomethingElseDocument document = ClaimantTellSomethingElseDocument.builder()
+        RespondentTellSomethingElseDocument document = RespondentTellSomethingElseDocument.builder()
                 .accessKey(accessKey)
                 .outputName(CLAIMANT_TSE_FILE_NAME)
                 .templateName(CLAIMANT_TSE_TEMPLATE_NAME)
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    public static String claimantSelectApplicationToType(String selectApplication) {
+        if (selectApplication.equals(CLAIMANT_TSE_WITHDRAW_CLAIM)) {
+            return "withdraw";
+        } else {
+            throw new IllegalArgumentException(String.format("Unexpected application type %s", selectApplication));
+        }
     }
 
     private static String getDocumentName(TSEApplicationTypeData selectedAppData) {

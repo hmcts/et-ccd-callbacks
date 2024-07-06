@@ -409,7 +409,7 @@ public class TornadoService {
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case CLAIMANT_TSE_FILE_NAME -> {
-                dmStoreDocumentName = tseService.getTseDocumentName(caseData);
+                dmStoreDocumentName = tseService.getClaimantTseDocumentName(caseData);
                 return ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case REFERRAL_SUMMARY_PDF -> {

@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -42,6 +42,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 
 @Slf4j
@@ -66,10 +68,10 @@ public class TseService {
      * starts a new application in the same case.
      *
      * @param caseData   contains all the case data.
-     * @param isClaimant create a claimant application or a respondent application
+     * @param userType create an application for the claimant, respondent or claimant representative
      */
 
-    public void createApplication(CaseData caseData, boolean isClaimant) {
+    public void createApplication(CaseData caseData, String userType) {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             caseData.setGenericTseApplicationCollection(new ArrayList<>());
         }
@@ -82,10 +84,18 @@ public class TseService {
         application.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
         application.setStatus(OPEN_STATE);
 
-        if (isClaimant) {
-            addClaimantData(caseData, application);
-        } else {
-            addRespondentData(caseData, application);
+        switch (userType) {
+            case CLAIMANT_TITLE:
+                addClaimantData(caseData, application);
+                break;
+            case RESPONDENT_TITLE:
+                addRespondentData(caseData, application);
+                break;
+            case CLAIMANT_REP_TITLE:
+                addClaimantRepresentativeData(caseData, application);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected user type: " + userType);
         }
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
@@ -134,6 +144,12 @@ public class TseService {
         application.setApplicationState(IN_PROGRESS);
     }
 
+    private void addClaimantRepresentativeData(CaseData caseData, GenericTseApplicationType application) {
+        addClaimantData(caseData, application);
+        application.setApplicant(CLAIMANT_REP_TITLE);
+        addSupportingMaterialToDocumentCollection(caseData, application, true);
+    }
+
     private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {
         application.setApplicant(RESPONDENT_TITLE);
         assignDataToFieldsFromApplicationType(application, caseData);
@@ -141,20 +157,28 @@ public class TseService {
         application.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
         application.setApplicationState(NOT_STARTED_YET);
-        addSupportingMaterialToDocumentCollection(caseData, application);
-
+        addSupportingMaterialToDocumentCollection(caseData, application, false);
     }
 
-    private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application) {
+    private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application,
+                                                           boolean isClaimantRep) {
         if (application.getDocumentUpload() != null) {
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
+            String applicationDoc;
+            if (isClaimantRep) {
+                String selectApplicationType =
+                        claimantSelectApplicationToType(caseData.getClaimantTseSelectApplication());
+                applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
+                        selectApplicationType);
+            } else {
+                applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
+                        application.getType());
 
-            String applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
-                            application.getType());
+            }
             String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(applicationDoc);
-            String extension = FileNameUtils.getExtension(application.getDocumentUpload().getDocumentFilename());
+            String extension = FilenameUtils.getExtension(application.getDocumentUpload().getDocumentFilename());
             application.getDocumentUpload().setDocumentFilename("Application %s - %s - Attachment.%s".formatted(
                     application.getNumber(),
                     applicationDoc,
@@ -438,5 +462,11 @@ public class TseService {
         return String.format("Application %d - %s.pdf",
                 getNextApplicationNumber(caseData) - 1,
                 caseData.getResTseSelectApplication());
+    }
+
+    public String getClaimantTseDocumentName(CaseData caseData) {
+        return String.format("Application %d - %s.pdf",
+                getNextApplicationNumber(caseData) - 1,
+                caseData.getClaimantTseSelectApplication());
     }
 }

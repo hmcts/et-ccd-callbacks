@@ -16,7 +16,7 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLAIMANT_TSE_FILE_NAME;
@@ -65,7 +65,7 @@ public class ClaimantTellSomethingElseService {
             String topLevel = DocumentHelper.getTopLevelDocument(applicationDocMapping);
             DocumentInfo documentInfo =
                     tornadoService.generateEventDocument(caseData, userToken, caseTypeId, CLAIMANT_TSE_FILE_NAME);
-            caseData.setDocMarkUp(documentInfo.getMarkUp());
+            caseData.setDocMarkUp(documentInfo.getMarkUp().replace("Document", "Download a copy of your application"));
             caseData.getDocumentCollection().add(createDocumentTypeItemFromTopLevel(
                     documentManagementService.addDocumentToDocumentField(documentInfo),
                     topLevel,
@@ -75,14 +75,6 @@ public class ClaimantTellSomethingElseService {
 
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
-        }
-    }
-
-    private String claimantSelectApplicationToType(String selectApplication) {
-        if (selectApplication.equals(CLAIMANT_TSE_WITHDRAW_CLAIM)) {
-            return "withdraw";
-        } else {
-            throw new IllegalArgumentException(String.format("Unexpected application type %s", selectApplication));
         }
     }
 }

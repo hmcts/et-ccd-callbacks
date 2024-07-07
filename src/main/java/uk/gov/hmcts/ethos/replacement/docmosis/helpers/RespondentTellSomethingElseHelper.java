@@ -76,47 +76,34 @@ public final class RespondentTellSomethingElseHelper {
     }
 
     public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
-        switch (caseData.getResTseSelectApplication()) {
-            case TSE_APP_AMEND_RESPONSE:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument1(), caseData.getResTseTextBox1());
-            case TSE_APP_CHANGE_PERSONAL_DETAILS:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument2(), caseData.getResTseTextBox2());
-            case TSE_APP_CLAIMANT_NOT_COMPLIED:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument3(), caseData.getResTseTextBox3());
-            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument4(), caseData.getResTseTextBox4());
-            case TSE_APP_CONTACT_THE_TRIBUNAL:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument5(), caseData.getResTseTextBox5());
-            case TSE_APP_ORDER_OTHER_PARTY:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument6(), caseData.getResTseTextBox6());
-            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument7(), caseData.getResTseTextBox7());
-            case TSE_APP_POSTPONE_A_HEARING:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument8(), caseData.getResTseTextBox8());
-            case TSE_APP_RECONSIDER_JUDGEMENT:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument9(), caseData.getResTseTextBox9());
-            case TSE_APP_RESTRICT_PUBLICITY:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument10(), caseData.getResTseTextBox10());
-            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument11(), caseData.getResTseTextBox11());
-            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
-                return new TSEApplicationTypeData(
-                        caseData.getResTseDocument12(), caseData.getResTseTextBox12());
-            default:
-                throw new IllegalArgumentException(String.format("Unexpected application type %s",
+        return switch (caseData.getResTseSelectApplication()) {
+            case TSE_APP_AMEND_RESPONSE -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument1(), caseData.getResTseTextBox1());
+            case TSE_APP_CHANGE_PERSONAL_DETAILS -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument2(), caseData.getResTseTextBox2());
+            case TSE_APP_CLAIMANT_NOT_COMPLIED -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument3(), caseData.getResTseTextBox3());
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument4(), caseData.getResTseTextBox4());
+            case TSE_APP_CONTACT_THE_TRIBUNAL -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument5(), caseData.getResTseTextBox5());
+            case TSE_APP_ORDER_OTHER_PARTY -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument6(), caseData.getResTseTextBox6());
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument7(), caseData.getResTseTextBox7());
+            case TSE_APP_POSTPONE_A_HEARING -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument8(), caseData.getResTseTextBox8());
+            case TSE_APP_RECONSIDER_JUDGEMENT -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument9(), caseData.getResTseTextBox9());
+            case TSE_APP_RESTRICT_PUBLICITY -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument10(), caseData.getResTseTextBox10());
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument11(), caseData.getResTseTextBox11());
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER -> new TSEApplicationTypeData(
+                    caseData.getResTseDocument12(), caseData.getResTseTextBox12());
+            default -> throw new IllegalArgumentException(String.format("Unexpected application type %s",
                     caseData.getResTseSelectApplication()));
-        }
+        };
     }
 
     private static String getDocumentName(TSEApplicationTypeData selectedAppData) {

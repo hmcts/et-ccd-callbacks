@@ -242,8 +242,10 @@ public class ListingService {
 
     private String getESQuery(String dateFrom, String dateTo, String key, String venue, String managingOffice) {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
-                .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE).gte(dateFrom).lte(dateTo))
-                .filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+                .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE).gte(dateFrom).lte(dateTo));
+        if (!ALL_OFFICES.equals(managingOffice)) {
+            boolQueryBuilder.filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+        }
 
         if (!ALL_VENUES.equals(venue)) {
             boolQueryBuilder.must(new MatchQueryBuilder(key, venue));

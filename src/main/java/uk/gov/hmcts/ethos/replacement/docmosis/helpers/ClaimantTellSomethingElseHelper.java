@@ -27,15 +27,6 @@ public final class ClaimantTellSomethingElseHelper {
     private ClaimantTellSomethingElseHelper() {
     }
 
-    public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
-        if (caseData.getClaimantTseSelectApplication().equals(CLAIMANT_TSE_WITHDRAW_CLAIM)) {
-            return new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13());
-        }
-        throw new IllegalArgumentException(String.format("Unexpected application type %s",
-                caseData.getResTseSelectApplication()));
-    }
-
     public static String getDocumentRequest(CaseData caseData, String accessKey)
             throws JsonProcessingException {
 
@@ -61,6 +52,15 @@ public final class ClaimantTellSomethingElseHelper {
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
+        if (caseData.getClaimantTseSelectApplication().equals(CLAIMANT_TSE_WITHDRAW_CLAIM)) {
+            return new TSEApplicationTypeData(
+                    caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13());
+        }
+        throw new IllegalArgumentException(String.format("Unexpected application type %s",
+                caseData.getResTseSelectApplication()));
     }
 
     public static String claimantSelectApplicationToType(String selectApplication) {

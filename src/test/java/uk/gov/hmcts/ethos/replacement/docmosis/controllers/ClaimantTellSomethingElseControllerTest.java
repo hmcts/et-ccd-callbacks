@@ -13,12 +13,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -40,6 +47,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/claimantTSE/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/claimantTSE/aboutToSubmit";
     private static final String COMPLETE_APPLICATION_URL = "/claimantTSE/completeApplication";
+    private static final String VALIDATE_DETAILS_URL = "/claimantTSE/validateGiveDetails";
 
     @MockBean
     ClaimantTellSomethingElseService claimantTseService;
@@ -52,17 +60,19 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     private JsonMapper jsonMapper;
     private CCDRequest ccdRequest;
     private MockedStatic mockHelper;
+    private CaseData caseData;
 
     @BeforeEach
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        CaseData caseData = CaseDataBuilder.builder()
+        caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("test")
                 .withClaimant("claimant")
                 .build();
-        caseData.setResTseSelectApplication("caseRef");
-        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
+        caseData.setClaimantTseSelectApplication("caseRef");
+        caseData.setClaimantTseRule92(NO);
+        caseData.setGenericTseApplicationCollection(createApplicationCollection());
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
@@ -116,6 +126,8 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
 
     @Test
     void completeApplication_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(claimantTseService.buildApplicationCompleteResponse(any())).thenReturn("body");
         mockMvc.perform(post(COMPLETE_APPLICATION_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -125,5 +137,31 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(claimantTseService).buildApplicationCompleteResponse(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void validateGiveDetails_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(VALIDATE_DETAILS_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(claimantTseService).validateGiveDetails(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    private List<GenericTseApplicationTypeItem> createApplicationCollection() {
+        GenericTseApplicationType claimantTseType = new GenericTseApplicationType();
+        claimantTseType.setCopyToOtherPartyYesOrNo(NO);
+
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        tseApplicationTypeItem.setValue(claimantTseType);
+
+        return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
     }
 }

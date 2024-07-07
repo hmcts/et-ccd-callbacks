@@ -13,17 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -40,25 +37,6 @@ public class ClaimantTellSomethingElseController {
 
     private final ClaimantTellSomethingElseService claimantTseService;
     private final TseService tseService;
-
-    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_NO = "<hr>"
-            + "<h3>What happens next</h3>"
-            + "<p>The tribunal will consider all correspondence and let you know what happens next.</p>"
-            + "<hr>";
-
-    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE = "<hr>"
-            + "<h3>What happens next</h3>"
-            + "<p>You must submit your application after copying the correspondence to the other party.</p>"
-            + "<p>To copy this correspondence to the other party, you must send it to them by post or email. "
-            + "You must include all supporting documents.</p>";
-
-    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE = "<hr>"
-            + "<h3>What happens next</h3>"
-            + "<p>You have sent a copy of your application to the respondent. They will have until %s to respond.</p>"
-            + "<p>If they do respond, they are expected to copy their response to you.</p>"
-            + "<p>You may be asked to supply further information. "
-            + "The tribunal will consider all correspondence and let you know what happens next.</p>"
-            + "<hr>";
 
     /**
      * Callback endpoint to be called when the event ClaimantTSE is about to start.
@@ -160,25 +138,7 @@ public class ClaimantTellSomethingElseController {
     public ResponseEntity<CCDCallbackResponse> completeApplication(
             @RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<GenericTseApplicationTypeItem> tseApplicationCollection =
-                caseData.getGenericTseApplicationCollection();
-        GenericTseApplicationTypeItem latestTSEApplication =
-                tseApplicationCollection.get(tseApplicationCollection.size() - 1);
-
-        String ansRule92 = latestTSEApplication.getValue().getCopyToOtherPartyYesOrNo();
-        String isRespOffline = ccdRequest.getCaseDetails().getCaseData().getClaimantTseRespNotAvailable();
-        String body;
-        if (YES.equals(ansRule92)) {
-            if (YES.equals(isRespOffline)) {
-                body = APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
-                body = body + caseData.getDocMarkUp() + "</br>";
-            } else {
-                body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE,
-                        UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
-            }
-        } else {
-            body = APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
-        }
+        String body = claimantTseService.buildApplicationCompleteResponse(caseData);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .confirmation_body(body)

@@ -96,7 +96,8 @@ class ClaimantTellSomethingElseServiceTest {
     void generateAndAddApplicationPdf() throws IOException {
         CaseData caseData = new CaseData();
         caseData.setClaimantTseSelectApplication("Withdraw all or part of claim");
-        DocumentInfo documentInfo = new DocumentInfo("document.pdf", "Withdraw Claim", "binaryUrl/documents/", "<>Some doc</>");
+        DocumentInfo documentInfo = new DocumentInfo("document.pdf", "Withdraw Claim",
+                "binaryUrl/documents/", "<>Some doc</>");
         when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(documentInfo);
 
         claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");

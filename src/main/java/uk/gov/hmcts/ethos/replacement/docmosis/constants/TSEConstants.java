@@ -11,12 +11,11 @@ public final class TSEConstants {
             + "<p>The tribunal will consider all correspondence and let you know what happens next.</p>"
             + "<hr>";
     public static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE = "<hr>"
-                    + "<h2>What happens next</h2>"
+                    + "<h2>Copy this correspondence to the other party</h2>"
                     + "<p>You must submit your application after copying the correspondence to the other party.</p>"
                     + "<p>To copy this correspondence to the other party, you must send it to them by post or email. "
                     + "You must include all supporting documents.</p>"
-                    + "<h3>%s</h3>"
-                    + "<br>";
+                    + "<h3>%s</h3>";
     public static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE = "<hr>"
                             + "<h2>What happens next</h2>"
                             + "<p>You have sent a copy of your application to the respondent. "

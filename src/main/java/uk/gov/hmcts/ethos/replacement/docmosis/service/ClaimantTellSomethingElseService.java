@@ -89,10 +89,10 @@ public class ClaimantTellSomethingElseService {
                 tseApplicationCollection.get(tseApplicationCollection.size() - 1);
 
         String ansRule92 = latestTSEApplication.getValue().getCopyToOtherPartyYesOrNo();
-        String isRespOffline = caseData.getClaimantTseRespNotAvailable();
+        String tseRespNotAvailability = caseData.getClaimantTseRespNotAvailable();
         String body;
         if (YES.equals(ansRule92)) {
-            if (YES.equals(isRespOffline)) {
+            if (YES.equals(tseRespNotAvailability)) {
                 body = TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
                 body = body + caseData.getDocMarkUp();
             } else {

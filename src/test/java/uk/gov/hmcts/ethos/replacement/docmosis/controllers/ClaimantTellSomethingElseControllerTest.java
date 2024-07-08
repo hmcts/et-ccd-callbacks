@@ -60,13 +60,12 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     private JsonMapper jsonMapper;
     private CCDRequest ccdRequest;
     private MockedStatic mockHelper;
-    private CaseData caseData;
 
     @BeforeEach
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        caseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("test")
                 .withClaimant("claimant")
                 .build();

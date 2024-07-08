@@ -21,6 +21,9 @@ import java.util.List;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
@@ -93,14 +96,14 @@ public class ClaimantTellSomethingElseService {
         String body;
         if (YES.equals(ansRule92)) {
             if (YES.equals(tseRespNotAvailability)) {
-                body = TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
-                body = body + caseData.getDocMarkUp();
+                body = APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
+                body = body + caseData.getDocMarkUp() + "<br><br>";
             } else {
-                body = String.format(TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE,
+                body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE,
                         UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
             }
         } else {
-            body = TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
+            body = APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
         }
         return body;
     }

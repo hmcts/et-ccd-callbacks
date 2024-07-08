@@ -167,7 +167,8 @@ class ClaimantTellSomethingElseServiceTest {
         caseData.setGenericTseApplicationCollection(List.of(latestTSEApplication));
 
         String response = claimantTellSomethingElseService.buildApplicationCompleteResponse(caseData);
-        assertThat(response, is(APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE + "Document"));
+        assertThat(response, is(String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE,
+                caseData.getDocMarkUp())));
     }
 
     @Test

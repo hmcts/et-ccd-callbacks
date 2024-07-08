@@ -28,9 +28,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.is
 
 public class MultipleCreationMidEventValidationService {
 
+    public static final String CASE_STATE_VETTED_WARNING =
+            " cases have not been Accepted, but are Vetted. If this is permissible please click Ignore and Continue";
+    public static final String CASE_STATE_SUBMITTED_WARNING =
+            " cases have not been Accepted, but are Submitted. If this is permissible please click Ignore and Continue";
+
     public static final String CASE_STATE_ERROR = " cases have not been Accepted, Vetted, or Submitted.";
     public static final String CASE_BELONG_MULTIPLE_ERROR = " cases already belong to a different multiple";
     public static final String CASE_EXIST_ERROR = " cases do not exist.";
+
     public static final String LEAD_STATE_ERROR = " lead case has not been Accepted, Vetted, or Submitted.";
     public static final String LEAD_BELONG_MULTIPLE_ERROR = " lead case already belongs to a different multiple";
     public static final String LEAD_EXIST_ERROR = " lead case does not exist.";
@@ -42,8 +48,6 @@ public class MultipleCreationMidEventValidationService {
     public static final String CASE_NOT_BELONG_TO_MULTIPLE_ERROR = " cases are not a part of the multiple.";
     public static final int MULTIPLE_MAX_SIZE = 50;
 
-    private static final List<String> VALID_STATES = List.of(ACCEPTED_STATE, VETTED_STATE, SUBMITTED_STATE);
-
     private final SingleCasesReadingService singleCasesReadingService;
 
     @Autowired
@@ -54,6 +58,7 @@ public class MultipleCreationMidEventValidationService {
     public void multipleCreationValidationLogic(String userToken,
                                                 MultipleDetails multipleDetails,
                                                 List<String> errors,
+                                                List<String> warnings,
                                                 boolean amendAction) {
 
         MultipleData multipleData = multipleDetails.getCaseData();
@@ -72,17 +77,16 @@ public class MultipleCreationMidEventValidationService {
                 log.info("Validating lead case introduced by user: {}", multipleData.getLeadCase());
 
                 validateCases(userToken, caseTypeId, managingOffice,
-                        new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())), errors, true);
+                        new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())), errors, warnings, true);
             }
 
             List<String> ethosCaseRefCollection =
                     MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
 
             log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
-
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
-            validateCases(userToken, caseTypeId, managingOffice, ethosCaseRefCollection, errors, false);
+            validateCases(userToken, caseTypeId, managingOffice, ethosCaseRefCollection, errors, warnings, false);
         }
     }
 
@@ -160,6 +164,7 @@ public class MultipleCreationMidEventValidationService {
                                String managingOffice,
                                List<String> caseRefCollection,
                                List<String> errors,
+                               List<String> warnings,
                                boolean isLead) {
 
         if (!caseRefCollection.isEmpty()) {
@@ -172,7 +177,7 @@ public class MultipleCreationMidEventValidationService {
             log.info("Validating cases");
             boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId);
 
-            validateSingleCasesState(submitEvents, errors, isLead, managingOffice, isScotland);
+            validateSingleCasesState(submitEvents, errors, warnings, isLead, managingOffice, isScotland);
         }
     }
 
@@ -201,21 +206,34 @@ public class MultipleCreationMidEventValidationService {
 
     private void validateSingleCasesState(List<SubmitEvent> submitEvents,
                                           List<String> errors,
+                                          List<String> warnings,
                                           boolean isLead,
                                           String multipleManagingOffice,
                                           boolean isScotland) {
 
         List<String> listCasesStateError = new ArrayList<>();
+        List<String> listCasesStateVettingWarnings = new ArrayList<>();
+        List<String> listCasesStateSubmittedWarnings = new ArrayList<>();
 
         List<String> listCasesMultipleError = new ArrayList<>();
 
         for (SubmitEvent submitEvent : submitEvents) {
             String ethosCaseReference = submitEvent.getCaseData().getEthosCaseReference();
 
-            if (!VALID_STATES.contains(submitEvent.getState())) {
-                log.info("VALIDATION ERROR: state of single case not {}", VALID_STATES.toString());
-
-                listCasesStateError.add(ethosCaseReference);
+            switch (submitEvent.getState()) {
+                case ACCEPTED_STATE:
+                    break;
+                case VETTED_STATE:
+                    log.info("VALIDATION WARNING: state of single case is vetted");
+                    listCasesStateVettingWarnings.add(ethosCaseReference);
+                    break;
+                case SUBMITTED_STATE:
+                    log.info("VALIDATION WARNING: state of single case is submitted");
+                    listCasesStateSubmittedWarnings.add(ethosCaseReference);
+                    break;
+                default:
+                    log.info("VALIDATION ERROR: state of single case not Accepted, Vetted, or Submitted");
+                    listCasesStateError.add(ethosCaseReference);
             }
 
             if (!isEmptyOrWhitespace(submitEvent.getCaseData().getMultipleReference())) {
@@ -238,6 +256,13 @@ public class MultipleCreationMidEventValidationService {
             String errorMessage = isLead ? LEAD_STATE_ERROR : CASE_STATE_ERROR;
 
             errors.add(listCasesStateError + errorMessage);
+        }
+
+        if (!listCasesStateVettingWarnings.isEmpty()) {
+            warnings.add(listCasesStateVettingWarnings + CASE_STATE_VETTED_WARNING);
+        }
+        if (!listCasesStateSubmittedWarnings.isEmpty()) {
+            warnings.add(listCasesStateSubmittedWarnings + CASE_STATE_SUBMITTED_WARNING);
         }
 
         if (!listCasesMultipleError.isEmpty()) {

@@ -55,6 +55,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getListingCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntityErrorsAndWarnings;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -457,12 +458,13 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
+        List<String> warnings = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleCreationMidEventValidationService.multipleCreationValidationLogic(
-                userToken, multipleDetails, errors, false);
+                userToken, multipleDetails, errors, warnings, false);
 
-        return getMultipleCallbackRespEntity(errors, multipleDetails);
+        return getMultipleCallbackRespEntityErrorsAndWarnings(warnings, errors, multipleDetails.getCaseData());
     }
 
     @PostMapping(value = "/multipleRemoveCaseIdsMidEventValidation", consumes = APPLICATION_JSON_VALUE)
@@ -519,12 +521,13 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
+        List<String> warnings = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleCreationMidEventValidationService.multipleCreationValidationLogic(
-                userToken, multipleDetails, errors, true);
+                userToken, multipleDetails, errors, warnings, true);
 
-        return getMultipleCallbackRespEntity(errors, multipleDetails);
+        return getMultipleCallbackRespEntityErrorsAndWarnings(warnings, errors, multipleDetails.getCaseData());
     }
 
     @PostMapping(value = "/multipleSingleMidEventValidation", consumes = APPLICATION_JSON_VALUE)

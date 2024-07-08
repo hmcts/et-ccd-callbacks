@@ -802,7 +802,7 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     void multipleCreationMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
-                eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), isA(Boolean.class));
+                eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), anyList(), isA(Boolean.class));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -815,7 +815,7 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     void multipleAmendCaseIdsMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
-                        eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), isA(Boolean.class));
+                        eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), anyList(), isA(Boolean.class));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                         .content(requestContent.toString())

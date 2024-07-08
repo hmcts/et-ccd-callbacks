@@ -50,6 +50,7 @@ class MultipleCreationMidEventValidationServiceTest {
 
     private MultipleDetails multipleDetails;
     private List<String> errors;
+    private List<String> warnings;
     private String userToken;
 
     @BeforeEach
@@ -57,6 +58,7 @@ class MultipleCreationMidEventValidationServiceTest {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         errors = new ArrayList<>();
+        warnings = new ArrayList<>();
         userToken = "authString";
     }
 
@@ -160,6 +162,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(1, errors.size());
@@ -175,6 +178,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(3, errors.size());
@@ -204,6 +208,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(3, errors.size());
@@ -241,6 +246,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(0, errors.size());
@@ -256,6 +262,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(0, errors.size());
@@ -271,6 +278,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(0, errors.size());
@@ -300,6 +308,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 true);
 
         assertEquals(1, errors.size());
@@ -320,6 +329,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 true);
 
         assertTrue(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,
@@ -344,6 +354,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 true);
 
         assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,

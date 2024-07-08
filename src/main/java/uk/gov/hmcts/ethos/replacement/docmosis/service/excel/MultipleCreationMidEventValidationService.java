@@ -19,6 +19,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.VETTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.isEmptyOrWhitespace;
 
 @Slf4j
@@ -26,10 +28,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.is
 
 public class MultipleCreationMidEventValidationService {
 
-    public static final String CASE_STATE_ERROR = " cases have not been Accepted.";
+    public static final String CASE_STATE_ERROR = " cases have not been Accepted, Vetted, or Submitted.";
     public static final String CASE_BELONG_MULTIPLE_ERROR = " cases already belong to a different multiple";
     public static final String CASE_EXIST_ERROR = " cases do not exist.";
-    public static final String LEAD_STATE_ERROR = " lead case has not been Accepted.";
+    public static final String LEAD_STATE_ERROR = " lead case has not been Accepted, Vetted, or Submitted.";
     public static final String LEAD_BELONG_MULTIPLE_ERROR = " lead case already belongs to a different multiple";
     public static final String LEAD_EXIST_ERROR = " lead case does not exist.";
     public static final String CASE_BELONGS_DIFFERENT_OFFICE = "Case %s is managed by %s";
@@ -39,6 +41,8 @@ public class MultipleCreationMidEventValidationService {
     public static final String LEAD_CASE_CANNOT_BE_REMOVED = " lead case cannot be removed.";
     public static final String CASE_NOT_BELONG_TO_MULTIPLE_ERROR = " cases are not a part of the multiple.";
     public static final int MULTIPLE_MAX_SIZE = 50;
+
+    private static final List<String> VALID_STATES = List.of(ACCEPTED_STATE, VETTED_STATE, SUBMITTED_STATE);
 
     private final SingleCasesReadingService singleCasesReadingService;
 
@@ -208,8 +212,8 @@ public class MultipleCreationMidEventValidationService {
         for (SubmitEvent submitEvent : submitEvents) {
             String ethosCaseReference = submitEvent.getCaseData().getEthosCaseReference();
 
-            if (!submitEvent.getState().equals(ACCEPTED_STATE)) {
-                log.info("VALIDATION ERROR: state of single case not Accepted");
+            if (!VALID_STATES.contains(submitEvent.getState())) {
+                log.info("VALIDATION ERROR: state of single case not {}", VALID_STATES.toString());
 
                 listCasesStateError.add(ethosCaseReference);
             }

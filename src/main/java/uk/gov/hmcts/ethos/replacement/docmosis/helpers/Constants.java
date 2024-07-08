@@ -69,7 +69,7 @@ public class Constants {
     public static final String MONTH_STRING_DATE_FORMAT = "dd MMM yyyy";
     public static final String EMPTY_STRING = "";
     public static final String DIGITAL_CASE_FILE = "Digital case file";
-    public static final String DCF_LINK_MARK_UP =
+    public static final String DOC_OPENS_IN_NEW_TAB_MARK_UP =
         "<a target=\"_blank\" href=\"%s\">%s (opens in new tab)</a><br>";
 
     private Constants() {

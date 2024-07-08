@@ -26,7 +26,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DCF_LINK_MARK_UP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOC_OPENS_IN_NEW_TAB_MARK_UP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DIGITAL_CASE_FILE;
 
 @RequiredArgsConstructor
@@ -127,14 +127,14 @@ public class DigitalCaseFileService {
             .stream()
             .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(TRIBUNAL_CASE_FILE)
                 || defaultIfEmpty(d.getValue().getMiscDocuments(), "").equals(TRIBUNAL_CASE_FILE))
-            .map(d -> formatReplyToReferralDCFLink(d.getValue().getUploadedDocument(), TRIBUNAL_CASE_FILE))
+            .map(d -> formatReplyToReferralDCFLink(d.getValue().getUploadedDocument(), DIGITAL_CASE_FILE))
             .collect(Collectors.joining());
     }
 
     private String formatReplyToReferralDCFLink(UploadedDocumentType uploadedDocumentType, String type) {
         String documentBinaryUrl = uploadedDocumentType.getDocumentBinaryUrl();
         String link = documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
-        return String.format(DCF_LINK_MARK_UP, link, type);
+        return String.format(DOC_OPENS_IN_NEW_TAB_MARK_UP, link, type);
     }
 }
 

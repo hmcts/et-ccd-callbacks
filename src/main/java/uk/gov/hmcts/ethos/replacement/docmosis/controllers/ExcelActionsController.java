@@ -99,7 +99,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> createMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) throws IOException {
-        log.info("CREATE MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("CREATE MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -128,7 +128,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> amendMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("AMEND MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("AMEND MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -157,7 +157,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> fixMultipleCaseApi(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("AMEND MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("AMEND MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -185,7 +185,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> amendMultipleAPI(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("AMEND MULTIPLE API ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("AMEND MULTIPLE API ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -213,7 +213,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> importMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("IMPORT MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("IMPORT MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -242,7 +242,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> preAcceptMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("PRE ACCEPT MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("PRE ACCEPT MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -302,7 +302,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> batchUpdate(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) throws IOException {
-        log.info("BATCH UPDATE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("BATCH UPDATE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -331,7 +331,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> dynamicListFlags(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("DYNAMIC LIST FLAGS ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("DYNAMIC LIST FLAGS ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -360,7 +360,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> multipleMidEventValidation(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("MULTIPLE MID EVENT VALIDATION ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("MULTIPLE MID EVENT VALIDATION ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -390,7 +390,7 @@ public class ExcelActionsController {
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("SUB MULTIPLE MID EVENT VALIDATION ---> "
-                + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+                + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -419,7 +419,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> updateSubMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("UPDATE SUB MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("UPDATE SUB MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -449,7 +449,7 @@ public class ExcelActionsController {
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("MULTIPLE CREATION MID EVENT VALIDATION ---> "
-                + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+                + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -480,7 +480,7 @@ public class ExcelActionsController {
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("MULTIPLE REMOVE CASES MID EVENT VALIDATION ---> "
-                + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+                + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -511,7 +511,7 @@ public class ExcelActionsController {
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("MULTIPLE AMEND CASE IDS MID EVENT VALIDATION ---> "
-                + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+                + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -542,7 +542,7 @@ public class ExcelActionsController {
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
         log.info("MULTIPLE SINGLE MID EVENT VALIDATION ---> "
-                + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+                + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -571,7 +571,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> multipleMidBatch1Validation(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("MULTIPLE MID BATCH 1 VALIDATION ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("MULTIPLE MID BATCH 1 VALIDATION ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -598,7 +598,7 @@ public class ExcelActionsController {
     public ResponseEntity<ListingCallbackResponse> listingsDateRangeMidEventValidation(
             @RequestBody ListingRequest listingRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("LISTING DATE RANGE VALIDATION ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
+        log.info("LISTING DATE RANGE VALIDATION ---> " + LOG_MESSAGE + "{}", listingRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -656,7 +656,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> closeMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("CLOSE MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("CLOSE MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -692,7 +692,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> updatePayloadMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("UPDATE PAYLOAD MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("UPDATE PAYLOAD MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -722,7 +722,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> resetMultipleState(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("RESET MULTIPLE STATE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("RESET MULTIPLE STATE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -753,7 +753,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> dynamicListOfficesMultiple(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("DYNAMIC LIST OFFICES MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("DYNAMIC LIST OFFICES MULTIPLE ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -782,7 +782,7 @@ public class ExcelActionsController {
     public ResponseEntity<MultipleCallbackResponse> multipleTransfer(
             @RequestBody MultipleRequest multipleRequest,
             @RequestHeader("Authorization") String userToken) {
-        log.info("MULTIPLE TRANSFER ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+        log.info("MULTIPLE TRANSFER ---> " + LOG_MESSAGE + "{}", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

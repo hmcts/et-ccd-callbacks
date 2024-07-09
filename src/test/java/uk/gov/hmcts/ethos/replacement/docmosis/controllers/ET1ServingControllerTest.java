@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -41,6 +42,8 @@ class ET1ServingControllerTest extends BaseControllerTest {
 
     @MockBean
     private ServingService servingService;
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @Autowired
     private MockMvc mvc;
     @Autowired

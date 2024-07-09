@@ -121,10 +121,9 @@ public class MultipleCreationMidEventValidationService {
                                          List<SubmitEvent> casesToBeRemoved,
                                          List<String> errors) {
 
-        log.info("Validate number of cases returned");
         validateNumberCasesReturned(casesToBeRemoved, errors, false, caseRefCollection);
 
-        log.info("Validating cases");
+        log.info("Validating cases for removal");
         List<String> listCasesNotBelongError = new ArrayList<>();
         for (SubmitEvent submitEvent : casesToBeRemoved) {
             CaseData caseBeingValidated = submitEvent.getCaseData();
@@ -170,12 +169,10 @@ public class MultipleCreationMidEventValidationService {
             List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(
                     userToken, caseTypeId, caseRefCollection, MANUALLY_CREATED_POSITION);
 
-            log.info("Validate number of cases returned");
             validateNumberCasesReturned(submitEvents, errors, isLead, caseRefCollection);
 
-            log.info("Validating cases");
+            log.info("Validating case states");
             boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId);
-
             validateSingleCasesState(submitEvents, errors, warnings, isLead, managingOffice, isScotland);
         }
     }
@@ -184,6 +181,7 @@ public class MultipleCreationMidEventValidationService {
                                              List<String> errors,
                                              boolean isLead,
                                              List<String> caseRefCollection) {
+        log.info("Validate number of cases returned");
 
         if (caseRefCollection.size() != submitEvents.size()) {
             log.info("List returned is different");

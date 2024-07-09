@@ -62,8 +62,10 @@ template:
   tse:
     respondent:
       application:
-        claimant: 5d014e5a-9528-4d02-bd31-8eca98cfba19
-        cyClaimant: 198c5afc-9984-4a04-96db-37e1f6e96843
+        claimant-a: 4585dacf-031d-4cd1-a941-5e1214aa502d
+        claimant-b: fbddc109-52d7-453c-904c-6003b76b17e9
+        cyClaimant-a: d340c60b-111b-41f7-ab9c-6cd34cdebee5
+        cyClaimant-b: 99ec3a75-7371-4b6d-aa5a-9050c1537cf1
         respondent-no: e8e02ca0-6443-41c4-9064-705f7ab8b39b
         respondent-type-a: 368b44ed-54ff-4ba6-9f90-cdbe6fab81b9
         respondent-type-b: eb056a09-72ca-4bf2-b774-016aae1d185c

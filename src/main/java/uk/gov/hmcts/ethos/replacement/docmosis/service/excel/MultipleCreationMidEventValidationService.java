@@ -134,7 +134,7 @@ public class MultipleCreationMidEventValidationService {
             }
 
             if (isNullOrEmpty(caseBeingValidated.getMultipleReference())
-                || !multipleReference.equals(caseBeingValidated.getMultipleReference())) {
+                    || !multipleReference.equals(caseBeingValidated.getMultipleReference())) {
                 log.info("VALIDATION ERROR: case does not belong to this multiple");
 
                 listCasesNotBelongError.add(submitEvent.getCaseData().getEthosCaseReference());
@@ -208,45 +208,30 @@ public class MultipleCreationMidEventValidationService {
                                           String multipleManagingOffice,
                                           boolean isScotland) {
 
-        List<String> listCasesStateError = new ArrayList<>();
         List<String> listCasesStateVettingWarnings = new ArrayList<>();
         List<String> listCasesStateSubmittedWarnings = new ArrayList<>();
+        List<String> listCasesStateError = new ArrayList<>();
 
         List<String> listCasesMultipleError = new ArrayList<>();
 
         for (SubmitEvent submitEvent : submitEvents) {
             String ethosCaseReference = submitEvent.getCaseData().getEthosCaseReference();
 
-            switch (submitEvent.getState()) {
-                case ACCEPTED_STATE:
-                    break;
-                case VETTED_STATE:
-                    log.info("VALIDATION WARNING: state of single case is vetted");
-                    listCasesStateVettingWarnings.add(ethosCaseReference);
-                    break;
-                case SUBMITTED_STATE:
-                    log.info("VALIDATION WARNING: state of single case is submitted");
-                    listCasesStateSubmittedWarnings.add(ethosCaseReference);
-                    break;
-                default:
-                    log.info("VALIDATION ERROR: state of single case not Accepted, Vetted, or Submitted");
-                    listCasesStateError.add(ethosCaseReference);
-            }
+            validateState(submitEvent.getState(),
+                    listCasesStateVettingWarnings,
+                    listCasesStateSubmittedWarnings,
+                    listCasesStateError,
+                    ethosCaseReference);
 
-            if (!isEmptyOrWhitespace(submitEvent.getCaseData().getMultipleReference())) {
-                log.info("VALIDATION ERROR: already another multiple");
+            CaseData caseData = submitEvent.getCaseData();
+            validateMultipleReference(caseData.getMultipleReference(), listCasesMultipleError, ethosCaseReference);
 
-                listCasesMultipleError.add(ethosCaseReference);
-            }
-
-            String singleManagingOffice = submitEvent.getCaseData().getManagingOffice();
-            if (!isScotland
-                    && !isNullOrEmpty(singleManagingOffice)
-                    && !multipleManagingOffice.equals(singleManagingOffice)) {
-
-                String errorMessage = isLead ? LEAD_CASE_BELONGS_DIFFERENT_OFFICE : CASE_BELONGS_DIFFERENT_OFFICE;
-                errors.add(String.format(errorMessage, ethosCaseReference, singleManagingOffice));
-            }
+            validateManagingOffice(isScotland,
+                    isLead,
+                    caseData.getManagingOffice(),
+                    multipleManagingOffice,
+                    errors,
+                    ethosCaseReference);
         }
 
         if (!listCasesStateError.isEmpty()) {
@@ -266,6 +251,54 @@ public class MultipleCreationMidEventValidationService {
             String errorMessage = isLead ? LEAD_BELONG_MULTIPLE_ERROR : CASE_BELONG_MULTIPLE_ERROR;
 
             errors.add(listCasesMultipleError + errorMessage);
+        }
+    }
+
+    private void validateManagingOffice(boolean isScotland,
+                                        boolean isLead,
+                                        String singleManagingOffice,
+                                        String multipleManagingOffice,
+                                        List<String> errors,
+                                        String ethosCaseReference) {
+        if (!isScotland
+                && !isNullOrEmpty(singleManagingOffice)
+                && !multipleManagingOffice.equals(singleManagingOffice)) {
+
+            String errorMessage = isLead ? LEAD_CASE_BELONGS_DIFFERENT_OFFICE : CASE_BELONGS_DIFFERENT_OFFICE;
+            errors.add(String.format(errorMessage, ethosCaseReference, singleManagingOffice));
+        }
+    }
+
+    private void validateMultipleReference(String multipleReference,
+                                           List<String> listCasesMultipleError,
+                                           String ethosCaseReference) {
+        if (!isEmptyOrWhitespace(multipleReference)) {
+            log.info("VALIDATION ERROR: already another multiple");
+
+            listCasesMultipleError.add(ethosCaseReference);
+        }
+    }
+
+    private void validateState(String state,
+                               List<String> listCasesStateVettingWarnings,
+                               List<String> listCasesStateSubmittedWarnings,
+                               List<String> listCasesStateError,
+                               String ethosCaseReference) {
+        switch (state) {
+            case ACCEPTED_STATE:
+                break;
+            case VETTED_STATE:
+                log.info("VALIDATION WARNING: state of single case is vetted");
+                listCasesStateVettingWarnings.add(ethosCaseReference);
+                break;
+            case SUBMITTED_STATE:
+                log.info("VALIDATION WARNING: state of single case is submitted");
+                listCasesStateSubmittedWarnings.add(ethosCaseReference);
+                break;
+            default:
+                log.info("VALIDATION ERROR: state of single case not Accepted, Vetted, or Submitted");
+                listCasesStateError.add(ethosCaseReference);
+                break;
         }
     }
 }

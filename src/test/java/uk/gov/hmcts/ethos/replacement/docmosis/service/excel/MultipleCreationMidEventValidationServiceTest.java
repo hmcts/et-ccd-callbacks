@@ -223,7 +223,7 @@ class MultipleCreationMidEventValidationServiceTest {
         List<SubmitEvent> cases = getSubmitEvents();
         cases.get(0).setState(VETTED_STATE);
         cases.get(0).getCaseData().setMultipleReference(" ");
-        cases.get(1).setState(SUBMITTED_STATE);
+        cases.get(1).setState(ACCEPTED_STATE);
         cases.get(1).getCaseData().setManagingOffice("Manchester");
 
         multipleDetails.getCaseData().setLeadCase(cases.get(0).getCaseData().getEthosCaseReference());

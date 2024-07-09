@@ -42,7 +42,7 @@ public class ClaimantTellSomethingElseService {
         TSEApplicationTypeData selectedAppData =
                 ClaimantTellSomethingElseHelper.getSelectedApplicationType(caseData);
         if (selectedAppData.getUploadedTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
-            errors.add(TSEConstants.MISSING_DETAILS);
+            errors.add(TSEConstants.GIVE_DETAIL_MISSING);
         }
         return errors;
     }

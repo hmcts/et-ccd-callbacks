@@ -7,8 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
@@ -33,7 +33,7 @@ public final class ClaimantTellSomethingElseHelper {
         TSEApplicationTypeData selectedAppData = getSelectedApplicationType(caseData);
         GenericTseApplicationTypeItem lastApp = getCurrentGenericTseApplicationTypeItem(caseData);
 
-        RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
+        TseApplicationData data = TseApplicationData.builder()
                 .resTseApplicant(CLAIMANT_TITLE)
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .resTseSelectApplication(defaultIfEmpty(caseData.getClaimantTseSelectApplication(), null))
@@ -45,7 +45,7 @@ public final class ClaimantTellSomethingElseHelper {
                 .resTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getClaimantTseRule92AnsNoGiveDetails(), null))
                 .build();
 
-        RespondentTellSomethingElseDocument document = RespondentTellSomethingElseDocument.builder()
+        TseApplicationDocument document = TseApplicationDocument.builder()
                 .accessKey(accessKey)
                 .outputName(CLAIMANT_TSE_FILE_NAME)
                 .templateName(CLAIMANT_TSE_TEMPLATE_NAME)

@@ -83,7 +83,6 @@ public class MultipleCreationMidEventValidationService {
             List<String> ethosCaseRefCollection =
                     MultiplesHelper.getCaseIdsForMidEvent(multipleData.getCaseIdCollection());
 
-            log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
             validateCases(userToken, caseTypeId, managingOffice, ethosCaseRefCollection, errors, warnings, false);
@@ -105,7 +104,6 @@ public class MultipleCreationMidEventValidationService {
             return;
         }
 
-        log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
         validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
         String caseTypeId = multipleDetails.getCaseTypeId();
@@ -150,6 +148,7 @@ public class MultipleCreationMidEventValidationService {
     }
 
     private void validateCaseReferenceCollectionSize(List<String> ethosCaseRefCollection, List<String> errors) {
+        log.info("Validating case id collection size: {}", ethosCaseRefCollection.size());
         if (ethosCaseRefCollection.size() > MULTIPLE_MAX_SIZE) {
             log.info("Case id collection reached the max size");
 

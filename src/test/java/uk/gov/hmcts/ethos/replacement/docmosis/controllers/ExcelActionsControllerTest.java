@@ -348,7 +348,7 @@ class ExcelActionsControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, hasSize(0)));
     }
 
     @Test
@@ -361,7 +361,7 @@ class ExcelActionsControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, hasSize(0)));
     }
 
     @Test

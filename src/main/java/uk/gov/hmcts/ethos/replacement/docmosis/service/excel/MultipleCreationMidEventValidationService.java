@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,10 +35,12 @@ public class MultipleCreationMidEventValidationService {
             " cases have not been Accepted, but are Submitted. If this is permissible please click Ignore and Continue";
 
     public static final String CASE_STATE_ERROR = " cases have not been Accepted, Vetted, or Submitted.";
+    public static final String CASE_STATE_ERROR_OLD = " cases have not been Accepted.";
     public static final String CASE_BELONG_MULTIPLE_ERROR = " cases already belong to a different multiple";
     public static final String CASE_EXIST_ERROR = " cases do not exist.";
 
     public static final String LEAD_STATE_ERROR = " lead case has not been Accepted, Vetted, or Submitted.";
+    public static final String LEAD_STATE_ERROR_OLD = " lead case has not been Accepted.";
     public static final String LEAD_BELONG_MULTIPLE_ERROR = " lead case already belongs to a different multiple";
     public static final String LEAD_EXIST_ERROR = " lead case does not exist.";
     public static final String CASE_BELONGS_DIFFERENT_OFFICE = "Case %s is managed by %s";
@@ -49,10 +52,13 @@ public class MultipleCreationMidEventValidationService {
     public static final int MULTIPLE_MAX_SIZE = 50;
 
     private final SingleCasesReadingService singleCasesReadingService;
+    private final FeatureToggleService featureToggleService;
 
     @Autowired
-    public MultipleCreationMidEventValidationService(SingleCasesReadingService singleCasesReadingService) {
+    public MultipleCreationMidEventValidationService(SingleCasesReadingService singleCasesReadingService,
+                                                     FeatureToggleService featureToggleService) {
         this.singleCasesReadingService = singleCasesReadingService;
+        this.featureToggleService = featureToggleService;
     }
 
     public void multipleCreationValidationLogic(String userToken,
@@ -217,11 +223,18 @@ public class MultipleCreationMidEventValidationService {
         for (SubmitEvent submitEvent : submitEvents) {
             String ethosCaseReference = submitEvent.getCaseData().getEthosCaseReference();
 
-            validateState(submitEvent.getState(),
-                    listCasesStateVettingWarnings,
-                    listCasesStateSubmittedWarnings,
-                    listCasesStateError,
-                    ethosCaseReference);
+            if (featureToggleService.isMultiplesEnabled()) {
+                validateState(submitEvent.getState(),
+                        listCasesStateVettingWarnings,
+                        listCasesStateSubmittedWarnings,
+                        listCasesStateError,
+                        ethosCaseReference);
+            } else {
+                if (!ACCEPTED_STATE.equals(submitEvent.getState())) {
+                    log.info("VALIDATION ERROR: state of single case not Accepted");
+                    listCasesStateError.add(submitEvent.getCaseData().getEthosCaseReference());
+                }
+            }
 
             CaseData caseData = submitEvent.getCaseData();
             validateMultipleReference(caseData.getMultipleReference(), listCasesMultipleError, ethosCaseReference);
@@ -235,7 +248,10 @@ public class MultipleCreationMidEventValidationService {
         }
 
         if (!listCasesStateError.isEmpty()) {
-            String errorMessage = isLead ? LEAD_STATE_ERROR : CASE_STATE_ERROR;
+            String errorMessage = isLead ? LEAD_STATE_ERROR_OLD : CASE_STATE_ERROR_OLD;
+            if (featureToggleService.isMultiplesEnabled()) {
+                errorMessage = isLead ? LEAD_STATE_ERROR : CASE_STATE_ERROR;
+            }
 
             errors.add(listCasesStateError + errorMessage);
         }

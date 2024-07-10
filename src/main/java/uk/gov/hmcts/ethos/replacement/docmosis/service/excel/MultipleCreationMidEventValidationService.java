@@ -229,8 +229,7 @@ public class MultipleCreationMidEventValidationService {
                         listCasesStateSubmittedWarnings,
                         listCasesStateError,
                         ethosCaseReference);
-            }
-            else {
+            } else {
                 if (!ACCEPTED_STATE.equals(submitEvent.getState())) {
                     log.info("VALIDATION ERROR: state of single case not Accepted");
                     listCasesStateError.add(submitEvent.getCaseData().getEthosCaseReference());

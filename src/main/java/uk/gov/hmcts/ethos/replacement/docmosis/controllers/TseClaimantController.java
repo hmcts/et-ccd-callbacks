@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -30,7 +31,7 @@ public class TseClaimantController {
 
     private final VerifyTokenService verifyTokenService;
     private final TseService tseService;
-
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -58,7 +59,7 @@ public class TseClaimantController {
             tseService.removeStoredApplication(caseDetails.getCaseData());
             tseService.clearApplicationData(caseDetails.getCaseData());
         }
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseDetails.getCaseData());
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
@@ -60,6 +61,8 @@ class ReplyToReferralControllerTest {
     private static final String SUBMITTED_REFERRAL_URL = "/replyReferral/completeReplyToReferral";
     private static final String VALIDATE_EMAIL_URL = "/replyReferral/validateReplyToEmail";
 
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean

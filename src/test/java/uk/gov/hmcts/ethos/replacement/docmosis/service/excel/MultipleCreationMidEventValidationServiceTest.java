@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,9 @@ class MultipleCreationMidEventValidationServiceTest {
 
     @Mock
     private SingleCasesReadingService singleCasesReadingService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private MultipleCreationMidEventValidationService multipleCreationMidEventValidationService;
 
@@ -60,6 +64,8 @@ class MultipleCreationMidEventValidationServiceTest {
         errors = new ArrayList<>();
         warnings = new ArrayList<>();
         userToken = "authString";
+
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(false);
     }
 
     @Test
@@ -191,7 +197,8 @@ class MultipleCreationMidEventValidationServiceTest {
     }
 
     @Test
-    void multipleCreationValidationLogic_WrongStateAndMultipleErrorEmptyLead() {
+    void multipleCreationValidationLogic_WrongStateAndMultipleErrorEmptyLead_FF_True() {
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
         multipleDetails.getCaseData().setLeadCase(null);
 
         List<SubmitEvent> cases = getSubmitEvents();
@@ -215,11 +222,39 @@ class MultipleCreationMidEventValidationServiceTest {
         assertEquals("Case 245001/2020 is managed by Bristol", errors.get(0));
         assertEquals("[245000/2020, 245001/2020] cases have not been Accepted, Vetted, or Submitted.", errors.get(1));
         assertEquals("[245000/2020] cases already belong to a different multiple", errors.get(2));
+    }
 
+    @Test
+    void multipleCreationValidationLogic_WrongStateAndMultipleErrorEmptyLead_FF_False() {
+        multipleDetails.getCaseData().setLeadCase(null);
+
+        List<SubmitEvent> cases = getSubmitEvents();
+        cases.get(0).setState(REJECTED_STATE);
+        cases.get(1).setState(CLOSED_STATE);
+
+        when(singleCasesReadingService.retrieveSingleCases(userToken,
+                multipleDetails.getCaseTypeId(),
+                MultiplesHelper.getCaseIds(multipleDetails.getCaseData()),
+                MANUALLY_CREATED_POSITION))
+                .thenReturn(cases);
+
+        multipleCreationMidEventValidationService.multipleCreationValidationLogic(
+                userToken,
+                multipleDetails,
+                errors,
+                warnings,
+                false);
+
+        assertEquals(3, errors.size());
+        assertEquals("Case 245001/2020 is managed by Bristol", errors.get(0));
+        assertEquals("[245000/2020, 245001/2020] cases have not been Accepted.", errors.get(1));
+        assertEquals("[245000/2020] cases already belong to a different multiple", errors.get(2));
     }
 
     @Test
     void multipleCreationValidationLogic_ValidStates() {
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
+
         List<SubmitEvent> cases = getSubmitEvents();
         cases.get(0).setState(VETTED_STATE);
         cases.get(0).getCaseData().setMultipleReference(" ");
@@ -227,7 +262,6 @@ class MultipleCreationMidEventValidationServiceTest {
         cases.get(1).getCaseData().setManagingOffice("Manchester");
 
         multipleDetails.getCaseData().setLeadCase(cases.get(0).getCaseData().getEthosCaseReference());
-
         when(singleCasesReadingService.retrieveSingleCases(
                 userToken,
                 multipleDetails.getCaseTypeId(),

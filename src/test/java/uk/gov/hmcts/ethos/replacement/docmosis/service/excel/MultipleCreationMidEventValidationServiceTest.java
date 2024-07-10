@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,11 +30,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.VETTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService.CASE_BELONGS_DIFFERENT_OFFICE;
 
 @ExtendWith(SpringExtension.class)
@@ -42,11 +46,15 @@ class MultipleCreationMidEventValidationServiceTest {
 
     @Mock
     private SingleCasesReadingService singleCasesReadingService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private MultipleCreationMidEventValidationService multipleCreationMidEventValidationService;
 
     private MultipleDetails multipleDetails;
     private List<String> errors;
+    private List<String> warnings;
     private String userToken;
 
     @BeforeEach
@@ -54,7 +62,10 @@ class MultipleCreationMidEventValidationServiceTest {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         errors = new ArrayList<>();
+        warnings = new ArrayList<>();
         userToken = "authString";
+
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(false);
     }
 
     @Test
@@ -157,6 +168,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(1, errors.size());
@@ -172,6 +184,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(3, errors.size());
@@ -184,26 +197,93 @@ class MultipleCreationMidEventValidationServiceTest {
     }
 
     @Test
-    void multipleCreationValidationLogic_WrongStateAndMultipleErrorEmptyLead() {
-
+    void multipleCreationValidationLogic_WrongStateAndMultipleErrorEmptyLead_FF_True() {
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
         multipleDetails.getCaseData().setLeadCase(null);
+
+        List<SubmitEvent> cases = getSubmitEvents();
+        cases.get(0).setState(REJECTED_STATE);
+        cases.get(1).setState(CLOSED_STATE);
 
         when(singleCasesReadingService.retrieveSingleCases(userToken,
                 multipleDetails.getCaseTypeId(),
                 MultiplesHelper.getCaseIds(multipleDetails.getCaseData()),
                 MANUALLY_CREATED_POSITION))
-                .thenReturn(getSubmitEvents());
+                .thenReturn(cases);
 
         multipleCreationMidEventValidationService.multipleCreationValidationLogic(
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
+                false);
+
+        assertEquals(3, errors.size());
+        assertEquals("Case 245001/2020 is managed by Bristol", errors.get(0));
+        assertEquals("[245000/2020, 245001/2020] cases have not been Accepted, Vetted, or Submitted.", errors.get(1));
+        assertEquals("[245000/2020] cases already belong to a different multiple", errors.get(2));
+    }
+
+    @Test
+    void multipleCreationValidationLogic_WrongStateAndMultipleErrorEmptyLead_FF_False() {
+        multipleDetails.getCaseData().setLeadCase(null);
+
+        List<SubmitEvent> cases = getSubmitEvents();
+        cases.get(0).setState(REJECTED_STATE);
+        cases.get(1).setState(CLOSED_STATE);
+
+        when(singleCasesReadingService.retrieveSingleCases(userToken,
+                multipleDetails.getCaseTypeId(),
+                MultiplesHelper.getCaseIds(multipleDetails.getCaseData()),
+                MANUALLY_CREATED_POSITION))
+                .thenReturn(cases);
+
+        multipleCreationMidEventValidationService.multipleCreationValidationLogic(
+                userToken,
+                multipleDetails,
+                errors,
+                warnings,
                 false);
 
         assertEquals(3, errors.size());
         assertEquals("Case 245001/2020 is managed by Bristol", errors.get(0));
         assertEquals("[245000/2020, 245001/2020] cases have not been Accepted.", errors.get(1));
         assertEquals("[245000/2020] cases already belong to a different multiple", errors.get(2));
+    }
+
+    @Test
+    void multipleCreationValidationLogic_ValidStates() {
+        when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
+
+        List<SubmitEvent> cases = getSubmitEvents();
+        cases.get(0).setState(VETTED_STATE);
+        cases.get(0).getCaseData().setMultipleReference(" ");
+        cases.get(1).setState(ACCEPTED_STATE);
+        cases.get(1).getCaseData().setManagingOffice("Manchester");
+
+        multipleDetails.getCaseData().setLeadCase(cases.get(0).getCaseData().getEthosCaseReference());
+        when(singleCasesReadingService.retrieveSingleCases(
+                userToken,
+                multipleDetails.getCaseTypeId(),
+                List.of(MultiplesHelper.getCaseIds(multipleDetails.getCaseData()).get(0)),
+                MANUALLY_CREATED_POSITION))
+                .thenReturn(List.of(cases.get(0)));
+
+        when(singleCasesReadingService.retrieveSingleCases(
+                userToken,
+                multipleDetails.getCaseTypeId(),
+                MultiplesHelper.getCaseIds(multipleDetails.getCaseData()),
+                MANUALLY_CREATED_POSITION))
+                .thenReturn(cases);
+
+        multipleCreationMidEventValidationService.multipleCreationValidationLogic(
+                userToken,
+                multipleDetails,
+                errors,
+                warnings,
+                false);
+
+        assertEquals(0, errors.size());
 
     }
 
@@ -216,6 +296,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(0, errors.size());
@@ -231,6 +312,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 false);
 
         assertEquals(0, errors.size());
@@ -260,6 +342,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 true);
 
         assertEquals(1, errors.size());
@@ -280,6 +363,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 true);
 
         assertTrue(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,
@@ -304,6 +388,7 @@ class MultipleCreationMidEventValidationServiceTest {
                 userToken,
                 multipleDetails,
                 errors,
+                warnings,
                 true);
 
         assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,

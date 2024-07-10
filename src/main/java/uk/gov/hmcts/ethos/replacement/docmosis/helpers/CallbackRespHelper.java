@@ -58,16 +58,6 @@ public final class CallbackRespHelper {
     }
 
     @NotNull
-    public static ResponseEntity<ListingCallbackResponse> getListingCallbackRespEntity(
-            List<String> errors, ListingData listingData) {
-
-        return ResponseEntity.ok(ListingCallbackResponse.builder()
-                .data(listingData)
-                .errors(errors)
-                .build());
-    }
-
-    @NotNull
     public static ResponseEntity<MultipleCallbackResponse> getMultipleCallbackRespEntity(
             List<String> errors, MultipleDetails multipleDetails) {
 
@@ -100,7 +90,21 @@ public final class CallbackRespHelper {
     }
 
     public static ResponseEntity<MultipleCallbackResponse> multipleResponse(MultipleData data, List<String> errors) {
-        return ResponseEntity.ok(MultipleCallbackResponse.builder().errors(errors).data(data).build());
+        return ResponseEntity.ok(MultipleCallbackResponse.builder()
+                .errors(errors)
+                .data(data)
+                .build());
+    }
+
+    @NotNull
+    public static ResponseEntity<MultipleCallbackResponse> getMultipleCallbackRespEntityErrorsAndWarnings(
+            List<String> warnings, List<String> errors, MultipleData caseData) {
+
+        return ResponseEntity.ok(MultipleCallbackResponse.builder()
+                .data(caseData)
+                .errors(errors)
+                .warnings(warnings)
+                .build());
     }
 
 }

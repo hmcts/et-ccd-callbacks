@@ -183,7 +183,7 @@ class Et1ReppedServiceTest {
     private static Stream<Arguments> validatePostcodes() {
         return Stream.of(
                 Arguments.of("LS16 6NB", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
-                Arguments.of("B1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, NO),
+                Arguments.of("B1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
                 Arguments.of("EH1 1AA", ENGLANDWALES_CASE_TYPE_ID, 1, NO),
                 Arguments.of("RM1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
                 Arguments.of("EC1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),

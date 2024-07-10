@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,6 +42,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 
 @Slf4j
@@ -66,10 +68,10 @@ public class TseService {
      * starts a new application in the same case.
      *
      * @param caseData   contains all the case data.
-     * @param isClaimant create a claimant application or a respondent application
+     * @param userType create an application for the claimant, respondent or claimant representative
      */
 
-    public void createApplication(CaseData caseData, boolean isClaimant) {
+    public void createApplication(CaseData caseData, String userType) {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             caseData.setGenericTseApplicationCollection(new ArrayList<>());
         }
@@ -82,10 +84,18 @@ public class TseService {
         application.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
         application.setStatus(OPEN_STATE);
 
-        if (isClaimant) {
-            addClaimantData(caseData, application);
-        } else {
-            addRespondentData(caseData, application);
+        switch (userType) {
+            case CLAIMANT_TITLE:
+                addClaimantData(caseData, application);
+                break;
+            case RESPONDENT_TITLE:
+                addRespondentData(caseData, application);
+                break;
+            case CLAIMANT_REP_TITLE:
+                addClaimantRepresentativeData(caseData, application);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected user type: " + userType);
         }
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
@@ -118,9 +128,8 @@ public class TseService {
      * @param caseData contains all the case data.
      */
     public void clearApplicationData(CaseData caseData) {
-        caseData.setClaimantTse(null);
+        clearClaimantTseDataFromCaseData(caseData);
         clearRespondentTseDataFromCaseData(caseData);
-
     }
 
     private void addClaimantData(CaseData caseData, GenericTseApplicationType application) {
@@ -133,7 +142,12 @@ public class TseService {
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
         application.setApplicationState(IN_PROGRESS);
+    }
 
+    private void addClaimantRepresentativeData(CaseData caseData, GenericTseApplicationType application) {
+        addClaimantData(caseData, application);
+        application.setApplicant(CLAIMANT_REP_TITLE);
+        addSupportingMaterialToDocumentCollection(caseData, application, true);
     }
 
     private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {
@@ -143,20 +157,28 @@ public class TseService {
         application.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
         application.setApplicationState(NOT_STARTED_YET);
-        addSupportingMaterialToDocumentCollection(caseData, application);
-
+        addSupportingMaterialToDocumentCollection(caseData, application, false);
     }
 
-    private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application) {
+    private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application,
+                                                           boolean isClaimantRep) {
         if (application.getDocumentUpload() != null) {
             if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
+            String applicationDoc;
+            if (isClaimantRep) {
+                String selectApplicationType =
+                        claimantSelectApplicationToType(caseData.getClaimantTseSelectApplication());
+                applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
+                        selectApplicationType);
+            } else {
+                applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
+                        application.getType());
 
-            String applicationDoc = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
-                            application.getType());
+            }
             String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(applicationDoc);
-            String extension = FileNameUtils.getExtension(application.getDocumentUpload().getDocumentFilename());
+            String extension = FilenameUtils.getExtension(application.getDocumentUpload().getDocumentFilename());
             application.getDocumentUpload().setDocumentFilename("Application %s - %s - Attachment.%s".formatted(
                     application.getNumber(),
                     applicationDoc,
@@ -171,10 +193,10 @@ public class TseService {
     }
 
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
-        RespondentTSEApplicationTypeData selectedAppData =
+        TSEApplicationTypeData selectedAppData =
                 RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
-        respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
+        respondentTseType.setDocumentUpload(selectedAppData.getUploadedTseDocument());
     }
 
     private void clearRespondentTseDataFromCaseData(CaseData caseData) {
@@ -207,6 +229,16 @@ public class TseService {
         caseData.setResTseDocument10(null);
         caseData.setResTseDocument11(null);
         caseData.setResTseDocument12(null);
+    }
+
+    private void clearClaimantTseDataFromCaseData(CaseData caseData) {
+        caseData.setClaimantTse(null);
+        caseData.setClaimantTseSelectApplication(null);
+        caseData.setClaimantTseRule92(null);
+        caseData.setClaimantTseRule92AnsNoGiveDetails(null);
+
+        caseData.setClaimantTseDocument13(null);
+        caseData.setClaimantTseTextBox13(null);
     }
 
     /**
@@ -430,5 +462,11 @@ public class TseService {
         return String.format("Application %d - %s.pdf",
                 getNextApplicationNumber(caseData) - 1,
                 caseData.getResTseSelectApplication());
+    }
+
+    public String getClaimantTseDocumentName(CaseData caseData) {
+        return String.format("Application %d - %s.pdf",
+                getNextApplicationNumber(caseData) - 1,
+                caseData.getClaimantTseSelectApplication());
     }
 }

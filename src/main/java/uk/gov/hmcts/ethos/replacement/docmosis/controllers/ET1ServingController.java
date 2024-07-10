@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -30,6 +31,7 @@ public class ET1ServingController {
         "<h1>Documents submitted</h1>\r\n\r\n<h5>We have notified the following parties:</h5>\r\n\r\n<h3>%s</h3>";
 
     private final ServingService servingService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -89,7 +91,7 @@ public class ET1ServingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         servingService.addServingDocToDocumentCollection(caseData);
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 

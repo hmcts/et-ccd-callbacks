@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -55,6 +56,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/respondentTSE/aboutToStart";
     private static final String SHOW_ERROR_URL = "/respondentTSE/showError";
 
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @MockBean
     private RespondentTellSomethingElseService resTseService;
     @MockBean

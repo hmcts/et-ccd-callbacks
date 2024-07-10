@@ -31,10 +31,9 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAM
 
 @Slf4j
 @Service("excelCreationService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.CloseResource", "PMD.LawOfDemeter",
-                   "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class ExcelCreationService {
 
+    @SuppressWarnings({"PMD.CloseResource"})
     public byte[] writeExcel(List<?> multipleCollection, List<String> subMultipleCollection, String leadCaseString) {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(SHEET_NAME);
@@ -43,13 +42,19 @@ public class ExcelCreationService {
         enableLocking(sheet);
         enableLocking(hiddenSheet);
 
-        initializeHeaders(workbook, sheet);
-        initializeData(workbook, sheet, multipleCollection, subMultipleCollection, leadCaseString);
+        CellStyle styleForUnLocking = getStyleForUnLocking(workbook);
+        CellStyle styleForLocking = getStyleForLocking(workbook, false);
+        CellStyle styleForLockingLead = getStyleForLocking(workbook, true);
+
+        initializeHeaders(sheet, styleForLocking);
+        initializeData(sheet, multipleCollection, subMultipleCollection, leadCaseString,
+                styleForUnLocking, styleForLocking, styleForLockingLead);
 
         adjustColumnSize(sheet);
-        createHiddenSheet(workbook, hiddenSheet, subMultipleCollection);
+        createHiddenSheet(hiddenSheet, subMultipleCollection, styleForLocking);
         addSubMultiplesValidation(workbook, sheet, multipleCollection, subMultipleCollection);
 
+        log.info("Excel Workbook has {} CellStyles", workbook.getNumCellStyles());
         return MultiplesHelper.writeExcelFileToByteArray(workbook);
     }
 
@@ -105,9 +110,10 @@ public class ExcelCreationService {
         }
     }
 
-    private void createHiddenSheet(XSSFWorkbook workbook, XSSFSheet hiddenSheet, List<String> subMultipleCollection) {
+    private void createHiddenSheet(XSSFSheet hiddenSheet,
+                                   List<String> subMultipleCollection,
+                                   CellStyle styleForLocking) {
         if (!subMultipleCollection.isEmpty()) {
-            CellStyle styleForLocking = getStyleForLocking(workbook, false);
             for (int i = 0; i < subMultipleCollection.size(); i++) {
                 XSSFRow row = hiddenSheet.createRow(i);
                 createCell(row, 0, subMultipleCollection.get(i), styleForLocking);
@@ -135,9 +141,8 @@ public class ExcelCreationService {
         }
     }
 
-    private void initializeHeaders(XSSFWorkbook workbook, XSSFSheet sheet) {
+    private void initializeHeaders(XSSFSheet sheet, CellStyle styleForLocking) {
         XSSFRow rowHead = sheet.createRow(0);
-        CellStyle styleForLocking = getStyleForLocking(workbook, false);
 
         for (int j = 0; j < MultiplesHelper.HEADERS.size(); j++) {
             rowHead.createCell(j).setCellValue(MultiplesHelper.HEADERS.get(j));
@@ -154,8 +159,9 @@ public class ExcelCreationService {
         }
     }
 
-    private void initializeData(XSSFWorkbook workbook, XSSFSheet sheet, List<?> multipleCollection,
-                                List<String> subMultipleCollection, String leadCaseString) {
+    private void initializeData(XSSFSheet sheet, List<?> multipleCollection,
+                                List<String> subMultipleCollection, String leadCaseString,
+                                CellStyle styleForUnLocking, CellStyle styleForLocking, CellStyle styleForLockingLead) {
 
         if (multipleCollection.isEmpty()) {
             return;
@@ -165,37 +171,38 @@ public class ExcelCreationService {
         log.info(isStringRefsList ? "Initializing multipleRefs" : "Initializing data");
 
         SortedMap<String, SortedMap<String, Object>> orderedAllCasesList =
-            MultiplesHelper.createCollectionOrderedByCaseRef(multipleCollection);
+                MultiplesHelper.createCollectionOrderedByCaseRef(multipleCollection);
         if (orderedAllCasesList.isEmpty()) {
             return;
         }
         String leadCase = MultiplesHelper.getCurrentLead(leadCaseString);
         final int[] rowIndex = {1};
         orderedAllCasesList.forEach((String caseYear, Map<String, Object> caseYearList) ->
-            caseYearList.forEach((String caseNum, Object caseItem) -> {
-                if (isStringRefsList) {
-                    constructCaseExcelRow(workbook, sheet, rowIndex[0], (String) caseItem, leadCase, null,
-                            !subMultipleCollection.isEmpty());
-                } else {
-                    MultipleObject multipleObject = (MultipleObject) caseItem;
-                    constructCaseExcelRow(workbook, sheet, rowIndex[0], multipleObject.getEthosCaseRef(), leadCase,
-                            multipleObject, !subMultipleCollection.isEmpty());
-                }
-                rowIndex[0]++;
-            })
+                caseYearList.forEach((String caseNum, Object caseItem) -> {
+                    if (isStringRefsList) {
+                        constructCaseExcelRow(sheet, rowIndex[0], (String) caseItem, leadCase, null,
+                                !subMultipleCollection.isEmpty(),
+                                styleForUnLocking, styleForLocking, styleForLockingLead);
+                    } else {
+                        MultipleObject multipleObject = (MultipleObject) caseItem;
+                        constructCaseExcelRow(sheet, rowIndex[0], multipleObject.getEthosCaseRef(), leadCase,
+                                multipleObject, !subMultipleCollection.isEmpty(),
+                                styleForUnLocking, styleForLocking, styleForLockingLead);
+                    }
+                    rowIndex[0]++;
+                })
         );
     }
 
-    private void constructCaseExcelRow(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex, String ethosCaseRef,
-                                       String leadCase, MultipleObject multipleObject, boolean hasSubMultiples) {
-        CellStyle styleForUnLocking = getStyleForUnLocking(workbook);
-        CellStyle styleForLocking = getStyleForLocking(workbook, false);
+    private void constructCaseExcelRow(XSSFSheet sheet, int rowIndex, String ethosCaseRef, String leadCase,
+                                       MultipleObject multipleObject, boolean hasSubMultiples,
+                                       CellStyle styleForUnLocking, CellStyle styleForLocking,
+                                       CellStyle styleForLockingLead) {
         XSSFRow row = sheet.createRow(rowIndex);
         int columnIndex = 0;
 
         if (ethosCaseRef.equals(leadCase)) {
-            log.info("Lead: " + leadCase);
-            CellStyle styleForLockingLead = getStyleForLocking(workbook, true);
+            log.info("Lead: {}", leadCase);
             createCell(row, columnIndex, ethosCaseRef, styleForLockingLead);
         } else {
             createCell(row, columnIndex, ethosCaseRef, styleForLocking);
@@ -213,12 +220,11 @@ public class ExcelCreationService {
                 }
             }
         } else {
-            if (!hasSubMultiples) {
-                columnIndex++;
-                createCell(row, columnIndex, multipleObject.getSubMultiple(), styleForLocking);
-            } else {
-                columnIndex++;
+            columnIndex++;
+            if (hasSubMultiples) {
                 createCell(row, columnIndex, multipleObject.getSubMultiple(), styleForUnLocking);
+            } else {
+                createCell(row, columnIndex, multipleObject.getSubMultiple(), styleForLocking);
             }
             // Create these cells unlocked
             columnIndex++;
@@ -280,7 +286,7 @@ public class ExcelCreationService {
     }
 
     public void addReportAdminDetails(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex,
-                                       String reportPrintedOnDescription, int lastCol) {
+                                      String reportPrintedOnDescription, int lastCol) {
         CellRangeAddress reportTitleCellRange = new CellRangeAddress(rowIndex, rowIndex, 0, lastCol);
         sheet.addMergedRegion(reportTitleCellRange);
         XSSFRow rowReportTitle = sheet.createRow(rowIndex);
@@ -317,7 +323,7 @@ public class ExcelCreationService {
     }
 
     public void initializeReportHeaders(String documentName, String periodDescription, XSSFWorkbook workbook,
-                                         XSSFSheet sheet, List<String> headers) {
+                                        XSSFSheet sheet, List<String> headers) {
         CellRangeAddress reportTitleCellRange = new CellRangeAddress(0, 0, 0, headers.size() - 1);
         sheet.addMergedRegion(reportTitleCellRange);
         XSSFRow rowReportTitle = sheet.createRow(0);

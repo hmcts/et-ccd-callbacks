@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -34,6 +35,8 @@ class HearingDetailsControllerTest {
 
     @MockBean
     private HearingDetailsService hearingDetailsService;
+    @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @Autowired
     private MockMvc mockMvc;

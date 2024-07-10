@@ -473,7 +473,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         caseFlagsService.setupCaseFlags(caseData);
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

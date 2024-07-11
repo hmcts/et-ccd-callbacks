@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,7 +39,7 @@ class ExcelCreationServiceTest {
 
     String leadLink = "<a target=\"_blank\" href=\"https://www-ccd.perftest.platform.hmcts.net/v2/case/1604313560561842\">245000/2020</a>";
 
-    private Map<String, Object> multipleObjects;
+    private SortedMap<String, Object> multipleObjects;
 
     @BeforeEach
     public void setUp() {
@@ -102,12 +102,6 @@ class ExcelCreationServiceTest {
         }
     }
 
-    private XSSFWorkbook createWorkbook() {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        workbook.createSheet("Sheet1");
-        return workbook;
-    }
-
     @Test
     void reportSubTitleCellStyleTest() throws IOException {
         try (XSSFWorkbook workbook = createWorkbook()) {
@@ -163,5 +157,11 @@ class ExcelCreationServiceTest {
             }
         }
 
+    }
+
+    private XSSFWorkbook createWorkbook() {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        workbook.createSheet("Sheet1");
+        return workbook;
     }
 }

@@ -70,7 +70,7 @@ public class ExcelCreationService {
                     styleForClaimant, userToken, caseTypeId);
 
             adjustColumnSize(sheet);
-            createHiddenSheet(workbook, hiddenSheet, subMultipleCollection);
+            createHiddenSheet(hiddenSheet, subMultipleCollection, styleForLocking);
             addSubMultiplesValidation(workbook, sheet, multipleCollection, subMultipleCollection);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -152,9 +152,10 @@ public class ExcelCreationService {
         sheet.setColumnWidth(6, claimantColumnWidth);
     }
 
-    private void createHiddenSheet(XSSFWorkbook workbook, XSSFSheet hiddenSheet, List<String> subMultipleCollection) {
+    private void createHiddenSheet(XSSFSheet hiddenSheet,
+                                   List<String> subMultipleCollection,
+                                   CellStyle styleForLocking) {
         if (!subMultipleCollection.isEmpty()) {
-            CellStyle styleForLocking = getStyleForLocking(workbook, false);
             for (int i = 0; i < subMultipleCollection.size(); i++) {
                 XSSFRow row = hiddenSheet.createRow(i);
                 createCell(row, 0, subMultipleCollection.get(i), styleForLocking);

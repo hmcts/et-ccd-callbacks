@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -32,6 +33,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 
 @ExtendWith(SpringExtension.class)
 class ServingServiceTest {
@@ -72,9 +75,8 @@ class ServingServiceTest {
     }
 
     private static CaseDetails generateCaseDetails() throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
-                ServingServiceTest.class.getClassLoader()
-                .getResource("midServingCaseDetailsTest.json")).toURI())));
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource("midServingCaseDetailsTest.json")).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
@@ -120,24 +122,19 @@ class ServingServiceTest {
     }
 
     @Test
-    void sendNotifications_shouldSendThreeNotifications() {
+    void sendNotifications_shouldSendNotificationToRep() {
+        Organisation organisation = Organisation.builder().organisationID("Claimant Rep").build();
+        notifyCaseDetails.getCaseData().setCaseSource("MyHMCTS");
+        notifyCaseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
+        notifyCaseDetails.getCaseData().getRepresentativeClaimantType().setMyHmctsOrganisation(organisation);
         servingService.sendNotifications(notifyCaseDetails);
-
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToCitizenHub", "citizenUrl1683646754393041");
-
-        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1683646754393041");
-
-        verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1683646754393041");
+        assertThat(personalisation.getValue()).containsEntry(LINK_TO_EXUI, "exuiUrl1683646754393041");
     }
 
     @Test
     void sendNotifications_shouldHandleMissingEmails() {
         notifyCaseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
-        notifyCaseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
-        notifyCaseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
         servingService.sendNotifications(notifyCaseDetails);
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }

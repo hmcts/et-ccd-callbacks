@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.claimantMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
-    private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
-    private static final String SERVING_RECIPIENT_RESPONDENT = "Respondent";
     private static final String ACAS_MAILTO_LINK = "mailto:et3@acas.org.uk?subject={0}&body=Parties%20in%20claim"
             + "%3A%20{1}%20vs%20{2}%0D%0ACase%20reference%20number%3A%20{3}%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%"
             + "20tribunal%20has%20completed%20{4}%20to%20the%20{5}.%0D%0A%0D%0AThe%20documents%20we"
@@ -60,8 +60,8 @@ public class ServingService {
     @Value("${template.et1Serving.claimant}")
     private String claimantTemplateId;
 
-    @Value("${template.et1Serving.respondent}")
-    private String respondentTemplateId;
+    @Value("${template.et1Serving.claimantRep}")
+    private String claimantRepTemplateId;
 
     private final EmailService emailService;
 
@@ -70,7 +70,7 @@ public class ServingService {
         if (CollectionUtils.isNotEmpty(docList)) {
             documentLinks = docList
                 .stream()
-                .filter(d -> d.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE))
+                .filter(d -> SERVING_DOCUMENT_OTHER_TYPE.equals(d.getValue().getTypeOfDocument()))
                 .map(this::createDocLinkBinary)
                 .collect(Collectors.joining());
         }
@@ -129,24 +129,23 @@ public class ServingService {
      * @param caseDetails object that holds the case data.
      */
     public void sendNotifications(CaseDetails caseDetails) {
-        caseDetails.getCaseData().getRespondentCollection()
-            .forEach(o -> {
-                Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseDetails, o.getValue());
-                respondent.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
-
-                if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
-                    return;
-                }
-                emailService.sendEmail(respondentTemplateId, respondent.get(EMAIL_ADDRESS), respondent);
-            });
-
-        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseDetails);
-        claimant.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
-        if (isNullOrEmpty(claimant.get(EMAIL_ADDRESS))) {
-            return;
+        Map<String, String> personalisation;
+        if (claimantMyHmctsCase(caseDetails.getCaseData())) {
+            personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
+            personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
+            if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
+                return;
+            }
+            emailService.sendEmail(claimantRepTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
+        } else if (!isClaimantNonSystemUser(caseDetails.getCaseData())) {
+            personalisation = NotificationHelper.buildMapForClaimant(caseDetails);
+            personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+            if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
+                return;
+            }
+            emailService.sendEmail(claimantTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
         }
 
-        emailService.sendEmail(claimantTemplateId, claimant.get(EMAIL_ADDRESS), claimant);
     }
 
     /**

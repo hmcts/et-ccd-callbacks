@@ -8,6 +8,7 @@ import org.mockito.Captor;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class Et3NotificationServiceTest {
@@ -58,17 +60,33 @@ class Et3NotificationServiceTest {
     }
 
     @Test
-    void sendNotifications_shouldSendThreeNotifications() {
+    void sendNotifications_shouldSendNotifications() {
         et3NotificationService.sendNotifications(caseDetails);
-
-        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToCitizenHub", "citizenUrl1234");
 
         verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), personalisation.capture());
         assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1234");
 
         verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), personalisation.capture());
         assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1234");
+    }
+
+    @Test
+    void et3NotificationService_shouldSendNotificationsToClaimantRep() {
+        Organisation organisation = Organisation.builder().organisationID("Claimant Rep").build();
+        caseDetails.getCaseData().setCaseSource("MyHMCTS");
+        caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
+        caseDetails.getCaseData().getRepresentativeClaimantType().setMyHmctsOrganisation(organisation);
+        et3NotificationService.sendNotifications(caseDetails);
+        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), personalisation.capture());
+        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1234");
+    }
+
+    @Test
+    void et3NotificationService_shouldSendNotificationsToClaimant() {
+        caseDetails.getCaseData().setEt1OnlineSubmission(YES);
+        et3NotificationService.sendNotifications(caseDetails);
+        verify(emailService, times(1)).sendEmail(any(), eq("claimant@unrepresented.com"), personalisation.capture());
+        assertThat(personalisation.getValue()).containsEntry("linkToCitizenHub", "citizenUrl1234");
     }
 
     @Test

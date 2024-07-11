@@ -20,9 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -32,11 +30,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/et3Notification")
 public class Et3NotificationController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_HEADER =
         "<h1>Documents submitted</h1>\r\n\r\n<h5>We have notified the following parties:</h5>\r\n\r\n<h3>%s</h3>";
 
-    private final VerifyTokenService verifyTokenService;
     private final ServingService servingService;
     private final Et3NotificationService et3NotificationService;
 
@@ -66,11 +62,6 @@ public class Et3NotificationController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt3OtherTypeDocumentName(
             servingService.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));
@@ -96,11 +87,6 @@ public class Et3NotificationController {
     public ResponseEntity<CCDCallbackResponse> et3NotificationSubmitted(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 

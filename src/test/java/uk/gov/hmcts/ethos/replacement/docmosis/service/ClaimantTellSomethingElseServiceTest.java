@@ -190,7 +190,7 @@ class ClaimantTellSomethingElseServiceTest {
 
         String response = claimantTellSomethingElseService.buildApplicationCompleteResponse(caseData);
         assertThat(response, is(String.format(TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE,
-                UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))));
+                UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7), caseData.getDocMarkUp())));
     }
 
     @Test
@@ -211,7 +211,7 @@ class ClaimantTellSomethingElseServiceTest {
         caseData.setGenericTseApplicationCollection(List.of(latestTSEApplication));
 
         String response = claimantTellSomethingElseService.buildApplicationCompleteResponse(caseData);
-        assertThat(response, is(APPLICATION_COMPLETE_RULE92_ANSWERED_NO));
+        assertThat(response, is(String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_NO, caseData.getDocMarkUp())));
     }
 
     private static Stream<Arguments> selectedApplicationList() {

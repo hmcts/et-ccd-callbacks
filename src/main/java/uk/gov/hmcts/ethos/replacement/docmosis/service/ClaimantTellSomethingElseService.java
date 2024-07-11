@@ -100,10 +100,10 @@ public class ClaimantTellSomethingElseService {
                         caseData.getDocMarkUp());
             } else {
                 body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE,
-                        UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+                        UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7), caseData.getDocMarkUp());
             }
         } else {
-            body = APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
+            body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_NO, caseData.getDocMarkUp());
         }
         return body;
     }

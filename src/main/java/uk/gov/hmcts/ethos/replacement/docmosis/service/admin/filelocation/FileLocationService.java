@@ -166,7 +166,6 @@ public class FileLocationService {
     public List<String> updateFileLocation(AdminData adminData) {
 
         List<String> errors = new ArrayList<>();
-        String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
 
         if (fileLocationRepository.existsByNameAndTribunalOffice(adminData.getFileLocationName(),
@@ -175,6 +174,7 @@ public class FileLocationService {
                     adminData.getFileLocationName(), adminData.getTribunalOffice()));
             return errors;
         }
+        String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
         FileLocation selectedFileLocation = fileLocationRepository
                 .findByCodeAndTribunalOffice(selectedFileLocationCode, tribunalOffice);
         if (selectedFileLocation != null) {

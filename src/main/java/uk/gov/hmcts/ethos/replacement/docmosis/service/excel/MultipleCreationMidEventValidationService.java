@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -22,7 +23,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOUR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.VETTED_STATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.isEmptyOrWhitespace;
 
 @Slf4j
 @Service("multipleCreationMidEventValidationService")
@@ -288,7 +288,7 @@ public class MultipleCreationMidEventValidationService {
     private void validateMultipleReference(String multipleReference,
                                            List<String> listCasesMultipleError,
                                            String ethosCaseReference) {
-        if (!isEmptyOrWhitespace(multipleReference)) {
+        if (StringUtils.isNotBlank(multipleReference)) {
             log.info("VALIDATION ERROR: already another multiple");
 
             listCasesMultipleError.add(ethosCaseReference);

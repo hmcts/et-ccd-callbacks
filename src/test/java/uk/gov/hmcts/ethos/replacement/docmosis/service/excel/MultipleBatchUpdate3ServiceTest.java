@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -47,7 +47,7 @@ class MultipleBatchUpdate3ServiceTest {
     @InjectMocks
     private MultipleBatchUpdate3Service multipleBatchUpdate3Service;
 
-    private TreeMap<String, Object> multipleObjectsFlags;
+    private SortedMap<String, Object> multipleObjectsFlags;
     private MultipleDetails multipleDetails;
     private List<SubmitEvent> submitEvents;
     private String userToken;

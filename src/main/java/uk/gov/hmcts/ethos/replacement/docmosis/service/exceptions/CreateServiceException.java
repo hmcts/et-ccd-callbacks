@@ -1,9 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions;
 
+import java.io.Serial;
+
 /**
  * Is thrown when create service fails.
  */
 public class CreateServiceException extends RuntimeException {
+    @Serial
+    private static final long serialVersionUID = Long.MIN_VALUE;
+
     /**
      * Creates a {@link CreateServiceException} with a message and a cause.
      * @param msg a message explaining why this exception is thrown

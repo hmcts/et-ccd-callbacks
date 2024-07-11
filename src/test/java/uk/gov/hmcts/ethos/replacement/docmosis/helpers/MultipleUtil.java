@@ -63,6 +63,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -134,15 +135,15 @@ public final class MultipleUtil {
         return multipleObjectTreeMap;
     }
 
-    public static TreeMap<String, Object> getMultipleObjectsSubMultiple() {
-        TreeMap<String, Object> multipleObjectTreeMap = new TreeMap<>();
+    public static SortedMap<String, Object> getMultipleObjectsSubMultiple() {
+        SortedMap<String, Object> multipleObjectTreeMap = new TreeMap<>();
         multipleObjectTreeMap.put("SubMultiple", new ArrayList<>(Collections.singletonList("245000/2020")));
         multipleObjectTreeMap.put("SubMultiple3", new ArrayList<>(Collections.singletonList("245003/2020")));
         return multipleObjectTreeMap;
     }
 
-    public static TreeMap<String, Object> getMultipleObjectsDLFlags() {
-        TreeMap<String, Object> multipleObjectTreeMap = new TreeMap<>();
+    public static SortedMap<String, Object> getMultipleObjectsDLFlags() {
+        SortedMap<String, Object> multipleObjectTreeMap = new TreeMap<>();
         multipleObjectTreeMap.put(HEADER_3, new HashSet<>(Collections.singletonList("AA")));
         multipleObjectTreeMap.put(HEADER_4, new HashSet<>(Arrays.asList("BB", "CC")));
         return multipleObjectTreeMap;
@@ -179,6 +180,7 @@ public final class MultipleUtil {
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantLastName("Mike");
         caseData.setClaimantIndType(claimantIndType);
+        caseData.setClaimant("Horatio Hornblower");
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Andrew Smith");
         respondentSumType.setRespondentAddress(address);
@@ -508,9 +510,9 @@ public final class MultipleUtil {
     public static XSSFSheet getDataTypeSheet(String fileName) throws IOException {
 
         Resource body = new ClassPathResource(fileName);
-        XSSFWorkbook workbook = new XSSFWorkbook(body.getInputStream());
-        return workbook.getSheet(SHEET_NAME);
-
+        try (XSSFWorkbook workbook = new XSSFWorkbook(body.getInputStream())) {
+            return workbook.getSheet(SHEET_NAME);
+        }
     }
 
     public static CaseData getCaseDataForSinglesToBeMoved() {

@@ -12,6 +12,8 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.claimantMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 
 /**
  * Service to support ET3 Notification journey.
@@ -43,13 +45,22 @@ public class Et3NotificationService {
                 emailService.sendEmail(et3MyHmctsTemplateId, respondentEmail, respondent);
             });
 
-        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseDetails);
-        claimant.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
-        String claimantEmail = claimant.get(EMAIL_ADDRESS);
-        if (isNullOrEmpty(claimantEmail)) {
-            return;
+        Map<String, String> personalisation;
+        if (claimantMyHmctsCase(caseDetails.getCaseData())) {
+            personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
+            personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
+            if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
+                return;
+            }
+            emailService.sendEmail(et3MyHmctsTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
+        } else if (!isClaimantNonSystemUser(caseDetails.getCaseData())) {
+            personalisation = NotificationHelper.buildMapForClaimant(caseDetails);
+            personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+            if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
+                return;
+            }
+            emailService.sendEmail(et3CitizenTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
         }
 
-        emailService.sendEmail(et3CitizenTemplateId, claimantEmail, claimant);
     }
 }

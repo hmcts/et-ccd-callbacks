@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.common.Strings;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -366,5 +367,12 @@ public final class Helper {
      */
     public static String getFirstListItem(List<String> list) {
         return CollectionUtils.isEmpty(list) ? null : list.get(0);
+    }
+
+    public static boolean claimantMyHmctsCase(CaseData caseData) {
+        return "MyHMCTS".equals(caseData.getCaseSource())
+               && YES.equals(caseData.getClaimantRepresentedQuestion())
+               && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
+               && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
     }
 }

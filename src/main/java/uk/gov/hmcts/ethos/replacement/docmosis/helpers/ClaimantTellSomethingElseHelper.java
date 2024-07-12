@@ -12,6 +12,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationDo
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -33,10 +36,76 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLA
 public final class ClaimantTellSomethingElseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     private static final String CLAIMANT_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
+    private static final Map<String, Function<CaseData, TSEApplicationTypeData>>
+            APPLICATION_TYPE_DATA_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, String> APPLICATION_TYPE_MAP = new ConcurrentHashMap<>();
+
+    static {
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_AMEND_CLAIM", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument1(), caseData.getClaimantTseTextBox1()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument2(), caseData.getClaimantTseTextBox2()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_CONSIDER_DECISION_AFRESH", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument3(), caseData.getClaimantTseTextBox3()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_CONTACT_THE_TRIBUNAL", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument4(), caseData.getClaimantTseTextBox4()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument5(), caseData.getClaimantTseTextBox5()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_ORDER_OTHER_PARTY", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument6(), caseData.getClaimantTseTextBox6()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_POSTPONE_A_HEARING", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument7(), caseData.getClaimantTseTextBox7()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_RECONSIDER_JUDGMENT", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument8(), caseData.getClaimantTseTextBox8()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument9(), caseData.getClaimantTseTextBox9()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_RESTRICT_PUBLICITY", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument10(), caseData.getClaimantTseTextBox10()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument11(), caseData.getClaimantTseTextBox11()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument12(), caseData.getClaimantTseTextBox12()));
+        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_WITHDRAW_CLAIM", caseData ->
+                new TSEApplicationTypeData(caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13()));
+    }
+
+    static {
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_AMEND_CLAIM, "amend");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS, "change-details");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_CONSIDER_DECISION_AFRESH, "reconsider-decision");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND, "witness");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_ORDER_OTHER_PARTY, "respondent");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_POSTPONE_A_HEARING, "postpone");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_RECONSIDER_JUDGMENT, "reconsider-judgement");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED, "non-compliance");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_RESTRICT_PUBLICITY, "publicity");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART, "strike");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER, "vary");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_WITHDRAW_CLAIM, "withdraw");
+        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_CONTACT_THE_TRIBUNAL, "other");
+    }
 
     private ClaimantTellSomethingElseHelper() {
+    }
+
+    public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
+        String applicationType = caseData.getClaimantTseSelectApplication();
+        Function<CaseData, TSEApplicationTypeData> handler = APPLICATION_TYPE_DATA_MAP.get(applicationType);
+        if (handler != null) {
+            return handler.apply(caseData);
+        } else {
+            throw new IllegalArgumentException(String.format("Unexpected application type %s", applicationType));
+        }
+    }
+
+    public static String claimantSelectApplicationToType(String selectApplication) {
+        String type = APPLICATION_TYPE_MAP.get(selectApplication);
+        if (type != null) {
+            return type;
+        } else {
+            throw new IllegalArgumentException(String.format("Unexpected application type %s", selectApplication));
+        }
     }
 
     public static String getDocumentRequest(CaseData caseData, String accessKey)
@@ -64,60 +133,6 @@ public final class ClaimantTellSomethingElseHelper {
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
-    }
-
-    public static TSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
-        return switch (caseData.getClaimantTseSelectApplication()) {
-            case CLAIMANT_TSE_AMEND_CLAIM -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument1(), caseData.getClaimantTseTextBox1());
-            case CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument2(), caseData.getClaimantTseTextBox2());
-            case CLAIMANT_TSE_CONSIDER_DECISION_AFRESH -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument3(), caseData.getClaimantTseTextBox3());
-            case CLAIMANT_TSE_CONTACT_THE_TRIBUNAL -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument4(), caseData.getClaimantTseTextBox4());
-            case CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument5(), caseData.getClaimantTseTextBox5());
-            case CLAIMANT_TSE_ORDER_OTHER_PARTY -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument6(), caseData.getClaimantTseTextBox6());
-            case CLAIMANT_TSE_POSTPONE_A_HEARING -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument7(), caseData.getClaimantTseTextBox7());
-            case CLAIMANT_TSE_RECONSIDER_JUDGMENT -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument8(), caseData.getClaimantTseTextBox8());
-            case CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument9(), caseData.getClaimantTseTextBox9());
-            case CLAIMANT_TSE_RESTRICT_PUBLICITY -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument10(), caseData.getClaimantTseTextBox10());
-            case CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument11(), caseData.getClaimantTseTextBox11());
-            case CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument12(), caseData.getClaimantTseTextBox12());
-            case CLAIMANT_TSE_WITHDRAW_CLAIM -> new TSEApplicationTypeData(
-                    caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13());
-            default -> throw new IllegalArgumentException(String.format("Unexpected application type %s",
-                    caseData.getResTseSelectApplication()));
-        };
-    }
-
-    public static String claimantSelectApplicationToType(String selectApplication) {
-        return switch (selectApplication) {
-            case CLAIMANT_TSE_AMEND_CLAIM -> "amend";
-            case CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS -> "change-details";
-            case CLAIMANT_TSE_CONSIDER_DECISION_AFRESH -> "reconsider-decision";
-            case CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND -> "witness";
-            case CLAIMANT_TSE_ORDER_OTHER_PARTY -> "respondent";
-            case CLAIMANT_TSE_POSTPONE_A_HEARING -> "postpone";
-            case CLAIMANT_TSE_RECONSIDER_JUDGMENT -> "reconsider-judgement";
-            case CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED -> "non-compliance";
-            case CLAIMANT_TSE_RESTRICT_PUBLICITY -> "publicity";
-            case CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART -> "strike";
-            case CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER -> "vary";
-            case CLAIMANT_TSE_WITHDRAW_CLAIM -> "withdraw";
-            case CLAIMANT_TSE_CONTACT_THE_TRIBUNAL -> "other";
-            default ->
-                    throw new IllegalArgumentException(String.format("Unexpected application type %s",
-                            selectApplication));
-        };
     }
 
     private static String getDocumentName(TSEApplicationTypeData selectedAppData) {

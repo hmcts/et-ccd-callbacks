@@ -43,7 +43,19 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_AMEND_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CONSIDER_DECISION_AFRESH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CONTACT_THE_TRIBUNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_ORDER_OTHER_PARTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_POSTPONE_A_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_RECONSIDER_JUDGMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_RESTRICT_PUBLICITY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.GIVE_DETAIL_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 
@@ -216,23 +228,57 @@ class ClaimantTellSomethingElseServiceTest {
 
     private static Stream<Arguments> selectedApplicationList() {
         return Stream.of(
-            Arguments.of(CLAIMANT_TSE_WITHDRAW_CLAIM)
+                Arguments.of(TSEConstants.CLAIMANT_TSE_AMEND_CLAIM),
+                Arguments.of(CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS),
+                Arguments.of(CLAIMANT_TSE_CONSIDER_DECISION_AFRESH),
+                Arguments.of(CLAIMANT_TSE_CONTACT_THE_TRIBUNAL),
+                Arguments.of(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND),
+                Arguments.of(CLAIMANT_TSE_ORDER_OTHER_PARTY),
+                Arguments.of(TSEConstants.CLAIMANT_TSE_POSTPONE_A_HEARING),
+                Arguments.of(TSEConstants.CLAIMANT_TSE_RECONSIDER_JUDGMENT),
+                Arguments.of(TSEConstants.CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED),
+                Arguments.of(TSEConstants.CLAIMANT_TSE_RESTRICT_PUBLICITY),
+                Arguments.of(TSEConstants.CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART),
+                Arguments.of(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER),
+                Arguments.of(CLAIMANT_TSE_WITHDRAW_CLAIM)
         );
     }
 
     private void setTextBoxForSelectedApplication(CaseData caseData) {
-        if (caseData.getClaimantTseSelectApplication().equals(CLAIMANT_TSE_WITHDRAW_CLAIM)) {
-            caseData.setClaimantTseTextBox13("Some text");
-        } else {
-            throw new IllegalArgumentException("Unexpected application type");
+        switch (caseData.getClaimantTseSelectApplication()) {
+            case CLAIMANT_TSE_AMEND_CLAIM -> caseData.setClaimantTseTextBox1("Some text");
+            case CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS -> caseData.setClaimantTseTextBox2("Some text");
+            case CLAIMANT_TSE_CONSIDER_DECISION_AFRESH -> caseData.setClaimantTseTextBox3("Some text");
+            case CLAIMANT_TSE_CONTACT_THE_TRIBUNAL -> caseData.setClaimantTseTextBox4("Some text");
+            case CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND -> caseData.setClaimantTseTextBox5("Some text");
+            case CLAIMANT_TSE_ORDER_OTHER_PARTY -> caseData.setClaimantTseTextBox6("Some text");
+            case CLAIMANT_TSE_POSTPONE_A_HEARING -> caseData.setClaimantTseTextBox7("Some text");
+            case CLAIMANT_TSE_RECONSIDER_JUDGMENT -> caseData.setClaimantTseTextBox8("Some text");
+            case CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED -> caseData.setClaimantTseTextBox9("Some text");
+            case CLAIMANT_TSE_RESTRICT_PUBLICITY -> caseData.setClaimantTseTextBox10("Some text");
+            case CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART -> caseData.setClaimantTseTextBox11("Some text");
+            case CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER -> caseData.setClaimantTseTextBox12("Some text");
+            case CLAIMANT_TSE_WITHDRAW_CLAIM -> caseData.setClaimantTseTextBox13("Some text");
+            default -> throw new IllegalArgumentException("Unexpected application type");
         }
     }
 
     private void setDocForSelectedApplication(CaseData caseData) {
-        if (caseData.getClaimantTseSelectApplication().equals(CLAIMANT_TSE_WITHDRAW_CLAIM)) {
-            caseData.setClaimantTseDocument13(createDocumentType());
-        } else {
-            throw new IllegalArgumentException("Unexpected application type");
+        switch (caseData.getClaimantTseSelectApplication()) {
+            case CLAIMANT_TSE_AMEND_CLAIM -> caseData.setClaimantTseDocument1(createDocumentType());
+            case CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS -> caseData.setClaimantTseDocument2(createDocumentType());
+            case CLAIMANT_TSE_CONSIDER_DECISION_AFRESH -> caseData.setClaimantTseDocument3(createDocumentType());
+            case CLAIMANT_TSE_CONTACT_THE_TRIBUNAL -> caseData.setClaimantTseDocument4(createDocumentType());
+            case CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND -> caseData.setClaimantTseDocument5(createDocumentType());
+            case CLAIMANT_TSE_ORDER_OTHER_PARTY -> caseData.setClaimantTseDocument6(createDocumentType());
+            case CLAIMANT_TSE_POSTPONE_A_HEARING -> caseData.setClaimantTseDocument7(createDocumentType());
+            case CLAIMANT_TSE_RECONSIDER_JUDGMENT -> caseData.setClaimantTseDocument8(createDocumentType());
+            case CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED -> caseData.setClaimantTseDocument9(createDocumentType());
+            case CLAIMANT_TSE_RESTRICT_PUBLICITY -> caseData.setClaimantTseDocument10(createDocumentType());
+            case CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART -> caseData.setClaimantTseDocument11(createDocumentType());
+            case CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER -> caseData.setClaimantTseDocument12(createDocumentType());
+            case CLAIMANT_TSE_WITHDRAW_CLAIM -> caseData.setClaimantTseDocument13(createDocumentType());
+            default -> throw new IllegalArgumentException("Unexpected application type");
         }
     }
 

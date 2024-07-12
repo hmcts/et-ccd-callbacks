@@ -28,7 +28,10 @@ import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -67,6 +70,42 @@ class ClaimantTellSomethingElseServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TornadoService tornadoService;
+
+    private static final Map<String, BiConsumer<CaseData, String>> APPLICATION_SETTER_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, BiConsumer<CaseData, UploadedDocumentType>>
+            DOCUMENT_SETTER_MAP = new ConcurrentHashMap<>();
+
+    static {
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_AMEND_CLAIM, CaseData::setClaimantTseTextBox1);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS, CaseData::setClaimantTseTextBox2);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_CONSIDER_DECISION_AFRESH, CaseData::setClaimantTseTextBox3);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_CONTACT_THE_TRIBUNAL, CaseData::setClaimantTseTextBox4);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND, CaseData::setClaimantTseTextBox5);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_ORDER_OTHER_PARTY, CaseData::setClaimantTseTextBox6);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_POSTPONE_A_HEARING, CaseData::setClaimantTseTextBox7);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_RECONSIDER_JUDGMENT, CaseData::setClaimantTseTextBox8);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED, CaseData::setClaimantTseTextBox9);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_RESTRICT_PUBLICITY, CaseData::setClaimantTseTextBox10);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART, CaseData::setClaimantTseTextBox11);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER, CaseData::setClaimantTseTextBox12);
+        APPLICATION_SETTER_MAP.put(CLAIMANT_TSE_WITHDRAW_CLAIM, CaseData::setClaimantTseTextBox13);
+    }
+
+    static {
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_AMEND_CLAIM, CaseData::setClaimantTseDocument1);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS, CaseData::setClaimantTseDocument2);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_CONSIDER_DECISION_AFRESH, CaseData::setClaimantTseDocument3);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_CONTACT_THE_TRIBUNAL, CaseData::setClaimantTseDocument4);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND, CaseData::setClaimantTseDocument5);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_ORDER_OTHER_PARTY, CaseData::setClaimantTseDocument6);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_POSTPONE_A_HEARING, CaseData::setClaimantTseDocument7);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_RECONSIDER_JUDGMENT, CaseData::setClaimantTseDocument8);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED, CaseData::setClaimantTseDocument9);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_RESTRICT_PUBLICITY, CaseData::setClaimantTseDocument10);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART, CaseData::setClaimantTseDocument11);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER, CaseData::setClaimantTseDocument12);
+        DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_WITHDRAW_CLAIM, CaseData::setClaimantTseDocument13);
+    }
 
     @BeforeEach
     void setUp() {
@@ -228,57 +267,39 @@ class ClaimantTellSomethingElseServiceTest {
 
     private static Stream<Arguments> selectedApplicationList() {
         return Stream.of(
-                Arguments.of(TSEConstants.CLAIMANT_TSE_AMEND_CLAIM),
+                Arguments.of(CLAIMANT_TSE_AMEND_CLAIM),
                 Arguments.of(CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS),
                 Arguments.of(CLAIMANT_TSE_CONSIDER_DECISION_AFRESH),
                 Arguments.of(CLAIMANT_TSE_CONTACT_THE_TRIBUNAL),
                 Arguments.of(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND),
                 Arguments.of(CLAIMANT_TSE_ORDER_OTHER_PARTY),
-                Arguments.of(TSEConstants.CLAIMANT_TSE_POSTPONE_A_HEARING),
-                Arguments.of(TSEConstants.CLAIMANT_TSE_RECONSIDER_JUDGMENT),
-                Arguments.of(TSEConstants.CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED),
-                Arguments.of(TSEConstants.CLAIMANT_TSE_RESTRICT_PUBLICITY),
-                Arguments.of(TSEConstants.CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART),
+                Arguments.of(CLAIMANT_TSE_POSTPONE_A_HEARING),
+                Arguments.of(CLAIMANT_TSE_RECONSIDER_JUDGMENT),
+                Arguments.of(CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED),
+                Arguments.of(CLAIMANT_TSE_RESTRICT_PUBLICITY),
+                Arguments.of(CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART),
                 Arguments.of(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER),
                 Arguments.of(CLAIMANT_TSE_WITHDRAW_CLAIM)
         );
     }
 
     private void setTextBoxForSelectedApplication(CaseData caseData) {
-        switch (caseData.getClaimantTseSelectApplication()) {
-            case CLAIMANT_TSE_AMEND_CLAIM -> caseData.setClaimantTseTextBox1("Some text");
-            case CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS -> caseData.setClaimantTseTextBox2("Some text");
-            case CLAIMANT_TSE_CONSIDER_DECISION_AFRESH -> caseData.setClaimantTseTextBox3("Some text");
-            case CLAIMANT_TSE_CONTACT_THE_TRIBUNAL -> caseData.setClaimantTseTextBox4("Some text");
-            case CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND -> caseData.setClaimantTseTextBox5("Some text");
-            case CLAIMANT_TSE_ORDER_OTHER_PARTY -> caseData.setClaimantTseTextBox6("Some text");
-            case CLAIMANT_TSE_POSTPONE_A_HEARING -> caseData.setClaimantTseTextBox7("Some text");
-            case CLAIMANT_TSE_RECONSIDER_JUDGMENT -> caseData.setClaimantTseTextBox8("Some text");
-            case CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED -> caseData.setClaimantTseTextBox9("Some text");
-            case CLAIMANT_TSE_RESTRICT_PUBLICITY -> caseData.setClaimantTseTextBox10("Some text");
-            case CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART -> caseData.setClaimantTseTextBox11("Some text");
-            case CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER -> caseData.setClaimantTseTextBox12("Some text");
-            case CLAIMANT_TSE_WITHDRAW_CLAIM -> caseData.setClaimantTseTextBox13("Some text");
-            default -> throw new IllegalArgumentException("Unexpected application type");
+        String applicationType = caseData.getClaimantTseSelectApplication();
+        BiConsumer<CaseData, String> setter = APPLICATION_SETTER_MAP.get(applicationType);
+        if (setter != null) {
+            setter.accept(caseData, "Some text");
+        } else {
+            throw new IllegalArgumentException("Unexpected application type");
         }
     }
 
     private void setDocForSelectedApplication(CaseData caseData) {
-        switch (caseData.getClaimantTseSelectApplication()) {
-            case CLAIMANT_TSE_AMEND_CLAIM -> caseData.setClaimantTseDocument1(createDocumentType());
-            case CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS -> caseData.setClaimantTseDocument2(createDocumentType());
-            case CLAIMANT_TSE_CONSIDER_DECISION_AFRESH -> caseData.setClaimantTseDocument3(createDocumentType());
-            case CLAIMANT_TSE_CONTACT_THE_TRIBUNAL -> caseData.setClaimantTseDocument4(createDocumentType());
-            case CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND -> caseData.setClaimantTseDocument5(createDocumentType());
-            case CLAIMANT_TSE_ORDER_OTHER_PARTY -> caseData.setClaimantTseDocument6(createDocumentType());
-            case CLAIMANT_TSE_POSTPONE_A_HEARING -> caseData.setClaimantTseDocument7(createDocumentType());
-            case CLAIMANT_TSE_RECONSIDER_JUDGMENT -> caseData.setClaimantTseDocument8(createDocumentType());
-            case CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED -> caseData.setClaimantTseDocument9(createDocumentType());
-            case CLAIMANT_TSE_RESTRICT_PUBLICITY -> caseData.setClaimantTseDocument10(createDocumentType());
-            case CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART -> caseData.setClaimantTseDocument11(createDocumentType());
-            case CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER -> caseData.setClaimantTseDocument12(createDocumentType());
-            case CLAIMANT_TSE_WITHDRAW_CLAIM -> caseData.setClaimantTseDocument13(createDocumentType());
-            default -> throw new IllegalArgumentException("Unexpected application type");
+        String applicationType = caseData.getClaimantTseSelectApplication();
+        BiConsumer<CaseData, UploadedDocumentType> setter = DOCUMENT_SETTER_MAP.get(applicationType);
+        if (setter != null) {
+            setter.accept(caseData, createDocumentType());
+        } else {
+            throw new IllegalArgumentException("Unexpected application type");
         }
     }
 

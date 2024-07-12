@@ -115,7 +115,8 @@ public final class ClaimantTellSomethingElseHelper {
             case CLAIMANT_TSE_WITHDRAW_CLAIM -> "withdraw";
             case CLAIMANT_TSE_CONTACT_THE_TRIBUNAL -> "other";
             default ->
-                    throw new IllegalArgumentException(String.format("Unexpected application type %s", selectApplication));
+                    throw new IllegalArgumentException(String.format("Unexpected application type %s",
+                            selectApplication));
         };
     }
 

@@ -42,31 +42,31 @@ public final class ClaimantTellSomethingElseHelper {
     private static final Map<String, String> APPLICATION_TYPE_MAP = new ConcurrentHashMap<>();
 
     static {
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_AMEND_CLAIM", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_AMEND_CLAIM, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument1(), caseData.getClaimantTseTextBox1()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument2(), caseData.getClaimantTseTextBox2()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_CONSIDER_DECISION_AFRESH", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_CONSIDER_DECISION_AFRESH, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument3(), caseData.getClaimantTseTextBox3()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_CONTACT_THE_TRIBUNAL", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_CONTACT_THE_TRIBUNAL, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument4(), caseData.getClaimantTseTextBox4()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument5(), caseData.getClaimantTseTextBox5()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_ORDER_OTHER_PARTY", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_ORDER_OTHER_PARTY, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument6(), caseData.getClaimantTseTextBox6()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_POSTPONE_A_HEARING", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_POSTPONE_A_HEARING, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument7(), caseData.getClaimantTseTextBox7()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_RECONSIDER_JUDGMENT", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_RECONSIDER_JUDGMENT, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument8(), caseData.getClaimantTseTextBox8()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument9(), caseData.getClaimantTseTextBox9()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_RESTRICT_PUBLICITY", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_RESTRICT_PUBLICITY, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument10(), caseData.getClaimantTseTextBox10()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument11(), caseData.getClaimantTseTextBox11()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument12(), caseData.getClaimantTseTextBox12()));
-        APPLICATION_TYPE_DATA_MAP.put("CLAIMANT_TSE_WITHDRAW_CLAIM", caseData ->
+        APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_WITHDRAW_CLAIM, caseData ->
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13()));
     }
 

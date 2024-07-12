@@ -71,7 +71,7 @@ public class DefaultValuesReaderService {
         }
     }
 
-    public void getCaseData(CaseData caseData, DefaultValues defaultValues) {
+    public void setCaseData(CaseData caseData, DefaultValues defaultValues) {
         setPositionType(caseData, defaultValues);
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
         if (caseData.getCaseSource() == null || caseData.getCaseSource().trim().equals("")) {

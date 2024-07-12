@@ -351,7 +351,7 @@ public class Et1ReppedHelper {
     }
 
     private static NewEmploymentType claimantNewEmployment(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getClaimantNewJob()) || caseData.getClaimantNewJob().get(0).equals(NO)) {
+        if (CollectionUtils.isEmpty(caseData.getClaimantNewJob())) {
             return null;
         }
         NewEmploymentType newEmploymentType = new NewEmploymentType();

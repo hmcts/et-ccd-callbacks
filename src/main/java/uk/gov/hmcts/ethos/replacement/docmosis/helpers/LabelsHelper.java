@@ -103,9 +103,9 @@ public final class LabelsHelper {
         }
 
         if (claimantType != null) {
-            getEntityAddress(addressLabelType, claimantType.getClaimantAddressUK());
-            getEntityTelephone(addressLabelType, claimantType.getClaimantPhoneNumber());
-            getEntityFax(addressLabelType, claimantType.getClaimantMobileNumber());
+            setEntityAddress(addressLabelType, claimantType.getClaimantAddressUK());
+            setEntityTelephone(addressLabelType, claimantType.getClaimantPhoneNumber());
+            setEntityFax(addressLabelType, claimantType.getClaimantMobileNumber());
         } else {
             addressLabelType.setFullAddress("");
             addressLabelType.setLabelEntityAddress(new Address());
@@ -160,9 +160,9 @@ public final class LabelsHelper {
         addressLabelType.setFullName(CLAIMANT_REP + nullCheck(representedTypeC.getNameOfRepresentative()));
         addressLabelType.setLabelEntityName01(nullCheck(representedTypeC.getNameOfRepresentative()));
         addressLabelType.setLabelEntityName02(nullCheck(representedTypeC.getNameOfOrganisation()));
-        getEntityAddress(addressLabelType, representedTypeC.getRepresentativeAddress());
-        getEntityTelephone(addressLabelType, representedTypeC.getRepresentativePhoneNumber());
-        getEntityFax(addressLabelType, representedTypeC.getRepresentativeMobileNumber());
+        setEntityAddress(addressLabelType, representedTypeC.getRepresentativeAddress());
+        setEntityTelephone(addressLabelType, representedTypeC.getRepresentativePhoneNumber());
+        setEntityFax(addressLabelType, representedTypeC.getRepresentativeMobileNumber());
 
         if (isNullOrEmpty(nullCheck(representedTypeC.getRepresentativeReference()))) {
             addressLabelType.setLabelEntityReference(REF);
@@ -230,9 +230,9 @@ public final class LabelsHelper {
             addressLabelType.setFullName(RESPONDENT + nullCheck(respondentSumType.getRespondentName()));
             addressLabelType.setLabelEntityName01(nullCheck(respondentSumType.getRespondentName()));
             addressLabelType.setLabelEntityName02("");
-            getEntityAddress(addressLabelType, DocumentHelper.getRespondentAddressET3(respondentSumType));
-            getEntityTelephone(addressLabelType, respondentSumType.getRespondentPhone1());
-            getEntityFax(addressLabelType, respondentSumType.getRespondentPhone2());
+            setEntityAddress(addressLabelType, DocumentHelper.getRespondentAddressET3(respondentSumType));
+            setEntityTelephone(addressLabelType, respondentSumType.getRespondentPhone1());
+            setEntityFax(addressLabelType, respondentSumType.getRespondentPhone2());
             addressLabelType.setLabelEntityReference(REF);
             addressLabelType.setLabelCaseReference(ethosCaseReference);
 
@@ -294,9 +294,9 @@ public final class LabelsHelper {
             addressLabelType.setFullName(RESPONDENT_REP + nullCheck(representedTypeR.getNameOfRepresentative()));
             addressLabelType.setLabelEntityName01(nullCheck(representedTypeR.getNameOfRepresentative()));
             addressLabelType.setLabelEntityName02(nullCheck(representedTypeR.getNameOfOrganisation()));
-            getEntityAddress(addressLabelType, representedTypeR.getRepresentativeAddress());
-            getEntityTelephone(addressLabelType, representedTypeR.getRepresentativePhoneNumber());
-            getEntityFax(addressLabelType, representedTypeR.getRepresentativeMobileNumber());
+            setEntityAddress(addressLabelType, representedTypeR.getRepresentativeAddress());
+            setEntityTelephone(addressLabelType, representedTypeR.getRepresentativePhoneNumber());
+            setEntityFax(addressLabelType, representedTypeR.getRepresentativeMobileNumber());
 
             if (isNullOrEmpty(nullCheck(representedTypeR.getRepresentativeReference()))) {
                 addressLabelType.setLabelEntityReference(REF);
@@ -320,7 +320,7 @@ public final class LabelsHelper {
 
     }
 
-    private static void getEntityAddress(AddressLabelType addressLabelType, Address entityAddress) {
+    private static void setEntityAddress(AddressLabelType addressLabelType, Address entityAddress) {
 
         if (entityAddress != null) {
             addressLabelType.setFullAddress(getFullAddressOneLine(entityAddress).toString());
@@ -333,7 +333,7 @@ public final class LabelsHelper {
 
     }
 
-    private static void getEntityTelephone(AddressLabelType addressLabelType, String telephone) {
+    private static void setEntityTelephone(AddressLabelType addressLabelType, String telephone) {
 
         if (isNullOrEmpty(nullCheck(telephone))) {
             addressLabelType.setLabelEntityTelephone("");
@@ -342,7 +342,7 @@ public final class LabelsHelper {
         }
     }
 
-    private static void getEntityFax(AddressLabelType addressLabelType, String fax) {
+    private static void setEntityFax(AddressLabelType addressLabelType, String fax) {
 
         if (isNullOrEmpty(nullCheck(fax))) {
             addressLabelType.setLabelEntityFax("");

@@ -337,7 +337,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version: '2.2.5'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.16.1'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.16.2'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
 
@@ -428,7 +428,7 @@ dependencies {
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.10.3'
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
+    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.3'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
@@ -490,7 +490,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 306
-pmdTest.maxFailures = 207
+pmdMain.maxFailures = 265
+pmdTest.maxFailures = 183
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

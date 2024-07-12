@@ -22,8 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -47,6 +47,7 @@ class ExcelDocManagementServiceTest {
 
     private MultipleDetails multipleDetails;
     private String userToken;
+    private String caseTypeId;
     private byte[] bytes;
 
     @BeforeEach
@@ -57,6 +58,7 @@ class ExcelDocManagementServiceTest {
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         userToken = "authString";
         bytes = "Bytes to return".getBytes();
+        caseTypeId = multipleDetails.getCaseTypeId();
     }
 
     @Test
@@ -100,7 +102,7 @@ class ExcelDocManagementServiceTest {
                 .thenReturn(uri);
         when(excelCreationService.writeExcel(multipleCollection,
                 subMultipleCollection,
-                multipleDetails.getCaseData().getLeadCase()))
+                multipleDetails.getCaseData().getLeadCase(), userToken, caseTypeId))
                 .thenReturn(bytes);
         excelDocManagementService.generateAndUploadExcel(multipleCollection,
                 userToken, multipleDetails);
@@ -111,7 +113,7 @@ class ExcelDocManagementServiceTest {
         verifyNoMoreInteractions(documentManagementService);
         verify(excelCreationService, times(1)).writeExcel(multipleCollection,
                 subMultipleCollection,
-                multipleDetails.getCaseData().getLeadCase());
+                multipleDetails.getCaseData().getLeadCase(), userToken, caseTypeId);
         verifyNoMoreInteractions(excelCreationService);
         assertEquals("3", multipleDetails.getCaseData().getCaseCounter());
     }
@@ -130,7 +132,7 @@ class ExcelDocManagementServiceTest {
                 .thenReturn(uri);
         when(excelCreationService.writeExcel(multipleCollection,
                 new ArrayList<>(),
-                multipleDetails.getCaseData().getLeadCase()))
+                multipleDetails.getCaseData().getLeadCase(), userToken, caseTypeId))
                 .thenReturn(bytes);
         excelDocManagementService.generateAndUploadExcel(multipleCollection,
                 userToken, multipleDetails);
@@ -143,7 +145,7 @@ class ExcelDocManagementServiceTest {
         verify(excelCreationService, times(1)).writeExcel(
                 multipleCollection,
                 new ArrayList<>(),
-                multipleDetails.getCaseData().getLeadCase());
+                multipleDetails.getCaseData().getLeadCase(), userToken, caseTypeId);
         verifyNoMoreInteractions(excelCreationService);
     }
 
@@ -169,8 +171,8 @@ class ExcelDocManagementServiceTest {
                 multipleDetails.getCaseTypeId());
         verify(scheduleCreationService, times(1))
                 .writeSchedule(multipleDetails.getCaseData(),
-                    new ArrayList<>(),
-                    new TreeMap<>());
+                        new ArrayList<>(),
+                        new TreeMap<>());
         verifyNoMoreInteractions(excelCreationService);
     }
 

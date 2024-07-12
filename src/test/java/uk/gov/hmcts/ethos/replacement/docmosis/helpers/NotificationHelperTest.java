@@ -28,6 +28,7 @@ class NotificationHelperTest {
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
             .withClaimantIndType("Claimant", "LastName", "Mr", "Mr")
+            .withClaimant("Claimant LastName")
             .withRespondentWithAddress("Respondent Unrepresented",
                 "32 Sweet Street", "14 House", null,
                 "Manchester", "M11 4ED", "United Kingdom",
@@ -61,53 +62,30 @@ class NotificationHelperTest {
 
     @Test
     void buildMapForClaimant_withRepresentedClaimant_shouldReturnClaimantRepDetails() {
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
+        Map<String, String> actual = NotificationHelper.buildMapForClaimantRepresentative(caseData);
 
         assertThat(actual).containsEntry("emailAddress", "claimant@represented.com")
-            .containsEntry("name", "C Rep")
+            .containsEntry("name", "Claimant Rep")
             .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
     void buildMapForClaimant_withRepresentedClaimantWithNoEmail_shouldReturnClaimantRepDetails() {
         caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
+        Map<String, String> actual = NotificationHelper.buildMapForClaimantRepresentative(caseData);
 
         assertThat(actual).containsEntry("emailAddress", "")
-            .containsEntry("name", "C Rep")
+            .containsEntry("name", "Claimant Rep")
             .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
-    void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithTitle() {
+    void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetails() {
         caseData.setRepresentativeClaimantType(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
         assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
-            .containsEntry("name", "Mr LastName")
-            .containsEntry("caseNumber", "12345/6789");
-    }
-
-    @Test
-    void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithPreferredTitle() {
-        caseData.setRepresentativeClaimantType(null);
-        caseData.getClaimantIndType().setClaimantTitle(null);
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
-
-        assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
-            .containsEntry("name", "Mr LastName")
-            .containsEntry("caseNumber", "12345/6789");
-    }
-
-    @Test
-    void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithInitial() {
-        caseData.setRepresentativeClaimantType(null);
-        caseData.getClaimantIndType().setClaimantTitle(null);
-        caseData.getClaimantIndType().setClaimantPreferredTitle(null);
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
-
-        assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
-            .containsEntry("name", "C LastName")
+            .containsEntry("name", "Claimant LastName")
             .containsEntry("caseNumber", "12345/6789");
     }
 

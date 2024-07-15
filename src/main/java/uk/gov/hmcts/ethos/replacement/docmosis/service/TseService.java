@@ -237,8 +237,33 @@ public class TseService {
         caseData.setClaimantTseRule92(null);
         caseData.setClaimantTseRule92AnsNoGiveDetails(null);
 
-        caseData.setClaimantTseDocument13(null);
+        caseData.setClaimantTseTextBox1(null);
+        caseData.setClaimantTseTextBox2(null);
+        caseData.setClaimantTseTextBox3(null);
+        caseData.setClaimantTseTextBox4(null);
+        caseData.setClaimantTseTextBox5(null);
+        caseData.setClaimantTseTextBox6(null);
+        caseData.setClaimantTseTextBox7(null);
+        caseData.setClaimantTseTextBox8(null);
+        caseData.setClaimantTseTextBox9(null);
+        caseData.setClaimantTseTextBox10(null);
+        caseData.setClaimantTseTextBox11(null);
+        caseData.setClaimantTseTextBox12(null);
         caseData.setClaimantTseTextBox13(null);
+
+        caseData.setClaimantTseDocument1(null);
+        caseData.setClaimantTseDocument2(null);
+        caseData.setClaimantTseDocument3(null);
+        caseData.setClaimantTseDocument4(null);
+        caseData.setClaimantTseDocument5(null);
+        caseData.setClaimantTseDocument6(null);
+        caseData.setClaimantTseDocument7(null);
+        caseData.setClaimantTseDocument8(null);
+        caseData.setClaimantTseDocument9(null);
+        caseData.setClaimantTseDocument10(null);
+        caseData.setClaimantTseDocument11(null);
+        caseData.setClaimantTseDocument12(null);
+        caseData.setClaimantTseDocument13(null);
     }
 
     /**

@@ -133,19 +133,17 @@ public class MultipleCreationService {
         List<SubmitEvent> cases = ccdClient.retrieveCasesElasticSearch(token, singleCaseTypeId, caseIds);
         log.info("Retrieved {} cases from ES when adding legalreps to newly created multiple", cases.size());
 
-        List<String> orgIds = getUniqueOrganisations(cases);
-
-        List<OrganisationUsersIdamUser> users = orgIds.stream()
-            .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
-            .flatMap(o -> o.getBody().getUsers().stream())
-            .toList();
-
         Map<Long, List<String>> emails = getUniqueLegalRepEmails(cases);
 
         if (emails.isEmpty()) {
             // No need to ask message-handler to update permissions if all cases have no legal reps
             return;
         }
+        List<String> orgIds = getUniqueOrganisations(cases);
+        List<OrganisationUsersIdamUser> users = orgIds.stream()
+                .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
+                .flatMap(o -> o.getBody().getUsers().stream())
+                .toList();
 
         Map<String, String> legalrepMap = buildEmailIdMap(users);
 
@@ -343,10 +341,9 @@ public class MultipleCreationService {
 
         MultipleData multipleData = multipleDetails.getCaseData();
 
-        if (multipleData.getMultipleReference() == null
-                || multipleData.getMultipleReference().trim().equals("")) {
+        if (StringUtils.isBlank(multipleData.getMultipleReference())) {
 
-            log.info("Case Type: " + multipleDetails.getCaseTypeId());
+            log.info("Case Type: {}", multipleDetails.getCaseTypeId());
 
             return multipleReferenceService.createReference(multipleDetails.getCaseTypeId());
 
@@ -358,14 +355,9 @@ public class MultipleCreationService {
     }
 
     private void addDataToMultiple(MultipleData multipleData) {
-
-        if (multipleData.getMultipleSource() == null
-                || multipleData.getMultipleSource().trim().isEmpty()) {
-
+        if (StringUtils.isBlank(multipleData.getMultipleSource())) {
             multipleData.setMultipleSource(MANUALLY_CREATED_POSITION);
-
         }
-
     }
 
     private void setLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {

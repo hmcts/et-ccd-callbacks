@@ -47,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstan
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.WORKING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantHearingPreferencesValidator.PHONE_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantHearingPreferencesValidator.VIDEO_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.UNEXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
@@ -350,13 +351,13 @@ public class Et1ReppedHelper {
     }
 
     private static NewEmploymentType claimantNewEmployment(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getClaimantNewJob()) || caseData.getClaimantNewJob().get(0).equals(NO)) {
+        if (CollectionUtils.isEmpty(caseData.getClaimantNewJob())) {
             return null;
         }
         NewEmploymentType newEmploymentType = new NewEmploymentType();
         newEmploymentType.setNewJob(getFirstListItem(caseData.getClaimantNewJob()));
         newEmploymentType.setNewlyEmployedFrom(caseData.getClaimantNewJobStartDate());
-        newEmploymentType.setNewPayBeforeTax(caseData.getClaimantNewJobPayBeforeTax());
+        newEmploymentType.setNewPayBeforeTax(formatPay(caseData.getClaimantNewJobPayBeforeTax()));
         newEmploymentType.setNewJobPayInterval(getFirstListItem(caseData.getClaimantNewJobPayPeriod()));
         return newEmploymentType;
     }
@@ -385,19 +386,19 @@ public class Et1ReppedHelper {
             }
         }
         claimantOtherType.setClaimantAverageWeeklyHours(caseData.getClaimantAverageWeeklyWorkHours());
-        claimantOtherType.setClaimantPayBeforeTax(caseData.getClaimantPayBeforeTax());
-        claimantOtherType.setClaimantPayAfterTax(caseData.getClaimantPayAfterTax());
+        claimantOtherType.setClaimantPayBeforeTax(formatPay(caseData.getClaimantPayBeforeTax()));
+        claimantOtherType.setClaimantPayAfterTax(formatPay(caseData.getClaimantPayAfterTax()));
         claimantOtherType.setClaimantPayCycle(CollectionUtils.isEmpty(caseData.getClaimantPayType())
                                               || caseData.getClaimantPayType().get(0).equals(
                 NOT_SURE)
-                ? null
+                ? EMPTY_STRING
                 : PAY_PERIODS.get(getFirstListItem(caseData.getClaimantPayType())));
         claimantOtherType.setClaimantPensionContribution(
                 CollectionUtils.isEmpty(caseData.getClaimantPensionContribution())
                 || caseData.getClaimantPensionContribution().get(0).equals(NOT_SURE)
-                ? null
+                ? EMPTY_STRING
                 : caseData.getClaimantPensionContribution().get(0));
-        claimantOtherType.setClaimantPensionWeeklyContribution(caseData.getClaimantWeeklyPension());
+        claimantOtherType.setClaimantPensionWeeklyContribution(formatPay(caseData.getClaimantWeeklyPension()));
         claimantOtherType.setClaimantBenefits(getFirstListItem(caseData.getClaimantEmployeeBenefits()));
         claimantOtherType.setClaimantBenefitsDetail(caseData.getClaimantBenefits());
         return claimantOtherType;
@@ -606,5 +607,15 @@ public class Et1ReppedHelper {
             return Collections.singletonList("Please provide details of the claim");
         }
         return Collections.emptyList();
+    }
+
+    private static String formatPay(String pay) {
+        if (isNullOrEmpty(pay)) {
+            return null;
+        } else if (pay.length() < 3) {
+            return pay;
+        } else {
+            return pay.substring(0, pay.length() - 2);
+        }
     }
 }

@@ -12,7 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
@@ -28,7 +28,7 @@ class MultipleAmendLeadCaseServiceTest {
     @InjectMocks
     private MultipleAmendLeadCaseService multipleAmendLeadCaseService;
 
-    private TreeMap<String, Object> multipleObjects;
+    private SortedMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
     private String userToken;
 

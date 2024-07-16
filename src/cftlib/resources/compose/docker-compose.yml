@@ -13,7 +13,7 @@ services:
       GOV_NOTIFY_API_KEY:
       SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:6432/evidence
       SPRING_DATASOURCE_USERNAME: "postgres"
-      SPRING_DATASOURCE_PASSWORD: "postgres"
+      SPRING_DATASOURCE_PASSWORD: "${ET_COS_CFTLIB_DB_PASSWORD}"
       ENABLE_AZURE_STORAGE_CONTAINER: "true"
       ENABLE_POSTGRES_BLOB_STORAGE: "false"
       STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azure-storage-emulator-azurite:10000/devstoreaccount1"

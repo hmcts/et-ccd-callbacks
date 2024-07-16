@@ -11,6 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +42,7 @@ class MultipleUpdateServiceTest {
     @InjectMocks
     private MultipleUpdateService multipleUpdateService;
 
-    private TreeMap<String, Object> multipleObjectsFlags;
+    private SortedMap<String, Object> multipleObjectsFlags;
     private MultipleDetails multipleDetails;
     private String userToken;
 

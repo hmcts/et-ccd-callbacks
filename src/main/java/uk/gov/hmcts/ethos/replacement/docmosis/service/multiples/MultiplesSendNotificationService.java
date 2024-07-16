@@ -32,6 +32,7 @@ import java.util.SortedMap;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_LEAD;
@@ -161,6 +162,7 @@ public class MultiplesSendNotificationService {
                 .multipleRef(multipleData.getMultipleReference())
                 .ethosCaseRefCollection(ethosCaseRefCollection)
                 .username(username)
+                .confirmation(NO)
                 .build();
     }
 

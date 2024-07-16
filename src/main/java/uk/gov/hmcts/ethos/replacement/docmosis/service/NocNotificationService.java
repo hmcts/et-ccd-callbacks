@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildRespondentPersonalisation;
@@ -53,7 +54,9 @@ public class NocNotificationService {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
-        sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
+        if (!isClaimantNonSystemUser(caseDataPrevious)) {
+            sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
+        }
 
         if (changeRequest.getOrganisationToRemove() != null) {
             String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();

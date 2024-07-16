@@ -301,36 +301,36 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void caseDataDefaultsClaimantDocs() {
-        DocumentTypeItem et1Doc = new DocumentTypeItem();
-        et1Doc.setId(UUID.randomUUID().toString());
-        DocumentType et1DocType = new DocumentType();
-        et1DocType.setShortDescription("et1Description");
-        et1DocType.setTypeOfDocument(ET1_DOC_TYPE);
-        et1DocType.setCreationDate("creationDate");
-        et1Doc.setValue(et1DocType);
-        DocumentTypeItem et1Attachment = new DocumentTypeItem();
-        et1Attachment.setId(UUID.randomUUID().toString());
-        DocumentType et1AttachmentType = new DocumentType();
-        et1AttachmentType.setShortDescription("et1AttachmentDesc");
-        et1AttachmentType.setTypeOfDocument(ET1_ATTACHMENT_DOC_TYPE);
-        et1AttachmentType.setCreationDate("creationDateAttachment");
-        et1Attachment.setValue(et1AttachmentType);
-        DocumentTypeItem acas = new DocumentTypeItem();
-        acas.setId(UUID.randomUUID().toString());
-        DocumentType acasType = new DocumentType();
-        acasType.setShortDescription("acasDesc");
-        acasType.setTypeOfDocument(ACAS_DOC_TYPE);
-        acasType.setCreationDate("creationDateAcas");
-        acas.setValue(acasType);
+        DocumentTypeItem et1Doc = DocumentTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(DocumentType.builder()
+                        .startingClaimDocuments(ET1_DOC_TYPE)
+                        .build())
+                .build();
+        DocumentTypeItem et1Attachment = DocumentTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(DocumentType.builder()
+                        .startingClaimDocuments(ET1_ATTACHMENT_DOC_TYPE)
+                        .build())
+                .build();
+        DocumentTypeItem acas = DocumentTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(DocumentType.builder()
+                        .startingClaimDocuments(ACAS_DOC_TYPE)
+                        .build())
+                .build();
+
+        DocumentTypeItem hiddenClaimantDoc = DocumentTypeItem.builder()
+                .value(DocumentType.builder()
+                        .startingClaimDocuments("ET1 Vetting")
+                        .build())
+                .build();
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
-        caseData.setDocumentCollection(List.of(et1Doc, et1Attachment, acas));
+        caseData.setDocumentCollection(List.of(et1Doc, et1Attachment, acas, hiddenClaimantDoc));
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals("et1Description", caseData.getClaimantDocumentCollection()
-                .get(0).getValue().getShortDescription());
-        assertEquals("et1AttachmentDesc", caseData.getClaimantDocumentCollection()
-                .get(1).getValue().getShortDescription());
-        assertEquals("acasDesc", caseData.getClaimantDocumentCollection().get(2)
-                .getValue().getShortDescription());
+        assertEquals(3, caseData.getClaimantDocumentCollection().size());
+        assertTrue(caseData.getClaimantDocumentCollection().stream().noneMatch(d -> "ET1 Vetting".equals(
+                d.getValue().getStartingClaimDocuments())));
     }
 
     @Test

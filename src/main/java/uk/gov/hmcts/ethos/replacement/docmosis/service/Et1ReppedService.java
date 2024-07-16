@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -84,7 +83,7 @@ public class Et1ReppedService {
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
             TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER,
-            TribunalOffice.NEWCASTLE);
+            TribunalOffice.NEWCASTLE, TribunalOffice.WATFORD, TribunalOffice.WALES, TribunalOffice.MIDLANDS_WEST);
 
     /**
      * Validates the postcode and region.
@@ -182,7 +181,9 @@ public class Et1ReppedService {
             et1Attachment.setCategoryId(DocumentCategory.ET1_ATTACHMENT.getCategory());
             documentList.add(createDocumentTypeItem(caseData.getEt1SectionThreeDocumentUpload(), ET1_ATTACHMENT));
         }
-        documentList.addAll(acasCertificates);
+        if (CollectionUtils.isNotEmpty(acasCertificates)) {
+            documentList.addAll(acasCertificates);
+        }
         caseData.setClaimantDocumentCollection(documentList);
         caseData.setDocumentCollection(documentList);
         DocumentHelper.setDocumentNumbers(caseData);
@@ -254,8 +255,8 @@ public class Et1ReppedService {
                 .map(acasNumber -> {
                     try {
                         return acasService.getAcasCertificates(caseData, acasNumber, userToken, caseTypeId);
-                    } catch (JsonProcessingException e) {
-                        log.error("Failed to retrieve ACAS Certificate", e);
+                    } catch (Exception e) {
+                        log.error("Failed to process ACAS Certificate {}", acasNumber, e);
                         return null;
                     }
                 })

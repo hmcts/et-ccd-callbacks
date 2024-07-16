@@ -22,6 +22,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -60,6 +62,8 @@ class ReplyToReferralControllerTest {
     private static final String VALIDATE_EMAIL_URL = "/replyReferral/validateReplyToEmail";
 
     @MockBean
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private UserIdamService userIdamService;
@@ -71,6 +75,8 @@ class ReplyToReferralControllerTest {
     private EmailService emailService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private DigitalCaseFileService digitalCaseFileService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -92,7 +98,7 @@ class ReplyToReferralControllerTest {
             .build();
 
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        DynamicFixedListType selectReferralList = 
+        DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");

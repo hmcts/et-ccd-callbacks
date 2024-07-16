@@ -183,7 +183,7 @@ class Et1ReppedServiceTest {
     private static Stream<Arguments> validatePostcodes() {
         return Stream.of(
                 Arguments.of("LS16 6NB", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
-                Arguments.of("B1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, NO),
+                Arguments.of("B1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
                 Arguments.of("EH1 1AA", ENGLANDWALES_CASE_TYPE_ID, 1, NO),
                 Arguments.of("RM1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
                 Arguments.of("EC1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
@@ -258,6 +258,32 @@ class Et1ReppedServiceTest {
         when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
         assertDoesNotThrow(() -> et1ReppedService.createAndUploadEt1Docs(caseDetails, "authToken"));
         assertEquals(2, caseDetails.getCaseData().getDocumentCollection().size());
+    }
+
+    @Test
+    void shouldAddDocsIfAcasCertThrowsError() throws Exception {
+        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
+        caseDetails.getCaseData().setRespondentAcasNumber("123456");
+        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
+        et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
+
+        DocumentInfo documentInfo = DocumentInfo.builder()
+                .description("ET1 - John Doe")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+                .thenReturn(documentInfo);
+        UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
+                .withUrl("http://test.com/documents/random-uuid")
+                .withFilename("ET1 - John Doe.pdf")
+                .build();
+        when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
+        when(acasService.getAcasCertificates(any(), anyString(), anyString(), anyString()))
+                .thenThrow(new IllegalArgumentException("Error"));
+
+        assertDoesNotThrow(() -> et1ReppedService.createAndUploadEt1Docs(caseDetails, "authToken"));
+        assertEquals(1, caseDetails.getCaseData().getDocumentCollection().size());
     }
 
     @Test

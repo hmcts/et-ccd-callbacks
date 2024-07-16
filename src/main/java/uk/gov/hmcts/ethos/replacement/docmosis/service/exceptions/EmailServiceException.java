@@ -1,9 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions;
 
+import java.io.Serial;
+
 /**
  * Is thrown when email service failed to send email.
  */
 public class EmailServiceException extends RuntimeException {
+    @Serial
+    private static final long serialVersionUID = Long.MIN_VALUE;
+
     /**
      * Creates a {@link EmailServiceException} with a message and a cause.
      * @param msg a message explaining why this exception is thrown

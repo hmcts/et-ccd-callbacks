@@ -10,7 +10,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,7 +25,7 @@ class MultipleBatchUpdate1ServiceTest {
     @InjectMocks
     private MultipleBatchUpdate1Service multipleBatchUpdate1Service;
 
-    private TreeMap<String, Object> multipleObjectsFlags;
+    private SortedMap<String, Object> multipleObjectsFlags;
     private MultipleDetails multipleDetails;
     private String userToken;
 

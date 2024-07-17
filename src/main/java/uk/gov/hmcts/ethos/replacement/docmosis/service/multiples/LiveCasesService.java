@@ -30,9 +30,10 @@ public class LiveCasesService {
             return;
         }
         if (YES.equals(multipleData.getLiveCases())) {
-            log.info("Filtering live submitEvents");
+            log.info("Filtering live cases");
             List<String> ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
-            log.info("Retrieving data from single submitEvents");
+
+            log.info("Retrieving data from single cases");
             List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(
                     userToken,
                     caseTypeId,
@@ -45,9 +46,9 @@ public class LiveCasesService {
                     .toList();
 
             if (closedCases.isEmpty()) {
-                log.warn("No closed submitEvents found");
+                log.warn("No closed cases found");
             } else {
-                log.info("Removing closed submitEvents");
+                log.info("Removing closed cases");
                 closedCases.forEach(multipleObjects::remove);
             }
         }

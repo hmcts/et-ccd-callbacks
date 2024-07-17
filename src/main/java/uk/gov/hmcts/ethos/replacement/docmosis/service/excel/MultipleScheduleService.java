@@ -70,7 +70,7 @@ public class MultipleScheduleService {
 
         } else {
 
-            log.warn("Pull information from single cases");
+            log.info("Pull information from single cases");
 
             List<String> sortedCaseIdsCollection =
                     sortCollectionByEthosCaseRef(getCaseIdCollectionFromFilter(multipleObjects, filterExcelType));
@@ -80,13 +80,14 @@ public class MultipleScheduleService {
                             sortedCaseIdsCollection, errors);
 
             if (featureToggleService.isMultiplesEnabled() && YES.equals(multipleData.getLiveCases())) {
-                log.warn("Filtering live cases");
+                log.info("Filtering live cases");
                 schedulePayloads = schedulePayloads.stream()
                         .filter(schedulePayload -> !CLOSED_STATE.equals(schedulePayload.getState()))
                         .toList();
+                multipleData.setLiveCases(null);
             }
 
-            log.warn("Generate schedule");
+            log.info("Generate schedule");
 
             documentInfo = generateSchedule(userToken, multipleObjects, multipleDetails, schedulePayloads, errors);
 

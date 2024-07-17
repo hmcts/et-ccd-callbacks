@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,8 @@ class MultipleScheduleServiceTest {
     private SingleCasesReadingService singleCasesReadingService;
     @Mock
     private ExcelDocManagementService excelDocManagementService;
+    @Mock
+    FeatureToggleService featureToggleService;
     @InjectMocks
     private MultipleScheduleService multipleScheduleService;
 

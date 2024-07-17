@@ -6,6 +6,7 @@ import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadES;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadES;
+import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantIndType;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -40,7 +42,8 @@ public final class MultiplesScheduleHelper {
     private MultiplesScheduleHelper() {
     }
 
-    public static SchedulePayload getSchedulePayloadFromSchedulePayloadES(SchedulePayloadES submitEventES) {
+    public static SchedulePayload getSchedulePayloadFromSchedulePayloadES(SchedulePayloadEvent schedulePayloadEvent) {
+        SchedulePayloadES submitEventES = schedulePayloadEvent.getSchedulePayloadES();
         return SchedulePayload.builder()
                 .ethosCaseRef(nullCheck(submitEventES.getEthosCaseReference()))
                 .claimantName(nullCheck(getClaimantName(submitEventES.getClaimantCompany(),
@@ -60,6 +63,7 @@ public final class MultiplesScheduleHelper {
                         ADDRESS_LINE3)))
                 .respondentTown(nullCheck(getRespondentData(submitEventES.getRespondentCollection(), TOWN)))
                 .respondentPostCode(nullCheck(getRespondentData(submitEventES.getRespondentCollection(), POSTCODE)))
+                .state(nullCheck(schedulePayloadEvent.getState()))
                 .build();
     }
 
@@ -112,11 +116,11 @@ public final class MultiplesScheduleHelper {
 
     private static String getScheduleAddress(String field, Address address) {
         return switch (field) {
-            case ADDRESS_LINE1 -> address.getAddressLine1() != null ? address.getAddressLine1() : "";
-            case ADDRESS_LINE2 -> address.getAddressLine2() != null ? address.getAddressLine2() : "";
-            case ADDRESS_LINE3 -> address.getAddressLine3() != null ? address.getAddressLine3() : "";
-            case TOWN -> address.getPostTown() != null ? address.getPostTown() : "";
-            default -> address != null ? address.getPostCode() : "";
+            case ADDRESS_LINE1 -> Optional.ofNullable(address.getAddressLine1()).orElse("");
+            case ADDRESS_LINE2 -> Optional.ofNullable(address.getAddressLine2()).orElse("");
+            case ADDRESS_LINE3 -> Optional.ofNullable(address.getAddressLine3()).orElse("");
+            case TOWN -> Optional.ofNullable(address.getPostTown()).orElse("");
+            default -> Optional.ofNullable(address).map(Address::getPostCode).orElse("");
         };
     }
 

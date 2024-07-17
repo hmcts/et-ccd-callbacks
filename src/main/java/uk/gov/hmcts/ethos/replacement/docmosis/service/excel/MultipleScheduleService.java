@@ -6,10 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.ScheduleCallable;
 
 import java.util.ArrayList;
@@ -22,7 +24,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class MultipleScheduleService {
     private final ExcelReadingService excelReadingService;
     private final SingleCasesReadingService singleCasesReadingService;
     private final ExcelDocManagementService excelDocManagementService;
+    private final FeatureToggleService featureToggleService;
 
     public static final int ES_PARTITION_SIZE = 500;
     public static final int THREAD_NUMBER = 20;
@@ -40,14 +45,15 @@ public class MultipleScheduleService {
     public DocumentInfo bulkScheduleLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
         log.info("Read excel for schedule logic");
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         FilterExcelType filterExcelType =
-                MultiplesScheduleHelper.getFilterExcelTypeByScheduleDoc(multipleDetails.getCaseData());
+                MultiplesScheduleHelper.getFilterExcelTypeByScheduleDoc(multipleData);
 
         SortedMap<String, Object> multipleObjects =
                 excelReadingService.readExcel(
                         userToken,
-                        MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
+                        MultiplesHelper.getExcelBinaryUrl(multipleData),
                         errors,
                         multipleDetails.getCaseData(),
                         filterExcelType);
@@ -64,7 +70,7 @@ public class MultipleScheduleService {
 
         } else {
 
-            log.info("Pull information from single cases");
+            log.warn("Pull information from single cases");
 
             List<String> sortedCaseIdsCollection =
                     sortCollectionByEthosCaseRef(getCaseIdCollectionFromFilter(multipleObjects, filterExcelType));
@@ -73,7 +79,14 @@ public class MultipleScheduleService {
                     getSchedulePayloadCollection(userToken, multipleDetails.getCaseTypeId(),
                             sortedCaseIdsCollection, errors);
 
-            log.info("Generate schedule");
+            if (featureToggleService.isMultiplesEnabled() && YES.equals(multipleData.getLiveCases())) {
+                log.warn("Filtering live cases");
+                schedulePayloads = schedulePayloads.stream()
+                        .filter(schedulePayload -> !CLOSED_STATE.equals(schedulePayload.getState()))
+                        .toList();
+            }
+
+            log.warn("Generate schedule");
 
             documentInfo = generateSchedule(userToken, multipleObjects, multipleDetails, schedulePayloads, errors);
 
@@ -117,7 +130,7 @@ public class MultipleScheduleService {
 
         List<Future<HashSet<SchedulePayload>>> resultList = new ArrayList<>();
 
-        log.info("CaseIdCollectionSize: " + caseIdCollection.size());
+        log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
 
         for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
 
@@ -136,7 +149,7 @@ public class MultipleScheduleService {
 
                 HashSet<SchedulePayload> schedulePayloads = fut.get();
 
-                log.info("PartialSize: " + schedulePayloads.size());
+                log.info("PartialSize: {}", schedulePayloads.size());
 
                 result.addAll(schedulePayloads);
 
@@ -154,7 +167,7 @@ public class MultipleScheduleService {
 
         executor.shutdown();
 
-        log.info("ResultSize: " + result.size());
+        log.info("ResultSize: {}", result.size());
 
         return result;
 

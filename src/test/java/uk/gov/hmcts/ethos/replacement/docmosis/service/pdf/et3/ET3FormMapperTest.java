@@ -200,7 +200,8 @@ class ET3FormMapperTest {
     @SneakyThrows
     void testMapRespondent(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData)) {
-            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3)).hasMessage(TEST_PDF_CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE);
+            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3))
+                    .hasMessage(TEST_PDF_CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE);
             return;
         }
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {

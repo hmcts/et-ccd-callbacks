@@ -66,7 +66,8 @@ class PdfBoxServiceTest {
             CaseData caseData, String userToken, String caseTypeId, String documentName, String pdfTemplate) {
         if (ObjectUtils.isEmpty(caseData)) {
             assertThatThrownBy(() -> pdfBoxService.generatePdfDocumentInfo(caseData, userToken, caseTypeId,
-                    documentName, pdfTemplate, SUBMIT_ET3)).hasMessage(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
+                    documentName, pdfTemplate, SUBMIT_ET3))
+                    .hasMessage(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
             return;
         }
         if (isExceptionThrownForEmptyValueWithExpectedMessage(userToken, PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY,

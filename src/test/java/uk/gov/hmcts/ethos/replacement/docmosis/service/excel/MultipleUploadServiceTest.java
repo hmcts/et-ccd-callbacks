@@ -86,7 +86,7 @@ class MultipleUploadServiceTest {
 
         assertEquals(ERROR_SHEET_NUMBER_ROWS + multipleDetails.getCaseData().getCaseIdCollection().size(),
                 errors.get(0));
-        assertEquals(ERROR_SHEET_NUMBER_COLUMNS + MultiplesHelper.HEADERS.size(),
+        assertEquals(ERROR_SHEET_NUMBER_COLUMNS + MultiplesHelper.getHeaders().size(),
                 errors.get(1));
     }
 

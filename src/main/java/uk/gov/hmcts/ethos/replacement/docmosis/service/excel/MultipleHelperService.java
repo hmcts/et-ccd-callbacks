@@ -66,7 +66,11 @@ public class MultipleHelperService {
                         newLeadCase));
                 if (featureToggleService.isMultiplesEnabled()) {
                     multipleData.setLeadCaseId(leadCaseId);
-                    multipleData.setLeadEthosCaseRef(newLeadCase);
+                    multipleData.setLeadEthosCaseRef(newLeadCase); 
+                }
+
+                if (featureToggleService.isMul2Enabled()) {
+                    multipleData.setNextListedDate(submitEvent.getCaseData().getNextListedDate());
                 }
 
             } else {
@@ -94,21 +98,21 @@ public class MultipleHelperService {
                         caseTypeId,
                         multipleRef);
 
-        if (!multipleEvents.isEmpty()) {
+        if (multipleEvents.isEmpty()) {
+            errors.add("Multiple " + multipleRef + " does not exist");
+        } else {
 
             SubmitMultipleEvent multipleEvent = multipleEvents.get(0);
 
-            if (!multipleEvent.getState().equals(TRANSFERRED_STATE)) {
+            if (multipleEvent.getState().equals(TRANSFERRED_STATE)) {
+                errors.add("Multiple " + multipleRef
+                        + " has been transferred. The case cannot be moved to this multiple");
+            } else {
                 validateSubMultiple(subMultipleName,
                         multipleEvent.getCaseData().getSubMultipleCollection(),
                         errors,
                         multipleRef);
-            } else {
-                errors.add("Multiple " + multipleRef
-                        + " has been transferred. The case cannot be moved to this multiple");
             }
-        } else {
-            errors.add("Multiple " + multipleRef + " does not exist");
         }
     }
 
@@ -212,7 +216,8 @@ public class MultipleHelperService {
 
     }
 
-    public void sendCreationUpdatesToSinglesWithoutConfirmation(String userToken, String caseTypeId,
+    public void sendCreationUpdatesToSinglesWithoutConfirmation(String userToken,
+                                                                String caseTypeId,
                                                                 String jurisdiction,
                                                                 MultipleData updatedMultipleData,
                                                                 List<String> errors,

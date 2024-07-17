@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -77,9 +78,7 @@ class NocNotificationServiceTest {
             .withRespondent("Respondent", YES, "2022-03-01", "res@rep.com", false)
             .withChangeOrganisationRequestField(
                 organisationToAdd,
-                organisationToRemove,
-                null,
-                null,
+                organisationToRemove, null,
                 null)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -101,9 +100,7 @@ class NocNotificationServiceTest {
                 "res@rep.com", false)
             .withChangeOrganisationRequestField(
                 organisationToAdd,
-                organisationToRemove,
-                null,
-                null,
+                organisationToRemove, null,
                 null)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -142,12 +139,43 @@ class NocNotificationServiceTest {
                 caseDetailsBefore,
                 caseDetailsNew,
                 caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
-        // Claimant
-        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
+        // Claimant rep emails to be done in another ticket
+        verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
         verify(emailService, times(1)).sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
         //Old Representative
         verify(emailService, times(1)).sendEmail(any(), eq(OLD_ORG_ADMIN_EMAIL), any());
+        // Tribunal
+        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
+        // Respondent
+        verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), any());
+    }
+
+    @Test
+    void sendNotificationsShouldSendFiveNotifications_NoSuperUserEmail() {
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse1 = RetrieveOrgByIdResponse.builder().build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(OLD_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse1));
+
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse2 = RetrieveOrgByIdResponse.builder().build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(NEW_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse2));
+
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Respondent");
+        respondentSumType.setRespondentEmail("res@rep.com");
+        when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
+        when(emailService.getCitizenCaseLink(any())).thenReturn("http://domain/citizen-hub/1234");
+        nocNotificationService.sendNotificationOfChangeEmails(
+                caseDetailsBefore,
+                caseDetailsNew,
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+        // Claimant rep emails to be done in another ticket
+        verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
+        //New Representative
+        verify(emailService, never()).sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
+        //Old Representative
+        verify(emailService, never()).sendEmail(any(), eq(OLD_ORG_ADMIN_EMAIL), any());
         // Tribunal
         verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
         // Respondent

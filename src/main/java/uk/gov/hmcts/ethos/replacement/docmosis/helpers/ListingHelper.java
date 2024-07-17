@@ -353,7 +353,7 @@ public final class ListingHelper {
             sb.append("{\"date\":\"").append(listingEntry.getKey()).append(NEW_LINE);
             sb.append("\"case_total\":\"").append(listingEntry.getValue().size()).append(NEW_LINE);
             sb.append(LISTING_NEWLINE);
-            getListingEntry(listingData, caseType, sb, entries, listingEntry);
+            setListingEntry(listingData, caseType, sb, entries, listingEntry);
         }
         return sb;
     }
@@ -451,12 +451,12 @@ public final class ListingHelper {
             String hearingRoomOrVenue = byRoom ? "Hearing_room" : "Hearing_venue";
             sb.append("{\"").append(hearingRoomOrVenue).append("\":\"").append(listingEntry.getKey()).append(NEW_LINE)
                     .append(LISTING_NEWLINE);
-            getListingEntry(listingData, caseType, sb, entries, listingEntry);
+            setListingEntry(listingData, caseType, sb, entries, listingEntry);
         }
         return sb;
     }
 
-    private static void getListingEntry(ListingData listingData, String caseType, StringBuilder sb,
+    private static void setListingEntry(ListingData listingData, String caseType, StringBuilder sb,
                                         Iterator<Map.Entry<String, List<ListingTypeItem>>> entries,
                                         Map.Entry<String, List<ListingTypeItem>> listingEntry) {
         for (int i = 0; i < listingEntry.getValue().size(); i++) {

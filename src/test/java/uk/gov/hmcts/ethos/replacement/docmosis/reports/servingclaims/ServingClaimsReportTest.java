@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.listing.types.ClaimServedTypeItem;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -258,7 +257,7 @@ class ServingClaimsReportTest {
                 .get(0).getValue().getClaimServedItems();
         List<ClaimServedTypeItem> expectedDay6PlusItems = claimServedItems.stream()
             .filter(x -> Integer.parseInt(x.getValue().getReportedNumberOfDays()) >= 5)
-                .collect(Collectors.toList());
+                .toList();
         ClaimServedTypeItem firstClaimServedItem = expectedDay6PlusItems.get(0);
 
         String reportedNumberOfDays = firstClaimServedItem.getValue().getReportedNumberOfDays();

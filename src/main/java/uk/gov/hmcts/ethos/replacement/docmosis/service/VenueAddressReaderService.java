@@ -24,12 +24,12 @@ public class VenueAddressReaderService {
     }
 
     public String getVenueAddress(HearingType hearingType, String caseTypeId, String managingOffice) {
-        String hearingVenue = getHearingVenue(hearingType, caseTypeId);
         List<VenueAddress> venueAddressList  = venueAddressesService.getTribunalVenueAddresses(managingOffice);
 
         if (CollectionUtils.isEmpty(venueAddressList)) {
             throw new VenueAddressReaderException("Venue address list not found for " + managingOffice);
         }
+        String hearingVenue = getHearingVenue(hearingType, caseTypeId);
 
         VenueAddress venueAddressItem = venueAddressList.stream()
                 .filter(v -> v.getVenue().equals(hearingVenue))

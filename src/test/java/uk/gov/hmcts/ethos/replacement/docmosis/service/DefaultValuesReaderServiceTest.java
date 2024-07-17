@@ -155,11 +155,11 @@ class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    void testGetCaseDataWithNoValues() {
+    void testSetCaseDataWithNoValues() {
         DefaultValues defaultValues = createDefaultValues();
         CaseData caseData = new CaseData();
 
-        defaultValuesReaderService.getCaseData(caseData, defaultValues);
+        defaultValuesReaderService.setCaseData(caseData, defaultValues);
 
         assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
         assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());
@@ -174,11 +174,11 @@ class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    void testGetCaseDataWithExistingValues() {
+    void testSetCaseDataWithExistingValues() {
         DefaultValues defaultValues = createDefaultValues();
         CaseData caseData = createCaseWithValues();
 
-        defaultValuesReaderService.getCaseData(caseData, defaultValues);
+        defaultValuesReaderService.setCaseData(caseData, defaultValues);
 
         assertEquals("ExistingPositionType", caseData.getPositionType());
         assertEquals("ExistingCaseSource", caseData.getCaseSource());
@@ -193,13 +193,13 @@ class DefaultValuesReaderServiceTest {
     }
 
     @Test
-    void testGetCaseDataWithClaimantWorkAddress() {
+    void testSetCaseDataWithClaimantWorkAddress() {
         CaseData caseData = new CaseData();
         caseData.setClaimantWorkAddressQuestion(Constants.YES);
         caseData.setClaimantWorkAddressQRespondent(new DynamicFixedListType("Respondent 2"));
         caseData.setRespondentCollection(createRespondents());
         DefaultValues defaultValues = createDefaultValues();
-        defaultValuesReaderService.getCaseData(caseData, defaultValues);
+        defaultValuesReaderService.setCaseData(caseData, defaultValues);
 
         assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
         assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());

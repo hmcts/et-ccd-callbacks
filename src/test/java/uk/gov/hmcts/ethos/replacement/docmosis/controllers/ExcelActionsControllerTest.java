@@ -81,6 +81,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     private static final String MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL = "/multipleCreationMidEventValidation";
     private static final String MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL =
             "/multipleAmendCaseIdsMidEventValidation";
+    private static final String MULTIPLE_REMOVE_CASE_IDS_MID_EVENT_VALIDATION_URL =
+            "/multipleRemoveCaseIdsMidEventValidation";
     private static final String MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL = "/multipleSingleMidEventValidation";
     private static final String MULTIPLE_MID_BATCH_1_VALIDATION_URL = "/multipleMidBatch1Validation";
     private static final String CLOSE_MULTIPLE_URL = "/closeMultiple";
@@ -346,16 +348,29 @@ class ExcelActionsControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, hasSize(0)));
     }
 
     @Test
     void multipleAmendCaseIdsMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, hasSize(0)));
+    }
+
+    @Test
+    void multipleRemoveCaseIdsMidEventValidation() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(MULTIPLE_REMOVE_CASE_IDS_MID_EVENT_VALIDATION_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
@@ -595,9 +610,18 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     @Test
     void multipleAmendCaseIdsMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content("error")
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void multipleRemoveCaseIdsMidEventValidationError400() throws Exception {
+        mvc.perform(post(MULTIPLE_REMOVE_CASE_IDS_MID_EVENT_VALIDATION_URL)
+                        .content("error")
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -778,7 +802,7 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     void multipleCreationMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
-                eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), isA(Boolean.class));
+                eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), anyList(), isA(Boolean.class));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -791,12 +815,25 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     void multipleAmendCaseIdsMidEventValidationError500() throws Exception {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
-                eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), isA(Boolean.class));
+                        eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), anyList(), isA(Boolean.class));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
-                .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void multipleRemoveCaseIdsMidEventValidationError500() throws Exception {
+        doThrow(new InternalException(ERROR_MESSAGE))
+                .when(multipleCreationMidEventValidationService).multipleRemoveCasesValidationLogic(
+                        eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(MULTIPLE_REMOVE_CASE_IDS_MID_EVENT_VALIDATION_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 

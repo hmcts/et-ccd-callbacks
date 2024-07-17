@@ -68,7 +68,7 @@ class VenueImportServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testImportVenuesEnglandWales")
     void testImportVenuesEnglandWales(TribunalOffice tribunalOffice) throws FixedListSheetReaderException, IOException {
         AdminData adminData = createAdminData(tribunalOffice);
         try (XSSFWorkbook workbook = createWorkbook(tribunalOffice)) {
@@ -85,7 +85,7 @@ class VenueImportServiceTest {
         assertNotNull(adminData.getVenueImport().getVenueImportFile().getLastImported());
     }
 
-    private static Stream<TribunalOffice> testImportVenuesEnglandWales() { //NOPMD - parameterized tests
+    private static Stream<TribunalOffice> testImportVenuesEnglandWales() {
         return TribunalOffice.ENGLANDWALES_OFFICES.stream();
     }
 

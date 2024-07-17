@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -122,6 +124,8 @@ class Et1ReppedServiceTest {
                 postcodeToOfficeService, tornadoService, tribunalOfficesService, userIdamService, emailService,
                 adminUserService);
         when(postcodeToOfficeMappings.getPostcodes()).thenReturn(getPostcodes());
+        ReflectionTestUtils.setField(et1ReppedService, "et1ProfessionalSubmissionTemplateId",
+                "ec815e00-39b0-4711-8b24-614ea1f2de89");
     }
 
     @Test
@@ -179,7 +183,7 @@ class Et1ReppedServiceTest {
     private static Stream<Arguments> validatePostcodes() {
         return Stream.of(
                 Arguments.of("LS16 6NB", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
-                Arguments.of("B1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, NO),
+                Arguments.of("B1 1AA", ENGLANDWALES_CASE_TYPE_ID, 0, YES),
                 Arguments.of("EH1 1AA", ENGLANDWALES_CASE_TYPE_ID, 1, NO),
                 Arguments.of("RM1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
                 Arguments.of("EC1 1AA", SCOTLAND_CASE_TYPE_ID, 1, NO),
@@ -190,7 +194,7 @@ class Et1ReppedServiceTest {
     }
 
     @Test
-    void assignCaseAccess() {
+    void assignCaseAccess() throws IOException {
         when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         when(authTokenGenerator.generate()).thenReturn("serviceAuthToken");
         when(adminUserService.getAdminUserToken()).thenReturn("userToken");
@@ -235,6 +239,11 @@ class Et1ReppedServiceTest {
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
 
+        caseDetails.getCaseData().setEt1SectionThreeDocumentUpload(UploadedDocumentBuilder.builder()
+                .withUrl("http://test.com/documents/random-uuid")
+                .withFilename("SupportingDoc.pdf")
+                .build());
+
         DocumentInfo documentInfo = DocumentInfo.builder()
                 .description("ET1 - John Doe")
                 .url("http://test.com/documents/random-uuid")
@@ -248,7 +257,42 @@ class Et1ReppedServiceTest {
                 .build();
         when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
         assertDoesNotThrow(() -> et1ReppedService.createAndUploadEt1Docs(caseDetails, "authToken"));
+        assertEquals(2, caseDetails.getCaseData().getDocumentCollection().size());
+    }
+
+    @Test
+    void shouldAddDocsIfAcasCertThrowsError() throws Exception {
+        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
+        caseDetails.getCaseData().setRespondentAcasNumber("123456");
+        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
+        et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
+
+        DocumentInfo documentInfo = DocumentInfo.builder()
+                .description("ET1 - John Doe")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+                .thenReturn(documentInfo);
+        UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
+                .withUrl("http://test.com/documents/random-uuid")
+                .withFilename("ET1 - John Doe.pdf")
+                .build();
+        when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
+        when(acasService.getAcasCertificates(any(), anyString(), anyString(), anyString()))
+                .thenThrow(new IllegalArgumentException("Error"));
+
+        assertDoesNotThrow(() -> et1ReppedService.createAndUploadEt1Docs(caseDetails, "authToken"));
         assertEquals(1, caseDetails.getCaseData().getDocumentCollection().size());
+    }
+
+    @Test
+    void shouldSendEmail() throws Exception {
+        when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
+        Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
+        et1ReppedService.sendEt1Confirmation(caseDetails, "authToken");
+        verify(emailService, times(1)).sendEmail(anyString(), anyString(), any());
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {

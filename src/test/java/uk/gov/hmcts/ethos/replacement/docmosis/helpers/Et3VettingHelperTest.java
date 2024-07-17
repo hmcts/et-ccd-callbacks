@@ -328,7 +328,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
 
         assertNull(caseData.getEt3NameAddressRespondent());
     }
@@ -349,7 +349,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
             + "address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"
             + "&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
@@ -371,7 +371,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
             + "address &#09&#09 None Given</pre><hr>";
 
@@ -393,7 +393,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; None Given<br><br>"
             + "Contact address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09"
             + "&#09&#09&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
@@ -416,7 +416,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
             + "address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"
             + "&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09"
@@ -440,7 +440,7 @@ class Et3VettingHelperTest {
             .withClaimServedDate("2022-01-01")
             .build();
 
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
 
         String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact"
             + " address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"
@@ -453,7 +453,7 @@ class Et3VettingHelperTest {
     void givenHearingIsListed_SetCaseAsListed() {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
+            .withHearingSession(0, "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
             .withConciliationTrack("Test track")
             .build();
         Et3VettingHelper.setHearingListedForExUi(caseData);
@@ -476,7 +476,7 @@ class Et3VettingHelperTest {
     void givenHearingIsNotListed_SetCaseAsNotListed() {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_POSTPONED, false)
+            .withHearingSession(0, "2021-12-25T00:00:00.000", HEARING_STATUS_POSTPONED, false)
             .withConciliationTrack("Test track")
             .build();
         Et3VettingHelper.setHearingListedForExUi(caseData);
@@ -489,7 +489,7 @@ class Et3VettingHelperTest {
     void givenHearingIsListedButNoTrack_SetCaseAsListedNoTrackFound() {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
+            .withHearingSession(0, "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
             .build();
         Et3VettingHelper.setHearingListedForExUi(caseData);
 

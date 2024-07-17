@@ -1,14 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -30,9 +29,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 
 @Service
 @Slf4j
@@ -76,11 +78,12 @@ public class Et1ReppedService {
 
     @Value("${template.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
-    private static final String ET1_EN_PDF = "ET1_2222.pdf";
+    private static final String ET1_EN_PDF = "ET1_0224.pdf";
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
-            TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST);
+            TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER,
+            TribunalOffice.NEWCASTLE, TribunalOffice.WATFORD, TribunalOffice.WALES, TribunalOffice.MIDLANDS_WEST);
 
     /**
      * Validates the postcode and region.
@@ -157,7 +160,7 @@ public class Et1ReppedService {
             }
 
             List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
-                    userToken);
+                    userToken, caseDetails.getCaseTypeId());
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
@@ -178,9 +181,12 @@ public class Et1ReppedService {
             et1Attachment.setCategoryId(DocumentCategory.ET1_ATTACHMENT.getCategory());
             documentList.add(createDocumentTypeItem(caseData.getEt1SectionThreeDocumentUpload(), ET1_ATTACHMENT));
         }
-        documentList.addAll(acasCertificates);
+        if (CollectionUtils.isNotEmpty(acasCertificates)) {
+            documentList.addAll(acasCertificates);
+        }
         caseData.setClaimantDocumentCollection(documentList);
         caseData.setDocumentCollection(documentList);
+        DocumentHelper.setDocumentNumbers(caseData);
     }
 
     /**
@@ -228,10 +234,11 @@ public class Et1ReppedService {
 
     private String getEt1DocumentName(CaseData caseData, String pdfSource) {
         return ET1_CY_PDF.equals(pdfSource) ? "ET1 CY - " + caseData.getClaimant() + ".pdf"
-                : "ET1 - " + caseData.getClaimant() + ".pdf";
+                : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken) {
+    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken,
+                                                                  String caseTypeId) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -247,9 +254,9 @@ public class Et1ReppedService {
         List<DocumentInfo> documentInfoList = acasNumbers.stream()
                 .map(acasNumber -> {
                     try {
-                        return acasService.getAcasCertificates(caseData, acasNumber, userToken);
-                    } catch (JsonProcessingException e) {
-                        log.error("Failed to retrieve ACAS Certificate", e);
+                        return acasService.getAcasCertificates(caseData, acasNumber, userToken, caseTypeId);
+                    } catch (Exception e) {
+                        log.error("Failed to process ACAS Certificate {}", acasNumber, e);
                         return null;
                     }
                 })
@@ -351,7 +358,7 @@ public class Et1ReppedService {
      * @param caseDetails the case details
      * @param userToken the user token
      */
-    public void assignCaseAccess(CaseDetails caseDetails, String userToken) {
+    public void assignCaseAccess(CaseDetails caseDetails, String userToken) throws IOException {
         UserDetails claimantRepUser = userIdamService.getUserDetails(userToken);
         OrganisationsResponse organisation = getOrganisationDetailsFromUserId(claimantRepUser.getUid());
 

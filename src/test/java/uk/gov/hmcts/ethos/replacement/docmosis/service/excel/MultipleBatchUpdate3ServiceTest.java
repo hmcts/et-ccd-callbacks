@@ -9,7 +9,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -19,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -45,7 +47,7 @@ class MultipleBatchUpdate3ServiceTest {
     @InjectMocks
     private MultipleBatchUpdate3Service multipleBatchUpdate3Service;
 
-    private TreeMap<String, Object> multipleObjectsFlags;
+    private SortedMap<String, Object> multipleObjectsFlags;
     private MultipleDetails multipleDetails;
     private List<SubmitEvent> submitEvents;
     private String userToken;
@@ -172,9 +174,10 @@ class MultipleBatchUpdate3ServiceTest {
 
     @Test
     void batchUpdate3LogicNoChanges() {
-
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
-        multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(ListTypeItem.from(dynamicListType));
         multipleDetails.getCaseData().setBatchUpdateRespondent(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateJudgment(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
         multipleDetails.getCaseData().setBatchUpdateRespondentRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
@@ -198,4 +201,60 @@ class MultipleBatchUpdate3ServiceTest {
 
     }
 
+    @Test
+    void batchUpdate3LogicJurisdictionNull() {
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(null);
+        multipleDetails.getCaseData().setBatchUpdateRespondent(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJudgment(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateRespondentRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+
+        multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
+
+        when(singleCasesReadingService.retrieveSingleCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData().getBatchUpdateCase(),
+                multipleDetails.getCaseData().getMultipleSource()))
+                .thenReturn(submitEvents.get(0));
+
+        multipleBatchUpdate3Service.batchUpdate3Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        verifyNoMoreInteractions(multipleHelperService);
+
+        assertEquals(OPEN_STATE, multipleDetails.getCaseData().getState());
+    }
+
+    @Test
+    void batchUpdate3LogicJurisdictions() {
+        DynamicListType noneList = new DynamicListType();
+        noneList.setDynamicList(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        DynamicListType dagList = new DynamicListType();
+        dagList.setDynamicList(MultipleUtil.generateDynamicList("DAG"));
+
+        multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJurisdictionList(ListTypeItem.from(noneList, dagList));
+        multipleDetails.getCaseData().setBatchUpdateRespondent(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateJudgment(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+        multipleDetails.getCaseData().setBatchUpdateRespondentRep(MultipleUtil.generateDynamicList(SELECT_NONE_VALUE));
+
+        multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
+
+        when(singleCasesReadingService.retrieveSingleCase(userToken,
+                multipleDetails.getCaseTypeId(),
+                multipleDetails.getCaseData().getBatchUpdateCase(),
+                multipleDetails.getCaseData().getMultipleSource()))
+                .thenReturn(submitEvents.get(0));
+
+        multipleBatchUpdate3Service.batchUpdate3Logic(userToken,
+                multipleDetails,
+                new ArrayList<>(),
+                multipleObjectsFlags);
+
+        assertEquals(OPEN_STATE, multipleDetails.getCaseData().getState());
+    }
 }

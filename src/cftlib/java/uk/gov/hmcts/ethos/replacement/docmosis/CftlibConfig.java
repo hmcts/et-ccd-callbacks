@@ -8,8 +8,11 @@ import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ACAS_API;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ACAS_EMAIL;
@@ -177,7 +180,7 @@ public class CftlibConfig implements CFTLibConfigurer {
     private String adminCcdConfigPath;
 
     @Override
-    public void configure(CFTLib lib) {
+    public void configure(CFTLib lib) throws IOException, URISyntaxException {
         createRoles(lib);
         createUsers(lib);
         importCcdDefinitions(lib);
@@ -188,10 +191,16 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createRoles(CASEWORKER_ROLES);
     }
 
-    private void createUsers(CFTLib lib) {
+    private void createUsers(CFTLib lib) throws IOException, URISyntaxException {
         // Create importer user
         lib.createIdamUser(CCD_DOCKER_DEFAULT_EMAIL,
             CCD_IMPORT);
+
+        String fileName = "roleAssignment.json";
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
+                .getContextClassLoader().getResource(fileName)).toURI())));
+
+        lib.configureRoleAssignments(json);
 
         // Create test users in the idam simulator.
         lib.createIdamUser(JUDGE_EW_EMAIL,

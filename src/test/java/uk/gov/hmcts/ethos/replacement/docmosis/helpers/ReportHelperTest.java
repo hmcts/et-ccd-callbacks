@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +32,7 @@ class ReportHelperTest {
                 .stream()
                 .map(lrd -> lrd.getValue().getReportOffice())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(expected, offices);
     }
 
@@ -48,12 +47,12 @@ class ReportHelperTest {
                 .stream()
                 .map(lrd -> lrd.getValue().getFileLocation())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(expected, offices);
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("testLiveCaseloadShowsReportOfficeWithEmptyReport")
     void testLiveCaseloadShowsReportOfficeWithEmptyReport(String caseTypeId, String managingOffice,
                                                           String expectedReportOffice) {
         ListingDetails listingDetails = new ListingDetails();

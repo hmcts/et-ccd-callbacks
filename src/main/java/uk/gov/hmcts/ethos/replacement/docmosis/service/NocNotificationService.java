@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildRespondentPersonalisation;
@@ -47,12 +48,15 @@ public class NocNotificationService {
     @Value("${template.nocNotification.tribunal}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew,
+    public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
+                                               CaseDetails caseDetailsNew,
                                                ChangeOrganisationRequest changeRequest) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
-        sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
+        if (!isClaimantNonSystemUser(caseDataPrevious)) {
+            sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
+        }
 
         if (changeRequest.getOrganisationToRemove() != null) {
             String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
@@ -114,14 +118,16 @@ public class NocNotificationService {
             return;
         }
 
-        String oldOrgAdminEmail = resBody.getSuperUser().getEmail();
-        if (isNullOrEmpty(oldOrgAdminEmail)) {
+        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
             log.warn("Previous Org {} is missing org admin email", orgId);
             return;
         }
 
         Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
-        emailService.sendEmail(previousRespondentSolicitorTemplateId, oldOrgAdminEmail, personalisation);
+        emailService.sendEmail(
+                previousRespondentSolicitorTemplateId,
+                resBody.getSuperUser().getEmail(),
+                personalisation);
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
@@ -138,15 +144,14 @@ public class NocNotificationService {
             return;
         }
 
-        String newOrgAdminEmail = resBody.getSuperUser().getEmail();
-        if (isNullOrEmpty(newOrgAdminEmail)) {
+        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
             log.warn("New Org {} is missing org admin email", orgId);
             return;
         }
 
         String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
         Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
-        emailService.sendEmail(newRespondentSolicitorTemplateId, newOrgAdminEmail, personalisation);
+        emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);
     }
 
     private ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(String orgId) {

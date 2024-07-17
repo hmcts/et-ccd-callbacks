@@ -277,7 +277,7 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             defaultValuesReaderService.setSubmissionReference(ccdRequest.getCaseDetails());
             DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
-            defaultValuesReaderService.getCaseData(caseData, defaultValues);
+            defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
@@ -400,7 +400,7 @@ public class CaseActionsForCaseWorkerController {
         if (errors.isEmpty()) {
             DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             log.info("Post Default values loaded: " + defaultValues);
-            defaultValuesReaderService.getCaseData(caseData, defaultValues);
+            defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
@@ -473,7 +473,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         caseFlagsService.setupCaseFlags(caseData);
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -742,7 +742,7 @@ public class CaseActionsForCaseWorkerController {
     })
     public ResponseEntity<CCDCallbackResponse> amendHearing(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("AMEND HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -753,6 +753,10 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+
+        if (featureToggleService.isMul2Enabled()) {
+            caseManagementForCaseWorkerService.setNextListedDateOnMultiple(ccdRequest.getCaseDetails());
+        }
         return getCallbackRespEntityNoErrors(caseData);
     }
 

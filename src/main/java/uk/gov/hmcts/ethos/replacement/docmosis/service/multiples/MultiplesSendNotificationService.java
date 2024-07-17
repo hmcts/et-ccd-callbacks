@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeMultiple;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -31,6 +32,7 @@ import java.util.SortedMap;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_LEAD;
@@ -160,6 +162,7 @@ public class MultiplesSendNotificationService {
                 .multipleRef(multipleData.getMultipleReference())
                 .ethosCaseRefCollection(ethosCaseRefCollection)
                 .username(username)
+                .confirmation(NO)
                 .build();
     }
 
@@ -193,6 +196,22 @@ public class MultiplesSendNotificationService {
         sendNotificationType.setNotificationSentFrom(multipleData.getMultipleReference());
 
         return sendNotificationType;
+    }
+
+    public void setSendNotificationDocumentsToDocumentCollection(MultipleData multipleData) {
+        List<DocumentTypeItem> uploadedDoc = multipleData.getSendNotificationUploadDocument();
+
+        if (CollectionUtils.isEmpty(uploadedDoc)) {
+            return;
+        }
+
+        List<DocumentTypeItem> documentCollection = multipleData.getDocumentCollection();
+        if (CollectionUtils.isEmpty(documentCollection)) {
+            multipleData.setDocumentCollection(uploadedDoc);
+            return;
+        }
+
+        documentCollection.addAll(uploadedDoc);
     }
 
     public void clearSendNotificationFields(MultipleData multipleData) {

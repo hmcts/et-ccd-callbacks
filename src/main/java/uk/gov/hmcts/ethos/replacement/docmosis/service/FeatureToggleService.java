@@ -1,11 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.launchdarkly.FeatureToggleApi;
 
-@Slf4j
 @Service
 public class FeatureToggleService {
 
@@ -50,5 +48,13 @@ public class FeatureToggleService {
 
     public boolean isMultiplesEnabled() {
         return this.featureToggleApi.isFeatureEnabled("multiples");
+    }
+
+    public boolean isEt1DocGenEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("et1-doc-gen");
+    }
+
+    public boolean isMul2Enabled() {
+        return this.featureToggleApi.isFeatureEnabled("MUL2");
     }
 }

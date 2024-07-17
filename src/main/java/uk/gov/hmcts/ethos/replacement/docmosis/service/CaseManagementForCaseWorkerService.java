@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -29,9 +29,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -54,6 +57,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -82,6 +86,8 @@ public class CaseManagementForCaseWorkerService {
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
     private final CaseManagementLocationService caseManagementLocationService;
+    private final MultipleReferenceService multipleReferenceService;
+    private final MultipleCasesSendingService multipleCasesSendingService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -96,6 +102,7 @@ public class CaseManagementForCaseWorkerService {
 
     public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
     public static final String CASE_MANAGEMENT_CODE = "Employment";
+    private static final String EMPLOYMENT_JURISDICTION = "EMPLOYMENT";
     public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
     private final String ccdGatewayBaseUrl;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
@@ -110,7 +117,9 @@ public class CaseManagementForCaseWorkerService {
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
                                               CaseManagementLocationService caseManagementLocationService,
-                                              @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl) {
+                                              MultipleReferenceService multipleReferenceService,
+                                              @Value("${ccd_gateway_base_url}") String ccdGatewayBaseUrl,
+                                              MultipleCasesSendingService multipleCasesSendingService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
         this.clerkService = clerkService;
@@ -118,7 +127,9 @@ public class CaseManagementForCaseWorkerService {
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
         this.caseManagementLocationService = caseManagementLocationService;
+        this.multipleReferenceService = multipleReferenceService;
         this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
+        this.multipleCasesSendingService = multipleCasesSendingService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -149,7 +160,10 @@ public class CaseManagementForCaseWorkerService {
 
     public void claimantDefaults(CaseData caseData) {
         String claimantTypeOfClaimant = caseData.getClaimantTypeOfClaimant();
-        if (!isNullOrEmpty(claimantTypeOfClaimant)) {
+
+        if (isNullOrEmpty(claimantTypeOfClaimant)) {
+            caseData.setClaimant(MISSING_CLAIMANT);
+        } else {
             if (claimantTypeOfClaimant.equals(INDIVIDUAL_TYPE_CLAIMANT)) {
                 String claimantFirstNames = nullCheck(caseData.getClaimantIndType().getClaimantFirstNames());
                 String claimantLastName = nullCheck(caseData.getClaimantIndType().getClaimantLastName());
@@ -157,9 +171,8 @@ public class CaseManagementForCaseWorkerService {
             } else {
                 caseData.setClaimant(nullCheck(caseData.getClaimantCompany()));
             }
-        } else {
-            caseData.setClaimant(MISSING_CLAIMANT);
         }
+
         if (featureToggleService.isHmcEnabled()) {
             caseData.setClaimantId(UUID.randomUUID().toString());
         }
@@ -173,7 +186,7 @@ public class CaseManagementForCaseWorkerService {
         if (documentCollection != null) {
             for (DocumentTypeItem documentTypeItem : documentCollection) {
                 DocumentType documentType = documentTypeItem.getValue();
-                if (claimantDocs.contains(defaultIfEmpty(documentType.getTypeOfDocument(), ""))) {
+                if (claimantDocs.contains(defaultIfEmpty(documentType.getStartingClaimDocuments(), ""))) {
                     claimantDocumentCollection.add(documentTypeItem);
                 }
             }
@@ -323,6 +336,33 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setNextListedDateOnMultiple(CaseDetails details) throws IOException {
+        CaseData caseData = details.getCaseData();
+        if (StringUtils.isEmpty(caseData.getMultipleReference()) || !YES.equals(caseData.getLeadClaimant())) {
+            return;
+        }
+
+        String adminToken = adminUserService.getAdminUserToken();
+        String multipleCaseTypeId = details.getCaseTypeId() + "_Multiple";
+        SubmitMultipleEvent multiple = multipleReferenceService.getMultipleByReference(
+            adminToken,
+            multipleCaseTypeId,
+            caseData.getMultipleReference()
+        );
+
+        var multipleData = multiple.getCaseData();
+
+        multipleData.setNextListedDate(caseData.getNextListedDate());
+
+        multipleCasesSendingService.sendUpdateToMultiple(
+            adminToken, 
+            multipleCaseTypeId, 
+            EMPLOYMENT, 
+            multipleData, 
+            String.valueOf(multiple.getCaseId())
+        );
+    }
+
     private List<String> getListedDates(HearingTypeItem hearingTypeItem) {
         HearingType hearingType = hearingTypeItem.getValue();
         List<String> dates = new ArrayList<>();
@@ -340,19 +380,27 @@ public class CaseManagementForCaseWorkerService {
 
     public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails) {
         // get a target case data using the source case data and elastic search query
-        List<SubmitEvent> submitEvent = caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
-                caseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
-        if (CollectionUtils.isEmpty(submitEvent)) {
+        Pair<String, List<SubmitEvent>> caseRefAndCaseDataPair =
+                caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
+                        caseDetails.getCaseId(), authToken, caseTypeIdsToCheck);
+        if (caseRefAndCaseDataPair == null
+                || caseRefAndCaseDataPair.getFirst().isEmpty()
+                || caseRefAndCaseDataPair.getSecond().isEmpty()) {
             return;
         }
 
-        String sourceCaseId = String.valueOf(submitEvent.get(0).getCaseId());
-        SubmitEvent fullSourceCase = caseRetrievalForCaseWorkerService.caseRetrievalRequest(authToken,
-                caseDetails.getCaseTypeId(), "EMPLOYMENT", sourceCaseId);
-        if (fullSourceCase.getCaseData().getEthosCaseReference() != null) {
+        String sourceCaseTypeId = caseRefAndCaseDataPair.getFirst();
+        SubmitEvent submitEvent = caseRefAndCaseDataPair.getSecond().get(0);
+        log.info("SubmitEvent retrieved from ES for the update target case: {} with source case type of {}.",
+                submitEvent.getCaseId(), sourceCaseTypeId);
+        String sourceCaseId = String.valueOf(submitEvent.getCaseId());
+        String ethosCaseReference = caseRetrievalForCaseWorkerService.caseRefRetrievalRequest(authToken,
+                caseDetails.getCaseTypeId(), EMPLOYMENT_JURISDICTION, sourceCaseId);
+        log.info("Source Case reference is retrieved via retrieveTransferredCaseReference: {}.", ethosCaseReference);
+        if (ethosCaseReference != null) {
             caseDetails.getCaseData().setTransferredCaseLink("<a target=\"_blank\" href=\""
                     + String.format("%s/cases/case-details/%s", ccdGatewayBaseUrl, sourceCaseId) + "\">"
-                    + fullSourceCase.getCaseData().getEthosCaseReference() + "</a>");
+                    + ethosCaseReference + "</a>");
         }
     }
 

@@ -239,7 +239,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getEventId());
         et3ResponseService.saveEt3Response(caseData, documentInfo);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
@@ -368,7 +368,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getEventId());
         documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
                 "Draft ET3 - " + caseData.getSubmitEt3Respondent().getSelectedLabel()));
         caseData.setDocMarkUp(documentInfo.getMarkUp());

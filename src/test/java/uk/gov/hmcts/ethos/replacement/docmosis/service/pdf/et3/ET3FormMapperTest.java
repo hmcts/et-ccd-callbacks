@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.platform.commons.util.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.ANNUALLY_CAPITALISED;
@@ -75,6 +77,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONDENT_FIELD_TITLE_OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONSE_FIELD_CONTEST_CLAIM_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CHECKBOX_PDF_RESPONSE_FIELD_CONTEST_CLAIM_YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_DD_MM_YYYY_DASH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_YYYY_MM_DD_DASH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.EMAIL_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.EMAIL_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.MONTHLY_CAPITALISED;
@@ -84,6 +88,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.POST_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.POST_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_ACAS_FIELD_AGREEMENT_NO_REASON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_CLAIMANT_FIELD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_DISABILITY_DETAILS;
@@ -105,7 +110,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormCon
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_DATE_RECEIVED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_RTF;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_REPRESENTATIVE_FIELD_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_REPRESENTATIVE_FIELD_EMAIL_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_REPRESENTATIVE_FIELD_MOBILE_PHONE_NUMBER;
@@ -153,7 +157,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_MONTH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_EMPLOYMENT_START_YEAR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_HEADER_VALUE_CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_HEADER_VALUE_DATE_RECEIVED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_REPRESENTATIVE_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_REPRESENTATIVE_EMAIL_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_PDF_REPRESENTATIVE_MOBILE_PHONE_NUMBER;
@@ -188,6 +191,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3Fo
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormTestUtil.getCheckboxValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormTestUtil.getCorrectedCheckboxValue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormTestUtil.getCorrectedDetailValue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.util.ET3FormUtil.formatDate;
 
 class ET3FormMapperTest {
 
@@ -196,31 +200,31 @@ class ET3FormMapperTest {
     @SneakyThrows
     void testMapRespondent(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData)) {
-            assertThatThrownBy(() -> mapEt3Form(caseData)).hasMessage(TEST_PDF_CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE);
+            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3)).hasMessage(TEST_PDF_CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE);
             return;
         }
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            assertThatThrownBy(() -> mapEt3Form(caseData))
+            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3))
                     .hasMessage(TEST_PDF_RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE);
             return;
         }
         if (ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent())) {
-            assertThatThrownBy(() -> mapEt3Form(caseData))
+            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3))
                     .hasMessage(TEST_PDF_RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
             return;
         }
         if (ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent().getValue())) {
-            assertThatThrownBy(() -> mapEt3Form(caseData)).hasMessage(
+            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3)).hasMessage(
                     TEST_PDF_RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
             return;
         }
         if (isBlank(caseData.getSubmitEt3Respondent().getValue().getLabel())) {
-            assertThatThrownBy(() -> mapEt3Form(caseData)).hasMessage(
+            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3)).hasMessage(
                     TEST_PDF_RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
             return;
         }
         if (TEST_DUMMY_VALUE.equals(caseData.getSubmitEt3Respondent().getValue().getLabel())) {
-            assertThatThrownBy(() -> mapEt3Form(caseData))
+            assertThatThrownBy(() -> mapEt3Form(caseData, SUBMIT_ET3))
                     .hasMessage(TEST_PDF_RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE);
             return;
         }
@@ -228,7 +232,7 @@ class ET3FormMapperTest {
                 .filter(r -> caseData.getSubmitEt3Respondent()
                         .getSelectedLabel().equals(r.getValue().getRespondentName()))
                 .toList().get(0).getValue();
-        Map<String, Optional<String>> pdfFields = mapEt3Form(caseData);
+        Map<String, Optional<String>> pdfFields = mapEt3Form(caseData, SUBMIT_ET3);
         checkRespondent(pdfFields, respondentSumType);
         checkHeader(pdfFields, respondentSumType);
         checkClaimant(pdfFields, respondentSumType);
@@ -253,12 +257,13 @@ class ET3FormMapperTest {
 
     private static void checkHeader(Map<String, Optional<String>> pdfFields, RespondentSumType respondentSumType) {
         assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_CASE_NUMBER)).contains(TEST_PDF_HEADER_VALUE_CASE_NUMBER);
-        assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_DATE_RECEIVED)).contains(TEST_PDF_HEADER_VALUE_DATE_RECEIVED);
+        assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_DATE_RECEIVED)).contains(
+                formatDate(LocalDate.now().toString(), DATE_FORMAT_YYYY_MM_DD_DASH, DATE_FORMAT_DD_MM_YYYY_DASH)
+        );
         if (ObjectUtils.isEmpty(respondentSumType.getEt3ResponseRespondentSupportDocument())
                 && ObjectUtils.isEmpty(respondentSumType.getEt3ResponseEmployerClaimDocument())
                 && CollectionUtils.isEmpty(respondentSumType.getEt3ResponseContestClaimDocument())) {
-            assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF))
-                    .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS);
+            assertNull(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF));
         } else {
             assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF))
                     .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS);

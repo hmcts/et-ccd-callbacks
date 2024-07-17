@@ -46,7 +46,8 @@ public final class ET3FormMapper {
         // Add a private constructor to hide the implicit public one.
     }
 
-    public static Map<String, Optional<String>> mapEt3Form(CaseData caseData) throws GenericServiceException {
+    public static Map<String, Optional<String>> mapEt3Form(CaseData caseData, String event)
+            throws GenericServiceException {
         checkCaseData(caseData);
         String submitRespondent = caseData.getSubmitEt3Respondent().getSelectedLabel();
         Stream<RespondentSumTypeItem> respondentSumTypeStream = caseData.getRespondentCollection().stream()
@@ -74,7 +75,7 @@ public final class ET3FormMapper {
         }
         ConcurrentMap<String, Optional<String>> pdfFields = new ConcurrentHashMap<>();
         RespondentSumType respondentSumType = selectedRespondent.get().getValue();
-        mapHeader(caseData, respondentSumType, pdfFields);
+        mapHeader(caseData, respondentSumType, pdfFields, event);
         mapClaimant(caseData, respondentSumType, pdfFields);
         mapRespondent(respondentSumType, pdfFields);
         mapAcas(respondentSumType, pdfFields);

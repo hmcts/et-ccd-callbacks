@@ -17,9 +17,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_DD_MM_YYYY_DASH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.DATE_FORMAT_YYYY_MM_DD_DASH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.TXT_PDF_HEADER_FIELD_DATE_RECEIVED;
@@ -50,10 +51,10 @@ class ET3FormHeaderMapperTest {
         if (ObjectUtils.isEmpty(respondentSumType.getEt3ResponseRespondentSupportDocument())
                 && ObjectUtils.isEmpty(respondentSumType.getEt3ResponseEmployerClaimDocument())
                 && CollectionUtils.isEmpty(respondentSumType.getEt3ResponseContestClaimDocument())) {
-            assertNull(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF));
+            assertEquals(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF), Optional.of(STRING_EMPTY));
         } else {
             assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF))
-                    .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS);
+                    .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS.formatted(3));
         }
     }
 

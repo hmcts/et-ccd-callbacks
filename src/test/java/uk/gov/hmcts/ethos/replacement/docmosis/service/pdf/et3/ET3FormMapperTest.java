@@ -267,7 +267,7 @@ class ET3FormMapperTest {
             assertNull(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF));
         } else {
             assertThat(pdfFields.get(TXT_PDF_HEADER_FIELD_RTF))
-                    .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS);
+                    .contains(TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS.formatted(3));
         }
     }
 

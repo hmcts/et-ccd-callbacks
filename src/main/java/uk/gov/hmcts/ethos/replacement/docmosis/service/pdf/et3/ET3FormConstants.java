@@ -39,7 +39,7 @@ public final class ET3FormConstants {
     public static final String TXT_PDF_HEADER_FIELD_CASE_NUMBER = "case number";
     public static final String TXT_PDF_HEADER_FIELD_DATE_RECEIVED = "date_received";
     public static final String TXT_PDF_HEADER_FIELD_RTF = "RTF";
-    public static final String TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS = "Documents attached: %d";
+    public static final String TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS = "+%d Doc";
 
     // SECTION 1 CLAIMANT CONSTANTS
     public static final String TXT_PDF_CLAIMANT_FIELD_NAME = "1.1 Claimant's name";

@@ -22,6 +22,14 @@ public class LiveCasesService {
     private final SingleCasesReadingService singleCasesReadingService;
     private final FeatureToggleService featureToggleService;
 
+    /**
+     * Modifies the list of cases to remove any cases in a Closed state.
+     *
+     * @param userToken       Authorisation
+     * @param caseTypeId      EnglandWales or Scotland case type
+     * @param multipleObjects List of single cases retrieved from Excel sheet
+     * @param multipleData    Case data
+     */
     public void filterLiveCases(String userToken,
                                 String caseTypeId,
                                 SortedMap<String, Object> multipleObjects,

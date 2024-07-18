@@ -79,11 +79,13 @@ public class MultipleScheduleService {
                     getSchedulePayloadCollection(userToken, multipleDetails.getCaseTypeId(),
                             sortedCaseIdsCollection, errors);
 
-            if (featureToggleService.isMultiplesEnabled() && YES.equals(multipleData.getLiveCases())) {
-                log.info("Filtering live cases");
-                schedulePayloads = schedulePayloads.stream()
-                        .filter(schedulePayload -> !CLOSED_STATE.equals(schedulePayload.getState()))
-                        .toList();
+            if (featureToggleService.isMultiplesEnabled()) {
+                if (YES.equals(multipleData.getLiveCases())) {
+                    log.info("Filtering live cases");
+                    schedulePayloads = schedulePayloads.stream()
+                            .filter(schedulePayload -> !CLOSED_STATE.equals(schedulePayload.getState()))
+                            .toList();
+                }
                 multipleData.setLiveCases(null);
             }
 

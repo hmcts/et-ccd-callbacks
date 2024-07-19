@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ public class Et1ReppedController {
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private final Et1ReppedService et1ReppedService;
     private final FeatureToggleService featureToggleService;
+    private final Et1SubmissionService et1SubmissionService;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -504,9 +506,9 @@ public class Et1ReppedController {
         if (featureToggleService.isEt1DocGenEnabled()) {
             caseData.setRequiresSubmissionDocuments(YES);
         } else {
-            et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
+            et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
         }
-        et1ReppedService.sendEt1Confirmation(caseDetails, userToken);
+        et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -637,7 +639,7 @@ public class Et1ReppedController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         if (featureToggleService.isEt1DocGenEnabled()) {
-            et1ReppedService.createAndUploadEt1Docs(caseDetails, userToken);
+            et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
             caseDetails.getCaseData().setRequiresSubmissionDocuments(null);
         }
 

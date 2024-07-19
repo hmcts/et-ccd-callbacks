@@ -57,4 +57,8 @@ public class FeatureToggleService {
     public boolean isMul2Enabled() {
         return this.featureToggleApi.isFeatureEnabled("MUL2");
     }
+
+    public boolean citizenEt1Generation() {
+        return true;
+    }
 }

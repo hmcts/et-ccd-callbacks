@@ -76,7 +76,7 @@ withNightlyPipeline(type, product, component) {
         """
     }
 
-    before('fullFunctionalTest') {
+    after('apiGatewayTest') {
         sh """
            yarn install
            yarn playwright install
@@ -91,7 +91,7 @@ withNightlyPipeline(type, product, component) {
         env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     }
 
-    afterAlways('fullFunctionalTest') {
+    afterAlways('apiGatewayTest') {
         stage('ui end-to-end tests') {
             yarnBuilder.yarn('test:fullfunctional')
             steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'

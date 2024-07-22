@@ -77,11 +77,6 @@ withNightlyPipeline(type, product, component) {
     }
 
     before('fullFunctionalTest') {
-        sh """
-           yarn install
-           yarn playwright install
-        """
-
         env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
         env.ET_COS_URL = "http://et-cos-aat.service.core-compute-aat.internal"
         env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"

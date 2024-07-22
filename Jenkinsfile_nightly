@@ -76,25 +76,12 @@ withNightlyPipeline(type, product, component) {
         """
     }
 
-    afterAlways('fullFunctionalTest') {
-        stage('ui end-to-end tests') {
-            yarnBuilder.yarn('test:fullfunctional')
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-    
-            publishHTML target: [
-                    allowMissing : true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll : true,
-                    reportDir : "functional-output",
-                    reportFiles : "ET-CCD-Callbacks-ui-e2e-tests.html",
-                    reportName : "ET UI E2E tests result"
-            ]
-            
-        }
-    }
-
     before('fullFunctionalTest') {
+        sh """
+           yarn install
+           yarn playwright install
+        """
+
         env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
         env.ET_COS_URL = "http://et-cos-aat.service.core-compute-aat.internal"
         env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
@@ -103,17 +90,21 @@ withNightlyPipeline(type, product, component) {
     }
 
     afterAlways('fullFunctionalTest') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+        stage('ui end-to-end tests') {
+            yarnBuilder.yarn('test:fullfunctional')
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
 
-        publishHTML target: [
-                allowMissing : true,
-                alwaysLinkToLastBuild: true,
-                keepAll : true,
-                reportDir : "functional-output",
-                reportFiles : "ET-CCD-Callbacks-tests.html",
-                reportName : "ET E2E functional tests result"
-        ]
+            publishHTML target: [
+                    allowMissing : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll : true,
+                    reportDir : "functional-output",
+                    reportFiles : "ET-CCD-Callbacks-ui-e2e-tests.html",
+                    reportName : "ET UI E2E tests result"
+            ]
+
+        }
     }
 
     afterAlways('fortify-scan') {

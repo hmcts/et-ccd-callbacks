@@ -132,7 +132,7 @@ tasks.register('smoke', Test) {
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
 }
 
-tasks.register('apiTest', Test) {
+tasks.register('functional', Test) {
     testClassesDirs = sourceSets.apiTest.output.classesDirs
     classpath = sourceSets.apiTest.runtimeClasspath
 

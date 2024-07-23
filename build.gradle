@@ -336,8 +336,8 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.2.5'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.16.2'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.3.0'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.17.0'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
 
@@ -415,7 +415,7 @@ dependencies {
     }
     testImplementation(platform('org.junit:junit-bom:5.10.3'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.8'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.0'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
@@ -490,7 +490,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 265
+pmdMain.maxFailures = 264
 pmdTest.maxFailures = 183
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

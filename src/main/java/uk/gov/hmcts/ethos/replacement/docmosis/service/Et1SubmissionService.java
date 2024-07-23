@@ -206,8 +206,9 @@ public class Et1SubmissionService {
                             "lastName", userDetails.getLastName(),
                             "citizenPortalLink", emailService.getCitizenCaseLink(caseDetails.getCaseId()),
                             LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()),
-                            "link_to_et1_pdf_file",
-                            prepareUpload(pdfService.convertCaseToPdf(caseDetails.getCaseData(), ET1_EN_PDF))
+                            "link_to_et1_pdf_file", et1.length == 0
+                                    ? "Please contact the tribunal for a copy of your ET1"
+                                    : prepareUpload(et1)
                     ));
 
         } catch (Exception e) {
@@ -225,7 +226,8 @@ public class Et1SubmissionService {
                     adminUserService.getAdminUserToken(), et1.getValue().getUploadedDocument().getDocumentBinaryUrl());
             return uploadedDocument.getContent().getInputStream().readAllBytes();
         } catch (Exception e) {
-            throw new IOException("Failed to get ET1 PDF", e);
+            log.warn("Failed to get ET1 PDF for case {} ", caseDetails.getCaseId(), e);
+            return new byte[0];
         }
     }
 

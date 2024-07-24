@@ -14,19 +14,16 @@ import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -37,7 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
-import static uk.gov.service.notify.NotificationClient.prepareUpload;
 
 @Service
 @Slf4j
@@ -49,7 +45,6 @@ public class Et1SubmissionService {
     private final TornadoService tornadoService;
     private final UserIdamService userIdamService;
     private final EmailService emailService;
-    private final AdminUserService adminUserService;
 
     @Value("${template.et1.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
@@ -188,13 +183,8 @@ public class Et1SubmissionService {
                         CLAIMANT, caseDetails.getCaseData().getClaimant()));
     }
 
-    /*
-    // todo refactor the template once this code has gone live to use linkToCitizenHub instead of citizenPortalLink
-        like all the other claimant templates
-     */
     public void sendEt1ConfirmationClaimant(CaseDetails caseDetails, String userToken) {
         try {
-            byte[] et1 = getEt1ByteArray(caseDetails);
             log.info("Sending ET1 confirmation email for case {}", caseDetails.getCaseId());
             UserDetails userDetails = userIdamService.getUserDetails(userToken);
             String templateId = WELSH_LANGUAGE.equals(findLanguagePreference(caseDetails.getCaseData()))
@@ -204,30 +194,11 @@ public class Et1SubmissionService {
                     userDetails.getEmail(),
                     Map.of("firstName", userDetails.getFirstName(),
                             "lastName", userDetails.getLastName(),
-                            "citizenPortalLink", emailService.getCitizenCaseLink(caseDetails.getCaseId()),
-                            LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()),
-                            "link_to_et1_pdf_file", et1.length == 0
-                                    ? "Please contact the tribunal for a copy of your ET1"
-                                    : prepareUpload(et1)
+                            LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId())
                     ));
 
         } catch (Exception e) {
             log.error("Failed to send ET1 confirmation email", e);
-        }
-    }
-
-    private byte[] getEt1ByteArray(CaseDetails caseDetails) throws IOException {
-        try {
-            DocumentTypeItem et1 = caseDetails.getCaseData().getDocumentCollection().stream()
-                    .filter(Et1SubmissionService::findEt1Document)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("ET1 document not found"));
-            UploadedDocument uploadedDocument = documentManagementService.downloadFile(
-                    adminUserService.getAdminUserToken(), et1.getValue().getUploadedDocument().getDocumentBinaryUrl());
-            return uploadedDocument.getContent().getInputStream().readAllBytes();
-        } catch (Exception e) {
-            log.warn("Failed to get ET1 PDF for case {} ", caseDetails.getCaseId(), e);
-            return new byte[0];
         }
     }
 
@@ -247,8 +218,4 @@ public class Et1SubmissionService {
         };
     }
 
-    private static boolean findEt1Document(DocumentTypeItem doc) {
-        return ET1.equals(defaultIfEmpty(doc.getValue().getDocumentType(), ""))
-               || ET1.equals(defaultIfEmpty(doc.getValue().getStartingClaimDocuments(), ""));
-    }
 }

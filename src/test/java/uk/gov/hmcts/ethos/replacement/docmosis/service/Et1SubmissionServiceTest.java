@@ -106,7 +106,7 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void createAndUploadEt1Docs() throws Exception {
+    void createAndUploadEt1DocsMyHmcts() throws Exception {
         caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
@@ -128,8 +128,16 @@ class Et1SubmissionServiceTest {
                 .withFilename("ET1 - John Doe.pdf")
                 .build();
         when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
+        DocumentInfo acasDocument = DocumentInfo.builder()
+                .description("ACAS Certificate")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(acasService.getAcasCertificates(any(), anyString(), anyString(), anyString()))
+                .thenReturn(acasDocument);
+
         assertDoesNotThrow(() -> et1SubmissionService.createAndUploadEt1Docs(caseDetails, "authToken"));
-        assertEquals(2, caseDetails.getCaseData().getDocumentCollection().size());
+        assertEquals(3, caseDetails.getCaseData().getDocumentCollection().size());
     }
 
     @Test
@@ -165,6 +173,33 @@ class Et1SubmissionServiceTest {
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, "authToken");
         verify(emailService, times(1)).sendEmail(anyString(), anyString(), any());
+    }
+
+    @Test
+    void createAndUploadEt1DocsEt1() throws Exception {
+        caseDetails =  generateCaseDetails("citizenCaseData.json");
+        DocumentInfo documentInfo = DocumentInfo.builder()
+                .description("ET1 - John Doe")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+                .thenReturn(documentInfo);
+        UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
+                .withUrl("http://test.com/documents/random-uuid")
+                .withFilename("ET1 - John Doe.pdf")
+                .build();
+        when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
+        DocumentInfo acasDocument = DocumentInfo.builder()
+                .description("ACAS Certificate")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(acasService.getAcasCertificates(any(), anyString(), anyString(), anyString()))
+                .thenReturn(acasDocument);
+
+        assertDoesNotThrow(() -> et1SubmissionService.createAndUploadEt1Docs(caseDetails, "authToken"));
+        assertEquals(7, caseDetails.getCaseData().getDocumentCollection().size());
     }
 
     @ParameterizedTest

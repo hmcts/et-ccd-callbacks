@@ -67,7 +67,7 @@ public final class Helper {
             + "be added from the List Hearing menu item";
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
-
+    private static final String MY_HMCTS = "MyHMCTS";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Helper() {
@@ -390,8 +390,8 @@ public final class Helper {
         return CollectionUtils.isEmpty(list) ? null : list.get(0);
     }
 
-    public static boolean claimantMyHmctsCase(CaseData caseData) {
-        return "MyHMCTS".equals(caseData.getCaseSource())
+    public static boolean isRepresentedClaimantWithMyHmctsCase(CaseData caseData) {
+        return MY_HMCTS.equals(caseData.getCaseSource())
                && YES.equals(caseData.getClaimantRepresentedQuestion())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());

@@ -8,9 +8,11 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.LiveCasesService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,11 +39,13 @@ class MultipleUpdateServiceTest {
     private MultipleBatchUpdate2Service multipleBatchUpdate2Service;
     @Mock
     private MultipleBatchUpdate3Service multipleBatchUpdate3Service;
+    @Mock
+    private LiveCasesService liveCasesService;
 
     @InjectMocks
     private MultipleUpdateService multipleUpdateService;
 
-    private TreeMap<String, Object> multipleObjectsFlags;
+    private SortedMap<String, Object> multipleObjectsFlags;
     private MultipleDetails multipleDetails;
     private String userToken;
 

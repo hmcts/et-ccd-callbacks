@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -45,6 +46,7 @@ public class RespondentTellSomethingElseController {
     private final VerifyTokenService verifyTokenService;
     private final RespondentTellSomethingElseService resTseService;
     private final TseService tseService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -188,6 +190,7 @@ public class RespondentTellSomethingElseController {
         resTseService.sendClaimantEmail(caseDetails);
         resTseService.sendAdminEmail(caseDetails);
         tseService.clearApplicationData(caseData);
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

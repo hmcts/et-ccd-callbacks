@@ -34,6 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceT
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_DOCUMENT_URL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_PDF_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_USER_TOKEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_SAMPLE_PDF_BYTE_ARRAY_SIZE;
 
@@ -65,7 +66,8 @@ class PdfBoxServiceTest {
             CaseData caseData, String userToken, String caseTypeId, String documentName, String pdfTemplate) {
         if (ObjectUtils.isEmpty(caseData)) {
             assertThatThrownBy(() -> pdfBoxService.generatePdfDocumentInfo(caseData, userToken, caseTypeId,
-                    documentName, pdfTemplate)).hasMessage(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
+                    documentName, pdfTemplate, SUBMIT_ET3))
+                    .hasMessage(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
             return;
         }
         if (isExceptionThrownForEmptyValueWithExpectedMessage(userToken, PDF_SERVICE_EXCEPTION_WHEN_USER_TOKEN_EMPTY,
@@ -87,7 +89,7 @@ class PdfBoxServiceTest {
             return;
         }
         DocumentInfo documentInfo = pdfBoxService.generatePdfDocumentInfo(
-                caseData, userToken, caseTypeId, documentName, pdfTemplate);
+                caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3);
 
         assertThat(documentInfo.getType()).isEqualTo(APPLICATION_PDF_VALUE);
         assertThat(documentInfo.getUrl()).contains(TEST_DOCUMENT_URL);
@@ -99,7 +101,7 @@ class PdfBoxServiceTest {
     @SneakyThrows
     void testConvertCaseToPdfAsByteArray() {
         CaseData caseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
-        byte[] pdfByteArray = pdfBoxService.convertCaseToPdfAsByteArray(caseData, ET3_FORM_PDF_TEMPLATE);
+        byte[] pdfByteArray = pdfBoxService.convertCaseToPdfAsByteArray(caseData, ET3_FORM_PDF_TEMPLATE, SUBMIT_ET3);
         assertThat(pdfByteArray).hasSize(TEST_SAMPLE_PDF_BYTE_ARRAY_SIZE);
     }
 
@@ -109,7 +111,7 @@ class PdfBoxServiceTest {
                                                                       String pdfTemplate) {
         if (StringUtils.isBlank(emptyValue)) {
             assertThatThrownBy(() -> pdfBoxService
-                    .generatePdfDocumentInfo(caseData, userToken, caseTypeId, documentName, pdfTemplate))
+                    .generatePdfDocumentInfo(caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3))
                     .hasMessage(expectedMessage);
             return true;
         }

@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.SortedMap;
@@ -56,8 +57,8 @@ public class MultipleUploadService {
                         errors);
 
                 log.info("Update the document information");
-                log.info("File name uploaded: "
-                        + multipleData.getCaseImporterFile().getUploadedDocument().getDocumentFilename());
+                log.info("File name uploaded: {}",
+                        multipleData.getCaseImporterFile().getUploadedDocument().getDocumentFilename());
 
                 setSubMultipleInSingleCaseData(userToken, errors, multipleDetails);
                 multipleData.setCaseImporterFile(
@@ -67,7 +68,7 @@ public class MultipleUploadService {
 
             } else {
 
-                log.error("Errors uploading excel: " + errors);
+                log.error("Errors uploading excel: {}", errors);
 
             }
 
@@ -119,11 +120,11 @@ public class MultipleUploadService {
 
             }
 
-            log.info("Number of columns: " + datatypeSheet.getRow(0).getLastCellNum());
+            log.info("Number of columns: {}", datatypeSheet.getRow(0).getLastCellNum());
+            int headersSize = MultiplesHelper.getHeaders().size();
+            if (datatypeSheet.getRow(0).getLastCellNum() != headersSize) {
 
-            if (datatypeSheet.getRow(0).getLastCellNum() != MultiplesHelper.HEADERS.size()) {
-
-                errors.add(ERROR_SHEET_NUMBER_COLUMNS + MultiplesHelper.HEADERS.size());
+                errors.add(ERROR_SHEET_NUMBER_COLUMNS + headersSize);
 
             }
 

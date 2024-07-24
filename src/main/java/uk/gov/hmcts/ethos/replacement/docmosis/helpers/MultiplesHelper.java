@@ -12,11 +12,11 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleType;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.ExcelGenerationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,16 +39,21 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_6;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_7;
 
 @Slf4j
 public final class MultiplesHelper {
 
-    public static final List<String> HEADERS = new ArrayList<>(Arrays.asList(
-            HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5, HEADER_6));
+    private static final List<String> HEADERS = new ArrayList<>(List.of(
+            HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5, HEADER_6, HEADER_7));
     public static final String SELECT_ALL = "All";
     public static final String MULTIPLE_SUFFIX = "_Multiple";
 
     private MultiplesHelper() {
+    }
+
+    public static List<String> getHeaders() {
+        return HEADERS;
     }
 
     public static List<String> getCaseIds(MultipleData multipleData) {
@@ -324,12 +329,12 @@ public final class MultiplesHelper {
 
         for (Object item : list) {
             String ethosCaseRef;
-            if (item instanceof String) {
-                ethosCaseRef = (String) item;
-            } else if (item instanceof MultipleObject) {
-                ethosCaseRef = ((MultipleObject) item).getEthosCaseRef();
-            } else if (item instanceof SchedulePayload) {
-                ethosCaseRef = ((SchedulePayload) item).getEthosCaseRef();
+            if (item instanceof String string) {
+                ethosCaseRef = string;
+            } else if (item instanceof MultipleObject multipleObject) {
+                ethosCaseRef = multipleObject.getEthosCaseRef();
+            } else if (item instanceof SchedulePayload schedulePayload) {
+                ethosCaseRef = schedulePayload.getEthosCaseRef();
             } else {
                 log.info("unrecognised input object type: {}", item.getClass());
                 break;
@@ -360,7 +365,7 @@ public final class MultiplesHelper {
             workbook.close();
         } catch (IOException e) {
             log.error("Error generating the excel");
-            throw new RuntimeException("Error generating the excel", e);
+            throw new ExcelGenerationException("Error generating the excel", e);
         }
 
         return bos.toByteArray();

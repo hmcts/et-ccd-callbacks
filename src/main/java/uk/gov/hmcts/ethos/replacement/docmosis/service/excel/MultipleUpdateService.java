@@ -3,9 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.LiveCasesService;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,9 +26,10 @@ public class MultipleUpdateService {
     private final MultipleBatchUpdate1Service multipleBatchUpdate1Service;
     private final MultipleBatchUpdate2Service multipleBatchUpdate2Service;
     private final MultipleBatchUpdate3Service multipleBatchUpdate3Service;
+    private final LiveCasesService liveCasesService;
 
     public void bulkUpdateLogic(String userToken, MultipleDetails multipleDetails, List<String> errors)
-        throws IOException {
+            throws IOException {
 
         log.info("Read excel to update logic");
 
@@ -65,7 +68,10 @@ public class MultipleUpdateService {
                                   List<String> errors,
                                   SortedMap<String, Object> multipleObjects) throws IOException {
 
-        String batchUpdateType = multipleDetails.getCaseData().getBatchUpdateType();
+        MultipleData multipleData = multipleDetails.getCaseData();
+        String batchUpdateType = multipleData.getBatchUpdateType();
+
+        liveCasesService.filterLiveCases(userToken, multipleDetails.getCaseTypeId(), multipleObjects, multipleData);
 
         if (batchUpdateType.equals(BATCH_UPDATE_TYPE_1)) {
 
@@ -94,5 +100,4 @@ public class MultipleUpdateService {
         }
 
     }
-
 }

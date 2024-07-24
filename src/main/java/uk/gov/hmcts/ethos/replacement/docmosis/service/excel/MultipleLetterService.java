@@ -56,16 +56,16 @@ public class MultipleLetterService {
 
         DocumentInfo documentInfo = new DocumentInfo();
 
-        if (!multipleObjects.keySet().isEmpty()) {
+        if (multipleObjects.keySet().isEmpty()) {
+
+            errors.add(NO_CASES_SEARCHED);
+
+        } else {
 
             log.info("Check top level document to generate");
 
             documentInfo = checkGenerationLetterOrLabel(userToken, multipleDetails,
                     multipleObjects, errors, documentInfo, validation);
-
-        } else {
-
-            errors.add(NO_CASES_SEARCHED);
 
         }
         if (!validation) {

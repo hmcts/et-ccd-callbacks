@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -51,6 +52,7 @@ public class Et3VettingController {
             + "<li>add any changed or new information to case details</li></ul>";
     private final VerifyTokenService verifyTokenService;
     private final Et3VettingService et3VettingService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     /**
      * Called for the ET3 "Select Respondent" page. Creates a DynamicList containing a list of all the respondents
@@ -192,7 +194,7 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+        Et3VettingHelper.setRespondentNameAndAddress(caseData);
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -291,7 +293,7 @@ public class Et3VettingController {
         DocumentInfo documentInfo = et3VettingService.generateEt3ProcessingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
-
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

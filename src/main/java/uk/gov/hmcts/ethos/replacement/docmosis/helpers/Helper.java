@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.common.Strings;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -65,10 +66,10 @@ public final class Helper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Helper() {
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public static String nullCheck(String value) {
@@ -278,7 +279,7 @@ public final class Helper {
      * @return A new object that has a subset of data from the source object dependent on the class passed
      */
     public static Object intersectProperties(Object sourceObject, Class<?> targetClassType) {
-        return objectMapper.convertValue(sourceObject, targetClassType);
+        return OBJECT_MAPPER.convertValue(sourceObject, targetClassType);
     }
 
     /**
@@ -385,5 +386,12 @@ public final class Helper {
      */
     public static String getFirstListItem(List<String> list) {
         return CollectionUtils.isEmpty(list) ? null : list.get(0);
+    }
+
+    public static boolean claimantMyHmctsCase(CaseData caseData) {
+        return "MyHMCTS".equals(caseData.getCaseSource())
+               && YES.equals(caseData.getClaimantRepresentedQuestion())
+               && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
+               && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
     }
 }

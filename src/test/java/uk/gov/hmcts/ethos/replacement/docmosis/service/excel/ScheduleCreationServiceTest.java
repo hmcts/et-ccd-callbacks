@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import static org.junit.Assert.assertNotNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
@@ -27,8 +27,8 @@ class ScheduleCreationServiceTest {
     @InjectMocks
     private ScheduleCreationService scheduleCreationService;
 
-    private TreeMap<String, Object> multipleObjectsFlags;
-    private TreeMap<String, Object> multipleObjectsSubMultiple;
+    private SortedMap<String, Object> multipleObjectsFlags;
+    private SortedMap<String, Object> multipleObjectsSubMultiple;
     private MultipleDetails multipleDetails;
     private List<SchedulePayload> schedulePayloads;
 

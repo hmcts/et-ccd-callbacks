@@ -6,6 +6,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -25,44 +27,46 @@ class RowHandlerImportStrategyTest {
     }
 
     @Test
-    void testImportWorkbookRowHandlerAccepts() {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        TribunalOffice[] tribunalOffices = TribunalOffice.values();
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
-            createSheet(workbook, tribunalOffice.getOfficeName());
-        }
+    void testImportWorkbookRowHandlerAccepts() throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            TribunalOffice[] tribunalOffices = TribunalOffice.values();
+            for (TribunalOffice tribunalOffice : tribunalOffices) {
+                createSheet(workbook, tribunalOffice.getOfficeName());
+            }
 
-        TestSheetHandler sheetHandler = new TestSheetHandler();
-        RowHandler rowHandler = mock(RowHandler.class);
-        when(rowHandler.accept(isA(Row.class))).thenReturn(true);
-        RowHandlerImportStrategy strategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
+            TestSheetHandler sheetHandler = new TestSheetHandler();
+            RowHandler rowHandler = mock(RowHandler.class);
+            when(rowHandler.accept(isA(Row.class))).thenReturn(true);
+            RowHandlerImportStrategy strategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
 
-        strategy.importWorkbook(workbook);
+            strategy.importWorkbook(workbook);
 
-        verify(rowHandler, times(tribunalOffices.length)).accept(isA(Row.class));
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
-            verify(rowHandler, times(1)).handle(eq(tribunalOffice), isA(Row.class));
+            verify(rowHandler, times(tribunalOffices.length)).accept(isA(Row.class));
+            for (TribunalOffice tribunalOffice : tribunalOffices) {
+                verify(rowHandler, times(1)).handle(eq(tribunalOffice), isA(Row.class));
+            }
         }
     }
 
     @Test
-    void testImportWorkbookRowHandlerNotAccepts() {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        TribunalOffice[] tribunalOffices = TribunalOffice.values();
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
-            createSheet(workbook, tribunalOffice.getOfficeName());
-        }
+    void testImportWorkbookRowHandlerNotAccepts() throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            TribunalOffice[] tribunalOffices = TribunalOffice.values();
+            for (TribunalOffice tribunalOffice : tribunalOffices) {
+                createSheet(workbook, tribunalOffice.getOfficeName());
+            }
 
-        TestSheetHandler sheetHandler = new TestSheetHandler();
-        RowHandler rowHandler = mock(RowHandler.class);
-        when(rowHandler.accept(isA(Row.class))).thenReturn(false);
-        RowHandlerImportStrategy strategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
+            TestSheetHandler sheetHandler = new TestSheetHandler();
+            RowHandler rowHandler = mock(RowHandler.class);
+            when(rowHandler.accept(isA(Row.class))).thenReturn(false);
+            RowHandlerImportStrategy strategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
 
-        strategy.importWorkbook(workbook);
+            strategy.importWorkbook(workbook);
 
-        verify(rowHandler, times(tribunalOffices.length)).accept(isA(Row.class));
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
-            verify(rowHandler, never()).handle(eq(tribunalOffice), isA(Row.class));
+            verify(rowHandler, times(tribunalOffices.length)).accept(isA(Row.class));
+            for (TribunalOffice tribunalOffice : tribunalOffices) {
+                verify(rowHandler, never()).handle(eq(tribunalOffice), isA(Row.class));
+            }
         }
     }
 

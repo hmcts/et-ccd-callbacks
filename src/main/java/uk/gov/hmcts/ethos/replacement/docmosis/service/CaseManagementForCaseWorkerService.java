@@ -186,7 +186,7 @@ public class CaseManagementForCaseWorkerService {
         if (documentCollection != null) {
             for (DocumentTypeItem documentTypeItem : documentCollection) {
                 DocumentType documentType = documentTypeItem.getValue();
-                if (claimantDocs.contains(defaultIfEmpty(documentType.getTypeOfDocument(), ""))) {
+                if (claimantDocs.contains(defaultIfEmpty(documentType.getStartingClaimDocuments(), ""))) {
                     claimantDocumentCollection.add(documentTypeItem);
                 }
             }

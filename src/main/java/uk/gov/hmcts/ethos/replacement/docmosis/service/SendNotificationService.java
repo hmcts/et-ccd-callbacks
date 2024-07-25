@@ -222,7 +222,7 @@ public class SendNotificationService {
             return;
         }
 
-        // Send notification to the claimant Only
+        // Send notification to the claimant
         String caseId = caseDetails.getCaseId();
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
             // If represented, send notification to claimant representative Only
@@ -236,7 +236,7 @@ public class SendNotificationService {
                             personalisation);
                 }
             } else {
-                // If not represented, send notification to the claimant Only
+                // If not represented, send notification to the claimant
                 String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
                 // Send notification to the claimant only if the claimant is a system user
                 if (!isClaimantNonSystemUser(caseData) && !isNullOrEmpty(claimantEmailAddress)) {

@@ -230,11 +230,10 @@ public class SendNotificationService {
                 personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
                 personalisation.put(LINK_TO_EXUI,
                         emailService.getClaimantRepExuiCaseNotificationsLink(caseDetails.getCaseId()));
-                if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
-                    return;
+                if (!isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
+                    emailService.sendEmail(claimantRepSendNotificationTemplateId, personalisation.get(EMAIL_ADDRESS),
+                            personalisation);
                 }
-                emailService.sendEmail(claimantRepSendNotificationTemplateId, personalisation.get(EMAIL_ADDRESS),
-                        personalisation);
             } else {
                 // If not represented, send notification to the claimant Only
                 String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();

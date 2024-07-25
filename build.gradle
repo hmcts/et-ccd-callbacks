@@ -337,7 +337,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version: '2.3.0'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '14fabd4914'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: 'b3b7ec6f4f'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
 

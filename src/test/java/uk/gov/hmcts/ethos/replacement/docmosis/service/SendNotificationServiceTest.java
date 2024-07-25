@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -120,6 +121,10 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationDetails("details");
         caseData.setSendNotificationRequestMadeBy("Judge");
         caseData.setNotificationSentFrom("60001");
+
+        //ensures that the case is for system user
+        caseDetails.getCaseData().setEt1OnlineSubmission("Yes");
+        caseDetails.getCaseData().setHubLinksStatuses(new HubLinksStatuses());
     }
 
     @Test
@@ -331,8 +336,21 @@ class SendNotificationServiceTest {
         Organisation org = Organisation.builder().organisationID("myHmctsOrgId").organisationName("testOrg").build();
         representedTypeC.setMyHmctsOrganisation(org);
         caseDetails.getCaseData().setRepresentativeClaimantType(representedTypeC);
-        when(emailService.getExuiCaseLink(anyString()))
-                .thenReturn("http://localhost:3455/cases/case-details/" + caseDetails.getCaseId());
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(0)).sendEmail(anyString(), anyString(), anyMap());
+    }
+
+    @Test
+    void sendNotifyEmails_ClaimantNotRepresented_NonSystemUser() {
+        caseDetails.getCaseData().setSendNotificationSubject(List.of("OTHER_SUBJECT"));
+        caseDetails.getCaseData().setSendNotificationNotify(CLAIMANT_ONLY);
+        when(featureToggleService.isEccEnabled()).thenReturn(true);
+        caseDetails.getCaseData().setCaseSource("ET1Online");
+        caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
+        caseDetails.getCaseData().setEt1OnlineSubmission(null);
+        caseDetails.getCaseData().setHubLinksStatuses(null);
+        caseDetails.getCaseData().setRepresentativeClaimantType(null);
 
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(0)).sendEmail(anyString(), anyString(), anyMap());

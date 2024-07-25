@@ -276,11 +276,11 @@ public class CaseActionsForCaseWorkerController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
 
-        List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         if (errors.isEmpty()) {
-            defaultValuesReaderService.setSubmissionReference(ccdRequest.getCaseDetails());
-            DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
+            defaultValuesReaderService.setSubmissionReference(caseDetails);
+            DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
@@ -292,7 +292,7 @@ public class CaseActionsForCaseWorkerController {
             DocumentHelper.setDocumentNumbers(caseData);
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
-            defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+            defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
 
             boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
             log.info("Caseflags feature flag is {}", caseFlagsToggle);
@@ -308,6 +308,7 @@ public class CaseActionsForCaseWorkerController {
             }
 
             if (featureToggleService.citizenEt1Generation() && "SUBMIT_CASE_DRAFT".equals(ccdRequest.getEventId())) {
+                caseDetails.setCaseData(caseData);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
                 et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
             }

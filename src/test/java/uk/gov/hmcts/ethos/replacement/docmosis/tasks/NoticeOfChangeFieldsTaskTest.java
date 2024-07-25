@@ -65,9 +65,9 @@ class NoticeOfChangeFieldsTaskTest {
         SubmitEvent submitEvent = new ObjectMapper().readValue(ResourceLoader.getResource("caseDetailsTest1.json"),
                 SubmitEvent.class);
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+                .thenReturn(List.of(submitEvent));
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
-                .thenReturn(Collections.emptyList()).thenReturn(Collections.emptyList());
+                .thenReturn(Collections.emptyList());
         CaseData caseData = submitEvent.getCaseData();
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)

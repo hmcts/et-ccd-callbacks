@@ -59,11 +59,10 @@ public class NoticeOfChangeFieldsTask {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
-                while (CollectionUtils.isNotEmpty(cases)) {
-                    cases.forEach(c -> triggerEventForCase(adminUserToken, c, caseTypeId));
-                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                    log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
+                if (CollectionUtils.isEmpty(cases)) {
+                    return;
                 }
+                cases.forEach(submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

@@ -192,7 +192,8 @@ public class Et1SubmissionService {
                     : claimantSubmissionTemplateId;
             emailService.sendEmail(templateId,
                     userDetails.getEmail(),
-                    Map.of("firstName", userDetails.getFirstName(),
+                    Map.of(CASE_NUMBER, caseDetails.getCaseData().getEthosCaseReference(),
+                            "firstName", userDetails.getFirstName(),
                             "lastName", userDetails.getLastName(),
                             LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId())
                     ));

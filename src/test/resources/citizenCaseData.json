@@ -1,5 +1,6 @@
 {
   "case_data": {
+    "ethosCaseReference": "6000001/2024",
     "typesOfClaim" : [ "discrimination", "breachOfContract", "payRelated", "unfairDismissal", "whistleBlowing",
       "otherTypesOfClaims" ],
     "caseType" : "Single",

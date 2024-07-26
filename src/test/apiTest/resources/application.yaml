@@ -1,6 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5050/et_cos
+    password: ${ET_COS_DB_PASSWORD:}
+    url: jdbc:postgresql://${ET_COS_DB_HOST:localhost}:${ET_COS_DB_PORT:5432}/${ET_COS_DB_NAME:et_cos}${ET_COS_DB_CONN_OPTIONS:}
+    username: ${ET_COS_DB_USER_NAME:et_cos}
   flyway:
     locations: classpath:db/migration,classpath:db/dev
   main:
@@ -160,6 +162,9 @@ cron:
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
+  noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}
 
 pdf:
   et3form: "ET3_0224.pdf"
+
+rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}

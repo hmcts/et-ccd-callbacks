@@ -164,3 +164,5 @@ cron:
 
 pdf:
   et3form: "ET3_0224.pdf"
+
+rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}

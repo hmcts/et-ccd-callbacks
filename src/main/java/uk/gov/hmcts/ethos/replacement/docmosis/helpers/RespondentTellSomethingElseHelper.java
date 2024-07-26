@@ -67,6 +67,7 @@ public final class RespondentTellSomethingElseHelper {
         APPLICATION_TYPE_DATA_MAP.put(TSE_APP_VARY_OR_REVOKE_AN_ORDER, caseData ->
                 new TSEApplicationTypeData(caseData.getResTseDocument12(), caseData.getResTseTextBox12()));
     }
+
     private RespondentTellSomethingElseHelper() {
     }
 

@@ -113,6 +113,15 @@ public class ClaimantTellSomethingElseController {
         claimantTseService.populateClaimantTse(caseData);
         tseService.createApplication(caseData, CLAIMANT_REP_TITLE);
         claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId());
+
+        // send email notifications
+        if (Boolean.TRUE.equals(Helper.isRespondentSystemUser(caseData))) {
+            claimantTseService.sendRespondentsEmail(caseDetails);
+        }
+        claimantTseService.sendAcknowledgementEmail(caseDetails, userToken);
+        claimantTseService.sendAdminEmail(caseDetails);
+
+        // clear application data
         tseService.clearApplicationData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

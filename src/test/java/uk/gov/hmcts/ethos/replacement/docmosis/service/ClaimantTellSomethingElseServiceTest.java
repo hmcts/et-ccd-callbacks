@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -65,11 +66,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_E
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class ClaimantTellSomethingElseServiceTest {
     private ClaimantTellSomethingElseService claimantTellSomethingElseService;
+    private EmailService emailService;
 
     @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
     private TornadoService tornadoService;
+    @MockBean
+    private UserIdamService userIdamService;
+    @MockBean
+    private TribunalOfficesService tribunalOfficesService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private static final Map<String, BiConsumer<CaseData, String>> APPLICATION_SETTER_MAP = new ConcurrentHashMap<>();
     private static final Map<String, BiConsumer<CaseData, UploadedDocumentType>>
@@ -110,7 +118,8 @@ class ClaimantTellSomethingElseServiceTest {
     @BeforeEach
     void setUp() {
         claimantTellSomethingElseService =
-                new ClaimantTellSomethingElseService(documentManagementService, tornadoService);
+                new ClaimantTellSomethingElseService(documentManagementService, tornadoService,
+                        userIdamService, emailService, featureToggleService, tribunalOfficesService);
     }
 
     @ParameterizedTest
@@ -310,4 +319,6 @@ class ClaimantTellSomethingElseServiceTest {
         uploadedDocumentType.setDocumentUrl("Some doc");
         return uploadedDocumentType;
     }
+
+
 }

@@ -41,6 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_HEARING_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
@@ -229,8 +230,9 @@ public class SendNotificationService {
             Map<String, String> personalisation;
             if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
                 personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
-                personalisation.put(LINK_TO_EXUI,
-                        emailService.getClaimantRepExuiCaseNotificationsLink(caseDetails.getCaseId()));
+                personalisation.put(CCD_ID, caseDetails.getCaseId());
+                personalisation.put(LINK_TO_EXUI, emailService.getClaimantRepExuiCaseNotificationsLink(
+                        caseDetails.getCaseId()));
                 if (!isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
                     emailService.sendEmail(claimantRepSendNotificationTemplateId, personalisation.get(EMAIL_ADDRESS),
                             personalisation);
@@ -345,5 +347,4 @@ public class SendNotificationService {
         emailData.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         return emailData;
     }
-
 }

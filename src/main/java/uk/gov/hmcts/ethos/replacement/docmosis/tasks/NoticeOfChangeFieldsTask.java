@@ -15,13 +15,15 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
@@ -36,7 +38,8 @@ public class NoticeOfChangeFieldsTask {
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
     private final FeatureToggleService featureToggleService;
-    private final NocRespondentRepresentativeService nocService;
+    private final CaseConverter caseConverter;
+    private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
     private final List<String> validStates = List.of(SUBMITTED_STATE, VETTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
 
     @Value("${cron.caseTypeId}")
@@ -74,7 +77,13 @@ public class NoticeOfChangeFieldsTask {
             CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
                     String.valueOf(submitEvent.getCaseId()), "UPDATE_CASE_SUBMITTED");
             CaseDetails caseDetails = ccdRequest.getCaseDetails();
-            CaseData caseData = nocService.prepopulateOrgPolicyAndNoc(caseDetails.getCaseData());
+
+            Map<String, Object> caseDataAsMap = caseConverter.toMap(caseDetails.getCaseData());
+            Map<String, Object> noticeOfChangeAnswers =
+                    noticeOfChangeFieldPopulator.generate(caseDetails.getCaseData());
+            caseDataAsMap.putAll(noticeOfChangeAnswers);
+            CaseData caseData = caseConverter.convert(caseDataAsMap, CaseData.class);
+
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
                     caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
             log.info("Added Notice of change fields for case {}", submitEvent.getCaseId());

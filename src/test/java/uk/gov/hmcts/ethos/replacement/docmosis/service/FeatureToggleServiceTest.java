@@ -114,6 +114,13 @@ class FeatureToggleServiceTest {
 
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenNoticeOfChangeFieldsIsEnabled(Boolean toggleStat) {
+        givenToggle("noticeOfChangeFields", toggleStat);
+        assertThat(featureToggleService.isNoticeOfChangeFieldsEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

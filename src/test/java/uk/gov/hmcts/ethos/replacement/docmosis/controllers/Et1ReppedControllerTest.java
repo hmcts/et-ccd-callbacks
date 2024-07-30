@@ -216,6 +216,7 @@ class Et1ReppedControllerTest {
                 .organisationIdentifier("AA11BB")
                 .build();
         when(et1ReppedService.getOrganisationDetailsFromUserId(anyString())).thenReturn(organisationsResponse);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any())).thenReturn(caseData);
     }
 
     @Test

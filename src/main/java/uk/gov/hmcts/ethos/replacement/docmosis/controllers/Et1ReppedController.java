@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWork
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class Et1ReppedController {
     private final Et1ReppedService et1ReppedService;
     private final FeatureToggleService featureToggleService;
     private final Et1SubmissionService et1SubmissionService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -510,6 +512,7 @@ public class Et1ReppedController {
         }
         et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
+        caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

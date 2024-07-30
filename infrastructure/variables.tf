@@ -49,3 +49,7 @@ variable "aks_subscription_id" {}
 variable "businessArea" {
   default = "CFT"
 }
+
+variable "postgres_geo_redundant_backups" {
+  default = false
+}

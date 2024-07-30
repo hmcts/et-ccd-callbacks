@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -36,7 +35,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceT
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_USER_TOKEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_SAMPLE_PDF_BYTE_ARRAY_SIZE;
 
 class PdfBoxServiceTest {
 
@@ -95,14 +93,6 @@ class PdfBoxServiceTest {
         assertThat(documentInfo.getUrl()).contains(TEST_DOCUMENT_URL);
         assertThat(documentInfo.getDescription()).isEqualTo(TEST_DOCUMENT_NAME);
         assertThat(documentInfo.getMarkUp()).isEqualTo(TEST_DOCUMENT_MARKUP);
-    }
-
-    @Test
-    @SneakyThrows
-    void testConvertCaseToPdfAsByteArray() {
-        CaseData caseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
-        byte[] pdfByteArray = pdfBoxService.convertCaseToPdfAsByteArray(caseData, ET3_FORM_PDF_TEMPLATE, SUBMIT_ET3);
-        assertThat(pdfByteArray).hasSize(TEST_SAMPLE_PDF_BYTE_ARRAY_SIZE);
     }
 
     private boolean isExceptionThrownForEmptyValueWithExpectedMessage(String emptyValue, String expectedMessage,

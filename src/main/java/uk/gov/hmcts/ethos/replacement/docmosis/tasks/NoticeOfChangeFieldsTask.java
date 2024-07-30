@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopula
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +60,11 @@ public class NoticeOfChangeFieldsTask {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
-                if (CollectionUtils.isEmpty(cases)) {
-                    return;
+                while (!cases.isEmpty()) {
+                    cases.forEach(submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
+                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                    log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
                 }
-                cases.forEach(submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
@@ -87,7 +86,7 @@ public class NoticeOfChangeFieldsTask {
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
                     caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
             log.info("Added Notice of change fields for case {}", submitEvent.getCaseId());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }

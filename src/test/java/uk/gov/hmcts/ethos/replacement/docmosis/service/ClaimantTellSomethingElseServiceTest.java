@@ -319,6 +319,4 @@ class ClaimantTellSomethingElseServiceTest {
         uploadedDocumentType.setDocumentUrl("Some doc");
         return uploadedDocumentType;
     }
-
-
 }

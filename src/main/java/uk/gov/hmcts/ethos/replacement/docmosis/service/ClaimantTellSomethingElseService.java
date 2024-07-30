@@ -77,7 +77,6 @@ public class ClaimantTellSomethingElseService {
     private final FeatureToggleService featureToggleService;
     private final TribunalOfficesService tribunalOfficesService;
 
-
     @Value("${template.tse.claimant-rep.application.claimant-rep-a}")
     private String tseClaimantRepAcknowledgeTypeATemplateId;
     @Value("${template.tse.claimant-rep.application.claimant-rep-b}")
@@ -194,9 +193,9 @@ public class ClaimantTellSomethingElseService {
         }
 
         emailService.sendEmail(
-                GROUP_B_TYPES.contains(applicationType) ?
-                        tseClaimantRepAcknowledgeTypeBTemplateId :
-                        tseClaimantRepAcknowledgeTypeCTemplateId,
+                GROUP_B_TYPES.contains(applicationType)
+                        ? tseClaimantRepAcknowledgeTypeBTemplateId
+                        : tseClaimantRepAcknowledgeTypeCTemplateId,
                 email,
                 prepareEmailContent(caseDetails));
     }
@@ -228,8 +227,8 @@ public class ClaimantTellSomethingElseService {
         String applicationType = caseData.getClaimantTseSelectApplication();
 
         if (CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND.equals(applicationType)
-        || NO.equals(caseData.getClaimantTseRule92())
-        || NO.equals(caseData.getClaimantTseRespNotAvailable())) {
+            || NO.equals(caseData.getClaimantTseRule92())
+            || NO.equals(caseData.getClaimantTseRespNotAvailable())) {
             return;
         }
 
@@ -266,7 +265,6 @@ public class ClaimantTellSomethingElseService {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
     }
-
 
     private List<String> getRespondentEmailAddressList(CaseData caseData) {
         List<String> respEmailAddresses = new ArrayList<>();

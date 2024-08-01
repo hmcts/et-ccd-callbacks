@@ -31,8 +31,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_APP_TYPE_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
-import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
@@ -52,6 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CONSIDER_DECISION_AFRESH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND;
@@ -195,7 +196,7 @@ public class ClaimantTellSomethingElseService {
         emailService.sendEmail(
                 GROUP_B_TYPES.contains(applicationType)
                         ? tseClaimantRepAcknowledgeTypeBTemplateId
-                        : tseClaimantRepAcknowledgeTypeCTemplateId,
+                        : tseClaimantRepAcknowledgeTypeATemplateId,
                 email,
                 prepareEmailContent(caseDetails));
     }
@@ -212,14 +213,16 @@ public class ClaimantTellSomethingElseService {
 
     private Map<String, String> prepareEmailContent(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        return Map.of(
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                CLAIMANT, caseData.getClaimant(),
-                RESPONDENT_NAMES, getRespondentNames(caseData),
-                HEARING_DATE, getNearestHearingToReferral(caseData, NOT_SET),
-                SHORT_TEXT, caseData.getClaimantTseSelectApplication(),
-                EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId())
-        );
+
+        Map<String, String> content = new ConcurrentHashMap<>();
+        content.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        content.put(CLAIMANT, caseData.getClaimant());
+        content.put(RESPONDENT_NAMES, getRespondentNames(caseData));
+        content.put(HEARING_DATE, getNearestHearingToReferral(caseData, NOT_SET));
+        content.put(SHORT_TEXT, caseData.getClaimantTseSelectApplication());
+        content.put(EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId()));
+
+        return content;
     }
 
     public void sendRespondentsEmail(CaseDetails caseDetails) {
@@ -286,7 +289,7 @@ public class ClaimantTellSomethingElseService {
                     : tseClaimantRepToRespAcknowledgeTypeBTemplateId;
         } else {
             return isWelsh
-                    ? cyTseClaimantToRespondentTypeBTemplateId
+                    ? cyTseClaimantToRespondentTypeATemplateId
                     : tseClaimantRepToRespAcknowledgeTypeATemplateId;
         }
     }
@@ -297,8 +300,8 @@ public class ClaimantTellSomethingElseService {
         JSONObject documentJson =
                 NotificationClient.prepareUpload(document, false, true, "52 weeks");
         String shortText = isWelsh
-                ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
-                : caseData.getResTseSelectApplication();
+                ? CY_APP_TYPE_MAP.get(APPLICATION_TYPE_MAP.get(caseData.getClaimantTseSelectApplication()))
+                : caseData.getClaimantTseSelectApplication();
         String datePlus7 = isWelsh
                 ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
                 : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
@@ -359,13 +362,13 @@ public class ClaimantTellSomethingElseService {
     private Map<String, String> prepareContentAdminEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
-        personalisation.put(EMAIL_FLAG, "");
-        personalisation.put(CLAIMANT, caseData.getClaimant());
-        personalisation.put(DATE, getNearestHearingToReferral(caseData, NOT_SET));
-        personalisation.put("url", emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        personalisation.put(RESPONDENTS, getRespondentNames(caseData));
-        return personalisation;
+        Map<String, String> content = new ConcurrentHashMap<>();
+        content.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        content.put(EMAIL_FLAG, "");
+        content.put(CLAIMANT, caseData.getClaimant());
+        content.put(DATE, getNearestHearingToReferral(caseData, NOT_SET));
+        content.put("url", emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        content.put(RESPONDENTS, getRespondentNames(caseData));
+        return content;
     }
 }

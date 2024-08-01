@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
@@ -39,7 +40,6 @@ public final class ClaimantTellSomethingElseHelper {
     private static final String CLAIMANT_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
     private static final Map<String, Function<CaseData, TSEApplicationTypeData>>
             APPLICATION_TYPE_DATA_MAP = new ConcurrentHashMap<>();
-    private static final Map<String, String> APPLICATION_TYPE_MAP = new ConcurrentHashMap<>();
 
     static {
         APPLICATION_TYPE_DATA_MAP.put(CLAIMANT_TSE_AMEND_CLAIM, caseData ->
@@ -70,22 +70,6 @@ public final class ClaimantTellSomethingElseHelper {
                 new TSEApplicationTypeData(caseData.getClaimantTseDocument13(), caseData.getClaimantTseTextBox13()));
     }
 
-    static {
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_AMEND_CLAIM, "amend");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS, "change-details");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_CONSIDER_DECISION_AFRESH, "reconsider-decision");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND, "witness");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_ORDER_OTHER_PARTY, "respondent");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_POSTPONE_A_HEARING, "postpone");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_RECONSIDER_JUDGMENT, "reconsider-judgement");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_RESPONDENT_NOT_COMPLIED, "non-compliance");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_RESTRICT_PUBLICITY, "publicity");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART, "strike");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER, "vary");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_WITHDRAW_CLAIM, "withdraw");
-        APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_CONTACT_THE_TRIBUNAL, "other");
-    }
-
     private ClaimantTellSomethingElseHelper() {
     }
 
@@ -100,7 +84,7 @@ public final class ClaimantTellSomethingElseHelper {
     }
 
     public static String claimantSelectApplicationToType(String selectApplication) {
-        String type = APPLICATION_TYPE_MAP.get(selectApplication);
+        String type = TSEConstants.APPLICATION_TYPE_MAP.get(selectApplication);
         if (type != null) {
             return type;
         } else {

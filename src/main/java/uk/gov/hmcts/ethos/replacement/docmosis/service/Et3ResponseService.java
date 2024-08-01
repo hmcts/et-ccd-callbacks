@@ -85,7 +85,7 @@ public class Et3ResponseService {
     }
 
     private void saveEt3DetailsToRespondent(CaseData caseData, UploadedDocumentType uploadedDocument) {
-        String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel();
+        String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel().trim();
 
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
                 .filter(r -> respondentSelected.equals(r.getValue().getRespondentName().trim()))

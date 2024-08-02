@@ -68,6 +68,8 @@ public class ET1ReppedConstants {
             "Monthly", MONTHS,
             "Annual", "Annual");
     public static final String NOT_SURE = "Not sure";
+    public static final String CLAIM_DETAILS_MISSING = "Provide the details of the claim by uploading a document or "
+                                                       + "entering them in the text box below";
 
     private ET1ReppedConstants() {
         // Access through static methods

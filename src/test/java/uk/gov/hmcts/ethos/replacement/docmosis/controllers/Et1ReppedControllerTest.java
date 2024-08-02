@@ -69,6 +69,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_DETAILS_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MULTIPLE_OPTION_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.TRIAGE_ERROR_MESSAGE;
@@ -888,7 +889,7 @@ class Et1ReppedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]", is("Please provide details of the claim")))
+                .andExpect(jsonPath("$.errors[0]", is(CLAIM_DETAILS_MISSING)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

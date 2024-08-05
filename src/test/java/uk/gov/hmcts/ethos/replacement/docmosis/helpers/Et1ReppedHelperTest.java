@@ -205,6 +205,8 @@ class Et1ReppedHelperTest {
     void validateGroundsError() {
         caseData.setEt1SectionThreeClaimDetails(null);
         caseData.setEt1SectionThreeDocumentUpload(null);
-        assertEquals(1, Et1ReppedHelper.validateGrounds(caseData).size());
+        List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
+        assertEquals(1, errors.size());
+        assertEquals(ET1ReppedConstants.CLAIM_DETAILS_MISSING, errors.get(0));
     }
 }

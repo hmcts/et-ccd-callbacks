@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_R
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.CASE_MANAGEMENT_ORDERS_REQUESTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.HEARING;
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -178,6 +179,30 @@ class SendNotificationServiceTest {
         sendNotificationService.createSendNotification(caseData);
         SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
         assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
+    }
+
+    @Test
+    void testUpdateHearingClaimantViewStateWithRespondentOnly() {
+        caseData.setSendNotificationSubject(List.of(CASE_MANAGEMENT_ORDERS_REQUESTS, HEARING));
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        sendNotificationService.updateHearingClaimantViewState(caseData);
+        assertNull(caseData.getHearingClaimantViewState());
+    }
+
+    @Test
+    void testUpdateHearingClaimantViewStateWithoutHearing() {
+        caseData.setSendNotificationSubject(List.of(CASE_MANAGEMENT_ORDERS_REQUESTS));
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        sendNotificationService.updateHearingClaimantViewState(caseData);
+        assertNull(caseData.getHearingClaimantViewState());
+    }
+
+    @Test
+    void testUpdateHearingClaimantViewStateReturnNotViewedYet() {
+        caseData.setSendNotificationSubject(List.of(HEARING));
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        sendNotificationService.updateHearingClaimantViewState(caseData);
+        assertEquals(NOT_VIEWED_YET, caseData.getHearingClaimantViewState());
     }
 
     @Test

@@ -54,6 +54,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 public class SendNotificationService {
     private static final String EMPLOYER_CONTRACT_CLAIM = "Employer Contract Claim";
     public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
+    public static final String HEARING = "Hearing";
 
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
@@ -156,6 +157,13 @@ public class SendNotificationService {
             return 1;
         }
         return caseData.getSendNotificationCollection().size() + 1;
+    }
+
+    public void updateHearingClaimantViewState(CaseData caseData) {
+        if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())
+            && caseData.getSendNotificationSubject().contains(HEARING)) {
+            caseData.setHearingClaimantViewState(NOT_VIEWED_YET);
+        }
     }
 
     public void clearSendNotificationFields(CaseData caseData) {

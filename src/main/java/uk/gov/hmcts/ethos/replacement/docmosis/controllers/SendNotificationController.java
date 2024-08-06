@@ -101,6 +101,7 @@ public class SendNotificationController {
         CaseData caseData = caseDetails.getCaseData();
         sendNotificationService.createSendNotification(caseData);
         sendNotificationService.sendNotifyEmails(caseDetails);
+        sendNotificationService.updateHearingClaimantViewState(caseData);
         sendNotificationService.clearSendNotificationFields(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

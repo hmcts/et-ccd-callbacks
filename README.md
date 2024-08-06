@@ -5,7 +5,7 @@ This application is responsible for handling all CCD callback requests for Emplo
 ## Prerequisites
 
 ### Java
-- [JDK 11](https://www.oracle.com/java)
+- [JDK 17](https://www.oracle.com/java)
 
 ### CCD Common Components
 The application should be run locally in an environment that includes CCD common components.

@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClaimantTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 
@@ -143,5 +144,100 @@ public class ClaimantTellSomethingElseController {
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .confirmation_body(body)
                 .build());
+    }
+
+    @PostMapping(value = "/displayTable", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> displayClaimantApplicationsTable(
+            @RequestBody CCDRequest ccdRequest) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setClaimantTseTableMarkUp(claimantTseService.generateClaimantApplicationTableMarkdown(caseData));
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Resets the dynamic list for select an application to view either an open or closed application.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/viewApplicationsAboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Resets the dynamic list for select an application to to view")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setTseViewApplicationSelect(null);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Populates the dynamic list of the applications open or closed on a case.
+     * Called after 'view an application' is clicked and open or closed has been selected.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+
+    @PostMapping(value = "/midPopulateChooseApplication", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the  dynamic list of the open or closed applications")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> populateChooseApplication(
+
+            @RequestBody CCDRequest ccdRequest) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setTseViewApplicationSelect(
+                TseViewApplicationHelper.populateOpenOrClosedApplications(caseData, true));
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/midPopulateSelectedApplicationData", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates data for the selected application")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }), @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> populateSelectedApplicationData(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setTseApplicationSummaryAndResponsesMarkup(
+                tseService.formatViewApplication(caseData, userToken, true)
+        );
+        return getCallbackRespEntityNoErrors(caseData);
     }
 }

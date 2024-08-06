@@ -8,18 +8,24 @@ import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
@@ -36,6 +42,13 @@ public class ClaimantTellSomethingElseService {
 
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
+
+    private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
+    private static final String TABLE_COLUMNS_MARKDOWN =
+            "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
+                    + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
+                    + "%s\r\n";
+    private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
 
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -106,5 +119,30 @@ public class ClaimantTellSomethingElseService {
             body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_NO, caseData.getDocMarkUp());
         }
         return body;
+    }
+
+    public String generateClaimantApplicationTableMarkdown(CaseData caseData) {
+        List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
+        if (isEmpty(genericApplicationList)) {
+            return EMPTY_TABLE_MESSAGE;
+        }
+
+        AtomicInteger applicationNumber = new AtomicInteger(1);
+
+        String tableRows = genericApplicationList.stream()
+                .filter(TseViewApplicationHelper::applicationsSharedWithClaimant)
+                .map(o -> formatRow(o, applicationNumber))
+                .collect(Collectors.joining());
+
+        return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
+    }
+
+    private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
+        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+        int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
+        String status = Optional.ofNullable(value.getStatus()).orElse(OPEN_STATE);
+
+        return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
+                value.getDate(), value.getDueDate(), responses, status);
     }
 }

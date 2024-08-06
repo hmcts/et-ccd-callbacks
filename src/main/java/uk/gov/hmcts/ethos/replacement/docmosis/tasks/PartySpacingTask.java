@@ -66,8 +66,10 @@ public class PartySpacingTask {
                     if (featureToggleService.isPartySpacingCronEnabled()) {
                         cases.forEach(submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
                     }
-                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                    log.info("{} - Party spacing task - Retrieved {} cases", caseTypeId, cases.size());
+                    if (featureToggleService.isPartySpacingCronEnabled()) {
+                        cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                        log.info("{} - Party spacing task - Retrieved {} cases", caseTypeId, cases.size());
+                    }
                 }
             } catch (Exception e) {
                 log.error(e.getMessage());

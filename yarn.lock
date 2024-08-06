@@ -7605,7 +7605,7 @@ __metadata:
     sinon: 18.0.0
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 4.0.1
+    sonarqube-scanner: 4.2.0
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
@@ -14075,6 +14075,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"properties-file@npm:3.5.4":
+  version: 3.5.4
+  resolution: "properties-file@npm:3.5.4"
+  checksum: b87485eee2afc62237d221749055a4143e9d5d1d5876260ac93fd9041e58b376d9cbdbc9ffc41da1d9e369747cc8ae5a3ef2ad50e897b93da5c4ab9091fcb189
+  languageName: node
+  linkType: hard
+
 "proto-list@npm:~1.2.1":
   version: 1.2.4
   resolution: "proto-list@npm:1.2.4"
@@ -15831,9 +15838,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:4.0.1":
-  version: 4.0.1
-  resolution: "sonarqube-scanner@npm:4.0.1"
+"sonarqube-scanner@npm:4.2.0":
+  version: 4.2.0
+  resolution: "sonarqube-scanner@npm:4.2.0"
   dependencies:
     adm-zip: 0.5.12
     axios: 1.6.8
@@ -15842,13 +15849,14 @@ __metadata:
     hpagent: 1.2.0
     jest-sonar-reporter: 2.0.0
     node-forge: ^1.3.1
+    properties-file: 3.5.4
     proxy-from-env: ^1.1.0
     semver: 7.6.0
     slugify: 1.6.6
     tar-stream: 3.1.7
   bin:
     sonar-scanner: bin/sonar-scanner
-  checksum: 3dfd85f27cbd1b4640569af452fb30c8dca0ac12209ec137196b1e0799f90b405f3f2ec5c6edbba639bb9d1bf04c84e26e280cc08a162328f8511c6fe95d9606
+  checksum: 610fa683ae09ab559d4139c3ac73d5a1a38ee37754f47e064abea0add1922d5604ea026b114405a1585e5cd2067fac16621746d2c985ba550d525179c4333627
   languageName: node
   linkType: hard
 

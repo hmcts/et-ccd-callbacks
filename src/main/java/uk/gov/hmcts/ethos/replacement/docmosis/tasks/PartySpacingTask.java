@@ -42,7 +42,6 @@ public class PartySpacingTask {
     private static final String RESPONDENT_REP_NAME = "data.repCollection.value.name_of_representative.keyword";
     private final List<String> validStates = List.of(SUBMITTED_STATE, VETTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
 
-
     @Value("${cron.caseTypeId}")
     private String caseTypeIdsString;
 

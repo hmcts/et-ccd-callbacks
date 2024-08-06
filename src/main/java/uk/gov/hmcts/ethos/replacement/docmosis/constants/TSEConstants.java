@@ -23,7 +23,8 @@ public final class TSEConstants {
             + "<h3>%s</h3>";
     public static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE = "<hr>"
                     + "<h2>Copy this correspondence to the other party</h2>"
-                    + "<p>You must submit your application after copying the correspondence to the other party.</p>"
+                    + "<p>You have submitted your application to the tribunal. "
+                    + "You must now copy the correspondence to the other party.</p>"
                     + "<p>To copy this correspondence to the other party, you must send it to them by post or email. "
                     + "You must include all supporting documents.</p>"
                     + "<h3>%s</h3>";

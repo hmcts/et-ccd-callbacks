@@ -1,8 +1,9 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.utils;
+package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import java.util.Arrays;
 import java.util.List;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.VETTED_STATE;
 
 @Component
 @RequiredArgsConstructor
@@ -35,6 +40,7 @@ public class PartySpacingTask {
     private static final String RESPONDENT_NAME_KEYWORD = "data.respondentCollection.value.respondent_name.keyword";
     private static final String CLAIMANT_REP_NAME = "data.representativeClaimantType.name_of_representative.keyword";
     private static final String RESPONDENT_REP_NAME = "data.repCollection.value.name_of_representative.keyword";
+    private final List<String> validStates = List.of(SUBMITTED_STATE, VETTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
 
     @Value("${cron.caseTypeId}")
     private String caseTypeIdsString;
@@ -57,7 +63,9 @@ public class PartySpacingTask {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 log.info("{} - Party spacing task - Retrieved {} cases", caseTypeId, cases.size());
                 while (!cases.isEmpty()) {
-                    cases.forEach(submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
+                    cases.stream()
+                            .filter(submitEvent -> featureToggleService.isPartySpacingCronEnabled())
+                            .forEach(submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
                     if (featureToggleService.isPartySpacingCronEnabled()) {
                         cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                         log.info("{} - Party spacing task - Retrieved {} cases", caseTypeId, cases.size());
@@ -95,6 +103,7 @@ public class PartySpacingTask {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
+                        .must(new TermsQueryBuilder("state.keyword", validStates))
                         // Not looking for claimant company as not onboarded yet
                         .should(new WildcardQueryBuilder(CLAIMANT_FIRST_NAMES_KEYWORD, "* "))
                         .should(new WildcardQueryBuilder(CLAIMANT_FIRST_NAMES_KEYWORD, " *"))

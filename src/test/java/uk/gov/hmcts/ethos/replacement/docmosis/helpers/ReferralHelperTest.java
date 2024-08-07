@@ -3,6 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,6 +49,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.PARTY_NOT_RESPONDED_COMPILED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.PARTY_NOT_RESPONDED_COMPLIED;
 
 class ReferralHelperTest {
     private CaseData caseData;
@@ -300,6 +306,26 @@ class ReferralHelperTest {
         assertEquals("Yes", caseData.getUpdateIsUrgent());
         assertEquals("Instruction", caseData.getUpdateReferralInstruction());
         assertEquals("Subject Specify", caseData.getUpdateReferralSubjectSpecify());
+    }
+
+    @ParameterizedTest
+    @MethodSource("partyNotCompliedCorrectly")
+    void handlePartyNotCompliedCorrectly(String subject, String expected) {
+        caseData.setSelectReferral(new DynamicFixedListType("1"));
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
+        referral.setReferralSubject(subject);
+        ReferralHelper.populateUpdateReferralDetails(caseData);
+        assertEquals(expected, caseData.getUpdateReferralSubject());
+    }
+
+    public static Stream<Arguments> partyNotCompliedCorrectly() {
+        return Stream.of(
+                Arguments.of(PARTY_NOT_RESPONDED_COMPLIED, PARTY_NOT_RESPONDED_COMPILED),
+                Arguments.of(PARTY_NOT_RESPONDED_COMPILED, PARTY_NOT_RESPONDED_COMPILED),
+                Arguments.of("Other", "Other"),
+                Arguments.of("ET1", "ET1")
+        );
     }
 
     @Test

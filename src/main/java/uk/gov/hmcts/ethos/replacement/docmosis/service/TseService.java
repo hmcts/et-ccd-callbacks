@@ -147,6 +147,7 @@ public class TseService {
     private void addClaimantRepresentativeData(CaseData caseData, GenericTseApplicationType application) {
         addClaimantData(caseData, application);
         application.setApplicant(CLAIMANT_REP_TITLE);
+        application.setType(caseData.getClaimantTseSelectApplication());
         addSupportingMaterialToDocumentCollection(caseData, application, true);
     }
 

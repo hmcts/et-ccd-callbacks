@@ -169,7 +169,6 @@ public class ClaimantTellSomethingElseController {
      * Resets the dynamic list for select an application to view either an open or closed application.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/viewApplicationsAboutToStart", consumes = APPLICATION_JSON_VALUE)
@@ -195,7 +194,6 @@ public class ClaimantTellSomethingElseController {
      * Called after 'view an application' is clicked and open or closed has been selected.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
 
@@ -236,7 +234,7 @@ public class ClaimantTellSomethingElseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseApplicationSummaryAndResponsesMarkup(
-                tseService.formatViewApplication(caseData, userToken, true)
+                tseService.formatViewApplication(caseData, userToken, false)
         );
         return getCallbackRespEntityNoErrors(caseData);
     }

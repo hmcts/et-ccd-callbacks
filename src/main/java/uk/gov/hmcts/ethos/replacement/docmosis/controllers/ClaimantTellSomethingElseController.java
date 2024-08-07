@@ -148,13 +148,13 @@ public class ClaimantTellSomethingElseController {
 
     @PostMapping(value = "/displayTable", consumes = APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> displayClaimantApplicationsTable(
             @RequestBody CCDRequest ccdRequest) {
@@ -174,13 +174,13 @@ public class ClaimantTellSomethingElseController {
     @PostMapping(value = "/viewApplicationsAboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Resets the dynamic list for select an application to to view")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
             @RequestBody CCDRequest ccdRequest) {
@@ -200,13 +200,13 @@ public class ClaimantTellSomethingElseController {
     @PostMapping(value = "/midPopulateChooseApplication", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the  dynamic list of the open or closed applications")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> populateChooseApplication(
 
@@ -221,12 +221,13 @@ public class ClaimantTellSomethingElseController {
     @PostMapping(value = "/midPopulateSelectedApplicationData", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates data for the selected application")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }), @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> populateSelectedApplicationData(
             @RequestBody CCDRequest ccdRequest,

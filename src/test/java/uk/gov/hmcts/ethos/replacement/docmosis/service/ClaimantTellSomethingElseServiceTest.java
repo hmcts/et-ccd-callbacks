@@ -27,6 +27,8 @@ import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,6 +42,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ALL_OR_PART_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_SETTLED;
@@ -61,6 +64,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLA
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.GIVE_DETAIL_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ReferralsUtil.createRespondentType;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class ClaimantTellSomethingElseServiceTest {
@@ -106,6 +110,13 @@ class ClaimantTellSomethingElseServiceTest {
         DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER, CaseData::setClaimantTseDocument12);
         DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_WITHDRAW_CLAIM, CaseData::setClaimantTseDocument13);
     }
+
+    private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
+            + "Response due | Number of responses | Status "
+            + "|\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType"
+            + "|Claimant Representative|testDate|testDueDate|0|Open|\r\n\r\n";
+
+    private static final String EXPECTED_EMPTY_TABLE_MESSAGE = "There are no applications to view";
 
     @BeforeEach
     void setUp() {
@@ -309,5 +320,58 @@ class ClaimantTellSomethingElseServiceTest {
         uploadedDocumentType.setDocumentFilename("testFileName");
         uploadedDocumentType.setDocumentUrl("Some doc");
         return uploadedDocumentType;
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_hasApplications() {
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
+        caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());
+
+        assertThat(claimantTellSomethingElseService.generateClaimantApplicationTableMarkdown(caseData),
+                is(EXPECTED_TABLE_MARKDOWN));
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_hasNoApplications() {
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
+
+        assertThat(claimantTellSomethingElseService.generateClaimantApplicationTableMarkdown(caseData),
+                is(EXPECTED_EMPTY_TABLE_MESSAGE));
+    }
+
+    private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {
+        GenericTseApplicationType tseApplicationType = new GenericTseApplicationType();
+
+        tseApplicationType.setDate("testDate");
+        tseApplicationType.setNumber("number");
+        tseApplicationType.setApplicant(CLAIMANT_REP_TITLE);
+        tseApplicationType.setDetails("testDetails");
+        tseApplicationType.setDocumentUpload(createDocumentType());
+        tseApplicationType.setType("testType");
+        tseApplicationType.setCopyToOtherPartyYesOrNo("yes");
+        tseApplicationType.setCopyToOtherPartyText("text");
+        tseApplicationType.setDueDate("testDueDate");
+
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId("id");
+        tseApplicationTypeItem.setValue(tseApplicationType);
+
+        List<GenericTseApplicationTypeItem> tseApplicationCollection = new ArrayList<>();
+        tseApplicationCollection.add(tseApplicationTypeItem);
+
+        return tseApplicationCollection;
+    }
+
+    private CaseData createCaseData(String selectedApplication, String selectedRule92Answer) {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withEthosCaseReference("test")
+                .withClaimant("claimant")
+                .withClaimantType("person@email.com")
+                .build();
+        caseData.setClaimantTseSelectApplication(selectedApplication);
+        caseData.setClaimantTseRule92(selectedRule92Answer);
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+
+        return caseData;
     }
 }

@@ -3,9 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.elasticsearch.common.Strings;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
@@ -35,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_PAPERS;
@@ -52,9 +53,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_REPLY_TO_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_STRIKING_OUT_WARNING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.COMPANY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
@@ -140,7 +143,7 @@ public final class Helper {
             if (caseData.getRespondentCollection().size() == 1
                     && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseStruckOut())
                     && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseReceived())
-                    && !Strings.isNullOrEmpty(caseData.getRespondentCollection().get(0)
+                    && !isNullOrEmpty(caseData.getRespondentCollection().get(0)
                     .getValue().getResponseReceivedDate())) {
                 return caseData.getRespondentCollection();
             }
@@ -374,5 +377,58 @@ public final class Helper {
                && YES.equals(caseData.getClaimantRepresentedQuestion())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
+    }
+
+    /**
+     * Removes leading and trailing spaces from party names.
+     * @param caseData the case data to remove spaces from
+     */
+    public static void removeSpacesFromPartyNames(CaseData caseData) {
+        removeSpacesFromClaimant(caseData);
+        removeSpacesFromClaimantRepresentative(caseData);
+        removeSpacesFromRespondent(caseData);
+        removeSpacesFromRespondentRepresentative(caseData);
+    }
+
+    private static void removeSpacesFromRespondentRepresentative(CaseData caseData) {
+        if (ObjectUtils.isNotEmpty(caseData.getRepCollection())) {
+            caseData.getRepCollection().stream()
+                    .filter(ObjectUtils::isNotEmpty)
+                    .map(RepresentedTypeRItem::getValue)
+                    .filter(r -> ObjectUtils.isNotEmpty(r) && !isNullOrEmpty(r.getNameOfRepresentative()))
+                    .forEach(r -> r.setNameOfRepresentative(r.getNameOfRepresentative().trim()));
+        }
+    }
+
+    private static void removeSpacesFromRespondent(CaseData caseData) {
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            caseData.getRespondentCollection().stream()
+                    .filter(ObjectUtils::isNotEmpty)
+                    .map(RespondentSumTypeItem::getValue)
+                    .filter(r -> ObjectUtils.isNotEmpty(r) && !isNullOrEmpty(r.getRespondentName()))
+                    .forEach(r -> r.setRespondentName(r.getRespondentName().trim()));
+        }
+    }
+
+    private static void removeSpacesFromClaimantRepresentative(CaseData caseData) {
+        if (ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
+            && !isNullOrEmpty(caseData.getRepresentativeClaimantType().getNameOfRepresentative())) {
+            caseData.getRepresentativeClaimantType().setNameOfRepresentative(
+                    caseData.getRepresentativeClaimantType().getNameOfRepresentative().trim());
+        }
+    }
+
+    private static void removeSpacesFromClaimant(CaseData caseData) {
+        if (COMPANY.equals(caseData.getClaimantTypeOfClaimant()) && !isNullOrEmpty(caseData.getClaimantCompany())) {
+            caseData.setClaimantCompany(caseData.getClaimantCompany().trim());
+        } else if (INDIVIDUAL_TYPE_CLAIMANT.equals(caseData.getClaimantTypeOfClaimant())
+                   && ObjectUtils.isNotEmpty(caseData.getClaimantIndType())
+                   && !isNullOrEmpty(caseData.getClaimantIndType().getClaimantFirstNames())
+                   && !isNullOrEmpty(caseData.getClaimantIndType().getClaimantLastName())) {
+            caseData.getClaimantIndType().setClaimantFirstNames(
+                    caseData.getClaimantIndType().getClaimantFirstNames().trim());
+            caseData.getClaimantIndType().setClaimantLastName(
+                    caseData.getClaimantIndType().getClaimantLastName().trim());
+        }
     }
 }

@@ -305,7 +305,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '9.0.91'
+    tomcatEmbedVersion = '9.0.93'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -368,7 +368,7 @@ dependencies {
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
-    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.13'
+    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.14'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -421,7 +421,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.11'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.12'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
@@ -490,7 +490,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 264
+pmdMain.maxFailures = 262
 pmdTest.maxFailures = 183
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

@@ -121,7 +121,8 @@
             "AddressLine1": "1 Rse Way"
           },
           "respondentFirstName": "Test",
-          "respondent_ACAS_question": "No"
+          "respondent_ACAS_question": "Yes",
+          "respondent_ACAS": "R123456/78/90"
         }
       }
     ],

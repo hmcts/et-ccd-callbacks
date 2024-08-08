@@ -58,6 +58,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("MUL2");
     }
 
+    public boolean citizenEt1Generation() {
+        return this.featureToggleApi.isFeatureEnabled("citizen-et1-generation");
+    }
+
     public boolean isNoticeOfChangeFieldsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("noticeOfChangeFields");
     }

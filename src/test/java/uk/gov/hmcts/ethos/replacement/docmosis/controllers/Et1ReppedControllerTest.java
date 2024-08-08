@@ -32,6 +32,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -128,7 +129,8 @@ class Et1ReppedControllerTest {
     private UserIdamService userIdamService;
     @MockBean
     private OrganisationClient organisationClient;
-
+    @MockBean
+    private Et1SubmissionService et1SubmissionService;
     @MockBean
     private CaseActionsForCaseWorkerController caseActionsForCaseWorkerController;
     @Autowired

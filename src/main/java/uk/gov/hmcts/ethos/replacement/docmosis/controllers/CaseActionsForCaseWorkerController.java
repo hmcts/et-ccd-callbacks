@@ -45,6 +45,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -116,7 +117,7 @@ public class CaseActionsForCaseWorkerController {
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsService caseFlagsService;
     private final CaseManagementLocationService caseManagementLocationService;
-
+    private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
@@ -272,14 +273,14 @@ public class CaseActionsForCaseWorkerController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         if (errors.isEmpty()) {
-            defaultValuesReaderService.setSubmissionReference(ccdRequest.getCaseDetails());
-            DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
+            defaultValuesReaderService.setSubmissionReference(caseDetails);
+            DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
@@ -292,7 +293,7 @@ public class CaseActionsForCaseWorkerController {
             Helper.removeSpacesFromPartyNames(caseData);
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
-            defaultValuesReaderService.setPositionAndOffice(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+            defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
 
             boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
             log.info("Caseflags feature flag is {}", caseFlagsToggle);
@@ -305,6 +306,12 @@ public class CaseActionsForCaseWorkerController {
             if (hmcToggle) {
                 caseManagementForCaseWorkerService.setPublicCaseName(caseData);
                 caseManagementLocationService.setCaseManagementLocationCode(caseData);
+            }
+
+            if (featureToggleService.citizenEt1Generation() && "SUBMIT_CASE_DRAFT".equals(ccdRequest.getEventId())) {
+                caseDetails.setCaseData(caseData);
+                et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
+                et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
             }
         }
 

@@ -89,7 +89,8 @@ All logins use a password of `password`.
 | admin@hmcts.net                | caseworker, caseworker-employment, caseworker-employment-api                 | Admin account with access to all cases
 | solicitor1@etorganisation1.com | caseworker-employment-legalrep-solicitor                                     | Solicitor account |
 | superuser@etorganisation1.com  | caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager | Organisation admin account
-| citizen@gmail.com              | citizen                                                                      | Citizen account
+| citizen@gmail.com              | citizen                                                                      | Claimant Citizen account
+| respondent@gmail.com           | citizen                                                                      | Respondent Citizen account
 
 ## Importing CCD Definitions
 

@@ -73,6 +73,7 @@ public final class RolesConstants {
     public static final String SUPERUSER_EMAIL = "superuser@etorganisation1.com";
     public static final String SOLICITOR_1_EMAIL = "solicitor1@etorganisation1.com";
     public static final String CITIZEN_EMAIL = "citizen@gmail.com";
+    public static final String RESPONDENT_EMAIL = "respondent@gmail.com";
     public static final String IDAM_SYSTEM_USER_EMAIL = "data.store.idam.system.user@gmail.com";
     public static final String MCA_SYSTEM_IDAM_ACC_EMAIL = "mca.system.idam.acc@gmail.com";
     public static final String MCA_NOC_APPROVER_EMAIL = "mca.noc.approver@gmail.com";

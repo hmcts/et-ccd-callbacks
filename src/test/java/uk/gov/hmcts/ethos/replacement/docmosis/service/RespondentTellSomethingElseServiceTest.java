@@ -498,7 +498,7 @@ class RespondentTellSomethingElseServiceTest {
         caseData.setResTseCopyToOtherPartyYesOrNo("copyToOtherPartyYesOrNo");
         caseData.setResTseCopyToOtherPartyTextArea("copyToOtherPartyTextArea");
 
-        tseService.createApplication(caseData, false);
+        tseService.createApplication(caseData, RESPONDENT_TITLE);
 
         var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
         assertThat(genericTseApplicationType.getDetails(), is(textBoxData));

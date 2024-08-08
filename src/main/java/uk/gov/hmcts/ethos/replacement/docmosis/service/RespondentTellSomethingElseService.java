@@ -15,7 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -109,9 +109,9 @@ public class RespondentTellSomethingElseService {
      */
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        RespondentTSEApplicationTypeData selectedAppData =
+        TSEApplicationTypeData selectedAppData =
                 RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
-        if (selectedAppData.getResTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
+        if (selectedAppData.getUploadedTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
             errors.add(GIVE_DETAIL_MISSING);
         }
         return errors;

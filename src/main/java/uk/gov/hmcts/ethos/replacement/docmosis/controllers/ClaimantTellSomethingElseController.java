@@ -116,7 +116,7 @@ public class ClaimantTellSomethingElseController {
         claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId());
 
         // send email notifications
-        if (Boolean.TRUE.equals(Helper.isRespondentSystemUser(caseData))) {
+        if (Helper.isRespondentSystemUser(caseData)) {
             claimantTseService.sendRespondentsEmail(caseDetails);
         }
         claimantTseService.sendAcknowledgementEmail(caseDetails, userToken);

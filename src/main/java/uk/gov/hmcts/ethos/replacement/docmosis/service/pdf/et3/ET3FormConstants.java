@@ -186,7 +186,7 @@ public final class ET3FormConstants {
 
     // ET3 FORM MAPPER CONSTANTS
     public static final String RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD =
-            "There were no respondent found for the entered respondent name";
+            "There were no respondent found for the entered respondent name ";
     public static final String CASE_DATA_NOT_FOUND_EXCEPTION_FIRST_WORD = "Case data is empty";
     public static final String RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_FIRST_WORD =
             "There is no respondent defined in the case";

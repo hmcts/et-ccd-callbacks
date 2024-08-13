@@ -92,6 +92,10 @@ public final class ReferralHelper {
     private static final String CLOSE_PRE_TAG = "</pre>";
     private static final String BREAKS = "\r\n";
 
+    // Below needed to fix a typo issue introduced when referrals went live
+    public static final String PARTY_NOT_RESPONDED_COMPLIED = "Party not responded/complied";
+    public static final String PARTY_NOT_RESPONDED_COMPILED = "Party not responded/compiled";
+
     private ReferralHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -163,7 +167,9 @@ public final class ReferralHelper {
     public static void populateUpdateReferralDetails(BaseCaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         caseData.setUpdateReferCaseTo(referral.getReferCaseTo());
-        caseData.setUpdateReferralSubject(referral.getReferralSubject());
+        caseData.setUpdateReferralSubject(PARTY_NOT_RESPONDED_COMPLIED.equals(referral.getReferralSubject())
+                ? PARTY_NOT_RESPONDED_COMPILED
+                : referral.getReferralSubject());
         caseData.setUpdateReferralDetails(referral.getReferralDetails());
         caseData.setUpdateReferentEmail(referral.getReferentEmail());
         caseData.setUpdateIsUrgent(referral.getIsUrgent());

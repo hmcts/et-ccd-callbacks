@@ -11,9 +11,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
@@ -28,10 +30,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -226,5 +231,96 @@ public class HelperTest {
             Arguments.of("MyHMCTS", YES, null, false),
             Arguments.of("MyHMCTS", YES, representedTypeC, true)
         );
+    }
+
+    @Test
+    void trims_spaces_from_claimant_company_name() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimantTypeOfClaimant(COMPANY_TYPE_CLAIMANT);
+        caseData.setClaimantCompany("  Company Name  ");
+
+        Helper.removeSpacesFromPartyNames(caseData);
+
+        assertEquals("Company Name", caseData.getClaimantCompany());
+    }
+
+    @Test
+    void trims_spaces_from_claimant_individual_names() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimantTypeOfClaimant(INDIVIDUAL_TYPE_CLAIMANT);
+        ClaimantIndType claimantIndType = new ClaimantIndType();
+        claimantIndType.setClaimantFirstNames("  First  ");
+        claimantIndType.setClaimantLastName("  Last  ");
+        caseData.setClaimantIndType(claimantIndType);
+
+        Helper.removeSpacesFromPartyNames(caseData);
+
+        assertEquals("First", caseData.getClaimantIndType().getClaimantFirstNames());
+        assertEquals("Last", caseData.getClaimantIndType().getClaimantLastName());
+    }
+
+    @Test
+    void trims_spaces_from_representative_claimant_name() {
+        CaseData caseData = new CaseData();
+        RepresentedTypeC representativeClaimantType = new RepresentedTypeC();
+        representativeClaimantType.setNameOfRepresentative("  Representative Name  ");
+        caseData.setRepresentativeClaimantType(representativeClaimantType);
+
+        Helper.removeSpacesFromPartyNames(caseData);
+
+        assertEquals("Representative Name", caseData.getRepresentativeClaimantType().getNameOfRepresentative());
+    }
+
+    @Test
+     void handles_null_claimant_individual_names() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimantTypeOfClaimant(INDIVIDUAL_TYPE_CLAIMANT);
+        ClaimantIndType claimantIndType = new ClaimantIndType();
+        claimantIndType.setClaimantFirstNames(null);
+        claimantIndType.setClaimantLastName(null);
+        caseData.setClaimantIndType(claimantIndType);
+
+        assertDoesNotThrow(() -> Helper.removeSpacesFromPartyNames(caseData));
+        assertNull(caseData.getClaimantIndType().getClaimantFirstNames());
+        assertNull(caseData.getClaimantIndType().getClaimantLastName());
+    }
+
+    @Test
+    void trims_spaces_from_respondent_names() {
+        RespondentSumType respondent1Value = new RespondentSumType();
+        respondent1Value.setRespondentName("Respondent 1  ");
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setValue(respondent1Value);
+
+        RespondentSumType respondent2Value = new RespondentSumType();
+        respondent2Value.setRespondentName("  Respondent 2");
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setValue(respondent2Value);
+
+        CaseData caseData = new CaseData();
+        caseData.setClaimantTypeOfClaimant(COMPANY_TYPE_CLAIMANT);
+        caseData.setClaimantCompany("  Company Name  ");
+        caseData.setRespondentCollection(List.of(respondent1, respondent2));
+
+        Helper.removeSpacesFromPartyNames(caseData);
+
+        assertEquals("Company Name", caseData.getClaimantCompany());
+        assertEquals("Respondent 1", caseData.getRespondentCollection().get(0).getValue().getRespondentName());
+        assertEquals("Respondent 2", caseData.getRespondentCollection().get(1).getValue().getRespondentName());
+    }
+
+    @Test
+    void trims_spaces_from_representative_names() {
+        RepresentedTypeR representedTypeR = new RepresentedTypeR();
+        representedTypeR.setNameOfRepresentative("  Representative Name  ");
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setValue(representedTypeR);
+
+        CaseData caseData = new CaseData();
+        caseData.setRepCollection(List.of(representedTypeRItem));
+
+        Helper.removeSpacesFromPartyNames(caseData);
+
+        assertEquals("Representative Name", caseData.getRepCollection().get(0).getValue().getNameOfRepresentative());
     }
 }

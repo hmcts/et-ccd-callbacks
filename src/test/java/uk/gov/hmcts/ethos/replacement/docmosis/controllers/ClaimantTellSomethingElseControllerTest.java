@@ -48,6 +48,13 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/claimantTSE/aboutToSubmit";
     private static final String COMPLETE_APPLICATION_URL = "/claimantTSE/completeApplication";
     private static final String VALIDATE_DETAILS_URL = "/claimantTSE/validateGiveDetails";
+    private static final String DISPLAY_TABLE_URL = "/claimantTSE/displayTable";
+    private static final String VIEW_APPLICATION_ABOUT_TO_START_URL =
+            "/claimantTSE/viewApplicationsAboutToStart";
+    private static final String MID_POPULATE_CHOOSE_APPLICATION_URL =
+            "/claimantTSE/midPopulateChooseApplication";
+    private static final String MID_POPULATE_SELECTED_APPLICATION =
+            "/claimantTSE/midPopulateSelectedApplicationData";
 
     @MockBean
     ClaimantTellSomethingElseService claimantTseService;
@@ -162,5 +169,125 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
         tseApplicationTypeItem.setValue(claimantTseType);
 
         return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
+    }
+
+    @Test
+    void displayClaimantApplicationsTable_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(DISPLAY_TABLE_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(claimantTseService).generateClaimantApplicationTableMarkdown(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void displayClaimantApplicationsTable_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(DISPLAY_TABLE_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToStart_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void aboutToStart_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToStart_badRequest() throws Exception {
+        mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void midPopulateChooseApplication_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void midPopulateChooseApplication_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void midPopulateChooseApplication_badRequest() throws Exception {
+        mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
+                        .content("test content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void midPopulateReply_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void midPopulateReply_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void midPopulateReply_badRequest() throws Exception {
+        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -53,7 +53,7 @@ class TseViewApplicationHelperTest {
     void populateOpenOrClosedApplications_withEmptyList_doesNothing() {
         caseData.setGenericTseApplicationCollection(null);
         caseData.setTseViewApplicationOpenOrClosed("Open");
-        DynamicFixedListType actual = TseViewApplicationHelper.populateOpenOrClosedApplications(caseData);
+        DynamicFixedListType actual = TseViewApplicationHelper.populateOpenOrClosedApplications(caseData, false);
         assertNull(actual);
     }
 
@@ -61,7 +61,8 @@ class TseViewApplicationHelperTest {
     void populateOpenApplications_withAnOpenApplication_returnsDynamicList() {
         caseData.setTseViewApplicationOpenOrClosed("Open");
 
-        DynamicFixedListType actual = TseViewApplicationHelper.populateOpenOrClosedApplications(caseData);
+        DynamicFixedListType actual =
+                TseViewApplicationHelper.populateOpenOrClosedApplications(caseData, false);
 
         assert actual != null;
         assertThat(actual.getListItems().size(), is(1));
@@ -71,7 +72,8 @@ class TseViewApplicationHelperTest {
     void populateClosedApplications_withNoClosedApplications_returnEmptyList() {
         caseData.setTseViewApplicationOpenOrClosed("Closed");
 
-        DynamicFixedListType actual = TseViewApplicationHelper.populateOpenOrClosedApplications(caseData);
+        DynamicFixedListType actual =
+                TseViewApplicationHelper.populateOpenOrClosedApplications(caseData, false);
 
         assert actual != null;
         assertThat(actual.getListItems().size(), is(0));

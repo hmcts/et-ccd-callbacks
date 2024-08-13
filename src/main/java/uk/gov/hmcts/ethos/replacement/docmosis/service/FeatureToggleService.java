@@ -61,4 +61,8 @@ public class FeatureToggleService {
     public boolean isNoticeOfChangeFieldsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("noticeOfChangeFields");
     }
+
+    public boolean isPartySpacingCronEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("party-spacing-cron");
+    }
 }

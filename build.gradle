@@ -305,7 +305,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '9.0.91'
+    tomcatEmbedVersion = '9.0.93'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -337,7 +337,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version: '2.3.0'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: 'b3b7ec6f4f'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: 'a828b22410'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
 
@@ -368,7 +368,7 @@ dependencies {
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
-    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.13'
+    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.14'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -415,13 +415,13 @@ dependencies {
     }
     testImplementation(platform('org.junit:junit-bom:5.10.3'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.0'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.1'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.11'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.12'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
@@ -490,7 +490,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 264
+pmdMain.maxFailures = 262
 pmdTest.maxFailures = 183
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

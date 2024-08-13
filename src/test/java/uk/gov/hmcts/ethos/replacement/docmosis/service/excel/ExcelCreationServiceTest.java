@@ -25,7 +25,6 @@ import java.util.SortedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -61,10 +60,10 @@ class ExcelCreationServiceTest {
     void shouldNotWriteExcelRows() {
         when(singleCasesReadingService.retrieveSingleCase(any(), any(), any(), any()))
                 .thenReturn(null);
-        assertNotNull((excelCreationService.writeExcel(
+        assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(multipleObjects.values()),
                 new ArrayList<>(Arrays.asList("245000/1", "245000/1")),
-                leadLink, "userToken", "caseTypeId")));
+                leadLink, "userToken", "caseTypeId"));
     }
 
     @Test

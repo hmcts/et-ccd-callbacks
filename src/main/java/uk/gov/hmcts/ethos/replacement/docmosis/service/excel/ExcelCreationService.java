@@ -249,7 +249,6 @@ public class ExcelCreationService {
                                        CellStyle styleForLockingLead, CellStyle styleForClaimant,
                                        String userToken, String caseTypeId) {
 
-        XSSFRow row = sheet.createRow(rowIndex);
         log.info("Retrieving single case - {}", ethosCaseRef);
         SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(
                 userToken, caseTypeId, ethosCaseRef, MANUALLY_CREATED_POSITION);
@@ -258,16 +257,12 @@ public class ExcelCreationService {
             log.warn("Could not retrieve single case - {}", ethosCaseRef);
             return;
         }
+        XSSFRow row = sheet.createRow(rowIndex);
 
         String claimant = submitEvent.getCaseData().getClaimant();
         int columnIndex = 0;
 
-        if (ethosCaseRef.equals(leadCase)) {
-            log.info("Lead: {}", leadCase);
-            createCell(row, columnIndex, ethosCaseRef, styleForLockingLead);
-        } else {
-            createCell(row, columnIndex, ethosCaseRef, styleForLocking);
-        }
+        createFirstColumn(ethosCaseRef, leadCase, styleForLocking, styleForLockingLead, row, columnIndex);
 
         if (multipleObject == null) {
             for (int k = 0; k < MultiplesHelper.getHeaders().size() - 2; k++) {
@@ -299,6 +294,20 @@ public class ExcelCreationService {
             createCell(row, columnIndex, multipleObject.getFlag4(), styleForUnLocking);
             columnIndex++;
             createCell(row, columnIndex, claimant, styleForClaimant);
+        }
+    }
+
+    private void createFirstColumn(String ethosCaseRef,
+                                   String leadCase,
+                                   CellStyle styleForLocking,
+                                   CellStyle styleForLockingLead,
+                                   XSSFRow row,
+                                   int columnIndex) {
+        if (ethosCaseRef.equals(leadCase)) {
+            log.info("Lead: {}", leadCase);
+            createCell(row, columnIndex, ethosCaseRef, styleForLockingLead);
+        } else {
+            createCell(row, columnIndex, ethosCaseRef, styleForLocking);
         }
     }
 

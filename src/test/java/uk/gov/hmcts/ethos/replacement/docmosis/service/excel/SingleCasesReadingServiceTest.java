@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyList;
@@ -62,18 +64,19 @@ class SingleCasesReadingServiceTest {
     @Test
     void retrieveSingleCase() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchForCreation(userToken,
-                multipleDetails.getCaseTypeId(),
-                new ArrayList<>(Collections.singletonList(CASE_REF)),
+                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
+                Collections.singletonList(CASE_REF),
                 multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEventList);
-        singleCasesReadingService.retrieveSingleCase(userToken,
+        SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 CASE_REF,
                 multipleDetails.getCaseData().getMultipleSource());
         verify(ccdClient, times(1)).retrieveCasesElasticSearchForCreation(userToken,
                 "Manchester",
-                new ArrayList<>(Collections.singletonList(CASE_REF)),
+                Collections.singletonList(CASE_REF),
                 multipleDetails.getCaseData().getMultipleSource());
+        assertNotNull(submitEvent);
         verifyNoMoreInteractions(ccdClient);
     }
 
@@ -87,6 +90,10 @@ class SingleCasesReadingServiceTest {
         SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 CASE_REF,
+                multipleDetails.getCaseData().getMultipleSource());
+        verify(ccdClient, times(3)).retrieveCasesElasticSearchForCreation(userToken,
+                "Manchester",
+                Collections.singletonList(CASE_REF),
                 multipleDetails.getCaseData().getMultipleSource());
         assertNull(submitEvent);
     }

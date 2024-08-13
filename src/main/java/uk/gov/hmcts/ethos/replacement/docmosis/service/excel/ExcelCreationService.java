@@ -254,6 +254,11 @@ public class ExcelCreationService {
         SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(
                 userToken, caseTypeId, ethosCaseRef, MANUALLY_CREATED_POSITION);
 
+        if (submitEvent == null) {
+            log.warn("Could not retrieve single case - {}", ethosCaseRef);
+            return;
+        }
+
         String claimant = submitEvent.getCaseData().getClaimant();
         int columnIndex = 0;
 

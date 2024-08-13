@@ -141,7 +141,7 @@ template:
         respondent-type-b: ${TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:36161401-e4a2-4a98-925c-a65529d23fad}
         cyRespondent-type-a: ${CY_TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b}
         cyRespondent-type-b: ${CY_TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b}
-        tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:1104fb2c-3de5-449d-9bb2-217405e8361e}
+        tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
 
     admin:
       reply:

@@ -2,10 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationData;
@@ -13,12 +13,18 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationDo
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_AMEND_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CONSIDER_DECISION_AFRESH;
@@ -38,6 +44,12 @@ public final class ClaimantTellSomethingElseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String CLAIMANT_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
+    private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
+    private static final String TABLE_COLUMNS_MARKDOWN =
+            "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
+                    + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
+                    + "%s\r\n";
+    private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
     private static final Map<String, Function<CaseData, TSEApplicationTypeData>>
             APPLICATION_TYPE_DATA_MAP = new ConcurrentHashMap<>();
 
@@ -134,10 +146,35 @@ public final class ClaimantTellSomethingElseHelper {
     }
 
     private static GenericTseApplicationTypeItem getCurrentGenericTseApplicationTypeItem(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return null;
         }
         return caseData.getGenericTseApplicationCollection()
                 .get(caseData.getGenericTseApplicationCollection().size() - 1);
+    }
+
+    public static String generateAndAddApplicationPdf(CaseData caseData) {
+        List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
+        if (isEmpty(genericApplicationList)) {
+            return EMPTY_TABLE_MESSAGE;
+        }
+
+        AtomicInteger applicationNumber = new AtomicInteger(1);
+
+        String tableRows = genericApplicationList.stream()
+                .filter(TseViewApplicationHelper::applicationsSharedWithClaimant)
+                .map(o -> formatRow(o, applicationNumber))
+                .collect(Collectors.joining());
+
+        return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
+    }
+
+    private static String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
+        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+        int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
+        String status = Optional.ofNullable(value.getStatus()).orElse(OPEN_STATE);
+
+        return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
+                value.getDate(), value.getDueDate(), responses, status);
     }
 }

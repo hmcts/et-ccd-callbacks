@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -25,9 +24,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -270,16 +271,12 @@ public class ClaimantTellSomethingElseService {
     }
 
     private List<String> getRespondentEmailAddressList(CaseData caseData) {
-        List<String> respEmailAddresses = new ArrayList<>();
-        caseData.getRespondentCollection()
-                .forEach(resp -> {
-                    String respondentEmailAddress = NotificationHelper.getEmailAddressForRespondent(
-                            caseData,
-                            resp.getValue()
-                    );
-                    respEmailAddresses.add(respondentEmailAddress);
-                });
-        return respEmailAddresses;
+        return caseData.getRepCollection().stream()
+                .filter(r -> Objects.nonNull(r)
+                        && YES.equals(defaultIfEmpty(r.getValue().getMyHmctsYesNo(), ""))
+                        && !isNullOrEmpty(r.getValue().getRepresentativeEmailAddress()))
+                .map(r -> r.getValue().getRepresentativeEmailAddress())
+                .toList();
     }
 
     private String getRespondentEmailTemplate(boolean isWelsh, String applicationType) {

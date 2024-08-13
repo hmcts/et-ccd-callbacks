@@ -23,8 +23,10 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
@@ -87,7 +89,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLA
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.GIVE_DETAIL_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ReferralsUtil.createRespondentType;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class ClaimantTellSomethingElseServiceTest {
@@ -667,6 +668,19 @@ class ClaimantTellSomethingElseServiceTest {
                         List.of("In person"), "60", "Days", "Sit Alone")
                 .withHearingSession(0, "2069-05-16T01:00:00.000", "Listed", false)
                 .build();
+
+        RepresentedTypeR representedType =
+                RepresentedTypeR.builder()
+                        .nameOfRepresentative("Respondent")
+                        .respRepName("Respondent")
+                        .representativeEmailAddress("test.rep@test.com")
+                        .myHmctsYesNo("Yes")
+                        .build();
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setId("1111-2222-3333-1111");
+        representedTypeRItem.setValue(representedType);
+        caseData.setRepCollection(new ArrayList<>());
+        caseData.getRepCollection().add(representedTypeRItem);
         caseData.setClaimantTseSelectApplication(selectedApplication);
         caseData.setClaimantTseRule92(YES);
         return caseData;

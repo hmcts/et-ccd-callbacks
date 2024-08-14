@@ -14,6 +14,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.CaseAccessPin;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -30,6 +31,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.CitizenRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.DefendantRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -40,6 +44,7 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -108,6 +113,8 @@ public class CaseManagementForCaseWorkerService {
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
             "Newcastle", "Scotland", "Wales", "Watford");
+    private static final int EXPIRY_PERIOD = 180;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -656,7 +663,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     /**
-     * Calls reference data API to remove HMCTSServiceId from a case's supplementary_data..
+     * Calls reference data API to remove HMCTSServiceId from a case's supplementary_data.
      *
      * @param caseDetails Details on the case
      */
@@ -733,5 +740,18 @@ public class CaseManagementForCaseWorkerService {
                 respondentSumType.setRespondentOrganisation("");
             }
         }
+    }
+
+    /**
+     * Sets case access pin to CaseData
+     * @param caseData CaseData received from controller
+     */
+    public void setCaseAccessPin(CaseData caseData) {
+        caseData.setCaseAccessPin(new CaseAccessPin.Builder().caseAccessibleRoles(
+                List.of(CitizenRole.CITIZEN.getCaseRoleLabel(),
+                        DefendantRole.DEFENDANT.getCaseRoleLabel(),
+                        ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()))
+                        .expiryDate(LocalDateTime.now().plusDays(EXPIRY_PERIOD).toString())
+                .build());
     }
 }

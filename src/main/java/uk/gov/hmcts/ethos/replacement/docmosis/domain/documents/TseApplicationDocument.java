@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
-public class RespondentTellSomethingElseDocument {
+public class TseApplicationDocument {
     @JsonProperty("accessKey")
     private String accessKey;
     @JsonProperty("templateName")
@@ -14,5 +14,5 @@ public class RespondentTellSomethingElseDocument {
     @JsonProperty("outputName")
     private String outputName;
     @JsonProperty("data")
-    private RespondentTellSomethingElseData data;
+    private TseApplicationData data;
 }

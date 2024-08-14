@@ -354,6 +354,24 @@ public final class Helper {
     }
 
     /**
+     * Checks if the respondent is a non-system user.
+     * A non-system user respondent refers to the cases that have been
+     * transferred from legacy ECM or a paper based claim
+     * which a caseworker would manually create in ExUI.
+     *
+     * @param caseData The case data to check for respondent user type.
+     * @return true if the respondent is a non-system user, false otherwise.
+     */
+    public static boolean isRespondentSystemUser(CaseData caseData) {
+        if (caseData != null) {
+            List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
+            return !CollectionUtils.isEmpty(repCollection)
+                    && repCollection.stream().anyMatch(rep -> YES.equals(rep.getValue().getMyHmctsYesNo()));
+        }
+        return true;
+    }
+
+    /**
      * Gets the last item in a list.
      * @param <T> the type of the elements in the list
      * @param list the list to get the last item from

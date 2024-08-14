@@ -21,6 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -55,7 +56,7 @@ public class TseClaimantController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
         if (caseDetails.getCaseData().getClaimantTse() != null) {
-            tseService.createApplication(caseDetails.getCaseData(), true);
+            tseService.createApplication(caseDetails.getCaseData(), CLAIMANT_TITLE);
             tseService.removeStoredApplication(caseDetails.getCaseData());
             tseService.clearApplicationData(caseDetails.getCaseData());
         }

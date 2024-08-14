@@ -91,9 +91,9 @@ template:
         claimant-no: a3621d2d-3cd8-4811-87e7-fcffa676dd3b
         respondent-type-a: 410270f3-4136-4f3c-99d7-0a564955803f
         respondent-type-b: 36161401-e4a2-4a98-925c-a65529d23fad
-        cyRespondent-type-a: 3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
-        cyRespondent-type-b: 3b3b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b
-        tribunal: 1104fb2c-3de5-449d-9bb2-217405e8361e
+        cyRespondent-type-a: d340c60b-111b-41f7-ab9c-6cd34cdebee5
+        cyRespondent-type-b: 99ec3a75-7371-4b6d-aa5a-9050c1537cf1
+        tribunal: bd7addc3-d1ea-47cf-9249-208a7033d454
 
     admin:
       reply:

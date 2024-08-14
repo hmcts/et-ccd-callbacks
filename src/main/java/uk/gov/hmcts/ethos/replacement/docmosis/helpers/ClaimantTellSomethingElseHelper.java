@@ -169,7 +169,7 @@ public final class ClaimantTellSomethingElseHelper {
                 .get(caseData.getGenericTseApplicationCollection().size() - 1);
     }
 
-    public static String generateAndAddApplicationPdf(CaseData caseData) {
+    public static String generateClaimantRepApplicationMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
         if (isEmpty(genericApplicationList)) {
             return EMPTY_TABLE_MESSAGE;

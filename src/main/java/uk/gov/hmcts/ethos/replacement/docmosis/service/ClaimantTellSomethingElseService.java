@@ -370,6 +370,6 @@ public class ClaimantTellSomethingElseService {
     }
   
     public String generateClaimantApplicationTableMarkdown(CaseData caseData) {
-        return ClaimantTellSomethingElseHelper.generateAndAddApplicationPdf(caseData);
+        return ClaimantTellSomethingElseHelper.generateClaimantRepApplicationMarkdown(caseData);
     }
 }

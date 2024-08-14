@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -56,7 +57,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -242,6 +245,32 @@ class ClaimantTellSomethingElseServiceTest {
                 .build();
 
         Assertions.assertThat(documentCollection).hasSize(1);
+        Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void generateAndAddApplicationPdf_CollectionNotEmpty() throws IOException {
+        CaseData caseData = new CaseData();
+        caseData.setClaimantTseSelectApplication("Withdraw all or part of claim");
+        DocumentInfo documentInfo = new DocumentInfo("document.pdf", "Withdraw Claim",
+                "binaryUrl/documents/", "<>Some doc</>");
+        when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(documentInfo);
+
+        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");
+        claimantTellSomethingElseService.generateAndAddApplicationPdf(caseData, "token", "typeId");
+
+        List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();
+        DocumentType actual = documentCollection.get(1).getValue();
+
+        DocumentType expected = DocumentType.builder()
+                .shortDescription("Withdraw all or part of claim")
+                .dateOfCorrespondence(LocalDate.now().toString())
+                .topLevelDocuments(WITHDRAWAL_SETTLED)
+                .documentType(WITHDRAWAL_OF_ALL_OR_PART_CLAIM)
+                .withdrawalSettledDocuments(WITHDRAWAL_OF_ALL_OR_PART_CLAIM)
+                .build();
+
+        Assertions.assertThat(documentCollection).hasSize(2);
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
@@ -434,6 +463,21 @@ class ClaimantTellSomethingElseServiceTest {
     }
 
     @Test
+    void sendAcknowledgeEmailAndGeneratePdf_TypeC() {
+        String selectedApplication = CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND;
+        CaseData caseData = createCaseData(selectedApplication, NO);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        Map<String, String> expectedPersonalisation = createEmailContentTypeC(caseData, selectedApplication);
+
+        claimantTellSomethingElseService.sendAcknowledgementEmail(caseDetails, AUTH_TOKEN);
+
+        verify(emailService).sendEmail(TEMPLATE_ID_C, LEGAL_REP_EMAIL, expectedPersonalisation);
+    }
+
+    @Test
     void displayRespondentApplicationsTable_hasApplications() {
         CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
         caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());
@@ -507,6 +551,16 @@ class ClaimantTellSomethingElseServiceTest {
         return content;
     }
 
+    private Map<String, String> createEmailContentTypeC(CaseData caseData,
+                                                   String selectedApplication) {
+        Map<String, String> content = new ConcurrentHashMap<>();
+        content.put("caseNumber", caseData.getEthosCaseReference());
+        content.put("claimant", caseData.getClaimant());
+        content.put("respondentNames", getRespondentNames(caseData));
+        content.put("exuiCaseDetailsLink", "exuiUrl669718251103419");
+        return content;
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
         CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART,
@@ -537,6 +591,18 @@ class ClaimantTellSomethingElseServiceTest {
         assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\","
                 + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+    }
+
+    @Test
+    void sendRespondentEmail_TypeC() throws IOException {
+        CaseData caseData = createCaseDataWithHearing(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
+        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails);
+        assertThat(caseData.getClaimantTseSelectApplication(), is(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND));
     }
 
     @ParameterizedTest
@@ -684,5 +750,49 @@ class ClaimantTellSomethingElseServiceTest {
         caseData.setClaimantTseSelectApplication(selectedApplication);
         caseData.setClaimantTseRule92(YES);
         return caseData;
+    }
+
+    @Test
+    void sendAdminEmail_DoesNothingWhenNoManagingOfficeIsSet() {
+        CaseData caseData = createCaseData("", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        claimantTellSomethingElseService.sendAdminEmail(caseDetails);
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendAdminEmail_DoesNothingWhenNoManagingOfficeHasNoEmail() {
+        CaseData caseData = createCaseData("", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseData.setManagingOffice("Aberdeen");
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        claimantTellSomethingElseService.sendAdminEmail(caseDetails);
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendAdminEmail_SendsEmail() {
+        CaseData caseData = createCaseData("", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseData.setManagingOffice("Bristol");
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.BRISTOL);
+        claimantTellSomethingElseService.sendAdminEmail(caseDetails);
+
+        Map<String, String> caseNumber = Map.of("caseNumber", "test",
+                "emailFlag", "",
+                "claimant", "claimant",
+                "respondents", "Father Ted",
+                "date", "Not set",
+                "url", "exuiUrl669718251103419");
+
+        verify(emailService, times(1)).sendEmail(any(), any(), eq(caseNumber));
     }
 }

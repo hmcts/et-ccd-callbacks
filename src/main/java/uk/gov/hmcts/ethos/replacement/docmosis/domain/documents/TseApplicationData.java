@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
-public class RespondentTellSomethingElseData {
+public class TseApplicationData {
 
     @JsonProperty("resTseApplicant")
     private String resTseApplicant;

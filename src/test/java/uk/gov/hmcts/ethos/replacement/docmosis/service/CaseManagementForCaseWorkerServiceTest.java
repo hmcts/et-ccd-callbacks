@@ -142,6 +142,24 @@ class CaseManagementForCaseWorkerServiceTest {
     @BeforeEach
     @SneakyThrows
     void setUp() {
+
+        setScotlandCaseRequests();
+        setGenericCaseRequests();
+        setManchesterCCDRequest();
+        setSubmitEvent();
+
+        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isHmcEnabled()).thenReturn(true);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
+                caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
+                adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
+                multipleCasesSendingService);
+    }
+
+    private void setScotlandCaseRequests() throws Exception {
         scotlandCcdRequest1 = new CCDRequest();
         CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
@@ -158,6 +176,9 @@ class CaseManagementForCaseWorkerServiceTest {
         CaseDetails caseDetailsScot5 = generateCaseDetails("caseDetailsScotTest5.json");
         scotlandCcdRequest5.setCaseDetails(caseDetailsScot5);
 
+    }
+
+    private void setGenericCaseRequests() throws Exception {
         ccdRequest10 = new CCDRequest();
         CaseDetails caseDetails10 = generateCaseDetails("caseDetailsTest10.json");
         ccdRequest10.setCaseDetails(caseDetails10);
@@ -193,7 +214,9 @@ class CaseManagementForCaseWorkerServiceTest {
         CCDRequest ccdRequest2 = new CCDRequest();
         CaseDetails caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         ccdRequest2.setCaseDetails(caseDetails2);
+    }
 
+    private void setManchesterCCDRequest() {
         manchesterCcdRequest = new CCDRequest();
         CaseData caseData = new CaseData();
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
@@ -214,7 +237,9 @@ class CaseManagementForCaseWorkerServiceTest {
         manchesterCaseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         manchesterCaseDetails.setJurisdiction("TRIBUNALS");
         manchesterCcdRequest.setCaseDetails(manchesterCaseDetails);
+    }
 
+    private void setSubmitEvent() {
         submitEvent = new SubmitEvent();
         CaseData submitCaseData = new CaseData();
         submitCaseData.setRespondentCollection(createRespondentCollection(true));
@@ -228,15 +253,6 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setState("Accepted");
         submitEvent.setCaseId(123);
         submitEvent.setCaseData(submitCaseData);
-        when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
-        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
-        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
-                caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
-                adminUserService, caseManagementLocationService, multipleReferenceService, ccdGatewayBaseUrl,
-                multipleCasesSendingService);
     }
 
     private static Address getAddress() {
@@ -971,7 +987,7 @@ class CaseManagementForCaseWorkerServiceTest {
         fullSourceCase.setCaseData(sourceCaseData);
 
         SubmitEvent submitEventLocal = new SubmitEvent();
-        submitEventLocal.setCaseId(123_45);
+        submitEventLocal.setCaseId(12_345);
 
         when(caseRetrievalForCaseWorkerService.transferSourceCaseRetrievalESRequest(
                 anyString(), anyString(), anyList()))
@@ -1364,7 +1380,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
         MultipleData multipleData = MultipleData.builder().build();
         SubmitMultipleEvent event = new SubmitMultipleEvent();
-        event.setCaseId(1716474017962374L);
+        event.setCaseId(1_716_474_017_962_374L);
         event.setCaseData(multipleData);
 
         String adminToken = "adminToken";

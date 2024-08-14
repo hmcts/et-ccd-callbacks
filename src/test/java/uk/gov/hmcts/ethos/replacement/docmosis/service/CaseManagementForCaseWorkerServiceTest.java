@@ -860,7 +860,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void midRespondentECCWithNoRespondentECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                anyString(), eq(AUTH_TOKEN), anyString(),anyList()))
+                anyString(), eq(AUTH_TOKEN), anyString(), anyList()))
                 .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         manchesterCcdRequest.getCaseDetails().getCaseData().setRespondentECC(null);
         assertThat(caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
@@ -870,7 +870,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void createECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                anyString(), eq(AUTH_TOKEN), anyString(),anyList()))
+                anyString(), eq(AUTH_TOKEN), anyString(), anyList()))
                 .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         CaseData casedata = caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
@@ -884,7 +884,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void linkOriginalCaseECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                anyString(), eq(AUTH_TOKEN), anyString(),anyList()))
+                anyString(), eq(AUTH_TOKEN), anyString(), anyList()))
                 .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertThat(caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getCaseRefECC()).isEqualTo("11111");
@@ -893,7 +893,7 @@ class CaseManagementForCaseWorkerServiceTest {
     @Test
     void linkOriginalCaseECCCounterClaims() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                anyString(), eq(AUTH_TOKEN), anyString(),anyList()))
+                anyString(), eq(AUTH_TOKEN), anyString(), anyList()))
                 .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertThat(caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim())
@@ -910,7 +910,7 @@ class CaseManagementForCaseWorkerServiceTest {
         c2.setValue(counterClaimType2);
         manchesterCcdRequest.getCaseDetails().getCaseData().setEccCases(Arrays.asList(c1, c2));
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                anyString(), eq(AUTH_TOKEN), anyString(),anyList()))
+                anyString(), eq(AUTH_TOKEN), anyString(), anyList()))
                 .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         assertThat(caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim())
@@ -940,7 +940,7 @@ class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setState("Closed");
         submitEvent.getCaseData().getRespondentCollection().get(0).getValue().setResponseReceived(NO);
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                anyString(), eq(AUTH_TOKEN), anyString(),anyList()))
+                anyString(), eq(AUTH_TOKEN), anyString(), anyList()))
                 .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         List<String> errors = new ArrayList<>();
         CaseData caseData = caseManagementForCaseWorkerService.createECC(

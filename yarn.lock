@@ -7642,7 +7642,7 @@ __metadata:
     sinon: 18.0.0
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 4.2.0
+    sonarqube-scanner: 4.2.1
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
@@ -15898,9 +15898,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:4.2.0":
-  version: 4.2.0
-  resolution: "sonarqube-scanner@npm:4.2.0"
+"sonarqube-scanner@npm:4.2.1":
+  version: 4.2.1
+  resolution: "sonarqube-scanner@npm:4.2.1"
   dependencies:
     adm-zip: 0.5.12
     axios: 1.6.8
@@ -15916,7 +15916,7 @@ __metadata:
     tar-stream: 3.1.7
   bin:
     sonar-scanner: bin/sonar-scanner
-  checksum: 610fa683ae09ab559d4139c3ac73d5a1a38ee37754f47e064abea0add1922d5604ea026b114405a1585e5cd2067fac16621746d2c985ba550d525179c4333627
+  checksum: 2b8def5021cd5197d4a90229a2348200c1d870965d30ab8a34db80fd9932baea0e483ea7821b33b8126e948934ab641fd026300976985b812b9f69ca025b2bb8
   languageName: node
   linkType: hard
 

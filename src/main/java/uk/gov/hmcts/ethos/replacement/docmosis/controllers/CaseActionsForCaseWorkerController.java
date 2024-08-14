@@ -290,6 +290,7 @@ public class CaseActionsForCaseWorkerController {
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             DocumentHelper.setDocumentNumbers(caseData);
+            Helper.removeSpacesFromPartyNames(caseData);
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             defaultValuesReaderService.setPositionAndOffice(caseDetails.getCaseTypeId(), caseData);
@@ -426,6 +427,7 @@ public class CaseActionsForCaseWorkerController {
             if (featureToggleService.isWorkAllocationEnabled() && caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
                 caseManagementLocationService.setCaseManagementLocation(caseData);
             }
+            Helper.removeSpacesFromPartyNames(caseData);
         }
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -484,6 +486,7 @@ public class CaseActionsForCaseWorkerController {
 
         caseFlagsService.setupCaseFlags(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        Helper.removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -541,6 +544,7 @@ public class CaseActionsForCaseWorkerController {
         caseFlagsService.setupCaseFlags(caseData);
 
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
+        Helper.removeSpacesFromPartyNames(caseData);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 

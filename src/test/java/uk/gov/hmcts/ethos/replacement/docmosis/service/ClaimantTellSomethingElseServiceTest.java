@@ -464,13 +464,12 @@ class ClaimantTellSomethingElseServiceTest {
 
     @Test
     void sendAcknowledgeEmailAndGeneratePdf_TypeC() {
-        String selectedApplication = CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND;
-        CaseData caseData = createCaseData(selectedApplication, NO);
+        CaseData caseData = createCaseData(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND, NO);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
 
-        Map<String, String> expectedPersonalisation = createEmailContentTypeC(caseData, selectedApplication);
+        Map<String, String> expectedPersonalisation = createEmailContentTypeC(caseData);
 
         claimantTellSomethingElseService.sendAcknowledgementEmail(caseDetails, AUTH_TOKEN);
 
@@ -551,8 +550,7 @@ class ClaimantTellSomethingElseServiceTest {
         return content;
     }
 
-    private Map<String, String> createEmailContentTypeC(CaseData caseData,
-                                                   String selectedApplication) {
+    private Map<String, String> createEmailContentTypeC(CaseData caseData) {
         Map<String, String> content = new ConcurrentHashMap<>();
         content.put("caseNumber", caseData.getEthosCaseReference());
         content.put("claimant", caseData.getClaimant());

@@ -20,7 +20,6 @@ import java.util.Set;
 @Service("singleCasesReadingService")
 public class SingleCasesReadingService {
 
-    private static final int RETRY_LIMIT = 3;
     private final CcdClient ccdClient;
 
     @Autowired
@@ -31,18 +30,12 @@ public class SingleCasesReadingService {
     public SubmitEvent retrieveSingleCase(String userToken, String multipleCaseTypeId, String caseId,
                                           String multipleSource) {
 
-        List<String> singleCaseIdList = Collections.singletonList(caseId);
-        List<SubmitEvent> submitEvents;
+        List<SubmitEvent> submitEvents = retrieveSingleCases(userToken,
+                multipleCaseTypeId,
+                new ArrayList<>(Collections.singletonList(caseId)),
+                multipleSource);
 
-        for (int i = 1; i <= RETRY_LIMIT; i++) {
-            log.info("Attempt {}: Retrieving single case with ID {}", i, caseId);
-            submitEvents = retrieveSingleCases(userToken, multipleCaseTypeId, singleCaseIdList, multipleSource);
-            if (!submitEvents.isEmpty()) {
-                return submitEvents.get(0);
-            }
-        }
-
-        return null;
+        return submitEvents.isEmpty() ? null : submitEvents.get(0);
     }
 
     public List<SubmitEvent> retrieveSingleCases(String userToken, String multipleCaseTypeId, List<String> caseIds,

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ class ExcelCreationServiceTest {
     private ExcelCreationService excelCreationService;
 
     @Mock
-    private SingleCasesReadingService singleCasesReadingService;
+    private MultipleScheduleService multipleScheduleService;
 
     String leadLink = "<a target=\"_blank\" href=\"https://www-ccd.perftest.platform.hmcts.net/v2/case/1604313560561842\">245000/2020</a>";
 
@@ -43,23 +44,15 @@ class ExcelCreationServiceTest {
 
     @BeforeEach
     public void setUp() {
+        SchedulePayload schedulePayload = SchedulePayload.builder()
+                .ethosCaseRef("245000/2020").claimantName("Yusuf Dikec").build();
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
-        when(singleCasesReadingService.retrieveSingleCase(any(), any(), any(), any()))
-                .thenReturn(MultipleUtil.getSubmitEvents().get(0));
+        when(multipleScheduleService.getSchedulePayloadCollection(any(), any(), any(), any()))
+                .thenReturn(List.of(schedulePayload));
     }
 
     @Test
     void writeExcelObjects() {
-        assertNotNull(excelCreationService.writeExcel(
-                new ArrayList<>(multipleObjects.values()),
-                new ArrayList<>(Arrays.asList("245000/1", "245000/1")),
-                leadLink, "userToken", "caseTypeId"));
-    }
-
-    @Test
-    void shouldNotWriteExcelRows() {
-        when(singleCasesReadingService.retrieveSingleCase(any(), any(), any(), any()))
-                .thenReturn(null);
         assertNotNull(excelCreationService.writeExcel(
                 new ArrayList<>(multipleObjects.values()),
                 new ArrayList<>(Arrays.asList("245000/1", "245000/1")),

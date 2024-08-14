@@ -91,7 +91,7 @@ class SingleCasesReadingServiceTest {
                 multipleDetails.getCaseTypeId(),
                 CASE_REF,
                 multipleDetails.getCaseData().getMultipleSource());
-        verify(ccdClient, times(3)).retrieveCasesElasticSearchForCreation(userToken,
+        verify(ccdClient, times(1)).retrieveCasesElasticSearchForCreation(userToken,
                 "Manchester",
                 Collections.singletonList(CASE_REF),
                 multipleDetails.getCaseData().getMultipleSource());

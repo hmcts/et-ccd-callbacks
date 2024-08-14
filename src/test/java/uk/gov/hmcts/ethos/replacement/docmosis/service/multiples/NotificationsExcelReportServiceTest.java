@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
 @ExtendWith(SpringExtension.class)
 class NotificationsExcelReportServiceTest {
@@ -102,25 +101,5 @@ class NotificationsExcelReportServiceTest {
         assertEquals(DOC_URL, notificationsExtract.getNotificationsExtractFile().getDocumentUrl());
         assertEquals(DOC_URL + "/binary", notificationsExtract.getNotificationsExtractFile().getDocumentBinaryUrl());
         assertNotNull(notificationsExtract.getExtractDateTime());
-    }
-
-    @Test
-    void shouldNotGenerateReportAndSetCaseDataWithErrors() throws IOException {
-        SortedMap<String, Object> sortedMap = new TreeMap<>();
-        for (int i = 0; i <= 10_000; i++) {
-            sortedMap.put(String.valueOf(i), MultipleObject.builder().ethosCaseRef("6000001/2024").build());
-        }
-        when(excelReadingService
-                .readExcel(
-                        any(),
-                        any(),
-                        any(),
-                        any(),
-                        any()))
-                .thenReturn(sortedMap);
-
-        notificationsExcelReportService.generateReport(multipleDetails, userToken, errors);
-
-        assertEquals(errors.get(0), "Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
     }
 }

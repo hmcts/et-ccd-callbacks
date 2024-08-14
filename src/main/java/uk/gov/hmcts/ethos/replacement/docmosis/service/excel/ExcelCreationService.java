@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -22,21 +23,29 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.ExcelGenerationException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.tasks.ScheduleCallable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HIDDEN_SHEET_NAME;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ES_PARTITION_SIZE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.THREAD_NUMBER;
 
 @Slf4j
 @Service("excelCreationService")
@@ -224,6 +233,22 @@ public class ExcelCreationService {
         if (orderedAllCasesList.isEmpty()) {
             return;
         }
+
+        List<String> ethosCaseRefCollection = new ArrayList<>();
+        orderedAllCasesList.forEach((String caseYear, Map<String, Object> caseYearList) ->
+                caseYearList.forEach((String caseNum, Object caseItem) -> {
+                    if (isStringRefsList) {
+                        ethosCaseRefCollection.add(caseItem.toString());
+                    } else {
+                        MultipleObject multipleObject = (MultipleObject) caseItem;
+                        ethosCaseRefCollection.add(multipleObject.getEthosCaseRef());
+                    }
+                }));
+
+        log.info("Pull information from single cases");
+        List<SchedulePayload> schedulePayloads =
+                getSchedulePayloadCollection(userToken, caseTypeId,
+                        ethosCaseRefCollection);
         String leadCase = MultiplesHelper.getCurrentLead(leadCaseString);
         final int[] rowIndex = {1};
         orderedAllCasesList.forEach((String caseYear, Map<String, Object> caseYearList) ->
@@ -231,12 +256,12 @@ public class ExcelCreationService {
                     if (isStringRefsList) {
                         constructCaseExcelRow(sheet, rowIndex[0], (String) caseItem, leadCase, null,
                                 !subMultipleCollection.isEmpty(), styleForUnLocking, styleForLocking,
-                                styleForLockingLead, styleForClaimant, userToken, caseTypeId);
+                                styleForLockingLead, styleForClaimant, schedulePayloads);
                     } else {
                         MultipleObject multipleObject = (MultipleObject) caseItem;
                         constructCaseExcelRow(sheet, rowIndex[0], multipleObject.getEthosCaseRef(), leadCase,
                                 multipleObject, !subMultipleCollection.isEmpty(), styleForUnLocking, styleForLocking,
-                                styleForLockingLead, styleForClaimant, userToken, caseTypeId);
+                                styleForLockingLead, styleForClaimant, schedulePayloads);
                     }
                     rowIndex[0]++;
                 })
@@ -247,19 +272,14 @@ public class ExcelCreationService {
                                        String leadCase, MultipleObject multipleObject, boolean hasSubMultiples,
                                        CellStyle styleForUnLocking, CellStyle styleForLocking,
                                        CellStyle styleForLockingLead, CellStyle styleForClaimant,
-                                       String userToken, String caseTypeId) {
+                                       List<SchedulePayload> schedulePayloads) {
 
-        log.info("Retrieving single case - {}", ethosCaseRef);
-        SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(
-                userToken, caseTypeId, ethosCaseRef, MANUALLY_CREATED_POSITION);
-
-        if (submitEvent == null) {
-            log.warn("Could not retrieve single case - {}", ethosCaseRef);
-            return;
-        }
         XSSFRow row = sheet.createRow(rowIndex);
 
-        String claimant = submitEvent.getCaseData().getClaimant();
+        String claimant = String.valueOf(schedulePayloads.stream()
+                .filter(c -> c.getEthosCaseRef().equals(ethosCaseRef))
+                .map(SchedulePayload::getClaimantName)
+                .findFirst());
         int columnIndex = 0;
 
         createFirstColumn(ethosCaseRef, leadCase, styleForLocking, styleForLockingLead, row, columnIndex);
@@ -418,6 +438,54 @@ public class ExcelCreationService {
             rowHead.createCell(j).setCellValue(headers.get(j));
             createCell(rowHead, j, headers.get(j), styleForColHeaderCell);
         }
+    }
+
+    private List<SchedulePayload> getSchedulePayloadCollection(String userToken, String caseTypeId,
+                                                               List<String> caseIdCollection) {
+
+        ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER);
+
+        List<Future<HashSet<SchedulePayload>>> resultList = new ArrayList<>();
+
+        log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
+
+        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
+
+            ScheduleCallable scheduleCallable =
+                    new ScheduleCallable(singleCasesReadingService, userToken, caseTypeId, partitionCaseIds);
+
+            resultList.add(executor.submit(scheduleCallable));
+
+        }
+
+        List<SchedulePayload> result = new ArrayList<>();
+
+        for (Future<HashSet<SchedulePayload>> fut : resultList) {
+
+            try {
+
+                HashSet<SchedulePayload> schedulePayloads = fut.get();
+
+                log.info("PartialSize: {}", schedulePayloads.size());
+
+                result.addAll(schedulePayloads);
+
+            } catch (InterruptedException | ExecutionException e) {
+
+                log.error(e.getMessage(), e);
+
+                Thread.currentThread().interrupt();
+
+            }
+
+        }
+
+        executor.shutdown();
+
+        log.info("ResultSize: {}", result.size());
+
+        return result;
+
     }
 
 }

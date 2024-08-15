@@ -259,12 +259,13 @@ public class TornadoService {
     public DocumentInfo createDocumentInfoFromBytes(String authToken, byte[] bytes, String documentName,
                                                      String caseTypeId) {
 
+        log.info("Uploading document to dm store: " + documentName);
         URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
-        log.info(downloadUrl);
+        log.info("downloadUrl " + downloadUrl);
         String markup = documentManagementService.generateMarkupDocument(downloadUrl);
-        log.info(markup);
+        log.info("markup " + markup);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
     }
 

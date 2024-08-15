@@ -300,7 +300,7 @@ public class ClaimantTellSomethingElseService {
         String datePlus7 = isWelsh
                 ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
                 : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
-        String citizenPortalLink = emailService.getCitizenCaseLink(
+        String exuiCaseDetailsLink = emailService.getExuiCaseLink(
                 caseDetails.getCaseId()) + (isWelsh ? WELSH_LANGUAGE_PARAM : "");
 
         return Map.of(
@@ -311,7 +311,7 @@ public class ClaimantTellSomethingElseService {
                 SHORT_TEXT, shortText,
                 DATE_PLUS_7, datePlus7,
                 LINK_TO_DOCUMENT, documentJson,
-                EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId())
+                EXUI_CASE_DETAILS_LINK, exuiCaseDetailsLink
         );
     }
 

@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.EmailServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -239,9 +240,10 @@ public class ClaimantTellSomethingElseService {
                 && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
 
         try {
+            log.info("Sending application email to respondent on case {}", caseData.getEthosCaseReference());
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);
             String emailTemplate = getRespondentEmailTemplate(isWelsh, applicationType);
-
+            log.info("Email template: {}", emailTemplate);
             respondentEmailAddressList.forEach(respondentEmail ->
                     sendEmailToRespondent(
                             emailTemplate,
@@ -264,7 +266,8 @@ public class ClaimantTellSomethingElseService {
                     prepareRespondentEmailContent(caseDetails, bytes, isWelsh)
             );
         } catch (NotificationClientException e) {
-            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+            log.warn("Failed to send email. Reference ID: {}. Reason:", caseData.getEthosCaseReference(), e);
+            throw new EmailServiceException("Failed to send email", e);
         }
     }
 

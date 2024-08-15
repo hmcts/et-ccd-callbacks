@@ -27,6 +27,8 @@ import java.util.concurrent.Future;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ES_PARTITION_SIZE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.THREAD_NUMBER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,10 +39,6 @@ public class MultipleScheduleService {
     private final SingleCasesReadingService singleCasesReadingService;
     private final ExcelDocManagementService excelDocManagementService;
     private final FeatureToggleService featureToggleService;
-
-    public static final int ES_PARTITION_SIZE = 500;
-    public static final int THREAD_NUMBER = 20;
-    public static final int SCHEDULE_LIMIT_CASES = 10_000;
 
     public DocumentInfo bulkScheduleLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
@@ -58,49 +56,35 @@ public class MultipleScheduleService {
                         multipleDetails.getCaseData(),
                         filterExcelType);
 
-        DocumentInfo documentInfo = new DocumentInfo();
+        log.info("Pull information from single cases");
 
-        log.info("Validate limit of cases to generate schedules");
+        List<String> sortedCaseIdsCollection =
+                sortCollectionByEthosCaseRef(getCaseIdCollectionFromFilter(multipleObjects, filterExcelType));
 
-        if (multipleObjects.keySet().size() > SCHEDULE_LIMIT_CASES) {
+        List<SchedulePayload> schedulePayloads =
+                getSchedulePayloadCollection(userToken, multipleDetails.getCaseTypeId(),
+                        sortedCaseIdsCollection, errors);
 
-            log.info("Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
-
-            errors.add("Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
-
-        } else {
-
-            log.info("Pull information from single cases");
-
-            List<String> sortedCaseIdsCollection =
-                    sortCollectionByEthosCaseRef(getCaseIdCollectionFromFilter(multipleObjects, filterExcelType));
-
-            List<SchedulePayload> schedulePayloads =
-                    getSchedulePayloadCollection(userToken, multipleDetails.getCaseTypeId(),
-                            sortedCaseIdsCollection, errors);
-
-            if (featureToggleService.isMultiplesEnabled()) {
-                if (YES.equals(multipleData.getLiveCases())) {
-                    log.info("Filtering live cases");
-                    schedulePayloads = schedulePayloads.stream()
-                            .filter(schedulePayload -> !CLOSED_STATE.equals(schedulePayload.getState()))
-                            .toList();
-                }
-                multipleData.setLiveCases(null);
+        if (featureToggleService.isMultiplesEnabled()) {
+            if (YES.equals(multipleData.getLiveCases())) {
+                log.info("Filtering live cases");
+                schedulePayloads = schedulePayloads.stream()
+                        .filter(schedulePayload -> !CLOSED_STATE.equals(schedulePayload.getState()))
+                        .toList();
             }
-
-            log.info("Generate schedule");
-
-            documentInfo = generateSchedule(userToken, multipleObjects, multipleDetails, schedulePayloads, errors);
-
+            multipleData.setLiveCases(null);
         }
+
+        log.info("Generate schedule");
+
+        DocumentInfo documentInfo =
+                generateSchedule(userToken, multipleObjects, multipleDetails, schedulePayloads, errors);
 
         log.info("Resetting mid fields");
 
         MultiplesHelper.resetMidFields(multipleDetails.getCaseData());
 
         return documentInfo;
-
     }
 
     private List<String> sortCollectionByEthosCaseRef(List<String> caseIdsCollection) {
@@ -126,8 +110,8 @@ public class MultipleScheduleService {
 
     }
 
-    private List<SchedulePayload> getSchedulePayloadCollection(String userToken, String caseTypeId,
-                                                               List<String> caseIdCollection, List<String> errors) {
+    public List<SchedulePayload> getSchedulePayloadCollection(String userToken, String caseTypeId,
+                                                              List<String> caseIdCollection, List<String> errors) {
 
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER);
 

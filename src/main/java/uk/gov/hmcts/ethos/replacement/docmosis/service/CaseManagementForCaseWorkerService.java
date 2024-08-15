@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.util.StringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendin
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -113,6 +115,11 @@ public class CaseManagementForCaseWorkerService {
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
             "Newcastle", "Scotland", "Wales", "Watford");
     private static final int EXPIRY_PERIOD = 180;
+    private static final int CASE_ACCESS_PIN_LENGTH = 12;
+    private static final String CASE_ACCESS_PIN_ALLOWED_CHARS = "ABCDEFGHJKLMNPRSTVWXYZ23456789";
+    private static final int RANDOM_STRING_START_POSITION = 0;
+    private static final boolean RANDOM_STRING_INCLUDES_LETTERS = false;
+    private static final boolean RANDOM_STRING_INCLUDES_NUMBERS = false;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -745,11 +752,21 @@ public class CaseManagementForCaseWorkerService {
      * @param caseData CaseData received from controller
      */
     public void setCaseAccessPin(CaseData caseData) {
-        caseData.setCaseAccessPin(new CaseAccessPin.Builder().caseAccessibleRoles(
-                List.of(CitizenRole.CITIZEN.getCaseRoleLabel(),
+        caseData.setCaseAccessPin(CaseAccessPin.builder()
+                .accessCode(generateAccessCode())
+                .caseAccessibleRoles(List.of(CitizenRole.CITIZEN.getCaseRoleLabel(),
                         DefendantRole.DEFENDANT.getCaseRoleLabel(),
                         ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()))
-                        .expiryDate(LocalDateTime.now().plusDays(EXPIRY_PERIOD).toString())
+                .expiryDate(LocalDateTime.now().plusDays(EXPIRY_PERIOD).toString())
                 .build());
+    }
+
+    private String generateAccessCode() {
+        return RandomStringUtils.random(CASE_ACCESS_PIN_LENGTH,
+                RANDOM_STRING_START_POSITION,
+                CASE_ACCESS_PIN_ALLOWED_CHARS.length(),
+                RANDOM_STRING_INCLUDES_LETTERS,
+                RANDOM_STRING_INCLUDES_NUMBERS,
+                CASE_ACCESS_PIN_ALLOWED_CHARS.toCharArray(), new SecureRandom());
     }
 }

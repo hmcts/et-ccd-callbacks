@@ -14,6 +14,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.Clai
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.addReportAdminDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.createCell;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.getCellStyle;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.initializeReportHeaders;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,7 +31,6 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     private static final String CLAIMANT_WORK_POSTCODE_HEADER = "Claimant Work Postcode";
     private static final String RESPONDENT_POSTCODE_HEADER = "Respondent Postcode";
     private static final String RESPONDENT_ET3_POSTCODE_HEADER = "Respondent ET3 Postcode";
-    private final ExcelCreationService excelCreationService;
     private static final List<String> HEADERS = new ArrayList<>(List.of(
             CASE_NUMBER_HEADER, DATE_OF_RECEIPT_HEADER, CLAIMANT_POSTCODE_HEADER,
             CLAIMANT_WORK_POSTCODE_HEADER, RESPONDENT_POSTCODE_HEADER, RESPONDENT_ET3_POSTCODE_HEADER));
@@ -40,7 +44,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(EXCEL_REPORT_WORKBOOK_NAME);
         adjustColumnSize(sheet);
-        excelCreationService.initializeReportHeaders(reportData.getDocumentName(),
+        initializeReportHeaders(reportData.getDocumentName(),
                 reportData.getReportPeriodDescription(),
                 workbook,
                 sheet,
@@ -70,7 +74,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
             constructCaseExcelRow(workbook, sheet, rowIndex, claim);
             rowIndex++;
         }
-        excelCreationService.addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription, 6);
+        addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription, 6);
     }
 
     private void addColumnFilterCellRange(XSSFSheet sheet, int reportDetailsCount) {
@@ -84,12 +88,12 @@ public class ClaimsByHearingVenueExcelReportCreationService {
         XSSFRow row = sheet.createRow(rowIndex);
         row.setHeight((short)(row.getHeight() * 4));
         int columnIndex = 0;
-        CellStyle cellStyle = excelCreationService.getCellStyle(workbook);
-        excelCreationService.createCell(row, columnIndex, item.getCaseReference(), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 1, item.getDateOfReceipt(), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 2, item.getClaimantPostcode(), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 3, item.getClaimantWorkPostcode(), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 4, item.getRespondentPostcode(), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 5, item.getRespondentET3Postcode(), cellStyle);
+        CellStyle cellStyle = getCellStyle(workbook);
+        createCell(row, columnIndex, item.getCaseReference(), cellStyle);
+        createCell(row, columnIndex + 1, item.getDateOfReceipt(), cellStyle);
+        createCell(row, columnIndex + 2, item.getClaimantPostcode(), cellStyle);
+        createCell(row, columnIndex + 3, item.getClaimantWorkPostcode(), cellStyle);
+        createCell(row, columnIndex + 4, item.getRespondentPostcode(), cellStyle);
+        createCell(row, columnIndex + 5, item.getRespondentET3Postcode(), cellStyle);
     }
 }

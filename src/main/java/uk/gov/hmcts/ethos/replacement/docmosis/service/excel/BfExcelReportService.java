@@ -18,7 +18,12 @@ import java.time.DateTimeException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.addReportAdminDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.createCell;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.getCellStyle;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.initializeReportHeaders;
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.CloseResource"})
 @Service
@@ -35,7 +40,6 @@ public class BfExcelReportService {
     private static final List<String> HEADERS = new ArrayList<>(List.of(
             CASE_NUMBER_HEADER, ACTION, DATE_TAKEN,
             BF_DATE, COMMENTS));
-    private final ExcelCreationService excelCreationService;
 
     public byte[] getReportExcelFile(BfActionReportData reportData) {
         if (reportData == null) {
@@ -45,7 +49,7 @@ public class BfExcelReportService {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(EXCEL_REPORT_WORKBOOK_NAME);
         adjustColumnSize(sheet);
-        excelCreationService.initializeReportHeaders(reportData.getDocumentName(),
+        initializeReportHeaders(reportData.getDocumentName(),
                 reportData.getReportPeriodDescription(),
                 workbook,
                 sheet,
@@ -81,7 +85,7 @@ public class BfExcelReportService {
             rowIndex++;
         }
 
-        excelCreationService.addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription, 4);
+        addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription, 4);
     }
 
     private void addColumnFilterCellRange(XSSFSheet sheet, int reportDetailsCount) {
@@ -95,17 +99,17 @@ public class BfExcelReportService {
         XSSFRow row = sheet.createRow(rowIndex);
         row.setHeight((short)(row.getHeight() * 4));
         int columnIndex = 0;
-        CellStyle cellStyle = excelCreationService.getCellStyle(workbook);
-        excelCreationService.createCell(row, columnIndex, bfDateType.getCaseReference(), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 1, bfDateType.getBroughtForwardAction(), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 2,
+        CellStyle cellStyle = getCellStyle(workbook);
+        createCell(row, columnIndex, bfDateType.getCaseReference(), cellStyle);
+        createCell(row, columnIndex + 1, bfDateType.getBroughtForwardAction(), cellStyle);
+        createCell(row, columnIndex + 2,
                 formatDate(bfDateType.getBroughtForwardEnteredDate()), cellStyle);
-        excelCreationService.createCell(row, columnIndex + 3,
+        createCell(row, columnIndex + 3,
                 formatDate(bfDateType.getBroughtForwardDate()), cellStyle);
         if (cellStyle != null) {
             cellStyle.setWrapText(true);
         }
-        excelCreationService.createCell(row, columnIndex + 4, bfDateType.getBroughtForwardDateReason(), cellStyle);
+        createCell(row, columnIndex + 4, bfDateType.getBroughtForwardDateReason(), cellStyle);
     }
 
     private String formatDate(String bfDate) {

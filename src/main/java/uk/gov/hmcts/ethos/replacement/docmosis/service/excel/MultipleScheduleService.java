@@ -110,7 +110,7 @@ public class MultipleScheduleService {
 
     }
 
-    public List<SchedulePayload> getSchedulePayloadCollection(String userToken, String caseTypeId,
+    private List<SchedulePayload> getSchedulePayloadCollection(String userToken, String caseTypeId,
                                                               List<String> caseIdCollection, List<String> errors) {
 
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -13,8 +14,21 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SingleCasesReadingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.tasks.ScheduleCallable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ES_PARTITION_SIZE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.THREAD_NUMBER;
 
 public final class ExcelReportHelper {
     private ExcelReportHelper() {
@@ -68,7 +82,7 @@ public final class ExcelReportHelper {
     }
 
     public static void addReportAdminDetails(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex,
-                                      String reportPrintedOnDescription, int lastCol) {
+                                             String reportPrintedOnDescription, int lastCol) {
         CellRangeAddress reportTitleCellRange = new CellRangeAddress(rowIndex, rowIndex, 0, lastCol);
         sheet.addMergedRegion(reportTitleCellRange);
         XSSFRow rowReportTitle = sheet.createRow(rowIndex);
@@ -115,7 +129,7 @@ public final class ExcelReportHelper {
     }
 
     public static void initializeReportHeaders(String documentName, String periodDescription, XSSFWorkbook workbook,
-                                        XSSFSheet sheet, List<String> headers) {
+                                               XSSFSheet sheet, List<String> headers) {
         CellRangeAddress reportTitleCellRange = new CellRangeAddress(0, 0, 0, headers.size() - 1);
         sheet.addMergedRegion(reportTitleCellRange);
         XSSFRow rowReportTitle = sheet.createRow(0);
@@ -146,5 +160,56 @@ public final class ExcelReportHelper {
         if (!Strings.isNullOrEmpty(value) && !value.isBlank()) {
             cell.setCellValue(value);
         }
+    }
+
+    public static List<SchedulePayload> getSchedulePayloadCollection(
+            String userToken, String caseTypeId,
+            List<String> caseIdCollection, List<String> errors, Logger log,
+            SingleCasesReadingService singleCasesReadingService) {
+
+        ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER);
+
+        List<Future<HashSet<SchedulePayload>>> resultList = new ArrayList<>();
+
+        log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
+
+        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
+
+            ScheduleCallable scheduleCallable =
+                    new ScheduleCallable(singleCasesReadingService, userToken, caseTypeId, partitionCaseIds);
+
+            resultList.add(executor.submit(scheduleCallable));
+
+        }
+
+        List<SchedulePayload> result = new ArrayList<>();
+
+        for (Future<HashSet<SchedulePayload>> fut : resultList) {
+
+            try {
+
+                HashSet<SchedulePayload> schedulePayloads = fut.get();
+
+                log.info("PartialSize: {}", schedulePayloads.size());
+
+                result.addAll(schedulePayloads);
+
+            } catch (InterruptedException | ExecutionException e) {
+
+                errors.add("Error Generating Schedules");
+
+                log.error(e.getMessage(), e);
+
+                Thread.currentThread().interrupt();
+
+            }
+
+        }
+
+        executor.shutdown();
+
+        log.info("ResultSize: {}", result.size());
+
+        return result;
     }
 }

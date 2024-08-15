@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,23 +11,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.tasks.ScheduleCallable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ES_PARTITION_SIZE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.THREAD_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.getSchedulePayloadCollection;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,7 +55,7 @@ public class MultipleScheduleService {
 
         List<SchedulePayload> schedulePayloads =
                 getSchedulePayloadCollection(userToken, multipleDetails.getCaseTypeId(),
-                        sortedCaseIdsCollection, errors);
+                        sortedCaseIdsCollection, errors, log, singleCasesReadingService);
 
         if (featureToggleService.isMultiplesEnabled()) {
             if (YES.equals(multipleData.getLiveCases())) {
@@ -107,56 +99,6 @@ public class MultipleScheduleService {
             return MultiplesScheduleHelper.getSubMultipleCaseIds(multipleObjects);
 
         }
-
-    }
-
-    private List<SchedulePayload> getSchedulePayloadCollection(String userToken, String caseTypeId,
-                                                              List<String> caseIdCollection, List<String> errors) {
-
-        ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER);
-
-        List<Future<HashSet<SchedulePayload>>> resultList = new ArrayList<>();
-
-        log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
-
-        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
-
-            ScheduleCallable scheduleCallable =
-                    new ScheduleCallable(singleCasesReadingService, userToken, caseTypeId, partitionCaseIds);
-
-            resultList.add(executor.submit(scheduleCallable));
-
-        }
-
-        List<SchedulePayload> result = new ArrayList<>();
-
-        for (Future<HashSet<SchedulePayload>> fut : resultList) {
-
-            try {
-
-                HashSet<SchedulePayload> schedulePayloads = fut.get();
-
-                log.info("PartialSize: {}", schedulePayloads.size());
-
-                result.addAll(schedulePayloads);
-
-            } catch (InterruptedException | ExecutionException e) {
-
-                errors.add("Error Generating Schedules");
-
-                log.error(e.getMessage(), e);
-
-                Thread.currentThread().interrupt();
-
-            }
-
-        }
-
-        executor.shutdown();
-
-        log.info("ResultSize: {}", result.size());
-
-        return result;
 
     }
 

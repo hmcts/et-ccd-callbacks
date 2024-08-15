@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.getCellStyle;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.initializeReportHeaders;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.CloseResource"})
+@SuppressWarnings({"PMD.CloseResource"})
 @Service
 @RequiredArgsConstructor
 @Slf4j

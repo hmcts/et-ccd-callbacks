@@ -22,7 +22,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ExcelReportHelper.
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.CloseResource", "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.CloseResource"})
 public class ClaimsByHearingVenueExcelReportCreationService {
     private static final String EXCEL_REPORT_WORKBOOK_NAME = "Claims By Hearing Venue Report";
     private static final String CASE_NUMBER_HEADER = "Case Number";

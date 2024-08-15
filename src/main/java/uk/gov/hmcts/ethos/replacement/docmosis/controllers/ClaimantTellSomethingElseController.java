@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -61,6 +62,8 @@ public class ClaimantTellSomethingElseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (Boolean.FALSE.equals(Helper.isRespondentSystemUser(caseData))) {
             caseData.setClaimantTseRespNotAvailable(YES);
+        } else {
+            caseData.setClaimantTseRespNotAvailable(NO);
         }
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -116,7 +119,7 @@ public class ClaimantTellSomethingElseController {
         claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId());
 
         // send email notifications
-        if (Helper.isRespondentSystemUser(caseData)) {
+        if (!Helper.isRespondentSystemUser(caseData)) {
             claimantTseService.sendRespondentsEmail(caseDetails);
         }
         claimantTseService.sendAcknowledgementEmail(caseDetails, userToken);

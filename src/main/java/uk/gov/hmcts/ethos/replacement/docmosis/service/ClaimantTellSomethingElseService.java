@@ -41,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET_CY;
@@ -65,7 +64,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLAIMANT_TSE_FILE_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_FILE_NAME;
 
 @Slf4j
 @Service
@@ -232,7 +230,7 @@ public class ClaimantTellSomethingElseService {
 
         if (CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND.equals(applicationType)
             || NO.equals(caseData.getClaimantTseRule92())
-            || NO.equals(caseData.getClaimantTseRespNotAvailable())) {
+            || YES.equals(caseData.getClaimantTseRespNotAvailable())) {
             return;
         }
 
@@ -241,7 +239,7 @@ public class ClaimantTellSomethingElseService {
                 && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
 
         try {
-            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", TSE_FILE_NAME);
+            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);
             String emailTemplate = getRespondentEmailTemplate(isWelsh, applicationType);
 
             respondentEmailAddressList.forEach(respondentEmail ->
@@ -313,7 +311,7 @@ public class ClaimantTellSomethingElseService {
                 SHORT_TEXT, shortText,
                 DATE_PLUS_7, datePlus7,
                 LINK_TO_DOCUMENT, documentJson,
-                LINK_TO_CITIZEN_HUB, citizenPortalLink
+                EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 

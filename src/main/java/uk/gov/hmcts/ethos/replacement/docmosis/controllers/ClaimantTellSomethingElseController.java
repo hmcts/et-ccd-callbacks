@@ -60,7 +60,7 @@ public class ClaimantTellSomethingElseController {
             @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (Boolean.FALSE.equals(Helper.isRespondentSystemUser(caseData))) {
+        if (Boolean.TRUE.equals(Helper.isRespondentSystemUser(caseData))) {
             caseData.setClaimantTseRespNotAvailable(YES);
         } else {
             caseData.setClaimantTseRespNotAvailable(NO);
@@ -119,7 +119,7 @@ public class ClaimantTellSomethingElseController {
         claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId());
 
         // send email notifications
-        if (Helper.isRespondentSystemUser(caseData)) {
+        if (!Helper.isRespondentSystemUser(caseData)) {
             claimantTseService.sendRespondentsEmail(caseDetails);
         }
         claimantTseService.sendAcknowledgementEmail(caseDetails, userToken);

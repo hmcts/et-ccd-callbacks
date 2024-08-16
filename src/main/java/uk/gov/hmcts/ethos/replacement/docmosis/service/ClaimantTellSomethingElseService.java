@@ -25,11 +25,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -242,6 +240,7 @@ public class ClaimantTellSomethingElseService {
         try {
             log.info("Sending application email to respondent on case {}", caseData.getEthosCaseReference());
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);
+            log.info("Document generated successfully");
             String emailTemplate = getRespondentEmailTemplate(isWelsh, applicationType);
             log.info("Email template: {}", emailTemplate);
             respondentEmailAddressList.forEach(respondentEmail ->
@@ -272,12 +271,13 @@ public class ClaimantTellSomethingElseService {
     }
 
     private List<String> getRespondentEmailAddressList(CaseData caseData) {
-        return caseData.getRepCollection().stream()
-                .filter(r -> Objects.nonNull(r)
-                        && YES.equals(defaultIfEmpty(r.getValue().getMyHmctsYesNo(), ""))
-                        && !isNullOrEmpty(r.getValue().getRepresentativeEmailAddress()))
-                .map(r -> r.getValue().getRepresentativeEmailAddress())
-                .toList();
+//        return caseData.getRepCollection().stream()
+//                .filter(r -> Objects.nonNull(r)
+//                        && YES.equals(defaultIfEmpty(r.getValue().getMyHmctsYesNo(), ""))
+//                        && !isNullOrEmpty(r.getValue().getRepresentativeEmailAddress()))
+//                .map(r -> r.getValue().getRepresentativeEmailAddress())
+//                .toList();
+        return List.of("solicitor1@etorganisation1.com");
     }
 
     private String getRespondentEmailTemplate(boolean isWelsh, String applicationType) {
@@ -294,6 +294,7 @@ public class ClaimantTellSomethingElseService {
 
     private Map<String, Object> prepareRespondentEmailContent(CaseDetails caseDetails, byte[] document,
                                                               boolean isWelsh) throws NotificationClientException {
+        log.info("Preparing email content for respondent");
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson =
                 NotificationClient.prepareUpload(document, false, true, "52 weeks");
@@ -306,6 +307,7 @@ public class ClaimantTellSomethingElseService {
         String exuiCaseDetailsLink = emailService.getExuiCaseLink(
                 caseDetails.getCaseId()) + (isWelsh ? WELSH_LANGUAGE_PARAM : "");
 
+        log.info("Email content prepared successfully");
         return Map.of(
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENT_NAMES, getRespondentNames(caseData),

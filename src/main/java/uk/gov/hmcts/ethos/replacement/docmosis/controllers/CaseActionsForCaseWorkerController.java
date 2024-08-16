@@ -90,6 +90,7 @@ public class CaseActionsForCaseWorkerController {
     private static final String TWO_HUNDERED = "200";
     private static final String FOUR_HUNDERED = "400";
     private static final String FIVE_HUNDERED = "500";
+    private static final String SUBMIT_CASE_DRAFT = "SUBMIT_CASE_DRAFT";
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
@@ -269,10 +270,6 @@ public class CaseActionsForCaseWorkerController {
             @RequestHeader("Authorization") String userToken) {
         log.info("POST DEFAULT VALUES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
 
@@ -308,7 +305,7 @@ public class CaseActionsForCaseWorkerController {
                 caseManagementLocationService.setCaseManagementLocationCode(caseData);
             }
 
-            if (featureToggleService.citizenEt1Generation() && "SUBMIT_CASE_DRAFT".equals(ccdRequest.getEventId())) {
+            if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
                 caseDetails.setCaseData(caseData);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
                 et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);

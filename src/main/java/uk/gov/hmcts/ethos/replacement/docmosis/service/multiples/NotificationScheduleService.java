@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SingleCasesReadingService;
@@ -16,13 +17,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ES_PARTITION_SIZE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.THREAD_NUMBER;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service("notificationScheduleService")
 public class NotificationScheduleService {
+
+    @Value("${es.partition.notifications}")
+    private int esPartitionSize;
     private final SingleCasesReadingService singleCasesReadingService;
 
     /**
@@ -45,7 +48,7 @@ public class NotificationScheduleService {
 
         log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
 
-        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
+        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, esPartitionSize)) {
 
             NotificationScheduleCallable scheduleCallable =
                     new NotificationScheduleCallable(

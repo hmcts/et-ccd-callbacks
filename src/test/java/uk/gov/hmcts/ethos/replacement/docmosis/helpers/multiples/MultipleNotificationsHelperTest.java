@@ -92,6 +92,8 @@ class MultipleNotificationsHelperTest {
                 Reply: Please cancel
                 Name: Barry White, Claimant
                 -------------
-                """, result);
+                Reply: Please cancel
+                Name: Barry White, Claimant
+                -------------""", result);
     }
 }

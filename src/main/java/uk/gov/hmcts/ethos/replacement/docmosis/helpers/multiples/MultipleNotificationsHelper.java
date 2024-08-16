@@ -7,15 +7,19 @@ import org.apache.http.client.utils.DateUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGroup;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
@@ -28,7 +32,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_ST
 @Slf4j
 public final class MultipleNotificationsHelper {
     private static final String UNKNOWN = "Unknown";
-    private static final int DEFAULT_RESPONSE_CAPACITY = 200;
 
     private MultipleNotificationsHelper() {
     }
@@ -42,37 +45,30 @@ public final class MultipleNotificationsHelper {
      */
     public static @NotNull List<NotificationGroup> flattenNotificationsWithCaseRef(
             List<NotificationSchedulePayload> schedulePayloads, String multipleRef) {
-        List<NotificationGroup> notificationGroups = new ArrayList<>();
-        for (NotificationSchedulePayload schedulePayload : schedulePayloads) {
-            for (SendNotificationTypeItem sendNotificationTypeItem : schedulePayload.getSendNotificationCollection()) {
-                SendNotificationType notification = sendNotificationTypeItem.getValue();
-                // Filter notifications sent from the multiple
-                if (isNotEmpty(notification.getNotificationSentFrom())
-                        && notification.getNotificationSentFrom().equals(multipleRef)) {
+        return schedulePayloads.stream()
+                .flatMap(schedulePayload -> {
+                    String ethosCaseRef = schedulePayload.getEthosCaseRef();
+                    return schedulePayload.getSendNotificationCollection().stream()
+                            .map(SendNotificationTypeItem::getValue)
+                            .filter(notification -> multipleRef.equals(notification.getNotificationSentFrom()))
+                            .map(notification -> createNotificationGroup(ethosCaseRef, notification));
+                })
+                .toList();
+    }
 
-                    String responseReceived;
-                    List<PseResponseTypeItem> responses;
-                    if (isEmpty(notification.getRespondCollection())) {
-                        responseReceived = NO;
-                        responses = new ArrayList<>();
-                    } else {
-                        responseReceived = YES;
-                        responses = notification.getRespondCollection();
-                    }
+    private static NotificationGroup createNotificationGroup(String ethosCaseRef, SendNotificationType notification) {
+        String responseReceived = isEmpty(notification.getRespondCollection()) ? NO : YES;
+        List<PseResponseTypeItem> responses = Optional.ofNullable(notification.getRespondCollection())
+                .orElseGet(ArrayList::new);
 
-                    notificationGroups.add(NotificationGroup.builder()
-                            .caseNumber(schedulePayload.getEthosCaseRef())
-                            .date(notification.getDate())
-                            .responseReceived(responseReceived)
-                            .notificationTitle(notification.getSendNotificationTitle())
-                            .notificationSubjectString(notification.getSendNotificationSubjectString())
-                            .respondCollection(responses)
-                            .build()
-                    );
-                }
-            }
-        }
-        return notificationGroups;
+        return NotificationGroup.builder()
+                .caseNumber(ethosCaseRef)
+                .date(notification.getDate())
+                .responseReceived(responseReceived)
+                .notificationTitle(notification.getSendNotificationTitle())
+                .notificationSubjectString(notification.getSendNotificationSubjectString())
+                .respondCollection(responses)
+                .build();
     }
 
     /**
@@ -100,30 +96,34 @@ public final class MultipleNotificationsHelper {
     public static @NotNull List<Map.Entry<Pair<String, String>,
             List<NotificationGroup>>> groupedNotificationsSortedByDate(Map<Pair<String, String>,
             List<NotificationGroup>> notificationsGroupedByTitle) {
-        return
-                notificationsGroupedByTitle.entrySet().stream().sorted(
-                        Comparator.comparing(e ->
-                                DateUtils.parseDate(e.getKey().getRight(), new String[]{MONTH_STRING_DATE_FORMAT})
+
+        // Create a cache for parsed dates to reduce overhead
+        Map<Pair<String, String>, Date> dateCache = new HashMap<>();
+
+        return notificationsGroupedByTitle.entrySet().stream()
+                .sorted(Comparator.comparing(entry ->
+                        dateCache.computeIfAbsent(entry.getKey(), key ->
+                                DateUtils.parseDate(key.getRight(), new String[]{MONTH_STRING_DATE_FORMAT})
                         )
-                ).toList();
+                ))
+                .toList();
     }
 
     public static @NotNull String getAndFormatReplies(List<PseResponseTypeItem> respondCollection) {
         if (respondCollection.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder(DEFAULT_RESPONSE_CAPACITY * respondCollection.size());
-        for (PseResponseTypeItem pseResponseTypeItem : respondCollection) {
-            PseResponseType response = pseResponseTypeItem.getValue();
-            String name = isNotEmpty(response.getAuthor()) ? response.getAuthor() : UNKNOWN;
-            sb.append("Reply: ").append(response.getResponse())
-                    .append(NEW_LINE_CELL)
-                    .append("Name: ")
-                    .append(name).append(", ").append(response.getFrom())
-                    .append(NEW_LINE_CELL)
-                    .append("-------------")
-                    .append(NEW_LINE_CELL);
-        }
-        return sb.toString();
+
+        return respondCollection.stream()
+                .map(PseResponseTypeItem::getValue)
+                .map(response -> {
+                    String name = isNotEmpty(response.getAuthor()) ? response.getAuthor() : UNKNOWN;
+                    return new StringJoiner(NEW_LINE_CELL)
+                            .add("Reply: " + response.getResponse())
+                            .add("Name: " + name + ", " + response.getFrom())
+                            .add("-------------")
+                            .toString();
+                })
+                .collect(Collectors.joining(NEW_LINE_CELL));
     }
 }

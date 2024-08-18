@@ -65,8 +65,4 @@ public class FeatureToggleService {
     public boolean isPartySpacingCronEnabled() {
         return this.featureToggleApi.isFeatureEnabled("party-spacing-cron");
     }
-
-    public boolean isUpdateTransferredCaseLinksEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("updateTransferredCaseLinks");
-    }
 }

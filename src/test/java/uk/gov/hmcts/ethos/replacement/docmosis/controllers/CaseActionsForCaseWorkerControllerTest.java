@@ -334,7 +334,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
@@ -352,7 +352,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         if (featureToggleService.isCaseAccessPinEnabled()) {
             mvc.perform(post(POST_DEFAULT_VALUES_URL)
@@ -382,7 +382,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent2.toString())
@@ -464,9 +464,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
+        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                         .content(requestContent2.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -483,9 +483,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
+        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
 
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
 
@@ -498,7 +498,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseManagementForCaseWorkerService, times(1)).updateWorkAllocationField(any(), any());
+        verify(caseManagementForCaseWorkerService, times(1))
+                .updateWorkAllocationField(anyList(), any(CaseData.class));
     }
 
     @Test
@@ -507,9 +508,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.continuingRespondent(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
+        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -524,9 +525,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void amendRespondentRepresentative() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(), anyString()))
+        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString()))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
 
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
@@ -538,7 +539,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(nocRespondentRepresentativeService, times(1)).updateNonMyHmctsOrgIds(any());
+        verify(nocRespondentRepresentativeService, times(1)).updateNonMyHmctsOrgIds(anyList());
     }
 
     @Test
@@ -581,7 +582,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(caseFlagsService, times(1)).setPrivateHearingFlag(any());
+        verify(caseFlagsService, times(1)).setPrivateHearingFlag(any(CaseData.class));
     }
 
     @Test
@@ -1874,7 +1875,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(caseManagementForCaseWorkerService, times(1))
-                .setHmctsServiceIdSupplementary(any());
+                .setHmctsServiceIdSupplementary(any(CaseDetails.class));
     }
 
     @Test
@@ -1904,7 +1905,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                         .content(requestContent.toString())
@@ -1915,6 +1916,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(caseManagementLocationService, times(1))
-                .setCaseManagementLocationCode(any());
+                .setCaseManagementLocationCode(any(CaseData.class));
     }
 }

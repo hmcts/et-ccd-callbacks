@@ -61,8 +61,10 @@ class CaseCreationForCaseWorkerServiceTest {
     @Test
     @SneakyThrows
     void caseCreationRequestException() {
-        when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
+        when(ccdClient.startCaseCreation(anyString(), any(CaseDetails.class)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.submitCaseCreation(anyString(), any(CaseDetails.class), any(CCDRequest.class)))
+                .thenReturn(submitEvent);
 
         assertThrows(Exception.class, () ->
                 caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken)
@@ -72,8 +74,9 @@ class CaseCreationForCaseWorkerServiceTest {
     @Test
     @SneakyThrows
     void caseCreationRequest() {
-        when(ccdClient.startCaseCreation(anyString(), any())).thenReturn(ccdRequest);
-        when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
+        when(ccdClient.startCaseCreation(anyString(), any(CaseDetails.class))).thenReturn(ccdRequest);
+        when(ccdClient.submitCaseCreation(anyString(), any(CaseDetails.class), any(CCDRequest.class)))
+                .thenReturn(submitEvent);
         SubmitEvent submitEvent1 = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
         assertEquals(submitEvent1, submitEvent);
     }

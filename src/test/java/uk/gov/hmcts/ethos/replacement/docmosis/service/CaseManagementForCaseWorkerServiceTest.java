@@ -944,7 +944,8 @@ class CaseManagementForCaseWorkerServiceTest {
                 anyString(), eq(AUTH_TOKEN), anyString(), anyList()))
                 .thenReturn(new ArrayList<>(Collections.singleton(submitEvent)));
         when(ccdClient.submitEventForCase(
-                any(), any(), any(), any(), any(), any()))
+                // doesn't accept any(CCDRequest.class) most probably gets null instead of the class.
+                anyString(), any(CaseData.class), anyString(), anyString(), any(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () ->
                 caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
@@ -994,7 +995,8 @@ class CaseManagementForCaseWorkerServiceTest {
                 anyString(), anyString(), anyList()))
                 .thenReturn(Pair.of("testSourceCaseType", List.of(submitEventSourceCase)));
         when(caseRetrievalForCaseWorkerService.caseRefRetrievalRequest(
-                any(), any(), any(), any()))
+                // doesn't accept anyString() as caseTypeId. Most probably it is null on runtime.
+                anyString(), any(), anyString(), anyString()))
                 .thenReturn(fullSourceCase.getCaseData().getEthosCaseReference());
 
         caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(AUTH_TOKEN, caseDetails);

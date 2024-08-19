@@ -152,6 +152,7 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseAccessPinEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
@@ -1484,5 +1485,18 @@ class CaseManagementForCaseWorkerServiceTest {
         dynamicValueType.setLabel("RespondentName1");
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
+    }
+
+    @Test
+    void setCaseAccessPin() {
+        CaseData caseData = ccdRequest10.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.setCaseAccessPin(caseData);
+        assertThat(caseData.getCaseAccessPin()).isNotNull();
+        assertThat(caseData.getCaseAccessPin().getCaseAccessibleRoles()).contains(
+                CitizenRole.CITIZEN.getCaseRoleLabel(),
+                DefendantRole.DEFENDANT.getCaseRoleLabel(),
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        assertThat(caseData.getCaseAccessPin().getExpiryDate()).isNotNull();
+        assertThat(caseData.getCaseAccessPin().getAccessCode()).hasSize(12);
     }
 }

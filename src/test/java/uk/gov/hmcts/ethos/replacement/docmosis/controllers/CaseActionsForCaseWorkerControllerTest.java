@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,13 +56,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -220,7 +221,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    @SneakyThrows
+    public void setUp() {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
@@ -246,8 +248,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createCase() throws Exception {
-        when(caseCreationForCaseWorkerService.caseCreationRequest(isA(CCDRequest.class),
+    @SneakyThrows
+    void createCase() {
+        when(caseCreationForCaseWorkerService.caseCreationRequest(any(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(submitEvent);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_CASE_URL)
@@ -261,9 +264,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCase() throws Exception {
+    @SneakyThrows
+    void retrieveCase() {
         when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN),
-                isA(String.class), isA(String.class), isA(String.class)))
+                anyString(), anyString(), anyString()))
                 .thenReturn(submitEvent);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASE_URL)
@@ -277,9 +281,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCases() throws Exception {
+    @SneakyThrows
+    void retrieveCases() {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
-        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(isA(CCDRequest.class),
+        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(any(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(submitEventList);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASES_URL)
@@ -293,8 +298,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateCase() throws Exception {
-        when(caseUpdateForCaseWorkerService.caseUpdateRequest(isA(CCDRequest.class),
+    @SneakyThrows
+    void updateCase() {
+        when(caseUpdateForCaseWorkerService.caseUpdateRequest(any(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(submitEvent);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_CASE_URL)
@@ -308,8 +314,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preDefaultValues() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+    @SneakyThrows
+    void preDefaultValues() {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
@@ -322,9 +329,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void postDefaultValuesFromET1WithPositionTypeDefined() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
-        when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
+    @SneakyThrows
+    void postDefaultValuesFromET1WithPositionTypeDefined() {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
@@ -339,9 +347,40 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void postDefaultValues() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
-        when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
+    @SneakyThrows
+    void postDefaultValuesFromET1CreatesCaseAccessPinWhenFeatureToggleEnabled() {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+        if (featureToggleService.isCaseAccessPinEnabled()) {
+            mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                            .content(requestContent.toString())
+                            .header(AUTHORIZATION, AUTH_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                    .andExpect(jsonPath(JsonMapper.DATA, contains("caseAccess")))
+                    .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                    .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        } else {
+            mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                            .content(requestContent.toString())
+                            .header(AUTHORIZATION, AUTH_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                    .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                    .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void postDefaultValues() {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
@@ -356,10 +395,11 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseDetails() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+    @SneakyThrows
+    void amendCaseDetails() {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
+        when(eventValidationService.validateCaseState(any(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -371,12 +411,13 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseDetails_noErrors() throws Exception {
+    @SneakyThrows
+    void amendCaseDetails_noErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateReceiptDate(isA(CaseDetails.class))).thenReturn(new ArrayList<>());
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
-        when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+        when(eventValidationService.validateReceiptDate(any(CaseDetails.class))).thenReturn(new ArrayList<>());
+        when(eventValidationService.validateCaseState(any(CaseDetails.class))).thenReturn(true);
+        when(eventValidationService.validateCurrentPosition(any(CaseDetails.class))).thenReturn(true);
+        when(defaultValuesReaderService.getDefaultValues(any(String.class))).thenReturn(defaultValues);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                         .content(requestContent2.toString())
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -388,10 +429,11 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseDetailsWithErrors() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
+    @SneakyThrows
+    void amendCaseDetailsWithErrors() {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(false);
+        when(eventValidationService.validateCaseState(any(CaseDetails.class))).thenReturn(false);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -403,7 +445,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendClaimantDetails() throws Exception {
+    @SneakyThrows
+    void amendClaimantDetails() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -416,8 +459,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentDetails() throws Exception {
-        when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
+    @SneakyThrows
+    void amendRespondentDetails() {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
@@ -434,8 +478,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentDetails_UpdateCounter() throws Exception {
-        when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
+    @SneakyThrows
+    void amendRespondentDetails_UpdateCounter() {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
@@ -457,8 +502,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentDetailsContinuingClaim() throws Exception {
-        when(caseManagementForCaseWorkerService.continuingRespondent(isA(CCDRequest.class)))
+    @SneakyThrows
+    void amendRespondentDetailsContinuingClaim() {
+        when(caseManagementForCaseWorkerService.continuingRespondent(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
@@ -475,7 +521,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentRepresentative() throws Exception {
+    @SneakyThrows
+    void amendRespondentRepresentative() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
@@ -495,7 +542,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateHearing() throws Exception {
+    @SneakyThrows
+    void updateHearing() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content(requestContent.toString())
@@ -508,7 +556,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void allocateHearing() throws Exception {
+    @SneakyThrows
+    void allocateHearing()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content(requestContent.toString())
@@ -521,7 +570,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void restrictedCases() throws Exception {
+    @SneakyThrows
+    void restrictedCases() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content(requestContent.toString())
@@ -535,7 +585,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicRestrictedCases() throws Exception {
+    @SneakyThrows
+    void dynamicRestrictedCases() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent.toString())
@@ -548,7 +599,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendHearing() throws Exception {
+    @SneakyThrows
+    void amendHearing() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_HEARING_URL)
                 .content(requestContent2.toString())
@@ -561,7 +613,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midEventAmendHearing() throws Exception {
+    @SneakyThrows
+    void midEventAmendHearing() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content(requestContent2.toString())
@@ -574,7 +627,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseState() throws Exception {
+    @SneakyThrows
+    void amendCaseState() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
@@ -587,9 +641,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseStateValidationErrors() throws Exception {
+    @SneakyThrows
+    void amendCaseStateValidationErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doCallRealMethod().when(eventValidationService).validateJurisdictionOutcome(isA(CaseData.class),
+        doCallRealMethod().when(eventValidationService).validateJurisdictionOutcome(any(CaseData.class),
                 eq(false), eq(false), eq(new ArrayList<>()));
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
@@ -602,7 +657,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentAddress() throws Exception {
+    @SneakyThrows
+    void midRespondentAddress() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent2.toString())
@@ -615,7 +671,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void jurisdictionValidation() throws Exception {
+    @SneakyThrows
+    void jurisdictionValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -628,7 +685,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void judgementValidation() throws Exception {
+    @SneakyThrows
+    void judgementValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -641,7 +699,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void depositValidation() throws Exception {
+    @SneakyThrows
+    void depositValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -654,7 +713,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentAddressPopulated() throws Exception {
+    @SneakyThrows
+    void midRespondentAddressPopulated() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent.toString())
@@ -667,10 +727,11 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentECC() throws Exception {
+    @SneakyThrows
+    void midRespondentECC() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseManagementForCaseWorkerService.createECC(isA(CaseDetails.class),
-                eq(AUTH_TOKEN), isA(List.class), isA(String.class)))
+        when(caseManagementForCaseWorkerService.createECC(any(CaseDetails.class),
+                eq(AUTH_TOKEN), anyList(), anyString()))
                 .thenReturn(new CaseData());
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content(requestContent2.toString())
@@ -683,10 +744,11 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createECC() throws Exception {
+    @SneakyThrows
+    void createECC() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseManagementForCaseWorkerService.createECC(isA(CaseDetails.class),
-                eq(AUTH_TOKEN), isA(List.class), isA(String.class)))
+        when(caseManagementForCaseWorkerService.createECC(any(CaseDetails.class),
+                eq(AUTH_TOKEN), anyList(), anyString()))
                 .thenReturn(new CaseData());
         mvc.perform(post(CREATE_ECC_URL)
                 .content(requestContent2.toString())
@@ -699,10 +761,11 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void linkOriginalCaseECC() throws Exception {
+    @SneakyThrows
+    void linkOriginalCaseECC() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseManagementForCaseWorkerService.createECC(isA(CaseDetails.class),
-                eq(AUTH_TOKEN), isA(List.class), isA(String.class)))
+        when(caseManagementForCaseWorkerService.createECC(any(CaseDetails.class),
+                eq(AUTH_TOKEN), anyList(), anyString()))
                 .thenReturn(new CaseData());
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content(requestContent2.toString())
@@ -715,7 +778,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void singleCaseMultipleMidEventValidation() throws Exception {
+    @SneakyThrows
+    void singleCaseMultipleMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
@@ -728,7 +792,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void hearingMidEventValidation() throws Exception {
+    @SneakyThrows
+    void hearingMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
@@ -741,7 +806,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void bfActions() throws Exception {
+    @SneakyThrows
+    void bfActions()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(BF_ACTIONS_URL)
                 .content(requestContent2.toString())
@@ -754,7 +820,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListBfActions() throws Exception {
+    @SneakyThrows
+    void dynamicListBfActions()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content(requestContent2.toString())
@@ -767,9 +834,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStartDisposal() throws Exception {
+    @SneakyThrows
+    void aboutToStartDisposal()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseBeforeCloseEvent(isA(CaseData.class),
+        when(eventValidationService.validateCaseBeforeCloseEvent(any(CaseData.class),
                         eq(false), eq(false), anyList())).thenReturn(anyList());
 
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
@@ -780,14 +848,15 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(clerkService, times(1)).initialiseClerkResponsible(isA(CaseData.class));
-        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(CaseData.class));
+        verify(clerkService, times(1)).initialiseClerkResponsible(any(CaseData.class));
+        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(any(CaseData.class));
     }
 
     @Test
-    void aboutToStartDisposalCaseCloseEventValidationErrors() throws Exception {
+    @SneakyThrows
+    void aboutToStartDisposalCaseCloseEventValidationErrors()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseBeforeCloseEvent(isA(CaseData.class),
+        when(eventValidationService.validateCaseBeforeCloseEvent(any(CaseData.class),
                 eq(false), eq(false), anyList())).thenReturn(List.of("test error"));
 
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
@@ -801,7 +870,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicRespondentRepresentativeNamesErrors() throws Exception {
+    @SneakyThrows
+    void dynamicRespondentRepresentativeNamesErrors()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content(requestContent2.toString())
@@ -814,7 +884,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicDepositOrderErrors() throws Exception {
+    @SneakyThrows
+    void dynamicDepositOrderErrors()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content(requestContent2.toString())
@@ -827,7 +898,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicRestrictedReportingErrors() throws Exception {
+    @SneakyThrows
+    void dynamicRestrictedReportingErrors()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent2.toString())
@@ -840,7 +912,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initialiseAmendCaseDetails() throws Exception {
+    @SneakyThrows
+    void initialiseAmendCaseDetails()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -851,14 +924,15 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(clerkService, times(1)).initialiseClerkResponsible(isA(CaseData.class));
-        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(CaseData.class));
+        verify(clerkService, times(1)).initialiseClerkResponsible(any(CaseData.class));
+        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(any(CaseData.class));
     }
 
     @Test
-    void reinstateClosedCaseMidEventValidation() throws Exception {
+    @SneakyThrows
+    void reinstateClosedCaseMidEventValidation()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseCloseValidator.validateReinstateClosedCaseMidEvent(isA(CaseData.class))).thenReturn(anyList());
+        when(caseCloseValidator.validateReinstateClosedCaseMidEvent(any(CaseData.class))).thenReturn(anyList());
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -870,9 +944,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void reinstateClosedCaseMidEventValidationErrors() throws Exception {
+    @SneakyThrows
+    void reinstateClosedCaseMidEventValidationErrors()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseCloseValidator.validateReinstateClosedCaseMidEvent(isA(CaseData.class)))
+        when(caseCloseValidator.validateReinstateClosedCaseMidEvent(any(CaseData.class)))
                 .thenReturn(List.of("test error"));
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -885,7 +960,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createCaseError400() throws Exception {
+    @SneakyThrows
+    void createCaseError400()  {
         mvc.perform(post(CREATION_CASE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -894,7 +970,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCaseError400() throws Exception {
+    @SneakyThrows
+    void retrieveCaseError400()  {
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -903,7 +980,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCasesError400() throws Exception {
+    @SneakyThrows
+    void retrieveCasesError400()  {
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -912,7 +990,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateCaseError400() throws Exception {
+    @SneakyThrows
+    void updateCaseError400()  {
         mvc.perform(post(UPDATE_CASE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -921,7 +1000,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preDefaultValuesError400() throws Exception {
+    @SneakyThrows
+    void preDefaultValuesError400()  {
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -930,7 +1010,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void postDefaultValuesError400() throws Exception {
+    @SneakyThrows
+    void postDefaultValuesError400()  {
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -939,7 +1020,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseDetailsError400() throws Exception {
+    @SneakyThrows
+    void amendCaseDetailsError400()  {
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -948,7 +1030,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendClaimantDetailsError400() throws Exception {
+    @SneakyThrows
+    void amendClaimantDetailsError400()  {
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -957,7 +1040,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentDetailsError400() throws Exception {
+    @SneakyThrows
+    void amendRespondentDetailsError400()  {
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -966,7 +1050,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentRepresentativeError400() throws Exception {
+    @SneakyThrows
+    void amendRespondentRepresentativeError400()  {
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -975,7 +1060,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateHearingError400() throws Exception {
+    @SneakyThrows
+    void updateHearingError400()  {
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -984,7 +1070,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void allocateHearingError400() throws Exception {
+    @SneakyThrows
+    void allocateHearingError400()  {
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -993,7 +1080,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void restrictedCasesError400() throws Exception {
+    @SneakyThrows
+    void restrictedCasesError400()  {
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1002,7 +1090,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendHearingError400() throws Exception {
+    @SneakyThrows
+    void amendHearingError400()  {
         mvc.perform(post(AMEND_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1011,7 +1100,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midEventAmendHearingError400() throws Exception {
+    @SneakyThrows
+    void midEventAmendHearingError400()  {
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1020,7 +1110,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseStateError400() throws Exception {
+    @SneakyThrows
+    void amendCaseStateError400()  {
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1029,7 +1120,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentAddressError400() throws Exception {
+    @SneakyThrows
+    void midRespondentAddressError400()  {
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1038,7 +1130,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void jurisdictionValidationError400() throws Exception {
+    @SneakyThrows
+    void jurisdictionValidationError400()  {
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1047,7 +1140,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void judgementValidationError400() throws Exception {
+    @SneakyThrows
+    void judgementValidationError400()  {
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1056,7 +1150,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void depositValidationError400() throws Exception {
+    @SneakyThrows
+    void depositValidationError400()  {
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1065,7 +1160,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentECCError400() throws Exception {
+    @SneakyThrows
+    void midRespondentECCError400()  {
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1074,7 +1170,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createECCError400() throws Exception {
+    @SneakyThrows
+    void createECCError400()  {
         mvc.perform(post(CREATE_ECC_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1083,7 +1180,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void linkOriginalCaseECCError400() throws Exception {
+    @SneakyThrows
+    void linkOriginalCaseECCError400()  {
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1092,7 +1190,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void singleCaseMultipleMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void singleCaseMultipleMidEventValidationError400()  {
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1101,7 +1200,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void hearingMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void hearingMidEventValidationError400()  {
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1110,7 +1210,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void bfActionsError400() throws Exception {
+    @SneakyThrows
+    void bfActionsError400()  {
         mvc.perform(post(BF_ACTIONS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1119,7 +1220,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListBfActionsError400() throws Exception {
+    @SneakyThrows
+    void dynamicListBfActionsError400()  {
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1128,7 +1230,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStartDisposalError400() throws Exception {
+    @SneakyThrows
+    void aboutToStartDisposalError400()  {
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1137,7 +1240,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicRespondentRepresentativeNamesUrlError400() throws Exception {
+    @SneakyThrows
+    void dynamicRespondentRepresentativeNamesUrlError400()  {
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1146,7 +1250,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicDepositOrderError400() throws Exception {
+    @SneakyThrows
+    void dynamicDepositOrderError400()  {
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1155,7 +1260,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicRestrictedReportingError400() throws Exception {
+    @SneakyThrows
+    void dynamicRestrictedReportingError400()  {
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1164,7 +1270,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicJudgmentError400() throws Exception {
+    @SneakyThrows
+    void dynamicJudgmentError400()  {
         mvc.perform(post(DYNAMIC_JUDGMENT_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1173,7 +1280,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void judgmentSubmittedError400() throws Exception {
+    @SneakyThrows
+    void judgmentSubmittedError400()  {
         mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1182,7 +1290,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicFixCaseAPIError400() throws Exception {
+    @SneakyThrows
+    void dynamicFixCaseAPIError400()  {
         mvc.perform(post(AMEND_FIX_CASE_API_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1192,7 +1301,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void reinstateClosedCaseError400() throws Exception {
+    @SneakyThrows
+    void reinstateClosedCaseError400()  {
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                         .content("error")
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1202,8 +1312,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createCaseError500() throws Exception {
-        when(caseCreationForCaseWorkerService.caseCreationRequest(isA(CCDRequest.class),
+    @SneakyThrows
+    void createCaseError500()  {
+        when(caseCreationForCaseWorkerService.caseCreationRequest(any(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_CASE_URL)
@@ -1214,9 +1325,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCaseError500() throws Exception {
-        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN), isA(String.class),
-                isA(String.class), isA(String.class)))
+    @SneakyThrows
+    void retrieveCaseError500()  {
+        when(caseRetrievalForCaseWorkerService.caseRetrievalRequest(eq(AUTH_TOKEN), anyString(),
+                anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASE_URL)
@@ -1227,8 +1339,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCasesError500() throws Exception {
-        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(isA(CCDRequest.class),
+    @SneakyThrows
+    void retrieveCasesError500()  {
+        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(any(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASES_URL)
@@ -1239,8 +1352,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateCaseError500() throws Exception {
-        when(caseUpdateForCaseWorkerService.caseUpdateRequest(isA(CCDRequest.class),
+    @SneakyThrows
+    void updateCaseError500()  {
+        when(caseUpdateForCaseWorkerService.caseUpdateRequest(any(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_CASE_URL)
@@ -1251,7 +1365,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preDefaultValuesError500() throws Exception {
+    @SneakyThrows
+    void preDefaultValuesError500()  {
         when(defaultValuesReaderService.getClaimantTypeOfClaimant()).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
@@ -1262,11 +1377,12 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void postDefaultValuesError500() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenThrow(
+    @SneakyThrows
+    void postDefaultValuesError500()  {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenThrow(
                 new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateReceiptDate(isA(CaseDetails.class))).thenThrow(
+        when(eventValidationService.validateReceiptDate(any(CaseDetails.class))).thenThrow(
                 new InternalException(ERROR_MESSAGE));
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
@@ -1276,11 +1392,12 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseDetailsError500() throws Exception {
+    @SneakyThrows
+    void amendCaseDetailsError500()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class)))
+        when(eventValidationService.validateCaseState(any(CaseDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
+        when(eventValidationService.validateCurrentPosition(any(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -1289,8 +1406,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentDetailsError500() throws Exception {
-        when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
+    @SneakyThrows
+    void amendRespondentDetailsError500()  {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
@@ -1301,8 +1419,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentDetailsClaimContinuingError500() throws Exception {
-        when(caseManagementForCaseWorkerService.continuingRespondent(isA(CCDRequest.class)))
+    @SneakyThrows
+    void amendRespondentDetailsClaimContinuingError500()  {
+        when(caseManagementForCaseWorkerService.continuingRespondent(any(CCDRequest.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
@@ -1313,10 +1432,11 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void singleCaseMultipleMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void singleCaseMultipleMidEventValidationError500()  {
         doThrow(new InternalException(ERROR_MESSAGE)).when(singleCaseMultipleMidEventValidationService)
                 .singleCaseMultipleValidationLogic(
-                eq(AUTH_TOKEN), isA(CaseDetails.class), isA(List.class));
+                eq(AUTH_TOKEN), any(CaseDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1326,7 +1446,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createCaseErrorForbidden() throws Exception {
+    @SneakyThrows
+    void createCaseErrorForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATION_CASE_URL)
                 .content(requestContent.toString())
@@ -1336,7 +1457,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCaseForbidden() throws Exception {
+    @SneakyThrows
+    void retrieveCaseForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content(requestContent.toString())
@@ -1346,7 +1468,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void retrieveCasesForbidden() throws Exception {
+    @SneakyThrows
+    void retrieveCasesForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content(requestContent.toString())
@@ -1356,7 +1479,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateCaseForbidden() throws Exception {
+    @SneakyThrows
+    void updateCaseForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_CASE_URL)
                 .content(requestContent.toString())
@@ -1366,7 +1490,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preDefaultValuesForbidden() throws Exception {
+    @SneakyThrows
+    void preDefaultValuesForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
@@ -1376,7 +1501,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void postDefaultValuesForbidden() throws Exception {
+    @SneakyThrows
+    void postDefaultValuesForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent2.toString())
@@ -1386,7 +1512,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseDetailsForbidden() throws Exception {
+    @SneakyThrows
+    void amendCaseDetailsForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -1396,7 +1523,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendClaimantDetailsForbidden() throws Exception {
+    @SneakyThrows
+    void amendClaimantDetailsForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -1406,7 +1534,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentDetailsForbidden() throws Exception {
+    @SneakyThrows
+    void amendRespondentDetailsForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -1416,7 +1545,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendRespondentRepresentativeForbidden() throws Exception {
+    @SneakyThrows
+    void amendRespondentRepresentativeForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content(requestContent.toString())
@@ -1426,7 +1556,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateHearingForbidden() throws Exception {
+    @SneakyThrows
+    void updateHearingForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content(requestContent.toString())
@@ -1436,7 +1567,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void allocateHearingForbidden() throws Exception {
+    @SneakyThrows
+    void allocateHearingForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content(requestContent.toString())
@@ -1446,7 +1578,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void restrictedCasesForbidden() throws Exception {
+    @SneakyThrows
+    void restrictedCasesForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content(requestContent.toString())
@@ -1456,7 +1589,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendHearingForbidden() throws Exception {
+    @SneakyThrows
+    void amendHearingForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_HEARING_URL)
                 .content(requestContent2.toString())
@@ -1466,7 +1600,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midEventAmendHearingForbidden() throws Exception {
+    @SneakyThrows
+    void midEventAmendHearingForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content(requestContent2.toString())
@@ -1476,7 +1611,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendCaseStateForbidden() throws Exception {
+    @SneakyThrows
+    void amendCaseStateForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
@@ -1486,7 +1622,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentAddressForbidden() throws Exception {
+    @SneakyThrows
+    void midRespondentAddressForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent2.toString())
@@ -1496,7 +1633,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void jurisdictionValidationForbidden() throws Exception {
+    @SneakyThrows
+    void jurisdictionValidationForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1506,7 +1644,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void judgementValidationForbidden() throws Exception {
+    @SneakyThrows
+    void judgementValidationForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1516,7 +1655,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void depositValidationForbidden() throws Exception {
+    @SneakyThrows
+    void depositValidationForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1526,7 +1666,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentAddressPopulatedForbidden() throws Exception {
+    @SneakyThrows
+    void midRespondentAddressPopulatedForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent.toString())
@@ -1536,7 +1677,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midRespondentECCForbidden() throws Exception {
+    @SneakyThrows
+    void midRespondentECCForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content(requestContent2.toString())
@@ -1546,7 +1688,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createECCForbidden() throws Exception {
+    @SneakyThrows
+    void createECCForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_ECC_URL)
                 .content(requestContent2.toString())
@@ -1556,7 +1699,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void linkOriginalCaseECCForbidden() throws Exception {
+    @SneakyThrows
+    void linkOriginalCaseECCForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content(requestContent2.toString())
@@ -1566,7 +1710,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void singleCaseMultipleMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void singleCaseMultipleMidEventValidationForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
@@ -1576,7 +1721,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void hearingMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void hearingMidEventValidationForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
@@ -1586,7 +1732,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void bfActionsForbidden() throws Exception {
+    @SneakyThrows
+    void bfActionsForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(BF_ACTIONS_URL)
                 .content(requestContent2.toString())
@@ -1596,7 +1743,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListBfActionsForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicListBfActionsForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content(requestContent2.toString())
@@ -1606,19 +1754,21 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStartDisposalForbidden() throws Exception {
+    @SneakyThrows
+    void aboutToStartDisposalForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
-        verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
+        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
+        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
     }
 
     @Test
-    void dynamicRespondentRepresentativeNamesUrlForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicRespondentRepresentativeNamesUrlForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content(requestContent2.toString())
@@ -1628,7 +1778,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicDepositOrderUrlForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicDepositOrderUrlForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content(requestContent2.toString())
@@ -1638,7 +1789,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicRestrictedReportingUrlForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicRestrictedReportingUrlForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent2.toString())
@@ -1648,7 +1800,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicJudgmentUrlForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicJudgmentUrlForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_JUDGMENT_URL)
                 .content(requestContent2.toString())
@@ -1658,7 +1811,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void judgmentSubmittedUrlForbidden() throws Exception {
+    @SneakyThrows
+    void judgmentSubmittedUrlForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
                 .content(requestContent2.toString())
@@ -1668,7 +1822,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicFixCaseAPIForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicFixCaseAPIForbidden()  {
         CaseDetails caseDetails = new CaseDetails();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_FIX_CASE_API_URL)
@@ -1680,7 +1835,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void reinstateClosedCaseForbidden() throws Exception {
+    @SneakyThrows
+    void reinstateClosedCaseForbidden()  {
         CaseData caseData = new CaseData();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
@@ -1692,7 +1848,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initialiseAmendCaseDetailsForbidden() throws Exception {
+    @SneakyThrows
+    void initialiseAmendCaseDetailsForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
@@ -1700,12 +1857,13 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
 
-        verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
-        verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
+        verify(clerkService, never()).initialiseClerkResponsible(any(CaseData.class));
+        verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
     }
 
     @Test
-    void addServiceIdUrl_tokenOk() throws Exception {
+    @SneakyThrows
+    void addServiceIdUrl_tokenOk()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ADD_SERVICE_ID_URL)
                 .content(requestContent2.toString())
@@ -1720,7 +1878,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void addServiceIdUrl_tokenFail() throws Exception {
+    @SneakyThrows
+    void addServiceIdUrl_tokenFail()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ADD_SERVICE_ID_URL)
                 .content(requestContent2.toString())
@@ -1730,7 +1889,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void addServiceIdUrl_badRequest() throws Exception {
+    @SneakyThrows
+    void addServiceIdUrl_badRequest()  {
         mvc.perform(post(ADD_SERVICE_ID_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -1739,9 +1899,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void setPostDefaultValuesAddsCaseManagementLocationCode() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
-        when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
+    @SneakyThrows
+    void setPostDefaultValuesAddsCaseManagementLocationCode()  {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());

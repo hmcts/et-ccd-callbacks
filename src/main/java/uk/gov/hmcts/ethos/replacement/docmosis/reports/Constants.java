@@ -23,6 +23,8 @@ public final class Constants {
             "data.hearingCollection.value.hearingDateCollection.value.listedDate";
 
     public static final Set<DayOfWeek> WEEKEND_DAYS_LIST = EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+    public static final int ES_PARTITION_SIZE = 1000;
+    public static final int THREAD_NUMBER = 20;
 
     private Constants() {
     }

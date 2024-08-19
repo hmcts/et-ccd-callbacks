@@ -35,7 +35,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
 @ExtendWith(SpringExtension.class)
 class MultipleScheduleServiceTest {
@@ -237,30 +236,4 @@ class MultipleScheduleServiceTest {
                 new ArrayList<>());
         verifyNoMoreInteractions(excelDocManagementService);
     }
-
-    @Test
-    void bulkScheduleLogicCasesFilteredExceeded() {
-        List<String> errors = new ArrayList<>();
-        multipleDetails.getCaseData().setScheduleDocName(LIST_CASES_CONFIG);
-        when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
-                .thenReturn(createBigTreeMap());
-        multipleScheduleService.bulkScheduleLogic(userToken,
-                multipleDetails,
-                errors);
-        assertEquals(1, errors.size());
-        assertEquals("Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES, errors.get(0));
-
-    }
-
-    private SortedMap<String, Object> createBigTreeMap() {
-
-        SortedMap<String, Object> treeMap = new TreeMap<>();
-
-        for (int i = 0; i < SCHEDULE_LIMIT_CASES + 1; i++) {
-            treeMap.put(String.valueOf(i), "Dummy");
-        }
-
-        return treeMap;
-    }
-
 }

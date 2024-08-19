@@ -48,7 +48,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 
 @Service("sendNotificationService")
@@ -238,8 +237,7 @@ public class SendNotificationService {
             } else {
                 // If not represented, send notification to the claimant Only
                 String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
-                // Send notification to the claimant only if the claimant is a system user
-                if (!isClaimantNonSystemUser(caseData) && !isNullOrEmpty(claimantEmailAddress)) {
+                if (!isNullOrEmpty(claimantEmailAddress)) {
                     emailService.sendEmail(claimantSendNotificationTemplateId, claimantEmailAddress,
                             buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
                 }

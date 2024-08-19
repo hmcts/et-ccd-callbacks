@@ -149,7 +149,7 @@ launchdarkly:
 
 es:
   partition:
-    notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE}:3000
+    notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE:3000}
 
 cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}

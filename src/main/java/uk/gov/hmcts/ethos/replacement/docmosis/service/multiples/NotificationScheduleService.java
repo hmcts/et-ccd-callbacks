@@ -26,6 +26,7 @@ public class NotificationScheduleService {
 
     @Value("${es.partition.notifications}")
     private int esPartitionSize;
+
     private final SingleCasesReadingService singleCasesReadingService;
 
     /**

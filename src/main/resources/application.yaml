@@ -210,7 +210,7 @@ launchdarkly:
 
 es:
   partition:
-    notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE}:3000
+    notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE:3000}
 
 cron:
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}

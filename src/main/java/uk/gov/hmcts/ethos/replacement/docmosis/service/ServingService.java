@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.claimantMyHmctsCase;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 
 @Service
 @Slf4j
@@ -130,8 +130,7 @@ public class ServingService {
      */
     public void sendNotifications(CaseDetails caseDetails) {
         Map<String, String> personalisation;
-
-        if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
+        if (claimantMyHmctsCase(caseDetails.getCaseData())) {
             personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
             personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
             if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
@@ -146,6 +145,7 @@ public class ServingService {
             }
             emailService.sendEmail(claimantTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
         }
+
     }
 
     /**
@@ -178,4 +178,5 @@ public class ServingService {
             default ->  DOC_TYPE_OTHER;
         };
     }
+
 }

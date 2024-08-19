@@ -66,8 +66,7 @@ public class HelperTest {
     }
 
     public static TokenResponse getUserToken() {
-        return new TokenResponse("abcefg", "28799", "pqrst", "hijklmno",
-                "openid profile roles", "Bearer");
+        return new TokenResponse("abcefg", "28799", "pqrst", "hijklmno", "openid profile roles", "Bearer");
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
@@ -206,17 +205,17 @@ public class HelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource("isRepresentedClaimantWithMyHmctsCaseParameter")
-    void isRepresentedClaimantWithMyHmctsCase(String caseSource, String claimantRepresentedQuestion,
-                                              RepresentedTypeC representedTypeC, boolean expected) {
+    @MethodSource("claimantMyHmctsCaseParameter")
+    void claimantMyHmctsCase(String caseSource, String claimantReppedQuestion, RepresentedTypeC representedTypeC,
+                             boolean expected) {
         CaseData caseData = new CaseData();
         caseData.setCaseSource(caseSource);
-        caseData.setClaimantRepresentedQuestion(claimantRepresentedQuestion);
+        caseData.setClaimantRepresentedQuestion(claimantReppedQuestion);
         caseData.setRepresentativeClaimantType(representedTypeC);
-        assertEquals(expected, Helper.isRepresentedClaimantWithMyHmctsCase(caseData));
+        assertEquals(expected, Helper.claimantMyHmctsCase(caseData));
     }
 
-    private static Stream<Arguments> isRepresentedClaimantWithMyHmctsCaseParameter() {
+    private static Stream<Arguments> claimantMyHmctsCaseParameter() {
         Organisation organisation = Organisation.builder()
                 .organisationID("dummyId")
                 .build();

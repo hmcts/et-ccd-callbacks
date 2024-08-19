@@ -160,8 +160,6 @@ template:
 
   claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
 
-  claimantRepSendNotification: ${CLAIMANT_REP_SEND_NOTIFICATION_TEMPLATE_ID:9352bba3-cdb4-4150-9840-599696147489}
-
   respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
 
   respondNotification:

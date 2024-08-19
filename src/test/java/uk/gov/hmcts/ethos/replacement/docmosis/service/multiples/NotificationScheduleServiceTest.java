@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -40,7 +41,10 @@ class NotificationScheduleServiceTest {
         multipleDetails.setCaseData(MultipleUtil.getMultipleDataForNotification());
         userToken = "authString";
         errors = new ArrayList<>();
-        caseIds = Arrays.asList(new String[]{"245000/2020", "245003/2020"});
+        caseIds = Arrays.asList("245000/2020", "245003/2020");
+        ReflectionTestUtils.setField(notificationScheduleService,
+                "esPartitionSize",
+                3000);
     }
 
     @Test

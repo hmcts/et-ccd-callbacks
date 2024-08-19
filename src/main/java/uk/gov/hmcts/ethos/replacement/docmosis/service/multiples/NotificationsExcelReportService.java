@@ -19,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGrou
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesSchedulePrinter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
@@ -39,6 +38,7 @@ import java.util.SortedMap;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.HEADER_1;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.REPLIES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.RESPONSE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper.flattenGroupAndSortNotificationsWithCaseRef;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper.getAndFormatReplies;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
 
@@ -86,16 +86,11 @@ public class NotificationsExcelReportService {
 
         MultipleData multipleData = multipleDetails.getCaseData();
         // Transform data for the extract
-        List<NotificationGroup> notificationGroups =
-                MultipleNotificationsHelper
-                        .flattenNotificationsWithCaseRef(schedulePayloads, multipleData.getMultipleReference());
-        Map<Pair<String, String>, List<NotificationGroup>> notificationsGroupedByTitle =
-                MultipleNotificationsHelper.groupNotificationsByTitleAndDate(notificationGroups);
-        List<Map.Entry<Pair<String, String>, List<NotificationGroup>>> sortedList =
-                MultipleNotificationsHelper.groupedNotificationsSortedByDate(notificationsGroupedByTitle);
+        List<Map.Entry<Pair<String, String>, List<NotificationGroup>>> sortedNotificationList =
+                flattenGroupAndSortNotificationsWithCaseRef(schedulePayloads, multipleData.getMultipleReference());
 
         log.info("Generating extract");
-        byte[] schedule = generateSchedule(multipleData, sortedList);
+        byte[] schedule = generateSchedule(multipleData, sortedNotificationList);
 
         log.info("Upload extract to doc store");
         URI documentSelfPath = documentManagementService.uploadDocument(userToken, schedule,

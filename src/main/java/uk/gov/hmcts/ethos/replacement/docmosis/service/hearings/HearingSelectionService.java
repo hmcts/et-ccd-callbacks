@@ -50,6 +50,7 @@ public class HearingSelectionService {
 
             String venue = hearingVenue == null ? listing.getHearingVenueScotland() :
                     hearingVenue.getValue().getLabel();
+
             String date = UtilHelper.formatLocalDateTime(listing.getListedDate());
             String label = String.format(
                     HEARING_FORMAT,

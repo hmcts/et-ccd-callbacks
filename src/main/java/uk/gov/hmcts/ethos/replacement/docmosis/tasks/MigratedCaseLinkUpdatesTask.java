@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.CaseDuplicateSearchException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -125,9 +126,10 @@ public class MigratedCaseLinkUpdatesTask {
                     pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
                 }
             } catch (IOException exception) {
-                log.info("Exception - while searching for duplicates by Ethos ref for type: {}. \nMessage: {}",
-                        sourceCaseTypeId, exception.getMessage());
-                throw new RuntimeException(exception);
+                String errorMessage = String.format(
+                        "Error searching for duplicates by Ethos reference for case type: %s", sourceCaseTypeId);
+                log.info(errorMessage, exception);
+                throw new CaseDuplicateSearchException(exception.getMessage(), exception);
             }
         });
 

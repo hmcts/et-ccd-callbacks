@@ -115,8 +115,6 @@ class Et1ReppedServiceTest {
         PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
         TribunalOfficesService tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
-        tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
-                postcodeToOfficeService);
         PdfService pdfService =  new PdfService(new PdfMapperService());
         et1ReppedService = new Et1ReppedService(acasService, authTokenGenerator, ccdCaseAssignment,
                 documentManagementService, jurisdictionCodesMapperService, organisationClient, pdfService,

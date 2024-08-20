@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -40,24 +41,6 @@ class MigratedCaseLinkUpdatesTaskTest {
         MockitoAnnotations.openMocks(this);
         // Set the caseTypeIdsString for the service
         ReflectionTestUtils.setField(migratedCaseLinkUpdatesTask, "caseTypeIdsString", "type1,type2");
-
-        SubmitEvent targetSubmitEvent = new SubmitEvent();
-        targetSubmitEvent.setCaseId(1L);
-        CaseData targetCaseData = new CaseData();
-        targetCaseData.setCcdID("ccd1");
-        targetSubmitEvent.setCaseData(targetCaseData);
-
-        SubmitEvent duplicateEvent1 = new SubmitEvent();
-        duplicateEvent1.setCaseId(2L);
-        CaseData duplicateCaseData1 = new CaseData();
-        duplicateCaseData1.setCcdID("ccd2");
-        duplicateEvent1.setCaseData(duplicateCaseData1);
-
-        SubmitEvent duplicateEvent2 = new SubmitEvent();
-        duplicateEvent2.setCaseId(3L);
-        CaseData duplicateCaseData2 = new CaseData();
-        duplicateCaseData2.setCcdID("ccd3");
-        duplicateEvent2.setCaseData(duplicateCaseData2);
     }
 
     @Test
@@ -144,5 +127,66 @@ class MigratedCaseLinkUpdatesTaskTest {
 
         verify(ccdClient, times(7)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void testUpdateTransferredCaseLinks_WithTransferredCasesAndNotDuplicates() throws Exception {
+        when(featureToggleService.isUpdateTransferredCaseLinksEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
+        SubmitEvent transferredCase1 = new SubmitEvent();
+        transferredCase1.setCaseData(new CaseData());
+        transferredCase1.getCaseData().setEthosCaseReference("ETHOS1231");
+        transferredCase1.getCaseData().setEthosCaseReference("caseRef11");
+        transferredCase1.getCaseData().setClaimant("claimant11");
+        transferredCase1.getCaseData().setRespondent("respondent11");
+        transferredCase1.getCaseData().setReceiptDate("2021-11-01");
+        transferredCase1.getCaseData().setFeeGroupReference("feeGroup11");
+
+        SubmitEvent transferredCase2 = new SubmitEvent();
+        transferredCase2.setCaseData(new CaseData());
+        transferredCase2.getCaseData().setEthosCaseReference("ETHOS1231");
+        transferredCase2.getCaseData().setEthosCaseReference("caseRef435");
+        transferredCase2.getCaseData().setClaimant("claimant345");
+        transferredCase2.getCaseData().setRespondent("respondent345");
+        transferredCase2.getCaseData().setReceiptDate("2022-12-02");
+        transferredCase2.getCaseData().setFeeGroupReference("feeGroup345");
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(transferredCase1, transferredCase2));
+
+        List<SubmitEvent> notMatchedDuplicates = new ArrayList<>();
+        notMatchedDuplicates.add(transferredCase1);
+        notMatchedDuplicates.add(transferredCase2);
+        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "ETHOS1231"))
+                .thenReturn(List.of(Pair.of("type1", notMatchedDuplicates)));
+
+        migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
+        // 11 invocations of buildAndGetElasticSearchRequest using ccdClient
+        // because the method calls were made covering two case types(EW, SC), and two transferred cases during
+        // run for each case type
+        verify(ccdClient, times(11)).buildAndGetElasticSearchRequest(
+                anyString(), anyString(), anyString());
+        verify(ccdClient, times(0)).startEventForCase(
+                anyString(), anyString(), anyString(), anyString(), anyString());
+        verify(ccdClient, times(0)).submitEventForCase(
+                anyString(), any(), anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
+    void shouldHandleExceptionDuringProcessing() throws Exception {
+        when(featureToggleService.isUpdateTransferredCaseLinksEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+                .thenThrow(new RuntimeException("Test Exception"));
+
+        migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
+
+        verify(featureToggleService).isUpdateTransferredCaseLinksEnabled();
+        verify(adminUserService).getAdminUserToken();
+        verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
+                anyString(), anyString(), anyString());
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(),
+                anyString(), anyString());
+        verify(ccdClient, never()).submitEventForCase(anyString(), any(), anyString(),
+                anyString(), any(), anyString());
     }
 }

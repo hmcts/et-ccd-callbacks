@@ -13,8 +13,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -62,7 +62,7 @@ class CcdCaseAssignmentTest {
 
     private CallbackRequest callbackRequest;
 
-    private CaseAssignmentUserRolesRequest rolesRequest;
+    private CaseAssignmentUserWithOrganisationRolesRequest rolesRequest;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -85,7 +85,7 @@ class CcdCaseAssignmentTest {
         MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
 
-        when(ccdClient.buildHeaders(any())).thenReturn(new HttpHeaders());
+        when(ccdClient.buildHeaders(anyString())).thenReturn(new HttpHeaders());
     }
 
     @Test
@@ -103,7 +103,7 @@ class CcdCaseAssignmentTest {
         CCDCallbackResponse actual = ccdCaseAssignment.applyNocAsAdmin(callbackRequest);
 
         assertThat(expected).isEqualTo(actual);
-        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(), any());
+        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(CaseDetails.class), anyString());
     }
 
     @Test
@@ -121,7 +121,7 @@ class CcdCaseAssignmentTest {
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 
         assertThat(expected).isEqualTo(actual);
-        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(), any());
+        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(CaseDetails.class), anyString());
     }
 
     @Test
@@ -156,12 +156,14 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
         when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(getAuditEvent()));
+        when(nocCcdService.getLatestAuditEventByName(anyString(), anyString(), anyString()))
+                .thenReturn(Optional.of(getAuditEvent()));
 
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 
         assertThat(expected).isEqualTo(actual);
-        verify(multipleReferenceService, times(1)).addLegalRepToMultiple(any(), any());
+        verify(multipleReferenceService, times(1))
+                .addLegalRepToMultiple(any(CaseDetails.class), anyString());
     }
 
     @Test
@@ -180,7 +182,7 @@ class CcdCaseAssignmentTest {
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 
         assertThat(expected).isEqualTo(actual);
-        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(), any());
+        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(CaseDetails.class), anyString());
     }
 
     @Test
@@ -195,12 +197,13 @@ class CcdCaseAssignmentTest {
         ).thenReturn(ResponseEntity.ok(expected));
         when(this.featureToggleService.isMul2Enabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.empty());
+        when(nocCcdService.getLatestAuditEventByName(anyString(), anyString(), anyString()))
+                .thenReturn(Optional.empty());
 
         CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 
         assertThat(expected).isEqualTo(actual);
-        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(), any());
+        verify(multipleReferenceService, never()).addLegalRepToMultiple(any(CaseDetails.class), anyString());
     }
 
     @Test

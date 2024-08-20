@@ -118,7 +118,7 @@ public class BulkUpdateService {
                             multipleTypeItemListAux, searchTypeItemList);
                 }
                 // 6) Create an event for each update single & bulk and assign lead
-                BulkDetails bulkDetailsAux = BulkHelper.setMultipleCollection(bulkDetails,
+                BulkDetails bulkDetailsAux = BulkHelper.getMultipleCollection(bulkDetails,
                         createUpdateEventsAndAssignLead(multipleTypeItemListAux, bulkDetails, userToken,
                                 submitBulkEventSubmitEventType));
                 bulkRequestPayload.setBulkDetails(bulkDetailsAux);

@@ -136,7 +136,7 @@ public class MigratedCaseLinkUpdatesTask {
         return pairsList;
     }
 
-    private void triggerEventForCase(String adminUserToken, SubmitEvent targetSubmitEvent,
+    public void triggerEventForCase(String adminUserToken, SubmitEvent targetSubmitEvent,
                                      List<SubmitEvent> duplicates, String targetCaseTypeId, String sourceCaseTypeId) {
         try {
             //get the source case details from the duplicates list

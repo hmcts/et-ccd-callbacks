@@ -9,7 +9,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -26,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,6 +46,9 @@ class MigratedCaseLinkUpdatesTaskTest {
     private MigratedCaseLinkUpdatesTask migratedCaseLinkUpdatesTask;
     private static final String ADMIN_TOKEN = "adminToken";
     private static final String ETHOS_REFERENCE = "testEthosRef";
+    private static final String TARGET_CASE_TYPE_ID = "TargetCaseType";
+    private static final String SOURCE_CASE_TYPE_ID = "SourceCaseType";
+    private static final String EVENT_ID = "migrateCaseLinkDetails";
 
     @BeforeEach
     void setUp() {
@@ -127,12 +133,14 @@ class MigratedCaseLinkUpdatesTaskTest {
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
                 .thenReturn(duplicates);
 
-        List<Pair<String, List<SubmitEvent>>> pairList = List.of(Pair.of("type1", duplicates));
-
         migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
 
         verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
+        verify(ccdClient, times(0)).startEventForCase(
+                anyString(), anyString(), anyString(), anyString(), anyString());
+        verify(ccdClient, times(0)).submitEventForCase(
+                anyString(), any(), anyString(), anyString(), any(), anyString());
     }
 
     @Test
@@ -241,5 +249,81 @@ class MigratedCaseLinkUpdatesTaskTest {
         assertEquals("Test Exception", exception.getMessage());
         verify(ccdClient, times(1)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void triggerEventForCase_ShouldTriggerEventSuccessfully() throws Exception {
+        CCDRequest ccdRequest = createCCDRequest();
+        SubmitEvent targetSubmitEvent = createSubmitEvent(22L, "TargetCcdId");
+        when(ccdClient.startEventForCase(eq(ADMIN_TOKEN), eq(TARGET_CASE_TYPE_ID),
+                        eq("EMPLOYMENT"), eq(String.valueOf(targetSubmitEvent.getCaseId())), eq(EVENT_ID)))
+                .thenReturn(ccdRequest);
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        when(ccdClient.submitEventForCase(
+                eq(ADMIN_TOKEN), eq(caseDetails.getCaseData()),
+                eq(caseDetails.getCaseTypeId()), eq("EMPLOYMENT"),
+                eq(ccdRequest), eq(caseDetails.getCaseId()))).thenReturn(targetSubmitEvent);
+
+        SubmitEvent sourceSubmitEvent = createSubmitEvent(12L, "SourceCcdId");
+        List<SubmitEvent> duplicates;
+        duplicates = new ArrayList<>();
+        duplicates.add(sourceSubmitEvent);
+        duplicates.add(targetSubmitEvent);
+
+        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, duplicates,
+                TARGET_CASE_TYPE_ID, SOURCE_CASE_TYPE_ID);
+
+        verify(ccdClient).startEventForCase(eq(ADMIN_TOKEN), eq(TARGET_CASE_TYPE_ID),
+                eq("EMPLOYMENT"), eq(String.valueOf(targetSubmitEvent.getCaseId())), eq(EVENT_ID));
+    }
+
+    @Test
+    void triggerEventForCase_ShouldNotTriggerEvent_WhenSourceCaseNotFound() throws IOException {
+        SubmitEvent sourceSubmitEvent = createSubmitEvent(12L, "SourceCcdId");
+        List<SubmitEvent> duplicates;
+        duplicates = new ArrayList<>();
+        duplicates.add(sourceSubmitEvent);
+        duplicates.remove(sourceSubmitEvent);
+        SubmitEvent targetSubmitEvent = createSubmitEvent(22L, "TargetCcdId");
+        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, duplicates,
+                TARGET_CASE_TYPE_ID, SOURCE_CASE_TYPE_ID);
+
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+        verify(ccdClient, never()).submitEventForCase(anyString(), any(), any(), any(), any(), anyString());
+    }
+
+    @Test
+    void triggerEventForCase_ShouldNotTriggerEvent_WhenSourceCaseDataIsNull() throws IOException {
+        SubmitEvent sourceSubmitEvent = createSubmitEvent(12L, "SourceCcdId");
+        sourceSubmitEvent.setCaseData(null);
+        List<SubmitEvent> duplicates;
+        duplicates = new ArrayList<>();
+        duplicates.add(sourceSubmitEvent);
+        duplicates.remove(sourceSubmitEvent);
+        SubmitEvent targetSubmitEvent = createSubmitEvent(22L, "TargetCcdId");
+        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, duplicates,
+                TARGET_CASE_TYPE_ID, SOURCE_CASE_TYPE_ID);
+
+        verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
+        verify(ccdClient, never()).submitEventForCase(anyString(), any(), any(), any(), any(), anyString());
+    }
+
+    private SubmitEvent createSubmitEvent(Long caseId, String ccdId) {
+        SubmitEvent submitEvent = new SubmitEvent();
+        CaseData caseData = new CaseData();
+        caseData.setCcdID(ccdId);
+        submitEvent.setCaseData(caseData);
+        submitEvent.setCaseId(caseId);
+        return submitEvent;
+    }
+
+    private CCDRequest createCCDRequest() {
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        CaseData caseData = new CaseData();
+        caseDetails.setCaseData(caseData);
+        ccdRequest.setCaseDetails(caseDetails);
+        return ccdRequest;
     }
 }

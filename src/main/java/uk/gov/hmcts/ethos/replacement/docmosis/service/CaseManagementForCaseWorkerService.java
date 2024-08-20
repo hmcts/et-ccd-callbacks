@@ -108,12 +108,6 @@ public class CaseManagementForCaseWorkerService {
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
             "Newcastle", "Scotland", "Wales", "Watford");
-    private static final int EXPIRY_PERIOD = 180;
-    private static final int CASE_ACCESS_PIN_LENGTH = 12;
-    private static final String CASE_ACCESS_PIN_ALLOWED_CHARS = "ABCDEFGHJKLMNPRSTVWXYZ23456789";
-    private static final int RANDOM_STRING_START_POSITION = 0;
-    private static final boolean RANDOM_STRING_INCLUDES_LETTERS = false;
-    private static final boolean RANDOM_STRING_INCLUDES_NUMBERS = false;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,

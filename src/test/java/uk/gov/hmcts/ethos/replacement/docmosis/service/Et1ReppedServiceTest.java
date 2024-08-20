@@ -68,10 +68,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class Et1ReppedServiceTest {
 
     private Et1ReppedService et1ReppedService;
-    private PostcodeToOfficeService postcodeToOfficeService;
     @MockBean
     private PostcodeToOfficeMappings postcodeToOfficeMappings;
-    private TribunalOfficesService tribunalOfficesService;
 
     @MockBean
     private AcasService acasService;
@@ -85,7 +83,6 @@ class Et1ReppedServiceTest {
     private JurisdictionCodesMapperService jurisdictionCodesMapperService;
     @MockBean
     private OrganisationClient organisationClient;
-    private PdfService pdfService;
     @MockBean
     private TornadoService tornadoService;
     @MockBean
@@ -115,10 +112,12 @@ class Et1ReppedServiceTest {
         draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
 
         emailService = spy(new EmailUtils());
-        pdfService = new PdfService(new PdfMapperService());
-        postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
+        PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
+        TribunalOfficesService tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
+                postcodeToOfficeService);
         tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
+        PdfService pdfService =  new PdfService(new PdfMapperService());
         et1ReppedService = new Et1ReppedService(acasService, authTokenGenerator, ccdCaseAssignment,
                 documentManagementService, jurisdictionCodesMapperService, organisationClient, pdfService,
                 postcodeToOfficeService, tornadoService, tribunalOfficesService, userIdamService, emailService,

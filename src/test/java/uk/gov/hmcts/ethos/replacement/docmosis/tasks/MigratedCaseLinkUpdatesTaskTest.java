@@ -24,8 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public class CaseLinkUpdatesTaskTest {
-    private NoticeOfChangeFieldsTask noticeOfChangeFieldsTask;
+class MigratedCaseLinkUpdatesTaskTest {
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
@@ -33,35 +32,28 @@ public class CaseLinkUpdatesTaskTest {
     @Mock
     private CcdClient ccdClient;
     @InjectMocks
-    private CaseLinkUpdatesTask caseLinkUpdatesTask;
-
-    private SubmitEvent targetSubmitEvent;
-    private SubmitEvent duplicateEvent1;
-    private SubmitEvent duplicateEvent2;
-    private String adminUserToken = "admin-token";
-    private String targetCaseTypeId = "TargetCaseType";
-    private String sourceCaseTypeId = "SourceCaseType";
-    private static final String EVENT_ID = "migrateCaseLinkDetails";
+    private MigratedCaseLinkUpdatesTask migratedCaseLinkUpdatesTask;
+    private static final String ADMIN_TOKEN = "adminToken";
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         // Set the caseTypeIdsString for the service
-        ReflectionTestUtils.setField(caseLinkUpdatesTask, "caseTypeIdsString", "type1,type2");
+        ReflectionTestUtils.setField(migratedCaseLinkUpdatesTask, "caseTypeIdsString", "type1,type2");
 
-        targetSubmitEvent = new SubmitEvent();
+        SubmitEvent targetSubmitEvent = new SubmitEvent();
         targetSubmitEvent.setCaseId(1L);
         CaseData targetCaseData = new CaseData();
         targetCaseData.setCcdID("ccd1");
         targetSubmitEvent.setCaseData(targetCaseData);
 
-        duplicateEvent1 = new SubmitEvent();
+        SubmitEvent duplicateEvent1 = new SubmitEvent();
         duplicateEvent1.setCaseId(2L);
         CaseData duplicateCaseData1 = new CaseData();
         duplicateCaseData1.setCcdID("ccd2");
         duplicateEvent1.setCaseData(duplicateCaseData1);
 
-        duplicateEvent2 = new SubmitEvent();
+        SubmitEvent duplicateEvent2 = new SubmitEvent();
         duplicateEvent2.setCaseId(3L);
         CaseData duplicateCaseData2 = new CaseData();
         duplicateCaseData2.setCcdID("ccd3");
@@ -72,7 +64,7 @@ public class CaseLinkUpdatesTaskTest {
     void testUpdateTransferredCaseLinks_FeatureDisabled() {
         when(featureToggleService.isUpdateTransferredCaseLinksEnabled()).thenReturn(false);
 
-        caseLinkUpdatesTask.updateTransferredCaseLinks();
+        migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
 
         verify(featureToggleService).isUpdateTransferredCaseLinksEnabled();
         verifyNoMoreInteractions(featureToggleService, adminUserService, ccdClient);
@@ -81,11 +73,11 @@ public class CaseLinkUpdatesTaskTest {
     @Test
     void testUpdateTransferredCaseLinks_NoTransferredCases() throws Exception {
         when(featureToggleService.isUpdateTransferredCaseLinksEnabled()).thenReturn(true);
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
                 .thenReturn(Collections.emptyList());
 
-        caseLinkUpdatesTask.updateTransferredCaseLinks();
+        migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
 
         verify(featureToggleService).isUpdateTransferredCaseLinksEnabled();
         verify(adminUserService).getAdminUserToken();
@@ -97,7 +89,7 @@ public class CaseLinkUpdatesTaskTest {
     @Test
     void testUpdateTransferredCaseLinks_WithTransferredCases() throws Exception {
         when(featureToggleService.isUpdateTransferredCaseLinksEnabled()).thenReturn(true);
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
 
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("caseRef1");
@@ -114,11 +106,11 @@ public class CaseLinkUpdatesTaskTest {
         List<SubmitEvent> duplicates = new ArrayList<>();
         duplicates.add(submitEvent);
         duplicates.add(submitEvent);
-        var coll = Collections.singletonList(Pair.of("type1", duplicates));
-        when(caseLinkUpdatesTask.findCaseByEthosReference("token", "testEthosRef"))
+        List<Pair<String, List<SubmitEvent>>> coll = Collections.singletonList(Pair.of("type1", duplicates));
+        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "testEthosRef"))
                 .thenReturn(coll);
 
-        caseLinkUpdatesTask.updateTransferredCaseLinks();
+        migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
 
         verify(featureToggleService).isUpdateTransferredCaseLinksEnabled();
         verify(adminUserService).getAdminUserToken();
@@ -145,10 +137,10 @@ public class CaseLinkUpdatesTaskTest {
         duplicates.add(transferredCase);
         duplicates.add(transferredCase);
         var coll = Collections.singletonList(Pair.of("type1", duplicates));
-        when(caseLinkUpdatesTask.findCaseByEthosReference("token", "testEthosRef"))
+        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "testEthosRef"))
                 .thenReturn(coll);
 
-        caseLinkUpdatesTask.updateTransferredCaseLinks();
+        migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
 
         verify(ccdClient, times(7)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());

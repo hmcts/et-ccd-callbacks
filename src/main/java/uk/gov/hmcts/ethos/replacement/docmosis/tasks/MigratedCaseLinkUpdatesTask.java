@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.VETTED_STATE;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class CaseLinkUpdatesTask {
+public class MigratedCaseLinkUpdatesTask {
     private final AdminUserService adminUserService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;

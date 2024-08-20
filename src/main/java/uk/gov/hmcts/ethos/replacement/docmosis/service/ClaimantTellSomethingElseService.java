@@ -238,7 +238,9 @@ public class ClaimantTellSomethingElseService {
         List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
         boolean isWelsh = featureToggleService.isWelshEnabled()
                 && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
-
+if (respondentEmailAddressList.isEmpty()) {
+    return;
+}
         try {
             log.info("Sending application email to respondent on case {}", caseData.getEthosCaseReference());
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);

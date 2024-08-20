@@ -56,7 +56,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -354,26 +353,16 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        if (featureToggleService.isCaseAccessPinEnabled()) {
-            mvc.perform(post(POST_DEFAULT_VALUES_URL)
-                            .content(requestContent.toString())
-                            .header(AUTHORIZATION, AUTH_TOKEN)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                    .andExpect(jsonPath(JsonMapper.DATA, contains("caseAccess")))
-                    .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                    .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        } else {
-            mvc.perform(post(POST_DEFAULT_VALUES_URL)
-                            .content(requestContent.toString())
-                            .header(AUTHORIZATION, AUTH_TOKEN)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                    .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                    .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        }
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
     }
 
     @Test

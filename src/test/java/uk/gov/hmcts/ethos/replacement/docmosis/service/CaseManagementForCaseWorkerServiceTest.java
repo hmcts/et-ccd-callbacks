@@ -45,9 +45,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.CitizenRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.DefendantRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
@@ -152,7 +149,6 @@ class CaseManagementForCaseWorkerServiceTest {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseAccessPinEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(
                 caseRetrievalForCaseWorkerService, ccdClient, clerkService, featureToggleService, HMCTS_SERVICE_ID,
@@ -1402,18 +1398,6 @@ class CaseManagementForCaseWorkerServiceTest {
                 "1716474017962374");
     }
 
-    @Test
-    void testSetCaseAccessPin() {
-        CaseData caseData = ccdRequest12.getCaseDetails().getCaseData();
-        caseManagementForCaseWorkerService.setCaseAccessPin(caseData);
-        assertThat(caseData.getCaseAccessPin().getAccessCode()).hasSize(12);
-        assertThat(caseData.getCaseAccessPin().getExpiryDate()).isNotNull();
-        assertThat(caseData.getCaseAccessPin().getCaseAccessibleRoles())
-                .contains(DefendantRole.DEFENDANT.getCaseRoleLabel(),
-                        CitizenRole.CITIZEN.getCaseRoleLabel(),
-                        ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-    }
-
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {
         RespondentSumTypeItem respondentSumTypeItem1 = createRespondentSumType(
                 "RespondentName1", false);
@@ -1487,18 +1471,5 @@ class CaseManagementForCaseWorkerServiceTest {
         dynamicValueType.setLabel("RespondentName1");
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
-    }
-
-    @Test
-    void setCaseAccessPin() {
-        CaseData caseData = ccdRequest10.getCaseDetails().getCaseData();
-        caseManagementForCaseWorkerService.setCaseAccessPin(caseData);
-        assertThat(caseData.getCaseAccessPin()).isNotNull();
-        assertThat(caseData.getCaseAccessPin().getCaseAccessibleRoles()).contains(
-                CitizenRole.CITIZEN.getCaseRoleLabel(),
-                DefendantRole.DEFENDANT.getCaseRoleLabel(),
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-        assertThat(caseData.getCaseAccessPin().getExpiryDate()).isNotNull();
-        assertThat(caseData.getCaseAccessPin().getAccessCode()).hasSize(12);
     }
 }

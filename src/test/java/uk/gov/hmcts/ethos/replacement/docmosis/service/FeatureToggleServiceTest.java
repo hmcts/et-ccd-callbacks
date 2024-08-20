@@ -128,13 +128,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isPartySpacingCronEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenNCaseAccessPinIsEnabled(Boolean toggleStat) {
-        givenToggle("case-access-pin", toggleStat);
-        assertThat(featureToggleService.isCaseAccessPinEnabled()).isEqualTo(toggleStat);
-    }
-
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

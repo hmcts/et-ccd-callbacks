@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.util.StringUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseAccessPin;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -32,9 +30,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.CitizenRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.DefendantRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -42,7 +37,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendin
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -745,28 +739,5 @@ public class CaseManagementForCaseWorkerService {
                 respondentSumType.setRespondentOrganisation("");
             }
         }
-    }
-
-    /**
-     * Sets case access pin to CaseData.
-     * @param caseData CaseData received from controller
-     */
-    public void setCaseAccessPin(CaseData caseData) {
-        caseData.setCaseAccessPin(CaseAccessPin.builder()
-                .accessCode(generateAccessCode())
-                .caseAccessibleRoles(List.of(CitizenRole.CITIZEN.getCaseRoleLabel(),
-                        DefendantRole.DEFENDANT.getCaseRoleLabel(),
-                        ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()))
-                .expiryDate(LocalDateTime.now().plusDays(EXPIRY_PERIOD).toString())
-                .build());
-    }
-
-    private String generateAccessCode() {
-        return RandomStringUtils.random(CASE_ACCESS_PIN_LENGTH,
-                RANDOM_STRING_START_POSITION,
-                CASE_ACCESS_PIN_ALLOWED_CHARS.length(),
-                RANDOM_STRING_INCLUDES_LETTERS,
-                RANDOM_STRING_INCLUDES_NUMBERS,
-                CASE_ACCESS_PIN_ALLOWED_CHARS.toCharArray(), new SecureRandom());
     }
 }

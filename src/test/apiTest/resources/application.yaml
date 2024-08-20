@@ -155,6 +155,10 @@ launchdarkly:
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
 
+es:
+  partition:
+    notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE:3000}
+
 cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}

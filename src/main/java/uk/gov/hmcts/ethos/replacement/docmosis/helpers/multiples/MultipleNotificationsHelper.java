@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.client.utils.DateUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
@@ -16,114 +15,95 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.groupingBy;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.NEW_LINE_CELL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class MultipleNotificationsHelper {
     private static final String UNKNOWN = "Unknown";
+    private static final String REPLY_SEPARATOR = "-------------";
     private static final int DEFAULT_RESPONSE_CAPACITY = 200;
 
     private MultipleNotificationsHelper() {
     }
 
     /**
-     * Flattened notifications joined with ethos case reference.
+     * Flattens notifications and joins with ethos case reference.
+     * Identifies related notifications by grouping them by title and date
+     * Sorts notifications by date to preserve report order.
      *
      * @param schedulePayloads response
      * @param multipleRef      multiple case Id
      * @return list of notification group type with all data needed for report
      */
-    public static @NotNull List<NotificationGroup> flattenNotificationsWithCaseRef(
-            List<NotificationSchedulePayload> schedulePayloads, String multipleRef) {
-        List<NotificationGroup> notificationGroups = new ArrayList<>();
-        for (NotificationSchedulePayload schedulePayload : schedulePayloads) {
-            for (SendNotificationTypeItem sendNotificationTypeItem : schedulePayload.getSendNotificationCollection()) {
-                SendNotificationType notification = sendNotificationTypeItem.getValue();
-                // Filter notifications sent from the multiple
-                if (isNotEmpty(notification.getNotificationSentFrom())
-                        && notification.getNotificationSentFrom().equals(multipleRef)) {
-
-                    String responseReceived;
-                    List<PseResponseTypeItem> responses;
-                    if (isEmpty(notification.getRespondCollection())) {
-                        responseReceived = NO;
-                        responses = new ArrayList<>();
-                    } else {
-                        responseReceived = YES;
-                        responses = notification.getRespondCollection();
-                    }
-
-                    notificationGroups.add(NotificationGroup.builder()
-                            .caseNumber(schedulePayload.getEthosCaseRef())
-                            .date(notification.getDate())
-                            .responseReceived(responseReceived)
-                            .notificationTitle(notification.getSendNotificationTitle())
-                            .notificationSubjectString(notification.getSendNotificationSubjectString())
-                            .respondCollection(responses)
-                            .build()
-                    );
-                }
-            }
-        }
-        return notificationGroups;
-    }
-
-    /**
-     * Identify related notifications by grouping them by title and date.
-     *
-     * @param notificationGroups flat list of all notifications
-     * @return grouped notifications
-     */
-    public static @NotNull Map<Pair<String, String>, List<NotificationGroup>> groupNotificationsByTitleAndDate(
-            List<NotificationGroup> notificationGroups) {
-        return notificationGroups.stream()
-                .collect(groupingBy(notificationGroup ->
-                        new ImmutablePair<>(
+    public static @NotNull List<Map.Entry<Pair<String, String>, List<NotificationGroup>>>
+        flattenGroupAndSortNotificationsWithCaseRef(List<NotificationSchedulePayload> schedulePayloads,
+                                                String multipleRef) {
+        Map<Pair<String, String>, List<NotificationGroup>> groupedNotifications = schedulePayloads.parallelStream()
+                .flatMap(schedulePayload -> {
+                    String ethosCaseRef = schedulePayload.getEthosCaseRef();
+                    return schedulePayload.getSendNotificationCollection().stream()
+                            .map(SendNotificationTypeItem::getValue)
+                            .filter(notification -> multipleRef.equals(notification.getNotificationSentFrom()))
+                            .map(notification -> createNotificationGroup(ethosCaseRef, notification));
+                })
+                .collect(Collectors.groupingByConcurrent(
+                        notificationGroup -> new ImmutablePair<>(
                                 notificationGroup.getNotificationTitle(),
-                                notificationGroup.getDate()))
-                );
+                                notificationGroup.getDate()),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> {
+                                    list.sort(Comparator.comparing(NotificationGroup::getDate));
+                                    return list;
+                                }
+                        )
+                ));
+
+        return new ArrayList<>(groupedNotifications.entrySet());
     }
 
-    /**
-     * Sort notifications so they come out in the same order each time.
-     *
-     * @param notificationsGroupedByTitle notifications for report
-     * @return grouped notifications in ascending date order
-     */
-    public static @NotNull List<Map.Entry<Pair<String, String>,
-            List<NotificationGroup>>> groupedNotificationsSortedByDate(Map<Pair<String, String>,
-            List<NotificationGroup>> notificationsGroupedByTitle) {
-        return
-                notificationsGroupedByTitle.entrySet().stream().sorted(
-                        Comparator.comparing(e ->
-                                DateUtils.parseDate(e.getKey().getRight(), new String[]{MONTH_STRING_DATE_FORMAT})
-                        )
-                ).toList();
+    private static NotificationGroup createNotificationGroup(String ethosCaseRef, SendNotificationType notification) {
+        String responseReceived = isEmpty(notification.getRespondCollection()) ? NO : YES;
+        List<PseResponseTypeItem> responses = Optional.ofNullable(notification.getRespondCollection())
+                .orElseGet(ArrayList::new);
+
+        return NotificationGroup.builder()
+                .caseNumber(ethosCaseRef)
+                .date(notification.getDate())
+                .responseReceived(responseReceived)
+                .notificationTitle(notification.getSendNotificationTitle())
+                .notificationSubjectString(notification.getSendNotificationSubjectString())
+                .respondCollection(responses)
+                .build();
     }
 
     public static @NotNull String getAndFormatReplies(List<PseResponseTypeItem> respondCollection) {
         if (respondCollection.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder(DEFAULT_RESPONSE_CAPACITY * respondCollection.size());
-        for (PseResponseTypeItem pseResponseTypeItem : respondCollection) {
-            PseResponseType response = pseResponseTypeItem.getValue();
-            String name = isNotEmpty(response.getAuthor()) ? response.getAuthor() : UNKNOWN;
-            sb.append("Reply: ").append(response.getResponse())
-                    .append(NEW_LINE_CELL)
-                    .append("Name: ")
-                    .append(name).append(", ").append(response.getFrom())
-                    .append(NEW_LINE_CELL)
-                    .append("-------------")
-                    .append(NEW_LINE_CELL);
-        }
-        return sb.toString();
+
+        int size = respondCollection.size();
+        StringBuilder resultBuilder = new StringBuilder(DEFAULT_RESPONSE_CAPACITY * respondCollection.size());
+
+        IntStream.range(0, size)
+                .forEach(i -> {
+                    PseResponseType response = respondCollection.get(i).getValue();
+                    String name = isNotEmpty(response.getAuthor()) ? response.getAuthor() : UNKNOWN;
+                    resultBuilder.append("Reply: ").append(response.getResponse()).append(NEW_LINE_CELL)
+                            .append("Name: ").append(name).append(", ").append(response.getFrom());
+                    if (i < size - 1) {
+                        resultBuilder.append(NEW_LINE_CELL).append(REPLY_SEPARATOR).append(NEW_LINE_CELL);
+                    }
+                });
+
+        return resultBuilder.toString();
     }
 }

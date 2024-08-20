@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -12,11 +13,17 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.CaseDuplicateSearchException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -35,11 +42,11 @@ class MigratedCaseLinkUpdatesTaskTest {
     @InjectMocks
     private MigratedCaseLinkUpdatesTask migratedCaseLinkUpdatesTask;
     private static final String ADMIN_TOKEN = "adminToken";
+    private static final String ETHOS_REFERENCE = "testEthosRef";
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        // Set the caseTypeIdsString for the service
         ReflectionTestUtils.setField(migratedCaseLinkUpdatesTask, "caseTypeIdsString", "type1,type2");
     }
 
@@ -113,19 +120,18 @@ class MigratedCaseLinkUpdatesTaskTest {
         transferredCase.getCaseData().setRespondent("respondent11");
         transferredCase.getCaseData().setReceiptDate("2021-11-01");
         transferredCase.getCaseData().setFeeGroupReference("feeGroup11");
-        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
-                .thenReturn(Collections.singletonList(transferredCase));
 
-        List<SubmitEvent> duplicates = new ArrayList<>();
+        List<SubmitEvent> duplicates = Mockito.mock(List.class);
         duplicates.add(transferredCase);
         duplicates.add(transferredCase);
-        var coll = Collections.singletonList(Pair.of("type1", duplicates));
-        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "testEthosRef"))
-                .thenReturn(coll);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+                .thenReturn(duplicates);
+
+        List<Pair<String, List<SubmitEvent>>> pairList = List.of(Pair.of("type1", duplicates));
 
         migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
 
-        verify(ccdClient, times(7)).buildAndGetElasticSearchRequest(
+        verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
     }
 
@@ -161,7 +167,7 @@ class MigratedCaseLinkUpdatesTaskTest {
 
         migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
         // 11 invocations of buildAndGetElasticSearchRequest using ccdClient
-        // because the method calls were made covering two case types(EW, SC), and two transferred cases during
+        // because the method calls were made covering two case types(type1,type2), and two transferred cases during
         // run for each case type
         verify(ccdClient, times(11)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
@@ -188,5 +194,52 @@ class MigratedCaseLinkUpdatesTaskTest {
                 anyString(), anyString());
         verify(ccdClient, never()).submitEventForCase(anyString(), any(), anyString(),
                 anyString(), any(), anyString());
+    }
+
+    @Test
+    void findCaseByEthosReference_ShouldReturnListOfPairs_WhenDuplicateCasesAreFound() throws IOException {
+        // Arrange
+        List<SubmitEvent> duplicateCases = new ArrayList<>();
+        duplicateCases.add(new SubmitEvent());
+        duplicateCases.add(new SubmitEvent());
+
+        when(ccdClient.buildAndGetElasticSearchRequest(
+                anyString(), anyString(), anyString())).thenReturn(duplicateCases);
+
+        List<Pair<String, List<SubmitEvent>>> result = migratedCaseLinkUpdatesTask.findCaseByEthosReference(
+                ADMIN_TOKEN, ETHOS_REFERENCE);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
+                anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void findCaseByEthosReference_ShouldReturnEmptyList_WhenNoDuplicateCasesAreFound() throws IOException {
+        List<SubmitEvent> noDuplicates = new ArrayList<>();
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(noDuplicates);
+        List<Pair<String, List<SubmitEvent>>> result = migratedCaseLinkUpdatesTask.findCaseByEthosReference(
+                ADMIN_TOKEN, ETHOS_REFERENCE);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
+                anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void findCaseByEthosReference_ShouldThrowException_WhenIOExceptionOccurs() throws IOException {
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+                .thenThrow(new IOException("Test Exception"));
+
+        CaseDuplicateSearchException exception = assertThrows(
+                CaseDuplicateSearchException.class,
+                () -> migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, ETHOS_REFERENCE)
+        );
+
+        assertEquals("Test Exception", exception.getMessage());
+        verify(ccdClient, times(1)).buildAndGetElasticSearchRequest(
+                anyString(), anyString(), anyString());
     }
 }

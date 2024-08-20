@@ -144,8 +144,11 @@ public class MigratedCaseLinkUpdatesTask {
                 .filter(submitEvent -> !submitEvent.getCaseData().getCcdID().equals(
                         targetSubmitEvent.getCaseData().getCcdID())).findFirst().orElse(null);
 
-            assert sourceCaseData != null;
-            assert sourceCaseData.getCaseData() != null;
+            if (sourceCaseData == null || sourceCaseData.getCaseData() == null) {
+                log.info("In triggerEventForCase method: Source case not found in duplicates list");
+                return;
+            }
+
             log.info("In triggerEventForCase method: Updating case {} with source case {}",
                     targetSubmitEvent.getCaseId(), sourceCaseData.getCaseData().getCcdID());
 

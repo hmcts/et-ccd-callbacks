@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -236,11 +237,15 @@ public class ClaimantTellSomethingElseService {
         }
 
         List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
+        if (respondentEmailAddressList.isEmpty()) {
+            return;
+        }
+
         boolean isWelsh = featureToggleService.isWelshEnabled()
-                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
-if (respondentEmailAddressList.isEmpty()) {
-    return;
-}
+                && Optional.ofNullable(caseData.getClaimantHearingPreference())
+                .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
+                .orElse(false);
+
         try {
             log.info("Sending application email to respondent on case {}", caseData.getEthosCaseReference());
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);

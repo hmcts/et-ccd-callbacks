@@ -404,18 +404,24 @@ public class Et1VettingService {
         if (!isNullOrEmpty(address.getAddressLine3())) {
             claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine3());
         }
-        claimantAddressStr.append(BR_WITH_TAB)
-                .append(defaultIfEmpty(address.getPostTown(), ""))
-                .append(BR_WITH_TAB)
-                .append(defaultIfEmpty(address.getPostCode(), ""));
+        if (!isNullOrEmpty(address.getPostTown())) {
+            claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown());
+        }
+        if (!isNullOrEmpty(address.getPostCode())) {
+            claimantAddressStr.append(BR_WITH_TAB).append(address.getPostCode());
+        }
         return claimantAddressStr.toString();
     }
 
     private boolean addressIsEmpty(Address address) {
-        return address == null || isNullOrEmpty(address.getAddressLine1()) && isNullOrEmpty(
-                address.getAddressLine2()) && isNullOrEmpty(address.getAddressLine3()) && isNullOrEmpty(
-                address.getPostTown()) && isNullOrEmpty(address.getPostCode()) && isNullOrEmpty(
-                address.getCountry()) && isNullOrEmpty(address.getCounty());
+        return address == null
+                || isNullOrEmpty(address.getAddressLine1())
+                && isNullOrEmpty(address.getAddressLine2())
+                && isNullOrEmpty(address.getAddressLine3())
+                && isNullOrEmpty(address.getPostTown())
+                && isNullOrEmpty(address.getPostCode())
+                && isNullOrEmpty(address.getCountry())
+                && isNullOrEmpty(address.getCounty());
     }
 
     private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {

@@ -655,4 +655,17 @@ class Et1VettingServiceTest {
         assertEquals(ADDRESS_NOT_ENTERED, et1VettingService.toAddressWithTab(new Address()));
     }
 
+    @Test
+    void testPartialAddress() {
+        Address address = new Address();
+        address.setAddressLine1("123 Main St");
+        address.setAddressLine2(null);
+        address.setAddressLine3("Leeds");
+        address.setPostCode(null);
+        String result = et1VettingService.toAddressWithTab(address);
+
+        String expected = "123 Main St<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Leeds";
+        assertEquals(expected, result);
+    }
+
 }

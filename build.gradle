@@ -381,7 +381,7 @@ dependencies {
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.1-RELEASE'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // 1084765
-    implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.3'
+    implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.5'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.112.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.112.Final'

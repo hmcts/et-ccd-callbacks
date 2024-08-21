@@ -68,9 +68,10 @@ public class MigratedCaseLinkUpdatesTask {
                         caseTypeId, query);
 
                 for (SubmitEvent submitEvent : transferredCases) {
-                     if (!featureToggleService.isUpdateTransferredCaseLinksEnabled()) {
-                         return;
-                     }
+                    if (!featureToggleService.isUpdateTransferredCaseLinksEnabled()) {
+                        return;
+                    }
+
                     //find possible duplicate cases by ethos reference
                     //list of pairs of 'case type id' and 'list of submit events'
                     List<Pair<String, List<SubmitEvent>>> listOfPairs = findCaseByEthosReference(
@@ -91,7 +92,7 @@ public class MigratedCaseLinkUpdatesTask {
         });
     }
 
-    // Checked field values : ethos ref, respondent, claimant, submission ref(i.e. FeeGroupReference),
+    // Checked field values : ethos ref, claimant, submission ref(i.e. FeeGroupReference),
     // and date of receipt
     private boolean haveSameCheckedFieldValues(List<SubmitEvent> duplicates) {
         SubmitEvent sourceCaseData = duplicates.get(0);

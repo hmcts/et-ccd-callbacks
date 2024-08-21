@@ -108,7 +108,7 @@ class MigratedCaseLinkUpdatesTaskTest {
 
         migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
 
-        verify(featureToggleService).isUpdateTransferredCaseLinksEnabled();
+        verify(featureToggleService, times(3)).isUpdateTransferredCaseLinksEnabled();
         verify(adminUserService).getAdminUserToken();
         verify(ccdClient, times(7))
                 .buildAndGetElasticSearchRequest(any(), any(), any());
@@ -206,7 +206,6 @@ class MigratedCaseLinkUpdatesTaskTest {
 
     @Test
     void findCaseByEthosReference_ShouldReturnListOfPairs_WhenDuplicateCasesAreFound() throws IOException {
-        // Arrange
         List<SubmitEvent> duplicateCases = new ArrayList<>();
         duplicateCases.add(new SubmitEvent());
         duplicateCases.add(new SubmitEvent());

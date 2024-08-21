@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -114,13 +116,28 @@ public class SingleCasesReadingService {
                                                                                    List<String> caseIds) {
         HashSet<NotificationSchedulePayloadEvent> schedulePayloadEvents = new HashSet<>();
         try {
-            schedulePayloadEvents = new HashSet<>(ccdClient.retrieveCasesElasticNotificationSearchSchedule(userToken,
-                    UtilHelper.getCaseTypeId(multipleCaseTypeId),
-                    caseIds));
-
+            schedulePayloadEvents = getNotificationSchedulePayloadEvents(userToken, multipleCaseTypeId, caseIds);
         } catch (Exception ex) {
             log.error("Error retrieving notification schedule cases: {}", ex.getMessage(), ex);
         }
         return schedulePayloadEvents;
+    }
+
+    /**
+     * Gets notification schedules with ES Query with default retryable behaviour of 3 attempts with one-second delay.
+     *
+     * @param userToken          user token
+     * @param multipleCaseTypeId multiple case type (EW or Scotland)
+     * @param caseIds            all single cases on the multiple
+     * @return schedulePayloadEvents
+     */
+    @Retryable
+    private HashSet<NotificationSchedulePayloadEvent> getNotificationSchedulePayloadEvents(
+            String userToken,
+            String multipleCaseTypeId,
+            List<String> caseIds) throws IOException {
+        return new HashSet<>(ccdClient.retrieveCasesElasticNotificationSearchSchedule(userToken,
+                UtilHelper.getCaseTypeId(multipleCaseTypeId),
+                caseIds));
     }
 }

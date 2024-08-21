@@ -9,12 +9,14 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGroup;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
@@ -34,7 +36,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.CompletableFuture;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.HEADER_1;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.REPLIES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.RESPONSE;
@@ -53,6 +57,7 @@ public class NotificationsExcelReportService {
     private final ExcelReadingService excelReadingService;
     private final NotificationScheduleService notificationScheduleService;
     private final DocumentManagementService documentManagementService;
+    private final CcdClient ccdClient;
 
     /**
      * Populates excel report with data and saves to case data.
@@ -65,23 +70,15 @@ public class NotificationsExcelReportService {
     public void generateReport(MultipleDetails multipleDetails,
                                String userToken,
                                List<String> errors) throws IOException {
-        log.info("Reading excel file for cases");
-        SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(
-                userToken, MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
-                errors, multipleDetails.getCaseData(), FilterExcelType.ALL);
 
-        List<String> ethosCaseRefCollection = new ArrayList<>();
-        multipleObjects.forEach((key, value) -> {
-            MultipleObject excelRow = (MultipleObject) value;
-            ethosCaseRefCollection.add(excelRow.getEthosCaseRef());
-        });
+        List<String> ethosCaseRefCollection = getEthosCaseRefCollection(multipleDetails, userToken, errors);
         // Retrieve relevant case data from sub cases using ES query
         log.info("Retrieving case data from single cases");
         List<NotificationSchedulePayload> schedulePayloads =
                 notificationScheduleService.getSchedulePayloadCollection(
                         userToken,
                         multipleDetails.getCaseTypeId(),
-                        ethosCaseRefCollection, errors
+                        ethosCaseRefCollection
                 );
 
         MultipleData multipleData = multipleDetails.getCaseData();
@@ -97,17 +94,43 @@ public class NotificationsExcelReportService {
                 FILE_NAME, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId());
 
         log.info("Set case data with extract");
-        setCaseDataWithExtractedDocument(multipleData, documentSelfPath);
+        setCaseDataWithExtractedDocument(multipleDetails, documentSelfPath, userToken);
     }
 
-    private static void setCaseDataWithExtractedDocument(MultipleData multipleData,
-                                                         URI documentSelfPath) {
+    private List<String> getEthosCaseRefCollection(MultipleDetails multipleDetails,
+                                                            String userToken,
+                                                            List<String> errors) {
+        log.info("Reading excel file for cases");
+        var x = MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData());
+        SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(
+                userToken, x,
+                errors, multipleDetails.getCaseData(), FilterExcelType.ALL);
+
+        List<String> ethosCaseRefCollection = new ArrayList<>();
+        multipleObjects.forEach((key, value) -> {
+            MultipleObject excelRow = (MultipleObject) value;
+            ethosCaseRefCollection.add(excelRow.getEthosCaseRef());
+        });
+        return ethosCaseRefCollection;
+    }
+
+    private void setCaseDataWithExtractedDocument(MultipleDetails multipleDetails,
+                                                  URI documentSelfPath,
+                                                  String userToken) throws IOException {
 
         UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder()
                 .documentFilename(FILE_NAME)
                 .documentUrl(String.valueOf(documentSelfPath))
                 .documentBinaryUrl(documentSelfPath + BINARY)
                 .build();
+
+        MultipleRequest returnedRequest =
+                ccdClient.startBulkAmendEventForMultiple(userToken,
+                        multipleDetails.getCaseTypeId(),
+                        EMPLOYMENT,
+                        multipleDetails.getCaseId());
+
+        MultipleData multipleData = returnedRequest.getCaseDetails().getCaseData();
 
         if (multipleData.getNotificationsExtract() == null) {
             multipleData.setNotificationsExtract(new NotificationsExtract());
@@ -116,6 +139,15 @@ public class NotificationsExcelReportService {
 
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
         multipleData.getNotificationsExtract().setExtractDateTime(formatter.format(new Date()));
+
+        ccdClient.submitMultipleEventForCase(
+                userToken,
+                multipleData,
+                multipleDetails.getCaseTypeId(),
+                EMPLOYMENT,
+                returnedRequest,
+                multipleDetails.getCaseId()
+        );
     }
 
     private byte[] generateSchedule(MultipleData multipleData,
@@ -201,5 +233,15 @@ public class NotificationsExcelReportService {
         Cell cell = row.createCell(cellIndex);
         cell.setCellValue(value);
         cell.setCellStyle(style);
+    }
+
+    public void generateReportAsync(MultipleDetails multipleDetails, String userToken, List<String> errors) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                generateReport(multipleDetails, userToken, errors);
+            } catch (IOException e) {
+                throw new IllegalStateException("Task interrupted", e);
+            }
+        });
     }
 }

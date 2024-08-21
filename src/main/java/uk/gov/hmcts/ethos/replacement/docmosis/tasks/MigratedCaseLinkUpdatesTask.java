@@ -68,6 +68,9 @@ public class MigratedCaseLinkUpdatesTask {
                         caseTypeId, query);
 
                 for (SubmitEvent submitEvent : transferredCases) {
+                     if (!featureToggleService.isUpdateTransferredCaseLinksEnabled()) {
+                         return;
+                     }
                     //find possible duplicate cases by ethos reference
                     //list of pairs of 'case type id' and 'list of submit events'
                     List<Pair<String, List<SubmitEvent>>> listOfPairs = findCaseByEthosReference(

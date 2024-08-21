@@ -101,8 +101,6 @@ public class MigratedCaseLinkUpdatesTask {
                 targetCaseData.getCaseData().getEthosCaseReference())
                 && sourceCaseData.getCaseData().getClaimant().equals(
                         targetCaseData.getCaseData().getClaimant())
-                && sourceCaseData.getCaseData().getRespondent().equals(
-                        targetCaseData.getCaseData().getRespondent())
                 && sourceCaseData.getCaseData().getFeeGroupReference().equals(
                         targetCaseData.getCaseData().getFeeGroupReference())
                 && sourceCaseData.getCaseData().getReceiptDate().equals(targetCaseData.getCaseData().getReceiptDate());

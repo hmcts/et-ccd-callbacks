@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -254,15 +253,15 @@ class MigratedCaseLinkUpdatesTaskTest {
     void triggerEventForCase_ShouldTriggerEventSuccessfully() throws Exception {
         CCDRequest ccdRequest = createCCDRequest();
         SubmitEvent targetSubmitEvent = createSubmitEvent(22L, "TargetCcdId");
-        when(ccdClient.startEventForCase(eq(ADMIN_TOKEN), eq(TARGET_CASE_TYPE_ID),
-                        eq("EMPLOYMENT"), eq(String.valueOf(targetSubmitEvent.getCaseId())), eq(EVENT_ID)))
+        when(ccdClient.startEventForCase(ADMIN_TOKEN, TARGET_CASE_TYPE_ID,
+                        "EMPLOYMENT", String.valueOf(targetSubmitEvent.getCaseId()), EVENT_ID))
                 .thenReturn(ccdRequest);
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         when(ccdClient.submitEventForCase(
-                eq(ADMIN_TOKEN), eq(caseDetails.getCaseData()),
-                eq(caseDetails.getCaseTypeId()), eq("EMPLOYMENT"),
-                eq(ccdRequest), eq(caseDetails.getCaseId()))).thenReturn(targetSubmitEvent);
+                ADMIN_TOKEN, caseDetails.getCaseData(),
+                caseDetails.getCaseTypeId(), "EMPLOYMENT",
+                ccdRequest, caseDetails.getCaseId())).thenReturn(targetSubmitEvent);
 
         SubmitEvent sourceSubmitEvent = createSubmitEvent(12L, "SourceCcdId");
         List<SubmitEvent> duplicates;
@@ -273,8 +272,8 @@ class MigratedCaseLinkUpdatesTaskTest {
         migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, duplicates,
                 TARGET_CASE_TYPE_ID, SOURCE_CASE_TYPE_ID);
 
-        verify(ccdClient).startEventForCase(eq(ADMIN_TOKEN), eq(TARGET_CASE_TYPE_ID),
-                eq("EMPLOYMENT"), eq(String.valueOf(targetSubmitEvent.getCaseId())), eq(EVENT_ID));
+        verify(ccdClient).startEventForCase(ADMIN_TOKEN, TARGET_CASE_TYPE_ID,
+                "EMPLOYMENT", String.valueOf(targetSubmitEvent.getCaseId()), EVENT_ID);
     }
 
     @Test

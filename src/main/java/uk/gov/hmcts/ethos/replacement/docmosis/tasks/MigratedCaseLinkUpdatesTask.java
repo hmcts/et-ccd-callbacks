@@ -22,7 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.CaseDuplicateS
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -61,7 +60,7 @@ public class MigratedCaseLinkUpdatesTask {
         String adminUserToken = adminUserService.getAdminUserToken();
         String[] caseTypeIds = caseTypeIdsString.split(",");
 
-        Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
+        List.of(caseTypeIds).forEach(caseTypeId -> {
             try {
                 //Get transferred cases by case type
                 List<SubmitEvent> transferredCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
@@ -119,7 +118,7 @@ public class MigratedCaseLinkUpdatesTask {
         List<Pair<String, List<SubmitEvent>>> pairsList = new ArrayList<>();
 
         //search for duplicates in all case types and group the result by case type id
-        Arrays.stream(caseTypeIds).forEach(sourceCaseTypeId -> {
+        List.of(caseTypeIds).forEach(sourceCaseTypeId -> {
             try {
                 //for each transferred case, get duplicates by ethos ref
                 List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,

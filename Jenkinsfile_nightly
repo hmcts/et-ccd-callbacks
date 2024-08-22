@@ -93,7 +93,6 @@ withNightlyPipeline(type, product, component) {
         env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
         env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     }
-
 //    afterAlways('apiGatewayTest') {
 //        stage('ui end-to-end tests') {
 //            yarnBuilder.yarn('test:fullfunctional')

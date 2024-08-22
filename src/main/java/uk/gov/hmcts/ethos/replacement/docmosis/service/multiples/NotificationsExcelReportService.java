@@ -101,9 +101,8 @@ public class NotificationsExcelReportService {
                                                             String userToken,
                                                             List<String> errors) {
         log.info("Reading excel file for cases");
-        var x = MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData());
         SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(
-                userToken, x,
+                userToken, MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
                 errors, multipleDetails.getCaseData(), FilterExcelType.ALL);
 
         List<String> ethosCaseRefCollection = new ArrayList<>();

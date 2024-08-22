@@ -116,7 +116,7 @@ public class SingleCasesReadingService {
                                                                                    List<String> caseIds) {
         HashSet<NotificationSchedulePayloadEvent> schedulePayloadEvents = new HashSet<>();
         try {
-            schedulePayloadEvents = getNotificationSchedulePayloadEvents(userToken, multipleCaseTypeId, caseIds);
+            schedulePayloadEvents = retryableESNotificationsQuery(userToken, multipleCaseTypeId, caseIds);
         } catch (Exception ex) {
             log.error("Error retrieving notification schedule cases: {}", ex.getMessage(), ex);
         }
@@ -132,7 +132,7 @@ public class SingleCasesReadingService {
      * @return schedulePayloadEvents
      */
     @Retryable
-    private HashSet<NotificationSchedulePayloadEvent> getNotificationSchedulePayloadEvents(
+    private HashSet<NotificationSchedulePayloadEvent> retryableESNotificationsQuery(
             String userToken,
             String multipleCaseTypeId,
             List<String> caseIds) throws IOException {

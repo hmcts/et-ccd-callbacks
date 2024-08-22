@@ -93,23 +93,24 @@ withNightlyPipeline(type, product, component) {
         env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
         env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     }
-//    afterAlways('apiGatewayTest') {
-//        stage('ui end-to-end tests') {
-//            yarnBuilder.yarn('test:fullfunctional')
-//            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
-//            steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-//
-//            publishHTML target: [
-//                    allowMissing : true,
-//                    alwaysLinkToLastBuild: true,
-//                    keepAll : true,
-//                    reportDir : "functional-output",
-//                    reportFiles : "ET-CCD-Callbacks-ui-e2e-tests.html",
-//                    reportName : "ET UI E2E tests result"
-//            ]
-//
-//        }
-//    }
+
+    afterAlways('apiGatewayTest') {
+        stage('ui end-to-end tests') {
+            yarnBuilder.yarn('test:fullfunctional')
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+
+            publishHTML target: [
+                    allowMissing : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll : true,
+                    reportDir : "functional-output",
+                    reportFiles : "ET-CCD-Callbacks-ui-e2e-tests.html",
+                    reportName : "ET UI E2E tests result"
+            ]
+
+        }
+    }
 
     afterAlways('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'

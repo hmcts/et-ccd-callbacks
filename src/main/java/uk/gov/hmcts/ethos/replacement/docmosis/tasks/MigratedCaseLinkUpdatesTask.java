@@ -7,7 +7,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -65,6 +64,10 @@ public class MigratedCaseLinkUpdatesTask {
                 //Get transferred cases by case type
                 List<SubmitEvent> transferredCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
                         caseTypeId, query);
+                if (!transferredCases.isEmpty()) {
+                    log.info("{} - Migrated case link updates task - Retrieved {} cases", caseTypeId,
+                            transferredCases.size());
+                }
 
                 for (SubmitEvent submitEvent : transferredCases) {
                     if (!featureToggleService.isUpdateTransferredCaseLinksEnabled()) {
@@ -75,6 +78,11 @@ public class MigratedCaseLinkUpdatesTask {
                     //list of pairs of 'case type id' and 'list of submit events'
                     List<Pair<String, List<SubmitEvent>>> listOfPairs = findCaseByEthosReference(
                             adminUserToken, submitEvent.getCaseData().getEthosCaseReference());
+
+                    if (!listOfPairs.isEmpty()) {
+                        log.info("Case type: {}, duplicate found for ethos ref {} - ", caseTypeId,
+                                submitEvent.getCaseData().getEthosCaseReference());
+                    }
 
                     for (Pair<String, List<SubmitEvent>> pair : listOfPairs) {
                         List<SubmitEvent> duplicates = pair.getRight();
@@ -177,10 +185,7 @@ public class MigratedCaseLinkUpdatesTask {
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates.get(0)))
                         .mustNot(new ExistsQueryBuilder("data.transferredCaseLink"))
-                )
-                .fetchSource(new String[]{"reference"}, null)
-                .sort("reference.keyword", SortOrder.ASC)
-                .toString();
+                ).toString();
     }
 
     private String buildFollowUpQuery(String ethosCaseReference) {
@@ -189,9 +194,6 @@ public class MigratedCaseLinkUpdatesTask {
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermsQueryBuilder("data.ethosCaseReference", ethosCaseReference))
-                )
-                .fetchSource(new String[]{"reference"}, null)
-                .sort("reference.keyword", SortOrder.ASC)
-                .toString();
+                ).toString();
     }
 }

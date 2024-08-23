@@ -127,6 +127,7 @@ public class MigratedCaseLinkUpdatesTask {
     public  List<Pair<String, List<SubmitEvent>>> findCaseByEthosReference(String adminUserToken,
                                                                            String ethosReference) {
         String followUpQuery = buildFollowUpQuery(ethosReference);
+        log.info("The follow up query is: {} ", followUpQuery);
         String[] caseTypeIds = caseTypeIdsString.split(",");
         List<Pair<String, List<SubmitEvent>>> pairsList = new ArrayList<>();
 
@@ -200,7 +201,7 @@ public class MigratedCaseLinkUpdatesTask {
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermsQueryBuilder("data.ethosCaseReference", ethosCaseReference))
-                ).fetchSource(new String[]{"reference"}, null)
-                .sort("reference.keyword", SortOrder.ASC).toString();
+                ).sort("reference.keyword", SortOrder.ASC)
+                .toString();
     }
 }

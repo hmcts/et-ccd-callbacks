@@ -7,6 +7,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -135,6 +136,7 @@ public class MigratedCaseLinkUpdatesTask {
                 //for each transferred case, get duplicates by ethos ref
                 List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
                         sourceCaseTypeId, followUpQuery);
+                log.info("In findCaseByEthosReference - the returned duplicateCases count {} ", duplicateCases.size());
                 if (duplicateCases.size() == TWO) {
                     pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
                 }
@@ -198,6 +200,7 @@ public class MigratedCaseLinkUpdatesTask {
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermsQueryBuilder("data.ethosCaseReference", ethosCaseReference))
-                ).toString();
+                ).fetchSource(new String[]{"reference"}, null)
+                .sort("reference.keyword", SortOrder.ASC).toString();
     }
 }

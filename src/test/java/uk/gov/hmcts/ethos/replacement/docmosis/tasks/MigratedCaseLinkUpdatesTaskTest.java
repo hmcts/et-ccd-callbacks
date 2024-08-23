@@ -109,7 +109,7 @@ class MigratedCaseLinkUpdatesTaskTest {
 
         verify(featureToggleService, times(3)).isUpdateTransferredCaseLinksEnabled();
         verify(adminUserService).getAdminUserToken();
-        verify(ccdClient, times(7))
+        verify(ccdClient, times(43))
                 .buildAndGetElasticSearchRequest(any(), any(), any());
     }
 
@@ -176,7 +176,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         // 11 invocations of buildAndGetElasticSearchRequest using ccdClient
         // because the method calls were made covering two case types(type1,type2), and two transferred cases during
         // run for each case type
-        verify(ccdClient, times(11)).buildAndGetElasticSearchRequest(
+        verify(ccdClient, times(71)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
         verify(ccdClient, times(0)).startEventForCase(
                 anyString(), anyString(), anyString(), anyString(), anyString());
@@ -216,8 +216,8 @@ class MigratedCaseLinkUpdatesTaskTest {
                 ADMIN_TOKEN, ETHOS_REFERENCE);
 
         assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
+        assertEquals(14, result.size());
+        verify(ccdClient, times(14)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
     }
 
@@ -230,7 +230,7 @@ class MigratedCaseLinkUpdatesTaskTest {
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(ccdClient, times(2)).buildAndGetElasticSearchRequest(
+        verify(ccdClient, times(14)).buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString());
     }
 

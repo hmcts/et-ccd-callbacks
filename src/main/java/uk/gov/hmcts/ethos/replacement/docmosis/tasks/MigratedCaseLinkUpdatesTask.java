@@ -45,9 +45,16 @@ public class MigratedCaseLinkUpdatesTask {
     @Value("${cron.caseTypeId}")
     private String caseTypeIdsString;
 
+    @Value("${cron.caseLinkCaseTypeId}")
+    private String caseLinkCaseTypeIdString;
+
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
     private static final int TWO = 2;
+    private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
+            "Leeds", "LondonCentral", "LondonEast", "LondonSouth",
+            "Manchester", "MidlandsEast", "MidlandsWest", "Newcastle",
+            "Scotland", "Wales", "Watford");
 
     @Scheduled(cron = "${cron.updateTransferredCaseLinks}")
     public void updateTransferredCaseLinks() {
@@ -128,11 +135,10 @@ public class MigratedCaseLinkUpdatesTask {
                                                                            String ethosReference) {
         String followUpQuery = buildFollowUpQuery(ethosReference);
         log.info("The follow up query is: {} ", followUpQuery);
-        String[] caseTypeIds = caseTypeIdsString.split(",");
         List<Pair<String, List<SubmitEvent>>> pairsList = new ArrayList<>();
 
         //search for duplicates in all case types and group the result by case type id
-        List.of(caseTypeIds).forEach(sourceCaseTypeId -> {
+        caseTypeIdsToCheck.forEach(sourceCaseTypeId -> {
             try {
                 //for each transferred case, get duplicates by ethos ref
                 List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,

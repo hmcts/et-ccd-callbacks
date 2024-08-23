@@ -80,7 +80,8 @@ public class MigratedCaseLinkUpdatesTask {
                             submitEvent.getCaseData().getEthosCaseReference());
                     List<Pair<String, List<SubmitEvent>>> listOfPairs = findCaseByEthosReference(
                             adminUserToken, submitEvent.getCaseData().getEthosCaseReference());
-
+                    log.info("The count of result of the search for duplicates {} case types with ethos ref {} is: {}", caseTypeId,
+                            submitEvent.getCaseData().getEthosCaseReference(), listOfPairs.size());
                     if (!listOfPairs.isEmpty()) {
                         log.info("Duplicates search result for {} case types with ethos ref {}  : \n {} \n",
                                 caseTypeId, submitEvent.getCaseData().getEthosCaseReference(),

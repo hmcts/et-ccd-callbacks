@@ -211,6 +211,6 @@ public class MigratedCaseLinkUpdatesTask {
                 .size(100)
                 .query(boolQuery)
                 .fetchSource(new String[]{"reference"}, null)
-                .sort("reference.keyword", SortOrder.ASC).toString();
+                .toString();
     }
 }

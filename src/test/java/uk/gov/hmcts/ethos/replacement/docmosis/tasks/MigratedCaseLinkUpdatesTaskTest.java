@@ -210,6 +210,7 @@ class MigratedCaseLinkUpdatesTaskTest {
     void findCaseByEthosReference_ShouldReturnListOfPairs_WhenDuplicateCasesAreFound() throws IOException {
         List<SubmitEvent> duplicateCases = new ArrayList<>();
         duplicateCases.add(new SubmitEvent());
+        duplicateCases.add(new SubmitEvent());
 
         when(ccdClient.buildAndGetElasticSearchRequest(
                 anyString(), anyString(), anyString())).thenReturn(duplicateCases);

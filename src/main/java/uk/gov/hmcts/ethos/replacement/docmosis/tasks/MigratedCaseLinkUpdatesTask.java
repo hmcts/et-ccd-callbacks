@@ -5,9 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -203,11 +204,16 @@ public class MigratedCaseLinkUpdatesTask {
     }
 
     private String buildFollowUpQuery(String ethosCaseReference) {
+        // Build the boolean query
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                .must(QueryBuilders.termsQuery("state.keyword", validStates))
+                .must(QueryBuilders.termQuery("data.ethosCaseReference", ethosCaseReference));
+
+        // Build the search source
         return new SearchSourceBuilder()
                 .size(100)
-                .query(new BoolQueryBuilder()
-                        .must(new TermsQueryBuilder("state.keyword", validStates))
-                        .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
-                ).toString();
+                .query(boolQuery)
+                .fetchSource(new String[]{"reference"}, null)
+                .sort("reference.keyword", SortOrder.ASC).toString();
     }
 }

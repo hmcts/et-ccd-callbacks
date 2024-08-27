@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRolesRequest;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
@@ -228,7 +228,7 @@ public class Et1ReppedService {
 
         log.info("Adding claimant solicitor role to case {}", caseDetails.getCaseId());
 
-        CaseAssignmentUserRolesRequest addCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
+        CaseAssignmentUserWithOrganisationRolesRequest addCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
                 Long.valueOf(caseDetails.getCaseId()),
                 claimantRepUser.getUid(),
                 organisation.getOrganisationIdentifier(),
@@ -237,7 +237,7 @@ public class Et1ReppedService {
 
         log.info("Removing creator role from case {}", caseDetails.getCaseId());
 
-        CaseAssignmentUserRolesRequest removeCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
+        CaseAssignmentUserWithOrganisationRolesRequest removeCaseUserRole = ccdCaseAssignment.getCaseAssignmentRequest(
                 Long.valueOf(caseDetails.getCaseId()),
                 claimantRepUser.getUid(),
                 organisation.getOrganisationIdentifier(),

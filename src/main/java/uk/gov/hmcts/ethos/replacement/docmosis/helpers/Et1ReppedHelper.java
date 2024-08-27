@@ -52,7 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.UNEXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
-public class Et1ReppedHelper {
+public final class Et1ReppedHelper {
 
     private Et1ReppedHelper() {
         super();

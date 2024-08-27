@@ -94,8 +94,24 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStartClaimantTSE_Success() throws Exception {
+    void aboutToStartClaimantTSE_SystemUser_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(Helper.isRespondentSystemUser(any())).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        mockHelper.verify(() -> Helper.isRespondentSystemUser(any()), times(1));
+    }
+
+    @Test
+    void aboutToStartClaimantTSE_NonSystemUser_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(Helper.isRespondentSystemUser(any())).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -117,8 +133,9 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmitRespondentTSE_Success() throws Exception {
+    void aboutToSubmitClaimantTSE_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(Helper.isRespondentSystemUser(any())).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -128,6 +145,26 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
+        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(claimantTseService).sendAdminEmail(ccdRequest.getCaseDetails());
+    }
+
+    @Test
+    void aboutToSubmitClaimantTSE_NonSystemRespondent_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(Helper.isRespondentSystemUser(any())).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
+        verify(claimantTseService).sendRespondentsEmail(ccdRequest.getCaseDetails());
+        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(claimantTseService).sendAdminEmail(ccdRequest.getCaseDetails());
     }
 
     @Test

@@ -259,10 +259,13 @@ public class TornadoService {
     public DocumentInfo createDocumentInfoFromBytes(String authToken, byte[] bytes, String documentName,
                                                      String caseTypeId) {
 
+        log.info("Uploading document to dm store: " + documentName);
         URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
+        log.info("downloadUrl " + downloadUrl);
         String markup = documentManagementService.generateMarkupDocument(downloadUrl);
+        log.info("markup " + markup);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
     }
 
@@ -290,12 +293,15 @@ public class TornadoService {
     }
 
     private DocumentInfo generateDocumentInfo(String documentName, URI documentSelfPath, String markupURL) {
-        return DocumentInfo.builder()
-                .type(DOCUMENT_NAME)
-                .description(documentName)
-                .markUp(markupURL)
-                .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")
-                .build();
+        DocumentInfo documentInfo =
+                DocumentInfo.builder()
+                        .type(DOCUMENT_NAME)
+                        .description(documentName)
+                        .markUp(markupURL)
+                        .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")
+                        .build();
+        log.info("DocumentInfo created: " + documentInfo.toString());
+        return documentInfo;
     }
 
     private void writeOutputStream(OutputStreamWriter outputStreamWriter, StringBuilder sb) throws IOException {

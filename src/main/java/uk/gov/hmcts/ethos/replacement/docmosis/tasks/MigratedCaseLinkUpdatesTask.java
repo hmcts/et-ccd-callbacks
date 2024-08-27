@@ -42,8 +42,6 @@ public class MigratedCaseLinkUpdatesTask {
     private final List<String> validStates = List.of(TRANSFERRED_STATE, ACCEPTED_STATE, REJECTED_STATE,
             SUBMITTED_STATE, VETTED_STATE, CLOSED_STATE);
     private static final String EVENT_ID = "migrateCaseLinkDetails";
-    @Value("${cron.caseTypeId}")
-    private String caseTypeIdsString;
 
     @Value("${cron.caseLinkCaseTypeId}")
     private String caseLinkCaseTypeIdString;
@@ -65,10 +63,11 @@ public class MigratedCaseLinkUpdatesTask {
 
         String query = buildStartQuery();
         String adminUserToken = adminUserService.getAdminUserToken();
-        String[] caseTypeIds = caseTypeIdsString.split(",");
+        String[] caseLinkCaseTypeIds = caseLinkCaseTypeIdString.split(",");
 
-        List.of(caseTypeIds).forEach(caseTypeId -> {
+        List.of(caseLinkCaseTypeIds).forEach(caseTypeId -> {
             try {
+                log.info("Case type: {} - started", caseTypeId);
                 //Get transferred cases by case type
                 List<SubmitEvent> transferredCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
                         caseTypeId, query);

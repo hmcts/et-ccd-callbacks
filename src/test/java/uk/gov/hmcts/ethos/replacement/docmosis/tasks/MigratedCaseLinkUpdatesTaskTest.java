@@ -52,7 +52,8 @@ class MigratedCaseLinkUpdatesTaskTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(migratedCaseLinkUpdatesTask, "caseTypeIdsString", "type1,type2");
+        ReflectionTestUtils.setField(migratedCaseLinkUpdatesTask, "caseLinkCaseTypeIdString",
+                "type1,type2");
     }
 
     @Test

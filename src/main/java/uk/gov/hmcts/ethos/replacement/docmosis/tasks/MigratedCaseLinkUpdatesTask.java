@@ -87,7 +87,7 @@ public class MigratedCaseLinkUpdatesTask {
                     log.info("Searching for duplicates {} case types with ethos ref: {}", caseTypeId,
                             submitEvent.getCaseData().getEthosCaseReference());
                     List<Pair<String, List<SubmitEvent>>> listOfPairs = findCaseByEthosReference(
-                            adminUserToken, submitEvent.getCaseData().getEthosCaseReference(), caseTypeId);
+                            adminUserToken, submitEvent.getCaseData().getEthosCaseReference());
                     log.info("The count of result of the search for duplicates {} case types with ethos ref {} is: {}",
                             caseTypeId, submitEvent.getCaseData().getEthosCaseReference(), listOfPairs.size());
                     if (!listOfPairs.isEmpty()) {
@@ -132,8 +132,7 @@ public class MigratedCaseLinkUpdatesTask {
     }
 
     public  List<Pair<String, List<SubmitEvent>>> findCaseByEthosReference(String adminUserToken,
-                                                                           String ethosReference,
-                                                                           String caseTypeId) {
+                                                                           String ethosReference) {
         String followUpQuery = buildFollowUpQuery(ethosReference);
         log.info("The follow up query is: {} ", followUpQuery);
         List<Pair<String, List<SubmitEvent>>> pairsList = new ArrayList<>();
@@ -141,13 +140,11 @@ public class MigratedCaseLinkUpdatesTask {
         //search for duplicates in all case types and group the result by case type id
         caseTypeIdsToCheck.forEach(sourceCaseTypeId -> {
             try {
-                if (!caseTypeId.equals(sourceCaseTypeId)) {
-                    //for each transferred case, get duplicates by ethos ref
-                    List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
-                            sourceCaseTypeId, followUpQuery);
-                    if (duplicateCases.size() == TWO) {
-                        pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
-                    }
+                //for each transferred case, get duplicates by ethos ref
+                List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
+                        sourceCaseTypeId, followUpQuery);
+                if (duplicateCases.size() == TWO) {
+                    pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
                 }
             } catch (IOException exception) {
                 String errorMessage = String.format(

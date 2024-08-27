@@ -103,8 +103,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         duplicates.add(submitEvent);
         duplicates.add(submitEvent);
         List<Pair<String, List<SubmitEvent>>> coll = Collections.singletonList(Pair.of("type1", duplicates));
-        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN,
-                "testEthosRef", "type1"))
+        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "testEthosRef"))
                 .thenReturn(coll);
 
         migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
@@ -171,8 +170,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         List<SubmitEvent> notMatchedDuplicates = new ArrayList<>();
         notMatchedDuplicates.add(transferredCase1);
         notMatchedDuplicates.add(transferredCase2);
-        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "ETHOS1231",
-                "type1"))
+        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "ETHOS1231"))
                 .thenReturn(List.of(Pair.of("type1", notMatchedDuplicates)));
 
         migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
@@ -216,7 +214,7 @@ class MigratedCaseLinkUpdatesTaskTest {
                 anyString(), anyString(), anyString())).thenReturn(duplicateCases);
 
         List<Pair<String, List<SubmitEvent>>> result = migratedCaseLinkUpdatesTask.findCaseByEthosReference(
-                ADMIN_TOKEN, ETHOS_REFERENCE, "type1");
+                ADMIN_TOKEN, ETHOS_REFERENCE);
 
         assertNotNull(result);
         assertEquals(14, result.size());
@@ -229,7 +227,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         List<SubmitEvent> noDuplicates = new ArrayList<>();
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(noDuplicates);
         List<Pair<String, List<SubmitEvent>>> result = migratedCaseLinkUpdatesTask.findCaseByEthosReference(
-                ADMIN_TOKEN, ETHOS_REFERENCE, "type1");
+                ADMIN_TOKEN, ETHOS_REFERENCE);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -244,8 +242,7 @@ class MigratedCaseLinkUpdatesTaskTest {
 
         CaseDuplicateSearchException exception = assertThrows(
                 CaseDuplicateSearchException.class,
-                () -> migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, ETHOS_REFERENCE,
-                        "type1")
+                () -> migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, ETHOS_REFERENCE)
         );
 
         assertEquals("Test Exception", exception.getMessage());

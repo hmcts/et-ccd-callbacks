@@ -155,8 +155,6 @@ public class MigratedCaseLinkUpdatesTask {
                 log.info(errorMessage, exception);
                 throw new CaseDuplicateSearchException(exception.getMessage(), exception);
             }
-            log.info("In findCaseByEthosReference for {} case type - the returned duplicateCases count {} ",
-                    caseTypeId, pairsList.size());
         });
 
         return pairsList;
@@ -211,7 +209,6 @@ public class MigratedCaseLinkUpdatesTask {
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
-                ).sort("reference.keyword", SortOrder.ASC)
-                .toString();
+                ).toString();
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -86,7 +87,7 @@ public class MigratedCaseLinkUpdatesTask {
                     log.info("Searching for duplicates {} case types with ethos ref: {}", caseTypeId,
                             submitEvent.getCaseData().getEthosCaseReference());
                     List<Pair<String, List<SubmitEvent>>> listOfPairs = findCaseByEthosReference(
-                            adminUserToken, submitEvent.getCaseData().getEthosCaseReference());
+                            adminUserToken, submitEvent.getCaseData().getEthosCaseReference(), caseTypeId);
                     log.info("The count of result of the search for duplicates {} case types with ethos ref {} is: {}",
                             caseTypeId, submitEvent.getCaseData().getEthosCaseReference(), listOfPairs.size());
                     if (!listOfPairs.isEmpty()) {
@@ -131,7 +132,8 @@ public class MigratedCaseLinkUpdatesTask {
     }
 
     public  List<Pair<String, List<SubmitEvent>>> findCaseByEthosReference(String adminUserToken,
-                                                                           String ethosReference) {
+                                                                           String ethosReference,
+                                                                           String caseTypeId) {
         String followUpQuery = buildFollowUpQuery(ethosReference);
         log.info("The follow up query is: {} ", followUpQuery);
         List<Pair<String, List<SubmitEvent>>> pairsList = new ArrayList<>();
@@ -139,12 +141,13 @@ public class MigratedCaseLinkUpdatesTask {
         //search for duplicates in all case types and group the result by case type id
         caseTypeIdsToCheck.forEach(sourceCaseTypeId -> {
             try {
-                //for each transferred case, get duplicates by ethos ref
-                List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
-                        sourceCaseTypeId, followUpQuery);
-                log.info("In findCaseByEthosReference - the returned duplicateCases count {} ", duplicateCases.size());
-                if (duplicateCases.size() == TWO) {
-                    pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
+                if (!caseTypeId.equals(sourceCaseTypeId)) {
+                    //for each transferred case, get duplicates by ethos ref
+                    List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
+                            sourceCaseTypeId, followUpQuery);
+                    if (duplicateCases.size() == TWO) {
+                        pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
+                    }
                 }
             } catch (IOException exception) {
                 String errorMessage = String.format(
@@ -152,6 +155,8 @@ public class MigratedCaseLinkUpdatesTask {
                 log.info(errorMessage, exception);
                 throw new CaseDuplicateSearchException(exception.getMessage(), exception);
             }
+            log.info("In findCaseByEthosReference for {} case type - the returned duplicateCases count {} ",
+                    caseTypeId, pairsList.size());
         });
 
         return pairsList;
@@ -205,8 +210,9 @@ public class MigratedCaseLinkUpdatesTask {
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
-                        .must(new TermsQueryBuilder("data.ethosCaseReference", ethosCaseReference))
-                ).sort("reference.keyword", SortOrder.ASC)
+                        .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
+                ).fetchSource("reference", null)
+                .sort("reference.keyword", SortOrder.ASC)
                 .toString();
     }
 }

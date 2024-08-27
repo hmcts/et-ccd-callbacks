@@ -332,7 +332,6 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentData(CaseData caseData) {
-        StringBuilder sb = new StringBuilder();
         List<RespondentSumTypeItem> respondentSumTypeItemList = CollectionUtils.isNotEmpty(
                 caseData.getRespondentCollection())
                 ? caseData.getRespondentCollection() : new ArrayList<>();
@@ -384,6 +383,7 @@ public final class DocumentHelper {
                             finalRespondentToBeShown.getRespondentName())).findFirst();
         }
 
+        StringBuilder sb = new StringBuilder();
         if (representedTypeRItem.isPresent()) {
             RepresentedTypeR representedTypeR = representedTypeRItem.get().getValue();
             sb.append(RESPONDENT_OR_REP_FULL_NAME).append(nullCheck(representedTypeR

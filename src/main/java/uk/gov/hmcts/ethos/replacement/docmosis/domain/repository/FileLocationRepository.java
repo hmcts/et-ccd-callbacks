@@ -23,8 +23,8 @@ public interface FileLocationRepository extends JpaRepository<FileLocation, Inte
     List<FileLocation> findByTribunalOffice(TribunalOffice tribunalOffice);
 
     /**
-     * Returns a list of file locations by tribunal office in ascending
-     * order of file location names from table et_cos.file_location
+     * Returns a list of file locations by tribunal office in ascending order of file location names.
+     * From table et_cos.file_location
      *
      * @param tribunalOffice tribunal office
      * @return a list of file locations
@@ -32,8 +32,7 @@ public interface FileLocationRepository extends JpaRepository<FileLocation, Inte
     List<FileLocation> findByTribunalOfficeOrderByNameAsc(TribunalOffice tribunalOffice);
 
     /**
-     * Returns only one file location by file location code and
-     * tribunal office from table et_cos.file_location
+     * Returns only one file location by file location code and tribunal office from table et_cos.file_location.
      *
      * @param fileLocationCode file location code,
      * @param tribunalOffice tribunal office

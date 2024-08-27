@@ -38,7 +38,6 @@ public class AddSingleCaseToMultipleService {
         if (caseData.getMultipleFlag().equals(NO)
                 && caseData.getEcmCaseType().equals(MULTIPLE_CASE_TYPE)) {
 
-            String leadClaimant = caseData.getLeadClaimant();
             String updatedMultipleReference = caseData.getMultipleReference();
             String multipleCaseTypeId = UtilHelper.getBulkCaseTypeId(caseTypeId);
             String subMultipleName;
@@ -69,6 +68,7 @@ public class AddSingleCaseToMultipleService {
 
                 String newEthosCaseReferenceToAdd = caseData.getEthosCaseReference();
 
+                String leadClaimant = caseData.getLeadClaimant();
                 if (ethosCaseRefCollection.isEmpty()) {
                     leadClaimant = YES;
                 }

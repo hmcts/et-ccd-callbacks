@@ -286,7 +286,6 @@ public class BulkUpdateService {
             BulkData bulkData = bulkDetails.getCaseData();
             String jurCodeSelected = bulkData.getJurCodesDynamicList().getValue().getCode();
             boolean updated = false;
-            boolean multipleReferenceUpdated = false;
             String respondentNameNewValue = bulkData.getRespondentSurnameV2();
             String caseId = searchTypeItem.getId();
             SubmitEvent submitEvent = ccdClient.retrieveCase(authToken,
@@ -406,6 +405,7 @@ public class BulkUpdateService {
                 }
             }
             String multipleRefNewValue = bulkData.getMultipleReferenceV2();
+            boolean multipleReferenceUpdated = false;
             if (!isNullOrEmpty(multipleRefNewValue)) {
                 updated = true;
                 multipleReferenceUpdated = true;

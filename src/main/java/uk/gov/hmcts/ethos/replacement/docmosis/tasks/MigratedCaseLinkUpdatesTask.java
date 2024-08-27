@@ -5,10 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -205,10 +204,10 @@ public class MigratedCaseLinkUpdatesTask {
 
     private String buildFollowUpQuery(String ethosCaseReference) {
         return new SearchSourceBuilder()
-                .size(maxCases)
+                .size(100)
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
-                        .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
+                        .should(new WildcardQueryBuilder("data.ethosCaseReference", ethosCaseReference))
                 ).toString();
     }
 }

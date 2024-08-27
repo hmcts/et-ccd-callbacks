@@ -49,7 +49,7 @@ public class MigratedCaseLinkUpdatesTask {
 
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
-    private static final int ONE = 1;
+    private static final int TWO = 2;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth",
             "Manchester", "MidlandsEast", "MidlandsWest", "Newcastle",
@@ -145,7 +145,7 @@ public class MigratedCaseLinkUpdatesTask {
                     //for each transferred case, get duplicates by ethos ref
                     List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
                             sourceCaseTypeId, followUpQuery);
-                    if (duplicateCases.size() == ONE) {
+                    if (duplicateCases.size() == TWO) {
                         pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
                     }
                 }

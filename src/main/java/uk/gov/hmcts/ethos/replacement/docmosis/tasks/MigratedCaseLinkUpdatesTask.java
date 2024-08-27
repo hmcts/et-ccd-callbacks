@@ -209,7 +209,7 @@ public class MigratedCaseLinkUpdatesTask {
         return new SearchSourceBuilder()
                 .size(100)
                 .query(boolQuery)
-                .fetchSource(new String[]{"reference"}, null)
+                .fetchSource("reference", null)
                 .toString();
     }
 }

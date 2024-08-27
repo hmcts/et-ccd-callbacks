@@ -211,8 +211,7 @@ public class MigratedCaseLinkUpdatesTask {
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
                         .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
-                ).fetchSource("reference", null)
-                .sort("reference.keyword", SortOrder.ASC)
+                ).sort("reference.keyword", SortOrder.ASC)
                 .toString();
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -207,7 +208,7 @@ public class MigratedCaseLinkUpdatesTask {
                 .size(100)
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
-                        .should(new WildcardQueryBuilder("data.ethosCaseReference", ethosCaseReference))
+                        .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
                 ).toString();
     }
 }

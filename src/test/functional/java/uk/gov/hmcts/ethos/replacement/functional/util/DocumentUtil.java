@@ -115,7 +115,6 @@ public class DocumentUtil {
             //sb.append("\"claimant_email_address\": \"").append(NEW_LINE);
         } else {
             ClaimantType claimantType = caseData.getClaimantType();
-            ClaimantIndType claimantIndType = caseData.getClaimantIndType();
 
             sb.append("\"claimant_addressLine1\": \"" + claimantType.getClaimantAddressUK()
                     .getAddressLine1()).append(NEW_LINE);
@@ -131,6 +130,7 @@ public class DocumentUtil {
                     .getPostCode())).append(NEW_LINE);
             String typeOfClaimant = caseData.getClaimantTypeOfClaimant();
             if (typeOfClaimant.equalsIgnoreCase(INDIVIDUAL_TYPE_CLAIMANT)) {
+                ClaimantIndType claimantIndType = caseData.getClaimantIndType();
                 sb.append("\"claimant_full_name\": \"" + claimantIndType.claimantFullName()).append(NEW_LINE);
                 sb.append("\"Claimant\": \"" + claimantIndType.claimantFullName()).append(NEW_LINE);
                 //sb.append("\"claimant_email_address\": \"").append(NEW_LINE);

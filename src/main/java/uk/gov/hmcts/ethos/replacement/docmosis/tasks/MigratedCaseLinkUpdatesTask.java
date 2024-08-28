@@ -142,7 +142,7 @@ public class MigratedCaseLinkUpdatesTask {
         //search for duplicates in all case types and group the result by case type id
         caseTypeIdsToCheck.forEach(sourceCaseTypeId -> {
             try {
-                String followUpQuery = buildFollowUpQuery(ethosReference, sourceCaseTypeId);
+                String followUpQuery = buildFollowUpQuery(ethosReference);
                 log.info("The follow up query is: {} ", followUpQuery);
                 //for each transferred case, get duplicates by ethos ref
                 List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
@@ -204,12 +204,11 @@ public class MigratedCaseLinkUpdatesTask {
                 ).toString();
     }
 
-    private String buildFollowUpQuery(String ethosCaseReference, String caseTypeId) {
+    private String buildFollowUpQuery(String ethosCaseReference) {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
-                        .must(new TermQueryBuilder("case_type_id.keyword", caseTypeId))
-                        .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
+                        .must(new TermQueryBuilder("data.ethosCaseReference.keyword", ethosCaseReference))
                 ).toString();
     }
 }

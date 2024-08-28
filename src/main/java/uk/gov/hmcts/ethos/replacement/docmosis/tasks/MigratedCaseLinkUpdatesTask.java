@@ -117,7 +117,7 @@ public class MigratedCaseLinkUpdatesTask {
 
     // Checked field values : ethos ref, claimant, submission ref(i.e. FeeGroupReference),
     // and date of receipt
-    private boolean haveSameCheckedFieldValues(List<SubmitEvent> duplicates) {
+    public boolean haveSameCheckedFieldValues(List<SubmitEvent> duplicates) {
         SubmitEvent sourceCaseData = duplicates.get(0);
         SubmitEvent targetCaseData = duplicates.get(1);
         if (sourceCaseData.getCaseData() == null || targetCaseData.getCaseData() == null) {

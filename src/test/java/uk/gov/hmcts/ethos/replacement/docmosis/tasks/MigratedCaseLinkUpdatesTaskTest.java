@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -338,6 +339,85 @@ class MigratedCaseLinkUpdatesTaskTest {
 
         verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
         verify(ccdClient, never()).submitEventForCase(anyString(), any(), any(), any(), any(), anyString());
+    }
+
+    @Test
+    void haveSameCheckedFieldValues_allFieldsMatch_returnsTrue() {
+        CaseData sourceCaseData = new CaseData();
+        sourceCaseData.setEthosCaseReference("ETHOS123");
+        sourceCaseData.setClaimant("Claimant1");
+        sourceCaseData.setFeeGroupReference("FeeGroup1");
+        sourceCaseData.setReceiptDate("2023-08-28");
+        SubmitEvent sourceSubmitEvent = mock(SubmitEvent.class);
+        sourceSubmitEvent.setCaseData(sourceCaseData);
+
+        CaseData targetCaseData = new CaseData();
+        targetCaseData.setEthosCaseReference("ETHOS123");
+        targetCaseData.setClaimant("Claimant1");
+        targetCaseData.setFeeGroupReference("FeeGroup1");
+        targetCaseData.setReceiptDate("2023-08-28");
+        SubmitEvent targetSubmitEvent = mock(SubmitEvent.class);
+        targetSubmitEvent.setCaseData(targetCaseData);
+
+        when(sourceSubmitEvent.getCaseData()).thenReturn(sourceCaseData);
+        when(targetSubmitEvent.getCaseData()).thenReturn(targetCaseData);
+
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
+                List.of(sourceSubmitEvent, targetSubmitEvent));
+
+        assertTrue(result);
+    }
+
+    @Test
+    void haveSameCheckedFieldValues_bothCaseDataNull_returnsFalse() {
+        SubmitEvent sourceSubmitEvent = mock(SubmitEvent.class);
+        when(sourceSubmitEvent.getCaseData()).thenReturn(null);
+        SubmitEvent targetSubmitEvent = mock(SubmitEvent.class);
+        when(targetSubmitEvent.getCaseData()).thenReturn(null);
+
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
+                List.of(sourceSubmitEvent, targetSubmitEvent));
+
+        assertFalse(result);
+    }
+
+    @Test
+    void haveSameCheckedFieldValues_oneCaseDataNull_returnsFalse() {
+        SubmitEvent sourceSubmitEvent = mock(SubmitEvent.class);
+        when(sourceSubmitEvent.getCaseData()).thenReturn(null);
+        SubmitEvent targetSubmitEvent = mock(SubmitEvent.class);
+
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
+                List.of(sourceSubmitEvent, targetSubmitEvent));
+
+        assertFalse(result);
+    }
+
+    @Test
+    void haveSameCheckedFieldValues_fieldsDoNotMatch_returnsFalse() {
+        CaseData sourceCaseData = new CaseData();
+        sourceCaseData.setEthosCaseReference("ETHOS123");
+        sourceCaseData.setClaimant("Claimant1");
+        sourceCaseData.setFeeGroupReference("FeeGroup1");
+        sourceCaseData.setReceiptDate("2023-08-28");
+        SubmitEvent sourceSubmitEvent = mock(SubmitEvent.class);
+        sourceSubmitEvent.setCaseData(sourceCaseData);
+
+        CaseData targetCaseData = new CaseData();
+        targetCaseData.setEthosCaseReference("ETHOS654");
+        targetCaseData.setClaimant("Claimant2");
+        targetCaseData.setFeeGroupReference("FeeGroup2");
+        targetCaseData.setReceiptDate("2023-08-29");
+        SubmitEvent targetSubmitEvent = mock(SubmitEvent.class);
+        targetSubmitEvent.setCaseData(targetCaseData);
+
+        when(sourceSubmitEvent.getCaseData()).thenReturn(sourceCaseData);
+        when(targetSubmitEvent.getCaseData()).thenReturn(targetCaseData);
+
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
+                List.of(sourceSubmitEvent, targetSubmitEvent));
+
+        assertFalse(result);
     }
 
     private SubmitEvent createSubmitEvent(Long caseId, String ccdId) {

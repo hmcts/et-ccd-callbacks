@@ -11,7 +11,6 @@ module.exports =  async function () {
     I.see('Day');
     I.see('Month');
     I.see('Year');
-
     I.see('Tribunal Office');
 
     const currentDate = new Date();

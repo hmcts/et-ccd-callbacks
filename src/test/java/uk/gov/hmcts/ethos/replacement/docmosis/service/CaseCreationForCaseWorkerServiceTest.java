@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,8 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -60,9 +59,12 @@ class CaseCreationForCaseWorkerServiceTest {
     }
 
     @Test
-    void caseCreationRequestException() throws IOException {
-        when(ccdClient.startCaseCreation(anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
+    @SneakyThrows
+    void caseCreationRequestException() {
+        when(ccdClient.startCaseCreation(anyString(), any(CaseDetails.class)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.submitCaseCreation(anyString(), any(CaseDetails.class), any(CCDRequest.class)))
+                .thenReturn(submitEvent);
 
         assertThrows(Exception.class, () ->
                 caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken)
@@ -70,9 +72,11 @@ class CaseCreationForCaseWorkerServiceTest {
     }
 
     @Test
-    void caseCreationRequest() throws IOException {
-        when(ccdClient.startCaseCreation(anyString(), any())).thenReturn(ccdRequest);
-        when(ccdClient.submitCaseCreation(anyString(), any(), any())).thenReturn(submitEvent);
+    @SneakyThrows
+    void caseCreationRequest() {
+        when(ccdClient.startCaseCreation(anyString(), any(CaseDetails.class))).thenReturn(ccdRequest);
+        when(ccdClient.submitCaseCreation(anyString(), any(CaseDetails.class), any(CCDRequest.class)))
+                .thenReturn(submitEvent);
         SubmitEvent submitEvent1 = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
         assertEquals(submitEvent1, submitEvent);
     }

@@ -63,10 +63,11 @@ public class Et3ResponseService {
      * @param caseTypeId reference which caseType the document will be uploaded to
      * @return DocumentInfo which contains the URL and description of the document uploaded to DM Store
      */
-    public DocumentInfo generateEt3ResponseDocument(CaseData caseData, String userToken, String caseTypeId) {
+    public DocumentInfo generateEt3ResponseDocument(CaseData caseData, String userToken, String caseTypeId,
+                                                    String event) {
         try {
             return pdfBoxService.generatePdfDocumentInfo(
-                    caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3FormTemplate);
+                    caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3FormTemplate, event);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
@@ -84,7 +85,7 @@ public class Et3ResponseService {
     }
 
     private void saveEt3DetailsToRespondent(CaseData caseData, UploadedDocumentType uploadedDocument) {
-        String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel();
+        String respondentSelected = caseData.getSubmitEt3Respondent().getSelectedLabel().trim();
 
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
                 .filter(r -> respondentSelected.equals(r.getValue().getRespondentName().trim()))

@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
@@ -45,6 +46,9 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private static final String SUBMIT_COMPLETE_URL = "/et3Response/sectionComplete";
     private static final String START_SUBMIT_ET3_URL = "/et3Response/startSubmitEt3";
     private static final String RELOAD_SUBMIT_DATA_URL = "/et3Response/reloadSubmitData";
+    private static final String DOWNLOAD_DRAFT_ABOUT_TO_START = "/et3Response/downloadDraft/aboutToStart";
+    private static final String DOWNLOAD_DRAFT_ABOUT_TO_SUBMIT = "/et3Response/downloadDraft/aboutToSubmit";
+    private static final String DOWNLOAD_DRAFT_SUBMITTED = "/et3Response/downloadDraft/submitted";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -74,6 +78,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
         ccdRequest.getCaseDetails().setCaseId("1683646754393041");
 
@@ -364,5 +369,47 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void downloadDraftAboutToStart_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(DOWNLOAD_DRAFT_ABOUT_TO_START)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void downloadDraftAboutToSubmit_tokenOk() throws Exception {
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setMarkUp("Document");
+        documentInfo.setDescription("Document.pdf");
+        ccdRequest.setEventId("draftEt3");
+        when(et3ResponseService.generateEt3ResponseDocument(ccdRequest.getCaseDetails().getCaseData(), AUTH_TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID, "draftEt3")).thenReturn(documentInfo);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(DOWNLOAD_DRAFT_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void downloadDraftSubmitted_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(DOWNLOAD_DRAFT_SUBMITTED)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

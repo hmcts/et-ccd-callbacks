@@ -147,11 +147,17 @@ launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
   env: ${LAUNCH_DARKLY_ENV:default}
 
+es:
+  partition:
+    notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE:3000}
+
 cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
+  noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}
+  partySpacing: ${CRON_PARTY_SPACING:0 */30 * * * ?}
 
 em-ccd-orchestrator:
   api:

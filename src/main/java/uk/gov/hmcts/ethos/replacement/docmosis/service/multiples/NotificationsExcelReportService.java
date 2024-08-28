@@ -19,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGrou
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesSchedulePrinter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
@@ -39,9 +38,9 @@ import java.util.SortedMap;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.HEADER_1;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.REPLIES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.RESPONSE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper.flattenGroupAndSortNotificationsWithCaseRef;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper.getAndFormatReplies;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -76,42 +75,29 @@ public class NotificationsExcelReportService {
             MultipleObject excelRow = (MultipleObject) value;
             ethosCaseRefCollection.add(excelRow.getEthosCaseRef());
         });
-        if (ethosCaseRefCollection.size() > SCHEDULE_LIMIT_CASES) {
+        // Retrieve relevant case data from sub cases using ES query
+        log.info("Retrieving case data from single cases");
+        List<NotificationSchedulePayload> schedulePayloads =
+                notificationScheduleService.getSchedulePayloadCollection(
+                        userToken,
+                        multipleDetails.getCaseTypeId(),
+                        ethosCaseRefCollection, errors
+                );
 
-            log.error("Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
+        MultipleData multipleData = multipleDetails.getCaseData();
+        // Transform data for the extract
+        List<Map.Entry<Pair<String, String>, List<NotificationGroup>>> sortedNotificationList =
+                flattenGroupAndSortNotificationsWithCaseRef(schedulePayloads, multipleData.getMultipleReference());
 
-            errors.add("Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
+        log.info("Generating extract");
+        byte[] schedule = generateSchedule(multipleData, sortedNotificationList);
 
-        } else {
-            // Retrieve relevant case data from sub cases using ES query
-            log.info("Retrieving case data from single cases");
-            List<NotificationSchedulePayload> schedulePayloads =
-                    notificationScheduleService.getSchedulePayloadCollection(
-                            userToken,
-                            multipleDetails.getCaseTypeId(),
-                            ethosCaseRefCollection, errors
-                    );
+        log.info("Upload extract to doc store");
+        URI documentSelfPath = documentManagementService.uploadDocument(userToken, schedule,
+                FILE_NAME, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId());
 
-            MultipleData multipleData = multipleDetails.getCaseData();
-            // Transform data for the extract
-            List<NotificationGroup> notificationGroups =
-                    MultipleNotificationsHelper
-                            .flattenNotificationsWithCaseRef(schedulePayloads, multipleData.getMultipleReference());
-            Map<Pair<String, String>, List<NotificationGroup>> notificationsGroupedByTitle =
-                    MultipleNotificationsHelper.groupNotificationsByTitleAndDate(notificationGroups);
-            List<Map.Entry<Pair<String, String>, List<NotificationGroup>>> sortedList =
-                    MultipleNotificationsHelper.groupedNotificationsSortedByDate(notificationsGroupedByTitle);
-
-            log.info("Generating extract");
-            byte[] schedule = generateSchedule(multipleData, sortedList);
-
-            log.info("Upload extract to doc store");
-            URI documentSelfPath = documentManagementService.uploadDocument(userToken, schedule,
-                    FILE_NAME, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId());
-
-            log.info("Set case data with extract");
-            setCaseDataWithExtractedDocument(multipleData, documentSelfPath);
-        }
+        log.info("Set case data with extract");
+        setCaseDataWithExtractedDocument(multipleData, documentSelfPath);
     }
 
     private static void setCaseDataWithExtractedDocument(MultipleData multipleData,
@@ -133,8 +119,8 @@ public class NotificationsExcelReportService {
     }
 
     private byte[] generateSchedule(MultipleData multipleData,
-                                   List<Map.Entry<Pair<String, String>,
-                                           List<NotificationGroup>>> notificationsGroupedByTitle) throws IOException {
+                                    List<Map.Entry<Pair<String, String>,
+                                            List<NotificationGroup>>> notificationsGroupedByTitle) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("NotificationsExtract");
 

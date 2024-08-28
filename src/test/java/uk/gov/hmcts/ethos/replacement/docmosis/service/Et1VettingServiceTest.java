@@ -9,6 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LEEDS;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LONDON_CENTRAL;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ADDRESS_NOT_ENTERED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
@@ -640,6 +643,29 @@ class Et1VettingServiceTest {
             caseData.setVettingJurisdictionCodeCollection(new ArrayList<>());
         }
         caseData.getVettingJurisdictionCodeCollection().add(codesTypeItem);
+    }
+
+    @Test
+    void testNullAddress() {
+        assertEquals(ADDRESS_NOT_ENTERED, et1VettingService.toAddressWithTab(null));
+    }
+
+    @Test
+    void testEmptyAddress() {
+        assertEquals(ADDRESS_NOT_ENTERED, et1VettingService.toAddressWithTab(new Address()));
+    }
+
+    @Test
+    void testPartialAddress() {
+        Address address = new Address();
+        address.setAddressLine1("123 Main St");
+        address.setAddressLine2(null);
+        address.setAddressLine3("Leeds");
+        address.setPostCode(null);
+        String result = et1VettingService.toAddressWithTab(address);
+
+        String expected = "123 Main St<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Leeds";
+        assertEquals(expected, result);
     }
 
 }

@@ -17,12 +17,8 @@ public final class ET3FormTestConstants {
     public static final String TEST_ADDRESS_COUNTY = "county";
     public static final String TEST_ADDRESS_COUNTRY = "country";
 
-    // PdfBoxService CONSTANTS
-    public static final int TEST_SAMPLE_PDF_BYTE_ARRAY_SIZE = 142_624;
-
     // ET3FormHeaderMapperTest CONSTANTS
     public static final String TEST_PDF_HEADER_VALUE_CASE_NUMBER = "6009729/2024";
-    public static final String TEST_PDF_HEADER_VALUE_DATE_RECEIVED = "13-05-2024";
 
     // ET3FormClaimantMapperTest CONSTANTS
     public static final String TEST_PDF_CLAIMANT_VALUE_ET1_CLAIMANT_NAME = "et citizen1";

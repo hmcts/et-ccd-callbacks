@@ -39,8 +39,7 @@ public final class ET3FormConstants {
     public static final String TXT_PDF_HEADER_FIELD_CASE_NUMBER = "case number";
     public static final String TXT_PDF_HEADER_FIELD_DATE_RECEIVED = "date_received";
     public static final String TXT_PDF_HEADER_FIELD_RTF = "RTF";
-    public static final String TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS = "Document exists";
-    public static final String TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_NOT_EXISTS = "No document";
+    public static final String TXT_PDF_HEADER_VALUE_ADDITIONAL_DOCUMENT_EXISTS = "+%d Doc";
 
     // SECTION 1 CLAIMANT CONSTANTS
     public static final String TXT_PDF_CLAIMANT_FIELD_NAME = "1.1 Claimant's name";
@@ -187,7 +186,7 @@ public final class ET3FormConstants {
 
     // ET3 FORM MAPPER CONSTANTS
     public static final String RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD =
-            "There were no respondent found for the entered respondent name";
+            "There were no respondent found for the entered respondent name ";
     public static final String CASE_DATA_NOT_FOUND_EXCEPTION_FIRST_WORD = "Case data is empty";
     public static final String RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_FIRST_WORD =
             "There is no respondent defined in the case";
@@ -204,6 +203,7 @@ public final class ET3FormConstants {
             "ET3 Form submitting respondent not found in case data";
     public static final String RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE =
             "ET3 Form submitting respondent name is empty or blank";
+    public static final String SUBMIT_ET3 = "submitEt3";
 
     private ET3FormConstants() {
         // Add a private constructor to hide the implicit public one.

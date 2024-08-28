@@ -8,7 +8,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '9.2.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'io.freefair.lombok' version '8.6'
+    id 'io.freefair.lombok' version '8.10'
     id 'org.sonarqube' version '5.1.0.4882'
     id 'pmd'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1214'
@@ -300,22 +300,22 @@ integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 
 ext {
-    junitJupiterVersion = '5.10.3'
+    junitJupiterVersion = '5.11.0'
     log4JVersion = '2.23.1'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '9.0.91'
+    tomcatEmbedVersion = '9.0.93'
 }
 
 ext["rest-assured.version"] = '5.1.0'
 
 dependencyManagement {
     dependencies {
-        dependencySet(group: 'com.google.guava', version: '33.2.1-jre') {
+        dependencySet(group: 'com.google.guava', version: '33.3.0-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.1.111.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.112.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -336,15 +336,15 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.2.5'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.16.2'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.3.1'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.17.1'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
 
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.5'
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
+    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.6'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.39.3'
 
     // Log4J core added to remove startup error message
@@ -354,8 +354,8 @@ dependencies {
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.65.Final'
     implementation group: 'org.json', name: 'json', version: '20240303'
-    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.26.2'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
+    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.27.1'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.16.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
@@ -363,12 +363,12 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.3.1'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.3.3'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
-    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.13'
+    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.16'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -381,10 +381,10 @@ dependencies {
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.1-RELEASE'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // 1084765
-    implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.3'
+    implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.5'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
-    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.111.Final'
-    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.111.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.112.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.112.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.0.0'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.0'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
@@ -397,7 +397,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'com.github.hmcts:fortify-client:1.4.3:all', {
+    testImplementation 'com.github.hmcts:fortify-client:1.4.4:all', {
         exclude module: 'commons-io'
     }
 
@@ -413,21 +413,21 @@ dependencies {
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
-    testImplementation(platform('org.junit:junit-bom:5.10.3'))
+    testImplementation(platform('org.junit:junit-bom:5.11.0'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.19.8'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.1'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.11'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.13'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.10.3'
+    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.11.0'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.3'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath
@@ -460,7 +460,7 @@ bootWithCCD {
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
-    environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos'
+    environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos,et_sya_api'
     // ccd-data-store-api
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,ccd_case_document_am_api,am_role_assignment_service,ethos_repl_docmosis_service,ecm_consumer,et_cos,et_msg_handler,et_sya_api,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,em_ccd_orchestrator,em_stitching_api'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
@@ -490,7 +490,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 265
+pmdMain.maxFailures = 257
 pmdTest.maxFailures = 183
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

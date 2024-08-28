@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class Et3ResponseController {
-
+    private static final String GENERATED_DOCUMENT_URL = "Please download the draft ET3 : ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String ET3_COMPLETE_HEADER = "<h1>ET3 Response submitted</h1>";
     private static final String ET3_COMPLETE_BODY =
@@ -49,13 +49,14 @@ public class Et3ResponseController {
                     \r
                     You should receive confirmation from the tribunal office to process your application within 5
                      working days. If you have not heard from them within 5 days, contact the office directly.""";
-    private static final String SECTION_COMPLETE_BODY =
-            "You may want to complete the rest of the ET3 Form using the links below"
-                    + "<br><a href=\"/cases/case-details/%s/trigger/et3Response/et3Response1\">ET3 - Respondent Details</a>"
-                    + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseEmploymentDetails/et3ResponseEmploymentDetails1"
-                    + "\">ET3 - Employment Details</a>"
-                    + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseDetails/et3ResponseDetails1\">ET3 - "
-                    + "Response Details</a>";
+    private static final String SECTION_COMPLETE_BODY = """
+        You may want to complete the rest of the ET3 Form using the links below\
+        <br><a href="/cases/case-details/%s/trigger/et3Response/et3Response1">ET3 - Respondent Details</a>\
+        <br><a href="/cases/case-details/%s/trigger/et3ResponseEmploymentDetails/et3ResponseEmploymentDetails1\
+        ">ET3 - Employment Details</a>\
+        <br><a href="/cases/case-details/%s/trigger/et3ResponseDetails/et3ResponseDetails1">ET3 - \
+        Response Details</a>
+        <br><a href="/cases/case-details/%s/trigger/downloadDraftEt3/downloadDraftEt31">Download draft ET3 Form</a>""";
     private final VerifyTokenService verifyTokenService;
     private final Et3ResponseService et3ResponseService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -178,7 +179,6 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
-        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -203,7 +203,7 @@ public class Et3ResponseController {
         }
 
         String ccdId = ccdRequest.getCaseDetails().getCaseId();
-        String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId);
+        String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId, ccdId);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_body(body)
@@ -238,7 +238,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getEventId());
         et3ResponseService.saveEt3Response(caseData, documentInfo);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
@@ -329,5 +329,72 @@ public class Et3ResponseController {
         Et3ResponseHelper.reloadSubmitOntoEt3(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/downloadDraft/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "reloads the data onto the case for submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> downloadDraftAboutToStart(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/downloadDraft/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "reloads the data onto the case for submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> downloadDraftAboutToSubmit(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getEventId());
+        documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
+                "Draft ET3 - " + caseData.getSubmitEt3Respondent().getSelectedLabel()));
+        caseData.setDocMarkUp(documentInfo.getMarkUp());
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/downloadDraft/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "reloads the data onto the case for submission")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> downloadDraftSubmitted(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        String ccdId = ccdRequest.getCaseDetails().getCaseId();
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(caseData)
+                .confirmation_body(GENERATED_DOCUMENT_URL + caseData.getDocMarkUp()
+                                   + "\r\n\r\n" + SECTION_COMPLETE_BODY.formatted(ccdId, ccdId, ccdId, ccdId))
+                .build());
     }
 }

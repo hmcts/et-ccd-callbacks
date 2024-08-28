@@ -63,7 +63,7 @@ public final class BulkHelper {
     private BulkHelper() {
     }
 
-    public static BulkDetails setMultipleCollection(BulkDetails bulkDetails,
+    public static BulkDetails getMultipleCollection(BulkDetails bulkDetails,
                                                     List<MultipleTypeItem> multipleTypeItemList) {
         if (multipleTypeItemList != null && !multipleTypeItemList.isEmpty()) {
             bulkDetails.getCaseData().setMultipleCollectionCount(String.valueOf(multipleTypeItemList.size()));

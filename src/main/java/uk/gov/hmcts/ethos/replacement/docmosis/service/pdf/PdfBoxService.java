@@ -73,7 +73,7 @@ public class PdfBoxService {
     timeout or maybe a bad gateway.
      */
     public DocumentInfo generatePdfDocumentInfo(CaseData caseData, String userToken, String caseTypeId,
-                                                String documentName, String pdfTemplate)
+                                                String documentName, String pdfTemplate, String event)
             throws IOException, GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
             Throwable exception = new Throwable(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
@@ -90,7 +90,7 @@ public class PdfBoxService {
         throwPdfServiceExceptionWhenStringValueIsEmpty(pdfTemplate,
                 PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY, caseData.getEthosCaseReference());
         try {
-            byte[] bytes = convertCaseToPdfAsByteArray(caseData, pdfTemplate);
+            byte[] bytes = convertCaseToPdfAsByteArray(caseData, pdfTemplate, event);
             String dmStoreDocumentName = generatePdfFileName(caseData, documentName);
             return tornadoService.createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
         } catch (IOException ioe) {
@@ -126,7 +126,7 @@ public class PdfBoxService {
      * @return a byte array of the generated pdf file.
      * @throws IOException if there is an issue reading the pdf template
      */
-    public byte[] convertCaseToPdfAsByteArray(CaseData caseData, String pdfSource) throws IOException {
+    public byte[] convertCaseToPdfAsByteArray(CaseData caseData, String pdfSource, String event) throws IOException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         InputStream stream = ObjectUtils.isEmpty(cl) || StringUtils.isBlank(pdfSource) ? null
                 : cl.getResourceAsStream(pdfSource);
@@ -139,7 +139,7 @@ public class PdfBoxService {
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
                 pdfForm.setDefaultResources(resources);
-                for (Map.Entry<String, Optional<String>> entry : mapEt3Form(caseData).entrySet()) {
+                for (Map.Entry<String, Optional<String>> entry : mapEt3Form(caseData, event).entrySet()) {
                     String entryKey = entry.getKey();
                     Optional<String> entryValue = entry.getValue();
                     if (entryValue.isPresent() && StringUtils.isNotBlank(entryValue.get())) {

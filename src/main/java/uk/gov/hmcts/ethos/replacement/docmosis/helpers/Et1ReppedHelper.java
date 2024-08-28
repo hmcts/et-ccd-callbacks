@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.listingFormatLocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_DETAILS_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.COMPLETED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.INDIVIDUAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MONTHS;
@@ -51,7 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.UNEXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
-public class Et1ReppedHelper {
+public final class Et1ReppedHelper {
 
     private Et1ReppedHelper() {
         super();
@@ -604,7 +605,7 @@ public class Et1ReppedHelper {
     public static List<String> validateGrounds(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData.getEt1SectionThreeDocumentUpload())
             && isNullOrEmpty(caseData.getEt1SectionThreeClaimDetails())) {
-            return Collections.singletonList("Please provide details of the claim");
+            return Collections.singletonList(CLAIM_DETAILS_MISSING);
         }
         return Collections.emptyList();
     }

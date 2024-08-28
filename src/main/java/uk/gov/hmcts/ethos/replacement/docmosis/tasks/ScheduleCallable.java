@@ -34,8 +34,7 @@ public class ScheduleCallable implements Callable<HashSet<SchedulePayload>> {
                 caseTypeId, partitionCaseIds);
 
         for (SchedulePayloadEvent schedulePayloadEvent : schedulePayloadEvents) {
-            schedulePayloads.add(MultiplesScheduleHelper.getSchedulePayloadFromSchedulePayloadES(
-                    schedulePayloadEvent.getSchedulePayloadES()));
+            schedulePayloads.add(MultiplesScheduleHelper.getSchedulePayloadFromSchedulePayloadES(schedulePayloadEvent));
         }
 
         return schedulePayloads;

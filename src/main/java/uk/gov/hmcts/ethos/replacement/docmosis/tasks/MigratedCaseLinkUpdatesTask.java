@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,10 +68,11 @@ public class MigratedCaseLinkUpdatesTask {
 
         List.of(caseLinkCaseTypeIds).forEach(caseTypeId -> {
             try {
-                log.info("Case type: {} - started", caseTypeId);
+                log.info("Case type: {} - started\n", caseTypeId);
                 //Get transferred cases by case type
-                List<SubmitEvent> transferredCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
-                        caseTypeId, query);
+                log.info("Start Query: {} - \n", query);
+                List<SubmitEvent> transferredCases = ccdClient.buildAndGetElasticSearchRequest(
+                        adminUserToken, caseTypeId, query);
                 if (!transferredCases.isEmpty()) {
                     log.info("{} - Migrated case link updates task - Retrieved {} cases", caseTypeId,
                             transferredCases.size());
@@ -204,15 +205,11 @@ public class MigratedCaseLinkUpdatesTask {
     }
 
     private String buildFollowUpQuery(String ethosCaseReference, String caseTypeId) {
-        // Build the boolean query
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termQuery("case_type_id.keyword", caseTypeId))
-                .must(QueryBuilders.termQuery("data.ethosCaseReference", ethosCaseReference));
-
-        // Build the search source
         return new SearchSourceBuilder()
-                .size(100)
-                .query(boolQuery)
-                .toString();
+                .size(maxCases)
+                .query(new BoolQueryBuilder()
+                        .must(new TermQueryBuilder("case_type_id.keyword", caseTypeId))
+                        .must(new TermQueryBuilder("data.ethosCaseReference", ethosCaseReference))
+                ).toString();
     }
 }

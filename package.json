@@ -12,10 +12,10 @@
         "@wdio/sauce-service": "9.0.7",
         "@wdio/selenium-standalone-service": "8.15.0",
         "@wdio/types": "9.0.4",
-        "axios": "1.7.4",
+        "axios": "1.7.5",
         "codeceptjs-saucehelper": "1.4.0",
         "cross-env": "7.0.3",
-        "eslint": "9.9.0",
+        "eslint": "9.9.1",
         "eslint-config-prettier": "9.1.0",
         "eslint-plugin-codeceptjs": "1.3.0",
         "eslint-plugin-import": "2.29.1",
@@ -71,7 +71,7 @@
         "chai-http": "5.0.0",
         "codeceptjs": "3.6.5",
         "codeceptjs-saucehelper": "^1.4.0",
-        "eslint": "9.9.0",
+        "eslint": "9.9.1",
         "eslint-config-prettier": "^9.0.0",
         "eslint-plugin-codeceptjs": "^1.3.0",
         "eslint-plugin-import": "^2.26.0",
@@ -91,7 +91,7 @@
         "playwright": "^1.35.1",
         "playwright-core": "^1.35.1",
         "proxyquire": "2.1.3",
-        "puppeteer": "23.1.1",
+        "puppeteer": "23.2.0",
         "rewire": "7.0.0",
         "selenium-standalone": "10.0.0",
         "sinon": "18.0.0",
@@ -122,5 +122,5 @@
         "qs": ">=6.10.3",
         "ua-parser-js": "^1.0.33"
     },
-    "packageManager": "yarn@3.8.4"
+    "packageManager": "yarn@3.8.5"
 }

@@ -48,6 +48,7 @@ public class MigratedCaseLinkUpdatesTask {
 
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
+    private static final int ONE = 1;
     private static final int TWO = 2;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth",
@@ -95,12 +96,16 @@ public class MigratedCaseLinkUpdatesTask {
                                 listOfPairs.get(0).getRight().get(0).getCaseData());
                     }
 
-                    for (Pair<String, List<SubmitEvent>> pair : listOfPairs) {
-                        List<SubmitEvent> duplicates = pair.getRight();
-                        if (duplicates != null && haveSameCheckedFieldValues(duplicates)) {
-                            //update valid matching duplicates by triggering event for case
-                            String sourceCaseTypeId = pair.getLeft();
-                            triggerEventForCase(adminUserToken, submitEvent, duplicates, caseTypeId, sourceCaseTypeId);
+                    if (listOfPairs.size() == TWO) {
+                        for (Pair<String, List<SubmitEvent>> pair : listOfPairs) {
+                            List<SubmitEvent> duplicates = pair.getRight();
+                            //check if duplicates have same checked field values
+                            if (duplicates != null && haveSameCheckedFieldValues(duplicates)) {
+                                //update valid matching duplicates by triggering event for case
+                                String sourceCaseTypeId = pair.getLeft();
+                                triggerEventForCase(adminUserToken, submitEvent, duplicates, caseTypeId,
+                                        sourceCaseTypeId);
+                            }
                         }
                     }
                 }
@@ -132,17 +137,16 @@ public class MigratedCaseLinkUpdatesTask {
 
     public  List<Pair<String, List<SubmitEvent>>> findCaseByEthosReference(String adminUserToken,
                                                                            String ethosReference) {
-        String followUpQuery = buildFollowUpQuery(ethosReference);
-        log.info("The follow up query is: {} ", followUpQuery);
         List<Pair<String, List<SubmitEvent>>> pairsList = new ArrayList<>();
-
         //search for duplicates in all case types and group the result by case type id
         caseTypeIdsToCheck.forEach(sourceCaseTypeId -> {
             try {
+                String followUpQuery = buildFollowUpQuery(ethosReference, sourceCaseTypeId);
+                log.info("The follow up query is: {} ", followUpQuery);
                 //for each transferred case, get duplicates by ethos ref
                 List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
                         sourceCaseTypeId, followUpQuery);
-                if (duplicateCases.size() == TWO) {
+                if (duplicateCases.size() == ONE) {
                     pairsList.add(Pair.of(sourceCaseTypeId, duplicateCases));
                 }
             } catch (IOException exception) {
@@ -199,17 +203,16 @@ public class MigratedCaseLinkUpdatesTask {
                 ).toString();
     }
 
-    private String buildFollowUpQuery(String ethosCaseReference) {
+    private String buildFollowUpQuery(String ethosCaseReference, String caseTypeId) {
         // Build the boolean query
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termsQuery("state.keyword", validStates))
+                .must(QueryBuilders.termQuery("case_type_id.keyword", caseTypeId))
                 .must(QueryBuilders.termQuery("data.ethosCaseReference", ethosCaseReference));
 
         // Build the search source
         return new SearchSourceBuilder()
                 .size(100)
                 .query(boolQuery)
-                .fetchSource("reference", null)
                 .toString();
     }
 }

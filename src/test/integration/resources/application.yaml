@@ -122,7 +122,10 @@ template:
   claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
 
   respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
-  et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
+  et1:
+    et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
+    submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
+    cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
 
 etcos:
   system:

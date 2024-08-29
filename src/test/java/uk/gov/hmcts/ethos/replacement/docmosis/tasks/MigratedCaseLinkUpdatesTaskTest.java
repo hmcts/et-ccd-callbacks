@@ -116,6 +116,45 @@ class MigratedCaseLinkUpdatesTaskTest {
     }
 
     @Test
+    void testUpdateTransferredCaseLinks_WithTransferredCases_Null_Casedata_In_Pairs() throws Exception {
+        when(featureToggleService.isUpdateTransferredCaseLinksEnabled()).thenReturn(true);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_TOKEN);
+
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("caseRef1");
+        caseData.setClaimant("claimant1");
+        caseData.setRespondent("respondent1");
+        caseData.setReceiptDate("2021-01-01");
+        caseData.setFeeGroupReference("feeGroup1");
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseData(caseData);
+
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any()))
+                .thenReturn(Collections.singletonList(submitEvent));
+
+        List<SubmitEvent> duplicates = new ArrayList<>();
+        SubmitEvent submitEventNull = new SubmitEvent();
+        duplicates.add(submitEvent);
+        duplicates.add(submitEventNull);
+
+        List<Pair<String, List<SubmitEvent>>> pairsList = new ArrayList<>();
+        pairsList.add(Pair.of("type1", List.of(duplicates.get(0))));
+        pairsList.add(Pair.of("type1", List.of(duplicates.get(1))));
+
+        when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "testEthosRef"))
+                .thenReturn(pairsList);
+
+        migratedCaseLinkUpdatesTask.updateTransferredCaseLinks();
+        assertEquals(2, pairsList.size());
+        verify(ccdClient, times(43))
+                .buildAndGetElasticSearchRequest(any(), any(), any());
+        verify(ccdClient, times(0)).startEventForCase(
+                anyString(), anyString(), anyString(), anyString(), anyString());
+        verify(ccdClient, times(0)).submitEventForCase(
+                anyString(), any(), anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
     void testUpdateTransferredCaseLinks_WithTransferredCasesAndDuplicates() throws Exception {
         when(featureToggleService.isUpdateTransferredCaseLinksEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("admin-token");
@@ -260,12 +299,14 @@ class MigratedCaseLinkUpdatesTaskTest {
                 .thenReturn(ccdRequest);
         when(ccdClient.submitEventForCase(ADMIN_TOKEN, ccdRequest.getCaseDetails().getCaseData(),
                 ccdRequest.getCaseDetails().getCaseTypeId(), "EMPLOYMENT",
-                ccdRequest, ccdRequest.getCaseDetails().getCaseId())).thenReturn(expectedSubmitEvent);
+                ccdRequest, ccdRequest.getCaseDetails().getCaseId()))
+                .thenReturn(expectedSubmitEvent);
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         when(ccdClient.submitEventForCase(
                 ADMIN_TOKEN, caseDetails.getCaseData(),
                 caseDetails.getCaseTypeId(), "EMPLOYMENT",
-                ccdRequest, caseDetails.getCaseId())).thenReturn(targetSubmitEvent);
+                ccdRequest, caseDetails.getCaseId()))
+                .thenReturn(targetSubmitEvent);
 
         SubmitEvent sourceSubmitEvent = createSubmitEvent(12L, "SourceCcdId");
         List<SubmitEvent> duplicates;

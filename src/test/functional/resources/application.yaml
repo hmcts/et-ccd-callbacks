@@ -25,4 +25,5 @@ es:
 cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  caseLinkCaseTypeId: ${CRON_CASE_LINK_CASE_TYPE_ID:Leeds,Bristol}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}

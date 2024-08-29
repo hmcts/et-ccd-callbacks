@@ -79,10 +79,11 @@ class MemberDaysReportDocTest {
                 .append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE);
 
         double durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
-        expectedDetailRowContent.append("\"Hearing_Duration\":\"")
-            .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
-            .append("\"\n")
-                .append("}]").append(",\n");
+        expectedDetailRowContent.append("\"Hearing_Duration\":\"");
+        expectedDetailRowContent.append(nullCheck(String.valueOf(
+                new DecimalFormat("#").format(durationInMinutes))));
+        expectedDetailRowContent.append("\"\n}],\n");
+
         StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
@@ -210,10 +211,10 @@ class MemberDaysReportDocTest {
         expectedDetailRowContent.append("\"Hearing_Clerk\":\"")
             .append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE);
         double durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
-        expectedDetailRowContent.append("\"Hearing_Duration\":\"")
-            .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
-            .append("\"\n");
-        expectedDetailRowContent.append("}]").append(",\n");
+        expectedDetailRowContent.append("\"Hearing_Duration\":\"");
+        expectedDetailRowContent.append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))));
+        expectedDetailRowContent.append("\"\n");
+        expectedDetailRowContent.append("}],\n");
         StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());

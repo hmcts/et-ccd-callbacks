@@ -40,8 +40,7 @@ public final class NocNotificationHelper {
 
             SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
 
-            respondentName =
-                    solicitorRole.getRepresentationItem(caseDataNew).map(respondentSumTypeItem ->
+            respondentName = solicitorRole.getRepresentationItem(caseDataNew).map(respondentSumTypeItem ->
                             respondentSumTypeItem.getValue().getRespondentName()).orElseThrow();
         } catch (NullPointerException e) {
             log.warn("Failed to get RespondentNameForNewSolicitor");

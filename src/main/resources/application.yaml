@@ -216,11 +216,13 @@ es:
 
 cron:
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  caseLinkCaseTypeId: ${CRON_CASE_LINK_CASE_TYPE_ID:Leeds,Bristol}
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:200}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
   noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 */10 * * * ?}
   partySpacing: ${CRON_PARTY_SPACING:0 */15 * * * ?}
+  updateTransferredCaseLinks: ${CRON_UPDATE_TRANSFERRED_CASE_LINKS:0 30 * * * ?}
 
 pdf:
   et3form: "ET3_0224.pdf"

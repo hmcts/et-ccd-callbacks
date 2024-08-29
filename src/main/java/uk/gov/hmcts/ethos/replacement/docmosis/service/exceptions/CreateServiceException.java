@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * Is thrown when create service fails.
  */
-public class CreateServiceException extends RuntimeException {
+public class    CreateServiceException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = Long.MIN_VALUE;
 

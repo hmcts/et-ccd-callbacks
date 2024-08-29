@@ -128,6 +128,13 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isPartySpacingCronEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenUpdateTransferredCaseLinksIsEnabled(Boolean toggleStat) {
+        givenToggle("updateTransferredCaseLinks", toggleStat);
+        assertThat(featureToggleService.isUpdateTransferredCaseLinksEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

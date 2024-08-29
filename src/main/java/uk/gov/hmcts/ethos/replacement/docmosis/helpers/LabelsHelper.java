@@ -363,10 +363,10 @@ public final class LabelsHelper {
                 .append(nullCheck(address.getPostTown()))
                 .append(isNullOrEmpty(nullCheck(address.getCounty())) || sb.isEmpty() ? "" : ", ")
                 .append(nullCheck(address.getCounty()))
-                .append(!isNullOrEmpty(nullCheck(address.getPostCode())) && !sb.isEmpty() ? ", " : "")
+                .append(!isNullOrEmpty(nullCheck(address.getPostCode())) && sb.isEmpty() ? "" : ", ")
                 .append(nullCheck(address.getPostCode()))
-                .append(!isNullOrEmpty(nullCheck(address.getCountry())) && !sb.isEmpty() ? ", " : "")
-                .append(nullCheck(address.getCountry())).append(!sb.isEmpty() ? "." : "");
+                .append(!isNullOrEmpty(nullCheck(address.getCountry())) && sb.isEmpty() ? "" : ", ")
+                .append(nullCheck(address.getCountry())).append(sb.isEmpty() ? "" : ".");
 
         return sb;
 

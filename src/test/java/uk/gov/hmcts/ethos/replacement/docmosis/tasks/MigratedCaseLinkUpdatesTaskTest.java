@@ -278,7 +278,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         when(migratedCaseLinkUpdatesTask.findCaseByEthosReference(ADMIN_TOKEN, "12"))
                 .thenReturn(List.of(Pair.of("type1", duplicates)));
 
-        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, duplicates,
+        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, sourceSubmitEvent,
                 TARGET_CASE_TYPE_ID, SOURCE_CASE_TYPE_ID);
         assertEquals("12", expectedSubmitEvent.getCaseData().getTransferredCaseLinkSourceCaseId());
         verify(ccdClient).startEventForCase(ADMIN_TOKEN, TARGET_CASE_TYPE_ID,
@@ -312,13 +312,8 @@ class MigratedCaseLinkUpdatesTaskTest {
 
     @Test
     void triggerEventForCase_ShouldNotTriggerEvent_WhenSourceCaseNotFound() throws IOException {
-        SubmitEvent sourceSubmitEvent = createSubmitEvent(12L, "SourceCcdId");
-        List<SubmitEvent> duplicates;
-        duplicates = new ArrayList<>();
-        duplicates.add(sourceSubmitEvent);
-        duplicates.remove(sourceSubmitEvent);
         SubmitEvent targetSubmitEvent = createSubmitEvent(22L, "TargetCcdId");
-        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, duplicates,
+        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, null,
                 TARGET_CASE_TYPE_ID, SOURCE_CASE_TYPE_ID);
 
         verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
@@ -326,15 +321,11 @@ class MigratedCaseLinkUpdatesTaskTest {
     }
 
     @Test
-    void triggerEventForCase_ShouldNotTriggerEvent_WhenSourceCaseDataIsNull() throws IOException {
+    void triggerEventForCase_ShouldNotTriggerEvent_WhenSourceCaseDataIsNull() throws Exception {
         SubmitEvent sourceSubmitEvent = createSubmitEvent(12L, "SourceCcdId");
         sourceSubmitEvent.setCaseData(null);
-        List<SubmitEvent> duplicates;
-        duplicates = new ArrayList<>();
-        duplicates.add(sourceSubmitEvent);
-        duplicates.remove(sourceSubmitEvent);
         SubmitEvent targetSubmitEvent = createSubmitEvent(22L, "TargetCcdId");
-        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, duplicates,
+        migratedCaseLinkUpdatesTask.triggerEventForCase(ADMIN_TOKEN, targetSubmitEvent, sourceSubmitEvent,
                 TARGET_CASE_TYPE_ID, SOURCE_CASE_TYPE_ID);
 
         verify(ccdClient, never()).startEventForCase(anyString(), anyString(), anyString(), anyString(), anyString());
@@ -362,8 +353,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         when(sourceSubmitEvent.getCaseData()).thenReturn(sourceCaseData);
         when(targetSubmitEvent.getCaseData()).thenReturn(targetCaseData);
 
-        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
-                List.of(sourceSubmitEvent, targetSubmitEvent));
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent);
 
         assertTrue(result);
     }
@@ -375,8 +365,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         SubmitEvent targetSubmitEvent = mock(SubmitEvent.class);
         when(targetSubmitEvent.getCaseData()).thenReturn(null);
 
-        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
-                List.of(sourceSubmitEvent, targetSubmitEvent));
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent);
 
         assertFalse(result);
     }
@@ -387,8 +376,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         when(sourceSubmitEvent.getCaseData()).thenReturn(null);
         SubmitEvent targetSubmitEvent = mock(SubmitEvent.class);
 
-        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
-                List.of(sourceSubmitEvent, targetSubmitEvent));
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent);
 
         assertFalse(result);
     }
@@ -414,8 +402,7 @@ class MigratedCaseLinkUpdatesTaskTest {
         when(sourceSubmitEvent.getCaseData()).thenReturn(sourceCaseData);
         when(targetSubmitEvent.getCaseData()).thenReturn(targetCaseData);
 
-        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(
-                List.of(sourceSubmitEvent, targetSubmitEvent));
+        boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent);
 
         assertFalse(result);
     }

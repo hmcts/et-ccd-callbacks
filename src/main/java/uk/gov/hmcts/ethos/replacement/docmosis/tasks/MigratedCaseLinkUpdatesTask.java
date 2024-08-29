@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -91,22 +92,29 @@ public class MigratedCaseLinkUpdatesTask {
                             adminUserToken, submitEvent.getCaseData().getEthosCaseReference());
                     log.info("The count of result of the search for duplicates {} case types with ethos ref {} is: {}",
                             caseTypeId, submitEvent.getCaseData().getEthosCaseReference(), listOfPairs.size());
-                    if (!listOfPairs.isEmpty()) {
-                        log.info("Duplicates search result for {} case types with ethos ref {}  : \n {} \n",
-                                caseTypeId, submitEvent.getCaseData().getEthosCaseReference(),
-                                listOfPairs.get(0).getRight().get(0).getCaseData());
-                    }
 
                     if (listOfPairs.size() == TWO) {
-                        for (Pair<String, List<SubmitEvent>> pair : listOfPairs) {
-                            List<SubmitEvent> duplicates = pair.getRight();
+                        //identify the target case and source case
+                        Pair<String, List<SubmitEvent>> targetPairList = listOfPairs.stream()
+                                .filter(pair -> pair.getLeft().equals(caseTypeId))
+                                .findFirst().orElse(null);
+                        Pair<String, List<SubmitEvent>> sourcePairList = listOfPairs.stream()
+                                .filter(pair -> !pair.getLeft().equals(caseTypeId))
+                                .findFirst().orElse(null);
+                        if (targetPairList == null || sourcePairList == null) {
+                            log.info("In updateTransferredCaseLinks method: Target or Source case not found.");
+                            return;
+                        } else {
+                            SubmitEvent targetSubmitEvent = targetPairList.getRight().get(0);
+                            SubmitEvent sourceSubmitEvent = sourcePairList.getRight().get(0);
                             //check if duplicates have same checked field values
-                            if (duplicates != null && haveSameCheckedFieldValues(duplicates)) {
+                            if (haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent)) {
                                 //update valid matching duplicates by triggering event for case
-                                String sourceCaseTypeId = pair.getLeft();
-                                triggerEventForCase(adminUserToken, submitEvent, duplicates, caseTypeId,
+                                String sourceCaseTypeId = sourcePairList.getLeft();
+                                triggerEventForCase(adminUserToken, targetSubmitEvent, sourceSubmitEvent, caseTypeId,
                                         sourceCaseTypeId);
                             }
+
                         }
                     }
                 }
@@ -118,20 +126,18 @@ public class MigratedCaseLinkUpdatesTask {
 
     // Checked field values : ethos ref, claimant, submission ref(i.e. FeeGroupReference),
     // and date of receipt
-    public boolean haveSameCheckedFieldValues(List<SubmitEvent> duplicates) {
-        SubmitEvent sourceCaseData = duplicates.get(0);
-        SubmitEvent targetCaseData = duplicates.get(1);
-        if (sourceCaseData.getCaseData() == null || targetCaseData.getCaseData() == null) {
+    public boolean haveSameCheckedFieldValues(SubmitEvent targetSubmitEvent, SubmitEvent sourceSubmitEvent) {
+
+        if (targetSubmitEvent.getCaseData() == null || sourceSubmitEvent.getCaseData() == null) {
             return false;
         }
 
-        boolean checkResult = sourceCaseData.getCaseData().getEthosCaseReference().equals(
-                targetCaseData.getCaseData().getEthosCaseReference())
-                && sourceCaseData.getCaseData().getClaimant().equals(
-                        targetCaseData.getCaseData().getClaimant())
-                && sourceCaseData.getCaseData().getFeeGroupReference().equals(
-                        targetCaseData.getCaseData().getFeeGroupReference())
-                && sourceCaseData.getCaseData().getReceiptDate().equals(targetCaseData.getCaseData().getReceiptDate());
+        CaseData targetCaseData = targetSubmitEvent.getCaseData();
+        CaseData sourceCaseData = sourceSubmitEvent.getCaseData();
+        boolean checkResult = sourceCaseData.getEthosCaseReference().equals(targetCaseData.getEthosCaseReference())
+                && sourceCaseData.getClaimant().equals(targetCaseData.getClaimant())
+                && sourceCaseData.getFeeGroupReference().equals(targetCaseData.getFeeGroupReference())
+                && sourceCaseData.getReceiptDate().equals(targetCaseData.getReceiptDate());
         log.info("The haveSameCheckedFieldValues method result is {} ", checkResult);
         return checkResult;
     }
@@ -162,20 +168,15 @@ public class MigratedCaseLinkUpdatesTask {
     }
 
     public void triggerEventForCase(String adminUserToken, SubmitEvent targetSubmitEvent,
-                                     List<SubmitEvent> duplicates, String targetCaseTypeId, String sourceCaseTypeId) {
+                                     SubmitEvent sourceSubmitEvent, String targetCaseTypeId, String sourceCaseTypeId) {
         try {
-            //get the source case details from the duplicates list
-            SubmitEvent sourceCaseData = duplicates.stream()
-                .filter(submitEvent -> !submitEvent.getCaseData().getCcdID().equals(
-                        targetSubmitEvent.getCaseData().getCcdID())).findFirst().orElse(null);
-
-            if (sourceCaseData == null || sourceCaseData.getCaseData() == null) {
-                log.info("In triggerEventForCase method: Source case not found in duplicates list");
+            if (sourceSubmitEvent == null || sourceSubmitEvent.getCaseData() == null) {
+                log.info("In triggerEventForCase method: Source case data null");
                 return;
             }
 
             log.info("In triggerEventForCase method: Updating case {} with source case {}",
-                    targetSubmitEvent.getCaseId(), sourceCaseData.getCaseData().getCcdID());
+                    targetSubmitEvent.getCaseId(), sourceSubmitEvent.getCaseData().getCcdID());
 
             CCDRequest returnedRequest = ccdClient.startEventForCase(adminUserToken, targetCaseTypeId,
                     "EMPLOYMENT", String.valueOf(targetSubmitEvent.getCaseId()), EVENT_ID);
@@ -184,7 +185,7 @@ public class MigratedCaseLinkUpdatesTask {
             // update target's two fields that will be used for link construction by triggering
             // the migrateCaseLinkDetails event for case
             targetCaseDetails.getCaseData().setTransferredCaseLinkSourceCaseId(
-                    String.valueOf(sourceCaseData.getCaseId()));
+                    String.valueOf(sourceSubmitEvent.getCaseId()));
             targetCaseDetails.getCaseData().setTransferredCaseLinkSourceCaseTypeId(sourceCaseTypeId);
 
             ccdClient.submitEventForCase(adminUserToken, targetCaseDetails.getCaseData(),

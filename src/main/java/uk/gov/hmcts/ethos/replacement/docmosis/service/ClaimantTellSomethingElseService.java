@@ -25,12 +25,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -61,6 +59,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLA
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_RECONSIDER_JUDGMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentEmailAddressList;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -247,11 +246,8 @@ public class ClaimantTellSomethingElseService {
                 .orElse(false);
 
         try {
-            log.info("Sending application email to respondent on case {}", caseData.getEthosCaseReference());
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);
-            log.info("Document generated successfully");
             String emailTemplate = getRespondentEmailTemplate(isWelsh, applicationType);
-            log.info("Email template: {}", emailTemplate);
             respondentEmailAddressList.forEach(respondentEmail ->
                     sendEmailToRespondent(
                             emailTemplate,
@@ -277,15 +273,6 @@ public class ClaimantTellSomethingElseService {
             log.warn("Failed to send email. Reference ID: {}. Reason:", caseData.getEthosCaseReference(), e);
             throw new EmailServiceException("Failed to send email", e);
         }
-    }
-
-    private List<String> getRespondentEmailAddressList(CaseData caseData) {
-        return caseData.getRepCollection().stream()
-                .filter(r -> Objects.nonNull(r)
-                        && YES.equals(defaultIfEmpty(r.getValue().getMyHmctsYesNo(), ""))
-                        && !isNullOrEmpty(r.getValue().getRepresentativeEmailAddress()))
-                .map(r -> r.getValue().getRepresentativeEmailAddress())
-                .toList();
     }
 
     private String getRespondentEmailTemplate(boolean isWelsh, String applicationType) {

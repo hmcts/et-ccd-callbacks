@@ -48,7 +48,7 @@
         "@codeceptjs/examples": "1.2.4",
         "@codeceptjs/ui": "1.2.0",
         "@types/archiver": "^6.0.0",
-        "@types/chai-as-promised": "^7.1.5",
+        "@types/chai-as-promised": "^8.0.0",
         "@types/fs-extra": "^11.0.0",
         "@types/git-rev-sync": "2.0.2",
         "@types/jest": "^29.0.0",

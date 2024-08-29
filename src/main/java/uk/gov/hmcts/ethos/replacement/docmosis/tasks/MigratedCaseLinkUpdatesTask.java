@@ -93,35 +93,65 @@ public class MigratedCaseLinkUpdatesTask {
                     log.info("The count of result of the search for duplicates {} case types with ethos ref {} is: {}",
                             caseTypeId, submitEvent.getCaseData().getEthosCaseReference(), listOfPairs.size());
 
-                    if (listOfPairs.size() == TWO) {
-                        //identify the target case and source case
-                        Pair<String, List<SubmitEvent>> targetPairList = listOfPairs.stream()
-                                .filter(pair -> pair.getLeft().equals(caseTypeId))
-                                .findFirst().orElse(null);
-                        Pair<String, List<SubmitEvent>> sourcePairList = listOfPairs.stream()
-                                .filter(pair -> !pair.getLeft().equals(caseTypeId))
-                                .findFirst().orElse(null);
-                        if (targetPairList == null || sourcePairList == null) {
-                            log.info("In updateTransferredCaseLinks method: Target or Source case not found.");
-                            return;
-                        } else {
-                            SubmitEvent targetSubmitEvent = targetPairList.getRight().get(0);
-                            SubmitEvent sourceSubmitEvent = sourcePairList.getRight().get(0);
-                            //check if duplicates have same checked field values
-                            if (haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent)) {
-                                //update valid matching duplicates by triggering event for case
-                                String sourceCaseTypeId = sourcePairList.getLeft();
-                                triggerEventForCase(adminUserToken, targetSubmitEvent, sourceSubmitEvent, caseTypeId,
-                                        sourceCaseTypeId);
-                            }
-
-                        }
+                    //identify the target case and source case
+                    SubmitEvent targetSubmitEvent = getTargetSubmitEventFromPair(listOfPairs, caseTypeId);
+                    SubmitEvent sourceSubmitEvent = getSourceSubmitEventFromPair(listOfPairs, caseTypeId);
+                    String sourceCaseTypeId = getSourceCaseTypeId(listOfPairs, caseTypeId);
+                    //check if duplicates have same checked field values
+                    if (targetSubmitEvent != null && sourceSubmitEvent != null && sourceCaseTypeId != null
+                            && haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent)) {
+                        //update valid matching duplicates by triggering event for case
+                        triggerEventForCase(adminUserToken, targetSubmitEvent, sourceSubmitEvent, caseTypeId,
+                                sourceCaseTypeId);
                     }
                 }
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
         });
+    }
+
+    public SubmitEvent getTargetSubmitEventFromPair(List<Pair<String, List<SubmitEvent>>> listOfPairs,
+                                                    String caseTypeId) {
+        if (listOfPairs.size() != TWO) {
+            return null;
+        }
+
+        Pair<String, List<SubmitEvent>> targetPairList = listOfPairs.stream()
+                .filter(pair -> pair.getLeft().equals(caseTypeId))
+                .findFirst().orElse(null);
+
+        if (targetPairList != null && targetPairList.getRight().size() == ONE) {
+            return targetPairList.getRight().get(0);
+        }
+
+        return null;
+    }
+
+    public SubmitEvent getSourceSubmitEventFromPair(List<Pair<String, List<SubmitEvent>>> listOfPairs,
+                                                    String caseTypeId) {
+        if (listOfPairs.size() != TWO) {
+            return null;
+        }
+
+        Pair<String, List<SubmitEvent>> sourcePairList = listOfPairs.stream()
+                .filter(pair -> !pair.getLeft().equals(caseTypeId))
+                .findFirst().orElse(null);
+        if (sourcePairList != null && sourcePairList.getRight().size() == ONE) {
+            return sourcePairList.getRight().get(0);
+        }
+        return null;
+    }
+
+    private String getSourceCaseTypeId(List<Pair<String, List<SubmitEvent>>> listOfPairs,
+                                       String caseTypeId) {
+        Pair<String, List<SubmitEvent>> sourcePairList = listOfPairs.stream()
+                .filter(pair -> !pair.getLeft().equals(caseTypeId))
+                .findFirst().orElse(null);
+        if (sourcePairList == null) {
+            return null;
+        }
+        return sourcePairList.getLeft();
     }
 
     // Checked field values : ethos ref, claimant, submission ref(i.e. FeeGroupReference),

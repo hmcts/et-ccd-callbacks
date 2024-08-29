@@ -24,6 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -446,6 +447,99 @@ class MigratedCaseLinkUpdatesTaskTest {
         boolean result = migratedCaseLinkUpdatesTask.haveSameCheckedFieldValues(targetSubmitEvent, sourceSubmitEvent);
 
         assertFalse(result);
+    }
+
+    @Test
+    void testGetTargetSubmitEventFromPair_ListSizeNotTwo() {
+        List<Pair<String, List<SubmitEvent>>> listOfPairs = List.of(
+                Pair.of("caseTypeId1", List.of(new SubmitEvent()))
+        );
+
+        SubmitEvent result = migratedCaseLinkUpdatesTask.getTargetSubmitEventFromPair(listOfPairs,
+                "caseTypeId1");
+
+        assertNull(result, "Expected null when listOfPairs size is not TWO.");
+    }
+
+    @Test
+    void testGetTargetSubmitEventFromPair_NoMatchingCaseTypeId() {
+        List<Pair<String, List<SubmitEvent>>> listOfPairs = List.of(
+                Pair.of("caseTypeId1", List.of(new SubmitEvent())),
+                Pair.of("caseTypeId2", List.of(new SubmitEvent()))
+        );
+
+        SubmitEvent result = migratedCaseLinkUpdatesTask.getTargetSubmitEventFromPair(listOfPairs,
+                "nonExistentCaseTypeId");
+
+        assertNull(result, "Expected null when no matching caseTypeId is found.");
+    }
+
+    @Test
+    void testGetTargetSubmitEventFromPair_MatchingCaseTypeId() {
+        SubmitEvent expectedEvent = new SubmitEvent();
+        List<Pair<String, List<SubmitEvent>>> listOfPairs = List.of(
+                Pair.of("caseTypeId1", List.of(expectedEvent)),
+                Pair.of("caseTypeId2", List.of(new SubmitEvent()))
+        );
+
+        SubmitEvent result = migratedCaseLinkUpdatesTask.getTargetSubmitEventFromPair(listOfPairs,
+                "caseTypeId1");
+
+        assertEquals(expectedEvent, result, "Expected the SubmitEvent matching the given caseTypeId.");
+    }
+
+    @Test
+    void testGetTargetSubmitEventFromPair_EmptySubmitEventList() {
+        List<Pair<String, List<SubmitEvent>>> listOfPairs = List.of(
+                Pair.of("caseTypeId1", List.of()),
+                Pair.of("caseTypeId2", List.of(new SubmitEvent()))
+        );
+
+        SubmitEvent result = migratedCaseLinkUpdatesTask.getTargetSubmitEventFromPair(listOfPairs,
+                "caseTypeId1");
+
+        assertNull(result, "Expected null when the SubmitEvent list is empty.");
+    }
+
+    @Test
+    void testGetTargetSubmitEventFromPair_NullPairReturned() {
+        List<Pair<String, List<SubmitEvent>>> listOfPairs = List.of(
+                Pair.of("caseTypeId1", List.of(new SubmitEvent())),
+                Pair.of("caseTypeId2", List.of(new SubmitEvent()))
+        );
+
+        SubmitEvent result = migratedCaseLinkUpdatesTask.getTargetSubmitEventFromPair(listOfPairs,
+                "nonExistentCaseTypeId");
+
+        assertNull(result, "Expected null when no matching caseTypeId is found.");
+    }
+
+    @Test
+    void testGetSourceSubmitEventFromPair__EmptySourceSubmitEventList() {
+        List<Pair<String, List<SubmitEvent>>> listOfPairs = List.of(
+                Pair.of("caseTypeId1", List.of()),
+                Pair.of("caseTypeId2", List.of(new SubmitEvent()))
+        );
+
+        SubmitEvent result = migratedCaseLinkUpdatesTask.getSourceSubmitEventFromPair(listOfPairs,
+                "caseTypeId2");
+
+        assertNull(result, "Expected null when the SubmitEvent list is empty.");
+    }
+
+    @Test
+    void testGetSourceSubmitEventFromPair_MatchingCaseTypeId() {
+        SubmitEvent expectedEvent = new SubmitEvent();
+        List<Pair<String, List<SubmitEvent>>> listOfPairs = List.of(
+                Pair.of("caseTypeId1", List.of(expectedEvent)),
+                Pair.of("caseTypeId2", List.of(new SubmitEvent()))
+        );
+
+        SubmitEvent result = migratedCaseLinkUpdatesTask.getSourceSubmitEventFromPair(listOfPairs,
+                "caseTypeId2");
+
+        assertEquals(expectedEvent, result,
+                "Expected the Source SubmitEvent not matching the current/given caseTypeId.");
     }
 
     private SubmitEvent createSubmitEvent(Long caseId, String ccdId) {

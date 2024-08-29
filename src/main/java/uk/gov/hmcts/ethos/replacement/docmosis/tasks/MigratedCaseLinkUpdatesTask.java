@@ -179,7 +179,6 @@ public class MigratedCaseLinkUpdatesTask {
         caseTypeIdsToCheck.forEach(sourceCaseTypeId -> {
             try {
                 String followUpQuery = buildFollowUpQuery(ethosReference);
-                log.info("The follow up query is: {} ", followUpQuery);
                 //for each transferred case, get duplicates by ethos ref
                 List<SubmitEvent> duplicateCases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken,
                         sourceCaseTypeId, followUpQuery);

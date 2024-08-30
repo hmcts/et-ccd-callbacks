@@ -21,7 +21,8 @@ function verifyClaimantHearingPreferences() {
     I.fillField('#claimantHearingPreference_reasonable_adjustments_detail','Wheelchair please');
     I.click('#claimantHearingPreference_contact_language-English');
     I.click('#claimantHearingPreference_hearing_language-Welsh');
-    I.click('Continue');
+    I.click('Submit');
+    I.wait(5);
     I.click('Submit');
 }
 module.exports = { verifyClaimantHearingPreferences };

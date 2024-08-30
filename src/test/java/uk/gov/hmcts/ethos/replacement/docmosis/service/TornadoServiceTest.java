@@ -347,22 +347,26 @@ class TornadoServiceTest {
     }
 
     private void mockConnectionSuccess() throws IOException {
-        InputStream inputStream = mock(InputStream.class);
-        OutputStream outputStream = mock(OutputStream.class);
-        when(inputStream.read(any(byte[].class))).thenReturn(-1);
-        mockConnection.setInputStream(inputStream);
-        mockConnection.setOutputStream(outputStream);
-        mockConnection.setResponseCode(HTTP_OK);
+        try (InputStream inputStream = mock(InputStream.class);
+             OutputStream outputStream = mock(OutputStream.class)) {
+            when(inputStream.read(any(byte[].class))).thenReturn(-1);
+            mockConnection.setInputStream(inputStream);
+            mockConnection.setOutputStream(outputStream);
+            mockConnection.setResponseCode(HTTP_OK);
+        }
     }
 
     private void mockConnectionError() throws IOException {
-        InputStream mockInputStream = mock(InputStream.class);
-        when(mockInputStream.read(any(byte[].class))).thenReturn(-1);
-        when(mockInputStream.read(any(byte[].class), anyInt(), anyInt())).thenReturn(-1);
-        OutputStream mockOutputStream = mock(OutputStream.class);
-        mockConnection.setErrorStream(mockInputStream);
-        mockConnection.setOutputStream(mockOutputStream);
-        mockConnection.setResponseCode(HTTP_INTERNAL_ERROR);
+        try (InputStream mockInputStream = mock(InputStream.class);
+             OutputStream mockOutputStream = mock(OutputStream.class)) {
+
+            when(mockInputStream.read(any(byte[].class))).thenReturn(-1);
+            when(mockInputStream.read(any(byte[].class), anyInt(), anyInt())).thenReturn(-1);
+
+            mockConnection.setErrorStream(mockInputStream);
+            mockConnection.setOutputStream(mockOutputStream);
+            mockConnection.setResponseCode(HTTP_INTERNAL_ERROR);
+        }
     }
 
     private ListingData createListingData() {

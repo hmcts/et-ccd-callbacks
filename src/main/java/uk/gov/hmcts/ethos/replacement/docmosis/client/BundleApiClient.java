@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.bundle.MultipleBundleCreateRequest;
 @FeignClient(name = "bundle", url = "${em-ccd-orchestrator.api.url}",
         configuration = FeignClientProperties.FeignClientConfiguration.class)
 public interface BundleApiClient {
-    @PostMapping(value = "api/stitch-ccd-bundles", consumes = "application/json")
+    @PostMapping(value = "api/new-bundle", consumes = "application/json")
     BundleCreateResponse stitchBundle(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @RequestHeader("ServiceAuthorization") String serviceAuthorization,

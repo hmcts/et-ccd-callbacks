@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
@@ -55,10 +54,7 @@ public class DigitalCaseFileService {
      * @return list of bundles
      */
     public List<Bundle> stitchCaseFile(CaseDetails caseDetails, String userToken) {
-        setBundleConfig(caseDetails.getCaseData());
-        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getCaseBundles())) {
-            caseDetails.getCaseData().setCaseBundles(createBundleData(caseDetails.getCaseData()));
-        }
+        caseDetails.getCaseData().setCaseBundles(createBundleData(caseDetails.getCaseData()));
         BundleCreateResponse bundleCreateResponse = stitchCaseFile(userToken, authTokenGenerator.generate(),
                 bundleRequestMapper(caseDetails));
         return bundleCreateResponse.getData().getCaseBundles();

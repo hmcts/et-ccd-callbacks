@@ -97,9 +97,9 @@ class TseHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource("populateSelectApplicationDropdown_hasTribunalResponse")
-    void populateSelectApplicationDropdown_hasTribunalResponse(String respondentResponseRequired,
-                                                               int numberOfApplication) {
+    @MethodSource("populateSelectApplicationDropdownHasTribunalResponse")
+    void populateSelectApplicationDropdownHasTribunalResponse(String respondentResponseRequired,
+                                                              int numberOfApplication) {
         genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(
             respondentResponseRequired);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
@@ -109,7 +109,7 @@ class TseHelperTest {
         assertThat(actual.getListItems().size(), is(numberOfApplication));
     }
 
-    private static Stream<Arguments> populateSelectApplicationDropdown_hasTribunalResponse() {
+    private static Stream<Arguments> populateSelectApplicationDropdownHasTribunalResponse() {
         return Stream.of(
             Arguments.of(NO, 0),
             Arguments.of(null, 0),

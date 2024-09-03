@@ -59,21 +59,21 @@ public class TseClaimantRepReplyService {
     private final ClaimantTellSomethingElseService claimantTseService;
     private final UserIdamService userIdamService;
 
-    @Value("${template.tse.respondent.respond.claimant}")
-    private String tseRespondentResponseTemplateId;
-    @Value("${template.tse.respondent.respond.cyClaimant}")
-    private String cyTseRespondentResponseTemplateId;
-    @Value("${template.tse.respondent.respond.respondent.rule-92-no}")
+    @Value("${template.tse.claimant-rep.respond.respondent}")
+    private String tseClaimantRepResponseTemplateId;
+    @Value("${template.tse.claimant-rep.respond.cyRespondent}")
+    private String cyTseClaimantRepResponseTemplateId;
+    @Value("${template.tse.claimant-rep.respond.claimant-rep.rule-92-no}")
     private String acknowledgementRule92NoEmailTemplateId;
-    @Value("${template.tse.respondent.respond.respondent.rule-92-yes}")
+    @Value("${template.tse.claimant-rep.respond.claimant-rep.rule-92-yes}")
     private String acknowledgementRule92YesEmailTemplateId;
-    @Value("${template.tse.respondent.reply-to-tribunal.tribunal}")
+    @Value("${template.tse.claimant-rep.reply-to-tribunal.tribunal}")
     private String replyToTribunalEmailToTribunalTemplateId;
-    @Value("${template.tse.respondent.reply-to-tribunal.claimant}")
+    @Value("${template.tse.claimant-rep.reply-to-tribunal.respondent}")
     private String replyToTribunalEmailToClaimantTemplateId;
-    @Value("${template.tse.respondent.reply-to-tribunal.respondent.rule-92-yes}")
+    @Value("${template.tse.claimant-rep.reply-to-tribunal.claimant-rep.rule-92-yes}")
     private String replyToTribunalAckEmailToLRRule92YesTemplateId;
-    @Value("${template.tse.respondent.reply-to-tribunal.respondent.rule-92-no}")
+    @Value("${template.tse.claimant-rep.reply-to-tribunal.claimant-rep.rule-92-no}")
     private String replyToTribunalAckEmailToLRRule92NoTemplateId;
 
 
@@ -321,8 +321,8 @@ public class TseClaimantRepReplyService {
         boolean isWelsh = featureToggleService.isWelshEnabled()
                 && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
         String emailTemplate = isWelsh
-                ? cyTseRespondentResponseTemplateId
-                : tseRespondentResponseTemplateId;
+                ? cyTseClaimantRepResponseTemplateId
+                : tseClaimantRepResponseTemplateId;
 
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",

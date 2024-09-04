@@ -336,7 +336,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.3.1'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.4.0'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.17.1'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
@@ -477,6 +477,8 @@ bootWithCCD {
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
+    // Allows latest XUI image without WA by not specifying EMPLOYMENT. Add EMPLOYMENT to enable WA.
+    environment 'WA_SUPPORTED_JURISDICTIONS', 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
 
     // xui-manage-org
     environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
@@ -491,6 +493,6 @@ bootWithCCD {
 }
 
 pmdMain.maxFailures = 257
-pmdTest.maxFailures = 183
+pmdTest.maxFailures = 72
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

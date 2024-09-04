@@ -43,6 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 class MultipleBatchUpdate2ServiceTest {
 
+    private static final int SIZE = 4;
     @Mock
     private ExcelDocManagementService excelDocManagementService;
     @Mock
@@ -281,7 +282,7 @@ class MultipleBatchUpdate2ServiceTest {
                 new ArrayList<>(),
                 multipleObjectsFlags);
 
-        verify(ccdClient, times(4)).removeUserFromMultiple(
+        verify(ccdClient, times(SIZE)).removeUserFromMultiple(
                 any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
@@ -315,7 +316,7 @@ class MultipleBatchUpdate2ServiceTest {
                 new ArrayList<>(),
                 multipleObjectsFlags);
 
-        verify(ccdClient, times(4)).removeUserFromMultiple(
+        verify(ccdClient, times(SIZE)).removeUserFromMultiple(
                 any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
@@ -357,7 +358,7 @@ class MultipleBatchUpdate2ServiceTest {
                 new ArrayList<>(),
                 multipleObjectsFlags);
 
-        verify(ccdClient, times(4)).removeUserFromMultiple(
+        verify(ccdClient, times(SIZE)).removeUserFromMultiple(
                 any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(1, multipleDetails.getCaseData().getLegalRepCollection().size());
@@ -382,7 +383,7 @@ class MultipleBatchUpdate2ServiceTest {
                 new ArrayList<>(),
                 multipleObjectsFlags);
 
-        verify(ccdClient, times(4)).removeUserFromMultiple(
+        verify(ccdClient, times(SIZE)).removeUserFromMultiple(
                 any(), any(), any(), any(), any());
         verifyNoMoreInteractions(ccdClient);
         assertEquals(2, multipleDetails.getCaseData().getLegalRepCollection().size());
@@ -456,7 +457,7 @@ class MultipleBatchUpdate2ServiceTest {
                         multipleDetails
                 ));
         assertEquals("Call to remove legal rep from Multiple Case failed for 245000", exception.getMessage());
-        assertEquals(4, multipleDetails.getCaseData().getLegalRepCollection().size());
+        assertEquals(SIZE, multipleDetails.getCaseData().getLegalRepCollection().size());
     }
 
     @Test
@@ -478,15 +479,16 @@ class MultipleBatchUpdate2ServiceTest {
                 ));
         assertEquals("Call to remove legal rep from Multiple Case failed for 245000 with call failed",
                 exception.getMessage());
-        assertEquals(4, multipleDetails.getCaseData().getLegalRepCollection().size());
+        assertEquals(SIZE, multipleDetails.getCaseData().getLegalRepCollection().size());
     }
 
     private void checkAndThrowException(MultipleBatchUpdate2Service service,
                                         String userToken,
                                         MultipleDetails multipleDetails) throws CaseCreationException, IOException {
-        service.batchUpdate2Logic(userToken, multipleDetails, new ArrayList<>(),
-                multipleObjectsFlags);
-        if (multipleDetails.getCaseData().getLegalRepCollection().size() != 4) {
+        service.batchUpdate2Logic(userToken, multipleDetails, new ArrayList<>(), multipleObjectsFlags);
+
+        int legalRepCount = multipleDetails.getCaseData().getLegalRepCollection().size();
+        if (legalRepCount != SIZE) {
             throw new CaseCreationException("Call to remove legal rep from Multiple Case failed for 245000");
         }
     }

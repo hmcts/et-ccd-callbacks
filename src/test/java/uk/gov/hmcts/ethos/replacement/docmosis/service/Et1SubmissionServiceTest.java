@@ -75,7 +75,6 @@ class Et1SubmissionServiceTest {
     private RestTemplate restTemplate;
     @MockBean
     private EmailService emailService;
-    private PdfService pdfService;
 
     private Et1SubmissionService et1SubmissionService;
     private CaseDetails caseDetails;
@@ -88,7 +87,7 @@ class Et1SubmissionServiceTest {
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
         emailService = spy(new EmailUtils());
-        pdfService = new PdfService(new PdfMapperService());
+        PdfService pdfService = new PdfService(new PdfMapperService());
         PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
         TribunalOfficesService tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);

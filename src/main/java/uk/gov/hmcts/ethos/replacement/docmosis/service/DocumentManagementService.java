@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -42,8 +41,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.launchdarkly.shaded.com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singletonList;
@@ -125,18 +122,18 @@ public class DocumentManagementService {
                 log.info("Using Document Upload Client");
                 UserDetails user = userIdamService.getUserDetails(authToken);
                 UploadResponse response = documentUploadClient.upload(
-                       authToken,
-                       authTokenGenerator.generate(),
+                        authToken,
+                        authTokenGenerator.generate(),
                         user.getUid(),
                         new ArrayList<>(singletonList("caseworker-employment")),
                         uk.gov.hmcts.reform.document.domain.Classification.PUBLIC,
                         singletonList(file)
                 );
                 Document document = response.getEmbedded().getDocuments().stream()
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new DocumentManagementException("Document management failed uploading file"
-                                    + OUTPUT_FILE_NAME));
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new DocumentManagementException("Document management failed uploading file"
+                                        + OUTPUT_FILE_NAME));
                 log.info("Uploaded document successful");
                 return URI.create(document.links.self.href);
             }
@@ -189,17 +186,9 @@ public class DocumentManagementService {
     }
 
     public String getDocumentUUID(String urlString) {
-        String regex = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(urlString);
-        if (matcher.find()) {
-            return matcher.group();
-        }
-        throw new NotFoundException("UUID not found in string" + urlString);
-        /*
         String documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
         documentUUID = documentUUID.replace(BINARY, "");
-        return documentUUID;*/
+        return documentUUID;
     }
 
     /**

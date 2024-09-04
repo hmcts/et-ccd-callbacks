@@ -14,4 +14,4 @@ Scenario('Verify Leeds case List Hearing', async ({I}) => {
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
     await hearingDetails(I, eventNames.HEARING_DETAILS, 'Yes');
 
-}).tag('@RET-BAT').tag('@local');
+}).tag('@RET-BAT').tag('@nightly');

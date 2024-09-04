@@ -4230,17 +4230,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.6.8":
-  version: 1.6.8
-  resolution: "axios@npm:1.6.8"
-  dependencies:
-    follow-redirects: ^1.15.6
-    form-data: ^4.0.0
-    proxy-from-env: ^1.1.0
-  checksum: bf007fa4b207d102459300698620b3b0873503c6d47bf5a8f6e43c0c64c90035a4f698b55027ca1958f61ab43723df2781c38a99711848d232cad7accbcdfcdd
-  languageName: node
-  linkType: hard
-
 "axios@npm:1.7.2":
   version: 1.7.2
   resolution: "axios@npm:1.7.2"
@@ -4260,6 +4249,17 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 2859fe01437cf133eee35571abc1d4b5224bb13e530e66cb3581ca226e170541dd5eef9f46abb41592cee0a2f54930c9e4978354e0cf1064748fc20d9a05e9d5
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.7.7":
+  version: 1.7.7
+  resolution: "axios@npm:1.7.7"
+  dependencies:
+    follow-redirects: ^1.15.6
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: 882d4fe0ec694a07c7f5c1f68205eb6dc5a62aecdb632cc7a4a3d0985188ce3030e0b277e1a8260ac3f194d314ae342117660a151fabffdc5081ca0b5a8b47fe
   languageName: node
   linkType: hard
 
@@ -7966,7 +7966,7 @@ __metadata:
     sinon: 18.0.0
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 4.2.1
+    sonarqube-scanner: 4.2.2
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
@@ -16183,12 +16183,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:4.2.1":
-  version: 4.2.1
-  resolution: "sonarqube-scanner@npm:4.2.1"
+"sonarqube-scanner@npm:4.2.2":
+  version: 4.2.2
+  resolution: "sonarqube-scanner@npm:4.2.2"
   dependencies:
     adm-zip: 0.5.12
-    axios: 1.6.8
+    axios: 1.7.7
     commander: 12.0.0
     fs-extra: 11.2.0
     hpagent: 1.2.0
@@ -16201,7 +16201,7 @@ __metadata:
     tar-stream: 3.1.7
   bin:
     sonar-scanner: bin/sonar-scanner
-  checksum: 2b8def5021cd5197d4a90229a2348200c1d870965d30ab8a34db80fd9932baea0e483ea7821b33b8126e948934ab641fd026300976985b812b9f69ca025b2bb8
+  checksum: ddbd66cb29e1ca6225fcbe2b7967158c9849f670e8a2e8ffb7a28850edf4fa80089f246daf6696f678570f1664d90b784307c6e3c0c818e95a57742b88df4b13
   languageName: node
   linkType: hard
 

@@ -38,7 +38,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseClaimantRepReplyController.class, JsonMapper.class})
-public class TseClaimantRepReplyControllerTest extends BaseControllerTest {
+class TseClaimantRepReplyControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/tseClaimantRepResponse/aboutToStart";
     private static final String MID_POPULATE_REPLY_URL = "/tseClaimantRepResponse/midPopulateReply";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseClaimantRepResponse/aboutToSubmit";

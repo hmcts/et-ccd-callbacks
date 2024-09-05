@@ -367,7 +367,8 @@ class TseClaimantRepReplyServiceTest {
         mockStatic.when(() -> TseHelper.getClaimantRepSelectedApplicationType(any()))
                 .thenReturn(getApplicationType(respondentResponseRequired));
 
-        MatcherAssert.assertThat(tseClaimantRepReplyService.isRespondingToTribunal(caseData), is(isRespondingToTribunal));
+        MatcherAssert.assertThat(tseClaimantRepReplyService.isRespondingToTribunal(caseData),
+                is(isRespondingToTribunal));
     }
 
     private static Stream<Arguments> isRespondingToTribunal() {

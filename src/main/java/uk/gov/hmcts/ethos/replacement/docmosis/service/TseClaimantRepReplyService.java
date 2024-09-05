@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
@@ -28,7 +27,6 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
@@ -39,6 +37,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentEmailAddressList;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
@@ -140,22 +139,14 @@ public class TseClaimantRepReplyService {
     }
 
     private static String getApplicationDoc(GenericTseApplicationType applicationType) {
-        if (CLAIMANT_TITLE.equals(applicationType.getApplicant())) {
-            return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
-                    getClaimantApplicationType(applicationType));
-        } else {
+        if (RESPONDENT_TITLE.equals(applicationType.getApplicant())) {
             return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
                     applicationType.getType());
+        } else {
+            String claimantApplicationType = claimantSelectApplicationToType(applicationType.getType());
+            return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
+                    claimantApplicationType);
         }
-    }
-
-    private static String getClaimantApplicationType(GenericTseApplicationType applicationType) {
-        return ClaimantTse.APP_TYPE_MAP.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().equals(applicationType.getType()))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse("");
     }
 
     /**
@@ -186,8 +177,8 @@ public class TseClaimantRepReplyService {
      * @param caseData in which the case details are extracted from
      */
     void updateApplicationState(CaseData caseData) {
-        GenericTseApplicationType selectedApplicationType = getRespondentSelectedApplicationType(caseData);
-        if (selectedApplicationType.getApplicant().equals(CLAIMANT_TITLE)) {
+        GenericTseApplicationType selectedApplicationType = getClaimantRepSelectedApplicationType(caseData);
+        if (selectedApplicationType.getApplicant().equals(RESPONDENT_TITLE)) {
             if (isRespondingToTribunal(caseData)) {
                 selectedApplicationType.setApplicationState(WAITING_FOR_THE_TRIBUNAL);
             } else {
@@ -350,7 +341,7 @@ public class TseClaimantRepReplyService {
         caseData.setTseResponseSupportingMaterial(null);
         caseData.setTseResponseCopyToOtherParty(null);
         caseData.setTseResponseCopyNoGiveDetails(null);
-        caseData.setTseRespondSelectApplication(null);
+        caseData.setClaimantRepRespondSelectApplication(null);
         caseData.setTseRespondingToTribunal(null);
         caseData.setTseRespondingToTribunalText(null);
     }

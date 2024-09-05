@@ -43,7 +43,6 @@ public class TseClaimantRepReplyController {
 
     private final TseClaimantRepReplyService tseClaimantRepReplyService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_BODY = """
         ### What happens next \r
         \r

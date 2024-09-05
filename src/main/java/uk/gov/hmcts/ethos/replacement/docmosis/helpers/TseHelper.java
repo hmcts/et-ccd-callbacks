@@ -252,7 +252,8 @@ public final class TseHelper {
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
      */
-    public static String getClaimantReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+    public static String getClaimantReplyDocumentRequest(CaseData caseData, String accessKey)
+            throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getClaimantRepSelectedApplicationType(caseData);
         assert selectedApplication != null;
 

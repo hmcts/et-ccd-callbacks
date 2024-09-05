@@ -76,7 +76,6 @@ public class TseClaimantRepReplyService {
     @Value("${template.tse.claimant-rep.reply-to-tribunal.claimant-rep.rule-92-no}")
     private String replyToTribunalAckEmailToLRRule92NoTemplateId;
 
-
     private static final String GIVE_MISSING_DETAIL = "Use the text box or supporting materials to give details.";
 
     public boolean isRespondingToTribunal(CaseData caseData) {

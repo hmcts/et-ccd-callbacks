@@ -1,5 +1,5 @@
 {
-  "goButton": "form button[type=\"submit\"]",
+  "goButton": "[type='submit']",
   "continueButton": "div.form-group.form-group-related > button[type=\"submit\"]",
   "continue": "Continue",
   "caseReference": "dt > ccd-markdown > div > markdown > h1",

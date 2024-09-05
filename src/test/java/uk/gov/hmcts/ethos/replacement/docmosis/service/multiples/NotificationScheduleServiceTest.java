@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SingleCasesReadingService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -27,8 +26,6 @@ class NotificationScheduleServiceTest {
     SingleCasesReadingService singleCasesReadingService;
 
     private String userToken;
-
-    private List<String> errors;
     private List<String> caseIds;
 
     private NotificationScheduleService notificationScheduleService;
@@ -40,7 +37,6 @@ class NotificationScheduleServiceTest {
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleDataForNotification());
         userToken = "authString";
-        errors = new ArrayList<>();
         caseIds = Arrays.asList("245000/2020", "245003/2020");
         ReflectionTestUtils.setField(notificationScheduleService,
                 "esPartitionSize",
@@ -58,8 +54,7 @@ class NotificationScheduleServiceTest {
         var result = notificationScheduleService.getSchedulePayloadCollection(
                 userToken,
                 ENGLANDWALES_BULK_CASE_TYPE_ID,
-                caseIds,
-                errors);
+                caseIds);
 
         Assertions.assertEquals(2, result.size());
     }
@@ -73,8 +68,7 @@ class NotificationScheduleServiceTest {
                 .thenReturn(schedulePayloadEvents);
         var result = notificationScheduleService.getSchedulePayloadCollection(userToken,
                 ENGLANDWALES_BULK_CASE_TYPE_ID,
-                caseIds,
-                errors);
+                caseIds);
 
         Assertions.assertEquals(0, result.size());
     }

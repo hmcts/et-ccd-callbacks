@@ -10,4 +10,4 @@ Scenario('Move Accepted case to case closed state error check', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
     await caseDetailsEvent(I, caseId, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
-}).tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@testlocal').retry(testConfig.TestRetryScenarios);

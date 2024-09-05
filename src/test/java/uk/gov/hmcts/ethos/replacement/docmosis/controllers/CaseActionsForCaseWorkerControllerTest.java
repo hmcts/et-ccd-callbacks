@@ -35,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -188,6 +189,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private Et1SubmissionService et1SubmissionService;
 
     @MockBean
     private NocRespondentHelper nocRespondentHelper;

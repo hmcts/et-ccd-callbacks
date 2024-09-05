@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -32,6 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -78,6 +78,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @RequiredArgsConstructor
 public class Et1VettingService {
 
+    public static final String ADDRESS_NOT_ENTERED = "Address not entered";
     private final TornadoService tornadoService;
     private final JpaVenueService jpaVenueService;
 
@@ -392,17 +393,35 @@ public class Et1VettingService {
     }
 
     public String toAddressWithTab(Address address) {
+        if (addressIsEmpty(address)) {
+            return ADDRESS_NOT_ENTERED;
+        }
         StringBuilder claimantAddressStr = new StringBuilder();
-        claimantAddressStr.append(address.getAddressLine1());
-        if (!Strings.isNullOrEmpty(address.getAddressLine2())) {
+        claimantAddressStr.append(defaultIfEmpty(address.getAddressLine1(), ""));
+        if (!isNullOrEmpty(address.getAddressLine2())) {
             claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine2());
         }
-        if (!Strings.isNullOrEmpty(address.getAddressLine3())) {
+        if (!isNullOrEmpty(address.getAddressLine3())) {
             claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine3());
         }
-        claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown())
-                .append(BR_WITH_TAB).append(address.getPostCode());
+        if (!isNullOrEmpty(address.getPostTown())) {
+            claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown());
+        }
+        if (!isNullOrEmpty(address.getPostCode())) {
+            claimantAddressStr.append(BR_WITH_TAB).append(address.getPostCode());
+        }
         return claimantAddressStr.toString();
+    }
+
+    private boolean addressIsEmpty(Address address) {
+        return address == null
+                || isNullOrEmpty(address.getAddressLine1())
+                && isNullOrEmpty(address.getAddressLine2())
+                && isNullOrEmpty(address.getAddressLine3())
+                && isNullOrEmpty(address.getPostTown())
+                && isNullOrEmpty(address.getPostCode())
+                && isNullOrEmpty(address.getCountry())
+                && isNullOrEmpty(address.getCounty());
     }
 
     private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {
@@ -412,7 +431,7 @@ public class Et1VettingService {
                     JurisdictionCode.valueOf(codeName.replaceAll("[^a-zA-Z]+", ""))
                         .getDescription()));
             } catch (IllegalArgumentException e) {
-                log.warn("The jurisdiction code " + codeName + " is invalid.", e);
+                log.warn("The jurisdiction code {} is invalid.", codeName, e);
             }
         }
     }

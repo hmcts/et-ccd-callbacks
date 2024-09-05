@@ -9,6 +9,6 @@ module.exports = async function (userName, password) {
     I.fillField('password', password);
     I.wait(3);
     I.forceClick('[name="save"]');
-    I.waitForElement('.hmcts-button--secondary',25);
-    I.see('Case list');
+    I.wait(10);
+    I.see('Sign out');
 };

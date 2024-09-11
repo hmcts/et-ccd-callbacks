@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRolesRequest;
@@ -32,6 +34,8 @@ public class CcdCaseAssignment {
 
     private static final String LEGAL_REP_ID_NOT_FOUND_ERROR =
             "Add Respondent Representative to Multiple failed. Legal Rep Id not found for case {}";
+    public static final String ERROR_FROM_CCD = "Error from CCD - {}";
+    public static final String CASE_USERS = "/case-users";
 
     private final RestTemplate restTemplate;
     private final CcdClient ccdClient;
@@ -136,17 +140,16 @@ public class CcdCaseAssignment {
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
-                ccdDataStoreUrl + "/case-users",
+                    ccdDataStoreUrl + CASE_USERS,
                 HttpMethod.DELETE,
                 requestEntity,
                 CaseAssignmentUserRolesResponse.class);
         } catch (RestClientResponseException exception) {
-            log.info("Error from CCD - {}", exception.getMessage());
+            log.info(ERROR_FROM_CCD, exception.getMessage());
             throw exception;
         }
 
-        log.info("Remove case user roles. Http status received from CCD API; {}",
-            response.getStatusCodeValue());
+        log.info("Remove case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
     }
 
     public void addCaseUserRoles(
@@ -158,17 +161,16 @@ public class CcdCaseAssignment {
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
-                ccdDataStoreUrl + "/case-users",
+                    ccdDataStoreUrl + CASE_USERS,
                 HttpMethod.POST,
                 requestEntity,
                     CaseAssignmentUserRolesResponse.class);
         } catch (RestClientResponseException exception) {
-            log.info("Error from CCD - {}", exception.getMessage());
+            log.info(ERROR_FROM_CCD, exception.getMessage());
             throw exception;
         }
 
-        log.info("Add case user roles. Http status received from CCD API; {}",
-            response.getStatusCodeValue());
+        log.info("Add case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
     }
 
     public CaseAssignmentUserWithOrganisationRolesRequest getCaseAssignmentRequest(
@@ -189,5 +191,54 @@ public class CcdCaseAssignment {
                 .caseRole(role)
                 .userId(userId)
                 .build();
+    }
+
+    /**
+     * Retrieve the users and roles assigned to a given an ID.
+     * @param caseId the case ID
+     * @return the response from the CCD API which contains a list of users and roles
+     * @throws IOException if there is an error with the request
+     */
+    public CaseAssignedUserRolesResponse getCaseUserRoles(String caseId) throws IOException {
+        String userToken = adminUserService.getAdminUserToken();
+        HttpEntity<Object> requestEntity = new HttpEntity<>(ccdClient.buildHeaders(userToken));
+        ResponseEntity<CaseAssignedUserRolesResponse> response;
+        try {
+            response = restTemplate.exchange(
+                ccdDataStoreUrl + "/case-users?case_ids=" + caseId,
+                HttpMethod.GET,
+                requestEntity,
+                CaseAssignedUserRolesResponse.class);
+        } catch (RestClientResponseException exception) {
+            log.info(ERROR_FROM_CCD, exception.getMessage());
+            throw exception;
+        }
+
+        log.info("Get case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
+        return response.getBody();
+    }
+
+    /**
+     * Add a user role to a case.
+     * @param caseAssignmentUserRolesRequest the request containing the user role to add
+     * @throws IOException if there is an error with the request
+     */
+    public void addCaseUserRole(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) throws IOException {
+        String userToken = adminUserService.getAdminUserToken();
+        HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
+                new HttpEntity<>(caseAssignmentUserRolesRequest, ccdClient.buildHeaders(userToken));
+        ResponseEntity<CaseAssignmentUserRolesResponse> response;
+        try {
+            response = restTemplate.exchange(
+                    ccdDataStoreUrl + CASE_USERS,
+                    HttpMethod.POST,
+                    requestEntity,
+                    CaseAssignmentUserRolesResponse.class);
+        } catch (RestClientResponseException exception) {
+            log.info(ERROR_FROM_CCD, exception.getMessage());
+            throw exception;
+        }
+
+        log.info("Add case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
     }
 }

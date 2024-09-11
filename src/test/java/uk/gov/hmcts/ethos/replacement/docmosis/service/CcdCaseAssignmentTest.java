@@ -13,6 +13,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignedUserRolesResponse;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,6 +45,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService.CREATOR_ROLE;
 
 @ExtendWith(SpringExtension.class)
 class CcdCaseAssignmentTest {
@@ -248,6 +253,70 @@ class CcdCaseAssignmentTest {
                         "Unauthorized", null, null, null));
         assertThrows(RestClientResponseException.class, () -> ccdCaseAssignment.addCaseUserRoles(rolesRequest),
                 "Unauthorised S2S service");
+    }
+
+    @Test
+    void getCaseUserRoles() {
+        CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
+                .caseDataId("1234123412341234")
+                .userId(UUID.randomUUID().toString())
+                .caseRole(CREATOR_ROLE)
+                .build();
+        CaseAssignedUserRolesResponse expected = CaseAssignedUserRolesResponse.builder()
+                .caseAssignedUserRoles(List.of(caseAssignmentUserRole))
+                .build();
+
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
+                    eq(CaseAssignedUserRolesResponse.class)))
+                .thenReturn(ResponseEntity.ok(expected));
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.getCaseUserRoles("1234123412341234"));
+    }
+
+    @Test
+    void getUserCaseRoles_exception() {
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
+                eq(CaseAssignedUserRolesResponse.class)))
+                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
+                        "Unauthorized", null, null, null));
+        assertThrows(RestClientResponseException.class, () -> ccdCaseAssignment.getCaseUserRoles("1234123412341234"),
+                "Unauthorised S2S service");
+    }
+
+    @Test
+    void addCaseUserRole() {
+        CaseAssignmentUserRolesResponse expected = CaseAssignmentUserRolesResponse.builder()
+                .statusMessage("Case-User-Role assignments created successfully")
+                .build();
+        CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
+                .caseDataId("1234123412341234")
+                .userId(UUID.randomUUID().toString())
+                .caseRole(CREATOR_ROLE)
+                .build();
+        CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest = CaseAssignmentUserRolesRequest.builder()
+                .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
+                .build();
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                    eq(CaseAssignmentUserRolesResponse.class)))
+                .thenReturn(ResponseEntity.ok(expected));
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.addCaseUserRole(caseAssignmentUserRolesRequest));
+    }
+
+    @Test
+    void addCaseUserRole_exception() {
+        CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
+                .caseDataId("1234123412341234")
+                .userId(UUID.randomUUID().toString())
+                .caseRole(CREATOR_ROLE)
+                .build();
+        CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest = CaseAssignmentUserRolesRequest.builder()
+                .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
+                .build();
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class),
+                eq(CaseAssignmentUserRolesResponse.class)))
+                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
+                        "Unauthorized", null, null, null));
+        assertThrows(RestClientResponseException.class, () ->
+                        ccdCaseAssignment.addCaseUserRole(caseAssignmentUserRolesRequest), "Unauthorised S2S service");
     }
 
     private AuditEvent getAuditEvent() {

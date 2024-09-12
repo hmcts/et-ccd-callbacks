@@ -15,12 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignedUserRolesResponse;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -69,15 +69,16 @@ class CaseAccessServiceTest {
 
     @Test
     void assignClaimantCaseAccess() throws IOException {
-        CaseAssignedUserRolesResponse caseAssignedUserRolesResponse = CaseAssignedUserRolesResponse.builder()
-                .caseAssignedUserRoles(Collections.singletonList(
-                        CaseAssignmentUserRole.builder()
-                                .caseDataId("1234567890123456")
-                                .userId(UUID.randomUUID().toString())
-                                .caseRole(CREATOR_ROLE)
-                                .build()))
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder()
+                .userId(UUID.randomUUID().toString())
+                .caseId("1234567890123456")
+                .caseRole(CREATOR_ROLE)
                 .build();
-        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseAssignedUserRolesResponse);
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(caseUserAssignment))
+                .build();
+
+        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
         CaseAssignmentUserRolesResponse expected = CaseAssignmentUserRolesResponse.builder()
                 .statusMessage("Case-User-Role assignments created successfully")
                 .build();
@@ -114,39 +115,39 @@ class CaseAccessServiceTest {
 
     @Test
     void noCaseRolesReturnedFromOriginalCase() throws IOException {
-        CaseAssignedUserRolesResponse caseAssignedUserRolesResponse = CaseAssignedUserRolesResponse.builder()
-                .caseAssignedUserRoles(Collections.emptyList())
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(Collections.emptyList())
                 .build();
-        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseAssignedUserRolesResponse);
+        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
         errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
         assertEquals("Case assigned user roles list is empty", errors.get(0));
     }
 
     @Test
     void noUserIdReturnedFromOriginalCase() throws IOException {
-        CaseAssignedUserRolesResponse caseAssignedUserRolesResponse = CaseAssignedUserRolesResponse.builder()
-                .caseAssignedUserRoles(Collections.singletonList(
-                        CaseAssignmentUserRole.builder()
-                                .caseDataId("1234567890123456")
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(Collections.singletonList(
+                        CaseUserAssignment.builder()
+                                .caseId("1234567890123456")
                                 .caseRole(CREATOR_ROLE)
                                 .build()))
                 .build();
-        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseAssignedUserRolesResponse);
+        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
         errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
         assertEquals("User ID is null or empty", errors.get(0));
     }
 
     @Test
     void errorAssigningCaseAccess() throws IOException {
-        CaseAssignedUserRolesResponse caseAssignedUserRolesResponse = CaseAssignedUserRolesResponse.builder()
-                .caseAssignedUserRoles(Collections.singletonList(
-                        CaseAssignmentUserRole.builder()
-                                .caseDataId("1234567890123456")
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(Collections.singletonList(
+                        CaseUserAssignment.builder()
+                                .caseId("1234567890123456")
                                 .userId(UUID.randomUUID().toString())
                                 .caseRole(CREATOR_ROLE)
                                 .build()))
                 .build();
-        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseAssignedUserRolesResponse);
+        when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
         when(restTemplate.exchange(
                 anyString(),
                 eq(HttpMethod.POST),

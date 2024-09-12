@@ -13,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
@@ -23,11 +22,14 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -256,30 +258,18 @@ class CcdCaseAssignmentTest {
     }
 
     @Test
-    void getCaseUserRoles() {
-        CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
-                .caseDataId("1234123412341234")
-                .userId(UUID.randomUUID().toString())
-                .caseRole(CREATOR_ROLE)
+    void getCaseUserRoles() throws IOException {
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(Collections.singletonList(
+                        CaseUserAssignment.builder()
+                                .caseId("1234567890123456")
+                                .userId(UUID.randomUUID().toString())
+                                .caseRole(CREATOR_ROLE)
+                                .build()))
                 .build();
-        CaseAssignedUserRolesResponse expected = CaseAssignedUserRolesResponse.builder()
-                .caseAssignedUserRoles(List.of(caseAssignmentUserRole))
-                .build();
+        when(ccdClient.retrieveCaseAssignments(anyString(), anyString())).thenReturn(caseUserAssignmentData);
+        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.getCaseUserRoles("1234567890123456"));
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
-                    eq(CaseAssignedUserRolesResponse.class)))
-                .thenReturn(ResponseEntity.ok(expected));
-        assertThatNoException().isThrownBy(() -> ccdCaseAssignment.getCaseUserRoles("1234123412341234"));
-    }
-
-    @Test
-    void getUserCaseRoles_exception() {
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class),
-                eq(CaseAssignedUserRolesResponse.class)))
-                .thenThrow(new RestClientResponseException("Unauthorised S2S service", 401,
-                        "Unauthorized", null, null, null));
-        assertThrows(RestClientResponseException.class, () -> ccdCaseAssignment.getCaseUserRoles("1234123412341234"),
-                "Unauthorised S2S service");
     }
 
     @Test

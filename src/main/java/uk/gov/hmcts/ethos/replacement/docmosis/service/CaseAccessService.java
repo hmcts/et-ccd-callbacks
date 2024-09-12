@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,9 @@ public class CaseAccessService {
         }
 
         try {
-            List<CaseAssignmentUserRole> caseAssignedUserRolesList =
-                    caseAssignment.getCaseUserRoles(caseId).getCaseAssignedUserRoles();
+            List<CaseUserAssignment> caseAssignedUserRolesList =
+                    caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
+
             if (caseAssignedUserRolesList.isEmpty()) {
                 return List.of("Case assigned user roles list is empty");
             }
@@ -49,7 +51,7 @@ public class CaseAccessService {
             String userId = caseAssignedUserRolesList.stream()
                     .filter(caseAssignedUserRole -> CREATOR_ROLE.equals(caseAssignedUserRole.getCaseRole()))
                     .findFirst()
-                    .map(CaseAssignmentUserRole::getUserId)
+                    .map(CaseUserAssignment::getUserId)
                     .orElse("");
 
             if (isNullOrEmpty(userId)) {

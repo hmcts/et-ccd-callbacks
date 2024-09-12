@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignedUserRolesResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRole;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
@@ -199,23 +199,9 @@ public class CcdCaseAssignment {
      * @return the response from the CCD API which contains a list of users and roles
      * @throws IOException if there is an error with the request
      */
-    public CaseAssignedUserRolesResponse getCaseUserRoles(String caseId) throws IOException {
-        String userToken = adminUserService.getAdminUserToken();
-        HttpEntity<Object> requestEntity = new HttpEntity<>(ccdClient.buildHeaders(userToken));
-        ResponseEntity<CaseAssignedUserRolesResponse> response;
-        try {
-            response = restTemplate.exchange(
-                ccdDataStoreUrl + "/case-users?case_ids=" + caseId,
-                HttpMethod.GET,
-                requestEntity,
-                CaseAssignedUserRolesResponse.class);
-        } catch (RestClientResponseException exception) {
-            log.info(ERROR_FROM_CCD, exception.getMessage());
-            throw exception;
-        }
-
-        log.info("Get case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
-        return response.getBody();
+    public CaseUserAssignmentData getCaseUserRoles(String caseId) throws IOException {
+        String authToken = adminUserService.getAdminUserToken();
+        return ccdClient.retrieveCaseAssignments(authToken, caseId);
     }
 
     /**

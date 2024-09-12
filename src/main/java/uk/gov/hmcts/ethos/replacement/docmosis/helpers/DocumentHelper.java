@@ -2,8 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -14,12 +12,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -32,7 +27,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -46,12 +40,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -61,39 +53,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_WITNESS_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_WITNESS_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_CLAIM;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_C_TO_DO_SOMETHING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_R_TO_DO_SOMETHING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CHANGE_OF_PARTYS_DETAILS;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIM_REJECTED;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.COT3;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.C_HAS_NOT_COMPLIED_WITH_AN_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_PROCESSING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.OTHER;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REFERRAL_JUDICIAL_DIRECTION;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_OF_CLAIM;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.R_HAS_NOT_COMPLIED_WITH_AN_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ALL_OR_PART_CLAIM;
 import static uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem.fromUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
@@ -112,50 +71,6 @@ public final class DocumentHelper {
     public static final String HEARING_TIME = "\"Hearing_time\":\"";
     public static final String HEARING_DATE_TIME = "\"Hearing_date_time\":\"";
     public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
-    public static final List<String> HIDDEN_DOCUMENT_TYPES = List.of(
-        ET1_VETTING,
-        ET3_PROCESSING,
-        INITIAL_CONSIDERATION,
-        APP_FOR_A_WITNESS_ORDER_C,
-        REFERRAL_JUDICIAL_DIRECTION,
-        "Referral/Judicial direction",
-        COT3,
-        OTHER,
-        REJECTION_OF_CLAIM,
-        "Rejection of Claim",
-        CLAIM_REJECTED,
-        CONTACT_THE_TRIBUNAL_C,
-        TRIBUNAL_CASE_FILE
-    );
-    private static final List<String> RESPONDENT_APPLICATION_DOC_TYPE = List.of(
-        APP_TO_AMEND_RESPONSE,
-        CHANGE_OF_PARTYS_DETAILS,
-        C_HAS_NOT_COMPLIED_WITH_AN_ORDER_R,
-        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R,
-        CONTACT_THE_TRIBUNAL_R,
-        APP_TO_ORDER_THE_C_TO_DO_SOMETHING,
-        APP_FOR_A_WITNESS_ORDER_R,
-        APP_TO_POSTPONE_R,
-        APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_R,
-        APP_TO_RESTRICT_PUBLICITY_R,
-        APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM,
-        APP_TO_VARY_OR_REVOKE_AN_ORDER_R
-    );
-    private static final List<String> CLAIMANT_APPLICATION_DOC_TYPE = List.of(
-        WITHDRAWAL_OF_ALL_OR_PART_CLAIM,
-        CHANGE_OF_PARTYS_DETAILS,
-        APP_TO_POSTPONE_C,
-        APP_TO_VARY_OR_REVOKE_AN_ORDER_C,
-        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C,
-        APP_TO_AMEND_CLAIM,
-        APP_TO_ORDER_THE_R_TO_DO_SOMETHING,
-        APP_FOR_A_WITNESS_ORDER_C,
-        R_HAS_NOT_COMPLIED_WITH_AN_ORDER_C,
-        APP_TO_RESTRICT_PUBLICITY_C,
-        APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE,
-        APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C,
-        CONTACT_THE_TRIBUNAL_C
-    );
 
     private DocumentHelper() {
     }
@@ -1089,73 +1004,6 @@ public final class DocumentHelper {
         uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setSecondLevelDocumentFromType(documentType, secondLevel);
         uk.gov.hmcts.ecm.common.helpers.DocumentHelper.setDocumentTypeForDocument(documentType);
         return documentTypeItem;
-    }
-
-    /**
-     *  Filter documents that only the legal rep should be able to see.
-     */
-    public static void setLegalRepVisibleDocuments(CaseData caseData) {
-        if (caseData.getDocumentCollection() == null) {
-            return;
-        }
-
-        caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-            .filter(d -> ObjectUtils.isNotEmpty(d.getValue().getUploadedDocument()))
-            .filter(d -> !containsTypeOfDocument(d.getValue()))
-            .filter(d -> !getClaimantRule92NoDocumentBinaryUrls(caseData)
-                .contains(d.getValue().getUploadedDocument().getDocumentBinaryUrl())).toList());
-    }
-
-    private static boolean containsTypeOfDocument(DocumentType documentType) {
-        String typeOfDocument = ObjectUtils.isNotEmpty(documentType.getDocumentType())
-            ? documentType.getDocumentType()
-            : documentType.getTypeOfDocument();
-        if (ObjectUtils.isEmpty(typeOfDocument)) {
-            return false;
-        }
-        return getMergedList().contains(typeOfDocument);
-    }
-
-    private static List<String> getMergedList() {
-        return Stream.of(
-                HIDDEN_DOCUMENT_TYPES,
-                RESPONDENT_APPLICATION_DOC_TYPE,
-                CLAIMANT_APPLICATION_DOC_TYPE
-            )
-            .flatMap(List::stream)
-            .distinct()
-            .toList();
-    }
-
-    @NotNull
-    private static List<String> getClaimantRule92NoDocumentBinaryUrls(CaseData caseData) {
-        List<Optional<UploadedDocumentType>> claimantRule92NoDocuments = new ArrayList<>();
-
-        // Get all documents with claimant rule 92 no - whether on application creation or in any subsequent response
-        // These will only be supporting material as pdfs for rule 92 'no' aren't meant to be generated.
-        for (GenericTseApplicationTypeItem app : ListUtils.emptyIfNull(caseData.getGenericTseApplicationCollection())) {
-            GenericTseApplicationType appType = app.getValue();
-            if (CLAIMANT_TITLE.equals(appType.getApplicant()) && NO.equals(appType.getCopyToOtherPartyYesOrNo())) {
-                claimantRule92NoDocuments.add(Optional.ofNullable(appType.getDocumentUpload()));
-            }
-
-            for (TseRespondTypeItem response : ListUtils.emptyIfNull(appType.getRespondCollection())) {
-                TseRespondType respondType = response.getValue();
-                if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
-                    claimantRule92NoDocuments.addAll(
-                        respondType.getSupportingMaterial().stream()
-                            .map(documentType -> Optional.ofNullable(documentType.getValue().getUploadedDocument()))
-                            .toList()
-                    );
-                }
-            }
-        }
-
-        // Get document binary urls of non-null documents
-        return claimantRule92NoDocuments.stream()
-            .filter(Optional::isPresent)
-            .map(optional -> optional.get().getDocumentBinaryUrl())
-            .toList();
     }
 
     /**

@@ -62,14 +62,14 @@ public class BulkCreationService {
                 bulkDetails.getCaseData().setMultipleReference(bulkSearchService.generateMultipleRef(bulkDetails));
                 // 3) Add list of cases to the multiple bulk case collection
                 if (submitEvents.isEmpty()) {
-                    bulkRequestPayload.setBulkDetails(BulkHelper.setMultipleCollection(bulkDetails,
+                    bulkRequestPayload.setBulkDetails(BulkHelper.getMultipleCollection(bulkDetails,
                             bulkDetails.getCaseData().getMultipleCollection()));
                 } else {
                     List<MultipleTypeItem> multipleTypeItemList =
                             BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents,
                             bulkDetails.getCaseData().getMultipleReference());
                     bulkRequestPayload.setBulkDetails(
-                            BulkHelper.setMultipleCollection(bulkDetails, multipleTypeItemList));
+                            BulkHelper.getMultipleCollection(bulkDetails, multipleTypeItemList));
                 }
             } else if (UPDATE_SINGLES_STEP.equals(action)) {
                 // 4) Create an event to update multiple reference field to all cases
@@ -124,7 +124,7 @@ public class BulkCreationService {
         BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
         BulkCasesPayload bulkCasesPayload = updateBulkRequest(bulkRequest, authToken, isPersistentQ);
         if (bulkCasesPayload.getErrors().isEmpty()) {
-            bulkRequest.setCaseDetails(BulkHelper.setMultipleCollection(bulkRequest.getCaseDetails(),
+            bulkRequest.setCaseDetails(BulkHelper.getMultipleCollection(bulkRequest.getCaseDetails(),
                     bulkCasesPayload.getMultipleTypeItems()));
             bulkRequest.setCaseDetails(BulkHelper.clearSearchCollection(bulkRequest.getCaseDetails()));
         }

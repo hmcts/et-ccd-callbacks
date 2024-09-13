@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRoleWithOrganisation;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesResponse;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRole;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -127,10 +127,12 @@ public class CcdCaseAssignment {
         return "";
     }
 
-    public void removeCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) throws IOException {
+    public void removeCaseUserRoles(
+            CaseAssignmentUserWithOrganisationRolesRequest caseAssignmentUserWithOrganisationRolesRequest)
+            throws IOException {
         String userToken = adminUserService.getAdminUserToken();
-        HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
-                new HttpEntity<>(caseAssignmentUserRolesRequest, ccdClient.buildHeaders(userToken));
+        HttpEntity<CaseAssignmentUserWithOrganisationRolesRequest> requestEntity =
+                new HttpEntity<>(caseAssignmentUserWithOrganisationRolesRequest, ccdClient.buildHeaders(userToken));
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
@@ -147,10 +149,12 @@ public class CcdCaseAssignment {
             response.getStatusCodeValue());
     }
 
-    public void addCaseUserRoles(CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest) throws IOException {
+    public void addCaseUserRoles(
+            CaseAssignmentUserWithOrganisationRolesRequest caseAssignmentUserWithOrganisationRolesRequest)
+            throws IOException {
         String userToken = adminUserService.getAdminUserToken();
-        HttpEntity<CaseAssignmentUserRolesRequest> requestEntity =
-                new HttpEntity<>(caseAssignmentUserRolesRequest, ccdClient.buildHeaders(userToken));
+        HttpEntity<CaseAssignmentUserWithOrganisationRolesRequest> requestEntity =
+                new HttpEntity<>(caseAssignmentUserWithOrganisationRolesRequest, ccdClient.buildHeaders(userToken));
         ResponseEntity<CaseAssignmentUserRolesResponse> response;
         try {
             response = restTemplate.exchange(
@@ -167,17 +171,19 @@ public class CcdCaseAssignment {
             response.getStatusCodeValue());
     }
 
-    public CaseAssignmentUserRolesRequest getCaseAssignmentRequest(Long caseId, String userId, String orgId,
-                                                                   String role) {
-        return CaseAssignmentUserRolesRequest.builder()
-                .caseAssignmentUserRolesWithOrganisation(
+    public CaseAssignmentUserWithOrganisationRolesRequest getCaseAssignmentRequest(
+            Long caseId, String userId, String orgId, String role) {
+        return CaseAssignmentUserWithOrganisationRolesRequest.builder()
+                .caseAssignmentUserRoles(
                         List.of(getCaseAssignmentUserRole(caseId, orgId, role, userId))
                 ).build();
     }
 
-    private CaseAssignmentUserRoleWithOrganisation getCaseAssignmentUserRole(Long caseId, String orgId,
-                                                                             String role, String userId) {
-        return CaseAssignmentUserRoleWithOrganisation.builder()
+    private CaseAssignmentUserWithOrganisationRole getCaseAssignmentUserRole(Long caseId,
+                                                                             String orgId,
+                                                                             String role,
+                                                                             String userId) {
+        return CaseAssignmentUserWithOrganisationRole.builder()
                 .organisationId(orgId)
                 .caseDataId(String.valueOf(caseId))
                 .caseRole(role)

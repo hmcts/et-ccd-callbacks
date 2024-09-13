@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SingleCasesReadingService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -26,8 +26,6 @@ class NotificationScheduleServiceTest {
     SingleCasesReadingService singleCasesReadingService;
 
     private String userToken;
-
-    private List<String> errors;
     private List<String> caseIds;
 
     private NotificationScheduleService notificationScheduleService;
@@ -39,8 +37,10 @@ class NotificationScheduleServiceTest {
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleDataForNotification());
         userToken = "authString";
-        errors = new ArrayList<>();
-        caseIds = Arrays.asList(new String[]{"245000/2020", "245003/2020"});
+        caseIds = Arrays.asList("245000/2020", "245003/2020");
+        ReflectionTestUtils.setField(notificationScheduleService,
+                "esPartitionSize",
+                3000);
     }
 
     @Test
@@ -54,8 +54,7 @@ class NotificationScheduleServiceTest {
         var result = notificationScheduleService.getSchedulePayloadCollection(
                 userToken,
                 ENGLANDWALES_BULK_CASE_TYPE_ID,
-                caseIds,
-                errors);
+                caseIds);
 
         Assertions.assertEquals(2, result.size());
     }
@@ -69,8 +68,7 @@ class NotificationScheduleServiceTest {
                 .thenReturn(schedulePayloadEvents);
         var result = notificationScheduleService.getSchedulePayloadCollection(userToken,
                 ENGLANDWALES_BULK_CASE_TYPE_ID,
-                caseIds,
-                errors);
+                caseIds);
 
         Assertions.assertEquals(0, result.size());
     }

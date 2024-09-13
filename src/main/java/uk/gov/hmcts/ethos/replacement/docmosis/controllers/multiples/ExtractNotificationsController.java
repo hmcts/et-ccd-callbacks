@@ -56,8 +56,8 @@ public class ExtractNotificationsController {
         List<String> errors = new ArrayList<>();
         MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
-        log.info("Generating report for multiple ref - {}", multipleDetails.getCaseId());
-        notificationsExcelReportService.generateReport(multipleDetails, userToken, errors);
+        log.info("Generating report asynchronously for multiple ref - {}", multipleDetails.getCaseId());
+        notificationsExcelReportService.generateReportAsync(multipleDetails, userToken, errors);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }

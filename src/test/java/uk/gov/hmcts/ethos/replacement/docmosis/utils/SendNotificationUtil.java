@@ -79,16 +79,19 @@ public final class SendNotificationUtil {
                         .date("6 Aug 2022")
                         .sendNotificationTitle("Submit hearing agenda")
                         .sendNotificationNotify(BOTH_PARTIES)
-                        .respondCollection(List.of(PseResponseTypeItem.builder()
-                                .id(UUID.randomUUID().toString())
-                                .value(PseResponseType.builder()
-                                        .from(CLAIMANT_TITLE)
-                                        .response("Please cancel")
-                                        .author("Barry White")
-                                        .build())
-                                .build()))
+                        .respondCollection(List.of(getPseResponseType(), getPseResponseType()))
                         .build())
                 .build();
+    }
+
+    public static PseResponseTypeItem getPseResponseType() {
+        return PseResponseTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(PseResponseType.builder()
+                        .from(CLAIMANT_TITLE)
+                        .response("Please cancel")
+                        .author("Barry White")
+                        .build()).build();
     }
 
     public static List<SendNotificationTypeItem> listOfSendNotificationTypeItemsOnMultiple(String multipleRef) {

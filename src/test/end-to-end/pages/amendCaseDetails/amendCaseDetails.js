@@ -21,7 +21,7 @@ module.exports = async function (clerkResponsible, physicalLocation, suggestedHe
     I.checkOption('#additionalCaseInfo_doNotPostpone_Yes');
     I.checkOption('#additionalCaseInfo_digitalFile_Yes');
     I.checkOption('#additionalCaseInfo_reasonableAdjustment_Yes');
-    I.click(commonConfig.continue);
+    I.click(commonConfig.submit);
 
     I.click(commonConfig.submit);
     //Verify the Case Details tab

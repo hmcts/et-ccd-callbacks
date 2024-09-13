@@ -67,6 +67,7 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest()
     enableCrossBrowserTest()
     enableFortifyScan()
+   // enableApiGatewayTest()
 
     before('crossBrowserTest') {
         sh """

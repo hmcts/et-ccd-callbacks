@@ -9,17 +9,18 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.multiples.NotificationGroup;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesSchedulePrinter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
@@ -35,13 +36,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.CompletableFuture;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.HEADER_1;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.REPLIES;
 import static uk.gov.hmcts.ecm.common.model.helper.ScheduleConstants.RESPONSE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper.flattenGroupAndSortNotificationsWithCaseRef;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.multiples.MultipleNotificationsHelper.getAndFormatReplies;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,6 +57,7 @@ public class NotificationsExcelReportService {
     private final ExcelReadingService excelReadingService;
     private final NotificationScheduleService notificationScheduleService;
     private final DocumentManagementService documentManagementService;
+    private final CcdClient ccdClient;
 
     /**
      * Populates excel report with data and saves to case data.
@@ -66,6 +70,36 @@ public class NotificationsExcelReportService {
     public void generateReport(MultipleDetails multipleDetails,
                                String userToken,
                                List<String> errors) throws IOException {
+
+        List<String> ethosCaseRefCollection = getEthosCaseRefCollection(multipleDetails, userToken, errors);
+        // Retrieve relevant case data from sub cases using ES query
+        log.info("Retrieving case data from single cases");
+        List<NotificationSchedulePayload> schedulePayloads =
+                notificationScheduleService.getSchedulePayloadCollection(
+                        userToken,
+                        multipleDetails.getCaseTypeId(),
+                        ethosCaseRefCollection
+                );
+
+        MultipleData multipleData = multipleDetails.getCaseData();
+        // Transform data for the extract
+        List<Map.Entry<Pair<String, String>, List<NotificationGroup>>> sortedNotificationList =
+                flattenGroupAndSortNotificationsWithCaseRef(schedulePayloads, multipleData.getMultipleReference());
+
+        log.info("Generating extract");
+        byte[] schedule = generateSchedule(multipleData, sortedNotificationList);
+
+        log.info("Upload extract to doc store");
+        URI documentSelfPath = documentManagementService.uploadDocument(userToken, schedule,
+                FILE_NAME, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId());
+
+        log.info("Set case data with extract");
+        setCaseDataWithExtractedDocument(multipleDetails, documentSelfPath, userToken);
+    }
+
+    private List<String> getEthosCaseRefCollection(MultipleDetails multipleDetails,
+                                                            String userToken,
+                                                            List<String> errors) {
         log.info("Reading excel file for cases");
         SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(
                 userToken, MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),
@@ -76,52 +110,26 @@ public class NotificationsExcelReportService {
             MultipleObject excelRow = (MultipleObject) value;
             ethosCaseRefCollection.add(excelRow.getEthosCaseRef());
         });
-        if (ethosCaseRefCollection.size() > SCHEDULE_LIMIT_CASES) {
-
-            log.error("Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
-
-            errors.add("Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
-
-        } else {
-            // Retrieve relevant case data from sub cases using ES query
-            log.info("Retrieving case data from single cases");
-            List<NotificationSchedulePayload> schedulePayloads =
-                    notificationScheduleService.getSchedulePayloadCollection(
-                            userToken,
-                            multipleDetails.getCaseTypeId(),
-                            ethosCaseRefCollection, errors
-                    );
-
-            MultipleData multipleData = multipleDetails.getCaseData();
-            // Transform data for the extract
-            List<NotificationGroup> notificationGroups =
-                    MultipleNotificationsHelper
-                            .flattenNotificationsWithCaseRef(schedulePayloads, multipleData.getMultipleReference());
-            Map<Pair<String, String>, List<NotificationGroup>> notificationsGroupedByTitle =
-                    MultipleNotificationsHelper.groupNotificationsByTitleAndDate(notificationGroups);
-            List<Map.Entry<Pair<String, String>, List<NotificationGroup>>> sortedList =
-                    MultipleNotificationsHelper.groupedNotificationsSortedByDate(notificationsGroupedByTitle);
-
-            log.info("Generating extract");
-            byte[] schedule = generateSchedule(multipleData, sortedList);
-
-            log.info("Upload extract to doc store");
-            URI documentSelfPath = documentManagementService.uploadDocument(userToken, schedule,
-                    FILE_NAME, APPLICATION_EXCEL_VALUE, multipleDetails.getCaseTypeId());
-
-            log.info("Set case data with extract");
-            setCaseDataWithExtractedDocument(multipleData, documentSelfPath);
-        }
+        return ethosCaseRefCollection;
     }
 
-    private static void setCaseDataWithExtractedDocument(MultipleData multipleData,
-                                                         URI documentSelfPath) {
+    private void setCaseDataWithExtractedDocument(MultipleDetails multipleDetails,
+                                                  URI documentSelfPath,
+                                                  String userToken) throws IOException {
 
         UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder()
                 .documentFilename(FILE_NAME)
                 .documentUrl(String.valueOf(documentSelfPath))
                 .documentBinaryUrl(documentSelfPath + BINARY)
                 .build();
+
+        MultipleRequest returnedRequest =
+                ccdClient.startBulkAmendEventForMultiple(userToken,
+                        multipleDetails.getCaseTypeId(),
+                        EMPLOYMENT,
+                        multipleDetails.getCaseId());
+
+        MultipleData multipleData = returnedRequest.getCaseDetails().getCaseData();
 
         if (multipleData.getNotificationsExtract() == null) {
             multipleData.setNotificationsExtract(new NotificationsExtract());
@@ -130,11 +138,20 @@ public class NotificationsExcelReportService {
 
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
         multipleData.getNotificationsExtract().setExtractDateTime(formatter.format(new Date()));
+
+        ccdClient.submitMultipleEventForCase(
+                userToken,
+                multipleData,
+                multipleDetails.getCaseTypeId(),
+                EMPLOYMENT,
+                returnedRequest,
+                multipleDetails.getCaseId()
+        );
     }
 
     private byte[] generateSchedule(MultipleData multipleData,
-                                   List<Map.Entry<Pair<String, String>,
-                                           List<NotificationGroup>>> notificationsGroupedByTitle) throws IOException {
+                                    List<Map.Entry<Pair<String, String>,
+                                            List<NotificationGroup>>> notificationsGroupedByTitle) throws IOException {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("NotificationsExtract");
 
@@ -215,5 +232,15 @@ public class NotificationsExcelReportService {
         Cell cell = row.createCell(cellIndex);
         cell.setCellValue(value);
         cell.setCellStyle(style);
+    }
+
+    public void generateReportAsync(MultipleDetails multipleDetails, String userToken, List<String> errors) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                generateReport(multipleDetails, userToken, errors);
+            } catch (IOException e) {
+                throw new IllegalStateException("Task interrupted", e);
+            }
+        });
     }
 }

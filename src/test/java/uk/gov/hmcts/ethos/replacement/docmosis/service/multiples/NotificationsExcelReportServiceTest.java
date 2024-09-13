@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,7 +31,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_ALL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocManagementService.APPLICATION_EXCEL_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
 @ExtendWith(SpringExtension.class)
 class NotificationsExcelReportServiceTest {
@@ -39,6 +41,8 @@ class NotificationsExcelReportServiceTest {
     private NotificationScheduleService notificationScheduleService;
     @MockBean
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private CcdClient ccdClient;
 
     private NotificationsExcelReportService notificationsExcelReportService;
 
@@ -48,7 +52,7 @@ class NotificationsExcelReportServiceTest {
     private List<String> errors;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(MultipleUtil.getMultipleDataForNotification());
@@ -57,7 +61,8 @@ class NotificationsExcelReportServiceTest {
         notificationsExcelReportService = new NotificationsExcelReportService(
                 excelReadingService,
                 notificationScheduleService,
-                documentManagementService);
+                documentManagementService,
+                ccdClient);
 
         var caseData = multipleDetails.getCaseData();
         caseData.setSendNotificationNotify(SEND_NOTIFICATION_ALL);
@@ -65,8 +70,7 @@ class NotificationsExcelReportServiceTest {
                 .getSchedulePayloadCollection(
                         eq(userToken),
                         eq(ENGLANDWALES_BULK_CASE_TYPE_ID),
-                        any(),
-                        eq(errors)))
+                        any()))
                 .thenReturn(MultipleUtil
                         .getNotificationSchedulePayloadList("6000001/2024", "246000"));
         when(documentManagementService
@@ -77,7 +81,9 @@ class NotificationsExcelReportServiceTest {
                         eq(APPLICATION_EXCEL_VALUE),
                         eq(ENGLANDWALES_BULK_CASE_TYPE_ID)))
                 .thenReturn(URI.create(DOC_URL));
-
+        MultipleRequest multipleRequest = new MultipleRequest();
+        multipleRequest.setCaseDetails(multipleDetails);
+        when(ccdClient.startBulkAmendEventForMultiple(any(), any(), any(), any())).thenReturn(multipleRequest);
     }
 
     @Test
@@ -89,11 +95,11 @@ class NotificationsExcelReportServiceTest {
         sortedMap.put("B", multipleObject2);
         when(excelReadingService
                 .readExcel(
-                        userToken,
-                        DOC_URL,
-                        errors,
-                        multipleDetails.getCaseData(),
-                        FilterExcelType.ALL))
+                        eq(userToken),
+                        any(),
+                        eq(errors),
+                        eq(multipleDetails.getCaseData()),
+                        eq(FilterExcelType.ALL)))
                 .thenReturn(sortedMap);
 
         notificationsExcelReportService.generateReport(multipleDetails, userToken, errors);
@@ -105,22 +111,8 @@ class NotificationsExcelReportServiceTest {
     }
 
     @Test
-    void shouldNotGenerateReportAndSetCaseDataWithErrors() throws IOException {
-        SortedMap<String, Object> sortedMap = new TreeMap<>();
-        for (int i = 0; i <= 10_000; i++) {
-            sortedMap.put(String.valueOf(i), MultipleObject.builder().ethosCaseRef("6000001/2024").build());
-        }
-        when(excelReadingService
-                .readExcel(
-                        any(),
-                        any(),
-                        any(),
-                        any(),
-                        any()))
-                .thenReturn(sortedMap);
-
-        notificationsExcelReportService.generateReport(multipleDetails, userToken, errors);
-
-        assertEquals(errors.get(0), "Number of cases exceed the limit of " + SCHEDULE_LIMIT_CASES);
+    void shouldNotFail() {
+        assertDoesNotThrow(() ->
+                notificationsExcelReportService.generateReportAsync(multipleDetails, userToken, errors));
     }
 }

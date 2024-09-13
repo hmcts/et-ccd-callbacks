@@ -11,9 +11,6 @@ module.exports =  async function () {
     I.see('Day');
     I.see('Month');
     I.see('Year');
-
-    I.see('Submission Reference');
-    I.see('Submission Reference (12 or 16 digit number)');
     I.see('Tribunal Office');
 
     const currentDate = new Date();
@@ -24,7 +21,6 @@ module.exports =  async function () {
     I.fillField(caseDateConfig.date_of_receipt_month, month);
     I.fillField(caseDateConfig.date_of_receipt_year, year);
 
-    I.fillField(caseDateConfig.submission_reference,'123456789012');
     I.selectOption(caseDateConfig.tribunal_office,'3: London Central');
 
     I.click(commonConfig.continueButton);

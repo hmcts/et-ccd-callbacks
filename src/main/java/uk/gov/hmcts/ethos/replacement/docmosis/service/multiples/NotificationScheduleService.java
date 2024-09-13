@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.NotificationSchedulePayload;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SingleCasesReadingService;
@@ -11,41 +12,33 @@ import uk.gov.hmcts.ethos.replacement.docmosis.tasks.NotificationScheduleCallabl
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.ES_PARTITION_SIZE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.THREAD_NUMBER;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service("notificationScheduleService")
 public class NotificationScheduleService {
+
+    @Value("${es.partition.notifications}")
+    private int esPartitionSize;
+
     private final SingleCasesReadingService singleCasesReadingService;
 
     /**
-     * Threaded execution of ES queries to retrieve all notifications sent from multiple.
+     * Execution of ES queries to retrieve all notifications sent from multiple.
      *
      * @param userToken        user Token
      * @param caseTypeId       multiple case type (EW or Scotland)
      * @param caseIdCollection all single cases on the multiple
-     * @param errors           errors
      * @return list of notifications from single cases
      */
     public List<NotificationSchedulePayload> getSchedulePayloadCollection(String userToken,
                                                                           String caseTypeId,
-                                                                          List<String> caseIdCollection,
-                                                                          List<String> errors) {
-
-        ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER);
-
-        List<Future<HashSet<NotificationSchedulePayload>>> resultList = new ArrayList<>();
+                                                                          List<String> caseIdCollection) {
 
         log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
+        List<NotificationSchedulePayload> result = new ArrayList<>();
 
-        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
+        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, esPartitionSize)) {
 
             NotificationScheduleCallable scheduleCallable =
                     new NotificationScheduleCallable(
@@ -54,40 +47,15 @@ public class NotificationScheduleService {
                             caseTypeId,
                             partitionCaseIds
                     );
-
-            resultList.add(executor.submit(scheduleCallable));
-
-        }
-
-        List<NotificationSchedulePayload> result = new ArrayList<>();
-
-        for (Future<HashSet<NotificationSchedulePayload>> fut : resultList) {
-
             try {
-
-                HashSet<NotificationSchedulePayload> schedulePayloads = fut.get();
-
+                HashSet<NotificationSchedulePayload> schedulePayloads = scheduleCallable.call();
                 log.info("PartialSize: {}", schedulePayloads.size());
-
                 result.addAll(schedulePayloads);
-
-            } catch (InterruptedException | ExecutionException e) {
-
-                errors.add("Error Generating Schedules");
-
-                log.error(e.getMessage(), e);
-
-                Thread.currentThread().interrupt();
-
+            } catch (Exception e) {
+                log.error("Error calling NotificationScheduleCallable", e);
             }
-
         }
-
-        executor.shutdown();
-
         log.info("ResultSize: {}", result.size());
-
         return result;
-
     }
 }

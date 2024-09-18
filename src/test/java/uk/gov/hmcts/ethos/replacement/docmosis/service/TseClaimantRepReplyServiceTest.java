@@ -24,7 +24,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -247,6 +249,18 @@ class TseClaimantRepReplyServiceTest {
         ReflectionTestUtils.setField(tseClaimantRepReplyService,
                 "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
 
+        RepresentedTypeR representedType =
+                RepresentedTypeR.builder()
+                        .nameOfRepresentative("Respondent")
+                        .respRepName("Respondent")
+                        .representativeEmailAddress("person@email.com")
+                        .myHmctsYesNo("Yes")
+                        .build();
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setId("1111-2222-3333-1111");
+        representedTypeRItem.setValue(representedType);
+        caseData.setRepCollection(new ArrayList<>());
+        caseData.getRepCollection().add(representedTypeRItem);
         tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
 
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());

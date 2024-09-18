@@ -313,14 +313,6 @@ public class TseClaimantRepReplyService {
             return;
         }
 
-        boolean isWelsh = featureToggleService.isWelshEnabled()
-                && Optional.ofNullable(caseData.getClaimantHearingPreference())
-                .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
-                .orElse(false);
-        String emailTemplate = isWelsh
-                ? cyTseClaimantRepResponseTemplateId
-                : tseClaimantRepResponseTemplateId;
-
         List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
         if (respondentEmailAddressList.isEmpty()) {
             return;
@@ -329,8 +321,19 @@ public class TseClaimantRepReplyService {
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
                     TSE_CLAIMANT_REP_REPLY);
+
+            boolean isWelsh = featureToggleService.isWelshEnabled()
+                    && Optional.ofNullable(caseData.getClaimantHearingPreference())
+                    .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
+                    .orElse(false);
+
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
                     bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
+
+            String emailTemplate = isWelsh
+                    ? cyTseClaimantRepResponseTemplateId
+                    : tseClaimantRepResponseTemplateId;
+
             respondentEmailAddressList.forEach(
                     respondentEmail ->
                             emailService.sendEmail(

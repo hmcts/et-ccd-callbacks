@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -39,6 +40,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
@@ -272,7 +275,9 @@ public class TseRespondentReplyService {
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
                     "TSE Reply.pdf");
-            String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+            String claimantEmail = Optional.ofNullable(caseData.getClaimantType().getClaimantEmailAddress())
+                    .orElse(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress());
+
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
                     bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
             emailService.sendEmail(emailTemplate,
@@ -358,6 +363,10 @@ public class TseRespondentReplyService {
         if (CLAIMANT_TITLE.equals(applicationType.getApplicant())) {
             return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
                     getClaimantApplicationType(applicationType));
+        } else if (CLAIMANT_REP_TITLE.equals(applicationType.getApplicant())) {
+            String claimantApplicationType = claimantSelectApplicationToType(applicationType.getType());
+            return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
+                    claimantApplicationType);
         } else {
             return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
                     applicationType.getType());

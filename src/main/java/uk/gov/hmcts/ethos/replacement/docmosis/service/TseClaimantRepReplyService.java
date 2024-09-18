@@ -152,7 +152,7 @@ public class TseClaimantRepReplyService {
     /**
      * Reply to a TSE application as a respondent, including updating app status, saving the reply and sending emails.
      *
-     * @param userToken autherisation token to get claimant's email address
+     * @param userToken authorisation token to get claimant's email address
      * @param caseDetails case details
      * @param caseData case data
      */

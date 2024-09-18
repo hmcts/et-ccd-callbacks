@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -156,7 +157,7 @@ public class TseClaimantRepReplyService {
      * @param caseDetails case details
      * @param caseData case data
      */
-    public void respondentReplyToTse(String userToken, CaseDetails caseDetails, CaseData caseData) {
+    public void claimantReplyToTse(String userToken, CaseDetails caseDetails, CaseData caseData) {
         updateApplicationState(caseData);
 
         boolean isRespondingToTribunal = isRespondingToTribunal(caseData);
@@ -284,8 +285,11 @@ public class TseClaimantRepReplyService {
      * Send emails when LR submits response to application.
      */
     public void sendRespondingToApplicationEmails(CaseDetails caseDetails, String userToken) {
-        sendEmailToClaimantForRespondingToApp(caseDetails);
+        // should send the email to respondent
+        sendEmailToRespondentForRespondingToApp(caseDetails);
+        // should send the email to claimant rep
         sendAcknowledgementEmailToLR(caseDetails, userToken, false);
+        // send the email to tribunal
         claimantTseService.sendAdminEmail(caseDetails);
     }
 
@@ -303,25 +307,36 @@ public class TseClaimantRepReplyService {
                 : acknowledgementRule92NoEmailTemplateId;
     }
 
-    private void sendEmailToClaimantForRespondingToApp(CaseDetails caseDetails) {
+    private void sendEmailToRespondentForRespondingToApp(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
+
         boolean isWelsh = featureToggleService.isWelshEnabled()
-                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+                && Optional.ofNullable(caseData.getClaimantHearingPreference())
+                .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
+                .orElse(false);
         String emailTemplate = isWelsh
                 ? cyTseClaimantRepResponseTemplateId
                 : tseClaimantRepResponseTemplateId;
 
+        List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
+        if (respondentEmailAddressList.isEmpty()) {
+            return;
+        }
+
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
                     TSE_CLAIMANT_REP_REPLY);
-            String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
                     bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
-            emailService.sendEmail(emailTemplate,
-                    claimantEmail, personalisation);
+            respondentEmailAddressList.forEach(
+                    respondentEmail ->
+                            emailService.sendEmail(
+                            emailTemplate,
+                            respondentEmail,
+                            personalisation));
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

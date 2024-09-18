@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.respondent;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondentViewService;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ProvideSomethingElseViewService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -31,7 +32,7 @@ class PseViewNotificationsControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/pseViewNotifications/aboutToStart";
 
     @MockBean
-    private PseRespondentViewService pseRespondentViewService;
+    private ProvideSomethingElseViewService provideSomethingElseViewService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired

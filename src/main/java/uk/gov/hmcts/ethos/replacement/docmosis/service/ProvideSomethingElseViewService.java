@@ -14,17 +14,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatRespondDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getPartyNotifications;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedNotificationWithCode;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PseRespondentViewService {
+public class ProvideSomethingElseViewService {
 
     private static final String TABLE_COLUMNS_MARKDOWN =
             "| No | Subject | To party | Date sent | Notification | Response due | Number of responses |\r\n"
@@ -39,35 +41,35 @@ public class PseRespondentViewService {
      * - SendNotificationNotify = RESPONDENT_ONLY or BOTH_PARTIES
      * @param caseData contains all the case data
      */
-    public DynamicFixedListType populateSelectDropdownView(CaseData caseData) {
+    public DynamicFixedListType populateSelectDropdownView(CaseData caseData, String party) {
         if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
             return null;
         }
 
         return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
-            .filter(this::isNotifyRespondent)
+            .filter(notification -> getPartyNotifications(notification, party))
             .map(r ->
                 DynamicValueType.create(
                     r.getValue().getNumber(),
-                    r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
+                    r.getValue().getNumber() + " - " + r.getValue().getSendNotificationTitle()
                 )
             )
             .toList());
     }
 
-    private boolean isNotifyRespondent(SendNotificationTypeItem sendNotificationTypeItem) {
-        return RESPONDENT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
-            || BOTH_PARTIES.equalsIgnoreCase(sendNotificationTypeItem.getValue().getSendNotificationNotify());
-    }
-
-    public String generateViewNotificationsMarkdown(CaseData caseData) {
+    public String generateViewNotificationsMarkdown(CaseData caseData, String partySelection) {
+        String filter = switch (partySelection) {
+            case RESPONDENT_TITLE -> CLAIMANT_ONLY;
+            case CLAIMANT_TITLE -> RESPONDENT_ONLY;
+            default -> throw new IllegalArgumentException("Invalid party selection");
+        };
         List<SendNotificationTypeItem> notifications = caseData.getSendNotificationCollection();
         if (CollectionUtils.isEmpty(notifications)) {
             return String.format(TABLE_COLUMNS_MARKDOWN, "");
         }
 
         String tableRows = notifications.stream()
-                .filter(o -> !CLAIMANT_ONLY.equals(o.getValue().getSendNotificationNotify()))
+                .filter(o -> !filter.equals(o.getValue().getSendNotificationNotify()))
                 .map(this::viewNotificationsFormatRow)
                 .collect(Collectors.joining());
 
@@ -92,12 +94,26 @@ public class PseRespondentViewService {
      * Initial Application and Respond details table.
      * @param caseData contains all the case data
      */
-    public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
-        if (caseData.getPseRespondentSelectJudgmentOrderNotification() == null) {
-            return "";
+    public String initialOrdReqDetailsTableMarkUp(CaseData caseData, String party) {
+        SendNotificationTypeItem sendNotificationTypeItem;
+        switch (party) {
+            case RESPONDENT_TITLE -> {
+                if (caseData.getPseRespondentSelectJudgmentOrderNotification() == null) {
+                    return "";
+                }
+                sendNotificationTypeItem = getSelectedNotificationWithCode(caseData,
+                        caseData.getPseRespondentSelectJudgmentOrderNotification().getSelectedCode());
+            }
+            case CLAIMANT_TITLE -> {
+                if (caseData.getClaimantSelectNotification() == null) {
+                    return "";
+                }
+                sendNotificationTypeItem = getSelectedNotificationWithCode(caseData,
+                        caseData.getClaimantSelectNotification().getSelectedCode());
+            }
+            default -> throw new IllegalArgumentException("Invalid party selection");
         }
-        SendNotificationTypeItem sendNotificationTypeItem = getSelectedNotificationWithCode(caseData,
-            caseData.getPseRespondentSelectJudgmentOrderNotification().getSelectedCode());
+
         if (sendNotificationTypeItem == null) {
             return "";
         }

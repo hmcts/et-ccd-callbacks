@@ -26,14 +26,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-class PseRespondentViewServiceTest {
+class ProvideSomethingElseViewServiceTest {
 
-    private PseRespondentViewService pseRespondentViewService;
+    private ProvideSomethingElseViewService provideSomethingElseViewService;
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        pseRespondentViewService = new PseRespondentViewService();
+        provideSomethingElseViewService = new ProvideSomethingElseViewService();
         caseData = CaseDataBuilder.builder().build();
 
         caseData.setSendNotificationCollection(List.of(
@@ -80,7 +80,7 @@ class PseRespondentViewServiceTest {
             DynamicValueType.create("3", "3 Send Notification Title")
         ));
 
-        assertThat(pseRespondentViewService.populateSelectDropdownView(caseData),
+        assertThat(provideSomethingElseViewService.populateSelectDropdownView(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -132,7 +132,7 @@ class PseRespondentViewServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -156,7 +156,7 @@ class PseRespondentViewServiceTest {
             |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 
-        assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -221,7 +221,7 @@ class PseRespondentViewServiceTest {
                         "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -245,7 +245,7 @@ class PseRespondentViewServiceTest {
             |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
             """;
 
-        assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
                 is(expected));
     }
 
@@ -284,7 +284,7 @@ class PseRespondentViewServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Date sent|5 Aug 2022|\r
@@ -296,7 +296,8 @@ class PseRespondentViewServiceTest {
             |Sent to|Both parties|\r
             """;
 
-        assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData), is(expected));
+        assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
+                is(expected));
     }
 
     @Test
@@ -308,7 +309,7 @@ class PseRespondentViewServiceTest {
             |3|Other (General correspondence)|Respondent only|23 February 2023|Send Notification Title|No|0|\r
             \r
             """;
-        String actual = pseRespondentViewService.generateViewNotificationsMarkdown(caseData);
+        String actual = provideSomethingElseViewService.generateViewNotificationsMarkdown(caseData, RESPONDENT_TITLE);
 
         assertThat(actual, is(expected));
     }

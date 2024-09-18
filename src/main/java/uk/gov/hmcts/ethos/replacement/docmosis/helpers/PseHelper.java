@@ -14,8 +14,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.addDocumentRows;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.asRow;
@@ -35,7 +39,7 @@ public final class PseHelper {
      * @param caseData contains all the case data
      * @return the select application in GenericTseApplicationTypeItem
      */
-    public static SendNotificationTypeItem getSelectedSendNotificationTypeItem(CaseData caseData) {
+    public static SendNotificationTypeItem getSelectedRespondentNotification(CaseData caseData) {
         String selectedAppId = caseData.getPseRespondentSelectOrderOrRequest().getSelectedCode();
         return getSelectedNotificationWithCode(caseData, selectedAppId);
     }
@@ -89,7 +93,7 @@ public final class PseHelper {
                 new String[] {"Sent to", sendNotificationType.getSendNotificationNotify()}
             )
         );
-        return MarkdownHelper.createTwoColumnTable(new String[]{"View Application", ""}, rows);
+        return MarkdownHelper.createTwoColumnTable(new String[]{"View Notification", ""}, rows);
     }
 
     public static List<String[]> getSendNotificationUploadDocumentList(SendNotificationType sendNotificationType) {
@@ -149,5 +153,23 @@ public final class PseHelper {
 
     private static boolean isClaimantEccResponse(List<String> sendNotificationSubject, String from) {
         return sendNotificationSubject.contains("Employer Contract Claim") && from.equals(CLAIMANT_TITLE);
+    }
+
+    public static boolean getPartyNotifications(SendNotificationTypeItem sendNotificationTypeItem, String party) {
+        if (CLAIMANT_TITLE.equals(party)) {
+            return CLAIMANT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
+                   || BOTH_PARTIES.equalsIgnoreCase(sendNotificationTypeItem.getValue().getSendNotificationNotify());
+        } else if (RESPONDENT_TITLE.equals(party)) {
+            return RESPONDENT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
+                   || BOTH_PARTIES.equalsIgnoreCase(sendNotificationTypeItem.getValue().getSendNotificationNotify());
+        } else {
+            throw new IllegalArgumentException("Invalid party selection");
+        }
+
+    }
+
+    public static SendNotificationTypeItem getSelectedClaimantNotification(CaseData caseData) {
+        String selectedAppId = caseData.getClaimantSelectNotification().getSelectedCode();
+        return getSelectedNotificationWithCode(caseData, selectedAppId);
     }
 }

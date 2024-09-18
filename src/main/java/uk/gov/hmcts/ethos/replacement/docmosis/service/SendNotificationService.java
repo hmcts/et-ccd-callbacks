@@ -65,7 +65,7 @@ public class SendNotificationService {
     private static final String EMAIL_ADDRESS = "emailAddress";
     @Value("${template.claimantSendNotification}")
     private String claimantSendNotificationTemplateId;
-    @Value("${template.claimantRepSendNotification}")
+    @Value("${template.pse.claimant-rep.new-notification}")
     private String claimantRepSendNotificationTemplateId;
     @Value("${template.respondentSendNotification}")
     private String respondentSendNotificationTemplateId;

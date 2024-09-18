@@ -123,7 +123,7 @@ class PseRespondToTribunalServiceTest {
                 DynamicValueType.create("3", "3 Send Notification Title")
         ));
 
-        assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
+        assertThat(pseRespondToTribService.populateSelectDropdown(caseData, RESPONDENT_TITLE),
                 is(expected));
     }
 
@@ -153,7 +153,7 @@ class PseRespondToTribunalServiceTest {
             DynamicValueType.create("2", "2 Submit hearing agenda")
         ));
 
-        assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
+        assertThat(pseRespondToTribService.populateSelectDropdown(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -202,7 +202,7 @@ class PseRespondToTribunalServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -277,7 +277,7 @@ class PseRespondToTribunalServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -333,7 +333,7 @@ class PseRespondToTribunalServiceTest {
                         "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|Acceptance|\r
             |Date sent|5 Aug 2022|\r
@@ -394,7 +394,7 @@ class PseRespondToTribunalServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Date sent|5 Aug 2022|\r
@@ -411,11 +411,11 @@ class PseRespondToTribunalServiceTest {
 
     @ParameterizedTest
     @MethodSource("inputList")
-    void validateInput_CountErrors(String responseText, String supportingMaterial, int expectedErrorCount) {
+    void validateRespondentInput_CountErrors(String responseText, String supportingMaterial, int expectedErrorCount) {
         caseData.setPseRespondentOrdReqResponseText(responseText);
         caseData.setPseRespondentOrdReqHasSupportingMaterial(supportingMaterial);
 
-        List<String> errors = pseRespondToTribService.validateInput(caseData);
+        List<String> errors = pseRespondToTribService.validateRespondentInput(caseData);
 
         assertEquals(expectedErrorCount, errors.size());
     }
@@ -764,7 +764,7 @@ class PseRespondToTribunalServiceTest {
                                         ).build()))
                                 .build()).build()));
 
-        String actual = pseRespondToTribService.getSubmittedBody(caseData);
+        String actual = pseRespondToTribService.getRespondentSubmittedBody(caseData);
 
         assertEquals(actual, String.format(SUBMITTED_BODY, ""));
     }
@@ -782,7 +782,7 @@ class PseRespondToTribunalServiceTest {
                                         ).build()))
                                 .build()).build()));
 
-        String actual = pseRespondToTribService.getSubmittedBody(caseData);
+        String actual = pseRespondToTribService.getRespondentSubmittedBody(caseData);
 
         assertEquals(actual, String.format(SUBMITTED_BODY, RULE92_ANSWERED_YES));
     }

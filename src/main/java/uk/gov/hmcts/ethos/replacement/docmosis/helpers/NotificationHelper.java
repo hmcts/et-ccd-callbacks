@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_ADDRESS;
@@ -127,7 +129,8 @@ public final class NotificationHelper {
                 return email;
             }
         }
-        return isNullOrEmpty(respondent.getRespondentEmail()) ? "" : respondent.getRespondentEmail();
+        // return empty string because if Respondents do not have portal access and should not be sent an email
+        return EMPTY_STRING;
     }
 
     private static String getNameForRespondent(CaseData caseData, RespondentSumType respondent) {
@@ -149,7 +152,9 @@ public final class NotificationHelper {
         }
 
         Optional<RepresentedTypeRItem> respondentRep = repCollection.stream()
-                .filter(o -> respondent.getRespondentName().equals(o.getValue().getRespRepName()))
+                .filter(r -> YES.equals(r.getValue().getMyHmctsYesNo())
+                             && !ObjectUtils.isEmpty(r.getValue().getRespondentOrganisation())
+                             && respondent.getRespondentName().equals(r.getValue().getRespRepName()))
                 .findFirst();
 
         return respondentRep.map(RepresentedTypeRItem::getValue).orElse(null);

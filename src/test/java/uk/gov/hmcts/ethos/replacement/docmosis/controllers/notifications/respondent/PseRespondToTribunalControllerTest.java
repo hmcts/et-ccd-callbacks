@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.respondent;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -177,7 +177,7 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondToTribunalService).validateInput(ccdRequest.getCaseDetails().getCaseData());
+        verify(pseRespondToTribunalService).validateRespondentInput(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -218,7 +218,7 @@ class PseRespondToTribunalControllerTest {
 
     @Test
     void submitted_Success() throws Exception {
-        when(pseRespondToTribunalService.getSubmittedBody(ccdRequest.getCaseDetails().getCaseData()))
+        when(pseRespondToTribunalService.getRespondentSubmittedBody(ccdRequest.getCaseDetails().getCaseData()))
             .thenReturn("SubmittedBody");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)

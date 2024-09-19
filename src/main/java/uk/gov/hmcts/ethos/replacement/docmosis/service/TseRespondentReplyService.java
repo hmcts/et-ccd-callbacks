@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
@@ -273,11 +274,17 @@ public class TseRespondentReplyService {
                 : tseRespondentResponseTemplateId;
 
         try {
+            String claimantEmail = Optional.ofNullable(caseData.getClaimantType().getClaimantEmailAddress())
+                    .orElseGet(() -> Optional.ofNullable(caseData.getRepresentativeClaimantType())
+                            .map(RepresentedTypeC::getRepresentativeEmailAddress)
+                            .orElse(null));
+
+            if (isNullOrEmpty(claimantEmail)) {
+                return;
+            }
+
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
                     "TSE Reply.pdf");
-            String claimantEmail = Optional.ofNullable(caseData.getClaimantType().getClaimantEmailAddress())
-                    .orElse(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress());
-
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
                     bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
             emailService.sendEmail(emailTemplate,

@@ -11,6 +11,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository
 
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+
 @Component
 @StaffRowHandler
 @RequiredArgsConstructor
@@ -51,6 +53,7 @@ public class JudgeRowHandler implements RowHandler {
     }
 
     private JudgeEmploymentStatus convertImportStatusCode(String statusCode) {
-        return EMPLOYMENT_STATUS_IMPORT_CODES.getOrDefault(statusCode, JudgeEmploymentStatus.UNKNOWN);
+        return EMPLOYMENT_STATUS_IMPORT_CODES.getOrDefault(
+                defaultIfEmpty(statusCode, ""), JudgeEmploymentStatus.UNKNOWN);
     }
 }

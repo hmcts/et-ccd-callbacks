@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import net.logstash.logback.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
@@ -198,7 +198,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void respondentDefaults(CaseData caseData) {
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
-            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
             caseData.setRespondent(nullCheck(respondentSumType.getRespondentName()));
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 checkExtensionRequired(respondentSumTypeItem);
@@ -306,7 +306,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void updateResponseReceivedCounter(List<RespondentSumTypeItem> respondentCollection) {
-        RespondentSumType firstRespondent = respondentCollection.get(0).getValue();
+        RespondentSumType firstRespondent = respondentCollection.getFirst().getValue();
         if (YES.equals(firstRespondent.getResponseReceived())) {
             firstRespondent.setResponseReceivedCount(
                     StringUtils.isBlank(firstRespondent.getResponseReceivedCount())
@@ -390,7 +390,7 @@ public class CaseManagementForCaseWorkerService {
         }
 
         String sourceCaseTypeId = caseRefAndCaseDataPair.getFirst();
-        SubmitEvent submitEvent = caseRefAndCaseDataPair.getSecond().get(0);
+        SubmitEvent submitEvent = caseRefAndCaseDataPair.getSecond().getFirst();
         log.info("SubmitEvent retrieved from ES for the update target case: {} with source case type of {}.",
                 submitEvent.getCaseId(), sourceCaseTypeId);
         String sourceCaseId = String.valueOf(submitEvent.getCaseId());
@@ -580,7 +580,7 @@ public class CaseManagementForCaseWorkerService {
         CaseData currentCaseData = caseDetails.getCaseData();
         List<SubmitEvent> submitEvents = getCasesES(caseDetails, authToken);
         if (submitEvents != null && !submitEvents.isEmpty()) {
-            SubmitEvent submitEvent = submitEvents.get(0);
+            SubmitEvent submitEvent = submitEvents.getFirst();
             if (ECCHelper.validCaseForECC(submitEvent, errors)) {
                 switch (callback) {
                     case MID_EVENT_CALLBACK:

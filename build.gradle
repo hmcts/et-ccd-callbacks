@@ -28,7 +28,7 @@ pmd {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -196,7 +196,7 @@ tasks.register('integration', Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     failFast = true
     reports {
-        html.enabled(true)
+        html.setRequired(true)
         html.destination file("${buildDir}/integration/")
     }
 }
@@ -417,7 +417,10 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.1'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
+    testImplementation ('org.mockito:mockito-inline:5.2.0'){
+        exclude group: 'net.bytebuddy', module: 'byte-buddy'
+    }
+    testImplementation 'net.bytebuddy:byte-buddy:1.14.17'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.13.0'
 
     // Contract Tests

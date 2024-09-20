@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Component;
@@ -42,7 +43,9 @@ public class JudgeRowHandler implements RowHandler {
     private Judge rowToJudge(TribunalOffice tribunalOffice, Row row) {
         String code = row.getCell(1).getStringCellValue();
         String name = row.getCell(2).getStringCellValue();
-        JudgeEmploymentStatus employmentStatus = convertImportStatusCode(row.getCell(4).getStringCellValue());
+        JudgeEmploymentStatus employmentStatus = convertImportStatusCode(ObjectUtils.isEmpty(row.getCell(4))
+                        ? JudgeEmploymentStatus.UNKNOWN.name()
+                        : defaultIfEmpty(row.getCell(4).getStringCellValue(), JudgeEmploymentStatus.UNKNOWN.name()));
 
         Judge judge =  new Judge();
         judge.setCode(code);

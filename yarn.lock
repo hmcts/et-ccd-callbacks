@@ -6881,10 +6881,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"devtools-protocol@npm:0.0.1330662":
-  version: 0.0.1330662
-  resolution: "devtools-protocol@npm:0.0.1330662"
-  checksum: de34cf3330f5b81b9fab346eea4dbab37ea6fbc6f9eb5a38deba115adfc30f292b861b8b674f16b8d27d5e3d13d2c82a0950b6ba8f46ff78fe1dbc6f83162389
+"devtools-protocol@npm:0.0.1342118":
+  version: 0.0.1342118
+  resolution: "devtools-protocol@npm:0.0.1342118"
+  checksum: 081d2a03b9cc28dae31fa6bde3b96f999b3d28e382cbfc9646fec639e425d21abbf8d2118424292a7341a1afde024835bfdc35bf29e367e3a12ebdb75106c942
   languageName: node
   linkType: hard
 
@@ -8146,14 +8146,14 @@ __metadata:
     mocha-multi: 1.1.7
     mochawesome: 7.1.3
     nock: 13.5.5
-    nodemon: 3.1.5
+    nodemon: 3.1.6
     nsp: 3.2.1
     otp: 1.1.2
     pa11y: 8.0.0
     playwright: ^1.35.1
     playwright-core: ^1.35.1
     proxyquire: 2.1.3
-    puppeteer: 23.3.1
+    puppeteer: 23.4.0
     randomstring: 1.3.0
     request: 2.88.2
     request-promise-native: 1.0.9
@@ -13430,9 +13430,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:3.1.5":
-  version: 3.1.5
-  resolution: "nodemon@npm:3.1.5"
+"nodemon@npm:3.1.6":
+  version: 3.1.6
+  resolution: "nodemon@npm:3.1.6"
   dependencies:
     chokidar: ^3.5.2
     debug: ^4
@@ -13446,7 +13446,7 @@ __metadata:
     undefsafe: ^2.0.5
   bin:
     nodemon: bin/nodemon.js
-  checksum: 56a41473b4990efebe8341f1da360af49d3b9e62c164d76ef6ec7f81efeca56c990dd4f275f03ddd1afde83d27c1ed3abe9c73d712fbebe08406c459b9f030ab
+  checksum: efa0e5cd34db4d38e6abdb54b468b968bdfa6ea366abb08707e8f4335894730d4f57b826daab995141f4b952aa110b6b3084c25d71a0560c363df3b95d51374d
   languageName: node
   linkType: hard
 
@@ -14900,17 +14900,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer-core@npm:23.3.1":
-  version: 23.3.1
-  resolution: "puppeteer-core@npm:23.3.1"
+"puppeteer-core@npm:23.4.0":
+  version: 23.4.0
+  resolution: "puppeteer-core@npm:23.4.0"
   dependencies:
     "@puppeteer/browsers": 2.4.0
     chromium-bidi: 0.6.5
     debug: ^4.3.7
-    devtools-protocol: 0.0.1330662
+    devtools-protocol: 0.0.1342118
     typed-query-selector: ^2.12.0
     ws: ^8.18.0
-  checksum: d28145b4a844a938c9a15c3243b6b7df53077c00248b3d65d5b58ee498ed2594b92934e51e6ba599c3c0ec875ebaa264b18619048ed9b3a711215b955cad5bac
+  checksum: 180e5204f556adb2445f9ba8afa28aa2276275f2f59f603256693c1e8c9dded76c4c8b712fedfb7e827847d772fbc84545f6ef31ae214a6a1e2234af558e34ec
   languageName: node
   linkType: hard
 
@@ -14928,19 +14928,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:23.3.1":
-  version: 23.3.1
-  resolution: "puppeteer@npm:23.3.1"
+"puppeteer@npm:23.4.0":
+  version: 23.4.0
+  resolution: "puppeteer@npm:23.4.0"
   dependencies:
     "@puppeteer/browsers": 2.4.0
     chromium-bidi: 0.6.5
     cosmiconfig: ^9.0.0
-    devtools-protocol: 0.0.1330662
-    puppeteer-core: 23.3.1
+    devtools-protocol: 0.0.1342118
+    puppeteer-core: 23.4.0
     typed-query-selector: ^2.12.0
   bin:
     puppeteer: lib/cjs/puppeteer/node/cli.js
-  checksum: 0e733a69030392b68930d6d61946b13f9f5dffae0d21bff8b9e6c4e07c38a67643c3c603f5f9437d47e60f8a23010c3d0b4383b3e189c1973c187a14a060f103
+  checksum: 07a133ea72b17b88efe0a4cd300475aef689dbbb5831403b4bb148f86ad7a37d9b5f0a975b3a3060f4838e048a14c968019442c7719ab07ee9f86e1c4670dc95
   languageName: node
   linkType: hard
 

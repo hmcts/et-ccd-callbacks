@@ -79,6 +79,27 @@ class JudgeRowHandlerTest {
         assertEquals(JudgeEmploymentStatus.UNKNOWN, actual.getEmploymentStatus());
     }
 
+    @Test
+    void testNoJudgeStatus() {
+        // Not creating row 4 which contains the judge status
+        Row row = mock(Row.class);
+        mockCell(row, 0, JUDGE_ROW_ID);
+        mockCell(row, 1, "01_JudgeCode");
+        mockCell(row, 2, "Judge Fudge");
+        mockCell(row, 3, "1");
+
+        JudgeRepository judgeRepository = mock(JudgeRepository.class);
+        JudgeRowHandler judgeRowHandler = new JudgeRowHandler(judgeRepository);
+        TribunalOffice tribunalOffice = TribunalOffice.NEWCASTLE;
+        judgeRowHandler.handle(tribunalOffice, row);
+
+        ArgumentCaptor<Judge> captor = ArgumentCaptor.forClass(Judge.class);
+        verify(judgeRepository, times(1)).save(captor.capture());
+
+        Judge actual = captor.getValue();
+        assertEquals(JudgeEmploymentStatus.UNKNOWN, actual.getEmploymentStatus());
+    }
+
     private void mockCell(Row row, int cellNum, String value) {
         Cell cell = mock(Cell.class);
         when(row.getCell(cellNum)).thenReturn(cell);

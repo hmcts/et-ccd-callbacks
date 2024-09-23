@@ -236,7 +236,7 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER_EMPLOYMENT,
             CASEWORKER_EMPLOYMENT_API,
             CASEWORKER_WA,
-            WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN);
+            WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN, CASEWORKER_CAA, CASEWORKER_APPROVER);
 
         lib.createIdamUser(SUPERUSER_EMAIL,
             CASEWORKER_CAA,

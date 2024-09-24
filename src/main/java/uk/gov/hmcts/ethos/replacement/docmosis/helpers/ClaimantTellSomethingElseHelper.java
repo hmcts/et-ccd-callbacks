@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLA
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLAIMANT_TSE_FILE_NAME;
 
 public final class ClaimantTellSomethingElseHelper {
@@ -204,5 +205,10 @@ public final class ClaimantTellSomethingElseHelper {
                         && !isNullOrEmpty(r.getValue().getRepresentativeEmailAddress()))
                 .map(r -> r.getValue().getRepresentativeEmailAddress())
                 .toList();
+    }
+
+    public static String getApplicantType(CaseData caseData) {
+        GenericTseApplicationType selectedApplicationType = getRespondentSelectedApplicationType(caseData);
+        return selectedApplicationType.getApplicant();
     }
 }

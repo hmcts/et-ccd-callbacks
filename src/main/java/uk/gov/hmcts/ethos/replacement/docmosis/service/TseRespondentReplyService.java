@@ -43,6 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getApplicantType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
@@ -356,9 +357,13 @@ public class TseRespondentReplyService {
             return;
         }
 
+        String linkToCase = CLAIMANT_REP_TITLE.equals(getApplicantType(caseData))
+                ? emailService.getExuiCaseLink(caseDetails.getCaseId())
+                : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+                LINK_TO_CITIZEN_HUB, linkToCase);
         emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, claimantEmail, personalisation);
     }
 

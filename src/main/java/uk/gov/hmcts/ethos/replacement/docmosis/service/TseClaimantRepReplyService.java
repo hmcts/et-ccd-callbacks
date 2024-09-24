@@ -44,7 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_E
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getClaimantRepSelectedApplicationType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_CLAIMANT_REP_REPLY;
 
 @Service
@@ -177,7 +176,7 @@ public class TseClaimantRepReplyService {
      *
      * @param caseData in which the case details are extracted from
      */
-    void updateApplicationState(CaseData caseData) {
+    protected void updateApplicationState(CaseData caseData) {
         GenericTseApplicationType selectedApplicationType = getClaimantRepSelectedApplicationType(caseData);
         if (selectedApplicationType.getApplicant().equals(RESPONDENT_TITLE)) {
             if (isRespondingToTribunal(caseData)) {
@@ -196,8 +195,8 @@ public class TseClaimantRepReplyService {
      * @param caseData contains all the case data
      * @param isRespondingToTribunal determines if responding to the Tribunal's request/order
      */
-    void saveReplyToApplication(CaseData caseData, boolean isRespondingToTribunal) {
-        GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
+    protected void saveReplyToApplication(CaseData caseData, boolean isRespondingToTribunal) {
+        GenericTseApplicationType genericTseApplicationType = getClaimantRepSelectedApplicationType(caseData);
 
         if (isEmpty(genericTseApplicationType.getRespondCollection())) {
             genericTseApplicationType.setRespondCollection(new ArrayList<>());
@@ -267,7 +266,7 @@ public class TseClaimantRepReplyService {
 
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+                LINK_TO_CITIZEN_HUB, emailService.getExuiCaseLink(caseDetails.getCaseId()));
         respondentEmailAddressList.forEach(respondentEmail ->
             emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, respondentEmail, personalisation));
     }
@@ -328,7 +327,7 @@ public class TseClaimantRepReplyService {
                     .orElse(false);
 
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
+                    bytes, emailService.getExuiCaseLink(caseDetails.getCaseId()), isWelsh);
 
             String emailTemplate = isWelsh
                     ? cyTseClaimantRepResponseTemplateId

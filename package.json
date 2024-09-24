@@ -69,7 +69,7 @@
         "chai": "4.5.0",
         "chai-as-promised": "8.0.0",
         "chai-http": "5.0.0",
-        "codeceptjs": "3.6.6",
+        "codeceptjs": "3.6.7",
         "codeceptjs-saucehelper": "^1.4.0",
         "eslint": "9.11.0",
         "eslint-config-prettier": "^9.0.0",

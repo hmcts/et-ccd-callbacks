@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.LegalRepDocumentsHelper;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -28,8 +26,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class LegalRepDocumentsController {
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final VerifyTokenService verifyTokenService;
 
     /**
      * Filters documents viewable to only the legalrep.
@@ -49,13 +45,32 @@ public class LegalRepDocumentsController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        LegalRepDocumentsHelper.setLegalRepVisibleDocuments(caseData);
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Clear documents viewable to the legalrep.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        DocumentHelper.setLegalRepVisibleDocuments(caseData);
+
+        // Setting values to null so it reduces the overall payload size
+        caseData.setLegalrepDocumentCollection(null);
+        caseData.setLegalRepDocumentsMarkdown(null);
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

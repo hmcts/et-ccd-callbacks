@@ -65,6 +65,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_CASE_MA
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_ORGANISATION_MANAGER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.RAS_VALIDATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.RESPONDENT_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ROLE_ASSIGNMENT_ADMIN_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_EMAIL;
@@ -235,7 +236,7 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER_EMPLOYMENT,
             CASEWORKER_EMPLOYMENT_API,
             CASEWORKER_WA,
-            WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN);
+            WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN, CASEWORKER_CAA, CASEWORKER_APPROVER);
 
         lib.createIdamUser(SUPERUSER_EMAIL,
             CASEWORKER_CAA,
@@ -269,7 +270,11 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR,
             "caseworker-divorce-solicitor");
 
+        // Claimant is a citizen
         lib.createIdamUser(CITIZEN_EMAIL, CITIZEN);
+
+        // Respondent is a citizen
+        lib.createIdamUser(RESPONDENT_EMAIL, CITIZEN);
 
         // Required by ccd-data-store-api
         lib.createIdamUser(IDAM_SYSTEM_USER_EMAIL, CASEWORKER);

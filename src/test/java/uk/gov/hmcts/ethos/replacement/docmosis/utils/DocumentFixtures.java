@@ -32,10 +32,6 @@ public final class DocumentFixtures {
         return DocumentType.from(getUploadedDocumentType());
     }
 
-    public static DocumentType getDocumentType(String documentName) {
-        return DocumentType.from(getUploadedDocumentType(documentName));
-    }
-
     public static DocumentType getDocumentType(String documentName, String type) {
         DocumentType from = DocumentType.from(getUploadedDocumentType(documentName));
         from.setTypeOfDocument(type);

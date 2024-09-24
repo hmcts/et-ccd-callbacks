@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -455,7 +456,9 @@ public class Et1VettingService {
                 && NO.equals(caseData.getClaimantWorkAddressQuestion())) {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
                     toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
-                    toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
+                    toAddressWithTab(ObjectUtils.isEmpty(caseData.getClaimantWorkAddress().getClaimantWorkAddress())
+                            ? new Address()
+                            : caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
                     toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress()));
         } else {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS,

@@ -21,12 +21,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({LegalRepDocumentsController.class, JsonMapper.class})
 class LegalRepDocumentsControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_START_URL = "/legalrepDocuments/aboutToStart";
+    private static final String ABOUT_TO_SUBMIT_URL = "/legalrepDocuments/aboutToSubmit";
 
     @Autowired
     private MockMvc mockMvc;
@@ -39,6 +43,9 @@ class LegalRepDocumentsControllerTest extends BaseControllerTest {
     protected void setUp() throws Exception {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withDocumentCollection(ET1)
+            .withDocumentCollection(ET1_ATTACHMENT)
+            .withDocumentCollection(TRIBUNAL_CASE_FILE)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.getCaseData().setEthosCaseReference("1234");
@@ -57,26 +64,24 @@ class LegalRepDocumentsControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath("$.data.legalRepDocumentsMarkdown", notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_START_URL)
+    void aboutToSubmit_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath("$.data.legalRepDocumentsMarkdown", nullValue()))
+            .andExpect(jsonPath("$.data.legalrepDocumentCollection", nullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Test
-    void aboutToStart_badRequest() throws Exception {
-        mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content("garbage content")
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
-    }
 }

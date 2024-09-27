@@ -51,7 +51,7 @@ public final class TseViewApplicationHelper {
     public static boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem applicationTypeItem) {
         String applicant = applicationTypeItem.getValue().getApplicant();
         String copyToRespondent = applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
-        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
+        boolean isClaimantAndRule92Shared = (CLAIMANT_TITLE.equals(applicant) || CLAIMANT_REP_TITLE.equals(applicant))
                 && YES.equals(copyToRespondent);
 
         return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;

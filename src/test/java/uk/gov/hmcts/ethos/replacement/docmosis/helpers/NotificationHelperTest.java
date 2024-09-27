@@ -90,12 +90,12 @@ class NotificationHelperTest {
     }
 
     @Test
-    void buildMapForRespondent_withUnrepresentedRespondent_shouldReturnRespondentDetails() {
+    void buildMapForRespondent_withUnrepresentedRespondent_shouldReturnNull() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
 
-        assertThat(actual).containsEntry("emailAddress", "respondent@unrepresented.com")
+        assertThat(actual).containsEntry("emailAddress", "")
             .containsEntry("name", "Respondent Unrepresented")
             .containsEntry("caseNumber", "12345/6789");
     }

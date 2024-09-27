@@ -22,8 +22,12 @@ import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRespondentSystemUser;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService.SUBMITTED_BODY;
 
 @Slf4j
 @RequestMapping("/claimantRespondNotification")
@@ -50,8 +54,7 @@ public class RespondToNotificationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setClaimantSelectNotification(
                 pseRespondToTribunalService.populateSelectDropdown(caseData, CLAIMANT_TITLE));
-
-        // Do we need to do stuff for R92?
+        caseData.setIsRespondentSystemUser(isRespondentSystemUser(caseData) ? YES : NO);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -72,13 +75,13 @@ public class RespondToNotificationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setClaimantNotificationTableMarkdown(
-                pseRespondToTribunalService.initialOrdReqDetailsTableMarkUp(caseData)
+                pseRespondToTribunalService.initialOrdReqDetailsTableMarkUp(caseData, CLAIMANT_TITLE)
         );
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Mid Event for initial Request/Order details")
+    @Operation(summary = "About to submit claimant response to notification")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -93,14 +96,13 @@ public class RespondToNotificationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        // TODO: This is a placeholder for the actual implementation
         pseRespondToTribunalService.saveClaimantResponse(caseData);
         pseRespondToTribunalService.clearClaimantNotificationDetails(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Mid Event for initial Request/Order details")
+    @Operation(summary = "Submitted page for claimant response to notification")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -115,10 +117,12 @@ public class RespondToNotificationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        // TODO: This is a placeholder for the actual implementation
         pseRespondToTribunalService.sendEmailsForClaimantResponse(ccdRequest.getCaseDetails(), userToken);
 
-        return getCallbackRespEntityNoErrors(caseData);
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .confirmation_body(SUBMITTED_BODY)
+                .data(caseData)
+                .build());
     }
 
     @PostMapping(value = "/midValidateInput", consumes = APPLICATION_JSON_VALUE)

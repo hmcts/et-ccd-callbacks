@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -49,6 +50,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -217,15 +219,23 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+            
+            </div> </details>
+
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -292,16 +302,24 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
             |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+            
+            </div> </details>
+
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -346,7 +364,7 @@ class PseRespondToTribunalServiceTest {
             |Sent to|Both parties|\r
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
                 is(expected));
     }
 
@@ -406,7 +424,7 @@ class PseRespondToTribunalServiceTest {
             |Sent to|Both parties|\r
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData), is(expected));
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE), is(expected));
     }
 
     @ParameterizedTest
@@ -685,7 +703,7 @@ class PseRespondToTribunalServiceTest {
                 LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
-        pseRespondToTribService.sendTribunalEmail(caseDetails);
+        pseRespondToTribService.sendTribunalEmail(caseDetails, RESPONDENT_TITLE);
         verify(emailService).sendEmail(TEMPLATE_ID, "manchesteret@justice.gov.uk", expectedMap);
     }
 
@@ -725,7 +743,7 @@ class PseRespondToTribunalServiceTest {
                 LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
-        pseRespondToTribService.sendTribunalEmail(caseDetails);
+        pseRespondToTribService.sendTribunalEmail(caseDetails, RESPONDENT_TITLE);
         verify(emailService).sendEmail(TEMPLATE_ID, "manchesteret@justice.gov.uk", expectedMap);
     }
 
@@ -785,5 +803,55 @@ class PseRespondToTribunalServiceTest {
         String actual = pseRespondToTribService.getRespondentSubmittedBody(caseData);
 
         assertEquals(actual, String.format(SUBMITTED_BODY, RULE92_ANSWERED_YES));
+    }
+
+    @Test
+    void sendEmailsForClaimantResponseR92No() {
+        caseData = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000001/2024")
+                .withManagingOffice("Manchester")
+                .withClaimant("John Doe")
+                .withRespondent(RespondentSumType.builder().respondentName("Jane Doe").build())
+                .withClaimantRepresentedQuestion(YES)
+                .withRepresentativeClaimantType("Mark Doe", "mail@mail.com")
+                .withRespondentRepresentative("Jane Doe", "James Doe", "respondentrep@test.com")
+                .withNotification("Notification One", "Hearing")
+                .build();
+        caseData.setClaimantSelectNotification(DynamicFixedListType.from("1", "1 - Notification One", true));
+        caseData.setClaimantNotificationCopyToOtherParty(NO);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId("1677174791076683");
+
+        when(userIdamService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.MANCHESTER);
+        pseRespondToTribService.sendEmailsForClaimantResponse(caseDetails, AUTH_TOKEN);
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendEmailsForClaimantResponseR92Yes() {
+        caseData = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000001/2024")
+                .withManagingOffice("Manchester")
+                .withClaimant("John Doe")
+                .withRespondent(RespondentSumType.builder().respondentName("Jane Doe").build())
+                .withClaimantRepresentedQuestion(YES)
+                .withRepresentativeClaimantType("Mark Doe", "mail@mail.com")
+                .withRespondentRepresentative("Jane Doe", "James Doe", "respondentrep@test.com")
+                .withNotification("Notification One", "Hearing")
+                .build();
+        caseData.setClaimantSelectNotification(DynamicFixedListType.from("1", "1 - Notification One", true));
+        caseData.setClaimantNotificationCopyToOtherParty(YES);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId("1677174791076683");
+
+        when(userIdamService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.MANCHESTER);
+        pseRespondToTribService.sendEmailsForClaimantResponse(caseDetails, AUTH_TOKEN);
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
     }
 }

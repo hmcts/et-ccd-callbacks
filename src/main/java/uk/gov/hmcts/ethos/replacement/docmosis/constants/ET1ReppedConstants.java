@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 import java.util.List;
 import java.util.Map;
 
-public class ET1ReppedConstants {
+public final class ET1ReppedConstants {
     public static final String TRIAGE_ERROR_MESSAGE = """
             The postcode you entered is not included under the early adopter sites yet. Please use the ET1 claim form
             linked on this page or copy the following into your browser:

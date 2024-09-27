@@ -63,9 +63,9 @@ class Et3NotificationServiceTest {
     void sendNotifications_shouldSendNotifications() {
         et3NotificationService.sendNotifications(caseDetails);
 
-        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), personalisation.capture());
-        assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1234");
-
+        // Should not send email to unrepresented respondent
+        verify(emailService, times(0)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
+        // Should send email to represented respondent
         verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), personalisation.capture());
         assertThat(personalisation.getValue()).containsEntry("linkToExUI", "exuiUrl1234");
     }

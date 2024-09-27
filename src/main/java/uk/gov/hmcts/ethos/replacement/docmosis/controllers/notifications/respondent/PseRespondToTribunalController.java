@@ -131,7 +131,7 @@ public class PseRespondToTribunalController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setPseRespondentOrdReqTableMarkUp(
-            pseRespondToTribunalService.initialOrdReqDetailsTableMarkUp(caseData)
+            pseRespondToTribunalService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE)
         );
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -194,7 +194,7 @@ public class PseRespondToTribunalController {
 
         pseRespondToTribunalService.sendAcknowledgeEmail(caseDetails, userToken);
         pseRespondToTribunalService.sendClaimantEmail(caseDetails);
-        pseRespondToTribunalService.sendTribunalEmail(caseDetails);
+        pseRespondToTribunalService.sendTribunalEmail(caseDetails, RESPONDENT_TITLE);
 
         pseRespondToTribunalService.clearRespondentResponse(caseDetails.getCaseData());
 

@@ -147,13 +147,21 @@ class ProvideSomethingElseViewServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
             |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+          
+            </div> </details>
+            
             """;
 
         assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
@@ -236,13 +244,21 @@ class ProvideSomethingElseViewServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Respondent|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
             |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My respondent hearing agenda.pdf</a>|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+            
+            </div> </details>
+            
             """;
 
         assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
@@ -306,7 +322,7 @@ class ProvideSomethingElseViewServiceTest {
             | No | Subject | To party | Date sent | Notification | Response due | Number of responses |\r
             |:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r
             |1|Other (General correspondence)|Both parties|23 February 2023|View notice of hearing|No|0|\r
-            |3|Other (General correspondence)|Respondent only|23 February 2023|Send Notification Title|No|0|\r
+            |2|Other (General correspondence)|Respondent only|23 February 2023|Send Notification Title|No|0|\r
             \r
             """;
         String actual = provideSomethingElseViewService.generateViewNotificationsMarkdown(caseData, RESPONDENT_TITLE);

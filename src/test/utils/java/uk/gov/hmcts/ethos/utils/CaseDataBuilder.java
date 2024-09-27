@@ -39,6 +39,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.time.LocalDateTime;
@@ -46,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
@@ -332,6 +335,10 @@ public class CaseDataBuilder {
         RepresentedTypeC rep = new RepresentedTypeC();
         rep.setNameOfRepresentative(name);
         rep.setRepresentativeEmailAddress(email);
+        rep.setMyHmctsOrganisation(Organisation.builder()
+                .organisationName("ClaimantOrg")
+                .organisationID(UUID.randomUUID().toString())
+                .build());
         caseData.setRepresentativeClaimantType(rep);
         return this;
     }
@@ -465,7 +472,13 @@ public class CaseDataBuilder {
         RepresentedTypeR item = RepresentedTypeR.builder()
                 .respRepName(respondentName)
                 .nameOfRepresentative(repName)
-                .representativeEmailAddress(email).build();
+                .representativeEmailAddress(email)
+                .myHmctsYesNo(YES)
+                .respondentOrganisation(Organisation.builder()
+                        .organisationID("1234")
+                        .organisationName("Respondent Org")
+                        .build())
+                .build();
         RepresentedTypeRItem itemType = new RepresentedTypeRItem();
         itemType.setValue(item);
         if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
@@ -627,5 +640,24 @@ public class CaseDataBuilder {
         address.setPostCode("Postcode");
         address.setCountry("Country");
         return address;
+    }
+
+    public CaseDataBuilder withNotification(String title, String type) {
+        if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
+            caseData.setSendNotificationCollection(new ArrayList<>());
+        }
+        SendNotificationType sendNotificationType = new SendNotificationType();
+        sendNotificationType.setNumber(String.valueOf(caseData.getSendNotificationCollection().size() + 1));
+        sendNotificationType.setDate(LocalDateTime.now().toString());
+        sendNotificationType.setSendNotificationTitle(title);
+        sendNotificationType.setSendNotificationSubject(List.of(type));
+        sendNotificationType.setSendNotificationNotify(BOTH_PARTIES);
+        sendNotificationType.setSendNotificationWhoCaseOrder("Judge");
+
+        SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
+        sendNotificationTypeItem.setValue(sendNotificationType);
+        sendNotificationTypeItem.setId(UUID.randomUUID().toString());
+        caseData.getSendNotificationCollection().add(sendNotificationTypeItem);
+        return this;
     }
 }

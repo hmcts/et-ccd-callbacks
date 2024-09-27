@@ -36,17 +36,16 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatRespondDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatResponseDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatTribunalResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getPartyNotifications;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedClaimantNotification;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedRespondentNotification;
@@ -62,9 +61,9 @@ public class PseRespondToTribunalService {
     private final TribunalOfficesService tribunalOfficesService;
     private final FeatureToggleService featureToggleService;
 
-    @Value("${template.pse.respondent.rule-92-yes}")
+    @Value("${template.pse.myhmcts.rule-92-yes}")
     private String acknowledgeEmailYesTemplateId;
-    @Value("${template.pse.respondent.rule-92-no}")
+    @Value("${template.pse.myhmcts.rule-92-no}")
     private String acknowledgeEmailNoTemplateId;
     @Value("${template.pse.claimant}")
     private String notificationToClaimantTemplateId;
@@ -77,10 +76,10 @@ public class PseRespondToTribunalService {
     @Value("${template.pse.respondent-rep.response-received}")
     private String respondentRepResponseConfirmationTemplateId;
 
-    private static final String GIVE_MISSING_DETAIL =
+    public static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
 
-    private static final String SUBMITTED_BODY = """
+    public static final String SUBMITTED_BODY = """
         ### What happens next\r
         \r
         %sThe tribunal will consider all correspondence and let you know what happens next.""";
@@ -128,9 +127,16 @@ public class PseRespondToTribunalService {
      * Initial Application and Respond details table.
      * @param caseData contains all the case data
      */
-    public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
-        SendNotificationType sendNotificationType = getSelectedRespondentNotification(caseData).getValue();
-        return formatOrdReqDetails(sendNotificationType) + formatRespondDetails(sendNotificationType);
+    public String initialOrdReqDetailsTableMarkUp(CaseData caseData, String party) {
+        SendNotificationType sendNotificationType = switch (party) {
+            case CLAIMANT_TITLE -> getSelectedClaimantNotification(caseData).getValue();
+            case RESPONDENT_TITLE -> getSelectedRespondentNotification(caseData).getValue();
+            default -> throw new IllegalArgumentException("Invalid party selection");
+        };
+
+        return formatOrdReqDetails(sendNotificationType)
+               + formatResponseDetails(sendNotificationType, party)
+               + formatTribunalResponse(sendNotificationType, party);
     }
 
     /**
@@ -195,7 +201,7 @@ public class PseRespondToTribunalService {
                     buildPersonalisationYes(caseDetails));
         } else {
             emailService.sendEmail(acknowledgeEmailNoTemplateId, email,
-                    buildPersonalisationNo(caseDetails));
+                    buildResponsePersonalisationNo(caseDetails, RESPONDENT_TITLE));
         }
     }
 
@@ -207,9 +213,13 @@ public class PseRespondToTribunalService {
         );
     }
 
-    private Map<String, String> buildPersonalisationNo(CaseDetails caseDetails) {
+    private Map<String, String> buildResponsePersonalisationNo(CaseDetails caseDetails, String party) {
         CaseData caseData = caseDetails.getCaseData();
-        SendNotificationType sendNotificationType = getSelectedRespondentNotification(caseData).getValue();
+        SendNotificationType sendNotificationType = switch (party) {
+            case CLAIMANT_TITLE -> getSelectedClaimantNotification(caseData).getValue();
+            case RESPONDENT_TITLE -> getSelectedRespondentNotification(caseData).getValue();
+            default -> throw new IllegalArgumentException("Invalid party selection");
+        };
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
@@ -267,7 +277,7 @@ public class PseRespondToTribunalService {
      * Generate email notification to admin when LR responds to order/request.
      * @param caseDetails in which the case details are extracted from
      */
-    public void sendTribunalEmail(CaseDetails caseDetails) {
+    public void sendTribunalEmail(CaseDetails caseDetails, String party) {
         String managingOffice = caseDetails.getCaseData().getManagingOffice();
         TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
         if (tribunalOffice == null) {
@@ -281,12 +291,16 @@ public class PseRespondToTribunalService {
 
         emailService.sendEmail(notificationToAdminTemplateId,
             adminEmail,
-            buildPersonalisationAdmin(caseDetails));
+            buildPersonalisationAdmin(caseDetails, party));
     }
 
-    private Map<String, String> buildPersonalisationAdmin(CaseDetails caseDetails) {
+    private Map<String, String> buildPersonalisationAdmin(CaseDetails caseDetails, String party) {
         CaseData caseData = caseDetails.getCaseData();
-        SendNotificationType sendNotificationType = getSelectedRespondentNotification(caseData).getValue();
+        SendNotificationType sendNotificationType = switch (party) {
+            case CLAIMANT_TITLE -> getSelectedClaimantNotification(caseData).getValue();
+            case RESPONDENT_TITLE -> getSelectedRespondentNotification(caseData).getValue();
+            default -> throw new IllegalArgumentException("Invalid party selection");
+        };
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 APPLICATION, sendNotificationType.getSendNotificationTitle(),
@@ -329,11 +343,18 @@ public class PseRespondToTribunalService {
 
     public void sendEmailsForClaimantResponse(CaseDetails caseDetails, String userToken) {
         sendClaimantResponseConfirmationEmail(caseDetails, userToken);
-        sendRespondentResponseConfirmationEmail(caseDetails);
+        sendTribunalEmail(caseDetails, CLAIMANT_TITLE);
+
+        if (YES.equals(caseDetails.getCaseData().getClaimantNotificationCopyToOtherParty())) {
+            sendRespondentResponseConfirmationEmail(caseDetails);
+        }
     }
 
     private void sendRespondentResponseConfirmationEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return;
+        }
         Set<RepresentedTypeRItem> respondentReps = caseData.getRepCollection().stream()
                 .filter(r -> YES.equals(r.getValue().getMyHmctsYesNo())
                              && !ObjectUtils.isEmpty(r.getValue().getRespondentOrganisation())
@@ -354,16 +375,21 @@ public class PseRespondToTribunalService {
     private Map<String, ?> buildPersonalisationRespondentRep(CaseDetails caseDetails) {
         return Map.of(
                 CLAIMANT, caseDetails.getCaseData().getClaimant(),
-                RESPONDENT_NAMES, getRespondentNames(caseDetails.getCaseData()),
+                RESPONDENTS, getRespondentNames(caseDetails.getCaseData()),
                 CASE_NUMBER, caseDetails.getCaseData().getEthosCaseReference(),
                 HEARING_DATE, getNearestHearingToReferral(caseDetails.getCaseData(), "Not set"),
-                EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId())
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 
     private void sendClaimantResponseConfirmationEmail(CaseDetails caseDetails, String userToken) {
         String email = userIdamService.getUserDetails(userToken).getEmail();
-        emailService.sendEmail(claimantRepResponseConfirmationTemplateId, email, buildPersonalisationYes(caseDetails));
+        if (YES.equals(caseDetails.getCaseData().getClaimantNotificationCopyToOtherParty())) {
+            emailService.sendEmail(acknowledgeEmailYesTemplateId, email, buildPersonalisationYes(caseDetails));
+        } else {
+            emailService.sendEmail(acknowledgeEmailNoTemplateId, email,
+                    buildResponsePersonalisationNo(caseDetails, CLAIMANT_TITLE));
+        }
     }
 
     public void saveClaimantResponse(CaseData caseData) {
@@ -377,7 +403,7 @@ public class PseRespondToTribunalService {
                 .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .response(caseData.getClaimantNotificationResponseText())
                 .hasSupportingMaterial(caseData.getClaimantNotificationSupportingMaterial())
-                .supportingMaterial(caseData.getClaimantNotificationUploadDocument())
+                .supportingMaterial(caseData.getClaimantNotificationDocuments())
                 .copyToOtherParty(caseData.getClaimantNotificationCopyToOtherParty())
                 .copyNoGiveDetails(caseData.getClaimantNotificationsCopyNoDetails())
                 .build();
@@ -403,8 +429,8 @@ public class PseRespondToTribunalService {
         caseData.setClaimantSelectNotification(null);
         caseData.setClaimantNotificationResponseText(null);
         caseData.setClaimantNotificationSupportingMaterial(null);
-        caseData.setClaimantNotificationUploadDocument(null);
-        caseData.setClaimantNotificationCopyToOtherParty(null);
+        caseData.setClaimantNotificationDocuments(null);
         caseData.setClaimantNotificationsCopyNoDetails(null);
     }
+
 }

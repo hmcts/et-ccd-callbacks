@@ -251,8 +251,6 @@ class TseServiceTest {
         List<String[]> actual = tseService.getApplicationDetailsRows(application, AUTH_TOKEN, false);
 
         List<String[]> expected = List.of(
-            MD_TABLE_EMPTY_LINE,
-            MD_TABLE_EMPTY_LINE,
             new String[] {"Applicant", "Respondent"},
             new String[] {"Type of application", "Amend response"},
             new String[] {"Application date", "2000-01-01"},
@@ -269,8 +267,6 @@ class TseServiceTest {
         List<String[]> actual = tseService.getApplicationDetailsRows(application, AUTH_TOKEN, true);
 
         List<String[]> expected = List.of(
-            MD_TABLE_EMPTY_LINE,
-            MD_TABLE_EMPTY_LINE,
             new String[] {"Applicant", "Respondent"},
             new String[] {"Type of application", "Amend response"},
             new String[] {"Application date", "2000-01-01"},
@@ -337,8 +333,6 @@ class TseServiceTest {
             String expected = """
                 |Application||\r
                 |--|--|\r
-                |||\r
-                |||\r
                 |Applicant|Respondent|\r
                 |Type of application|Amend response|\r
                 |Application date|2000-01-01|\r
@@ -387,8 +381,6 @@ class TseServiceTest {
             String expected = """
                 |Application||\r
                 |--|--|\r
-                |||\r
-                |||\r
                 |Applicant|Respondent|\r
                 |Supporting material|Document (txt, 1MB)|\r
                 |||\r
@@ -465,8 +457,6 @@ class TseServiceTest {
             String expected = """
                 |Application||\r
                 |--|--|\r
-                |||\r
-                |||\r
                 |Applicant|Respondent|\r
                 |Type of application|Amend response|\r
                 |Application date|2000-01-01|\r

@@ -897,6 +897,7 @@ class PseRespondToTribunalServiceTest {
         caseData.setClaimantSelectNotification(
                 DynamicFixedListType.of(DynamicValueType.create("1",
                         "1 View notice of hearing")));
+
         String expected = """
             |View Notification||\r
             |--|--|\r
@@ -927,8 +928,7 @@ class PseRespondToTribunalServiceTest {
             |Response Type| - |\r
             |Party to notify|Both parties|\r
             |Is a response required?|Yes|\r
-            |Parties to respond| - |\r
-            
+            |Parties to respond| - |\r\n
             
             </div> </details>
             

@@ -55,6 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.get
 @Service
 @RequiredArgsConstructor
 public class PseRespondToTribunalService {
+    public static final String INVALID_PARTY_SELECTION = "Invalid party selection";
     private final EmailService emailService;
     private final UserIdamService userIdamService;
     private final HearingSelectionService hearingSelectionService;
@@ -119,7 +120,7 @@ public class PseRespondToTribunalService {
             return CollectionUtils.isEmpty(pseResponseTypeItems)
                 || pseResponseTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
         } else {
-            throw new IllegalArgumentException("Invalid party selection");
+            throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
         }
     }
 
@@ -131,7 +132,7 @@ public class PseRespondToTribunalService {
         SendNotificationType sendNotificationType = switch (party) {
             case CLAIMANT_TITLE -> getSelectedClaimantNotification(caseData).getValue();
             case RESPONDENT_TITLE -> getSelectedRespondentNotification(caseData).getValue();
-            default -> throw new IllegalArgumentException("Invalid party selection");
+            default -> throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
         };
 
         return formatOrdReqDetails(sendNotificationType)
@@ -218,7 +219,7 @@ public class PseRespondToTribunalService {
         SendNotificationType sendNotificationType = switch (party) {
             case CLAIMANT_TITLE -> getSelectedClaimantNotification(caseData).getValue();
             case RESPONDENT_TITLE -> getSelectedRespondentNotification(caseData).getValue();
-            default -> throw new IllegalArgumentException("Invalid party selection");
+            default -> throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
         };
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
@@ -299,7 +300,7 @@ public class PseRespondToTribunalService {
         SendNotificationType sendNotificationType = switch (party) {
             case CLAIMANT_TITLE -> getSelectedClaimantNotification(caseData).getValue();
             case RESPONDENT_TITLE -> getSelectedRespondentNotification(caseData).getValue();
-            default -> throw new IllegalArgumentException("Invalid party selection");
+            default -> throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
         };
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),

@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -30,10 +29,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelec
 @RequiredArgsConstructor
 public class ProvideSomethingElseViewService {
 
-    private static final String TABLE_COLUMNS_MARKDOWN =
-            "| No | Subject | To party | Date sent | Notification | Response due | Number of responses |\r\n"
-                    + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
-                    + "%s\r\n";
+    private static final String TABLE_COLUMNS_MARKDOWN = """
+         | No | Subject | To party | Date sent | Notification | Response due | Number of responses |\r
+         |:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r
+         %s\r
+         """;
 
     private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
 
@@ -54,7 +54,7 @@ public class ProvideSomethingElseViewService {
                 .map(notification -> DynamicValueType.create(
                         notification.getValue().getNumber(),
                         count.incrementAndReturnValue() + " - " + notification.getValue().getSendNotificationTitle()))
-                .collect(Collectors.toList()));
+                .toList());
 
     }
 

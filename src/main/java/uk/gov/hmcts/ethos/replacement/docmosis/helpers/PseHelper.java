@@ -35,6 +35,7 @@ public final class PseHelper {
 
     private static final String ACCEPTANCE_OF_ECC_RESPONSE = "Acceptance of ECC response";
     public static final String CLAIMANT_REPRESENTATIVE = "Claimant Representative";
+    public static final String INVALID_PARTY_SELECTION = "Invalid party selection";
 
     private PseHelper() {
         // Access through static methods
@@ -150,7 +151,7 @@ public final class PseHelper {
                     (RESPONDENT_TITLE.equals(value.getFrom()) && YES.equals(value.getCopyToOtherParty()))
                     || CLAIMANT_TITLE.equals(value.getFrom())
                     || CLAIMANT_REPRESENTATIVE.equals(value.getFrom());
-            default -> throw new IllegalArgumentException("Invalid party selection");
+            default -> throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
         };
     }
 
@@ -193,16 +194,16 @@ public final class PseHelper {
     private static boolean filterTribunalResponse(RespondNotificationType value, String party) {
         return switch (party) {
             case CLAIMANT_TITLE ->
-                    value.getRespondNotificationPartyToNotify().equals(CLAIMANT_TITLE)
+                    value.getRespondNotificationPartyToNotify().equals(CLAIMANT_ONLY)
                     || value.getRespondNotificationPartyToNotify().equals(BOTH_PARTIES)
-                    || value.getRespondNotificationPartyToNotify().equals(CLAIMANT_ONLY)
-                    || value.getRespondNotificationPartyToNotify().equals(BOTH_PARTIES);
+                    || value.getRespondNotificationWhoRespond().equals(CLAIMANT_ONLY)
+                    || value.getRespondNotificationWhoRespond().equals(BOTH_PARTIES);
             case RESPONDENT_TITLE ->
-                    value.getRespondNotificationPartyToNotify().equals(RESPONDENT_TITLE)
+                    value.getRespondNotificationPartyToNotify().equals(RESPONDENT_ONLY)
                     || value.getRespondNotificationPartyToNotify().equals(BOTH_PARTIES)
-                    || value.getRespondNotificationPartyToNotify().equals(RESPONDENT_ONLY)
-                    || value.getRespondNotificationPartyToNotify().equals(BOTH_PARTIES);
-            default -> throw new IllegalArgumentException("Invalid party selection");
+                    || value.getRespondNotificationWhoRespond().equals(RESPONDENT_ONLY)
+                    || value.getRespondNotificationWhoRespond().equals(BOTH_PARTIES);
+            default -> throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
         };
     }
 
@@ -210,15 +211,16 @@ public final class PseHelper {
         return "\r\n" + MarkdownHelper.createTwoColumnTable(
                 new String[]{"Tribunal Response " + respondCount.incrementAndReturnValue(), " "},
                 Stream.of(
-                        asRow("Notification", value.getRespondNotificationTitle()),
-                        asRow("Response from", value.getRespondNotificationFullName()),
-                        asRow("Response date", value.getRespondNotificationDate()),
+                        asRow("Notification", defaultIfEmpty(value.getRespondNotificationTitle(), " - ")),
+                        asRow("Response from", defaultIfEmpty(value.getRespondNotificationFullName(), " - ")),
+                        asRow("Response date", defaultIfEmpty(value.getRespondNotificationDate(), " - ")),
                         addDocumentTypeRows(value.getRespondNotificationUploadDocument(), "Supporting material"),
                         asRow("Additional information",
                                 defaultIfEmpty(value.getRespondNotificationAdditionalInfo(), " - ")),
-                        asRow("Response Type", value.getRespondNotificationCmoOrRequest()),
-                        asRow("Party to notify", value.getRespondNotificationPartyToNotify()),
-                        asRow("Is a response required?", value.getRespondNotificationResponseRequired()),
+                        asRow("Response Type", defaultIfEmpty(value.getRespondNotificationCmoOrRequest(), " - ")),
+                        asRow("Party to notify", defaultIfEmpty(value.getRespondNotificationPartyToNotify(), " - ")),
+                        asRow("Is a response required?",
+                                defaultIfEmpty(value.getRespondNotificationResponseRequired(), " - ")),
                         asRow("Parties to respond", defaultIfEmpty(value.getRespondNotificationWhoRespond(), " - "))
                 ));
     }
@@ -231,7 +233,7 @@ public final class PseHelper {
             return RESPONDENT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
                    || BOTH_PARTIES.equalsIgnoreCase(sendNotificationTypeItem.getValue().getSendNotificationNotify());
         } else {
-            throw new IllegalArgumentException("Invalid party selection");
+            throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
         }
 
     }

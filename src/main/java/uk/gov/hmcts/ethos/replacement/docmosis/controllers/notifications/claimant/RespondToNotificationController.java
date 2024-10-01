@@ -26,6 +26,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRespondentSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService.SUBMITTED_BODY;
 
@@ -120,7 +121,7 @@ public class RespondToNotificationController {
         pseRespondToTribunalService.sendEmailsForClaimantResponse(ccdRequest.getCaseDetails(), userToken);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-                .confirmation_body(SUBMITTED_BODY)
+                .confirmation_body(SUBMITTED_BODY.formatted(EMPTY_STRING))
                 .data(caseData)
                 .build());
     }

@@ -427,7 +427,6 @@ public class PseRespondToTribunalService {
     }
 
     public void clearClaimantNotificationDetails(CaseData caseData) {
-        caseData.setClaimantSelectNotification(null);
         caseData.setClaimantNotificationResponseText(null);
         caseData.setClaimantNotificationSupportingMaterial(null);
         caseData.setClaimantNotificationDocuments(null);

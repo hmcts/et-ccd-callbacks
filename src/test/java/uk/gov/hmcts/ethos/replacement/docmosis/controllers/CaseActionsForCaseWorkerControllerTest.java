@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -460,8 +461,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                         .content(requestContent2.toString())
@@ -475,12 +474,52 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
+    void amendRespondentDetails_moreThan10Respondents() {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
+                .thenReturn(submitEvent.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(eventValidationService.validateMaximumSize(any(CaseData.class)))
+                .thenReturn(Optional.of("Max respondents exceeded"));
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetails_noRepCollection() {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
+                .thenReturn(submitEvent.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(eventValidationService.validateMaximumSize(any(CaseData.class)))
+                .thenReturn(Optional.empty());
+        ccdRequest.getCaseDetails().getCaseData().setRepCollection(null);
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
     void amendRespondentDetails_UpdateCounter() {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
 
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);

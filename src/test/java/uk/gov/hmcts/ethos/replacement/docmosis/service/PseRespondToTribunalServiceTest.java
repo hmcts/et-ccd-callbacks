@@ -123,7 +123,7 @@ class PseRespondToTribunalServiceTest {
 
         DynamicFixedListType expected = DynamicFixedListType.from(List.of(
                 DynamicValueType.create("1", "1 View notice of hearing"),
-                DynamicValueType.create("3", "3 Send Notification Title")
+                DynamicValueType.create("3", "2 Send Notification Title")
         ));
 
         assertThat(pseRespondToTribService.populateSelectDropdown(caseData, RESPONDENT_TITLE),

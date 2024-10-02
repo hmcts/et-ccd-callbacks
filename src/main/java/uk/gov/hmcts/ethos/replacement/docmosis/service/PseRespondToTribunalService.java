@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -99,14 +100,14 @@ public class PseRespondToTribunalService {
         if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
             return null;
         }
-
+        IntWrapper count = new IntWrapper(0);
         return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
             .filter(r -> getPartyNotifications(r, party)
                 && isNoReply(r.getValue().getRespondCollection(), party))
             .map(r ->
                 DynamicValueType.create(
                     r.getValue().getNumber(),
-                    r.getValue().getNumber() + " - " + r.getValue().getSendNotificationTitle()
+                    count.incrementAndReturnValue() + " - " + r.getValue().getSendNotificationTitle()
                 )
             )
             .toList());

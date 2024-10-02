@@ -225,7 +225,7 @@ public final class PseHelper {
                 ));
     }
 
-    public static boolean getPartyNotifications(SendNotificationTypeItem sendNotificationTypeItem, String party) {
+    public static boolean canPartyViewNotification(SendNotificationTypeItem sendNotificationTypeItem, String party) {
         if (CLAIMANT_TITLE.equals(party)) {
             return CLAIMANT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
                    || BOTH_PARTIES.equalsIgnoreCase(sendNotificationTypeItem.getValue().getSendNotificationNotify());

@@ -44,10 +44,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.canPartyViewNotification;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatResponseDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatTribunalResponse;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getPartyNotifications;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedClaimantNotification;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedRespondentNotification;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
@@ -102,8 +102,8 @@ public class PseRespondToTribunalService {
         }
         IntWrapper count = new IntWrapper(0);
         return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
-            .filter(r -> getPartyNotifications(r, party)
-                && isNoReply(r.getValue().getRespondCollection(), party))
+            .filter(r -> canPartyViewNotification(r, party)
+                         && isNoReply(r.getValue().getRespondCollection(), party))
             .map(r ->
                 DynamicValueType.create(
                     r.getValue().getNumber(),

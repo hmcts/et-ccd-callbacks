@@ -18,10 +18,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.canPartyViewNotification;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatResponseDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatTribunalResponse;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getPartyNotifications;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedNotificationWithCode;
 
 @Slf4j
@@ -50,7 +50,7 @@ public class ProvideSomethingElseViewService {
 
         IntWrapper count = new IntWrapper(0);
         return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
-                .filter(notification -> getPartyNotifications(notification, party))
+                .filter(notification -> canPartyViewNotification(notification, party))
                 .map(notification -> DynamicValueType.create(
                         notification.getValue().getNumber(),
                         count.incrementAndReturnValue() + " - " + notification.getValue().getSendNotificationTitle()))

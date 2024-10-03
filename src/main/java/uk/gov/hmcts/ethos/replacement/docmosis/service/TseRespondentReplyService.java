@@ -269,7 +269,10 @@ public class TseRespondentReplyService {
             return;
         }
         boolean isWelsh = featureToggleService.isWelshEnabled()
-                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+                && Optional.ofNullable(caseData.getClaimantHearingPreference())
+                .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
+                .orElse(false);
+
         String emailTemplate = isWelsh
                 ? cyTseRespondentResponseTemplateId
                 : tseRespondentResponseTemplateId;

@@ -68,6 +68,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -88,15 +89,11 @@ class TseClaimantRepReplyServiceTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
-    private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_NO = "replyToTribAckTemplateNo";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_YES = "replyToAppAckTemplateYes";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_NO = "replyToAppAckTemplateNo";
-    private static final String TEST_XUI_URL = "exuiUrl";
-    private static final String TEST_CUI_URL = "citizenUrl";
     private static final String CASE_NUMBER = "9876";
-    private static final String WITHDRAW_MY_CLAIM = "Withdraw all/part of claim";
 
     private EmailService emailService;
     private UserDetails userDetails;
@@ -196,7 +193,7 @@ class TseClaimantRepReplyServiceTest {
             assertThat(replyType.getCopyNoGiveDetails()).isEqualTo("It's a secret");
             assertThat(replyType.getHasSupportingMaterial()).isEqualTo(YES);
             assertThat(replyType.getCopyToOtherParty()).isEqualTo(NO);
-            assertThat(replyType.getFrom()).isEqualTo(RESPONDENT_TITLE);
+            assertThat(replyType.getFrom()).isEqualTo(CLAIMANT_REP_TITLE);
             assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename())
                     .isEqualTo("image.png");
 

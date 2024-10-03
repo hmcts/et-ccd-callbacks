@@ -17,13 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -33,9 +35,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class DigitalCaseFileController {
 
     private final DigitalCaseFileService digitalCaseFileService;
-    private final VerifyTokenService verifyTokenService;
-
-    private static final String INVALID_TOKEN = "Invalid Token {}";
 
     @PostMapping(path = "/selectDcf", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     @Operation(description = "Select DCF configuration and documents")
@@ -50,11 +49,6 @@ public class DigitalCaseFileController {
     public ResponseEntity<CCDCallbackResponse> selectDcf(@RequestBody CCDRequest ccdRequest,
                                                             @RequestHeader(value = HttpHeaders.AUTHORIZATION)
                                                             String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         // Convert doc type from legacy to new before dcf
@@ -78,15 +72,10 @@ public class DigitalCaseFileController {
                                                             @RequestHeader(value = HttpHeaders.AUTHORIZATION)
                                                             String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+        List<String> errors = new ArrayList<>();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        digitalCaseFileService.stitchCaseFile(caseDetails, userToken, errors);
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setCaseBundles(digitalCaseFileService.stitchCaseFile(ccdRequest.getCaseDetails(), userToken));
-        DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
-        caseData.setCaseBundles(null);
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityErrors(errors, caseDetails.getCaseData());
     }
 }

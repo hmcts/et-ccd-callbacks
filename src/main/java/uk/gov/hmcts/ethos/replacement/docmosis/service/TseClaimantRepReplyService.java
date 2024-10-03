@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentEmailAddressList;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
@@ -207,7 +208,7 @@ public class TseClaimantRepReplyService {
                 .response(caseData.getTseResponseText())
                 .supportingMaterial(caseData.getTseResponseSupportingMaterial())
                 .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
-                .from(RESPONDENT_TITLE)
+                .from(CLAIMANT_REP_TITLE)
                 .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                 .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
                 .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())

@@ -37,10 +37,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -378,9 +380,11 @@ public class PseRespondToTribunalService {
         return Map.of(
                 CLAIMANT, caseDetails.getCaseData().getClaimant(),
                 RESPONDENTS, getRespondentNames(caseDetails.getCaseData()),
+                RESPONDENT_NAMES, getRespondentNames(caseDetails.getCaseData()),
                 CASE_NUMBER, caseDetails.getCaseData().getEthosCaseReference(),
                 HEARING_DATE, getNearestHearingToReferral(caseDetails.getCaseData(), "Not set"),
-                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId())
+                LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()),
+                EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId())
         );
     }
 

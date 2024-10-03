@@ -72,7 +72,7 @@ public class TseClaimantRepReplyController {
             @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
+        caseData.setClaimantRepRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
 
         if (Boolean.FALSE.equals(Helper.isRespondentSystemUser(caseData))) {
             caseData.setClaimantTseRespNotAvailable(YES);
@@ -136,7 +136,7 @@ public class TseClaimantRepReplyController {
         if (tseClaimantRepReplyService.isRespondingToTribunal(caseData)) {
             tseClaimantRepReplyService.initialResReplyToTribunalTableMarkUp(caseData, userToken);
         } else {
-            TseHelper.setDataForRespondingToApplication(caseData);
+            TseHelper.setDataForRespondingToApplication(caseData, true);
         }
 
         return getCallbackRespEntityNoErrors(caseData);

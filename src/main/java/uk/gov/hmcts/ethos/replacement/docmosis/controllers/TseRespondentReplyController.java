@@ -157,7 +157,7 @@ public class TseRespondentReplyController {
         if (tseRespondentReplyService.isRespondingToTribunal(caseData)) {
             tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, userToken);
         } else {
-            TseHelper.setDataForRespondingToApplication(caseData);
+            TseHelper.setDataForRespondingToApplication(caseData, false);
         }
 
         return getCallbackRespEntityNoErrors(caseData);

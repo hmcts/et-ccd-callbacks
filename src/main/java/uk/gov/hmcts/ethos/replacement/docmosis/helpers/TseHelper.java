@@ -141,12 +141,18 @@ public final class TseHelper {
      *
      * @param caseData contains all the case data
      */
-    public static void setDataForRespondingToApplication(CaseData caseData) {
+    public static void setDataForRespondingToApplication(CaseData caseData, boolean isClaimantRep) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
-        GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
+        GenericTseApplicationType genericTseApplicationType;
+
+        if (isClaimantRep) {
+            genericTseApplicationType = getClaimantRepSelectedApplicationType(caseData);
+        } else {
+            genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
+        }
         assert genericTseApplicationType != null;
 
         LocalDate date = LocalDate.parse(genericTseApplicationType.getDate(), NEW_DATE_PATTERN);

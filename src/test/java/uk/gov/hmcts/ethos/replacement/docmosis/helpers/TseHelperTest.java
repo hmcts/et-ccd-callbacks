@@ -157,7 +157,7 @@ class TseHelperTest {
     @Test
     void setDataForRespondingToApplication_withEmptyList_doesNothing() {
         caseData.setGenericTseApplicationCollection(null);
-        TseHelper.setDataForRespondingToApplication(caseData);
+        TseHelper.setDataForRespondingToApplication(caseData, false);
         assertNull(caseData.getTseResponseIntro());
     }
 
@@ -165,7 +165,7 @@ class TseHelperTest {
     void setDataForRespondingToApplication_withAGroupBApplication_restoresData() {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
-        TseHelper.setDataForRespondingToApplication(caseData);
+        TseHelper.setDataForRespondingToApplication(caseData, false);
         String expected = """
             <p>The respondent has applied to <strong>Withdraw my claim</strong>.</p>
             <p>You do not need to respond to this application.</p>
@@ -184,7 +184,7 @@ class TseHelperTest {
         caseData.getGenericTseApplicationCollection().get(0).getValue().setType(TSE_APP_POSTPONE_A_HEARING);
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
-        TseHelper.setDataForRespondingToApplication(caseData);
+        TseHelper.setDataForRespondingToApplication(caseData, false);
         String expected = """
             <p>The respondent has applied to <strong>Postpone a hearing</strong>.</p>
             
@@ -205,7 +205,7 @@ class TseHelperTest {
         caseData.getGenericTseApplicationCollection().get(0).getValue().setDocumentUpload(documentType);
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
-        TseHelper.setDataForRespondingToApplication(caseData);
+        TseHelper.setDataForRespondingToApplication(caseData, false);
         String expected = """
             | | |\r
             |--|--|\r

@@ -289,8 +289,13 @@ public class TseRespondentReplyService {
 
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
                     "TSE Reply.pdf");
+
+            String linkToCase = CLAIMANT_REP_TITLE.equals(getApplicantType(caseData))
+                    ? emailService.getExuiCaseLink(caseDetails.getCaseId())
+                    : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
+                    bytes, linkToCase, isWelsh);
             emailService.sendEmail(emailTemplate,
                     claimantEmail, personalisation);
         } catch (Exception e) {

@@ -352,15 +352,15 @@ public class TseClaimantRepReplyService {
      * @param caseData contains all the case data
      */
     void resetReplyToApplicationPage(CaseData caseData) {
-        caseData.setTseResponseText(null);
-        caseData.setTseResponseIntro(null);
-        caseData.setTseResponseTable(null);
-        caseData.setTseResponseHasSupportingMaterial(null);
-        caseData.setTseResponseSupportingMaterial(null);
-        caseData.setTseResponseCopyToOtherParty(null);
-        caseData.setTseResponseCopyNoGiveDetails(null);
+        caseData.setClaimantRepResponseText(null);
+        caseData.setClaimantRepResponseIntro(null);
+        caseData.setClaimantRepResponseTable(null);
+        caseData.setClaimantRepResponseHasSupportingMaterial(null);
+        caseData.setClaimantRepResSupportingMaterial(null);
+        caseData.setClaimantRepResponseCopyToOtherParty(null);
+        caseData.setClaimantRepResponseCopyNoGiveDetails(null);
         caseData.setClaimantRepRespondSelectApplication(null);
-        caseData.setTseRespondingToTribunal(null);
-        caseData.setTseRespondingToTribunalText(null);
+        caseData.setClaimantRepRespondingToTribunal(null);
+        caseData.setClaimantRepRespondingToTribunalText(null);
     }
 }

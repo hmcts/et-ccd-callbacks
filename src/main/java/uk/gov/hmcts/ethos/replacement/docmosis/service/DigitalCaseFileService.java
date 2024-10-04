@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
@@ -22,6 +21,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -50,18 +52,27 @@ public class DigitalCaseFileService {
 
     /**
      * Creates a case file.
+     *
      * @param caseDetails data
-     * @param userToken token
-     * @return list of bundles
+     * @param userToken   token
+     * @param errors     errors that are returned from the Stitching API
      */
-    public List<Bundle> stitchCaseFile(CaseDetails caseDetails, String userToken) {
-        setBundleConfig(caseDetails.getCaseData());
-        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getCaseBundles())) {
-            caseDetails.getCaseData().setCaseBundles(createBundleData(caseDetails.getCaseData()));
+    public void stitchCaseFile(CaseDetails caseDetails, String userToken, List<String> errors) {
+        CaseData caseData = caseDetails.getCaseData();
+        setBundleConfig(caseData);
+        if (isEmpty(caseData.getCaseBundles())) {
+            caseData.setCaseBundles(createBundleData(caseData));
         }
         BundleCreateResponse bundleCreateResponse = stitchCaseFile(userToken, authTokenGenerator.generate(),
                 bundleRequestMapper(caseDetails));
-        return bundleCreateResponse.getData().getCaseBundles();
+
+        if (isNotEmpty(bundleCreateResponse.getErrors())) {
+            errors.addAll(bundleCreateResponse.getErrors());
+        } else {
+            caseData.setCaseBundles(bundleCreateResponse.getData().getCaseBundles());
+            DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
+            caseData.setCaseBundles(null);
+        }
     }
 
     private BundleCreateResponse stitchCaseFile(String authorization, String serviceAuthorization,
@@ -123,7 +134,7 @@ public class DigitalCaseFileService {
             return formatReplyToReferralDCFLink(caseData.getDigitalCaseFile().getUploadedDocument());
         }
 
-        return caseData.getDocumentCollection()
+        return emptyIfNull(caseData.getDocumentCollection())
             .stream()
             .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(TRIBUNAL_CASE_FILE)
                 || defaultIfEmpty(d.getValue().getMiscDocuments(), "").equals(TRIBUNAL_CASE_FILE))

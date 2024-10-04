@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.et.common.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -30,12 +31,14 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest.AUTH_TOKEN;
 
 @ExtendWith(SpringExtension.class)
 class DigitalCaseFileServiceTest {
@@ -48,9 +51,11 @@ class DigitalCaseFileServiceTest {
     private DigitalCaseFileService digitalCaseFileService;
     private CaseData caseData;
     private CaseDetails caseDetails;
+    private List<String> errors;
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
+        errors = new ArrayList<>();
         digitalCaseFileService = new DigitalCaseFileService(authTokenGenerator, bundleApiClient);
         caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
@@ -79,10 +84,8 @@ class DigitalCaseFileServiceTest {
 
     @Test
     void stitchBundleRequest() {
-        String authToken = "Bearer token";
-        caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.stitchCaseFile(caseDetails, authToken));
-        assertNotNull(caseDetails.getCaseData().getCaseBundles());
-        assertNotNull(caseDetails.getCaseData().getCaseBundles().get(0).value().getStitchedDocument());
+        digitalCaseFileService.stitchCaseFile(caseDetails, AUTH_TOKEN, errors);
+        assertNotNull(caseDetails.getCaseData().getDigitalCaseFile());
     }
 
     @ParameterizedTest
@@ -152,6 +155,18 @@ class DigitalCaseFileServiceTest {
         String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
         String expected = "";
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void stitchCaseFile_errorsFromApi() {
+        BundleCreateResponse bundleCreateResponse = BundleCreateResponse.builder()
+            .errors(List.of("Document one is password protected"))
+            .build();
+        when(bundleApiClient.stitchBundle(any(), any(), any()))
+            .thenReturn(bundleCreateResponse);
+        digitalCaseFileService.stitchCaseFile(caseDetails, AUTH_TOKEN, errors);
+        assertNotNull(errors);
+        assertNull(caseDetails.getCaseData().getDigitalCaseFile());
     }
 
 }

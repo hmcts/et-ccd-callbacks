@@ -304,27 +304,27 @@ class TseClaimantRepReplyServiceTest {
 
     @Test
     void resetReplyToApplicationPage_resetsData() {
-        caseData.setTseResponseCopyToOtherParty(YES);
-        caseData.setTseResponseCopyNoGiveDetails(YES);
-        caseData.setTseResponseText(YES);
-        caseData.setTseResponseIntro(YES);
-        caseData.setTseResponseTable(YES);
-        caseData.setTseResponseHasSupportingMaterial(YES);
-        caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
-        caseData.setTseRespondingToTribunal(YES);
-        caseData.setTseRespondingToTribunalText(YES);
+        caseData.setClaimantRepResponseCopyToOtherParty(YES);
+        caseData.setClaimantRepResponseCopyNoGiveDetails(YES);
+        caseData.setClaimantRepResponseText(YES);
+        caseData.setClaimantRepResponseIntro(YES);
+        caseData.setClaimantRepResponseTable(YES);
+        caseData.setClaimantRepResponseHasSupportingMaterial(YES);
+        caseData.setClaimantRepResSupportingMaterial(createSupportingMaterial());
+        caseData.setClaimantRepRespondingToTribunal(YES);
+        caseData.setClaimantRepRespondingToTribunalText(YES);
 
         tseClaimantRepReplyService.resetReplyToApplicationPage(caseData);
 
-        assertNull(caseData.getTseResponseText());
-        assertNull(caseData.getTseResponseIntro());
-        assertNull(caseData.getTseResponseTable());
-        assertNull(caseData.getTseResponseHasSupportingMaterial());
-        assertNull(caseData.getTseResponseSupportingMaterial());
-        assertNull(caseData.getTseResponseCopyToOtherParty());
-        assertNull(caseData.getTseResponseCopyNoGiveDetails());
-        assertNull(caseData.getTseRespondingToTribunal());
-        assertNull(caseData.getTseRespondingToTribunalText());
+        assertNull(caseData.getClaimantRepResponseText());
+        assertNull(caseData.getClaimantRepResponseIntro());
+        assertNull(caseData.getClaimantRepResponseTable());
+        assertNull(caseData.getClaimantRepResponseHasSupportingMaterial());
+        assertNull(caseData.getClaimantRepResSupportingMaterial());
+        assertNull(caseData.getClaimantRepResponseCopyToOtherParty());
+        assertNull(caseData.getClaimantRepResponseCopyNoGiveDetails());
+        assertNull(caseData.getClaimantRepRespondingToTribunal());
+        assertNull(caseData.getClaimantRepRespondingToTribunalText());
     }
 
     @Test

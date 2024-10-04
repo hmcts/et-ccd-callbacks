@@ -305,7 +305,7 @@ public class TseRespondentReplyService {
             getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
             userIdamService.getUserDetails(userToken).getEmail(),
             TseHelper.getPersonalisationForAcknowledgement(
-                caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId())));
+                caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId()), false));
     }
 
     private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {

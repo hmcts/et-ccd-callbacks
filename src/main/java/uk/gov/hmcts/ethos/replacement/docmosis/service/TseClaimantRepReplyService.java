@@ -278,7 +278,7 @@ public class TseClaimantRepReplyService {
                 getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
                 userIdamService.getUserDetails(userToken).getEmail(),
                 TseHelper.getPersonalisationForAcknowledgement(
-                        caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId())));
+                        caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId()), true));
     }
 
     /**

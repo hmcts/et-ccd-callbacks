@@ -309,9 +309,16 @@ public final class TseHelper {
         );
     }
 
-    public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl) {
+    public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl,
+                                                                           boolean isClaimantRep) {
         CaseData caseData = caseDetails.getCaseData();
-        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        GenericTseApplicationType selectedApplication;
+
+        if (isClaimantRep) {
+            selectedApplication = getClaimantRepSelectedApplicationType(caseData);
+        } else {
+            selectedApplication = getRespondentSelectedApplicationType(caseData);
+        }
         assert selectedApplication != null;
 
         return Map.of(

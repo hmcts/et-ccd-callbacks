@@ -116,7 +116,7 @@ class TseClaimantRepReplyServiceTest {
         mockStatic = mockStatic(TseHelper.class, Mockito.CALLS_REAL_METHODS);
         mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), anyBoolean()))
                 .thenReturn(Collections.emptyMap());
-        mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any()))
+        mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any(), anyBoolean()))
                 .thenReturn(Collections.emptyMap());
 
         caseData = CaseDataBuilder.builder()

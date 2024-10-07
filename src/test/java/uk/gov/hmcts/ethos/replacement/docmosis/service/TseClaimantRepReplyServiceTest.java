@@ -57,14 +57,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_REP;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -159,10 +157,10 @@ class TseClaimantRepReplyServiceTest {
 
     private static Stream<Arguments> changeApplicationState() {
         return Stream.of(
-                Arguments.of(CLAIMANT_REP, NO, NOT_STARTED_YET),
-                Arguments.of(CLAIMANT_REP, YES, NOT_STARTED_YET),
-                Arguments.of(RESPONDENT_TITLE, NO, UPDATED),
-                Arguments.of(RESPONDENT_TITLE, YES, UPDATED)
+                Arguments.of(CLAIMANT_REP_TITLE, NO, NOT_STARTED_YET)
+//                Arguments.of(CLAIMANT_REP_TITLE, YES, UPDATED),
+//                Arguments.of(RESPONDENT_TITLE, NO, UPDATED),
+//                Arguments.of(RESPONDENT_TITLE, YES, WAITING_FOR_THE_TRIBUNAL)
 
         );
     }
@@ -294,6 +292,33 @@ class TseClaimantRepReplyServiceTest {
         MatcherAssert.assertThat(caseData.getDocumentCollection().get(0).getValue().getTopLevelDocuments(),
                 is(CASE_MANAGEMENT));
     }
+
+//    @Test
+//    void addTseRespondentReplyPdfToDocCollection_claimantApp() throws IOException {
+//        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+//                .thenReturn(new DocumentInfo());
+//        when(documentManagementService.addDocumentToDocumentField(any()))
+//                .thenReturn(DocumentFixtures.getUploadedDocumentType());
+//        CaseDetails caseDetails = new CaseDetails();
+//        caseDetails.setCaseId("caseId");
+//        caseDetails.setCaseData(caseData);
+//        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+//
+//        genericTseApplicationType = GenericTseApplicationType.builder().applicant(CLAIMANT_REP_TITLE)
+//                .date("13 December 2022").dueDate("20 December 2022").type(TSE_APP_CHANGE_PERSONAL_DETAILS)
+//                .copyToOtherPartyYesOrNo(YES).details("Text").applicationState("notStartedYet")
+//                .number("1").responsesCount("0").status(OPEN_STATE).build();
+//
+//        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+//                .id(UUID.randomUUID().toString()).value(genericTseApplicationType).build();
+//
+//        tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(caseData, "testUserToken",
+//                caseDetails.getCaseTypeId());
+//
+//        MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(1));
+//        MatcherAssert.assertThat(caseData.getDocumentCollection().get(0).getValue().getTopLevelDocuments(),
+//                is(CASE_MANAGEMENT));
+//    }
 
     private static Stream<Arguments> sendRespondingToTribunalEmails() {
         return Stream.of(

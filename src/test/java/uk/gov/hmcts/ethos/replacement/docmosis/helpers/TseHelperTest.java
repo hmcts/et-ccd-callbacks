@@ -50,6 +50,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_R
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getClaimantRepSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -92,6 +93,20 @@ class TseHelperTest {
     @Test
     void populateSelectApplicationDropdown_withAnApplication_returnsDynamicList() {
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
+        assert actual != null;
+        assertThat(actual.getListItems().size(), is(1));
+    }
+
+    @Test
+    void populateClaimantRepSelectApplicationDropdown_withEmptyList_doesNothing() {
+        caseData.setGenericTseApplicationCollection(null);
+        DynamicFixedListType actual = TseHelper.populateClaimantRepSelectApplication(caseData);
+        assertNull(actual);
+    }
+
+    @Test
+    void populateClaimantRepSelectApplicationDropdown_withAnApplication_returnsDynamicList() {
+        DynamicFixedListType actual = TseHelper.populateClaimantRepSelectApplication(caseData);
         assert actual != null;
         assertThat(actual.getListItems().size(), is(1));
     }
@@ -258,6 +273,47 @@ class TseHelperTest {
     }
 
     @Test
+    void getClaimantReplyDocumentRequest_generatesData() throws JsonProcessingException {
+        caseData.setClaimantRepRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
+        caseData.getClaimantRepRespondSelectApplication().setValue(SELECT_APPLICATION);
+
+        UploadedDocumentType docType = new UploadedDocumentType();
+        docType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
+        docType.setDocumentFilename("image.png");
+        docType.setDocumentUrl("http://dm-store:8080/documents/1234");
+
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(docType);
+
+        GenericTypeItem<DocumentType> item = new GenericTypeItem<>();
+        item.setValue(documentType);
+        item.setId("78910");
+
+        caseData.setTseResponseSupportingMaterial(List.of(item));
+        String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
+        String replyDocumentRequest = TseHelper.getClaimantReplyDocumentRequest(caseData, "");
+        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
+                + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
+                + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
+                + "\"documentCollection\":[{\"id\":\"78910\","
+                + "\"value\":{\"typeOfDocument\":null,"
+                + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234"
+                + "\",\"document_filename\":\"image.png\","
+                + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
+                + ":null},\"ownerDocument\":null,"
+                + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
+                + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
+                + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
+                + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
+                + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
+                + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
+                + "\"copy\":\"Yes\","
+                + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
+
+        assertThat(replyDocumentRequest, is(expected));
+    }
+
+    @Test
     void getPersonalisationForResponse_withResponse() throws NotificationClientException {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(SELECT_APPLICATION);
@@ -365,6 +421,27 @@ class TseHelperTest {
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("3", ""));
 
             assertNull(getRespondentSelectedApplicationType(caseData));
+        }
+    }
+
+    @Nested
+    class GetClaimantRepSelectedApplicationTypItem {
+        @Test
+        void findExistingApplication() {
+            caseData.setClaimantRepRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
+            caseData.getClaimantRepRespondSelectApplication().setValue(SELECT_APPLICATION);
+
+            GenericTseApplicationType actualApplication = getClaimantRepSelectedApplicationType(caseData);
+
+            assertEquals(genericTseApplicationTypeItem.getValue(), actualApplication);
+        }
+
+        @Test
+        void nullWhenApplicationDoesNotExist() {
+            caseData.setClaimantRepRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
+            caseData.getClaimantRepRespondSelectApplication().setValue(DynamicValueType.create("3", ""));
+
+            assertNull(getClaimantRepSelectedApplicationType(caseData));
         }
     }
 }

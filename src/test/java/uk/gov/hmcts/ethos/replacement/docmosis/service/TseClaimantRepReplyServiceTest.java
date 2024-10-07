@@ -70,7 +70,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
@@ -330,10 +329,6 @@ class TseClaimantRepReplyServiceTest {
                 NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
                 APPLICATION_TYPE, TSE_APP_CHANGE_PERSONAL_DETAILS,
                 LINK_TO_EXUI, TEST_XUI_URL + "caseId");
-
-        Map<String, String> claimantPersonalisation = Map.of(
-                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
-                LINK_TO_CITIZEN_HUB, TEST_CUI_URL + "caseId");
 
         tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
         verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));

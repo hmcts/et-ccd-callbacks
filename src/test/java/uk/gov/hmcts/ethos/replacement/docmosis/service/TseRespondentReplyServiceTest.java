@@ -265,6 +265,13 @@ class TseRespondentReplyServiceTest {
                 .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }
 
+    private static Stream<Arguments> sendRespondingToApplicationEmails() {
+        return Stream.of(
+                Arguments.of(YES, atLeastOnce(), REPLY_TO_APP_ACK_TEMPLATE_YES),
+                Arguments.of(NO, never(), REPLY_TO_APP_ACK_TEMPLATE_NO)
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("sendRespondingToApplicationEmails")
     void sendRespondingToApplicationEmails_welshEnabled(String rule92, VerificationMode isEmailSentToClaimant,
@@ -292,13 +299,6 @@ class TseRespondentReplyServiceTest {
 
         verify(emailService)
                 .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
-    }
-
-    private static Stream<Arguments> sendRespondingToApplicationEmails() {
-        return Stream.of(
-                Arguments.of(YES, atLeastOnce(), REPLY_TO_APP_ACK_TEMPLATE_YES),
-                Arguments.of(NO, never(), REPLY_TO_APP_ACK_TEMPLATE_NO)
-        );
     }
 
     @Test

@@ -294,13 +294,6 @@ class TseClaimantRepReplyServiceTest {
                 is(CASE_MANAGEMENT));
     }
 
-    private static Stream<Arguments> sendRespondingToTribunalEmails() {
-        return Stream.of(
-                Arguments.of(YES, atLeastOnce(), REPLY_TO_TRIB_ACK_TEMPLATE_YES),
-                Arguments.of(NO, never(), REPLY_TO_TRIB_ACK_TEMPLATE_NO)
-        );
-    }
-
     @Test
     void resetReplyToApplicationPage_resetsData() {
         caseData.setClaimantRepResponseCopyToOtherParty(YES);
@@ -401,13 +394,14 @@ class TseClaimantRepReplyServiceTest {
 
     @Test
     void claimantReplyToTse() {
-        String userToken = "userToken";
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        String userToken = "userToken";
         tseClaimantRepReplyService.claimantReplyToTse(userToken, caseDetails, caseData);
     }
 }

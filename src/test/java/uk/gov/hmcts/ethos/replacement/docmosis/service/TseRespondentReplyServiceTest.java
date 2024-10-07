@@ -71,6 +71,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -242,6 +243,36 @@ class TseRespondentReplyServiceTest {
         caseData.setTseResponseCopyToOtherParty(rule92);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92YesEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
+
+        tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
+
+        verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        verify(emailService, isEmailSentToClaimant)
+                .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+        verify(respondentTellSomethingElseService).sendAdminEmail(any());
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondingToApplicationEmails")
+    void sendRespondingToApplicationEmails_welshEnabled(String rule92, VerificationMode isEmailSentToClaimant,
+                                           String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");

@@ -97,7 +97,6 @@ public class TseRespondentReplyController {
      * the other party (Claimant) is a non-system user.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
     @PostMapping(value = "/showError", consumes = APPLICATION_JSON_VALUE)

@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -47,6 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
@@ -505,10 +507,9 @@ class TseAdminServiceTest {
 
         tseAdminService.sendNotifyEmailsToRespondents(caseDetails);
 
-        // Email will be sent to the Representative if it exists,
-        // if not then email will be sent to the Respondent instead.
+        // Email will be sent to the Representative and not to respondent 2
         verify(emailService).sendEmail(TEMPLATE_ID, "rep@test.com", expectedPersonalisation1);
-        verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisation2);
+        verify(emailService, times(0)).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisation2);
     }
 
     private void setRepresentative() {
@@ -516,6 +517,11 @@ class TseAdminServiceTest {
         representedTypeRItem.setValue(RepresentedTypeR.builder()
                 .respRepName(RESPONDENT_1)
                 .representativeEmailAddress(REP_EMAIL)
+                .myHmctsYesNo(YES)
+                .respondentOrganisation(Organisation.builder()
+                        .organisationID("1234")
+                        .organisationName("Org Name")
+                        .build())
                 .build());
 
         caseData.setRepCollection(List.of(representedTypeRItem));

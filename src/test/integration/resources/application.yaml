@@ -93,11 +93,16 @@ template:
         respondent: ca1a1dd2-13c9-435d-b63e-0ca07abe937d
 
   pse:
+    claimant-rep:
+      acknowledgement-of-response: ${PSE_CLAIMANT_REP_ACKNOWLEDGEMENT_OF_RESPONSE_TEMPLATE_ID:000070c4-5968-4f6b-aca1-095e37988be9}
+      new-notification: ${PSE_CLAIMANT_REP_NEW_NOTIFICATION:9352bba3-cdb4-4150-9840-599696147489}
     claimant: bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff
     cyClaimant: fcd14cac-5e8e-478e-ab3c-89e394a3c663
-    respondent:
+    myhmcts:
       rule-92-yes: aa114479-e72b-4893-9024-c25aee1be6fc
       rule-92-no: 3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee
+    respondent-rep:
+      response-received: ${PSE_RESPONDENT_REP_RESPONSE_RECEIVED_TEMPLATE_ID:9ea43b1d-7029-48ea-a0bd-b9fc4c3c8b66}
     admin: 296d3c6e-00d7-4f43-a8bd-260d52b171a7
 
   nocNotification:
@@ -120,7 +125,6 @@ template:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
 
   claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
-
   respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
   et1:
     et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}

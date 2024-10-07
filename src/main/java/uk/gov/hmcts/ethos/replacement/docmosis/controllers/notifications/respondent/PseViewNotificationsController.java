@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.respondent;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,11 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondentViewService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ProvideSomethingElseViewService;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
@@ -32,12 +31,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class PseViewNotificationsController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final PseRespondentViewService pseRespondentViewService;
-    private final VerifyTokenService verifyTokenService;
+    private final ProvideSomethingElseViewService provideSomethingElseViewService;
 
     /**
-     * Populates the notifications table..
+     * Populates the notifications table.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -58,13 +55,9 @@ public class PseViewNotificationsController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setPseViewNotifications(pseRespondentViewService.generateViewNotificationsMarkdown(caseData));
+        caseData.setPseViewNotifications(provideSomethingElseViewService.generateViewNotificationsMarkdown(caseData,
+                RESPONDENT_TITLE));
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

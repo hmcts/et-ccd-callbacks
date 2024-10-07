@@ -391,6 +391,7 @@ class RespondNotificationServiceTest {
 
     private void setUpNotifyEmail() {
         RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Respondent One");
         respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
 
         caseDetails.setCaseId("1234");
@@ -399,7 +400,9 @@ class RespondNotificationServiceTest {
                 .withEthosCaseReference("1234")
                 .withClaimant("Claimant")
                 .withClaimantType(CLAIMANT_EMAIL)
-                .withRespondent(respondentSumType).build();
+                .withRespondent(respondentSumType)
+                .withRespondentRepresentative("Respondent One", "Rep LastName", "rep@gmail.com")
+                .build();
         caseData.setSendNotificationTitle("TEST");
         ReflectionTestUtils.setField(respondNotificationService,
                 "noResponseTemplateId", "noResponseTemplateId");
@@ -420,7 +423,7 @@ class RespondNotificationServiceTest {
         verify(emailService, times(1)).sendEmail(eq("noResponseTemplateId"),
             eq(CLAIMANT_EMAIL), any());
         verify(emailService, times(1)).sendEmail(eq("noResponseTemplateId"),
-            eq(RESPONDENT_EMAIL), any());
+            eq("rep@gmail.com"), any());
 
     }
 
@@ -468,8 +471,10 @@ class RespondNotificationServiceTest {
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
         verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
             eq(CLAIMANT_EMAIL), any());
-        verify(emailService, times(1)).sendEmail(eq("responseTemplateId"),
+        verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
             eq(RESPONDENT_EMAIL), any());
+        verify(emailService, times(1)).sendEmail(eq("responseTemplateId"),
+            eq("rep@gmail.com"), any());
 
     }
 

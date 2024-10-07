@@ -5200,9 +5200,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-http@npm:5.0.0":
-  version: 5.0.0
-  resolution: "chai-http@npm:5.0.0"
+"chai-http@npm:5.1.1":
+  version: 5.1.1
+  resolution: "chai-http@npm:5.1.1"
   dependencies:
     charset: ^1.0.1
     cookiejar: ^2.1.4
@@ -5210,7 +5210,7 @@ __metadata:
     methods: ^1.1.2
     qs: ^6.12.1
     superagent: ^9
-  checksum: c353d078f418aae46a3febb81a6108ba595926903acd5671c137a0df3cb5036323d7415b3c91897d3578b0f7141389291da09c71e379a2d2450f63a75714c143
+  checksum: 1d684709b8eb3c8cea2add75759b2701690ff22b676af06e30c00ca9bf46ebaf91a666da907dd701c348b7c7f9b72cf677812abeace8e83c400f7be2acd4b022
   languageName: node
   linkType: hard
 
@@ -8161,7 +8161,7 @@ __metadata:
     axios: 1.7.7
     chai: 4.5.0
     chai-as-promised: 8.0.0
-    chai-http: 5.0.0
+    chai-http: 5.1.1
     codeceptjs: 3.6.7
     codeceptjs-saucehelper: ^1.4.0
     cross-env: 7.0.3

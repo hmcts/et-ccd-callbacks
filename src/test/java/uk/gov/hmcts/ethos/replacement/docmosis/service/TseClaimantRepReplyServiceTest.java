@@ -64,7 +64,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.WAITING_FOR_THE_TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -160,9 +159,9 @@ class TseClaimantRepReplyServiceTest {
     private static Stream<Arguments> changeApplicationState() {
         return Stream.of(
                 Arguments.of(CLAIMANT_REP_TITLE, NO, NOT_STARTED_YET),
-                Arguments.of(CLAIMANT_REP_TITLE, YES, UPDATED),
+                Arguments.of(CLAIMANT_REP_TITLE, YES, NOT_STARTED_YET),
                 Arguments.of(RESPONDENT_TITLE, NO, UPDATED),
-                Arguments.of(RESPONDENT_TITLE, YES, WAITING_FOR_THE_TRIBUNAL)
+                Arguments.of(RESPONDENT_TITLE, YES, UPDATED)
 
         );
     }
@@ -398,5 +397,17 @@ class TseClaimantRepReplyServiceTest {
         genericTseApplicationTypeItem.setValue(applicationType);
 
         return applicationType;
+    }
+
+    @Test
+    void claimantReplyToTse() {
+        String userToken = "userToken";
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
+        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+        tseClaimantRepReplyService.claimantReplyToTse(userToken, caseDetails, caseData);
     }
 }

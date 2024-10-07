@@ -11,7 +11,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -23,13 +27,15 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -62,6 +68,7 @@ class SendNotificationServiceTest {
             "bundlesSubmittedNotificationForClaimantTemplateId";
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
             "bundlesSubmittedNotificationForTribunalTemplateId";
+    private static final String CLAIMANT_ONLY = "Claimant only";
 
     @BeforeEach
     public void setUp() {
@@ -85,6 +92,7 @@ class SendNotificationServiceTest {
                 .withClaimantType("claimant@email.com")
                 .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
                 .withRespondentRepresentative("Name", "Sally", "respondentRep@email.com")
+                .withRepresentativeClaimantType("Mr Claimant Represent",  "claimantRep@email.com")
                 .buildAsCaseDetails(SCOTLAND_CASE_TYPE_ID);
 
         caseDetails.setCaseId("1234");
@@ -111,6 +119,10 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationDetails("details");
         caseData.setSendNotificationRequestMadeBy("Judge");
         caseData.setNotificationSentFrom("60001");
+
+        //ensures that the case is for system user
+        caseDetails.getCaseData().setEt1OnlineSubmission("Yes");
+        caseDetails.getCaseData().setHubLinksStatuses(new HubLinksStatuses());
     }
 
     @Test
@@ -268,6 +280,78 @@ class SendNotificationServiceTest {
                 .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("citizenUrl1234", val.get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_ClaimantNotRepresented() {
+        caseData.setSendNotificationSubject(List.of("OTHER_SUBJECT"));
+        when(featureToggleService.isEccEnabled()).thenReturn(true);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        ClaimantType mockClaimantType = mock(ClaimantType.class);
+        mockClaimantType.setClaimantEmailAddress("claimant@example.com");
+        caseData.setClaimantType(mockClaimantType);
+        when(caseData.getClaimantType().getClaimantEmailAddress()).thenReturn("claimant@example.com");
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(1)).sendEmail(
+                eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
+                eq("claimant@example.com"),
+                personalisationCaptor.capture());
+    }
+
+    @Test
+    void sendNotifyEmails_ClaimantRepresented() {
+        caseDetails.getCaseData().setSendNotificationSubject(List.of("OTHER_SUBJECT"));
+        when(featureToggleService.isEccEnabled()).thenReturn(true);
+        caseDetails.getCaseData().setSendNotificationNotify(CLAIMANT_ONLY);
+        caseDetails.getCaseData().setCaseSource("MyHMCTS");
+        caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
+        RepresentedTypeC representedTypeC = new RepresentedTypeC();
+        representedTypeC.setNameOfRepresentative("testRep");
+        representedTypeC.setRepresentativeEmailAddress("rep@example.com");
+        Organisation org = Organisation.builder().organisationID("myHmctsOrgId").organisationName("testOrg").build();
+        representedTypeC.setMyHmctsOrganisation(org);
+        caseDetails.getCaseData().setRepresentativeClaimantType(representedTypeC);
+        when(emailService.getClaimantRepExuiCaseNotificationsLink(anyString()))
+                .thenReturn("http://localhost:3455/cases/case-details/"
+                        + caseDetails.getCaseId() + "#Notifications");
+        personalisationCaptor.getAllValues().clear();
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(1)).sendEmail(any(), any(), anyMap());
+    }
+
+    @Test
+    void sendNotifyEmails_ClaimantRepresented_NoEmail() {
+        caseDetails.getCaseData().setSendNotificationSubject(List.of("OTHER_SUBJECT"));
+        caseDetails.getCaseData().setSendNotificationNotify(CLAIMANT_ONLY);
+        when(featureToggleService.isEccEnabled()).thenReturn(true);
+        caseDetails.getCaseData().setCaseSource("MyHMCTS");
+        caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
+        RepresentedTypeC representedTypeC = new RepresentedTypeC();
+        representedTypeC.setNameOfRepresentative("testRep");
+        representedTypeC.setRepresentativeEmailAddress(null);
+        Organisation org = Organisation.builder().organisationID("myHmctsOrgId").organisationName("testOrg").build();
+        representedTypeC.setMyHmctsOrganisation(org);
+        caseDetails.getCaseData().setRepresentativeClaimantType(representedTypeC);
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(0)).sendEmail(anyString(), anyString(), anyMap());
+    }
+
+    @Test
+    void sendNotifyEmails_ClaimantNotRepresented_NonSystemUser() {
+        caseDetails.getCaseData().setSendNotificationSubject(List.of("OTHER_SUBJECT"));
+        caseDetails.getCaseData().setSendNotificationNotify(CLAIMANT_ONLY);
+        when(featureToggleService.isEccEnabled()).thenReturn(true);
+        caseDetails.getCaseData().setCaseSource("ET1Online");
+        caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
+        caseDetails.getCaseData().setEt1OnlineSubmission(null);
+        caseDetails.getCaseData().setHubLinksStatuses(null);
+        caseDetails.getCaseData().setRepresentativeClaimantType(null);
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(0)).sendEmail(anyString(), anyString(), anyMap());
     }
 
     @Test

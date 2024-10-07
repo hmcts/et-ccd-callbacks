@@ -12,8 +12,8 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.claimantMyHmctsCase;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 
 /**
  * Service to support ET3 Notification journey.
@@ -46,7 +46,7 @@ public class Et3NotificationService {
             });
 
         Map<String, String> personalisation;
-        if (claimantMyHmctsCase(caseDetails.getCaseData())) {
+        if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
             personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
             personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
             if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {

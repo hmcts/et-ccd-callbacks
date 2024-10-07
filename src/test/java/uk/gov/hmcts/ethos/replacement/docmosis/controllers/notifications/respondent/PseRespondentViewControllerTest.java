@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.respondent;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondentViewService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ProvideSomethingElseViewService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -26,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({PseRespondentViewController.class, JsonMapper.class})
@@ -39,7 +40,7 @@ class PseRespondentViewControllerTest {
     private VerifyTokenService verifyTokenService;
 
     @MockBean
-    private PseRespondentViewService pseRespondentViewService;
+    private ProvideSomethingElseViewService provideSomethingElseViewService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -74,7 +75,8 @@ class PseRespondentViewControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondentViewService).populateSelectDropdownView(ccdRequest.getCaseDetails().getCaseData());
+        verify(provideSomethingElseViewService).populateSelectDropdownView(ccdRequest.getCaseDetails().getCaseData(),
+                RESPONDENT_TITLE);
     }
 
     @Test
@@ -98,7 +100,8 @@ class PseRespondentViewControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(pseRespondentViewService).initialOrdReqDetailsTableMarkUp(ccdRequest.getCaseDetails().getCaseData());
+        verify(provideSomethingElseViewService).initialOrdReqDetailsTableMarkUp(
+                ccdRequest.getCaseDetails().getCaseData(), RESPONDENT_TITLE);
     }
 
     @Test

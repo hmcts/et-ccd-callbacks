@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -633,7 +634,7 @@ class TseAdmReplyServiceTest {
         // Email will be sent to the Representative if it exists,
         // if not then email will be sent to the Respondent instead.
         verify(emailService).sendEmail(TEMPLATE_ID, "rep@test.com", resultMap);
-        verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, resultMap);
+        verify(emailService, times(0)).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, resultMap);
     }
 
     @Test
@@ -666,6 +667,11 @@ class TseAdmReplyServiceTest {
         representedTypeRItem.setValue(RepresentedTypeR.builder()
                 .respRepName(RESPONDENT_1)
                 .representativeEmailAddress(REP_EMAIL)
+                .myHmctsYesNo(YES)
+                .respondentOrganisation(Organisation.builder()
+                        .organisationName("MyHMCTS")
+                        .organisationID("12345")
+                        .build())
                 .build());
 
         caseData.setRepCollection(List.of(representedTypeRItem));

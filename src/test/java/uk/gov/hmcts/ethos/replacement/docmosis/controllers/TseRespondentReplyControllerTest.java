@@ -139,7 +139,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
                 .thenReturn(false);
-        mockHelper.when(() -> Helper.claimantMyHmctsCase(any()))
+        mockHelper.when(() -> Helper.isRepresentedClaimantWithMyHmctsCase(any()))
                 .thenReturn(true);
         mockMvc.perform(post(SHOW_ERROR_URL)
                         .content(jsonMapper.toJson(ccdRequest))

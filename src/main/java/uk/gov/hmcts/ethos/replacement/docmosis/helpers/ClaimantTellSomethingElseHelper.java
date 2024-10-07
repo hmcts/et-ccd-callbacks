@@ -14,16 +14,19 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_AMEND_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CONSIDER_DECISION_AFRESH;
@@ -37,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLA
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLAIMANT_TSE_FILE_NAME;
 
 public final class ClaimantTellSomethingElseHelper {
@@ -192,5 +196,19 @@ public final class ClaimantTellSomethingElseHelper {
 
         return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
                 value.getDate(), value.getDueDate(), responses, status);
+    }
+
+    public static List<String> getRespondentEmailAddressList(CaseData caseData) {
+        return caseData.getRepCollection().stream()
+                .filter(r -> Objects.nonNull(r)
+                        && YES.equals(defaultIfEmpty(r.getValue().getMyHmctsYesNo(), ""))
+                        && !isNullOrEmpty(r.getValue().getRepresentativeEmailAddress()))
+                .map(r -> r.getValue().getRepresentativeEmailAddress())
+                .toList();
+    }
+
+    public static String getApplicantType(CaseData caseData) {
+        GenericTseApplicationType selectedApplicationType = getRespondentSelectedApplicationType(caseData);
+        return selectedApplicationType.getApplicant();
     }
 }

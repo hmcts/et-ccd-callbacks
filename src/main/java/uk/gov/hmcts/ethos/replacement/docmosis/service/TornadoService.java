@@ -66,6 +66,7 @@ public class TornadoService {
     public static final String CLAIMANT_TSE_FILE_NAME = "Claimant Contact the tribunal.pdf";
     public static final String REFERRAL_SUMMARY_PDF = "Referral Summary.pdf";
     public static final String TSE_REPLY = "TSE Reply.pdf";
+    public static final String TSE_CLAIMANT_REP_REPLY = "TSE Claimant Rep Reply.pdf";
     public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
 
     private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
@@ -259,13 +260,9 @@ public class TornadoService {
     public DocumentInfo createDocumentInfoFromBytes(String authToken, byte[] bytes, String documentName,
                                                      String caseTypeId) {
 
-        log.info("Uploading document to dm store: " + documentName);
         URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
-        log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
-        log.info("downloadUrl " + downloadUrl);
         String markup = documentManagementService.generateMarkupDocument(downloadUrl);
-        log.info("markup " + markup);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
     }
 
@@ -423,6 +420,9 @@ public class TornadoService {
             }
             case TSE_REPLY -> {
                 return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            }
+            case TSE_CLAIMANT_REP_REPLY -> {
+                return TseHelper.getClaimantReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_ADMIN_REPLY -> {
                 return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());

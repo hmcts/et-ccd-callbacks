@@ -310,8 +310,6 @@ public class TseService {
         String supportingMaterial = documentManagementService.displayDocNameTypeSizeLink(document, authToken);
 
         List<String[]> rows = new ArrayList<>(List.of(
-                MD_TABLE_EMPTY_LINE,
-                MD_TABLE_EMPTY_LINE,
                 new String[]{"Applicant", application.getApplicant()},
                 new String[]{"Type of application", application.getType()},
                 new String[]{"Application date", application.getDate()},

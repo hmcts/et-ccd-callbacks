@@ -99,6 +99,18 @@ template:
         cyRespondent-type-a: ${CY_TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:d340c60b-111b-41f7-ab9c-6cd34cdebee5}
         cyRespondent-type-b: ${CY_TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:99ec3a75-7371-4b6d-aa5a-9050c1537cf1}
         tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
+      respond:
+        respondent: ${TSE_RESPONDENT_RESPONSE_TO_CLAIMANT_REP_TEMPLATE_ID:88a60473-278f-4e03-8ba2-7e0da7f807dd}
+        cyRespondent: ${CY_TSE_RESPONDENT_RESPONSE_TO_CLAIMANT_REP_TEMPLATE_ID:5d00ecf1-790c-4942-8c39-06f20ac81847}
+        claimant-rep:
+          rule-92-yes: ${TSE_CLAIMANT_REP_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:dd2c25c5-cb5b-4ddb-984c-a4e7c3a3ddeb}
+          rule-92-no: ${TSE_CLAIMANT_REP_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:83e076fc-1819-4222-9c18-a4c0f8ad06b4}
+      reply-to-tribunal:
+        respondent: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_CLAIMANT_REP:9366acdd-8fb1-4425-9a16-04fbbdaa5f64}
+        claimant-rep:
+          rule-92-yes: ${TSE_CLAIMANT_REP_REPLY_TO_TRIB_TO_RES_RULE92_YES:cb40366e-bc50-42ed-ae7b-74edfe344bba}
+          rule-92-no: ${TSE_CLAIMANT_REP_REPLY_TO_TRIB_TO_RES_RULE92_NO:078dfb3b-21f3-4386-901d-ce50769a32d1}
+        tribunal: ${TSE_CLAIMANT_REP_REPLY_TO_TRIB_TO_TRIB:c2f72be8-541c-4bcc-b213-42557976dc39}
 
     admin:
       reply:

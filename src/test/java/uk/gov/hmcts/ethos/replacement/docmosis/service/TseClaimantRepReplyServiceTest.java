@@ -28,6 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
@@ -40,6 +41,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -66,7 +68,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERS
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
@@ -88,11 +93,15 @@ class TseClaimantRepReplyServiceTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_NO = "replyToTribAckTemplateNo";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_YES = "replyToAppAckTemplateYes";
     private static final String REPLY_TO_APP_ACK_TEMPLATE_NO = "replyToAppAckTemplateNo";
     private static final String CASE_NUMBER = "9876";
+    private static final String TEST_XUI_URL = "exuiUrl";
+    private static final String TEST_CUI_URL = "citizenUrl";
+    private static final String WITHDRAW_MY_CLAIM = "Withdraw all/part of claim";
 
     private EmailService emailService;
     private UserDetails userDetails;
@@ -292,6 +301,49 @@ class TseClaimantRepReplyServiceTest {
         MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(1));
         MatcherAssert.assertThat(caseData.getDocumentCollection().get(0).getValue().getTopLevelDocuments(),
                 is(CASE_MANAGEMENT));
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondingToTribunalEmails")
+    void sendRespondingToTribunalEmails(String rule92, VerificationMode isEmailSentToClaimant,
+                                        String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+        RepresentedTypeR typeR = new RepresentedTypeR();
+        typeR.setMyHmctsYesNo(YES);
+        typeR.setRepresentativeEmailAddress("rep@email.com");
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setValue(typeR);
+        caseData.setRepCollection(Collections.singletonList(representedTypeRItem));
+
+        when(claimantTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
+
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
+
+        Map<String, String> tribunalPersonalisation = Map.of(
+                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
+                APPLICATION_TYPE, TSE_APP_CHANGE_PERSONAL_DETAILS,
+                LINK_TO_EXUI, TEST_XUI_URL + "caseId");
+
+        Map<String, String> claimantPersonalisation = Map.of(
+                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
+                LINK_TO_CITIZEN_HUB, TEST_CUI_URL + "caseId");
+
+        tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
+        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
+    }
+
+    private static Stream<Arguments> sendRespondingToTribunalEmails() {
+        return Stream.of(
+                Arguments.of(YES, atLeastOnce(), REPLY_TO_TRIB_ACK_TEMPLATE_YES),
+                Arguments.of(NO, never(), REPLY_TO_TRIB_ACK_TEMPLATE_NO)
+        );
     }
 
     @Test

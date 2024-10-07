@@ -44,6 +44,7 @@ class TseClaimantRepReplyControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/tseClaimantRepResponse/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseClaimantRepResponse/submitted";
     private static final String SHOW_ERROR_URL = "/tseClaimantRepResponse/showError";
+    private static final String MID_VALIDATE_INPUT = "/tseClaimantRepResponse/midValidateInput";
 
     @Autowired
     private MockMvc mockMvc;
@@ -85,6 +86,23 @@ class TseClaimantRepReplyControllerTest extends BaseControllerTest {
     @Test
     void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(Helper.isRespondentSystemUser(any())).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        mockHelper.verify(() -> Helper.isRespondentSystemUser(any()), times(1));
+    }
+
+    @Test
+    void aboutToStart_tokenOk_respondentNonSystemUser() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(Helper.isRespondentSystemUser(any())).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -261,5 +279,15 @@ class TseClaimantRepReplyControllerTest extends BaseControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void midValidateInput_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_VALIDATE_INPUT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

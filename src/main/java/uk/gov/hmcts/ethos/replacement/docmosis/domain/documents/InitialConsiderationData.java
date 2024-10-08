@@ -100,6 +100,10 @@ public class InitialConsiderationData {
     private List<String> udlFinalF2FIssue;
     @JsonProperty("udlCheckComplianceOrders")
     private String udlCheckComplianceOrders;
+
+    @JsonProperty("hearingNotListedDoNotListFurtherDirections")
+    private String hearingNotListedDoNotListFurtherDirections;
+
     @JsonProperty("hearingNotListedOtherDirections")
     private String hearingNotListedOtherDirections;
 

@@ -99,7 +99,8 @@ public final class MarkdownHelper {
         return addRowsForDocument(document, documentLink, title);
     }
 
-    public static List<String[]> addDocumentRows(List<GenericTypeItem<DocumentType>> documents, String title) {
+    public static List<String[]> addGenericTypeDocumentRows(List<GenericTypeItem<DocumentType>> documents,
+                                                            String title) {
         if (documents == null) {
             return List.of();
         }
@@ -108,6 +109,17 @@ public final class MarkdownHelper {
             .filter(Objects::nonNull)
             .flatMap(o -> addDocumentRow(o.getValue(), title).stream())
             .toList();
+    }
+
+    public static List<String[]> addDocumentTypeRows(List<DocumentTypeItem> documents, String title) {
+        if (documents == null) {
+            return List.of();
+        }
+
+        return documents.stream()
+                .filter(Objects::nonNull)
+                .flatMap(o -> addDocumentRow(o.getValue(), title).stream())
+                .toList();
     }
 
     /**

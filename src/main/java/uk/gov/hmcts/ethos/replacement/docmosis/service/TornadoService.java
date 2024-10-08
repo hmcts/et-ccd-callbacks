@@ -66,6 +66,7 @@ public class TornadoService {
     public static final String CLAIMANT_TSE_FILE_NAME = "Claimant Contact the tribunal.pdf";
     public static final String REFERRAL_SUMMARY_PDF = "Referral Summary.pdf";
     public static final String TSE_REPLY = "TSE Reply.pdf";
+    public static final String TSE_CLAIMANT_REP_REPLY = "TSE Claimant Rep Reply.pdf";
     public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
 
     private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
@@ -260,7 +261,6 @@ public class TornadoService {
                                                      String caseTypeId) {
 
         URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
-        log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
         String markup = documentManagementService.generateMarkupDocument(downloadUrl);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
@@ -290,12 +290,15 @@ public class TornadoService {
     }
 
     private DocumentInfo generateDocumentInfo(String documentName, URI documentSelfPath, String markupURL) {
-        return DocumentInfo.builder()
-                .type(DOCUMENT_NAME)
-                .description(documentName)
-                .markUp(markupURL)
-                .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")
-                .build();
+        DocumentInfo documentInfo =
+                DocumentInfo.builder()
+                        .type(DOCUMENT_NAME)
+                        .description(documentName)
+                        .markUp(markupURL)
+                        .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")
+                        .build();
+        log.info("DocumentInfo created: " + documentInfo.toString());
+        return documentInfo;
     }
 
     private void writeOutputStream(OutputStreamWriter outputStreamWriter, StringBuilder sb) throws IOException {
@@ -417,6 +420,9 @@ public class TornadoService {
             }
             case TSE_REPLY -> {
                 return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            }
+            case TSE_CLAIMANT_REP_REPLY -> {
+                return TseHelper.getClaimantReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_ADMIN_REPLY -> {
                 return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());

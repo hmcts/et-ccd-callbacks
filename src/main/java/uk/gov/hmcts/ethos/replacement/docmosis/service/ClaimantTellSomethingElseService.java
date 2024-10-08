@@ -2,37 +2,69 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.EmailServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
+import uk.gov.service.notify.NotificationClient;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_APP_TYPE_MAP;
+import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE_PLUS_7;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_CASE_DETAILS_LINK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.NOT_SET_CY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_ONLINE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CONSIDER_DECISION_AFRESH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_RECONSIDER_JUDGMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentEmailAddressList;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLAIMANT_TSE_FILE_NAME;
 
 @Slf4j
@@ -42,13 +74,33 @@ public class ClaimantTellSomethingElseService {
 
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
+    private final UserIdamService userIdamService;
+    private final EmailService emailService;
+    private final FeatureToggleService featureToggleService;
+    private final TribunalOfficesService tribunalOfficesService;
 
-    private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
-    private static final String TABLE_COLUMNS_MARKDOWN =
-            "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
-                    + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
-                    + "%s\r\n";
-    private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
+    @Value("${template.tse.claimant-rep.application.claimant-rep-a}")
+    private String tseClaimantRepAcknowledgeTypeATemplateId;
+    @Value("${template.tse.claimant-rep.application.claimant-rep-b}")
+    private String tseClaimantRepAcknowledgeTypeBTemplateId;
+    @Value("${template.tse.claimant-rep.application.claimant-rep-c}")
+    private String tseClaimantRepAcknowledgeTypeCTemplateId;
+    @Value("${template.tse.claimant-rep.application.claimant-no}")
+    private String tseClaimantRepAcknowledgeNoTemplateId;
+    @Value("${template.tse.claimant-rep.application.respondent-type-a}")
+    private String tseClaimantRepToRespAcknowledgeTypeATemplateId;
+    @Value("${template.tse.claimant-rep.application.respondent-type-b}")
+    private String tseClaimantRepToRespAcknowledgeTypeBTemplateId;
+    @Value("${template.tse.claimant-rep.application.tribunal}")
+    private String tseClaimantRepNewApplicationTemplateId;
+    @Value("${template.tse.claimant-rep.application.cyRespondent-type-a}")
+    private String cyTseClaimantToRespondentTypeATemplateId;
+    @Value("${template.tse.claimant-rep.application.cyRespondent-type-b}")
+    private String cyTseClaimantToRespondentTypeBTemplateId;
+
+    private static final List<String> GROUP_B_TYPES = List.of(CLAIMANT_TSE_WITHDRAW_CLAIM,
+            CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS, CLAIMANT_TSE_CONSIDER_DECISION_AFRESH,
+            CLAIMANT_TSE_RECONSIDER_JUDGMENT);
 
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -121,28 +173,202 @@ public class ClaimantTellSomethingElseService {
         return body;
     }
 
-    public String generateClaimantApplicationTableMarkdown(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
-        if (isEmpty(genericApplicationList)) {
-            return EMPTY_TABLE_MESSAGE;
+    public void sendAcknowledgementEmail(CaseDetails caseDetails, String userToken) {
+        String email = userIdamService.getUserDetails(userToken).getEmail();
+        CaseData caseData = caseDetails.getCaseData();
+        String applicationType = caseData.getClaimantTseSelectApplication();
+
+        if (CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND.equals(applicationType)) {
+            emailService.sendEmail(
+                    tseClaimantRepAcknowledgeTypeCTemplateId,
+                    email,
+                    prepareEmailContentTypeC(caseDetails));
+            return;
         }
 
-        AtomicInteger applicationNumber = new AtomicInteger(1);
+        if (NO.equals(caseData.getClaimantTseRule92())) {
+            emailService.sendEmail(
+                    tseClaimantRepAcknowledgeNoTemplateId,
+                    email,
+                    prepareEmailContent(caseDetails));
+            return;
+        }
 
-        String tableRows = genericApplicationList.stream()
-                .filter(TseViewApplicationHelper::applicationsSharedWithClaimant)
-                .map(o -> formatRow(o, applicationNumber))
-                .collect(Collectors.joining());
-
-        return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
+        emailService.sendEmail(
+                GROUP_B_TYPES.contains(applicationType)
+                        ? tseClaimantRepAcknowledgeTypeBTemplateId
+                        : tseClaimantRepAcknowledgeTypeATemplateId,
+                email,
+                prepareEmailContent(caseDetails));
     }
 
-    private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
-        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
-        int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
-        String status = Optional.ofNullable(value.getStatus()).orElse(OPEN_STATE);
+    private Map<String, String> prepareEmailContentTypeC(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        return Map.of(
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                CLAIMANT, caseData.getClaimant(),
+                RESPONDENT_NAMES, getRespondentNames(caseData),
+                EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId())
+        );
+    }
 
-        return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
-                value.getDate(), value.getDueDate(), responses, status);
+    private Map<String, String> prepareEmailContent(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+
+        Map<String, String> content = new ConcurrentHashMap<>();
+        content.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        content.put(CLAIMANT, caseData.getClaimant());
+        content.put(RESPONDENT_NAMES, getRespondentNames(caseData));
+        content.put(HEARING_DATE, getNearestHearingToReferral(caseData, NOT_SET));
+        content.put(SHORT_TEXT, caseData.getClaimantTseSelectApplication());
+        content.put(EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(caseDetails.getCaseId()));
+
+        return content;
+    }
+
+    public void sendRespondentsEmail(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        String applicationType = caseData.getClaimantTseSelectApplication();
+
+        if (CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND.equals(applicationType)
+            || NO.equals(caseData.getClaimantTseRule92())
+            || YES.equals(caseData.getClaimantTseRespNotAvailable())) {
+            return;
+        }
+
+        List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
+        if (respondentEmailAddressList.isEmpty()) {
+            return;
+        }
+
+        boolean isWelsh = featureToggleService.isWelshEnabled()
+                && Optional.ofNullable(caseData.getClaimantHearingPreference())
+                .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
+                .orElse(false);
+
+        try {
+            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);
+            String emailTemplate = getRespondentEmailTemplate(isWelsh, applicationType);
+            respondentEmailAddressList.forEach(respondentEmail ->
+                    sendEmailToRespondent(
+                            emailTemplate,
+                            respondentEmail,
+                            caseDetails,
+                            bytes,
+                            isWelsh));
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
+    }
+
+    private void sendEmailToRespondent(String emailTemplate, String respondentEmail, CaseDetails caseDetails,
+                                       byte[] bytes, boolean isWelsh) {
+        CaseData caseData = caseDetails.getCaseData();
+        try {
+            emailService.sendEmail(
+                    emailTemplate,
+                    respondentEmail,
+                    prepareRespondentEmailContent(caseDetails, bytes, isWelsh)
+            );
+        } catch (NotificationClientException e) {
+            log.warn("Failed to send email. Reference ID: {}. Reason:", caseData.getEthosCaseReference(), e);
+            throw new EmailServiceException("Failed to send email", e);
+        }
+    }
+
+    private String getRespondentEmailTemplate(boolean isWelsh, String applicationType) {
+        if (GROUP_B_TYPES.contains(applicationType)) {
+            return isWelsh
+                    ? cyTseClaimantToRespondentTypeBTemplateId
+                    : tseClaimantRepToRespAcknowledgeTypeBTemplateId;
+        } else {
+            return isWelsh
+                    ? cyTseClaimantToRespondentTypeATemplateId
+                    : tseClaimantRepToRespAcknowledgeTypeATemplateId;
+        }
+    }
+
+    private Map<String, Object> prepareRespondentEmailContent(CaseDetails caseDetails, byte[] document,
+                                                              boolean isWelsh) throws NotificationClientException {
+        log.info("Preparing email content for respondent");
+        CaseData caseData = caseDetails.getCaseData();
+        JSONObject documentJson =
+                NotificationClient.prepareUpload(document, false, true, "52 weeks");
+        String shortText = isWelsh
+                ? CY_APP_TYPE_MAP.get(APPLICATION_TYPE_MAP.get(caseData.getClaimantTseSelectApplication()))
+                : caseData.getClaimantTseSelectApplication();
+        String datePlus7 = isWelsh
+                ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
+                : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
+        String exuiCaseDetailsLink = emailService.getExuiCaseLink(
+                caseDetails.getCaseId()) + (isWelsh ? WELSH_LANGUAGE_PARAM : "");
+
+        log.info("Email content prepared successfully");
+        return Map.of(
+                CLAIMANT, caseData.getClaimant(),
+                RESPONDENT_NAMES, getRespondentNames(caseData),
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                HEARING_DATE, getNearestHearingToReferralForRespondent(caseData, isWelsh),
+                SHORT_TEXT, shortText,
+                DATE_PLUS_7, datePlus7,
+                LINK_TO_DOCUMENT, documentJson,
+                LINK_TO_CITIZEN_HUB, exuiCaseDetailsLink
+        );
+    }
+
+    private String translateDateToWelsh(String date) {
+        return CY_MONTHS_MAP.entrySet().stream()
+                .filter(entry -> date.contains(entry.getKey()))
+                .findFirst()
+                .map(entry -> date.replace(entry.getKey(), entry.getValue()))
+                .orElse(date);
+    }
+
+    private String getNearestHearingToReferralForRespondent(CaseData caseData, boolean isWelsh) {
+        String hearingDate = getNearestHearingToReferral(caseData.getHearingCollection(), NOT_SET);
+        if (isWelsh) {
+            return NOT_SET.equals(hearingDate)
+                    ? NOT_SET_CY
+                    : translateDateToWelsh(hearingDate);
+        }
+        return hearingDate;
+    }
+
+    public void sendAdminEmail(CaseDetails caseDetails) {
+        String email = getTribunalEmail(caseDetails.getCaseData());
+        if (isNullOrEmpty(email)) {
+            return;
+        }
+
+        Map<String, String> personalisation = prepareContentAdminEmail(caseDetails);
+        emailService.sendEmail(tseClaimantRepNewApplicationTemplateId, email, personalisation);
+    }
+
+    public String getTribunalEmail(CaseData caseData) {
+        String managingOffice = caseData.getManagingOffice();
+        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
+
+        if (tribunalOffice == null) {
+            return null;
+        }
+
+        return tribunalOffice.getOfficeEmail();
+    }
+
+    private Map<String, String> prepareContentAdminEmail(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+
+        Map<String, String> content = new ConcurrentHashMap<>();
+        content.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        content.put(EMAIL_FLAG, "");
+        content.put(CLAIMANT, caseData.getClaimant());
+        content.put(DATE, getNearestHearingToReferral(caseData, NOT_SET));
+        content.put("url", emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        content.put(RESPONDENTS, getRespondentNames(caseData));
+        return content;
+    }
+  
+    public String generateClaimantApplicationTableMarkdown(CaseData caseData) {
+        return ClaimantTellSomethingElseHelper.generateClaimantRepApplicationMarkdown(caseData);
     }
 }

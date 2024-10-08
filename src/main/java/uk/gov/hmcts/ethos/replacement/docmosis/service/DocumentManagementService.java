@@ -122,18 +122,18 @@ public class DocumentManagementService {
                 log.info("Using Document Upload Client");
                 UserDetails user = userIdamService.getUserDetails(authToken);
                 UploadResponse response = documentUploadClient.upload(
-                       authToken,
-                       authTokenGenerator.generate(),
+                        authToken,
+                        authTokenGenerator.generate(),
                         user.getUid(),
                         new ArrayList<>(singletonList("caseworker-employment")),
                         uk.gov.hmcts.reform.document.domain.Classification.PUBLIC,
                         singletonList(file)
                 );
                 Document document = response.getEmbedded().getDocuments().stream()
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new DocumentManagementException("Document management failed uploading file"
-                                    + OUTPUT_FILE_NAME));
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new DocumentManagementException("Document management failed uploading file"
+                                        + OUTPUT_FILE_NAME));
                 log.info("Uploaded document successful");
                 return URI.create(document.links.self.href);
             }

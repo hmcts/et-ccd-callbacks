@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.respondent;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,51 +18,38 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FUNCTION_NOT_AVAILABLE_ERROR;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
- * REST controller for the "Respond to an Application" event.
+ * REST controller for the "Respond to an Order or Request" event.
  */
 @Slf4j
-@RequestMapping("/tseResponse")
+@RequestMapping("/pseRespondToTribunal")
 @RestController
 @RequiredArgsConstructor
-public class TseRespondentReplyController {
+public class PseRespondToTribunalController {
 
-    private final VerifyTokenService verifyTokenService;
-    private final TseRespondentReplyService tseRespondentReplyService;
-    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String SUBMITTED_BODY = """
-        ### What happens next \r
-        \r
-        You have sent your response to the tribunal%s.\r
-        \r
-        The tribunal will consider all correspondence and let you know what happens next.""";
-    private static final String SUBMITTED_COPY = " and copied it to the claimant";
+    private final PseRespondToTribunalService pseRespondToTribunalService;
 
     /**
-     *  Populates the dynamic list for select an application to respond to.
+     *  Populates the dynamic list for select an order or request to respond to.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the dynamic list for select an application to respond to")
+    @Operation(summary = "Populates the dynamic list for select an order or request to respond to")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -76,17 +63,12 @@ public class TseRespondentReplyController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+        caseData.setPseRespondentSelectOrderOrRequest(pseRespondToTribunalService.populateSelectDropdown(caseData,
+                RESPONDENT_TITLE));
 
-        if (Helper.isClaimantNonSystemUser(caseData)
-                && Boolean.FALSE.equals(Helper.isRepresentedClaimantWithMyHmctsCase(caseData))) {
-            caseData.setTseRespondNotAvailableWarning(YES);
+        if (Helper.isClaimantNonSystemUser(caseData)) {
+            caseData.setRespondToTribunalNotAvailableWarning(YES);
         }
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -97,6 +79,7 @@ public class TseRespondentReplyController {
      * the other party (Claimant) is a non-system user.
      *
      * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
     @PostMapping(value = "/showError", consumes = APPLICATION_JSON_VALUE)
@@ -110,12 +93,12 @@ public class TseRespondentReplyController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> showError(
-            @RequestBody CCDRequest ccdRequest) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
-        if (Helper.isClaimantNonSystemUser(caseData)
-                && Boolean.FALSE.equals(Helper.isRepresentedClaimantWithMyHmctsCase(caseData))) {
+        if (Helper.isClaimantNonSystemUser(caseData)) {
             errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
         }
 
@@ -123,14 +106,16 @@ public class TseRespondentReplyController {
     }
 
     /**
-     * Populates data needed for replying to a specific application.
-     *
-     * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
-     * @return Callback response entity with case data attached.
+     * Middle Event for initial Request/Order details.
+     * @param ccdRequest        CaseData which is a generic data type for most of the
+     *                          methods which holds case data
+     * @param  userToken        Used for authorisation
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
+     *                          includes caseData which contains the upload document names of
+     *                          type "Another type of document" in a html string format.
      */
-    @PostMapping(value = "/midPopulateReply", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the data needed for replying to the selected application")
+    @PostMapping(value = "/midDetailsTable", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Mid Event for initial Request/Order details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -140,23 +125,14 @@ public class TseRespondentReplyController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> midPopulateReply(
+    public ResponseEntity<CCDCallbackResponse> midDetailsTable(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        if (tseRespondentReplyService.isRespondingToTribunal(caseData)) {
-            tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, userToken);
-        } else {
-            TseHelper.setDataForRespondingToApplication(caseData, false);
-        }
-
+        caseData.setPseRespondentOrdReqTableMarkUp(
+            pseRespondToTribunalService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE)
+        );
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -181,28 +157,25 @@ public class TseRespondentReplyController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midValidateInput(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = tseRespondentReplyService.validateInput(caseData);
+        List<String> errors = pseRespondToTribunalService.validateRespondentInput(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**
-     * Saves the reply data onto the application object.
+     * Save the Response.
      *
-     * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
-     * @return Callback response entity with case data attached.
+     * @param ccdRequest        CaseData which is a generic data type for most of the
+     *                          methods which holds case data
+     * @param  userToken        Used for authorisation
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
+     *                          includes caseData which contains the upload document names of
+     *                          type "Another type of document" in a html string format.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Saves reply onto the application")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -216,29 +189,27 @@ public class TseRespondentReplyController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
-        tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, userToken,
-                caseDetails.getCaseTypeId());
-        tseRespondentReplyService.respondentReplyToTse(userToken, caseDetails, caseData);
-        caseManagementForCaseWorkerService.setNextListedDate(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        pseRespondToTribunalService.addRespondentResponseToJON(caseDetails.getCaseData(), userToken);
+
+        pseRespondToTribunalService.sendAcknowledgeEmail(caseDetails, userToken);
+        pseRespondToTribunalService.sendClaimantEmail(caseDetails);
+        pseRespondToTribunalService.sendTribunalEmail(caseDetails, RESPONDENT_TITLE);
+
+        pseRespondToTribunalService.clearRespondentResponse(caseDetails.getCaseData());
+
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
     /**
-     * Formats data for submit successful page.
+     * Informs Respondent about Response Submitted.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Formats data for submit successful page")
+    @Operation(summary = "Informs Respondent about Response Submitted")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -252,20 +223,13 @@ public class TseRespondentReplyController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        String body = String.format(
-            SUBMITTED_BODY,
-            YES.equals(caseData.getTseResponseCopyToOtherParty()) ? SUBMITTED_COPY : ""
-        );
+        String body = pseRespondToTribunalService.getRespondentSubmittedBody(caseData);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_body(body)
             .build());
     }
+
 }

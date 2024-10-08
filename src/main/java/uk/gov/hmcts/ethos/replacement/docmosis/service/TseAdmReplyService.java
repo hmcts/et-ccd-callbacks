@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -274,7 +276,10 @@ public class TseAdmReplyService {
         // if claimant only or both parties: send Claimant Reply Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
             || BOTH_PARTIES.equalsIgnoreCase(caseData.getTseAdmReplySelectPartyNotify())) {
-            String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+            String claimantEmail = Optional.ofNullable(caseData.getClaimantType().getClaimantEmailAddress())
+                    .orElseGet(() -> Optional.ofNullable(caseData.getRepresentativeClaimantType())
+                            .map(RepresentedTypeC::getRepresentativeEmailAddress)
+                            .orElse(null));
 
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =

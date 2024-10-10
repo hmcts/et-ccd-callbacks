@@ -132,6 +132,8 @@ public final class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
+                .hearingNotListedDoNotListFurtherDirections(
+                        defaultIfEmpty(caseData.getEtICHearingNotListedDoNotListHearingDirections(), null))
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information
@@ -197,11 +199,13 @@ public final class InitialConsiderationHelper {
                         .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
                 .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))
+
                 .otherDirections(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections).orElse(null))
 
                 // Hearing NOT Listed
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
+
                 //video hearing
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
@@ -258,6 +262,9 @@ public final class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
+
+                .hearingNotListedDoNotListFurtherDirections(
+                        defaultIfEmpty(caseData.getEtICHearingNotListedDoNotListHearingDirections(), null))
 
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))

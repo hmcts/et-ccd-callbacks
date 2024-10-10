@@ -336,7 +336,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.4.2'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '2.4.5'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.18.3'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
@@ -364,7 +364,7 @@ dependencies {
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.3.3'
     //To Remove vulnerability CVE-2020-11988
-    implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.9'
+    implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.10'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.16'

@@ -132,6 +132,8 @@ public final class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
+                .hearingNotListedDoNotListFurtherDirections(
+                        defaultIfEmpty(caseData.getEtICHearingNotListedDoNotListHearingDirections(), null))
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information

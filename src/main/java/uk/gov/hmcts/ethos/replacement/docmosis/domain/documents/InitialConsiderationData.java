@@ -76,22 +76,10 @@ public class InitialConsiderationData {
 
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;
-    @JsonProperty("udlReasons")
-    private List<String> udlReasons;
-    @JsonProperty("udlDisputeOnFacts")
-    private String udlDisputeOnFacts;
-    @JsonProperty("udlLittleOrNoAgreement")
-    private String udlLittleOrNoAgreement;
-    @JsonProperty("udlIssueOfLawArising")
-    private String udlIssueOfLawArising;
-    @JsonProperty("udlViewsOfParties")
-    private String udlViewsOfParties;
-    @JsonProperty("udlNoViewsExpressedByParties")
-    private String udlNoViewsExpressedByParties;
-    @JsonProperty("udlConcurrentProceedings")
-    private String udlConcurrentProceedings;
-    @JsonProperty("udlOther")
-    private String udlOther;
+    @JsonProperty("etICIssueStandardDirections")
+    private String etICIssueStandardDirections;
+    @JsonProperty("udlGiveReasonsIsd")
+    private String udlGiveReasonsIsd;
     @JsonProperty("udlHearingFormat")
     private String udlHearingFormat;
     @JsonProperty("udlCVPIssue")

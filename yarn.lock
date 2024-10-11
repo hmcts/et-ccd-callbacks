@@ -8226,7 +8226,7 @@ __metadata:
     playwright: ^1.35.1
     playwright-core: ^1.35.1
     proxyquire: 2.1.3
-    puppeteer: 23.5.1
+    puppeteer: 23.5.3
     randomstring: 1.3.0
     request: 2.88.2
     request-promise-native: 1.0.9
@@ -14965,9 +14965,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer-core@npm:23.5.1":
-  version: 23.5.1
-  resolution: "puppeteer-core@npm:23.5.1"
+"puppeteer-core@npm:23.5.3":
+  version: 23.5.3
+  resolution: "puppeteer-core@npm:23.5.3"
   dependencies:
     "@puppeteer/browsers": 2.4.0
     chromium-bidi: 0.8.0
@@ -14975,7 +14975,7 @@ __metadata:
     devtools-protocol: 0.0.1342118
     typed-query-selector: ^2.12.0
     ws: ^8.18.0
-  checksum: 49ec8d2387cea37360e0862c4d7f50917f8d58c7d24fbb44d24106d5e5b28e2e8871612814c71416a8bc262be57057d2b0f0660f859e3b05c747ac09065778f6
+  checksum: 9bcc0056c03980c83a7a233920fb505768968600df6d7ebacea66dc8dee402ba3db968ad37e912ada6521c8443cb32dd80f64f9940ddaa6e7dfcf8a957c3fa86
   languageName: node
   linkType: hard
 
@@ -14993,19 +14993,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:23.5.1":
-  version: 23.5.1
-  resolution: "puppeteer@npm:23.5.1"
+"puppeteer@npm:23.5.3":
+  version: 23.5.3
+  resolution: "puppeteer@npm:23.5.3"
   dependencies:
     "@puppeteer/browsers": 2.4.0
     chromium-bidi: 0.8.0
     cosmiconfig: ^9.0.0
     devtools-protocol: 0.0.1342118
-    puppeteer-core: 23.5.1
+    puppeteer-core: 23.5.3
     typed-query-selector: ^2.12.0
   bin:
     puppeteer: lib/cjs/puppeteer/node/cli.js
-  checksum: 46c117225f4475e472c9fb53517c5a3a2aa66a5459336f1ad644260d36881b030640b9907fcdb45e405f590bdd618f97c0af3f71ae001ccdce3e8104a004ed4c
+  checksum: 1c5cd20fc490ff9fae7063c538547ad6643751f2f8711e4e2d2ae20af1e90b09cc9cd1139b77324ff6abc50bf7da2c36c4524c7d3a0efa218b72c852c712b9f3
   languageName: node
   linkType: hard
 

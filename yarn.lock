@@ -89,8 +89,8 @@ __metadata:
   linkType: hard
 
 "@babel/eslint-parser@npm:^7.17.0":
-  version: 7.25.7
-  resolution: "@babel/eslint-parser@npm:7.25.7"
+  version: 7.25.8
+  resolution: "@babel/eslint-parser@npm:7.25.8"
   dependencies:
     "@nicolo-ribaudo/eslint-scope-5-internals": 5.1.1-v1
     eslint-visitor-keys: ^2.1.0
@@ -98,7 +98,7 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.11.0
     eslint: ^7.5.0 || ^8.0.0 || ^9.0.0
-  checksum: 6e84d0d60d4ccc3164590e161bfd3a82502f75d35878c00f0158b631c2c7533031197d175fce59cd7868d60c50e76d8cbc035d6e76f01ca08e034998e678127c
+  checksum: d263eff7cc123aeab8ea2dfe60eb39aaf1b5050fe3e895a459e01a9bb02975d5de6074b5a5550f50ae811f9f52e0dddceda54fe0da1e83e02bc6f50af0adaae0
   languageName: node
   linkType: hard
 
@@ -3389,13 +3389,13 @@ __metadata:
   linkType: hard
 
 "@wdio/cli@npm:^9.0.0":
-  version: 9.1.4
-  resolution: "@wdio/cli@npm:9.1.4"
+  version: 9.1.5
+  resolution: "@wdio/cli@npm:9.1.5"
   dependencies:
     "@types/node": ^20.1.1
     "@vitest/snapshot": ^2.1.1
     "@wdio/config": 9.1.3
-    "@wdio/globals": 9.1.4
+    "@wdio/globals": 9.1.5
     "@wdio/logger": 9.1.3
     "@wdio/protocols": 9.0.8
     "@wdio/types": 9.1.3
@@ -3415,11 +3415,11 @@ __metadata:
     read-pkg-up: ^10.0.0
     recursive-readdir: ^2.2.3
     tsx: ^4.7.2
-    webdriverio: 9.1.4
+    webdriverio: 9.1.5
     yargs: ^17.7.2
   bin:
     wdio: ./bin/wdio.js
-  checksum: f7ad13b40dbe4d7abbd263f58531a03678be618ca3a3286b4c6faf7531b8dbbf83f731038fa84ee08e848437e7c9d573af4200e58e48ba469229cdfd06b99f0e
+  checksum: 7ed4b0e45b7027ad7ae104395457c6534b1fcc4b4bc2bb3ea391e354c78d1cf248426a2f05becc159eb5a23cb42658f4914675464d16b122b1020cba2784c44e
   languageName: node
   linkType: hard
 
@@ -3469,18 +3469,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wdio/globals@npm:9.1.4":
-  version: 9.1.4
-  resolution: "@wdio/globals@npm:9.1.4"
+"@wdio/globals@npm:9.1.5":
+  version: 9.1.5
+  resolution: "@wdio/globals@npm:9.1.5"
   dependencies:
     expect-webdriverio: ^5.0.1
-    webdriverio: 9.1.4
+    webdriverio: 9.1.5
   dependenciesMeta:
     expect-webdriverio:
       optional: true
     webdriverio:
       optional: true
-  checksum: df89891e8ea95d82c89f232760362ef691c122d9a4ed3b867f380dfad9ad38ff05760a6d7192152bd9ad31562d16389f994b84bdadda7792ea27a28f825bf603
+  checksum: 648052b25fe9fd6102a57fb5660f9784cb4e69757c2398efdd21a5e8f94560d44b7b6b1db9632502658fc6ef9f1c53008328019e24ef44b56c26deafc6aec88f
   languageName: node
   linkType: hard
 
@@ -3568,16 +3568,16 @@ __metadata:
   linkType: hard
 
 "@wdio/sauce-service@npm:^9.0.0":
-  version: 9.1.4
-  resolution: "@wdio/sauce-service@npm:9.1.4"
+  version: 9.1.5
+  resolution: "@wdio/sauce-service@npm:9.1.5"
   dependencies:
     "@wdio/logger": 9.1.3
     "@wdio/types": 9.1.3
     "@wdio/utils": 9.1.3
     ip: ^2.0.1
     saucelabs: 8.0.0
-    webdriverio: 9.1.4
-  checksum: 5eb8aa6a40bdbb7286d6e1132951435891c4f463f247cb8d7b2486a87944d1408a2bf96741de68b2a77682f2a4fd74c9fb7323f614be7127ac68b5c0644549b2
+    webdriverio: 9.1.5
+  checksum: a13df45a0a9bfa431e8f403234f3387bff70aeb7bbfc6796e45bb3c839341172c95b02c51ace9f4e38e9e7764fb4b178d37cc47cd6925d50987f2f10deefd36f
   languageName: node
   linkType: hard
 
@@ -8226,7 +8226,7 @@ __metadata:
     playwright: ^1.35.1
     playwright-core: ^1.35.1
     proxyquire: 2.1.3
-    puppeteer: 23.5.1
+    puppeteer: 23.5.3
     randomstring: 1.3.0
     request: 2.88.2
     request-promise-native: 1.0.9
@@ -8236,14 +8236,14 @@ __metadata:
     sinon: 19.0.2
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 4.2.3
+    sonarqube-scanner: 4.2.4
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
     unirest: 0.6.0
     uuid: 10.0.0
     watch: 1.0.2
-    webdriverio: 9.1.4
+    webdriverio: 9.1.5
     when: 3.7.8
   languageName: unknown
   linkType: soft
@@ -14965,9 +14965,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer-core@npm:23.5.1":
-  version: 23.5.1
-  resolution: "puppeteer-core@npm:23.5.1"
+"puppeteer-core@npm:23.5.3":
+  version: 23.5.3
+  resolution: "puppeteer-core@npm:23.5.3"
   dependencies:
     "@puppeteer/browsers": 2.4.0
     chromium-bidi: 0.8.0
@@ -14975,7 +14975,7 @@ __metadata:
     devtools-protocol: 0.0.1342118
     typed-query-selector: ^2.12.0
     ws: ^8.18.0
-  checksum: 49ec8d2387cea37360e0862c4d7f50917f8d58c7d24fbb44d24106d5e5b28e2e8871612814c71416a8bc262be57057d2b0f0660f859e3b05c747ac09065778f6
+  checksum: 9bcc0056c03980c83a7a233920fb505768968600df6d7ebacea66dc8dee402ba3db968ad37e912ada6521c8443cb32dd80f64f9940ddaa6e7dfcf8a957c3fa86
   languageName: node
   linkType: hard
 
@@ -14993,19 +14993,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer@npm:23.5.1":
-  version: 23.5.1
-  resolution: "puppeteer@npm:23.5.1"
+"puppeteer@npm:23.5.3":
+  version: 23.5.3
+  resolution: "puppeteer@npm:23.5.3"
   dependencies:
     "@puppeteer/browsers": 2.4.0
     chromium-bidi: 0.8.0
     cosmiconfig: ^9.0.0
     devtools-protocol: 0.0.1342118
-    puppeteer-core: 23.5.1
+    puppeteer-core: 23.5.3
     typed-query-selector: ^2.12.0
   bin:
     puppeteer: lib/cjs/puppeteer/node/cli.js
-  checksum: 46c117225f4475e472c9fb53517c5a3a2aa66a5459336f1ad644260d36881b030640b9907fcdb45e405f590bdd618f97c0af3f71ae001ccdce3e8104a004ed4c
+  checksum: 1c5cd20fc490ff9fae7063c538547ad6643751f2f8711e4e2d2ae20af1e90b09cc9cd1139b77324ff6abc50bf7da2c36c4524c7d3a0efa218b72c852c712b9f3
   languageName: node
   linkType: hard
 
@@ -16584,9 +16584,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:4.2.3":
-  version: 4.2.3
-  resolution: "sonarqube-scanner@npm:4.2.3"
+"sonarqube-scanner@npm:4.2.4":
+  version: 4.2.4
+  resolution: "sonarqube-scanner@npm:4.2.4"
   dependencies:
     adm-zip: 0.5.12
     axios: 1.7.7
@@ -16602,7 +16602,7 @@ __metadata:
     tar-stream: 3.1.7
   bin:
     sonar-scanner: bin/sonar-scanner
-  checksum: 53956e68f2af24b770b1b156acbfe69c4450024faa1195bd6e34dae9f0720bda422dfc7444509dab60864b77ce73375caff3fa3bc2eeecf3d70ebc6b6872a79a
+  checksum: 2a0f1c418d916e15fbde8d945ebadccc3598de77cf70930a9892fe0384ec3f17b99fd38bb7930c7ba29fff39c1ed6155ac8ee7fdcb10272c09bf6779b1e1d9a8
   languageName: node
   linkType: hard
 
@@ -18389,9 +18389,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webdriver@npm:9.1.3":
-  version: 9.1.3
-  resolution: "webdriver@npm:9.1.3"
+"webdriver@npm:9.1.5":
+  version: 9.1.5
+  resolution: "webdriver@npm:9.1.5"
   dependencies:
     "@types/node": ^20.1.0
     "@types/ws": ^8.5.3
@@ -18402,13 +18402,13 @@ __metadata:
     "@wdio/utils": 9.1.3
     deepmerge-ts: ^7.0.3
     ws: ^8.8.0
-  checksum: d4ba2adda788ab945a5cbff3502dda528e687a132d5cd0e462c88810065cddfadf56a0e0deaf6957f4a9b1f2108ac0f3a2c8451dd9ce02712eb95ad5afe6b65a
+  checksum: 838726252a89fdcd4fa50e0276d0cf549250ed19fef2b97734a254071fb16855cfd2d3ddf517f047aa18e32a4ea7e294aa2c4168371e3b644c8eb49ecef2ceb4
   languageName: node
   linkType: hard
 
-"webdriverio@npm:9.1.4":
-  version: 9.1.4
-  resolution: "webdriverio@npm:9.1.4"
+"webdriverio@npm:9.1.5":
+  version: 9.1.5
+  resolution: "webdriverio@npm:9.1.5"
   dependencies:
     "@types/node": ^20.11.30
     "@types/sinonjs__fake-timers": ^8.1.5
@@ -18436,13 +18436,13 @@ __metadata:
     rgb2hex: 0.2.5
     serialize-error: ^11.0.3
     urlpattern-polyfill: ^10.0.0
-    webdriver: 9.1.3
+    webdriver: 9.1.5
   peerDependencies:
     puppeteer-core: ^22.3.0
   peerDependenciesMeta:
     puppeteer-core:
       optional: true
-  checksum: 72600a8bb11fda6f5b5ac8731c800eaf90a18ea433b6e786bd6af952a5ae080391fa295e352c036a06ece1c156a61b11ce3a3ff7b0aad268204ae915e5de1747
+  checksum: ea7a6dd4a428a0482b925a261962030104a169d6665d72eda8a3cf19b30e36cc4ff0715378362f6fb5d376171a6b3274beb262941b35b441e86bf1cce52eba54
   languageName: node
   linkType: hard
 

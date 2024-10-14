@@ -78,8 +78,8 @@ public class InitialConsiderationData {
     private String udlSitAlone;
     @JsonProperty("etICIssueStandardDirections")
     private String etICIssueStandardDirections;
-    @JsonProperty("udlGiveReasonsIsd")
-    private String udlGiveReasonsIsd;
+    @JsonProperty("etICUdlGiveReasonsIsd")
+    private String etICUdlGiveReasonsIsd;
     @JsonProperty("udlHearingFormat")
     private String udlHearingFormat;
     @JsonProperty("udlCVPIssue")

@@ -47,8 +47,8 @@ public class InitialConsiderationData {
     @JsonProperty("hearingNotListed")
     private List<String> hearingNotListed;
 
-    @JsonProperty("cvpHearingType")
-    private List<String> cvpHearingType;
+    @JsonProperty("videoHearingType")
+    private List<String> videoHearingType;
     @JsonProperty("cvpFinalDetails")
     private String cvpFinalDetails;
     @JsonProperty("cvpPreliminaryDetails")

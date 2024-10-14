@@ -82,7 +82,7 @@ public final class InitialConsiderationHelper {
 
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
                 //cvp
-                .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                .videoHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
                 .cvpFinalDetails(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICFinalHearingDetails).orElse(null))
@@ -195,7 +195,7 @@ public final class InitialConsiderationHelper {
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
 
                 //video hearing
-                .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                .videoHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
                 .cvpFinalDetails(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICFinalHearingDetails).orElse(null))

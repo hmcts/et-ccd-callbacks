@@ -47,8 +47,8 @@ public class InitialConsiderationData {
     @JsonProperty("hearingNotListed")
     private List<String> hearingNotListed;
 
-    @JsonProperty("cvpHearingType")
-    private List<String> cvpHearingType;
+    @JsonProperty("videoHearingType")
+    private List<String> videoHearingType;
     @JsonProperty("cvpFinalDetails")
     private String cvpFinalDetails;
     @JsonProperty("cvpPreliminaryDetails")
@@ -76,22 +76,10 @@ public class InitialConsiderationData {
 
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;
-    @JsonProperty("udlReasons")
-    private List<String> udlReasons;
-    @JsonProperty("udlDisputeOnFacts")
-    private String udlDisputeOnFacts;
-    @JsonProperty("udlLittleOrNoAgreement")
-    private String udlLittleOrNoAgreement;
-    @JsonProperty("udlIssueOfLawArising")
-    private String udlIssueOfLawArising;
-    @JsonProperty("udlViewsOfParties")
-    private String udlViewsOfParties;
-    @JsonProperty("udlNoViewsExpressedByParties")
-    private String udlNoViewsExpressedByParties;
-    @JsonProperty("udlConcurrentProceedings")
-    private String udlConcurrentProceedings;
-    @JsonProperty("udlOther")
-    private String udlOther;
+    @JsonProperty("etICIssueStandardDirections")
+    private String etICIssueStandardDirections;
+    @JsonProperty("etICUdlGiveReasonsIsd")
+    private String etICUdlGiveReasonsIsd;
     @JsonProperty("udlHearingFormat")
     private String udlHearingFormat;
     @JsonProperty("udlCVPIssue")
@@ -100,6 +88,10 @@ public class InitialConsiderationData {
     private List<String> udlFinalF2FIssue;
     @JsonProperty("udlCheckComplianceOrders")
     private String udlCheckComplianceOrders;
+
+    @JsonProperty("hearingNotListedDoNotListFurtherDirections")
+    private String hearingNotListedDoNotListFurtherDirections;
+
     @JsonProperty("hearingNotListedOtherDirections")
     private String hearingNotListedOtherDirections;
 

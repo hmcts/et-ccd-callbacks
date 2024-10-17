@@ -468,6 +468,9 @@ bootWithCCD {
     environment 'DEFINITION_STORE_S2S_AUTHORISED_SERVICES', 'ccd_data,ccd_gw,ccd_admin,aac_manage_case_assignment,wa_task_management_api,wa_task_monitor,wa_case_event_handler'
     environment 'WELSH_TRANSLATION_ENABLED', 'false'
 
+    // aac-manage-case-assignment
+    environment 'MANAGE_CASE_S2S_AUTHORISED_SERVICES', 'xui_webapp,ccd_data,finrem_case_orchestration,prl_cos_api,et_cos,et_sya_api'
+
     // ccd-case-document-am-api
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,et_cos,et_sya_api,ethos_repl_docmosis_service,em_ccd_orchestrator,em_stitching_api'

@@ -6,6 +6,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -56,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -80,7 +83,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(CaseActionsForCaseWorkerController.class)
+@WebMvcTest({CaseActionsForCaseWorkerController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
 class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
@@ -124,7 +127,8 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     private static final String ADD_SERVICE_ID_URL = "/addServiceId";
     private static final String AUTHORIZATION = "Authorization";
-
+    @Autowired
+    private JsonMapper jsonMapper;
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -457,8 +461,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                         .content(requestContent2.toString())
@@ -472,12 +474,52 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
+    void amendRespondentDetails_moreThan10Respondents() {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
+                .thenReturn(submitEvent.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(eventValidationService.validateMaximumSize(any(CaseData.class)))
+                .thenReturn(Optional.of("Max respondents exceeded"));
+
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
+                        .content(requestContent2.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentDetails_noRepCollection() {
+        when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
+                .thenReturn(submitEvent.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(eventValidationService.validateMaximumSize(any(CaseData.class)))
+                .thenReturn(Optional.empty());
+        ccdRequest.getCaseDetails().getCaseData().setRepCollection(null);
+        mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(nocRespondentHelper, times(0)).amendRespondentNameRepresentativeNames(any(CaseData.class));
+    }
+
+    @Test
+    @SneakyThrows
     void amendRespondentDetails_UpdateCounter() {
         when(caseManagementForCaseWorkerService.struckOutRespondents(any(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any(CaseData.class));
 
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
@@ -1911,4 +1953,34 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(caseManagementLocationService, times(1))
                 .setCaseManagementLocationCode(any(CaseData.class));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "initiateCase, 1",
+        "SUBMIT_CASE_DRAFT, 1",
+        "submitEt1Draft, 1",
+        "randomCCDEvent, 0"
+    })
+    @SneakyThrows
+    void setNoCAnswersWhenSubmittingACase(String eventId, int expectedInvocations)  {
+        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
+        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+
+        ccdRequest.setEventId(eventId);
+
+        mvc.perform(post(POST_DEFAULT_VALUES_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(nocRespondentRepresentativeService, times(expectedInvocations))
+                .prepopulateOrgPolicyAndNoc(any(CaseData.class));
+    }
+
 }

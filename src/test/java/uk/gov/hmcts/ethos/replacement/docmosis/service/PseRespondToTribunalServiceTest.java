@@ -23,6 +23,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -49,6 +51,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -120,10 +123,10 @@ class PseRespondToTribunalServiceTest {
 
         DynamicFixedListType expected = DynamicFixedListType.from(List.of(
                 DynamicValueType.create("1", "1 View notice of hearing"),
-                DynamicValueType.create("3", "3 Send Notification Title")
+                DynamicValueType.create("3", "2 Send Notification Title")
         ));
 
-        assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
+        assertThat(pseRespondToTribService.populateSelectDropdown(caseData, RESPONDENT_TITLE),
                 is(expected));
     }
 
@@ -153,7 +156,7 @@ class PseRespondToTribunalServiceTest {
             DynamicValueType.create("2", "2 Submit hearing agenda")
         ));
 
-        assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
+        assertThat(pseRespondToTribService.populateSelectDropdown(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -202,7 +205,7 @@ class PseRespondToTribunalServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -217,15 +220,23 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+            
+            </div> </details>
+
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -277,7 +288,7 @@ class PseRespondToTribunalServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -292,16 +303,24 @@ class PseRespondToTribunalServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
             |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+            
+            </div> </details>
+
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -333,7 +352,7 @@ class PseRespondToTribunalServiceTest {
                         "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|Acceptance|\r
             |Date sent|5 Aug 2022|\r
@@ -346,7 +365,7 @@ class PseRespondToTribunalServiceTest {
             |Sent to|Both parties|\r
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
                 is(expected));
     }
 
@@ -394,7 +413,7 @@ class PseRespondToTribunalServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Date sent|5 Aug 2022|\r
@@ -406,16 +425,16 @@ class PseRespondToTribunalServiceTest {
             |Sent to|Both parties|\r
             """;
 
-        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData), is(expected));
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE), is(expected));
     }
 
     @ParameterizedTest
     @MethodSource("inputList")
-    void validateInput_CountErrors(String responseText, String supportingMaterial, int expectedErrorCount) {
+    void validateRespondentInput_CountErrors(String responseText, String supportingMaterial, int expectedErrorCount) {
         caseData.setPseRespondentOrdReqResponseText(responseText);
         caseData.setPseRespondentOrdReqHasSupportingMaterial(supportingMaterial);
 
-        List<String> errors = pseRespondToTribService.validateInput(caseData);
+        List<String> errors = pseRespondToTribService.validateRespondentInput(caseData);
 
         assertEquals(expectedErrorCount, errors.size());
     }
@@ -685,7 +704,7 @@ class PseRespondToTribunalServiceTest {
                 LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
-        pseRespondToTribService.sendTribunalEmail(caseDetails);
+        pseRespondToTribService.sendTribunalEmail(caseDetails, RESPONDENT_TITLE);
         verify(emailService).sendEmail(TEMPLATE_ID, "manchesteret@justice.gov.uk", expectedMap);
     }
 
@@ -725,7 +744,7 @@ class PseRespondToTribunalServiceTest {
                 LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
-        pseRespondToTribService.sendTribunalEmail(caseDetails);
+        pseRespondToTribService.sendTribunalEmail(caseDetails, RESPONDENT_TITLE);
         verify(emailService).sendEmail(TEMPLATE_ID, "manchesteret@justice.gov.uk", expectedMap);
     }
 
@@ -764,7 +783,7 @@ class PseRespondToTribunalServiceTest {
                                         ).build()))
                                 .build()).build()));
 
-        String actual = pseRespondToTribService.getSubmittedBody(caseData);
+        String actual = pseRespondToTribService.getRespondentSubmittedBody(caseData);
 
         assertEquals(actual, String.format(SUBMITTED_BODY, ""));
     }
@@ -782,8 +801,153 @@ class PseRespondToTribunalServiceTest {
                                         ).build()))
                                 .build()).build()));
 
-        String actual = pseRespondToTribService.getSubmittedBody(caseData);
+        String actual = pseRespondToTribService.getRespondentSubmittedBody(caseData);
 
         assertEquals(actual, String.format(SUBMITTED_BODY, RULE92_ANSWERED_YES));
+    }
+
+    @Test
+    void sendEmailsForClaimantResponseR92No() {
+        caseData = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000001/2024")
+                .withManagingOffice("Manchester")
+                .withClaimant("John Doe")
+                .withRespondent(RespondentSumType.builder().respondentName("Jane Doe").build())
+                .withClaimantRepresentedQuestion(YES)
+                .withRepresentativeClaimantType("Mark Doe", "mail@mail.com")
+                .withRespondentRepresentative("Jane Doe", "James Doe", "respondentrep@test.com")
+                .withNotification("Notification One", "Hearing")
+                .build();
+        caseData.setClaimantSelectNotification(DynamicFixedListType.from("1", "1 - Notification One", true));
+        caseData.setClaimantNotificationCopyToOtherParty(NO);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId("1677174791076683");
+
+        when(userIdamService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.MANCHESTER);
+        pseRespondToTribService.sendEmailsForClaimantResponse(caseDetails, AUTH_TOKEN);
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendEmailsForClaimantResponseR92Yes() {
+        caseData = CaseDataBuilder.builder()
+                .withEthosCaseReference("6000001/2024")
+                .withManagingOffice("Manchester")
+                .withClaimant("John Doe")
+                .withRespondent(RespondentSumType.builder().respondentName("Jane Doe").build())
+                .withClaimantRepresentedQuestion(YES)
+                .withRepresentativeClaimantType("Mark Doe", "mail@mail.com")
+                .withRespondentRepresentative("Jane Doe", "James Doe", "respondentrep@test.com")
+                .withNotification("Notification One", "Hearing")
+                .build();
+        caseData.setClaimantSelectNotification(DynamicFixedListType.from("1", "1 - Notification One", true));
+        caseData.setClaimantNotificationCopyToOtherParty(YES);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId("1677174791076683");
+
+        when(userIdamService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.MANCHESTER);
+        pseRespondToTribService.sendEmailsForClaimantResponse(caseDetails, AUTH_TOKEN);
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void initialOrdReqDetailsTableMarkUp_withTribunalResponse() {
+
+        RespondNotificationType respondNotificationType = getRespondNotificationType();
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .date("5 Aug 2022")
+                                .sendNotificationTitle("View notice of hearing")
+                                .sendNotificationLetter(YES)
+                                .sendNotificationUploadDocument(List.of(
+                                        createDocumentTypeItem("Letter 4.8 - Hearing notice - hearing agenda.pdf",
+                                                "5fac5af5-b8ac-458c-a329-31cce78da5c2",
+                                                "Notice of Hearing and Submit Hearing Agenda document")))
+                                .sendNotificationSubject(List.of("Hearing", "Case management orders / requests"))
+                                .sendNotificationSelectHearing(DynamicFixedListType.of(
+                                        DynamicValueType.create("3", "3: Hearing - Leeds - 14 Aug 2022")))
+                                .sendNotificationCaseManagement("Case management order")
+                                .sendNotificationResponseTribunal("Yes - view document for details")
+                                .sendNotificationSelectParties(BOTH_PARTIES)
+                                .sendNotificationWhoCaseOrder("Legal Officer")
+                                .sendNotificationFullName("Mr Lee Gal Officer")
+                                .sendNotificationAdditionalInfo("Additional Info")
+                                .sendNotificationNotify(BOTH_PARTIES)
+                                .respondNotificationTypeCollection(
+                                        List.of(GenericTypeItem.<RespondNotificationType>builder()
+                                        .value(respondNotificationType)
+                                        .build()))
+                                .build())
+                        .build()
+        ));
+
+        caseData.setPseRespondentSelectOrderOrRequest(
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
+        caseData.setClaimantSelectNotification(
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
+
+        String expected = """
+            |View Notification||\r
+            |--|--|\r
+            |Notification|View notice of hearing|\r
+            |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Case management order or request?|Case management order|\r
+            |Is a response required?|Yes - view document for details|\r
+            |Party or parties to respond|Both parties|\r
+            |Additional information|Additional Info|\r
+            |Document|<a href="/documents/5fac5af5-b8ac-458c-a329-31cce78da5c2/binary" target="_blank">Letter 4.8 - Hearing notice - hearing agenda.pdf</a>|\r
+            |Description|Notice of Hearing and Submit Hearing Agenda document|\r
+            |Request made by|Legal Officer|\r
+            |Name|Mr Lee Gal Officer|\r
+            |Sent to|Both parties|\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Tribunal Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Tribunal Response 1| |\r
+            |--|--|\r
+            |Notification|Response to notice of hearing|\r
+            |Response from|Mr Lee Gal Officer|\r
+            |Response date|10 Aug 2022|\r
+            |Additional information|Additional Info|\r
+            |Response Type| - |\r
+            |Party to notify|Both parties|\r
+            |Is a response required?|Yes|\r
+            |Parties to respond| - |\r\n
+            
+            </div> </details>
+            
+            """;
+
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
+                is(expected));
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, CLAIMANT_TITLE),
+                is(expected));
+    }
+
+    private static RespondNotificationType getRespondNotificationType() {
+        RespondNotificationType respondNotificationType = new RespondNotificationType();
+        respondNotificationType.setRespondNotificationAdditionalInfo("Additional Info");
+        respondNotificationType.setRespondNotificationTitle("Response to notice of hearing");
+        respondNotificationType.setRespondNotificationFullName("Mr Lee Gal Officer");
+        respondNotificationType.setRespondNotificationPartyToNotify(BOTH_PARTIES);
+        respondNotificationType.setRespondNotificationDate("10 Aug 2022");
+        respondNotificationType.setRespondNotificationResponseRequired(YES);
+        return respondNotificationType;
     }
 }

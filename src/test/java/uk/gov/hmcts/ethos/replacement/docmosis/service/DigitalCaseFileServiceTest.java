@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -152,6 +153,13 @@ class DigitalCaseFileServiceTest {
         String actual = digitalCaseFileService.getReplyToReferralDCFLink(caseData);
         String expected = "";
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldNotThrowNullPointerIfNoFileOrDocs() {
+        caseData.setDigitalCaseFile(null);
+        caseData.setDocumentCollection(null);
+        assertDoesNotThrow(() -> digitalCaseFileService.getReplyToReferralDCFLink(caseData));
     }
 
 }

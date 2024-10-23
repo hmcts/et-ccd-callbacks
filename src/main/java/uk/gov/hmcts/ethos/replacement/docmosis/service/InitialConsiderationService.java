@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -254,5 +256,19 @@ public class InitialConsiderationService {
         caseData.setEtICPostponeGiveDetails(null);
         caseData.setEtICConvertPreliminaryGiveDetails(null);
         caseData.setEtICConvertF2fGiveDetails(null);
+    }
+    
+    public void processIcDocumentCollections(CaseData caseData) {
+        List<DocumentTypeItem> mergedCollection = new ArrayList<>();
+        if (caseData.getIcDocumentCollection1() != null) {
+            mergedCollection.addAll(caseData.getIcDocumentCollection1());
+        }
+        if (caseData.getIcDocumentCollection2() != null) {
+            mergedCollection.addAll(caseData.getIcDocumentCollection2());
+        }
+        if (caseData.getIcDocumentCollection3() != null) {
+            mergedCollection.addAll(caseData.getIcDocumentCollection3());
+        }
+        caseData.setIcAllDocumentCollection(mergedCollection);
     }
 }

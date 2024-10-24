@@ -82,7 +82,7 @@ public final class InitialConsiderationHelper {
 
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
                 //cvp
-                .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                .videoHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
                 .cvpFinalDetails(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICFinalHearingDetails).orElse(null))
@@ -108,22 +108,10 @@ public final class InitialConsiderationHelper {
                 //udl
                 .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcejSitAlone).orElse(null))
-                .udlReasons(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlGiveReasons).orElse(null))
-                .udlDisputeOnFacts(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlDisputeOnFacts).orElse(null))
-                .udlLittleOrNoAgreement(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlLittleOrNoAgreement).orElse(null))
-                .udlIssueOfLawArising(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlIssueOfLawArising).orElse(null))
-                .udlViewsOfParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlViewsOfParties).orElse(null))
-                .udlNoViewsExpressedByParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlNoViewsExpressedByParties).orElse(null))
-                .udlConcurrentProceedings(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlConcurrentProceedings).orElse(null))
-                .udlOther(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlOther).orElse(null))
+                .etICIssueStandardDirections(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtICIssueStandardDirections).orElse(null))
+                .etICUdlGiveReasonsIsd(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtICUdlGiveReasonsIsd).orElse(null))
                 .udlHearingFormat(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcudlHearFormat).orElse(null))
                 .udlCVPIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
@@ -132,6 +120,8 @@ public final class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
+                .hearingNotListedDoNotListFurtherDirections(
+                        defaultIfEmpty(caseData.getEtICHearingNotListedDoNotListHearingDirections(), null))
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information
@@ -197,13 +187,15 @@ public final class InitialConsiderationHelper {
                         .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
                 .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))
+
                 .otherDirections(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections).orElse(null))
 
                 // Hearing NOT Listed
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
+
                 //video hearing
-                .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
+                .videoHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
                 .cvpFinalDetails(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICFinalHearingDetails).orElse(null))
@@ -234,22 +226,10 @@ public final class InitialConsiderationHelper {
                 //udl
                 .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcejSitAlone).orElse(null))
-                .udlReasons(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlGiveReasons).orElse(null))
-                .udlDisputeOnFacts(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlDisputeOnFacts).orElse(null))
-                .udlLittleOrNoAgreement(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlLittleOrNoAgreement).orElse(null))
-                .udlIssueOfLawArising(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlIssueOfLawArising).orElse(null))
-                .udlViewsOfParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlViewsOfParties).orElse(null))
-                .udlNoViewsExpressedByParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlNoViewsExpressedByParties).orElse(null))
-                .udlConcurrentProceedings(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlConcurrentProceedings).orElse(null))
-                .udlOther(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtIcudlHearing::getEtIcudlOther).orElse(null))
+                .etICIssueStandardDirections(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtICIssueStandardDirections).orElse(null))
+                .etICUdlGiveReasonsIsd(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtICUdlGiveReasonsIsd).orElse(null))
                 .udlHearingFormat(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcudlHearFormat).orElse(null))
                 .udlCVPIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
@@ -258,6 +238,9 @@ public final class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
+
+                .hearingNotListedDoNotListFurtherDirections(
+                        defaultIfEmpty(caseData.getEtICHearingNotListedDoNotListHearingDirections(), null))
 
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))

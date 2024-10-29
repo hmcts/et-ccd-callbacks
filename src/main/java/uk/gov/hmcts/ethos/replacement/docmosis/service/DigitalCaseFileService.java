@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -123,7 +124,7 @@ public class DigitalCaseFileService {
             return formatReplyToReferralDCFLink(caseData.getDigitalCaseFile().getUploadedDocument());
         }
 
-        return caseData.getDocumentCollection()
+        return emptyIfNull(caseData.getDocumentCollection())
             .stream()
             .filter(d -> defaultIfEmpty(d.getValue().getTypeOfDocument(), "").equals(TRIBUNAL_CASE_FILE)
                 || defaultIfEmpty(d.getValue().getMiscDocuments(), "").equals(TRIBUNAL_CASE_FILE))

@@ -173,6 +173,9 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
         when(initialConsiderationService.generateJurisdictionCodesHtml(anyList(), any())).thenReturn("Jurisdictions");
         when(initialConsiderationService.getHearingDetails(anyList())).thenReturn("hearings");
         when(initialConsiderationService.getRespondentName(anyList())).thenReturn("respondents");
+        when(initialConsiderationService.getRespondentNameDetails(any(), any())).thenReturn("respondentsNames");
+        when(initialConsiderationService.getHearingPanelPreferenceDetails(any()))
+                .thenReturn("respondentsPanelPreference");
         mvc.perform(post(START_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)

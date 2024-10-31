@@ -98,9 +98,9 @@ public class InitialConsiderationService {
         if (currentRespondentSumTypeItem == null) {
             return RESPONDENT_MISSING;
         }
-        return String.format(RESPONDENT_NAME, index,
-                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreference()),
-                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreferenceReason()));
+        return String.format(RESPONDENT_NAME, index.getValue(),
+                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentName()),
+                nullCheck(currentRespondentSumTypeItem.getValue().getResponseRespondentName()));
     }
 
     public String getHearingPanelPreferenceDetails(RespondentSumTypeItem currentRespondentSumTypeItem) {

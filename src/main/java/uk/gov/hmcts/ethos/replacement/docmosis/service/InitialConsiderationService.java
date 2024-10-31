@@ -46,6 +46,13 @@ public class InitialConsiderationService {
             + "|In ET3 by respondent | %s|\r\n"
             + "\r\n";
 
+    private static final String  RESPONDENT_HEARING_PANEL_PREFERENCE =
+            "| Respondent hearing panel preference | |\r\n"
+                    + "|-------------|:------------|\r\n"
+                    + "|Preference | %s|\r\n"
+                    + "|Reason | %s|\r\n"
+                    + "\r\n";
+
     private static final String HEARING_DETAILS =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
@@ -85,6 +92,24 @@ public class InitialConsiderationService {
                         nullCheck(respondent.getValue().getRespondentName()),
                         nullCheck(respondent.getValue().getResponseRespondentName())))
                 .collect(Collectors.joining());
+    }
+
+    public String getRespondentNameDetails(RespondentSumTypeItem currentRespondentSumTypeItem, IntWrapper index) {
+        if (currentRespondentSumTypeItem == null) {
+            return RESPONDENT_MISSING;
+        }
+        return String.format(RESPONDENT_NAME, index,
+                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreference()),
+                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreferenceReason()));
+    }
+
+    public String getHearingPanelPreferenceDetails(RespondentSumTypeItem currentRespondentSumTypeItem) {
+        if (currentRespondentSumTypeItem == null) {
+            return RESPONDENT_MISSING;
+        }
+        return String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
+                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreference()),
+                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreferenceReason()));
     }
 
     /**

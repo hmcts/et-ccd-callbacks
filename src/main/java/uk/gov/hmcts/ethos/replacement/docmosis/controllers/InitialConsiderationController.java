@@ -24,9 +24,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -131,8 +133,22 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        caseData.setEtInitialConsiderationRespondent(
-            initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
+        //set respondent name and hearing panel preference details (repeating for each respondent)
+        IntWrapper respondentCount = new IntWrapper(0);
+        Optional.ofNullable(caseData.getRespondentCollection())
+                .filter(respondentCol -> !respondentCol.isEmpty())
+                .ifPresent(respondentCol -> {
+                    respondentCol.forEach(respondent -> {
+                        //Respondent name details
+                        caseData.setEtInitialConsiderationRespondent(
+                                initialConsiderationService.getRespondentNameDetails(
+                                        respondent, respondentCount));
+                        //Hearing panel preference details
+                        caseData.setIcHearingPanelPreference(
+                                initialConsiderationService.getHearingPanelPreferenceDetails(
+                                        respondent));
+                    });
+                });
         caseData.setEtInitialConsiderationHearing(
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
 

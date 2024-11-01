@@ -135,6 +135,8 @@ public class InitialConsiderationController {
             initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
         caseData.setEtInitialConsiderationHearing(
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
+        caseData.setEtIcHearingPanelPreference(
+                initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
 

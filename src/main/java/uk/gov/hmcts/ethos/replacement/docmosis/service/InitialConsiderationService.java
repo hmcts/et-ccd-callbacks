@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
@@ -52,6 +53,16 @@ public class InitialConsiderationService {
             + DATE_MARKUP
             + "|Type | %s|\r\n"
             + "|Duration | %s|";
+
+    private static final String CLAIMANT_HEARING_PANEL_PREFERENCE = """
+    |Claimant's hearing panel preference | |
+    |-------------|:------------|
+    |Panel Preference | %s|
+    |Reason for Panel Preference | %s|
+    """;
+
+    private static final String CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING =
+            String.format(CLAIMANT_HEARING_PANEL_PREFERENCE, "-", "-");
 
     private static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
         + "href=\"%s\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
@@ -125,6 +136,16 @@ public class InitialConsiderationService {
         } else {
             return String.format(HEARING_DETAILS, "-", "-", "-");
         }
+    }
+
+    public String getClaimantHearingPanelPreference(ClaimantHearingPreference claimantHearingPreference) {
+        if (claimantHearingPreference == null) {
+            return CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
+        }
+        return String.format(CLAIMANT_HEARING_PANEL_PREFERENCE,
+                Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreference()).orElse("-"),
+                Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreferenceWhy()).orElse("-")
+        );
     }
 
     /**

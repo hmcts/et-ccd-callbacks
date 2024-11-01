@@ -55,11 +55,11 @@ public class InitialConsiderationService {
             + "|Duration | %s|";
 
     private static final String CLAIMANT_HEARING_PANEL_PREFERENCE = """
-    |Claimant's hearing panel preference | |
-    |-------------|:------------|
-    |Panel Preference | %s|
-    |Reason for Panel Preference | %s|
-    """;
+            |Claimant's hearing panel preference | |
+            |-------------|:------------|
+            |Panel Preference | %s|
+            |Reason for Panel Preference | %s|
+            """;
 
     private static final String CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING =
             String.format(CLAIMANT_HEARING_PANEL_PREFERENCE, "-", "-");

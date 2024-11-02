@@ -44,14 +44,12 @@ public class InitialConsiderationService {
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | %s|\r\n"
             + "|In ET3 by respondent | %s|\r\n"
+            + "\r\n"
+            + "| Respondent hearing panel preference | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Preference | %s|\r\n"
+            + "|Reason | %s|\r\n"
             + "\r\n";
-
-    private static final String  RESPONDENT_HEARING_PANEL_PREFERENCE =
-            "| Respondent hearing panel preference | |\r\n"
-                    + "|-------------|:------------|\r\n"
-                    + "|Preference | %s|\r\n"
-                    + "|Reason | %s|\r\n"
-                    + "\r\n";
 
     private static final String HEARING_DETAILS =
         "|Hearing details | |\r\n"
@@ -68,7 +66,7 @@ public class InitialConsiderationService {
         + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
         + "(2019).pdf?csf=1&web=1&e=9bCQ8P";
     private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
-    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
+    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "", "", "");
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
 
@@ -88,28 +86,12 @@ public class InitialConsiderationService {
         return respondentCollection.stream()
                 .map(respondent -> String.format(
                         RESPONDENT_NAME,
-                        respondentCollection.size() > 1 ? respondentCount.incrementAndReturnValue() : "",
+                         respondentCount.incrementAndReturnValue(),
                         nullCheck(respondent.getValue().getRespondentName()),
-                        nullCheck(respondent.getValue().getResponseRespondentName())))
+                        nullCheck(respondent.getValue().getResponseRespondentName()),
+                        nullCheck(respondent.getValue().getRespondentHearingPanelPreference()),
+                        nullCheck(respondent.getValue().getRespondentHearingPanelPreferenceReason())))
                 .collect(Collectors.joining());
-    }
-
-    public String getRespondentNameDetails(RespondentSumTypeItem currentRespondentSumTypeItem, IntWrapper index) {
-        if (currentRespondentSumTypeItem == null) {
-            return RESPONDENT_MISSING;
-        }
-        return String.format(RESPONDENT_NAME, index.getValue(),
-                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentName()),
-                nullCheck(currentRespondentSumTypeItem.getValue().getResponseRespondentName()));
-    }
-
-    public String getHearingPanelPreferenceDetails(RespondentSumTypeItem currentRespondentSumTypeItem) {
-        if (currentRespondentSumTypeItem == null) {
-            return RESPONDENT_MISSING;
-        }
-        return String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
-                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreference()),
-                nullCheck(currentRespondentSumTypeItem.getValue().getRespondentHearingPanelPreferenceReason()));
     }
 
     /**

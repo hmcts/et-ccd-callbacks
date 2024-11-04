@@ -515,11 +515,11 @@ class InitialConsiderationServiceTest {
         String result = initialConsiderationService.getClaimantHearingPanelPreference(null);
 
         String expected = """
-        |Claimant's hearing panel preference | |
-        |-------------|:------------|
-        |Panel Preference | -|
-        |Reason for Panel Preference | -|
-        """;
+            |Claimant's hearing panel preference | |
+            |-------------|:------------|
+            |Panel Preference | -|
+            |Reason for Panel Preference | -|
+            """;
         assertEquals(expected, result);
     }
 }

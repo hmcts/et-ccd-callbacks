@@ -44,12 +44,13 @@ public class InitialConsiderationService {
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | %s|\r\n"
             + "|In ET3 by respondent | %s|\r\n"
-            + "\r\n"
-            + "| Respondent hearing panel preference | |\r\n"
+            + "\r\n";
+
+    private static final String RESPONDENT_HEARING_PANEL_PREFERENCE =
+        "| Respondent %s hearing panel preference | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Preference | %s|\r\n"
-            + "|Reason | %s|\r\n"
-            + "\r\n";
+            + "|Reason | %s|\r\n";
 
     private static final String HEARING_DETAILS =
         "|Hearing details | |\r\n"
@@ -88,7 +89,27 @@ public class InitialConsiderationService {
                         RESPONDENT_NAME,
                          respondentCount.incrementAndReturnValue(),
                         nullCheck(respondent.getValue().getRespondentName()),
-                        nullCheck(respondent.getValue().getResponseRespondentName()),
+                        nullCheck(respondent.getValue().getResponseRespondentName())))
+                .collect(Collectors.joining());
+    }
+
+    /**
+     * Creates the respondent's hearing panel preference section for Initial Consideration.
+     * Shows details for each respondent that specified hearing panel preference
+     *
+     * @param respondentCollection collection of respondents
+     * @return table with respondent's hearing panel preference details
+     */
+    public String getIcHearingPanelPreference(List<RespondentSumTypeItem> respondentCollection) {
+        if (respondentCollection == null) {
+            return null;
+        }
+
+        IntWrapper respondentCount = new IntWrapper(0);
+        return respondentCollection.stream()
+                .map(respondent -> String.format(
+                        RESPONDENT_HEARING_PANEL_PREFERENCE,
+                        respondentCount.incrementAndReturnValue(),
                         nullCheck(respondent.getValue().getRespondentHearingPanelPreference()),
                         nullCheck(respondent.getValue().getRespondentHearingPanelPreferenceReason())))
                 .collect(Collectors.joining());

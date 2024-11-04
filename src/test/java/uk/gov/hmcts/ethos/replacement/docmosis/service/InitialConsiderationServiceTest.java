@@ -54,11 +54,6 @@ class InitialConsiderationServiceTest {
                 + "|-------------|:------------|\r\n"
                 + "|In ET1 by claimant | %s|\r\n"
                 + "|In ET3 by respondent | %s|\r\n"
-                + "\r\n"
-                + "| Respondent hearing panel preference | |\r\n"
-                + "|-------------|:------------|\r\n"
-                + "|Preference | %s|\r\n"
-                + "|Reason | %s|\r\n"
                 + "\r\n";
 
     private static final String EXPECTED_RESPONDENT_NAME =
@@ -66,11 +61,6 @@ class InitialConsiderationServiceTest {
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Corp|\r\n"
             + "|In ET3 by respondent | |\r\n"
-                + "\r\n"
-                + "| Respondent hearing panel preference | |\r\n"
-                + "|-------------|:------------|\r\n"
-                + "|Preference | |\r\n"
-                + "|Reason | |\r\n"
                 + "\r\n";
 
     private static final String EXPECTED_RESPONDENT_NAME_2 =
@@ -79,20 +69,10 @@ class InitialConsiderationServiceTest {
             + "|In ET1 by claimant | Test Corp|\r\n"
             + "|In ET3 by respondent | |\r\n"
             + "\r\n"
-            + "| Respondent hearing panel preference | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Preference | |\r\n"
-            + "|Reason | |\r\n"
-            + "\r\n"
             + "| Respondent 2 name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Name Two|\r\n"
             + "|In ET3 by respondent | |\r\n"
-            + "\r\n"
-            + "| Respondent hearing panel preference | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Preference | |\r\n"
-            + "|Reason | |\r\n"
             + "\r\n";
 
     private static final String EXPECTED_RESPONDENT_NAME_BLANK =
@@ -100,12 +80,13 @@ class InitialConsiderationServiceTest {
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | |\r\n"
             + "|In ET3 by respondent | |\r\n"
-            + "\r\n"
-            + "| Respondent hearing panel preference | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Preference | |\r\n"
-            + "|Reason | |\r\n"
             + "\r\n";
+
+    private static final String RESPONDENT_HEARING_PANEL_PREFERENCE =
+            "| Respondent %s hearing panel preference | |\r\n"
+                    + "|-------------|:------------|\r\n"
+                    + "|Preference | %s|\r\n"
+                    + "|Reason | %s|\r\n";
 
     private static final String EXPECTED_HEARING_STRING =
         "|Hearing details | |\r\n"
@@ -140,7 +121,7 @@ class InitialConsiderationServiceTest {
         + "based on association or perception on grounds of age<br><br><strong>SXD</strong> - "
         + "Discrimination, including indirect discrimination, discrimination based on association or perception, "
         + "or harassment on grounds of sex, marriage and civil partnership<br><br><hr>";
-    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, 1, "", "", "", "", "");
+    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, 1, "", "", "");
 
     private CaseData caseDataEmpty;
     private CaseData caseData;
@@ -169,12 +150,10 @@ class InitialConsiderationServiceTest {
         respondent.setValue(new RespondentSumType());
         respondent.getValue().setRespondentName("Test Corp");
         respondent.getValue().setResponseRespondentName("Test Response");
-        respondent.getValue().setRespondentHearingPanelPreference("judge");
-        respondent.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
 
         String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
         assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, "1",
-                "Test Corp", "Test Response", "judge", "I deserve it"));
+                "Test Corp", "Test Response"));
     }
 
     @Test
@@ -184,7 +163,7 @@ class InitialConsiderationServiceTest {
         respondent.getValue().setRespondentName("Test Corp");
 
         String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "Test Corp", "", "", ""));
+        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "Test Corp", ""));
     }
 
     @Test
@@ -194,16 +173,56 @@ class InitialConsiderationServiceTest {
         respondent.getValue().setResponseRespondentName("Test Response");
 
         String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "", "Test Response", "", ""));
+        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "", "Test Response"));
     }
 
     @Test
-    void getHearingPanelPreferenceDetails_shouldReturnMissing_whenRespondentIsNull() {
+    void getIcHearingPanelPreference_shouldReturnNull_whenRespondentCollectionIsNull() {
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(null);
+        assertThat(hearingPanelPreferenceDetails).isNull();
+    }
+
+    @Test
+    void getIcHearingPanelPreference_shouldReturnFormattedDetails_whenRespondentHasPreferenceAndReason() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setRespondentHearingPanelPreference("judge");
+        respondent.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
+
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+                List.of(respondent));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it"));
+    }
+
+    @Test
+    void getIcHearingPanelPreference_shouldReturnFormattedDetails_whenRespondentHasNoPreferenceAndNoReason() {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(new RespondentSumType());
 
-        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_MISSING, 1, "", "", "", "", ""));
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+                List.of(respondent));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "", ""));
+    }
+
+    @Test
+    void getIcHearingPanelPreference_shouldReturnFormattedDetailsForMultipleRespondents() {
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setValue(new RespondentSumType());
+        respondent1.getValue().setRespondentHearingPanelPreference("judge");
+        respondent1.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
+
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setValue(new RespondentSumType());
+        respondent2.getValue().setRespondentHearingPanelPreference("panel");
+        respondent2.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
+
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+                List.of(respondent1, respondent2));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it")
+                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 2, "panel", "Fair trial"));
     }
 
     private void setFutureHearingDate(CaseData caseData) {

@@ -44,6 +44,8 @@ public class ScotlandAllocateHearingService {
         TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getAllocateHearingManagingOffice());
 
         caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
+        caseData.setAllocateHearingAdditionalJudge(judgeSelectionService.createJudgeSelection(managingOffice,
+                selectedHearing));
         caseData.setAllocateHearingVenue(scotlandVenueSelectionService.createVenueSelection(managingOffice,
                 selectedListing));
         caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());
@@ -81,6 +83,7 @@ public class ScotlandAllocateHearingService {
         HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
+        selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
         selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
         selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
 
@@ -148,18 +151,14 @@ public class ScotlandAllocateHearingService {
             return null;
         }
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(listing.getHearingVenueDayScotland());
-        switch (tribunalOffice) {
-            case GLASGOW:
-                return listing.getHearingGlasgow();
-            case ABERDEEN:
-                return listing.getHearingAberdeen();
-            case DUNDEE:
-                return listing.getHearingDundee();
-            case EDINBURGH:
-                return listing.getHearingEdinburgh();
-            default:
-                throw new IllegalArgumentException(String.format("Unexpected Scottish office %s", tribunalOffice));
-        }
+        return switch (tribunalOffice) {
+            case GLASGOW -> listing.getHearingGlasgow();
+            case ABERDEEN -> listing.getHearingAberdeen();
+            case DUNDEE -> listing.getHearingDundee();
+            case EDINBURGH -> listing.getHearingEdinburgh();
+            default -> throw new IllegalArgumentException(
+                    String.format("Unexpected Scottish office %s", tribunalOffice));
+        };
     }
 
     private DynamicFixedListType getEmployerMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {

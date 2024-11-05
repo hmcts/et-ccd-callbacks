@@ -86,7 +86,8 @@ class InitialConsiderationServiceTest {
             "| Respondent %s hearing panel preference | |\r\n"
                     + "|-------------|:------------|\r\n"
                     + "|Preference | %s|\r\n"
-                    + "|Reason | %s|\r\n";
+                    + "|Reason | %s|\r\n"
+                    + "\r\n";
 
     private static final String EXPECTED_HEARING_STRING =
         "|Hearing details | |\r\n"

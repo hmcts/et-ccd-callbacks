@@ -47,6 +47,13 @@ public class InitialConsiderationService {
             + "|In ET3 by respondent | %s|\r\n"
             + "\r\n";
 
+    private static final String RESPONDENT_HEARING_PANEL_PREFERENCE =
+        "| Respondent %s hearing panel preference | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Preference | %s|\r\n"
+            + "|Reason | %s|\r\n"
+            + "\r\n";
+
     private static final String HEARING_DETAILS =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
@@ -72,7 +79,7 @@ public class InitialConsiderationService {
         + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
         + "(2019).pdf?csf=1&web=1&e=9bCQ8P";
     private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
-    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
+    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "", "", "");
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
 
@@ -92,9 +99,31 @@ public class InitialConsiderationService {
         return respondentCollection.stream()
                 .map(respondent -> String.format(
                         RESPONDENT_NAME,
-                        respondentCollection.size() > 1 ? respondentCount.incrementAndReturnValue() : "",
+                         respondentCount.incrementAndReturnValue(),
                         nullCheck(respondent.getValue().getRespondentName()),
                         nullCheck(respondent.getValue().getResponseRespondentName())))
+                .collect(Collectors.joining());
+    }
+
+    /**
+     * Creates the respondent's hearing panel preference section for Initial Consideration.
+     * Shows details for each respondent that specified hearing panel preference
+     *
+     * @param respondentCollection collection of respondents
+     * @return table with respondent's hearing panel preference details
+     */
+    public String getIcHearingPanelPreference(List<RespondentSumTypeItem> respondentCollection) {
+        if (respondentCollection == null) {
+            return null;
+        }
+
+        IntWrapper respondentCount = new IntWrapper(0);
+        return respondentCollection.stream()
+                .map(respondent -> String.format(
+                        RESPONDENT_HEARING_PANEL_PREFERENCE,
+                        respondentCount.incrementAndReturnValue(),
+                        nullCheck(respondent.getValue().getRespondentHearingPanelPreference()),
+                        nullCheck(respondent.getValue().getRespondentHearingPanelPreferenceReason())))
                 .collect(Collectors.joining());
     }
 

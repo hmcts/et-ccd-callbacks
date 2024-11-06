@@ -17,9 +17,11 @@ import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -49,12 +51,19 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 class InitialConsiderationServiceTest {
     private static final LocalDateTime EARLIEST_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(5);
     private static final LocalDateTime SECOND_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(9);
+    private static final String RESPONDENT_NAME =
+            "| Respondent %s name given | |\r\n"
+                + "|-------------|:------------|\r\n"
+                + "|In ET1 by claimant | %s|\r\n"
+                + "|In ET3 by respondent | %s|\r\n"
+                + "\r\n";
+
     private static final String EXPECTED_RESPONDENT_NAME =
-        "| Respondent  name given | |\r\n"
+        "| Respondent 1 name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Corp|\r\n"
             + "|In ET3 by respondent | |\r\n"
-            + "\r\n";
+                + "\r\n";
 
     private static final String EXPECTED_RESPONDENT_NAME_2 =
         "| Respondent 1 name given | |\r\n"
@@ -74,6 +83,13 @@ class InitialConsiderationServiceTest {
             + "|In ET1 by claimant | |\r\n"
             + "|In ET3 by respondent | |\r\n"
             + "\r\n";
+
+    private static final String RESPONDENT_HEARING_PANEL_PREFERENCE =
+            "| Respondent %s hearing panel preference | |\r\n"
+                    + "|-------------|:------------|\r\n"
+                    + "|Preference | %s|\r\n"
+                    + "|Reason | %s|\r\n"
+                    + "\r\n";
 
     private static final String EXPECTED_HEARING_STRING =
         "|Hearing details | |\r\n"
@@ -108,11 +124,11 @@ class InitialConsiderationServiceTest {
         + "based on association or perception on grounds of age<br><br><strong>SXD</strong> - "
         + "Discrimination, including indirect discrimination, discrimination based on association or perception, "
         + "or harassment on grounds of sex, marriage and civil partnership<br><br><hr>";
+    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, 1, "", "", "");
 
     private CaseData caseDataEmpty;
     private CaseData caseData;
     private DocumentInfo documentInfo;
-
     private InitialConsiderationService initialConsiderationService;
     @MockBean
     private TornadoService tornadoService;
@@ -129,6 +145,87 @@ class InitialConsiderationServiceTest {
                 .url("https://test.com/documents/random-uuid")
                 .build();
         doCallRealMethod().when(documentManagementService).addDocumentToDocumentField(documentInfo);
+    }
+
+    @Test
+    void getRespondentNameWithPanelPreference_shouldReturnFormattedDetails_whenRespondentIsValid() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setRespondentName("Test Corp");
+        respondent.getValue().setResponseRespondentName("Test Response");
+
+        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
+        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, "1",
+                "Test Corp", "Test Response"));
+    }
+
+    @Test
+    void getRespondentNameDetails_shouldReturnFormattedDetails_whenRespondentHasNoResponseName() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setRespondentName("Test Corp");
+
+        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
+        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "Test Corp", ""));
+    }
+
+    @Test
+    void getRespondentNameDetails_shouldReturnFormattedDetails_whenRespondentHasNoName() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setResponseRespondentName("Test Response");
+
+        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
+        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "", "Test Response"));
+    }
+
+    @Test
+    void getIcHearingPanelPreference_shouldReturnNull_whenRespondentCollectionIsNull() {
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(null);
+        assertThat(hearingPanelPreferenceDetails).isNull();
+    }
+
+    @Test
+    void getIcHearingPanelPreference_shouldReturnFormattedDetails_whenRespondentHasPreferenceAndReason() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setRespondentHearingPanelPreference("judge");
+        respondent.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
+
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+                List.of(respondent));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it"));
+    }
+
+    @Test
+    void getIcHearingPanelPreference_shouldReturnFormattedDetails_whenRespondentHasNoPreferenceAndNoReason() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+                List.of(respondent));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "", ""));
+    }
+
+    @Test
+    void getIcHearingPanelPreference_shouldReturnFormattedDetailsForMultipleRespondents() {
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setValue(new RespondentSumType());
+        respondent1.getValue().setRespondentHearingPanelPreference("judge");
+        respondent1.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
+
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setValue(new RespondentSumType());
+        respondent2.getValue().setRespondentHearingPanelPreference("panel");
+        respondent2.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
+
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+                List.of(respondent1, respondent2));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it")
+                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 2, "panel", "Fair trial"));
     }
 
     private void setFutureHearingDate(CaseData caseData) {
@@ -201,8 +298,7 @@ class InitialConsiderationServiceTest {
                 .withRespondent("Test Name Two", YES, "2022-03-01", false)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID).getCaseData();
         String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
-        assertThat(respondentName)
-                .isEqualTo(EXPECTED_RESPONDENT_NAME_2);
+        assertThat(respondentName).isEqualTo(EXPECTED_RESPONDENT_NAME_2);
     }
 
     @Test

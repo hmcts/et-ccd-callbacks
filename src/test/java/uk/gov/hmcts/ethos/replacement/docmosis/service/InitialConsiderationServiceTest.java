@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -34,6 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -583,5 +585,37 @@ class InitialConsiderationServiceTest {
         dateListedType.setHearingStatus(status);
         hearingDate.setValue(dateListedType);
         return hearingDate;
+    }
+
+    @Test
+    void getClaimantHearingPanelPreferenceTest() {
+        ClaimantHearingPreference preference = new ClaimantHearingPreference();
+        preference.setClaimantHearingPanelPreference("Preference");
+        preference.setClaimantHearingPanelPreferenceWhy("Reason");
+        caseData.setClaimantHearingPreference(preference);
+
+        String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
+                caseData.getClaimantHearingPreference()));
+
+        String expected = """
+            |Claimant's hearing panel preference | |
+            |-------------|:------------|
+            |Panel Preference | Preference|
+            |Reason for Panel Preference | Reason|
+            """;
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void getClaimantHearingPanelPreference_NullPreference() {
+        String result = initialConsiderationService.getClaimantHearingPanelPreference(null);
+
+        String expected = """
+            |Claimant's hearing panel preference | |
+            |-------------|:------------|
+            |Panel Preference | -|
+            |Reason for Panel Preference | -|
+            """;
+        assertEquals(expected, result);
     }
 }

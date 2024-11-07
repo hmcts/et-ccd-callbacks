@@ -112,7 +112,7 @@ public class InitialConsiderationService {
      * @param respondentCollection collection of respondents
      * @return table with respondent's hearing panel preference details
      */
-    public String getIcHearingPanelPreference(List<RespondentSumTypeItem> respondentCollection) {
+    public String getIcRespondentHearingPanelPreference(List<RespondentSumTypeItem> respondentCollection) {
         if (respondentCollection == null) {
             return null;
         }

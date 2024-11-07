@@ -181,7 +181,7 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getIcHearingPanelPreference_shouldReturnNull_whenRespondentCollectionIsNull() {
-        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(null);
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(null);
         assertThat(hearingPanelPreferenceDetails).isNull();
     }
 
@@ -192,7 +192,7 @@ class InitialConsiderationServiceTest {
         respondent.getValue().setRespondentHearingPanelPreference("judge");
         respondent.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
 
-        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
                 String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it"));
@@ -203,7 +203,7 @@ class InitialConsiderationServiceTest {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(new RespondentSumType());
 
-        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
                 String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "", ""));
@@ -221,7 +221,7 @@ class InitialConsiderationServiceTest {
         respondent2.getValue().setRespondentHearingPanelPreference("panel");
         respondent2.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
 
-        String hearingPanelPreferenceDetails = initialConsiderationService.getIcHearingPanelPreference(
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent1, respondent2));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
                 String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it")

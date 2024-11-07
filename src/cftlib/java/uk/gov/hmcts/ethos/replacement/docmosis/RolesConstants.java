@@ -84,6 +84,23 @@ public final class RolesConstants {
     public static final String WA_SYSTEM_USER_EMAIL = "wa-system-user@fake.hmcts.net";
     public static final String ET_DEV_EMAIL = "et.dev@hmcts.net";
 
+    public static final String[] ECM_CASEWORKER_ROLES = {
+            CASEWORKER_EMPLOYMENT.concat("-bristol"), CASEWORKER_EMPLOYMENT.concat("-leeds"),
+            CASEWORKER_EMPLOYMENT.concat("-londoncentral"), CASEWORKER_EMPLOYMENT.concat("-londoneast"),
+            CASEWORKER_EMPLOYMENT.concat("-londonsouth"), CASEWORKER_EMPLOYMENT.concat("-manchester"),
+            CASEWORKER_EMPLOYMENT.concat("-midlandseast"), CASEWORKER_EMPLOYMENT.concat("-midlandswest"),
+            CASEWORKER_EMPLOYMENT.concat("-newcastle"), CASEWORKER_EMPLOYMENT.concat("-wales"),
+            CASEWORKER_EMPLOYMENT.concat("-watford")
+    };
+    public static final String[] ECM_JUDGE_ROLES = {
+            CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-bristol"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-leeds"),
+            CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-londoncentral"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-londoneast"),
+            CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-londonsouth"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-manchester"),
+            CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-midlandseast"),
+            CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-midlandswest"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-newcastle"),
+            CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-wales"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-watford")
+    };
+
     //Paths to definition files
     public static final String ENGLANGWALES_CONFIG_FILE = "/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx";
     public static final String SCOTLAND_CONFIG_FILE = "/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx";

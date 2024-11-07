@@ -119,11 +119,13 @@ public class InitialConsiderationService {
 
         IntWrapper respondentCount = new IntWrapper(0);
         return respondentCollection.stream()
-                .map(respondent -> String.format(
-                        RESPONDENT_HEARING_PANEL_PREFERENCE,
+                .map(respondent -> String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
                         respondentCount.incrementAndReturnValue(),
-                        nullCheck(respondent.getValue().getRespondentHearingPanelPreference()),
-                        nullCheck(respondent.getValue().getRespondentHearingPanelPreferenceReason())))
+                        Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreference())
+                                .orElse("-"),
+                        Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreferenceReason())
+                                .orElse("-")
+                        ))
                 .collect(Collectors.joining());
     }
 

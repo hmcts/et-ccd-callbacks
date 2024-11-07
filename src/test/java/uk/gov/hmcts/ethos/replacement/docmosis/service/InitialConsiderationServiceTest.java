@@ -206,7 +206,7 @@ class InitialConsiderationServiceTest {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "", ""));
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "-", "-"));
     }
 
     @Test

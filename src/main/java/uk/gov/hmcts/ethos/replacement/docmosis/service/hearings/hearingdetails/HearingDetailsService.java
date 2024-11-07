@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.Document;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
@@ -79,7 +78,7 @@ public class HearingDetailsService {
         HearingType selectedHearing = getSelectedHearing(caseData);
         if (selectedHearing != null && caseData.getUploadHearingNotesDocument() != null) {
             selectedHearing.setHearingNotesDocument(isNotEmpty(caseData.getRemoveHearingNotesDocument())
-                    ? new Document()
+                    ? null
                     : caseData.getUploadHearingNotesDocument());
         }
         caseData.setUploadHearingNotesDocument(null);

@@ -137,8 +137,10 @@ public class InitialConsiderationController {
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
         caseData.setEtIcHearingPanelPreference(
                 initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
-        caseData.setIcRespondentHearingPanelPreference(
-                initialConsiderationService.getIcRespondentHearingPanelPreference(caseData.getRespondentCollection()));
+        String icRespondentHearingPanelPreference = initialConsiderationService.getIcRespondentHearingPanelPreference(
+                caseData.getRespondentCollection());
+        log.info("Setting IcRespondentHearingPanelPreference ---> {}", icRespondentHearingPanelPreference);
+        caseData.setIcRespondentHearingPanelPreference(icRespondentHearingPanelPreference);
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         caseData.setEtInitialConsiderationJurisdictionCodes(

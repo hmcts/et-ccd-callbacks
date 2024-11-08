@@ -465,6 +465,7 @@ public class Et1VettingService {
 
     public String getAddressesHtml(CaseData caseData) {
         if (caseData.getClaimantWorkAddressQuestion() != null
+                && caseData.getClaimantWorkAddress() != null
                 && NO.equals(caseData.getClaimantWorkAddressQuestion())) {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
                     toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
@@ -478,7 +479,6 @@ public class Et1VettingService {
                     toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
             );
         }
-
     }
 
     /**

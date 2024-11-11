@@ -75,6 +75,8 @@ class Et1SubmissionServiceTest {
     private RestTemplate restTemplate;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private ET1PdfMapperService et1PdfMapperService;
 
     private Et1SubmissionService et1SubmissionService;
     private CaseDetails caseDetails;

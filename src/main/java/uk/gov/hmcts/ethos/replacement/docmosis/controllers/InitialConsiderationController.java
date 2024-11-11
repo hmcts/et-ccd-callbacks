@@ -132,12 +132,16 @@ public class InitialConsiderationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseData.setEtInitialConsiderationRespondent(
-            initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
+                initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
         caseData.setEtInitialConsiderationHearing(
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
+        caseData.setEtIcHearingPanelPreference(
+                initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
 
+        caseData.setIcHearingPanelPreference(
+                initialConsiderationService.getIcHearingPanelPreference(caseData.getRespondentCollection()));
         caseData.setEtInitialConsiderationJurisdictionCodes(
             initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);

@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
-import uk.gov.hmcts.ecm.common.service.pdf.ET1PdfMapperService;
+import uk.gov.hmcts.ecm.common.service.pdf.PdfMapperService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -46,7 +46,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.utils.ResourceUtils.generateCaseDetails;
 
 @SpringBootTest(classes = { Et1SubmissionService.class, Et1ReppedService.class, TribunalOfficesService.class,
-    PostcodeToOfficeService.class, PdfService.class, ET1PdfMapperService.class})
+    PostcodeToOfficeService.class, PdfService.class})
 @EnableConfigurationProperties({ CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class,
     PostcodeToOfficeMappings.class })
 class Et1SubmissionServiceTest {
@@ -87,7 +87,7 @@ class Et1SubmissionServiceTest {
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
         emailService = spy(new EmailUtils());
-        PdfService pdfService = new PdfService(new ET1PdfMapperService());
+        PdfService pdfService = new PdfService(new PdfMapperService());
         PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
         TribunalOfficesService tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);

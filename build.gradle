@@ -351,7 +351,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.17.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
-    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.66.Final'
+    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.69.Final'
     implementation group: 'org.json', name: 'json', version: '20240303'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.27.1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
@@ -420,7 +420,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.13.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.14'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.15'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 

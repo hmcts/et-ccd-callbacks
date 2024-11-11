@@ -17,6 +17,7 @@ import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
+import uk.gov.hmcts.ecm.common.service.pdf.ET1PdfMapperService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -91,6 +92,8 @@ class Et1ReppedServiceTest {
     private EmailService emailService;
     @MockBean
     private Et1SubmissionService et1SubmissionService;
+    @MockBean
+    private ET1PdfMapperService et1PdfMapperService;
 
     private CaseDetails caseDetails;
     private CaseData caseData;

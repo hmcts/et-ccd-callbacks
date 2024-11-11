@@ -17,7 +17,7 @@ import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
-import uk.gov.hmcts.ecm.common.service.pdf.PdfMapperService;
+import uk.gov.hmcts.ecm.common.service.pdf.ET1PdfMapperService;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -59,7 +59,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @SpringBootTest(classes = { Et1ReppedService.class, TribunalOfficesService.class, PostcodeToOfficeService.class,
-    PdfService.class, PdfMapperService.class})
+    PdfService.class, ET1PdfMapperService.class})
 @EnableConfigurationProperties({ CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class,
     PostcodeToOfficeMappings.class })
 class Et1ReppedServiceTest {

@@ -115,7 +115,7 @@ public class Et1SubmissionService {
 
     public DocumentInfo createEt1(CaseDetails caseDetails, String userToken, String pdfSource)
             throws PdfServiceException {
-        byte[] pdf = pdfService.convertCaseToPdf(caseDetails.getCaseData(), pdfSource);
+        byte[] pdf = pdfService.convertCaseToPdf(caseDetails.getCaseData(), pdfSource, ET1, "representative");
         if (ObjectUtils.isEmpty(pdf)) {
             throw new PdfServiceException("Failed to create ET1 PDF", new NullPointerException());
         }

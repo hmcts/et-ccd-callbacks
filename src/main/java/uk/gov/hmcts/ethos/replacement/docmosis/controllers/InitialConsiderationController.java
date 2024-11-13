@@ -139,7 +139,6 @@ public class InitialConsiderationController {
                 initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
         String icRespondentHearingPanelPreference = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 caseData.getRespondentCollection());
-        log.info("Setting IcRespondentHearingPanelPreference ---> {}", icRespondentHearingPanelPreference);
         caseData.setIcRespondentHearingPanelPreference(icRespondentHearingPanelPreference);
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();

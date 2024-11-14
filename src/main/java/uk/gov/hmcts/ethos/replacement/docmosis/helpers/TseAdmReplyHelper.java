@@ -26,6 +26,7 @@ import java.util.List;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.hasSupportingDocs;
 
 public final class TseAdmReplyHelper {
     private static final String TSE_ADMIN_REPLY_OUTPUT_NAME = "%s Reply.pdf";
@@ -115,10 +116,6 @@ public final class TseAdmReplyHelper {
             return new ArrayList<>();
         }
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
-    }
-
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return supportDocList != null && !supportDocList.isEmpty()  ? "Yes" : "No";
     }
 
 }

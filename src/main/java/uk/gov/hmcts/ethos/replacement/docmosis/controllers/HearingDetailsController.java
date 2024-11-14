@@ -16,12 +16,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -30,16 +28,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/hearingdetails")
 @Slf4j
 public class HearingDetailsController {
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    private final VerifyTokenService verifyTokenService;
     private final HearingDetailsService hearingDetailsService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
-    public HearingDetailsController(VerifyTokenService verifyTokenService,
-                                    HearingDetailsService hearingDetailsService,
+    public HearingDetailsController(HearingDetailsService hearingDetailsService,
                                     CaseManagementForCaseWorkerService caseManagementForCaseWorkerService) {
-        this.verifyTokenService = verifyTokenService;
         this.hearingDetailsService = hearingDetailsService;
         this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
     }
@@ -54,10 +47,6 @@ public class HearingDetailsController {
     public ResponseEntity<CCDCallbackResponse> initialiseHearingDynamicList(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         hearingDetailsService.initialiseHearingDetails(caseData);
@@ -75,10 +64,6 @@ public class HearingDetailsController {
     public ResponseEntity<CCDCallbackResponse> handleListingSelected(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         hearingDetailsService.handleListingSelected(caseData);
@@ -96,10 +81,6 @@ public class HearingDetailsController {
     public ResponseEntity<CCDCallbackResponse> hearingMidEventValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = HearingsHelper.hearingTimeValidation(caseData);
@@ -116,10 +97,6 @@ public class HearingDetailsController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         hearingDetailsService.updateCase(caseDetails);

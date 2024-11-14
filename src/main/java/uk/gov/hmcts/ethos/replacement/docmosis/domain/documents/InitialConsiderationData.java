@@ -56,6 +56,7 @@ public class InitialConsiderationData {
     @JsonProperty("cvpPreliminaryYesNo")
     private String cvpPreliminaryYesNo;
 
+    //old(hidden) preliminary Hearing fields
     @JsonProperty("preliminaryHearingType")
     private List<String> preliminaryHearingType;
     @JsonProperty("preliminaryHearingPurpose")
@@ -67,12 +68,43 @@ public class InitialConsiderationData {
     @JsonProperty("preliminaryHearingLengthType")
     private String preliminaryHearingLengthType;
 
+    //updated preliminary Hearing fields
+    @JsonProperty("preliminaryHearingTypeUpdated")
+    private List<String> preliminaryHearingTypeUpdated;
+    @JsonProperty("preliminaryHearingPurposeUpdated")
+    private List<String> preliminaryHearingPurposeUpdated;
+    @JsonProperty("preliminaryHearingNoticeUpdated")
+    private String preliminaryHearingNoticeUpdated;
+    @JsonProperty("preliminaryHearingLengthUpdated")
+    private String preliminaryHearingLengthUpdated;
+    @JsonProperty("preliminaryHearingLengthTypeUpdated")
+    private String preliminaryHearingLengthTypeUpdated;
+    @JsonProperty("preliminaryHearingIsWithMembers")
+    private String preliminaryHearingIsWithMembers;
+    @JsonProperty("preliminaryHearingIsWithMembersReason")
+    private String preliminaryHearingIsWithMembersReason;
+
+    //old(hidden) preliminary Hearing fields
     @JsonProperty("finalHearingType")
     private List<String> finalHearingType;
     @JsonProperty("finalHearingLength")
     private String finalHearingLength;
     @JsonProperty("finalHearingLengthType")
     private String finalHearingLengthType;
+
+    //updated preliminary Hearing fields
+    @JsonProperty("finalHearingTypeUpdated")
+    private List<String> finalHearingTypeUpdated;
+    @JsonProperty("finalHearingLengthUpdated")
+    private String finalHearingLengthUpdated;
+    @JsonProperty("finalHearingLengthTypeUpdated")
+    private String finalHearingLengthTypeUpdated;
+    @JsonProperty("finalHearingIsEJSitAlone")
+    private String finalHearingIsEJSitAlone;
+    @JsonProperty("finalHearingIsEJSitAloneReason")
+    private String finalHearingIsEJSitAloneReason;
+    @JsonProperty("finalHearingIsEJSitAloneFurtherDetails")
+    private String finalHearingIsEJSitAloneFurtherDetails;
 
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;

@@ -9,7 +9,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICFurtherInfoAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
 import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
@@ -201,7 +203,7 @@ public final class InitialConsiderationHelper {
                         .map(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections).orElse(null))
 
                 // Hearing NOT Listed
-                .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
+                .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedListUpdated()).orElse(null))
                 //video hearing
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
@@ -213,24 +215,24 @@ public final class InitialConsiderationHelper {
                         .map(EtICSeekComments::getEtICPrelimHearingYesNo).orElse(null))
                 //preliminary
                 .preliminaryHearingType(
-                        Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
-                                .map(EtICListForPreliminaryHearing::getEtICTypeOfPreliminaryHearing).orElse(null))
-                .preliminaryHearingPurpose(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
-                        .map(EtICListForPreliminaryHearing::getEtICPurposeOfPreliminaryHearing).orElse(null))
-                .preliminaryHearingNotice(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
-                        .map(EtICListForPreliminaryHearing::getEtICGiveDetailsOfHearingNotice).orElse(null))
-                .preliminaryHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
-                        .map(EtICListForPreliminaryHearing::getEtICLengthOfPrelimHearing).orElse(null))
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                                .map(EtICListForPreliminaryHearingUpdated::getEtICTypeOfPreliminaryHearing).orElse(null))
+                .preliminaryHearingPurpose(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(EtICListForPreliminaryHearingUpdated::getEtICPurposeOfPreliminaryHearing).orElse(null))
+                .preliminaryHearingNotice(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(EtICListForPreliminaryHearingUpdated::getEtICGiveDetailsOfHearingNotice).orElse(null))
+                .preliminaryHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(EtICListForPreliminaryHearingUpdated::getEtICLengthOfPrelimHearing).orElse(null))
                 .preliminaryHearingLengthType(Optional.ofNullable(
-                        caseData.getEtICHearingNotListedListForPrelimHearing())
-                        .map(EtICListForPreliminaryHearing::getPrelimHearingLengthNumType).orElse(null))
+                        caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
+                        .map(EtICListForPreliminaryHearingUpdated::getPrelimHearingLengthNumType).orElse(null))
                 //final
-                .finalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
-                        .map(EtICListForFinalHearing::getEtICTypeOfFinalHearing).orElse(null))
-                .finalHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
-                        .map(EtICListForFinalHearing::getEtICLengthOfFinalHearing).orElse(null))
-                .finalHearingLengthType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
-                        .map(EtICListForFinalHearing::getFinalHearingLengthNumType).orElse(null))
+                .finalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                        .map(EtICListForFinalHearingUpdated::getEtICTypeOfFinalHearing).orElse(null))
+                .finalHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                        .map(EtICListForFinalHearingUpdated::getEtICLengthOfFinalHearing).orElse(null))
+                .finalHearingLengthType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                        .map(EtICListForFinalHearingUpdated::getFinalHearingLengthNumType).orElse(null))
                 //udl
                 .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcejSitAlone).orElse(null))

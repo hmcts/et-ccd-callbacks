@@ -66,13 +66,27 @@ public class InitialConsiderationData {
     private String preliminaryHearingLength;
     @JsonProperty("preliminaryHearingLengthType")
     private String preliminaryHearingLengthType;
+    @JsonProperty("preliminaryHearingWithMembers")
+    private String preliminaryHearingWithMembers;
+    @JsonProperty("preliminaryHearingWithMembersReason")
+    private String preliminaryHearingWithMembersReason;
+    @JsonProperty("preliminaryHearingNotListedAnyOtherDirections")
+    private String preliminaryHearingNotListedAnyOtherDirections;
 
-    @JsonProperty("finalHearingType")
-    private List<String> finalHearingType;
-    @JsonProperty("finalHearingLength")
-    private String finalHearingLength;
-    @JsonProperty("finalHearingLengthType")
-    private String finalHearingLengthType;
+    @JsonProperty("etICFinalHearingType")
+    private List<String> etICFinalHearingType;
+    @JsonProperty("etICFinalHearingLength")
+    private String etICFinalHearingLength;
+    @JsonProperty("etICFinalHearingLengthType")
+    private String etICFinalHearingLengthType;
+    @JsonProperty("etICFinalHearingIsEJSitAlone")
+    private String etICFinalHearingIsEJSitAlone;
+    @JsonProperty("etICFinalHearingIsEJSitAloneReason")
+    private String etICFinalHearingIsEJSitAloneReason;
+    @JsonProperty("etICFinalHearingIsEJSitAloneFurtherDetails")
+    private String etICFinalHearingIsEJSitAloneFurtherDetails;
+    @JsonProperty("etICFinalHearingNotListedAnyOtherDirections")
+    private String etICFinalHearingNotListedAnyOtherDirections;
 
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;

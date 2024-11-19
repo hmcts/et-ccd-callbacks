@@ -78,6 +78,14 @@ public final class InitialConsiderationHelper {
                 .hearingConvertFinal(defaultIfEmpty(caseData.getEtICConvertPreliminaryGiveDetails(), null))
                 .hearingExtend(defaultIfEmpty(caseData.getEtICExtendDurationGiveDetails(), null))
                 .hearingOther(defaultIfEmpty(caseData.getEtICOtherGiveDetails(), null))
+                .hearingWithJudgeOrMembers(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembers).orElse(null))
+                .hearingWithJudgeOrMembersReason(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersReason).orElse(null))
+                .hearingWithJudgeOrMembersFurtherDetails(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
+                        .orElse(null))
+                
                 .otherDirections(defaultIfEmpty(caseData.getEtICHearingAnyOtherDirections(), null))
 
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))

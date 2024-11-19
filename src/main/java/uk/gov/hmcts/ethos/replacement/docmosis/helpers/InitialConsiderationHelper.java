@@ -85,7 +85,6 @@ public final class InitialConsiderationHelper {
                 .hearingWithJudgeOrMembersFurtherDetails(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
                         .orElse(null))
-                
                 .otherDirections(defaultIfEmpty(caseData.getEtICHearingAnyOtherDirections(), null))
 
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
@@ -234,7 +233,13 @@ public final class InitialConsiderationHelper {
                 // New values
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
                 .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
-
+                .hearingWithJudgeOrMembers(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembers).orElse(null))
+                .hearingWithJudgeOrMembersReason(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersReason).orElse(null))
+                .hearingWithJudgeOrMembersFurtherDetails(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
+                        .orElse(null))
                 .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
 

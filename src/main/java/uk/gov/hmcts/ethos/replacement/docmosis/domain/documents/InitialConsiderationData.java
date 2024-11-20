@@ -40,6 +40,12 @@ public class InitialConsiderationData {
     private String hearingConvertF2f;
     @JsonProperty("hearingOther")
     private String hearingOther;
+    @JsonProperty("hearingWithJudgeOrMembers")
+    private String hearingWithJudgeOrMembers;
+    @JsonProperty("hearingWithJudgeOrMembersReason")
+    private List<String> hearingWithJudgeOrMembersReason;
+    @JsonProperty("hearingWithJudgeOrMembersFurtherDetails")
+    private String hearingWithJudgeOrMembersFurtherDetails;
     @JsonProperty("otherDirections")
     private String otherDirections;
 

@@ -155,8 +155,8 @@ class InitialConsiderationHelperTest {
         finalHearingUpdated.setEtICLengthOfFinalHearing("1");
         finalHearingUpdated.setFinalHearingLengthNumType("Hours");
         finalHearingUpdated.setEtICFinalHearingIsEJSitAlone("JSA");
-        finalHearingUpdated.setEtICFinalHearingIsEJSitAloneReason("Members experience is likely to add significant " +
-                "value to the process of adjudication");
+        finalHearingUpdated.setEtICFinalHearingIsEJSitAloneReason("Members experience is likely to add significant "
+                + "value to the process of adjudication");
         return finalHearingUpdated;
     }
 }

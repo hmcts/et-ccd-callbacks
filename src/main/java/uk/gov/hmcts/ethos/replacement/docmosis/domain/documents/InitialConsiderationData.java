@@ -76,8 +76,9 @@ public class InitialConsiderationData {
     private String preliminaryHearingWithMembers;
     @JsonProperty("preliminaryHearingWithMembersReason")
     private String preliminaryHearingWithMembersReason;
-    @JsonProperty("preliminaryHearingNotListedAnyOtherDirections")
-    private String preliminaryHearingNotListedAnyOtherDirections;
+
+    @JsonProperty("hearingNotListedListAnyOtherDirections")
+    private String hearingNotListedListAnyOtherDirections;
 
     @JsonProperty("etICFinalHearingType")
     private List<String> etICFinalHearingType;
@@ -91,8 +92,6 @@ public class InitialConsiderationData {
     private String etICFinalHearingIsEJSitAloneReason;
     @JsonProperty("etICFinalHearingIsEJSitAloneFurtherDetails")
     private String etICFinalHearingIsEJSitAloneFurtherDetails;
-    @JsonProperty("etICFinalHearingNotListedAnyOtherDirections")
-    private String etICFinalHearingNotListedAnyOtherDirections;
 
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;

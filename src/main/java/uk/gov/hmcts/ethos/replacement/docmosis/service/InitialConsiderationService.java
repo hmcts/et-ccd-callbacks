@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,7 +36,25 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOCGEN_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.IC_OUTPUT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTION_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_HEARING_PANEL_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.hearingTypeMappings;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
@@ -47,60 +64,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 public class InitialConsiderationService {
 
     private final TornadoService tornadoService;
-
-    private static final String RESPONDENT_NAME =
-        "| Respondent %s name given | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|In ET1 by claimant | %s|\r\n"
-            + "|In ET3 by respondent | %s|\r\n"
-            + "\r\n";
-
-    private static final String RESPONDENT_HEARING_PANEL_PREFERENCE =
-        "| Respondent %s hearing panel preference | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Preference | %s|\r\n"
-            + "|Reason | %s|\r\n"
-            + "\r\n";
-
-    private static final String HEARING_DETAILS =
-        "|Hearing details | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + DATE_MARKUP
-            + "|Type | %s|\r\n"
-            + "|Duration | %s|";
-
-    private static final String CLAIMANT_HEARING_PANEL_PREFERENCE = """
-            |Claimant's hearing panel preference | |
-            |-------------|:------------|
-            |Panel Preference | %s|
-            |Reason for Panel Preference | %s|
-            """;
-
-    private static final String CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING =
-            String.format(CLAIMANT_HEARING_PANEL_PREFERENCE, "-", "-");
-
-    private static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
-        + "href=\"%s\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
-    private static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint"
-        + ".com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof";
-    private static final String CODES_URL_SCOTLAND = "https://judiciary.sharepoint"
-        + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
-        + "(2019).pdf?csf=1&web=1&e=9bCQ8P";
-    private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
-    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "", "", "");
-    private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
-    private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
-    private static final String LIST_FOR_PRELIMINARY_HEARING = "List for preliminary hearing";
-    private static final String LIST_FOR_FINAL_HEARING = "List for final hearing";
-    private static final String UDL_HEARING = "UDL hearing";
-    private static final String SEEK_COMMENTS = "Seek comments on the video hearing";
-    private static final String HEARING_NOT_LISTED = "Do not list at present (give other directions below)";
-    private static final String TELEPHONE = "Telephone";
-    private static final String VIDEO = "Video";
-    Map<String, String> hearingTypeMappings = Map.of(
-            "Video hearing", "Video",
-            "Final F2F hearings (not Aberdeen)", "F2F"
-    );
 
     /**
      * Creates the respondent detail section for Initial Consideration.

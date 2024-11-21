@@ -38,12 +38,11 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingNotice\":\"Purpose of preliminary hearing\",\"preliminaryHearingLength\":\"1\","
                 + "\"preliminaryHearingLengthType\":\"Hours\",\"preliminaryHearingWithMembers\":\"Yes\","
                 + "\"preliminaryHearingWithMembersReason\":\"reasons for requiring members\","
-                + "\"preliminaryHearingNotListedAnyOtherDirections\":null,"
+                + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":null,\"etICFinalHearingLength\":null,"
                 + "\"etICFinalHearingLengthType\":null,\"etICFinalHearingIsEJSitAlone\":null,"
                 + "\"etICFinalHearingIsEJSitAloneReason\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
-                + "\"etICFinalHearingNotListedAnyOtherDirections\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
                 + "\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,\"udlOther\":null,"
@@ -60,7 +59,6 @@ class InitialConsiderationHelperTest {
                 + "\"icOrderForFurtherInformation\":null,\"icOtherIssuesOrFinalOrders\":null,"
                 + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
 
-        // Assert
         assertEquals(expected, documentRequest);
     }
 
@@ -86,13 +84,12 @@ class InitialConsiderationHelperTest {
                 + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
                 + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
                 + "\"preliminaryHearingWithMembersReason\":null,"
-                + "\"preliminaryHearingNotListedAnyOtherDirections\":null,"
+                + "\"hearingNotListedListAnyOtherDirections\":null,"
                 + "\"etICFinalHearingType\":[\"Video\",\"F2F\"],\"etICFinalHearingLength\":\"1\","
                 + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
                 + "\"etICFinalHearingIsEJSitAloneReason\":\"Members experience is likely to add significant value to "
                 + "the process of adjudication\","
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
-                + "\"etICFinalHearingNotListedAnyOtherDirections\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
                 + "\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,\"udlOther\":null,"
@@ -109,7 +106,6 @@ class InitialConsiderationHelperTest {
                 + "\"icOrderForFurtherInformation\":null,\"icOtherIssuesOrFinalOrders\":null,"
                 + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
 
-        // Assert
         assertEquals(expected, documentRequest);
     }
 

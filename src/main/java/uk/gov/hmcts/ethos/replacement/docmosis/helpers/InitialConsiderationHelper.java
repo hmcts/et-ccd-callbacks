@@ -86,7 +86,8 @@ public final class InitialConsiderationHelper {
                         .orElse(null))
                 .otherDirections(defaultIfEmpty(caseData.getEtICHearingAnyOtherDirections(), null))
 
-                .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
+                .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedListUpdated())
+                        .orElse(null))
                 //cvp
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))

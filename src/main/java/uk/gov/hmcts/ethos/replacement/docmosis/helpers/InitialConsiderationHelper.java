@@ -124,8 +124,6 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearingUpdated())
                                 .map(EtICListForPreliminaryHearingUpdated::getEtICIsPreliminaryHearingWithMembersReason)
                                 .orElse(null))
-                .preliminaryHearingNotListedAnyOtherDirections(
-                        defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
 
                 //final
                 .etICFinalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
@@ -148,8 +146,11 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneFurtherDetails)
                                 .orElse(null))
-                .etICFinalHearingNotListedAnyOtherDirections(
-                        defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
+
+                //do not list
+                // hearingNotListedDoNotListAnyOtherDirections
+                .hearingNotListedListAnyOtherDirections(defaultIfEmpty(
+                        caseData.getEtICHearingNotListedAnyOtherDirections(), null))
 
                 //udl
                 .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())

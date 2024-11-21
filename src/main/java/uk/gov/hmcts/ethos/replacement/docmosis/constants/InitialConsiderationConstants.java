@@ -45,8 +45,8 @@ public class InitialConsiderationConstants {
     public static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint"
             + ".com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof";
     public static final String CODES_URL_SCOTLAND = "https://judiciary.sharepoint"
-            + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
-            + "(2019).pdf?csf=1&web=1&e=9bCQ8P";
+            + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
+            + "/ET%20jurisdiction%20list%20(2019).pdf?csf=1&web=1&e=9bCQ8P";
     public static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     public static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "", "", "");
     public static final String DOC_GEN_ERROR = "Failed to generate document for case id: %s";

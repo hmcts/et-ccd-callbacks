@@ -40,11 +40,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOCGEN_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOC_GEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.IC_OUTPUT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JSA;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTION_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
@@ -54,6 +56,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.WITH_MEMBERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.hearingTypeMappings;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
@@ -224,7 +228,7 @@ public class InitialConsiderationService {
         try {
             return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, IC_OUTPUT_NAME);
         } catch (Exception e) {
-            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+            throw new DocumentManagementException(String.format(DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
         }
     }
 
@@ -262,7 +266,7 @@ public class InitialConsiderationService {
         );
     }
 
-    public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
+    public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData) {
         List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();
         List<String> etICHearingNotListedListUpdated = new ArrayList<>();
         if (etICHearingNotListedList.contains(LIST_FOR_PRELIMINARY_HEARING)) {
@@ -290,6 +294,7 @@ public class InitialConsiderationService {
             EtICListForPreliminaryHearingUpdated updatedPrelimHearing = new EtICListForPreliminaryHearingUpdated();
             List<String> filteredTypes = prelimHearing.getEtICTypeOfPreliminaryHearing().stream()
                     .filter(type -> !TELEPHONE.equals(type))
+                    .map(type -> CVP.equals(type) ? VIDEO : type)
                     .toList();
             updatedPrelimHearing.setEtICTypeOfPreliminaryHearing(filteredTypes);
 
@@ -325,7 +330,7 @@ public class InitialConsiderationService {
 
             updatedFinalHearing.setEtICTypeOfFinalHearing(mappedTypes);
 
-            String ejSitAlone = YES.equals(udlHearing.getEtIcejSitAlone()) ? "JSA" : "With members";
+            String ejSitAlone = YES.equals(udlHearing.getEtIcejSitAlone()) ? JSA : WITH_MEMBERS;
             updatedFinalHearing.setEtICFinalHearingIsEJSitAlone(ejSitAlone);
 
             caseData.setEtICHearingNotListedListForFinalHearingUpdated(updatedFinalHearing);

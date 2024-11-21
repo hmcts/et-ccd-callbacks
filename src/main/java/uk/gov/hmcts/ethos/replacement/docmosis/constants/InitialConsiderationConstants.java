@@ -49,7 +49,7 @@ public class InitialConsiderationConstants {
             + "(2019).pdf?csf=1&web=1&e=9bCQ8P";
     public static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     public static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "", "", "");
-    public static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+    public static final String DOC_GEN_ERROR = "Failed to generate document for case id: %s";
     public static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
     public static final String LIST_FOR_PRELIMINARY_HEARING = "List for preliminary hearing";
     public static final String LIST_FOR_FINAL_HEARING = "List for final hearing";
@@ -59,10 +59,14 @@ public class InitialConsiderationConstants {
     public static final String TELEPHONE = "Telephone";
     public static final String VIDEO = "Video";
     public static final String F2F = "F2F";
+    public static final String CVP = "CVP";
     public static final Map<String, String> hearingTypeMappings = Map.of(
             "Video hearing", VIDEO,
+            "CVP hearing", VIDEO,
             "Final F2F hearings (not Aberdeen)", F2F
     );
+    public static final String JSA = "JSA";
+    public static final String WITH_MEMBERS = "With members";
 
     private InitialConsiderationConstants() {
         // Access through static methods

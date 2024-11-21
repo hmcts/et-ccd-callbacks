@@ -365,7 +365,6 @@ public class InitialConsiderationService {
             String ejSitAlone = YES.equals(udlHearing.getEtIcejSitAlone()) ? "JSA" : "With members";
             updatedFinalHearing.setEtICFinalHearingIsEJSitAlone(ejSitAlone);
 
-            updatedFinalHearing.setEtICFinalHearingIsEJSitAlone(udlHearing.getEtIcejSitAlone());
             caseData.setEtICHearingNotListedListForFinalHearingUpdated(updatedFinalHearing);
         }
     }

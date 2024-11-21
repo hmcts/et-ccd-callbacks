@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -263,7 +262,7 @@ public class InitialConsiderationService {
         );
     }
 
-    public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData) {
+    public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
         List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();
         List<String> etICHearingNotListedListUpdated = new ArrayList<>();
         if (etICHearingNotListedList.contains(LIST_FOR_PRELIMINARY_HEARING)) {

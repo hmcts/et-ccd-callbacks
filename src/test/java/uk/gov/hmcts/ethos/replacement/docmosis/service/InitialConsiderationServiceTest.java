@@ -47,9 +47,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_HEARING_PANEL_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
@@ -60,61 +64,56 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 class InitialConsiderationServiceTest {
     private static final LocalDateTime EARLIEST_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(5);
     private static final LocalDateTime SECOND_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(9);
-    private static final String RESPONDENT_NAME =
-            "| Respondent %s name given | |\r\n"
-                + "|-------------|:------------|\r\n"
-                + "|In ET1 by claimant | %s|\r\n"
-                + "|In ET3 by respondent | %s|\r\n"
-                + "\r\n";
 
-    private static final String EXPECTED_RESPONDENT_NAME =
-        "| Respondent 1 name given | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|In ET1 by claimant | Test Corp|\r\n"
-            + "|In ET3 by respondent | |\r\n"
-                + "\r\n";
+    private static final String EXPECTED_RESPONDENT_NAME = """
+        | Respondent 1 name given | |
+        |-------------|:------------|
+        |In ET1 by claimant | Test Corp|
+        |In ET3 by respondent | |
+        
+        """;
 
-    private static final String EXPECTED_RESPONDENT_NAME_2 =
-        "| Respondent 1 name given | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|In ET1 by claimant | Test Corp|\r\n"
-            + "|In ET3 by respondent | |\r\n"
-            + "\r\n"
-            + "| Respondent 2 name given | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|In ET1 by claimant | Test Name Two|\r\n"
-            + "|In ET3 by respondent | |\r\n"
-            + "\r\n";
+    private static final String EXPECTED_RESPONDENT_NAME_2 = """
+        | Respondent 1 name given | |
+        |-------------|:------------|
+        |In ET1 by claimant | Test Corp|
+        |In ET3 by respondent | |
 
-    private static final String EXPECTED_RESPONDENT_NAME_BLANK =
-        "| Respondent  name given | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|In ET1 by claimant | |\r\n"
-            + "|In ET3 by respondent | |\r\n"
-            + "\r\n";
+        | Respondent 2 name given | |
+        |-------------|:------------|
+        |In ET1 by claimant | Test Name Two|
+        |In ET3 by respondent | |
 
-    private static final String RESPONDENT_HEARING_PANEL_PREFERENCE =
-            "| Respondent %s hearing panel preference | |\r\n"
-                    + "|-------------|:------------|\r\n"
-                    + "|Preference | %s|\r\n"
-                    + "|Reason | %s|\r\n"
-                    + "\r\n";
+        """;
+
+    private static final String EXPECTED_RESPONDENT_NAME_BLANK = """
+        | Respondent  name given | |
+        |-------------|:------------|
+        |In ET1 by claimant | |
+        |In ET3 by respondent | |
+
+        """;
 
     private static final String EXPECTED_HEARING_STRING =
-        "|Hearing details | |\r\n"
-            + "|-------------|:------------|\r\n"
+        "|Hearing details | |\n"
+            + "|-------------|:------------|\n"
             + "|Date | "
             + EARLIEST_FUTURE_HEARING_DATE.toString("dd MMM yyyy")
             + "|\r\n"
-            + "|Type | Hearing|\r\n"
-            + "|Duration | 3.5 Hours|";
+            + "|Type | Hearing|\n"
+            + "|Duration | 3.5 Hours|"
+            + "\n\n";
 
-    private static final String EXPECTED_HEARING_BLANK =
-        "|Hearing details | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Date | -|\r\n"
-            + "|Type | -|\r\n"
-            + "|Duration | -|";
+    private static final String S1 = """
+            |Hearing details | |
+            |-------------|:------------|
+            |Date | 26 Nov 2024|
+            |Type | Hearing|
+            |Duration | 3.5 Hours|
+            
+            """;
+
+    private static final String EXPECTED_HEARING_BLANK = String.format(HEARING_DETAILS, "-", "-", "-");
 
     private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a "
         + "target=\"_blank\" href=\"https://judiciary.sharepoint"
@@ -501,11 +500,7 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setIsHearingAlreadyListed_shouldBeSetToNo_whenNoHearings() {
-        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Date | -|\r\n"
-            + "|Type | -|\r\n"
-            + "|Duration | -|");
+        caseData.setEtInitialConsiderationHearing(HEARING_MISSING);
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
         assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(NO);
@@ -628,7 +623,7 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void mapOldIcHearingNotListedOptionsToNew_preliminaryHearing() {
+    void mapOldIcHearingNotListedOptionsToNew_preliminaryHearing_EW() {
         CaseData caseData1 = new CaseData();
         caseData1.setEtICHearingNotListedList(List.of(LIST_FOR_PRELIMINARY_HEARING));
         EtICListForPreliminaryHearing preliminaryHearing = new EtICListForPreliminaryHearing();
@@ -638,7 +633,7 @@ class InitialConsiderationServiceTest {
         preliminaryHearing.setEtICLengthOfPrelimHearing("1");
         preliminaryHearing.setPrelimHearingLengthNumType("Hours");
         caseData1.setEtICHearingNotListedListForPrelimHearing(preliminaryHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForPrelimHearingUpdated()).isNotNull();
         EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated =
@@ -656,7 +651,7 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void mapOldIcHearingNotListedOptionsToNew_FinalHearing() {
+    void mapOldIcHearingNotListedOptionsToNew_FinalHearing_EW() {
         CaseData caseData1 = new CaseData();
         caseData1.setEtICHearingNotListedList(List.of(LIST_FOR_FINAL_HEARING));
         EtICListForFinalHearing finalHearing = new EtICListForFinalHearing();
@@ -664,7 +659,7 @@ class InitialConsiderationServiceTest {
         finalHearing.setEtICLengthOfFinalHearing("1");
         finalHearing.setFinalHearingLengthNumType("Hours");
         caseData1.setEtICHearingNotListedListForFinalHearing(finalHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
         EtICListForFinalHearingUpdated finalHearingUpdated =
@@ -678,14 +673,14 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void mapOldIcHearingNotListedOptionsToNew_UdlHearing() {
+    void mapOldIcHearingNotListedOptionsToNew_UdlHearing_EW() {
         CaseData caseData1 = new CaseData();
         caseData1.setEtICHearingNotListedList(List.of(UDL_HEARING));
         EtIcudlHearing udlHearing = new EtIcudlHearing();
         udlHearing.setEtIcudlHearFormat("Video hearing");
         udlHearing.setEtIcejSitAlone(YES);
         caseData1.setEtICHearingNotListedUDLHearing(udlHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
         EtICListForFinalHearingUpdated finalHearingUpdated =
@@ -696,16 +691,16 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void mapOldIcHearingNotListedOptionsToNew_seekComments() {
+    void mapOldIcHearingNotListedOptionsToNew_seekComments_EW() {
         CaseData caseData1 = new CaseData();
         caseData1.setEtICHearingNotListedList(List.of(SEEK_COMMENTS));
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListUpdated()).isEqualTo(List.of(HEARING_NOT_LISTED));
     }
 
     @Test
-    void clearIcHearingNotListedOldValues_shouldClearAllFields() {
+    void clearIcHearingNotListedOldValues_shouldClearAllFields_EW() {
         CaseData caseData1 = new CaseData();
         caseData1.setEtICHearingNotListedList(List.of("Some value"));
         caseData1.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());

@@ -10,6 +10,7 @@ public class InitialConsiderationConstants {
         |-------------|:------------|
         |In ET1 by claimant | %s|
         |In ET3 by respondent | %s|
+        
         """;
 
     public static final String RESPONDENT_HEARING_PANEL_PREFERENCE = """
@@ -17,6 +18,7 @@ public class InitialConsiderationConstants {
         |-------------|:------------|
         |Preference | %s|
         |Reason | %s|
+        
         """;
 
     public static final String HEARING_DETAILS = """
@@ -25,6 +27,7 @@ public class InitialConsiderationConstants {
         """ + DATE_MARKUP + """
         |Type | %s|
         |Duration | %s|
+        
         """;
 
     public static final String CLAIMANT_HEARING_PANEL_PREFERENCE = """

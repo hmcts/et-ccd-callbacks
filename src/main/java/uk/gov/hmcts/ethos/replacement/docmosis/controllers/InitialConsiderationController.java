@@ -154,7 +154,7 @@ public class InitialConsiderationController {
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData);
+            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }
 
         return getCallbackRespEntityNoErrors(caseData);

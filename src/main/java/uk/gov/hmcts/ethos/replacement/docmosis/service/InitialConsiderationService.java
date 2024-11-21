@@ -96,11 +96,11 @@ public class InitialConsiderationService {
     private static final String SEEK_COMMENTS = "Seek comments on the video hearing";
     private static final String HEARING_NOT_LISTED = "Do not list at present (give other directions below)";
     private static final String TELEPHONE = "Telephone";
+    private static final String VIDEO = "Video";
     Map<String, String> hearingTypeMappings = Map.of(
             "Video hearing", "Video",
             "Final F2F hearings (not Aberdeen)", "F2F"
     );
-
 
     /**
      * Creates the respondent detail section for Initial Consideration.

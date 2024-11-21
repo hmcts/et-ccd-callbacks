@@ -10,7 +10,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
 import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
@@ -41,6 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.VIDEO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -124,7 +127,12 @@ class InitialConsiderationServiceTest {
         + "based on association or perception on grounds of age<br><br><strong>SXD</strong> - "
         + "Discrimination, including indirect discrimination, discrimination based on association or perception, "
         + "or harassment on grounds of sex, marriage and civil partnership<br><br><hr>";
-    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, 1, "", "", "");
+    private static final String LIST_FOR_PRELIMINARY_HEARING = "List for preliminary hearing";
+    private static final String LIST_FOR_FINAL_HEARING = "List for final hearing";
+    private static final String UDL_HEARING = "UDL hearing";
+    private static final String SEEK_COMMENTS = "Seek comments on the video hearing";
+    private static final String HEARING_NOT_LISTED = "Do not list at present (give other directions below)";
+    private static final String TELEPHONE = "Telephone";
 
     private CaseData caseDataEmpty;
     private CaseData caseData;
@@ -617,5 +625,100 @@ class InitialConsiderationServiceTest {
             |Reason for Panel Preference | -|
             """;
         assertEquals(expected, result);
+    }
+
+    @Test
+    void mapOldIcHearingNotListedOptionsToNew_preliminaryHearing() {
+        CaseData caseData1 = new CaseData();
+        caseData1.setEtICHearingNotListedList(List.of(LIST_FOR_PRELIMINARY_HEARING));
+        EtICListForPreliminaryHearing preliminaryHearing = new EtICListForPreliminaryHearing();
+        preliminaryHearing.setEtICTypeOfPreliminaryHearing(List.of(VIDEO));
+        preliminaryHearing.setEtICPurposeOfPreliminaryHearing(List.of("Test purpose"));
+        preliminaryHearing.setEtICGiveDetailsOfHearingNotice("Case management");
+        preliminaryHearing.setEtICLengthOfPrelimHearing("1");
+        preliminaryHearing.setPrelimHearingLengthNumType("Hours");
+        caseData1.setEtICHearingNotListedListForPrelimHearing(preliminaryHearing);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+
+        assertThat(caseData1.getEtICHearingNotListedListForPrelimHearingUpdated()).isNotNull();
+        EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated =
+                caseData1.getEtICHearingNotListedListForPrelimHearingUpdated();
+        assertEquals(preliminaryHearing.getEtICTypeOfPreliminaryHearing(),
+                preliminaryHearingUpdated.getEtICTypeOfPreliminaryHearing());
+        assertEquals(preliminaryHearing.getEtICPurposeOfPreliminaryHearing(),
+                preliminaryHearingUpdated.getEtICPurposeOfPreliminaryHearing());
+        assertEquals(preliminaryHearing.getEtICGiveDetailsOfHearingNotice(),
+                preliminaryHearingUpdated.getEtICGiveDetailsOfHearingNotice());
+        assertEquals(preliminaryHearing.getEtICLengthOfPrelimHearing(),
+                preliminaryHearingUpdated.getEtICLengthOfPrelimHearing());
+        assertEquals(preliminaryHearing.getPrelimHearingLengthNumType(),
+                preliminaryHearingUpdated.getPrelimHearingLengthNumType());
+    }
+
+    @Test
+    void mapOldIcHearingNotListedOptionsToNew_FinalHearing() {
+        CaseData caseData1 = new CaseData();
+        caseData1.setEtICHearingNotListedList(List.of(LIST_FOR_FINAL_HEARING));
+        EtICListForFinalHearing finalHearing = new EtICListForFinalHearing();
+        finalHearing.setEtICTypeOfFinalHearing(List.of(VIDEO, TELEPHONE));
+        finalHearing.setEtICLengthOfFinalHearing("1");
+        finalHearing.setFinalHearingLengthNumType("Hours");
+        caseData1.setEtICHearingNotListedListForFinalHearing(finalHearing);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+
+        assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
+        EtICListForFinalHearingUpdated finalHearingUpdated =
+                caseData1.getEtICHearingNotListedListForFinalHearingUpdated();
+        assertEquals(List.of(VIDEO),
+                finalHearingUpdated.getEtICTypeOfFinalHearing());
+        assertEquals(finalHearing.getEtICLengthOfFinalHearing(),
+                finalHearingUpdated.getEtICLengthOfFinalHearing());
+        assertEquals(finalHearing.getFinalHearingLengthNumType(),
+                finalHearingUpdated.getFinalHearingLengthNumType());
+    }
+
+    @Test
+    void mapOldIcHearingNotListedOptionsToNew_UdlHearing() {
+        CaseData caseData1 = new CaseData();
+        caseData1.setEtICHearingNotListedList(List.of(UDL_HEARING));
+        EtIcudlHearing udlHearing = new EtIcudlHearing();
+        udlHearing.setEtIcudlHearFormat("Video hearing");
+        udlHearing.setEtIcejSitAlone(YES);
+        caseData1.setEtICHearingNotListedUDLHearing(udlHearing);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+
+        assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
+        EtICListForFinalHearingUpdated finalHearingUpdated =
+                caseData1.getEtICHearingNotListedListForFinalHearingUpdated();
+        assertEquals(List.of(VIDEO),
+                finalHearingUpdated.getEtICTypeOfFinalHearing());
+        assertEquals("JSA", finalHearingUpdated.getEtICFinalHearingIsEJSitAlone());
+    }
+
+    @Test
+    void mapOldIcHearingNotListedOptionsToNew_seekComments() {
+        CaseData caseData1 = new CaseData();
+        caseData1.setEtICHearingNotListedList(List.of(SEEK_COMMENTS));
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+
+        assertThat(caseData1.getEtICHearingNotListedListUpdated()).isEqualTo(List.of(HEARING_NOT_LISTED));
+    }
+
+    @Test
+    void clearIcHearingNotListedOldValues_shouldClearAllFields() {
+        CaseData caseData1 = new CaseData();
+        caseData1.setEtICHearingNotListedList(List.of("Some value"));
+        caseData1.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
+        caseData1.setEtICHearingNotListedListForFinalHearing(new EtICListForFinalHearing());
+        caseData1.setEtICHearingNotListedUDLHearing(new EtIcudlHearing());
+        caseData1.setEtICHearingNotListedAnyOtherDirections("Some directions");
+
+        initialConsiderationService.clearIcHearingNotListedOldValues(caseData1);
+
+        assertThat(caseData1.getEtICHearingNotListedList()).isNull();
+        assertThat(caseData1.getEtICHearingNotListedListForPrelimHearing()).isNull();
+        assertThat(caseData1.getEtICHearingNotListedListForFinalHearing()).isNull();
+        assertThat(caseData1.getEtICHearingNotListedUDLHearing()).isNull();
+        assertThat(caseData1.getEtICHearingNotListedAnyOtherDirections()).isNull();
     }
 }

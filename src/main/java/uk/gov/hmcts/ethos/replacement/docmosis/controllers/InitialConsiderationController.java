@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,6 +110,11 @@ public class InitialConsiderationController {
         if (featureToggleService.isHmcEnabled()) {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
+
+        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
+            initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
+        }
+
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -146,6 +152,10 @@ public class InitialConsiderationController {
                 initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
+
+        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
+            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

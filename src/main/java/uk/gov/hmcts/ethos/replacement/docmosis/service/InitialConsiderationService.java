@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
+import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -19,10 +24,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -82,6 +90,17 @@ public class InitialConsiderationService {
     private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "", "", "");
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
+    private static final String LIST_FOR_PRELIMINARY_HEARING = "List for preliminary hearing";
+    private static final String LIST_FOR_FINAL_HEARING = "List for final hearing";
+    private static final String UDL_HEARING = "UDL hearing";
+    private static final String SEEK_COMMENTS = "Seek comments on the video hearing";
+    private static final String HEARING_NOT_LISTED = "Do not list at present (give other directions below)";
+    private static final String TELEPHONE = "Telephone";
+    private static final String VIDEO = "Video";
+    Map<String, String> hearingTypeMappings = Map.of(
+            "Video hearing", "Video",
+            "Final F2F hearings (not Aberdeen)", "F2F"
+    );
 
     /**
      * Creates the respondent detail section for Initial Consideration.
@@ -278,6 +297,84 @@ public class InitialConsiderationService {
         caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
             ? NO : YES
         );
+    }
+
+    public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData) {
+        List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();
+        List<String> etICHearingNotListedListUpdated = new ArrayList<>();
+        if (etICHearingNotListedList.contains(LIST_FOR_PRELIMINARY_HEARING)) {
+            etICHearingNotListedListUpdated.add(LIST_FOR_PRELIMINARY_HEARING);
+            mapPreliminaryHearingToPreliminaryHearing(caseData);
+        }
+        if (etICHearingNotListedList.contains(LIST_FOR_FINAL_HEARING)) {
+            etICHearingNotListedListUpdated.add(LIST_FOR_FINAL_HEARING);
+            mapFinalHearingToFinalHearing(caseData);
+        }
+        if (etICHearingNotListedList.contains(UDL_HEARING)) {
+            etICHearingNotListedListUpdated.add(LIST_FOR_FINAL_HEARING);
+            mapUdlHearingToFinalHearing(caseData);
+        }
+        if (etICHearingNotListedList.contains(SEEK_COMMENTS)) {
+            etICHearingNotListedListUpdated.add(HEARING_NOT_LISTED);
+        }
+
+        caseData.setEtICHearingNotListedListUpdated(etICHearingNotListedListUpdated);
+    }
+
+    private void mapPreliminaryHearingToPreliminaryHearing(CaseData caseData) {
+        EtICListForPreliminaryHearing prelimHearing = caseData.getEtICHearingNotListedListForPrelimHearing();
+        if (prelimHearing != null) {
+            EtICListForPreliminaryHearingUpdated updatedPrelimHearing = new EtICListForPreliminaryHearingUpdated();
+            List<String> filteredTypes = prelimHearing.getEtICTypeOfPreliminaryHearing().stream()
+                    .filter(type -> !TELEPHONE.equals(type))
+                    .toList();
+            updatedPrelimHearing.setEtICTypeOfPreliminaryHearing(filteredTypes);
+
+            updatedPrelimHearing.setEtICPurposeOfPreliminaryHearing(prelimHearing.getEtICPurposeOfPreliminaryHearing());
+            updatedPrelimHearing.setEtICGiveDetailsOfHearingNotice(prelimHearing.getEtICGiveDetailsOfHearingNotice());
+            updatedPrelimHearing.setEtICLengthOfPrelimHearing(prelimHearing.getEtICLengthOfPrelimHearing());
+            updatedPrelimHearing.setPrelimHearingLengthNumType(prelimHearing.getPrelimHearingLengthNumType());
+            caseData.setEtICHearingNotListedListForPrelimHearingUpdated(updatedPrelimHearing);
+        }
+    }
+
+    private void mapFinalHearingToFinalHearing(CaseData caseData) {
+        EtICListForFinalHearing finalHearing = caseData.getEtICHearingNotListedListForFinalHearing();
+        if (finalHearing != null) {
+            EtICListForFinalHearingUpdated updatedFinalHearing = new EtICListForFinalHearingUpdated();
+            List<String> filteredTypes = finalHearing.getEtICTypeOfFinalHearing().stream()
+                    .filter(type -> !TELEPHONE.equals(type))
+                    .toList();
+            updatedFinalHearing.setEtICTypeOfFinalHearing(filteredTypes);
+            updatedFinalHearing.setEtICLengthOfFinalHearing(finalHearing.getEtICLengthOfFinalHearing());
+            updatedFinalHearing.setFinalHearingLengthNumType(finalHearing.getFinalHearingLengthNumType());
+            caseData.setEtICHearingNotListedListForFinalHearingUpdated(updatedFinalHearing);
+        }
+    }
+
+    private void mapUdlHearingToFinalHearing(CaseData caseData) {
+        EtIcudlHearing udlHearing = caseData.getEtICHearingNotListedUDLHearing();
+        if (udlHearing != null) {
+            EtICListForFinalHearingUpdated updatedFinalHearing = new EtICListForFinalHearingUpdated();
+            List<String> mappedTypes = Stream.of(udlHearing.getEtIcudlHearFormat())
+                    .map(type -> hearingTypeMappings.getOrDefault(type, type))
+                    .toList();
+
+            updatedFinalHearing.setEtICTypeOfFinalHearing(mappedTypes);
+
+            String ejSitAlone = YES.equals(udlHearing.getEtIcejSitAlone()) ? "JSA" : "With members";
+            updatedFinalHearing.setEtICFinalHearingIsEJSitAlone(ejSitAlone);
+
+            caseData.setEtICHearingNotListedListForFinalHearingUpdated(updatedFinalHearing);
+        }
+    }
+
+    public void clearIcHearingNotListedOldValues(CaseData caseData) {
+        caseData.setEtICHearingNotListedList(null);
+        caseData.setEtICHearingNotListedListForPrelimHearing(null);
+        caseData.setEtICHearingNotListedListForFinalHearing(null);
+        caseData.setEtICHearingNotListedUDLHearing(null);
+        caseData.setEtICHearingNotListedAnyOtherDirections(null);
     }
 
     private void removeEtIcCanProceedYesValue(CaseData caseData) {

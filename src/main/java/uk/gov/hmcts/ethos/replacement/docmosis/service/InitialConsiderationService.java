@@ -334,7 +334,6 @@ public class InitialConsiderationService {
             } else {
                 updatedFinalHearing.setEtICFinalHearingIsEJSitAlone(udlHearing.getEtIcejSitAlone());
             }
-
             caseData.setEtICHearingNotListedListForFinalHearingUpdated(updatedFinalHearing);
         }
     }
